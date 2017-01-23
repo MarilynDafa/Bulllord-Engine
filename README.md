@@ -2,6 +2,14 @@
 Bulllord Engine(牛魔王引擎) is an Ansi C99 style Cross-platform, Game Engine
 Currently only support 2D function，easily bind other languages eg. lua, c#, javascript...
 
+Feature lists:
+
+ * Lightweight
+ * Lightspeed
+ * Ansi C99 standard
+ * Easily bind with all languages
+ * Opengl like API
+ 
 Supported rendering backends:
 
  * Direct3D 12 (In Development)
