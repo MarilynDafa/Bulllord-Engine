@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "container:"
+      name = "test">
+      <FileRef
+         location = "group:ghgh/ghgh.xcodeproj">
+      </FileRef>
+   </Group>
+   <Group
+      location = "container:"
+      name = "IOS">
+      <FileRef
+         location = "group:bulllord-ios.xcodeproj">
+      </FileRef>
+   </Group>
+   <Group
+      location = "container:"
+      name = "OSX">
+      <FileRef
+         location = "group:bulllord-osx.xcodeproj">
+      </FileRef>
+   </Group>
+</Workspace>
