@@ -34,6 +34,11 @@ Supported compilers:
  * GCC 4.6 and above
  * VS2015 and above
  
+Future work:
+
+ * Finish all 2d relevant functions
+ * Add 3d function
+ 
 Licenses:
  
  Bulllord Game Engine
