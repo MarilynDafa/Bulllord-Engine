@@ -267,7 +267,6 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx)
 #endif
     return _ret;
 }
-
 static BLBool
 _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 {
@@ -1073,10 +1072,8 @@ _AudioInit()
 	mpaudec_open();
 }
 BLVoid
-_AudioStep(BLF32 _Delta)
+_AudioStep(BLU32 _Delta)
 {
-	if (_Delta <= 0.f)
-		return;
 	blMutexLock(_PrAudioMem->pSounds->pMutex);
 	FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
 	{

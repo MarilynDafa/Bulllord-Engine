@@ -196,7 +196,7 @@ _UtilsInit()
     _PrUtilsMem->nUriCount = 0;
 }
 BLVoid
-_UtilsStep(BLF32 _Delta)
+_UtilsStep(BLU32 _Delta)
 {
 }
 BLVoid
@@ -263,7 +263,7 @@ blGuidAsPointer(BLGuid _ID)
 {
 	BLU32 _inptr = PTRPART_INTERNAL(_ID);
 	if (_inptr >= MEMCACHE_CAP_INTERNAL)
-		return NULL;
+        return NULL;
 	else
 		return _PrUtilsMem->aPtrBuf[_inptr];
 }

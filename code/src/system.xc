@@ -22,12 +22,9 @@
 #include "../headers/audio.h"
 #include "../headers/utils.h"
 #include "../headers/streamio.h"
+#include "../headers/gpu.h"
 #include "internal/internal.h"
 #include "internal/dictionary.h"
-#include "../externals/mpeg2/a52.h"
-#include "../externals/mpeg2/mpeg2.h"
-#include "../externals/mpeg2/video_out.h"
-#include "../externals/mpeg2/audio_out.h"
 #if defined BL_PLATFORM_WIN32
 #	pragma comment(lib, "ws2_32.lib")
 #	pragma comment(lib, "opengl32.lib")
@@ -57,26 +54,26 @@
 extern "C" {
 #endif
 	extern BLVoid _StreamIOInit(BLVoid*);
-	extern BLVoid _StreamIOStep(BLF32);
+	extern BLVoid _StreamIOStep(BLU32);
     extern BLVoid _StreamIODestroy();
     extern BLVoid _NetworkInit();
-    extern BLVoid _NetworkStep(BLF32);
+    extern BLVoid _NetworkStep(BLU32);
 	extern BLVoid _NetworkDestroy();
 	extern BLVoid _UtilsInit();
-	extern BLVoid _UtilsStep(BLF32);
+	extern BLVoid _UtilsStep(BLU32);
 	extern BLVoid _UtilsDestroy();
     extern BLVoid _SpriteInit();
-    extern BLVoid _SpriteStep(BLF32);
+    extern BLVoid _SpriteStep(BLU32, BLBool);
     extern BLVoid _SpriteDestroy();
 	extern BLVoid _UIInit();
-	extern BLVoid _UIStep(BLF32, BLBool);
+	extern BLVoid _UIStep(BLU32, BLBool);
 	extern BLVoid _UIDestroy();
 	extern BLBool _UseCustomCursor();
 #ifdef __cplusplus
 }
 #endif
 extern BLVoid _AudioInit();
-extern BLVoid _AudioStep(BLF32);
+extern BLVoid _AudioStep(BLU32);
 extern BLVoid _AudioDestroy();
 extern BLVoid _SystemInit();
 extern BLVoid _SystemStep();
@@ -150,17 +147,8 @@ typedef struct _Event {
 typedef struct _Timer {
 	BLS32 nId;
 	BLF32 fElapse;
-	BLF32 fLastTime;
+	BLU32 nLastTime;
 }_BLTimer;
-typedef struct _VideoSection {
-	BLGuid nVideoStream;
-	mpeg2dec_t* pVideoDec;
-	mpeg2_info_t* pVideoInfo;
-	vo_instance_t* pVOInst;
-	ao_instance_t* pAOInst;
-	a52_state_t * pAudioDec;
-	BLU8* pTmpBuffer;
-}_BLVideoSection;
 typedef struct _SystemMember {
 	_BLBoostParam sBoostParam;
 	const BLVoid(*pSubscriber[BL_ET_COUNT][128])(BLEnum, BLU32, BLS32, BLVoid*);
@@ -173,10 +161,9 @@ typedef struct _SystemMember {
 	BLAnsi aContentDir[260];
 	BLAnsi aUserDir[260];
 	BLU8 aClipboard[1024];
-	_BLVideoSection sVideoSec;
 	BLU32 nEventsSz;
 	BLU32 nEventIdx;
-	BLF32 fSysTime;
+	BLU32 nSysTime;
 	BLS32 nOrientation;
 #if defined(BL_PLATFORM_WIN32)
 	HWND nHwnd;
@@ -3094,25 +3081,18 @@ _PollEvent()
 BLVoid
 _SystemInit()
 {
-	_PrSystemMem->fSysTime = blSystemSecTime();
-#if defined(_DEBUG)
-#	if defined(BL_PLATFORM_WIN32)
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#	elif defined(BL_PLATFORM_LINUX)
-    mtrace();
-#	endif
-#endif
-	_UtilsInit();
+	_PrSystemMem->nSysTime = blSystemTicks();
+    _ShowWindow();
+    _UtilsInit();
     _AudioInit();
-	_NetworkInit();
-	_UIInit();
+    _NetworkInit();
+    _UIInit();
     _SpriteInit();
 #ifdef BL_PLATFORM_ANDROID
-	_StreamIOInit(_PrSystemMem->pActivity->assetManager);
+    _StreamIOInit(_PrSystemMem->pActivity->assetManager);
 #else
-	_StreamIOInit(NULL);
+    _StreamIOInit(NULL);
 #endif
-    _ShowWindow();
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
 	_GbSystemRunning = TRUE;
 	_PrSystemMem->pBeginFunc();
@@ -3121,39 +3101,23 @@ _SystemInit()
 BLVoid
 _SystemStep()
 {
-    BLF32 _delta = blSystemSecTime() - _PrSystemMem->fSysTime;
-	_PrSystemMem->fSysTime = blSystemSecTime();
+    blClearFrameBuffer(INVALID_GUID, TRUE, TRUE, FALSE);
+    BLU32 _now = blSystemTicks();
+    BLU32 _delta = _now - _PrSystemMem->nSysTime;
+    _PrSystemMem->nSysTime = _now;
 	for (BLU32 _idx = 0 ; _idx < 8; ++_idx)
 	{
 		if (_PrSystemMem->aTimers[_idx].nId != -1)
 		{
-			if (_PrSystemMem->fSysTime - _PrSystemMem->aTimers[_idx].fLastTime >= _PrSystemMem->aTimers[_idx].fElapse)
+			if (_PrSystemMem->nSysTime - _PrSystemMem->aTimers[_idx].nLastTime >= (BLU32)_PrSystemMem->aTimers[_idx].fElapse * 1000)
 			{
 				blInvokeEvent(BL_ET_SYSTEM, BL_SE_TIMER, _PrSystemMem->aTimers[_idx].nId, NULL);
-				_PrSystemMem->aTimers[_idx].fLastTime = _PrSystemMem->fSysTime;
+				_PrSystemMem->aTimers[_idx].nLastTime = _PrSystemMem->nSysTime;
 			}
 		}
 	}
 	if (_GbVideoPlaying && _GbSystemRunning == TRUE)
 	{
-		BLU32 _read = blStreamRead(_PrSystemMem->sVideoSec.nVideoStream, 4096, _PrSystemMem->sVideoSec.pTmpBuffer);
-		BLU8* _end = _PrSystemMem->sVideoSec.pTmpBuffer + _read;
-		if (demux(_PrSystemMem->sVideoSec.pTmpBuffer, _end, 0, &_PrSystemMem->sVideoSec.pVideoDec, &_PrSystemMem->sVideoSec.pVideoInfo, _PrSystemMem->sVideoSec.pVOInst, &_PrSystemMem->sVideoSec.pAudioDec, _PrSystemMem->sVideoSec.pAOInst) || !_read)
-		{
-			mpeg2_close(_PrSystemMem->sVideoSec.pVideoDec);
-			a52_free(_PrSystemMem->sVideoSec.pAudioDec);
-			if (_PrSystemMem->sVideoSec.pVOInst->close)
-				_PrSystemMem->sVideoSec.pVOInst->close(_PrSystemMem->sVideoSec.pVOInst);
-			if (_PrSystemMem->sVideoSec.pAOInst->close)
-				_PrSystemMem->sVideoSec.pAOInst->close(_PrSystemMem->sVideoSec.pAOInst);
-			free(_PrSystemMem->sVideoSec.pTmpBuffer);
-			blDeleteStream(_PrSystemMem->sVideoSec.nVideoStream);
-			blInvokeEvent(BL_ET_SYSTEM, BL_SE_VIDEOOVER, 0, NULL);
-            _GbVideoPlaying = FALSE;
-#if defined(BL_PLATFORM_OSX)
-                _GpuSwapBuffer(3);
-#endif
-		}
         _PollMsg();
 		_PollEvent();
         _PrSystemMem->pStepFunc(_delta);
@@ -3168,8 +3132,9 @@ _SystemStep()
 		_AudioStep(_delta);
 		_NetworkStep(_delta);
 		_UIStep(_delta, TRUE);
-        _SpriteStep(_delta);
+        _SpriteStep(_delta, FALSE);
 		_UIStep(_delta, FALSE);
+        _SpriteStep(_delta, TRUE);
 		_StreamIOStep(_delta);
         _PrSystemMem->pStepFunc(_delta);
 		if (_GbSystemRunning == 1)
@@ -3179,32 +3144,21 @@ _SystemStep()
 BLVoid
 _SystemDestroy()
 {
-	if (_PrSystemMem->pEvents)
-		free(_PrSystemMem->pEvents);
 	if (_GbVideoPlaying)
 	{
-		mpeg2_close(_PrSystemMem->sVideoSec.pVideoDec);
-		a52_free(_PrSystemMem->sVideoSec.pAudioDec);
-		if (_PrSystemMem->sVideoSec.pVOInst->close)
-			_PrSystemMem->sVideoSec.pVOInst->close(_PrSystemMem->sVideoSec.pVOInst);
-		if (_PrSystemMem->sVideoSec.pAOInst->close)
-			_PrSystemMem->sVideoSec.pAOInst->close(_PrSystemMem->sVideoSec.pAOInst);
-		free(_PrSystemMem->sVideoSec.pTmpBuffer);
-		blDeleteStream(_PrSystemMem->sVideoSec.nVideoStream);
 		blInvokeEvent(BL_ET_SYSTEM, BL_SE_VIDEOOVER, 0, NULL);
 		_GbVideoPlaying = FALSE;
 	}
 	_PrSystemMem->pEndFunc();
-	_CloseWindow();
 	_StreamIODestroy();
     _SpriteDestroy();
 	_UIDestroy();
     _NetworkDestroy();
     _AudioDestroy();
-	_UtilsDestroy();
-#if defined(_DEBUG) && defined(BL_PLATFORM_LINUX)
-    muntrace();
-#endif
+    _UtilsDestroy();
+    _CloseWindow();
+    if (_PrSystemMem->pEvents)
+        free(_PrSystemMem->pEvents);
 #if defined(BL_PLATFORM_UWP)
 	delete _PrSystemMem;
 	_PrSystemMem = NULL;
@@ -3214,8 +3168,27 @@ _SystemDestroy()
 	_PrSystemMem = NULL;
 #endif
 }
-BLF32
-blSystemSecTime()
+BLEnum
+blPlatformIdentity()
+{
+#if defined(BL_PLATFORM_WIN32)
+    return BL_PLATFORM_WIN32;
+#elif defined(BL_PLATFORM_UWP)
+    return BL_PLATFORM_UWP;
+#elif defined(BL_PLATFORM_LINUX)
+    return BL_PLATFORM_LINUX;
+#elif defined(BL_PLATFORM_ANDROID)
+    return BL_PLATFORM_ANDROID;
+#elif defined(BL_PLATFORM_OSX)
+    return BL_PLATFORM_OSX;
+#elif defined(BL_PLATFORM_IOS)
+    return BL_PLATFORM_IOS;
+#else
+    return -1;
+#endif
+}
+BLU32
+blSystemTicks()
 {
 #if defined(BL_PLATFORM_WIN32)
     LARGE_INTEGER _litime, _lifreq;
@@ -3239,15 +3212,14 @@ blSystemSecTime()
     struct timeval _val;
     gettimeofday(&_val, NULL);
     return _val.tv_sec + _val.tv_usec / 1000000.0f;
-#elif defined(BL_PLATFORM_OSX)
-    struct timeval _val;
-    gettimeofday(&_val, NULL);
-    return _val.tv_sec + _val.tv_usec / 1000000.0f;
-#elif defined(BL_PLATFORM_IOS)
-    struct timeval _val;
-    gettimeofday(&_val, NULL);
-    return _val.tv_sec + _val.tv_usec / 1000000.0f;
+#elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
+    static mach_timebase_info_data_t _frequency = { 0 , 0 };
+    if (_frequency.denom == 0)
+        mach_timebase_info(&_frequency);
+    BLU64 _now = mach_absolute_time();
+    return (BLU32)((((_now) * _frequency.numer) / _frequency.denom) / 1000000);
 #endif
+    return 0;
 }
 const BLAnsi*
 blUserFolderDir()
@@ -3974,93 +3946,6 @@ blGetPluginProcAddress(IN BLAnsi* _Function)
 BLBool
 blVideoOperation(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _Play)
 {
-	if (_Play)
-	{
-		if (_Archive)
-			_PrSystemMem->sVideoSec.nVideoStream = blGenStream(_Filename, _Archive);
-		else
-		{
-			BLU32 _idx;
-			BLAnsi _tmpname[260];
-			BLAnsi _path[260] = { 0 };
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-			strcpy_s(_tmpname, 260, (const BLAnsi*)_Filename);
-			strcpy_s(_path, 260, blWorkingDir(TRUE));
-			strcat_s(_path, 260, _tmpname);
-#else
-			strcpy(_tmpname, (const BLAnsi*)_Filename);
-			strcpy(_path, blWorkingDir(TRUE));
-			strcat(_path, _tmpname);
-#endif
-			for (_idx = 0; _idx < strlen(_path); ++_idx)
-			{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-				if (_path[_idx] == '/')
-					_path[_idx] = '\\';
-#else
-				if (_path[_idx] == '\\')
-					_path[_idx] = '/';
-#endif
-			}
-			_PrSystemMem->sVideoSec.nVideoStream = blGenStream(_path, NULL);
-			if (INVALID_GUID == _PrSystemMem->sVideoSec.nVideoStream)
-			{
-				memset(_path, 0, sizeof(_path));
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-				strcpy_s(_path, 260, blUserFolderDir());
-				strcat_s(_path, 260, _tmpname);
-#else
-				strcpy(_path, blUserFolderDir());
-				strcat(_path, _tmpname);
-#endif
-				for (_idx = 0; _idx < strlen(_path); ++_idx)
-				{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-					if (_path[_idx] == '/')
-						_path[_idx] = '\\';
-#else
-					if (_path[_idx] == '\\')
-						_path[_idx] = '/';
-#endif
-				}
-				_PrSystemMem->sVideoSec.nVideoStream = blGenStream(_path, NULL);
-			}
-		}
-		if (INVALID_GUID == _PrSystemMem->sVideoSec.nVideoStream)
-			return FALSE;
-		_PrSystemMem->sVideoSec.pVOInst = vo_drivers()[0].open();
-		_PrSystemMem->sVideoSec.pAOInst = ao_drivers()[0].open();
-		mpeg2_accel(0);
-		_PrSystemMem->sVideoSec.pVideoDec = mpeg2_init();
-		_PrSystemMem->sVideoSec.pAudioDec = a52_init(0);
-		if (!_PrSystemMem->sVideoSec.pVideoDec)
-			return FALSE;
-		_PrSystemMem->sVideoSec.pVideoInfo = (mpeg2_info_t*)mpeg2_info(_PrSystemMem->sVideoSec.pVideoDec);
-		mpeg2_malloc_hooks(_Malloc_hook, NULL);
-		_PrSystemMem->sVideoSec.pTmpBuffer = (BLU8*)malloc(4096);
-#if defined(BL_PLATFORM_OSX)
-        _GpuSwapBuffer(2);
-#endif
-		_GbVideoPlaying = TRUE;
-	}
-	else
-	{
-		if (!_GbVideoPlaying)
-			return FALSE;
-		mpeg2_close(_PrSystemMem->sVideoSec.pVideoDec);
-		a52_free(_PrSystemMem->sVideoSec.pAudioDec);
-		if (_PrSystemMem->sVideoSec.pVOInst->close)
-			_PrSystemMem->sVideoSec.pVOInst->close(_PrSystemMem->sVideoSec.pVOInst);
-		if (_PrSystemMem->sVideoSec.pAOInst->close)
-			_PrSystemMem->sVideoSec.pAOInst->close(_PrSystemMem->sVideoSec.pAOInst);
-		free(_PrSystemMem->sVideoSec.pTmpBuffer);
-		blDeleteStream(_PrSystemMem->sVideoSec.nVideoStream);
-        blInvokeEvent(BL_ET_SYSTEM, BL_SE_VIDEOOVER, 0, NULL);
-#if defined(BL_PLATFORM_OSX)
-            _GpuSwapBuffer(3);
-#endif
-		_GbVideoPlaying = FALSE;
-	}
     return TRUE;
 }
 BLVoid
@@ -4286,7 +4171,7 @@ blSystemTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
 		return FALSE;
 	_PrSystemMem->aTimers[_idx].nId = _PositiveID;
 	_PrSystemMem->aTimers[_idx].fElapse = _Elapse;
-	_PrSystemMem->aTimers[_idx].fLastTime = blSystemSecTime();
+	_PrSystemMem->aTimers[_idx].nLastTime = blSystemTicks();
 	return TRUE;
 }
 BLVoid
@@ -4324,15 +4209,8 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _F
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
 	_PrSystemMem->nEventsSz = 0;
 	_PrSystemMem->nEventIdx = 0;
-	_PrSystemMem->fSysTime = 0.f;
+	_PrSystemMem->nSysTime = 0;
 	_PrSystemMem->nOrientation = SCREEN_LANDSCAPE_INTERNAL;
-	_PrSystemMem->sVideoSec.nVideoStream = INVALID_GUID;
-	_PrSystemMem->sVideoSec.pAOInst = NULL;
-	_PrSystemMem->sVideoSec.pAudioDec = NULL;
-	_PrSystemMem->sVideoSec.pVideoDec = NULL;
-	_PrSystemMem->sVideoSec.pVideoInfo = NULL;
-	_PrSystemMem->sVideoSec.pTmpBuffer = NULL;
-	_PrSystemMem->sVideoSec.pVOInst = NULL;
 #if defined(BL_PLATFORM_WIN32)
 	_PrSystemMem->bCtrlPressed = FALSE;
     _PrSystemMem->pCurPlugin = 0;
@@ -4380,7 +4258,6 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _F
     _PrSystemMem->pBeginFunc = _Begin;
     _PrSystemMem->pStepFunc = _Step;
     _PrSystemMem->pEndFunc = _End;
-    _PrSystemMem->fSysTime = blSystemSecTime();
     _SystemInit();
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
     do {
@@ -4404,15 +4281,8 @@ blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
 	_PrSystemMem->nEventsSz = 0;
 	_PrSystemMem->nEventIdx = 0;
-	_PrSystemMem->fSysTime = 0.f;
+	_PrSystemMem->nSysTime = 0;
 	_PrSystemMem->nOrientation = SCREEN_LANDSCAPE_INTERNAL;
-	_PrSystemMem->sVideoSec.nVideoStream = INVALID_GUID;
-	_PrSystemMem->sVideoSec.pAOInst = NULL;
-	_PrSystemMem->sVideoSec.pAudioDec = NULL;
-	_PrSystemMem->sVideoSec.pVideoDec = NULL;
-	_PrSystemMem->sVideoSec.pVideoInfo = NULL;
-	_PrSystemMem->sVideoSec.pTmpBuffer = NULL;
-	_PrSystemMem->sVideoSec.pVOInst = NULL;
 #if defined(BL_PLATFORM_WIN32)
     _PrSystemMem->bCtrlPressed = FALSE;
     _PrSystemMem->pCurPlugin = 0;

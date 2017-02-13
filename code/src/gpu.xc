@@ -35,6 +35,10 @@
 #	include <EGL/eglext.h>
 #	include <android/native_window.h>
 #endif
+typedef struct _GpuRes{
+    void* pRes;
+    BLS32 nRefCount;
+}_BLGpuRes;
 typedef struct _HardwareCaps{
 	BLEnum eApiType;
     BLU32 nApiVersion;
@@ -102,6 +106,7 @@ typedef struct _PipelineState{
 typedef struct _TextureBuffer {
     BLEnum eTarget;
     BLEnum eFormat;
+    BLGuid nID;
     BLU32 nHash;
     BLU32 nWidth;
     BLU32 nHeight;
@@ -159,6 +164,7 @@ typedef struct _FrameBuffer {
     } uData;
 }_BLFrameBuffer;
 typedef struct _GeometryBuffer {
+    BLGuid nID;
     BLEnum eVBTopology;
     BLEnum eIBFormat;
     BLU32 nHash;
@@ -166,12 +172,14 @@ typedef struct _GeometryBuffer {
     BLU32 nVBSize;
     BLU32 nIBSize;
     BLBool bDynamic;
+    BLEnum aInsSem[4];
     union {
 #if defined(BL_GL_BACKEND)
         struct _GL {
             GLuint nVBHandle;
             GLuint nIBHandle;
             GLuint nVAHandle;
+            GLuint nInsHandle[4];
         } sGL;
 #elif defined(BL_VK_BACKEND)
         struct _VK {
@@ -2432,7 +2440,7 @@ _GpuIntervention(NSView* _View, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
     BLBool _vkinited = FALSE;
     if (_vkinited)
     {
-        _PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
+        _PrGpuMem->sHardwareCaps.eApiType = BL_VULKAN_API;
     }
     else
     {
@@ -2554,6 +2562,20 @@ _GpuAnitIntervention()
         [NSOpenGLContext clearCurrentContext];
         [_PrGpuMem->pGLC update];
         [_PrGpuMem->pGLC release];
+    }
+    {
+        FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+        {
+            _BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
+            blDebugOutput("detected texture resource leak: hash>%u",  _tex->nHash);
+        }
+    }
+    {
+        FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+        {
+            _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
+            blDebugOutput("detected geometry buffer resource leak: hash>%u",  _geo->nHash);
+        }
     }
     blDeleteDict(_PrGpuMem->pTextureCache);
     blDeleteDict(_PrGpuMem->pBufferCache);
@@ -2748,6 +2770,14 @@ blClearFrameBuffer(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN 
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
+        if (_fbo)
+        {
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+        }
+        else
+        {
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+        }
         BLU32 _clearbuf = 0;
         if (_ColorBit)
             _clearbuf |= GL_COLOR_BUFFER_BIT;
@@ -3039,12 +3069,15 @@ blDetachFrameBuffer(IN BLGuid _FBO, IN BLU32 _Index, IN BLBool _DepthStencil)
 BLGuid
 blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Srgb, IN BLBool _Immutable, IN BLBool _RenderTarget, IN BLU32 _Layer, IN BLU32 _Mipmap, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, IN BLU8* _Data)
 {
-    _BLTextureBuffer* _tex;
+    _BLTextureBuffer* _tex = NULL;
     BLBool _cache = FALSE;
     if (_Immutable)
     {
         blMutexLock(_PrGpuMem->pTextureCache->pMutex);
-        _tex = (_BLTextureBuffer*)blDictElement(_PrGpuMem->pTextureCache, _Hash);
+        _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _Hash);
+        _tex = _res ? (_BLTextureBuffer*)_res->pRes : NULL;
+        if (_res)
+            _res->nRefCount++;
         blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
     }
     if (!_tex)
@@ -3137,11 +3170,25 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
                             {
                                 if(_Format > BL_TF_UNKNOWN)
                                 {
-                                    GL_CHECK_INTERNAL(glTexImage2D(_target, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glTexSubImage2D(_target, _level, 0, 0, _w, _h, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glTexImage2D(_target, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                    }
                                 }
                                 else
                                 {
-                                    GL_CHECK_INTERNAL(glCompressedTexImage2D(_target, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexSubImage2D(_target, _level, 0, 0, _w, _h, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexImage2D(_target, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
+                                    }
                                 }
                             }
                             break;
@@ -3149,7 +3196,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
                             {
                                 if(_Format > BL_TF_UNKNOWN)
                                 {
-                                    if (0 == _aidx)
+                                    if (0 == _aidx && !_Immutable)
                                     {
                                         GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _Layer, 0, _fmt, _type, 0));
                                     }
@@ -3157,7 +3204,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
                                 }
                                 else
                                 {
-                                    if (0 == _aidx)
+                                    if (0 == _aidx && !_Immutable)
                                     {
                                         GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _Layer, 0, _imagesz*_Layer, 0));
                                     }
@@ -3169,11 +3216,25 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
                             {
                                 if(_Format > BL_TF_UNKNOWN)
                                 {
-                                    GL_CHECK_INTERNAL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0 , 0, _w, _h, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                    }
                                 }
                                 else
                                 {
-                                    GL_CHECK_INTERNAL(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _w, _h, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
+                                    }
                                 }
                             }
                             break;
@@ -3201,11 +3262,25 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
                             {
                                 if(_Format > BL_TF_UNKNOWN)
                                 {
-                                    GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _fmt, _type, _Data + _level));
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glTexSubImage3D(_target, _level, 0, 0, 0, _w, _h, _d, _fmt, _type, _Data + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _fmt, _type, _Data + _level));
+                                    }
                                 }
                                 else
                                 {
-                                    GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _imagesz, _Data + _level));
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _level, 0, 0, 0, _w, _h, _d, _ifmt, _imagesz, _Data + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _imagesz, _Data + _level));
+                                    }
                                 }
                             }
                             break;
@@ -3238,12 +3313,31 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
         blDictInsert(_PrGpuMem->pTextureCache, _Hash, _tex);
         blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
     }
-    return blGenGuid(_tex, _Hash);
+    _tex->nID = blGenGuid(_tex, _Hash);
+    return _tex->nID;
 }
 BLVoid
 blDeleteTexture(IN BLGuid _Tex)
 {
+    BLBool _discard = FALSE;
     _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+    blMutexLock(_PrGpuMem->pTextureCache->pMutex);
+    _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _tex->nHash);
+    if (_res)
+    {
+        _res->nRefCount--;
+        if (_res->nRefCount <= 0)
+        {
+            _discard = TRUE;
+            free(_res);
+            blDictErase(_PrGpuMem->pTextureCache, _tex->nHash);
+        }
+    }
+    else
+        _discard = TRUE;
+    blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
+    if (!_discard)
+        return;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -3279,6 +3373,20 @@ blDeleteTexture(IN BLGuid _Tex)
 #endif
     free(_tex);
     blDeleteGuid(_Tex);
+}
+BLGuid
+blGainTexture(IN BLU32 _Hash)
+{
+    blMutexLock(_PrGpuMem->pTextureCache->pMutex);
+    _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _Hash);
+    blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
+    if (_res)
+    {
+        _res->nRefCount++;
+        return ((_BLTextureBuffer*)_res->pRes)->nID;
+    }
+    else
+        return INVALID_GUID;
 }
 BLVoid
 blTextureFilter(IN BLGuid _Tex, IN BLEnum _MinFilter, IN BLEnum _MagFilter, IN BLEnum _WrapS, IN BLEnum _WrapT, IN BLBool _Anisotropy)
@@ -3499,12 +3607,15 @@ blQueryTexture(IN BLGuid _Tex, OUT BLEnum* _Target, OUT BLEnum* _Format, OUT BLU
 BLGuid
 blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN BLEnum* _Semantic, IN BLEnum* _Decl, IN BLU32 _DeclNum,IN BLVoid* _VBO, IN BLU32 _VBSz, IN BLVoid* _IBO, IN BLU32 _IBSz, IN BLEnum _IBFmt)
 {
-    _BLGeometryBuffer* _geo;
+    _BLGeometryBuffer* _geo = NULL;
     BLBool _cache = FALSE;
     if (!_Dynamic)
     {
         blMutexLock(_PrGpuMem->pBufferCache->pMutex);
-        _geo = (_BLGeometryBuffer*)blDictElement(_PrGpuMem->pBufferCache, _Hash);
+        _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _Hash);
+        _geo = _res ? (_BLGeometryBuffer*)_res->pRes : NULL;
+        if (_res)
+            _res->nRefCount++;
         blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
     }
     if (!_geo)
@@ -3519,23 +3630,24 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
     _geo->bDynamic = _Dynamic;
     _geo->nVBSize = _VBSz;
     _geo->nIBSize = _IBSz;
+    _geo->aInsSem[0] = _geo->aInsSem[1] = _geo->aInsSem[2] = _geo->aInsSem[3] = BL_SL_INVALID;
     BLU32 _stride = 0;
     for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
     {
         switch(_Decl[_idx])
         {
-            case BL_VD_S8X1: case BL_VD_U8X1: _stride += 1*1;break;
-            case BL_VD_S8X2: case BL_VD_U8X2: _stride += 1*2;break;
-            case BL_VD_S8X3: case BL_VD_U8X3: _stride += 1*3;break;
-            case BL_VD_S8X4: case BL_VD_U8X4: _stride += 1*4;break;
-            case BL_VD_S16X1: case BL_VD_U16X1: _stride += 2*1;break;
-            case BL_VD_S16X2: case BL_VD_U16X2: _stride += 2*2;break;
-            case BL_VD_S16X3: case BL_VD_U16X3: _stride += 2*3;break;
-            case BL_VD_S16X4: case BL_VD_U16X4: _stride += 2*4;break;
-            case BL_VD_S32X1: case BL_VD_U32X1: case BL_VD_F32X1: _stride += 4*1;break;
-            case BL_VD_S32X2: case BL_VD_U32X2: case BL_VD_F32X2: _stride += 4*2;break;
-            case BL_VD_S32X3: case BL_VD_U32X3: case BL_VD_F32X3: _stride += 4*3;break;
-            case BL_VD_S32X4: case BL_VD_U32X4: case BL_VD_F32X4: _stride += 4*4;break;
+            case BL_VD_BOOLX1: _stride += 1 * 1; break;
+            case BL_VD_BOOLX2: _stride += 1 * 2; break;
+            case BL_VD_BOOLX3: _stride += 1 * 3; break;
+            case BL_VD_BOOLX4: _stride += 1 * 4; break;
+            case BL_VD_INTX1: _stride += 4 * 1; break;
+            case BL_VD_INTX2: _stride += 4 * 2; break;
+            case BL_VD_INTX3: _stride += 4 * 3; break;
+            case BL_VD_INTX4: _stride += 4 * 4; break;
+            case BL_VD_FLOATX1: _stride += 4 * 1; break;
+            case BL_VD_FLOATX2: _stride += 4 * 2; break;
+            case BL_VD_FLOATX3: _stride += 4 * 3; break;
+            case BL_VD_FLOATX4: _stride += 4 * 4; break;
             default:assert(0);break;
         }
     }
@@ -3543,6 +3655,8 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
+        _geo->uData.sGL.nIBHandle = -1;
+        _geo->uData.sGL.nInsHandle[0] = _geo->uData.sGL.nInsHandle[1] = _geo->uData.sGL.nInsHandle[2] = _geo->uData.sGL.nInsHandle[3] = -1;
         GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nVBHandle));
         GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
         GL_CHECK_INTERNAL(glBufferData(GL_ARRAY_BUFFER, _VBSz, _VBO, _Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
@@ -3554,9 +3668,9 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
             GL_CHECK_INTERNAL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, _IBSz, _IBO, _Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
             GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
         }
-        BLU8* _offset = NULL;
         GL_CHECK_INTERNAL(glGenVertexArrays(1, &_geo->uData.sGL.nVAHandle));
         GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
+        BLU8* _offset = NULL;
         BLU32 _used[16] = { 0 };
         for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
         {
@@ -3565,46 +3679,23 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
             GLenum _gtype;
             switch(_Decl[_idx])
             {
-                case BL_VD_S8X1:_numele = 1;_gtype = GL_BYTE;_gtsize = 1*1;break;
-                case BL_VD_S8X2:_numele = 2;_gtype = GL_BYTE;_gtsize = 2*1;break;
-                case BL_VD_S8X3:_numele = 3;_gtype = GL_BYTE;_gtsize = 3*1;break;
-                case BL_VD_S8X4:_numele = 4;_gtype = GL_BYTE;_gtsize = 4*1;break;
-                case BL_VD_U8X1:_numele = 1;_gtype = GL_UNSIGNED_BYTE;_gtsize = 1*1;break;
-                case BL_VD_U8X2:_numele = 2;_gtype = GL_UNSIGNED_BYTE;_gtsize = 2*1;break;
-                case BL_VD_U8X3:_numele = 3;_gtype = GL_UNSIGNED_BYTE;_gtsize = 3*1;break;
-                case BL_VD_U8X4:_numele = 4;_gtype = GL_UNSIGNED_BYTE;_gtsize = 4*1;break;
-                case BL_VD_S16X1:_numele = 1;_gtype = GL_SHORT;_gtsize = 1*2;break;
-                case BL_VD_S16X2:_numele = 2;_gtype = GL_SHORT;_gtsize = 2*2;break;
-                case BL_VD_S16X3:_numele = 3;_gtype = GL_SHORT;_gtsize = 3*2;break;
-                case BL_VD_S16X4:_numele = 4;_gtype = GL_SHORT;_gtsize = 4*2;break;
-                case BL_VD_U16X1:_numele = 1;_gtype = GL_UNSIGNED_SHORT;_gtsize = 1*2;break;
-                case BL_VD_U16X2:_numele = 2;_gtype = GL_UNSIGNED_SHORT;_gtsize = 2*2;break;
-                case BL_VD_U16X3:_numele = 3;_gtype = GL_UNSIGNED_SHORT;_gtsize = 3*2;break;
-                case BL_VD_U16X4:_numele = 4;_gtype = GL_UNSIGNED_SHORT;_gtsize = 4*2;break;
-                case BL_VD_S32X1:_numele = 1;_gtype = GL_INT;_gtsize = 1*4;break;
-                case BL_VD_S32X2:_numele = 2;_gtype = GL_INT;_gtsize = 2*4;break;
-                case BL_VD_S32X3:_numele = 3;_gtype = GL_INT;_gtsize = 3*4;break;
-                case BL_VD_S32X4:_numele = 4;_gtype = GL_INT;_gtsize = 4*4;break;
-                case BL_VD_U32X1:_numele = 1;_gtype = GL_UNSIGNED_INT;_gtsize = 1*4;break;
-                case BL_VD_U32X2:_numele = 2;_gtype = GL_UNSIGNED_INT;_gtsize = 2*4;break;
-                case BL_VD_U32X3:_numele = 3;_gtype = GL_UNSIGNED_INT;_gtsize = 3*4;break;
-                case BL_VD_U32X4:_numele = 4;_gtype = GL_UNSIGNED_INT;_gtsize = 4*4;break;
-                case BL_VD_F32X1:_numele = 1;_gtype = GL_FLOAT;_gtsize = 1*4;break;
-                case BL_VD_F32X2:_numele = 2;_gtype = GL_FLOAT;_gtsize = 2*4;break;
-                case BL_VD_F32X3:_numele = 3;_gtype = GL_FLOAT;_gtsize = 3*4;break;
-                case BL_VD_F32X4:_numele = 4;_gtype = GL_FLOAT;_gtsize = 4*4;break;
-                default:assert(0);break;
+                case BL_VD_BOOLX1: _numele = 1; _gtype = GL_BYTE; _gtsize = 1 * 1; break;
+                case BL_VD_BOOLX2: _numele = 2; _gtype = GL_BYTE; _gtsize = 2 * 1; break;
+                case BL_VD_BOOLX3: _numele = 3; _gtype = GL_BYTE; _gtsize = 3 * 1; break;
+                case BL_VD_BOOLX4: _numele = 4; _gtype = GL_BYTE; _gtsize = 4 * 1; break;
+                case BL_VD_INTX1: _numele = 1; _gtype = GL_INT; _gtsize = 1 * 4; break;
+                case BL_VD_INTX2: _numele = 2; _gtype = GL_INT; _gtsize = 2 * 4; break;
+                case BL_VD_INTX3: _numele = 3; _gtype = GL_INT; _gtsize = 3 * 4; break;
+                case BL_VD_INTX4: _numele = 4; _gtype = GL_INT; _gtsize = 4 * 4; break;
+                case BL_VD_FLOATX1: _numele = 1; _gtype = GL_FLOAT; _gtsize = 1 * 4; break;
+                case BL_VD_FLOATX2: _numele = 2; _gtype = GL_FLOAT; _gtsize = 2 * 4; break;
+                case BL_VD_FLOATX3: _numele = 3; _gtype = GL_FLOAT; _gtsize = 3 * 4; break;
+                case BL_VD_FLOATX4: _numele = 4; _gtype = GL_FLOAT; _gtsize = 4 * 4; break;
+                default: assert(0); break;
             }
             GL_CHECK_INTERNAL(glEnableVertexAttribArray(_Semantic[_idx]));
             GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
-            if (GL_FLOAT == _gtype)
-            {
-                GL_CHECK_INTERNAL(glVertexAttribPointer(_Semantic[_idx], _numele, _gtype, GL_FALSE, _stride, _offset));
-            }
-            else
-            {
-                GL_CHECK_INTERNAL(glVertexAttribIPointer(_Semantic[_idx], _numele, _gtype, _stride, _offset));
-            }
+            GL_CHECK_INTERNAL(glVertexAttribPointer(_Semantic[_idx], _numele, _gtype, GL_FALSE, _stride, _offset));
             _used[_Semantic[_idx]] = 1;
             _offset += _gtsize;
         }
@@ -3632,24 +3723,61 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
     if (_cache)
     {
         blMutexLock(_PrGpuMem->pBufferCache->pMutex);
-        blDictInsert(_PrGpuMem->pBufferCache, _Hash, _geo);
+        _BLGpuRes* _res = (_BLGpuRes*)malloc(sizeof(_BLGpuRes));
+        _res->nRefCount = 0;
+        _res->pRes = _geo;
+        blDictInsert(_PrGpuMem->pBufferCache, _Hash, _res);
         blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
     }
-    return blGenGuid(_geo, _Hash);
+    _geo->nID = blGenGuid(_geo, _Hash);
+    return _geo->nID;
 }
 BLVoid
 blDeleteGeometryBuffer(IN BLGuid _GBO)
 {
+    BLBool _discard = FALSE;
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+    blMutexLock(_PrGpuMem->pBufferCache->pMutex);
+    _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pBufferCache, _geo->nHash);
+    if (_res)
+    {
+        _res->nRefCount--;
+        if (_res->nRefCount <= 0)
+        {
+            _discard = TRUE;
+            free(_res);
+            blDictErase(_PrGpuMem->pBufferCache, _geo->nHash);
+        }
+    }
+    else
+        _discard = TRUE;
+    blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
+    if (!_discard)
+        return;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
         GL_CHECK_INTERNAL(glDeleteVertexArrays(1, &_geo->uData.sGL.nVAHandle));
         GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nVBHandle));
-        if (_geo->uData.sGL.nIBHandle)
+        if (_geo->uData.sGL.nIBHandle != 0xFFFFFFFF)
         {
-            GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
             GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nIBHandle));
+        }
+        if (_geo->uData.sGL.nInsHandle[0] != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[0]));
+        }
+        if (_geo->uData.sGL.nInsHandle[1] != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[1]));
+        }
+        if (_geo->uData.sGL.nInsHandle[2] != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[2]));
+        }
+        if (_geo->uData.sGL.nInsHandle[3] != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[3]));
         }
         GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, 0));
     }
@@ -3667,6 +3795,20 @@ blDeleteGeometryBuffer(IN BLGuid _GBO)
     }
 #endif
 }
+BLGuid
+blGainGeometryBuffer(IN BLU32 _Hash)
+{
+    blMutexLock(_PrGpuMem->pBufferCache->pMutex);
+    _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pBufferCache, _Hash);
+    blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
+    if (_res)
+    {
+        _res->nRefCount++;
+        return ((_BLGeometryBuffer*)_res->pRes)->nID;
+    }
+    else
+        return INVALID_GUID;
+}
 BLVoid
 blUpdateGeometryBuffer(IN BLGuid _GBO, IN BLU32 _VBOffset, IN BLU8* _VBO, IN BLU32 _VBSz, IN BLU32 _IBOffset, IN BLU8* _IBO, IN BLU32 _IBSz)
 {
@@ -3677,12 +3819,96 @@ blUpdateGeometryBuffer(IN BLGuid _GBO, IN BLU32 _VBOffset, IN BLU8* _VBO, IN BLU
         GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
         GL_CHECK_INTERNAL(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, _VBOffset, _VBSz, _VBO));
         GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-        if (_geo->uData.sGL.nIBHandle)
+        if (_geo->uData.sGL.nIBHandle != 0xFFFFFFFF)
         {
             GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
             GL_CHECK_INTERNAL(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, _IBOffset, _IBSz, _IBO));
             GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
         }
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLVoid
+blInstanceGeometryBuffer(IN BLGuid _GBO, IN BLEnum* _Semantic, IN BLEnum* _Decl, IN BLU32 _DeclNum, IN BLU32 _Instance)
+{
+    if (_DeclNum > 4)
+        return;
+    _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
+        for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
+        {
+            GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nInsHandle[_idx]));
+            BLU32 _vbsz = 0, _numele = 0;
+            GLenum _type;
+            switch(_Decl[_idx])
+            {
+                case BL_VD_BOOLX1: _numele = 1; _type = GL_BYTE; _vbsz = 1 * 1; break;
+                case BL_VD_BOOLX2: _numele = 2; _type = GL_BYTE; _vbsz = 2 * 1; break;
+                case BL_VD_BOOLX3: _numele = 3; _type = GL_BYTE; _vbsz = 3 * 1; break;
+                case BL_VD_BOOLX4: _numele = 4; _type = GL_BYTE; _vbsz = 4 * 1; break;
+                case BL_VD_INTX1: _numele = 1; _type = GL_INT; _vbsz = 1 * 4; break;
+                case BL_VD_INTX2: _numele = 2; _type = GL_INT; _vbsz = 2 * 4; break;
+                case BL_VD_INTX3: _numele = 3; _type = GL_INT; _vbsz = 3 * 4; break;
+                case BL_VD_INTX4: _numele = 4; _type = GL_INT; _vbsz = 4 * 4; break;
+                case BL_VD_FLOATX1: _numele = 1; _type = GL_FLOAT; _vbsz = 1 * 4; break;
+                case BL_VD_FLOATX2: _numele = 2; _type = GL_FLOAT; _vbsz = 2 * 4; break;
+                case BL_VD_FLOATX3: _numele = 3; _type = GL_FLOAT; _vbsz = 3 * 4; break;
+                case BL_VD_FLOATX4: _numele = 4; _type = GL_FLOAT; _vbsz = 4 * 4; break;
+                default: assert(0); break;
+            }
+            _vbsz *= _Instance;
+            GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nInsHandle[_idx]));
+            GL_CHECK_INTERNAL(glBufferData(GL_ARRAY_BUFFER, _vbsz, NULL, GL_DYNAMIC_DRAW));
+            GL_CHECK_INTERNAL(glEnableVertexAttribArray(_Semantic[_idx]));
+            GL_CHECK_INTERNAL(glVertexAttribPointer(_Semantic[_idx], _numele, GL_FLOAT, GL_FALSE, 0, NULL));
+            GL_CHECK_INTERNAL(glVertexAttribDivisor(_Semantic[_idx], 1));
+            _geo->aInsSem[_idx] = _Semantic[_idx];
+        }
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLVoid
+blInstanceUpdate(IN BLGuid _GBO, IN BLEnum _Semantic, IN BLVoid* _Buffer, IN BLU32 _BufferSz)
+{
+    _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        BLU32 _idx = 0;
+        for (; _idx < 4; ++_idx)
+        {
+            if (_geo->aInsSem[_idx] == _Semantic)
+                break;
+        }
+        GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nInsHandle[_idx]));
+        GL_CHECK_INTERNAL(glBufferSubData(GL_ARRAY_BUFFER, 0, _BufferSz, _Buffer));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
@@ -3783,7 +4009,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
         BLAnsi _glslver[64] = { 0 };
-        sprintf(_glslver, "#version %d", _PrGpuMem->sHardwareCaps.nApiVersion);
+        sprintf(_glslver, "#version %d core\n", _PrGpuMem->sHardwareCaps.nApiVersion);
         if (!_findbinary)
         {
             GLint _compiled = 0;
@@ -3878,6 +4104,14 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
                     blDebugOutput(_info);
                 }
             }
+            GLint _len = 0;
+            GL_CHECK_INTERNAL(glGetProgramiv(_tech->uData.sGL.nHandle, GL_PROGRAM_BINARY_LENGTH, &_len));
+            if (_len)
+            {
+                BLU8* _binary = (BLU8*)malloc(_len * sizeof(BLU8) + sizeof(GLenum));
+                GL_CHECK_INTERNAL(glGetProgramBinary(_tech->uData.sGL.nHandle, _len, NULL, (GLenum*)_binary, _binary + sizeof(GLenum)));
+                blWriteFile(_Filename, _len * sizeof(BLU8) + sizeof(GLenum), _binary);
+            }
             if (_vs)
             {
                 GL_CHECK_INTERNAL(glDeleteShader(_vs));
@@ -3890,13 +4124,6 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
             {
                 GL_CHECK_INTERNAL(glDeleteShader(_gs));
             }
-            GLint _len=0;
-            GL_CHECK_INTERNAL(glGetProgramiv(_tech->uData.sGL.nHandle, GL_PROGRAM_BINARY_LENGTH, &_len));
-            BLU8* _binary = (BLU8*)malloc(_len * sizeof(BLU8) + sizeof(GLenum));
-            GLenum _format = 0;
-            GL_CHECK_INTERNAL(glGetProgramBinary(_tech->uData.sGL.nHandle, _len, NULL, &_format, _binary + sizeof(GLenum)));
-            memcpy(_binary, &_format, sizeof(GLenum));
-            blWriteFile(_Filename, _len * sizeof(BLU8) + sizeof(GLenum), _binary);
         }
         else
         {
@@ -4050,7 +4277,7 @@ blTechSampler(IN BLGuid _Tech, IN BLAnsi* _Name, IN BLGuid _Tex, IN BLU32 _Unit)
     }
 }
 BLVoid
-blDraw(IN BLGuid _Tech, IN BLGuid _GBO)
+blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 {
     _PipelineStateRefreshGL();
     _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
@@ -4111,15 +4338,29 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO)
             case BL_PT_TRIANGLEFAN: _prim = GL_TRIANGLE_FAN; break;
             default: _prim = GL_TRIANGLES; break;
         }
-        if (_geo->uData.sGL.nIBHandle)
+        if (_geo->uData.sGL.nIBHandle != 0xFFFFFFFF)
         {
             GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
-            GL_CHECK_INTERNAL(glDrawElements(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT :  GL_UNSIGNED_SHORT, NULL));
+            if (1 == _Instance)
+            {
+                GL_CHECK_INTERNAL(glDrawElements(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT :  GL_UNSIGNED_SHORT, NULL));
+            }
+            else
+            {
+                GL_CHECK_INTERNAL(glDrawElementsInstanced(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT :  GL_UNSIGNED_SHORT, NULL, _Instance));
+            }
         }
         else
         {
             GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
-            GL_CHECK_INTERNAL(glDrawArrays(_prim, 0, _geo->nVertexNum));
+            if (1 == _Instance)
+            {
+                GL_CHECK_INTERNAL(glDrawArrays(_prim, 0, _geo->nVertexNum));
+            }
+            else
+            {
+                GL_CHECK_INTERNAL(glDrawArraysInstanced(_prim, 0, _geo->nVertexNum, _Instance));
+            }
         }
         GL_CHECK_INTERNAL(glUseProgram(0));
     }

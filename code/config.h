@@ -42,21 +42,21 @@
 #elif defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #	if defined(WINAPI_FAMILY)
 #		if WINAPI_FAMILY == WINAPI_FAMILY_APP|| WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
-#			define BL_PLATFORM_UWP
+#			define BL_PLATFORM_UWP      2
 #		endif
 #	else
-#		define BL_PLATFORM_WIN32
+#		define BL_PLATFORM_WIN32    1
 #	endif
 #elif defined(__APPLE_CC__)
 #   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 40000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 40000
-#       define BL_PLATFORM_IOS
+#       define BL_PLATFORM_IOS  6
 #   else
-#       define BL_PLATFORM_OSX
+#       define BL_PLATFORM_OSX  5
 #   endif
 #elif defined(ANDROID)
-#	define BL_PLATFORM_ANDROID
+#	define BL_PLATFORM_ANDROID  4
 #elif defined(linux) || defined(__linux) || defined(__linux__)
-#	define BL_PLATFORM_LINUX
+#	define BL_PLATFORM_LINUX    3
 #else	
 #	error unsupport platform
 #endif

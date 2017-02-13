@@ -25,10 +25,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-  BL_API  BLVoid dump();
-
-  BL_API BLVoid dump32(BLGuid _ID);
+    
 BL_API BLGuid blGenSprite(
 	IN BLAnsi* _Filename,
 	IN BLAnsi* _Archive,
@@ -139,21 +136,21 @@ BL_API BLBool blSpriteScissor(
     IN BLF32 _Height);
     
 BL_API BLBool blSpriteAsEmit(
-	IN BLGuid _ID,
-	IN BLEnum _Emitter,
-	IN BLU32 _EmitterParam,
+    IN BLGuid _ID,
+    IN BLF32 _EmitAngle,
+	IN BLF32 _EmitterRadius,
 	IN BLF32 _Life,
 	IN BLU32 _MaxAlive,
 	IN BLU32 _GenPerSec,
-	IN BLF32 _VelocityX,
-	IN BLF32 _VelocityY,
-	IN BLF32 _AccelerationX,
-	IN BLF32 _AccelerationY,
-	IN BLF32 _DisturbanceX,
-	IN BLF32 _DisturbanceY,
-	IN BLF32 _EmitAngle,
-	IN BLU32 _FadeColor,
-	IN BLF32 _FadeScale);
+	IN BLF32 _DirectionX,
+	IN BLF32 _DirectionY,
+    IN BLF32 _Velocity,
+    IN BLF32 _VelVariance,
+    IN BLF32 _Rotation,
+    IN BLF32 _RotVariance,
+	IN BLF32 _Scale,
+    IN BLF32 _ScaleVariance,
+    IN BLU32 _FadeColor);
     
 BL_API BLBool blSpriteAsCursor(
     IN BLGuid _ID);
@@ -189,6 +186,7 @@ BL_API BLBool blSpriteActionMove(
 BL_API BLBool blSpriteActionRotate(
 	IN BLGuid _ID,
 	IN BLF32 _Angle,
+    IN BLBool _ClockWise, 
 	IN BLF32 _Time,
 	IN BLBool _Loop);
 
@@ -196,6 +194,7 @@ BL_API BLBool blSpriteActionScale(
 	IN BLGuid _ID,
 	IN BLF32 _XScale,
 	IN BLF32 _YScale,
+    IN BLBool _Reverse,
 	IN BLF32 _Time,
 	IN BLBool _Loop);
 
@@ -204,6 +203,12 @@ BL_API BLBool blSpriteActionAlpha(
 	IN BLF32 _Alpha,
 	IN BLF32 _Time,
 	IN BLBool _Loop);
+    
+BL_API BLVoid blViewport(
+    OUT BLF32* _LTPosX,
+    OUT BLF32* _LTPosY,
+    OUT BLF32* _RBPosX,
+    OUT BLF32* _RBPosY);
 
 BL_API BLVoid blViewportMove(
 	IN BLF32 _XVec,

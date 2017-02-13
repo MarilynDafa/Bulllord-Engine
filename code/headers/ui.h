@@ -25,12 +25,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-BL_API BLVoid blWorkspace(
+BL_API BLVoid blUIWorkspace(
 	IN BLAnsi* _Dictionary,
 	IN BLAnsi* _Archive,
 	IN BLBool _UseDesignRes);
 
-BL_API BLVoid blQueryResolution(
+BL_API BLVoid blUIQueryResolution(
 	OUT BLU32* _Width,
 	OUT BLU32* _Height);
 

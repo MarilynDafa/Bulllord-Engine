@@ -44,7 +44,9 @@ extern "C" {
 		_Pparam ..
 */
     
-BL_API BLF32 blSystemSecTime();
+BL_API BLEnum blPlatformIdentity();
+    
+BL_API BLU32 blSystemTicks();
 
 BL_API const BLAnsi* blUserFolderDir();
 

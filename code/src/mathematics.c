@@ -32,12 +32,12 @@ blRandRangeI(IN BLS32 _Min, IN BLS32 _Max)
 BLF32
 blRandF()
 {
-	return (BLF32)rand() / (BLF32)0x7FFF;
+	return (BLF32)rand() / (BLF32)RAND_MAX;
 }
 BLF32
 blRandRangeF(IN BLF32 _Min, IN BLF32 _Max)
 {
-	return (_Max - _Min)*(BLF32)rand() / (BLF32)0x7FFF + _Min;
+	return (_Max - _Min)*(BLF32)rand() / (BLF32)RAND_MAX + _Min;
 }
 BLBool
 blScalarApproximate(IN BLF32 _V1, IN BLF32 _V2)

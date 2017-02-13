@@ -161,7 +161,7 @@ _FetchResource(const BLAnsi* _Filename, const BLAnsi* _Archive, BLVoid** _Res, B
 			strcpy(_node->nFilename, _Filename);
 			if (_Archive)
 				strcpy(_node->nArchive, _Archive);
-			_node->pRes = *_Res;
+            _node->pRes = _Res ? *_Res : NULL;
 			_node->fSetup = _Setup;
 			_node->fLoad = _Load;
 			_node->nGuid = _ID;
@@ -263,7 +263,7 @@ _StreamIOInit(BLVoid* _AssetMgr)
 	blDebugOutput("IO initialize successfully");
 }
 BLVoid
-_StreamIOStep(BLF32 _Delta)
+_StreamIOStep(BLU32 _Delta)
 {
 	_BLResNode* _res;
 	blMutexLock(_PrStreamIOMem->pSetupQueue->pMutex);

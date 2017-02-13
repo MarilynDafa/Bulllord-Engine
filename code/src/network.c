@@ -238,7 +238,7 @@ _NetworkDestroy()
 	free(_PrNetworkMem);
 }
 BLVoid
-_NetworkStep(BLF32 _Delta)
+_NetworkStep(BLU32 _Delta)
 {
 	if (_PrNetworkMem->pSendThread && _PrNetworkMem->pRecvThread)
 	{

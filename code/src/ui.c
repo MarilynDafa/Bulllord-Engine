@@ -51,6 +51,12 @@ typedef struct _Font {
 	BLDictionary* pAtlasDict;
 	FT_Face sFtFace;
 }_BLFont;
+typedef struct _PixmapSheet{
+    BLF32 fLTX;
+    BLF32 fLTY;
+    BLF32 fRBX;
+    BLF32 fRBY;
+}_BLPixmapSheet;
 typedef struct _Widget {
 	BLGuid nID;
 	BLEnum eType;
@@ -72,6 +78,7 @@ typedef struct _Widget {
 	BLBool bPenetration;
 	BLBool bAbsScissor;
 	BLBool bInteractive;
+    BLBool bValid;
 	union {
 		struct _Panel {
 			BLAnsi aPixmap[128];
@@ -83,7 +90,9 @@ typedef struct _Widget {
 			BLBool bModal;
 			BLBool bScrollable;
 			BLBool bFlipX;
-			BLBool bFlipY;
+            BLBool bFlipY;
+            BLGuid nPixmapTex;
+            BLDictionary* pPixmapSheetDct;
 		}sPanel;
 		struct _Button {
 			BLUtf8* pText;
@@ -108,7 +117,9 @@ typedef struct _Widget {
 			BLEnum eTxtAlignmentV;
 			BLBool bFlipX;
 			BLBool bFlipY;
-			BLU32 nState;
+            BLU32 nState;
+            BLGuid nPixmapTex;
+            BLDictionary* pPixmapSheetDct;
 		}sButton;
 		struct _Label {
 			BLUtf8* pText;
@@ -117,7 +128,9 @@ typedef struct _Widget {
 			BLRect aCommonTex[9];
 			BLAnsi aStencilMap[128];
 			BLBool bFlipX;
-			BLBool bFlipY;
+            BLBool bFlipY;
+            BLGuid nPixmapTex;
+            BLDictionary* pPixmapSheetDct;
 		}sLabel;
 		struct _Check {
 			BLUtf8* pText;
@@ -140,7 +153,9 @@ typedef struct _Widget {
 			BLEnum eTxtAlignmentV;
 			BLBool bFlipX;
 			BLBool bFlipY;
-			BLU32 nState;
+            BLU32 nState;
+            BLGuid nPixmapTex;
+            BLDictionary* pPixmapSheetDct;
 		}sCheck;
 		struct _Text {
 			BLUtf8* pText;
@@ -176,7 +191,9 @@ typedef struct _Widget {
 			BLF32 nPaddingY;
 			BLBool bFlipX;
 			BLBool bFlipY;
-			BLU32 nState;
+            BLU32 nState;
+            BLGuid nPixmapTex;
+            BLDictionary* pPixmapSheetDct;
 		}sText;
 		struct _Progress {
 			BLUtf8* pText;
@@ -194,7 +211,9 @@ typedef struct _Widget {
 			BLU32 nTxtColor;
 			BLU32 nPercent;
 			BLBool bFlipX;
-			BLBool bFlipY;
+            BLBool bFlipY;
+            BLGuid nPixmapTex;
+            BLDictionary* pPixmapSheetDct;
 		}sProgress;
 		struct _Slider {
 			BLAnsi aPixmap[128];
@@ -212,7 +231,9 @@ typedef struct _Widget {
 			BLVec2 sSliderSize;
 			BLBool bFlipX;
 			BLBool bFlipY;
-			BLU32 nState;
+            BLU32 nState;
+            BLGuid nPixmapTex;
+            BLDictionary* pPixmapSheetDct;
 		}sSlider;
 		struct _Table {
 			BLAnsi aPixmap[128];
@@ -229,7 +250,9 @@ typedef struct _Widget {
 			BLBool bItalics;
 			BLU32 nTxtColor;
 			BLBool bFlipX;
-			BLBool bFlipY;
+            BLBool bFlipY;
+            BLGuid nPixmapTex;
+            BLDictionary* pPixmapSheetDct;
 		}sTable;
 		struct _Dial {
 			BLAnsi aPixmap[128];
@@ -239,6 +262,8 @@ typedef struct _Widget {
 			BLS32 nEndAngle;
 			BLBool bAngleCut;
 			BLBool bClockWise;
+            BLGuid nPixmapTex;
+            BLDictionary* pPixmapSheetDct;
 		}sDial;
 		struct _Primitive {
 			BLBool bFill;
@@ -845,15 +870,15 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 BLVoid
 _UIInit()
 {
-	_PrUIMem = (_BLUIMember*)malloc(sizeof(_BLUIMember));
-	_PrUIMem->pFonts = blGenArray(FALSE);
-	memset(_PrUIMem->aDir, 0, sizeof(_PrUIMem->aDir));
-	memset(_PrUIMem->aArchive, 0, sizeof(_PrUIMem->aArchive));
-	FT_Init_FreeType(&_PrUIMem->sFtLibrary);
-	_PrUIMem->pRoot = (_BLWidget*)malloc(sizeof(_BLWidget));
-	memset(_PrUIMem->pRoot, 0, sizeof(_BLWidget));
-	_PrUIMem->pRoot->sDimension.fX = -1.f;
-	_PrUIMem->pRoot->sDimension.fY = -1.f;
+    _PrUIMem = (_BLUIMember*)malloc(sizeof(_BLUIMember));
+    _PrUIMem->pFonts = blGenArray(FALSE);
+    memset(_PrUIMem->aDir, 0, sizeof(_PrUIMem->aDir));
+    memset(_PrUIMem->aArchive, 0, sizeof(_PrUIMem->aArchive));
+    FT_Init_FreeType(&_PrUIMem->sFtLibrary);
+    _PrUIMem->pRoot = (_BLWidget*)malloc(sizeof(_BLWidget));
+    memset(_PrUIMem->pRoot, 0, sizeof(_BLWidget));
+    _PrUIMem->pRoot->sDimension.fX = -1.f;
+    _PrUIMem->pRoot->sDimension.fY = -1.f;
 	_PrUIMem->pRoot->sPosition.fX = 0.f;
 	_PrUIMem->pRoot->sPosition.fY = 0.f;
 	_PrUIMem->pRoot->pParent = NULL;
@@ -863,10 +888,11 @@ _UIInit()
 	_PrUIMem->pRoot->pChildren = blGenArray(FALSE);
 	_PrUIMem->pRoot->eType = BL_UT_PANEL;
 	_PrUIMem->pRoot->nID = blGenGuid(_PrUIMem->pRoot, blHashUtf8((const BLUtf8*)"Root"));
-	_PrUIMem->pPixmaps = blGenArray(FALSE);
+    _PrUIMem->pPixmaps = blGenArray(FALSE);
+    blWindowSize(&_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight);
 }
 BLVoid
-_UIStep(BLF32 _Delta, BLBool _Baseplate)
+_UIStep(BLU32 _Delta, BLBool _Baseplate)
 {
 	if (_Baseplate)
 	{
@@ -965,6 +991,7 @@ _UIStep(BLF32 _Delta, BLBool _Baseplate)
 BLVoid
 _UIDestroy()
 {
+    FT_Done_FreeType(_PrUIMem->sFtLibrary);
 	blDeleteUI(_PrUIMem->pRoot->nID);
 	{
 		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
@@ -998,11 +1025,10 @@ _UIDestroy()
 		}
 		blDeleteArray(_PrUIMem->pPixmaps);
 	}
-	FT_Done_FreeType(_PrUIMem->sFtLibrary);
 	free(_PrUIMem);
 }
 BLVoid
-blWorkspace(IN BLAnsi* _Dictionary, IN BLAnsi* _Archive, IN BLBool _UseDesignRes)
+blUIWorkspace(IN BLAnsi* _Dictionary, IN BLAnsi* _Archive, IN BLBool _UseDesignRes)
 {
 	strcpy(_PrUIMem->aDir, _Dictionary);
 	if (_Archive)
@@ -1065,7 +1091,7 @@ blWorkspace(IN BLAnsi* _Dictionary, IN BLAnsi* _Archive, IN BLBool _UseDesignRes
 	blDeleteStream(_stream);
 }
 BLVoid
-blQueryResolution(OUT BLU32* _Width, OUT BLU32* _Height)
+blUIQueryResolution(OUT BLU32* _Width, OUT BLU32* _Height)
 {
 	*_Width = _PrUIMem->nFboWidth;
 	*_Height = _PrUIMem->nFboHeight;
@@ -1073,546 +1099,567 @@ blQueryResolution(OUT BLU32* _Width, OUT BLU32* _Height)
 BLVoid
 blUIFile(IN BLAnsi* _Filename)
 {
-	BLAnsi _path[260] = { 0 };
-	if (_PrUIMem->aArchive[0] == 0)
-		strcpy(_path, blWorkingDir(TRUE));
-	strcat(_path, _PrUIMem->aDir);
+    BLAnsi _path[260] = { 0 };
+    if (_PrUIMem->aArchive[0] == 0)
+    {
+        strcpy(_path, blWorkingDir(TRUE));
+        strcat(_path, _PrUIMem->aDir);
+    }
+    else
+        strcpy(_path, _PrUIMem->aDir);
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-	strcat(_path, "\\bui\\");
+    strcat(_path, "\\bui\\");
 #else
-	strcat(_path, "/bui/");
+    strcat(_path, "/bui/");
 #endif
-	strcat(_path, _Filename);
-	BLGuid _layout = blGenStream(_path, _PrUIMem->aArchive);
-	ezxml_t _doc = ezxml_parse_str(blStreamData(_layout), blStreamLength(_layout));
-	ezxml_t _element = ezxml_child(_doc, "Element");
-	BLU32 _idx = 0;
-	BLAnsi* _tmp;
-	do {
-		const BLAnsi* _rpt = ezxml_attr(_element, "ReferencePt");
-		BLEnum _ha, _va;
-		if (!strcmp(_rpt, "LT")) { _ha = BL_UA_LEFT; _va = BL_UA_TOP; }
-		else if (!strcmp(_rpt, "LM")) { _ha = BL_UA_LEFT; _va = BL_UA_VCENTER; }
-		else if (!strcmp(_rpt, "LB")) { _ha = BL_UA_LEFT; _va = BL_UA_BOTTOM; }
-		else if (!strcmp(_rpt, "MT")) { _ha = BL_UA_HCENTER; _va = BL_UA_TOP; }
-		else if (!strcmp(_rpt, "MM")) { _ha = BL_UA_HCENTER; _va = BL_UA_VCENTER; }
-		else if (!strcmp(_rpt, "MB")) { _ha = BL_UA_HCENTER; _va = BL_UA_BOTTOM; }
-		else if (!strcmp(_rpt, "RT")) { _ha = BL_UA_RIGHT; _va = BL_UA_TOP; }
-		else if (!strcmp(_rpt, "RM")) { _ha = BL_UA_RIGHT; _va = BL_UA_VCENTER; }
-		else { _ha = BL_UA_RIGHT; _va = BL_UA_BOTTOM; }
-		const BLAnsi* _geo = ezxml_attr(_element, "Geometry");
-		_idx = 0;
-		BLS32 _geovar[4];
-		_tmp = strtok((BLAnsi*)_geo, ",");
-		while (_tmp)
-		{
-			_geovar[_idx] = (BLS32)strtol(_tmp, NULL, 10);
-			_tmp = strtok(NULL, ",");
-			_idx++;
-		}
-		const BLAnsi* _name = ezxml_attr(_element, "Name");
-		BLEnum _typevar;
-		const BLAnsi* _type = ezxml_attr(_element, "Type");
-		const BLAnsi* _parent = ezxml_attr(_element, "Parent");
-		BLU32 _parentvar = (BLU32)strtoul(_parent, NULL, 10);
-		const BLAnsi* _policy = ezxml_attr(_element, "Policy");
-		BLEnum _policyvar;
-		if (!strcmp(_policy, "Fixed"))
-			_policyvar = BL_UP_FIXED;
-		else if (!strcmp(_policy, "V-Match"))
-			_policyvar = BL_UP_VMatch;
-		else if (!strcmp(_policy, "H-Match"))
-			_policyvar = BL_UP_HMatch;
-		else
-			_policyvar = BL_UP_STRETCH;
-		_element = ezxml_child(_element, "Base");
-		const BLAnsi* _penetration = ezxml_attr(_element, "Penetration");
-		BLBool _penetrationvar = strcmp(_penetration, "true") ? FALSE : TRUE;
-		const BLAnsi* _cliped = ezxml_attr(_element, "Cliped");
-		BLBool _clipedvar = strcmp(_cliped, "true") ? FALSE : TRUE;
-		const BLAnsi* _abs = ezxml_attr(_element, "AbsScissor");
-		BLBool _absvar = strcmp(_abs, "true") ? FALSE : TRUE;
-		const BLAnsi* _tooltip = ezxml_attr(_element, "Tooltip");
-		const BLAnsi* _minsize = ezxml_attr(_element, "MinSize");
-		BLF32 _minsizevar[2];
-		_tmp = strtok((BLAnsi*)_minsize, ",");
-		_minsizevar[0] = (BLF32)strtod(_tmp, NULL);
-		_minsizevar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
-		const BLAnsi* _maxsize = ezxml_attr(_element, "MaxSize");
-		BLF32 _maxsizevar[2];
-		_tmp = strtok((BLAnsi*)_maxsize, ",");
-		_maxsizevar[0] = (BLF32)strtod(_tmp, NULL);
-		_maxsizevar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
-		_element = _element->sibling;
-		if (strcmp(ezxml_name(_element), "Ext"))
-			continue;
-		blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _QueryWidget(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_PANEL);
-		if (!strcmp(_type, "Panel"))
-		{
-			_typevar = BL_UT_PANEL;
-			const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
-			BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
-			BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
-			const BLAnsi* _dragable = ezxml_attr(_element, "Dragable");
-			BLBool _dragablevar = strcmp(_dragable, "true") ? FALSE : TRUE;
-			const BLAnsi* _modal = ezxml_attr(_element, "Modal");
-			BLBool _modalvar = strcmp(_modal, "true") ? FALSE : TRUE;
-			const BLAnsi* _baseplate = ezxml_attr(_element, "BasePlate");
-			BLBool _baseplatevar = strcmp(_baseplate, "true") ? FALSE : TRUE;
-			const BLAnsi* _scrollable = ezxml_attr(_element, "Scrollable");
-			BLBool _scrollablevar = strcmp(_scrollable, "true") ? FALSE : TRUE;
-			const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
-			const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
-			const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
-			BLF32 _commontexvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_commontex, ",");
-			while (_tmp)
-			{
-				_commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-		}
-		else if (!strcmp(_type, "Button"))
-		{
-			_typevar = BL_UT_BUTTON;
-			const BLAnsi* _enable = ezxml_attr(_element, "Enable");
-			BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
-			BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
-			BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
-			const BLAnsi* _text = ezxml_attr(_element, "Text");
-			BLEnum _txtha, _txtva;
-			const BLAnsi* _alignmenth = ezxml_attr(_element, "AlignmentH");
-			if (!strcmp(_alignmenth, "Left"))
-				_txtha = BL_UA_LEFT;
-			else if (!strcmp(_alignmenth, "Right"))
-				_txtha = BL_UA_RIGHT;
-			else
-				_txtha = BL_UA_HCENTER;
-			const BLAnsi* _alignmentv = ezxml_attr(_element, "AlignmentV");
-			if (!strcmp(_alignmentv, "Top"))
-				_txtha = BL_UA_LEFT;
-			else if (!strcmp(_alignmentv, "Bottom"))
-				_txtha = BL_UA_RIGHT;
-			else
-				_txtha = BL_UA_HCENTER;
-			const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
-			const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
-			BLU32 _fontsizevar = (BLU32)strtoul(_fontsize, NULL, 10);
-			const BLAnsi* _fontoutline = ezxml_attr(_element, "FontOutline");
-			BLBool _fontoutlinevar = strcmp(_fontoutline, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontbold = ezxml_attr(_element, "FontBold");
-			BLBool _fontboldvar = strcmp(_fontbold, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontshadow = ezxml_attr(_element, "FontShadow");
-			BLBool _fontshadowvar = strcmp(_fontshadow, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontitalics = ezxml_attr(_element, "FontItalics");
-			BLBool _fontitalicsvar = strcmp(_fontitalics, "true") ? FALSE : TRUE;
-			const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
-			BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
-			const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
-			const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
-			const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
-			BLF32 _commontexvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_commontex, ",");
-			while (_tmp)
-			{
-				_commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _hoveredmap = ezxml_attr(_element, "HoveredMap");
-			const BLAnsi* _hoveredtexcoord = ezxml_attr(_element, "HoveredTexcoord");
-			BLF32 _hoveredtexcoordvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_hoveredtexcoord, ",");
-			while (_tmp)
-			{
-				_hoveredtexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _pressedmap = ezxml_attr(_element, "PressedMap");
-			const BLAnsi* _pressedtexcoord = ezxml_attr(_element, "PressedTexcoord");
-			BLF32 _pressedtexcoordvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_pressedtexcoord, ",");
-			while (_tmp)
-			{
-				_pressedtexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _disablemap = ezxml_attr(_element, "DisableMap");
-			const BLAnsi* _disabletexcoord = ezxml_attr(_element, "DisableTexcoord");
-			BLF32 _disabletexcoordvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_disabletexcoord, ",");
-			while (_tmp)
-			{
-				_disabletexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-		}
-		else if (!strcmp(_type, "Label"))
-		{
-			_typevar = BL_UT_LABEL;
-			const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
-			BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
-			BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
-			const BLAnsi* _text = ezxml_attr(_element, "Text");
-			const BLAnsi* _padding = ezxml_attr(_element, "Padding");
-			BLF32 _paddingvar[2];
-			_tmp = strtok((BLAnsi*)_padding, ",");
-			_paddingvar[0] = (BLF32)strtod(_tmp, NULL);
-			_paddingvar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
-			const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
-			const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
-			const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
-			BLF32 _commontexvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_commontex, ",");
-			while (_tmp)
-			{
-				_commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-		}
-		else if (!strcmp(_type, "Check"))
-		{
-			_typevar = BL_UT_CHECK;
-			const BLAnsi* _enable = ezxml_attr(_element, "Enable");
-			BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
-			BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
-			BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
-			const BLAnsi* _text = ezxml_attr(_element, "Text");
-			BLEnum _txtha, _txtva;
-			const BLAnsi* _alignmenth = ezxml_attr(_element, "AlignmentH");
-			if (!strcmp(_alignmenth, "Left"))
-				_txtha = BL_UA_LEFT;
-			else if (!strcmp(_alignmenth, "Right"))
-				_txtha = BL_UA_RIGHT;
-			else
-				_txtha = BL_UA_HCENTER;
-			const BLAnsi* _alignmentv = ezxml_attr(_element, "AlignmentV");
-			if (!strcmp(_alignmentv, "Top"))
-				_txtha = BL_UA_LEFT;
-			else if (!strcmp(_alignmentv, "Bottom"))
-				_txtha = BL_UA_RIGHT;
-			else
-				_txtha = BL_UA_HCENTER;
-			const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
-			const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
-			BLU32 _fontsizevar = (BLU32)strtoul(_fontsize, NULL, 10);
-			const BLAnsi* _fontoutline = ezxml_attr(_element, "FontOutline");
-			BLBool _fontoutlinevar = strcmp(_fontoutline, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontbold = ezxml_attr(_element, "FontBold");
-			BLBool _fontboldvar = strcmp(_fontbold, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontshadow = ezxml_attr(_element, "FontShadow");
-			BLBool _fontshadowvar = strcmp(_fontshadow, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontitalics = ezxml_attr(_element, "FontItalics");
-			BLBool _fontitalicsvar = strcmp(_fontitalics, "true") ? FALSE : TRUE;
-			const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
-			BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
-			const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
-			const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
-			const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
-			BLF32 _commontexvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_commontex, ",");
-			while (_tmp)
-			{
-				_commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _checkedmap = ezxml_attr(_element, "CheckedMap");
-			const BLAnsi* _checkedtexcoord = ezxml_attr(_element, "CheckedTexcoord");
-			BLF32 _checkedtexcoordvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_checkedtexcoord, ",");
-			while (_tmp)
-			{
-				_checkedtexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _disablemap = ezxml_attr(_element, "DisableMap");
-			const BLAnsi* _disabletexcoord = ezxml_attr(_element, "DisableTexcoord");
-			BLF32 _disabletexcoordvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_disabletexcoord, ",");
-			while (_tmp)
-			{
-				_disabletexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-		}
-		else if (!strcmp(_type, "Text"))
-		{
-			_typevar = BL_UT_TEXT;
-			const BLAnsi* _enable = ezxml_attr(_element, "Enable");
-			BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
-			BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
-			BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
-			const BLAnsi* _wordwrap = ezxml_attr(_element, "Wordwrap");
-			BLBool _wordwrapvar = strcmp(_wordwrap, "true") ? FALSE : TRUE;
-			const BLAnsi* _numeric = ezxml_attr(_element, "Numeric");
-			BLBool _numericvar = strcmp(_numeric, "true") ? FALSE : TRUE;
-			const BLAnsi* _password = ezxml_attr(_element, "Password");
-			BLBool _passwordvar = strcmp(_password, "true") ? FALSE : TRUE;
-			const BLAnsi* _autoscroll = ezxml_attr(_element, "Autoscroll");
-			BLBool _autoscrollvar = strcmp(_autoscroll, "true") ? FALSE : TRUE;
-			const BLAnsi* _multiline = ezxml_attr(_element, "Multiline");
-			BLBool _multilinevar = strcmp(_multiline, "true") ? FALSE : TRUE;
-			const BLAnsi* _maxlength = ezxml_attr(_element, "MaxLength");
-			BLU32 _maxlengthvar = (BLU32)strtoul(_maxlength, NULL, 10);
-			const BLAnsi* _numericrange = ezxml_attr(_element, "NumericRange");
-			BLS32 _numericrangevar[2];
-			_tmp = strtok((BLAnsi*)_numericrange, ",");
-			_numericrangevar[0] = (BLS32)strtol(_tmp, NULL, 10);
-			_numericrangevar[1] = (BLS32)strtol(strtok(NULL, ","), NULL, 10);
-			const BLAnsi* _placeholder = ezxml_attr(_element, "Placeholder");
-			BLEnum _txtha, _txtva;
-			const BLAnsi* _alignmenth = ezxml_attr(_element, "AlignmentH");
-			if (!strcmp(_alignmenth, "Left"))
-				_txtha = BL_UA_LEFT;
-			else if (!strcmp(_alignmenth, "Right"))
-				_txtha = BL_UA_RIGHT;
-			else
-				_txtha = BL_UA_HCENTER;
-			const BLAnsi* _alignmentv = ezxml_attr(_element, "AlignmentV");
-			if (!strcmp(_alignmentv, "Top"))
-				_txtha = BL_UA_LEFT;
-			else if (!strcmp(_alignmentv, "Bottom"))
-				_txtha = BL_UA_RIGHT;
-			else
-				_txtha = BL_UA_HCENTER;
-			const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
-			const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
-			BLU32 _fontsizevar = (BLU32)strtoul(_fontsize, NULL, 10);
-			const BLAnsi* _fontoutline = ezxml_attr(_element, "FontOutline");
-			BLBool _fontoutlinevar = strcmp(_fontoutline, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontbold = ezxml_attr(_element, "FontBold");
-			BLBool _fontboldvar = strcmp(_fontbold, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontshadow = ezxml_attr(_element, "FontShadow");
-			BLBool _fontshadowvar = strcmp(_fontshadow, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontitalics = ezxml_attr(_element, "FontItalics");
-			BLBool _fontitalicsvar = strcmp(_fontitalics, "true") ? FALSE : TRUE;
-			const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
-			BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
-			const BLAnsi* _padding = ezxml_attr(_element, "Padding");
-			BLF32 _paddingvar[2];
-			_tmp = strtok((BLAnsi*)_padding, ",");
-			_paddingvar[0] = (BLF32)strtod(_tmp, NULL);
-			_paddingvar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
-			const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
-			const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
-			const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
-			BLF32 _commontexvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_commontex, ",");
-			while (_tmp)
-			{
-				_commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-		}
-		else if (!strcmp(_type, "Progress"))
-		{
-			_typevar = BL_UT_PROGRESS;
-			const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
-			BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
-			BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
-			const BLAnsi* _percent = ezxml_attr(_element, "Percent");
-			BLU32 _percentvar = (BLU32)strtoul(_percent, NULL, 10);
-			const BLAnsi* _border = ezxml_attr(_element, "Border");
-			BLF32 _bordevarr[2];
-			_tmp = strtok((BLAnsi*)_border, ",");
-			_bordevarr[0] = (BLF32)strtod(_tmp, NULL);
-			_bordevarr[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
-			const BLAnsi* _text = ezxml_attr(_element, "Text");
-			const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
-			const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
-			BLU32 _fontsizevar = (BLU32)strtoul(_fontsize, NULL, 10);
-			const BLAnsi* _fontoutline = ezxml_attr(_element, "FontOutline");
-			BLBool _fontoutlinevar = strcmp(_fontoutline, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontbold = ezxml_attr(_element, "FontBold");
-			BLBool _fontboldvar = strcmp(_fontbold, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontshadow = ezxml_attr(_element, "FontShadow");
-			BLBool _fontshadowvar = strcmp(_fontshadow, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontitalics = ezxml_attr(_element, "FontItalics");
-			BLBool _fontitalicsvar = strcmp(_fontitalics, "true") ? FALSE : TRUE;
-			const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
-			BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
-			const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
-			const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
-			const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
-			BLF32 _commontexvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_commontex, ",");
-			while (_tmp)
-			{
-				_commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _fillmap = ezxml_attr(_element, "FillMap");
-			const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-		}
-		else if (!strcmp(_type, "Slider"))
-		{
-			_typevar = BL_UT_SLIDER;
-			const BLAnsi* _enable = ezxml_attr(_element, "Enable");
-			BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
-			BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
-			BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
-			const BLAnsi* _orientation = ezxml_attr(_element, "Orientation");
-			BLBool _orientationvar = strcmp(_orientation, "Horizontal") ? FALSE : TRUE;
-			const BLAnsi* _sliderstep = ezxml_attr(_element, "SliderStep");
-			BLU32 _sliderstepvar = (BLU32)strtoul(_sliderstep, NULL, 10);
-			const BLAnsi* _sliderposition = ezxml_attr(_element, "SliderPosition");
-			BLU32 _sliderpositionvar = (BLU32)strtoul(_sliderposition, NULL, 10);
-			const BLAnsi* _slidersize = ezxml_attr(_element, "SliderSize");
-			BLU32 _slidersizevar[2];
-			_tmp = strtok((BLAnsi*)_slidersize, ",");
-			_slidersizevar[0] = (BLU32)strtoul(_tmp, NULL, 10);
-			_slidersizevar[1] = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
-			const BLAnsi* _range = ezxml_attr(_element, "Range");
-			BLF32 _rangevar[2];
-			_tmp = strtok((BLAnsi*)_range, ",");
-			_rangevar[0] = (BLF32)strtod(_tmp, NULL);
-			_rangevar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
-			const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
-			const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
-			const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
-			BLF32 _commontexvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_commontex, ",");
-			while (_tmp)
-			{
-				_commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _slidercommonmap = ezxml_attr(_element, "SliderCommonMap");
-			const BLAnsi* _slidersisablemap = ezxml_attr(_element, "SliderDisableMap");
-			const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-		}
-		else if (!strcmp(_type, "Table"))
-		{
-			_typevar = BL_UT_TABLE;
-			const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
-			BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
-			const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
-			BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
-			const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
-			BLU32 _fontsizevar = (BLU32)strtol(_fontsize, NULL, 10);
-			const BLAnsi* _fontoutline = ezxml_attr(_element, "FontOutline");
-			BLBool _fontoutlinevar = strcmp(_fontoutline, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontbold = ezxml_attr(_element, "FontBold");
-			BLBool _fontboldvar = strcmp(_fontbold, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontshadow = ezxml_attr(_element, "FontShadow");
-			BLBool _fontshadowvar = strcmp(_fontshadow, "true") ? FALSE : TRUE;
-			const BLAnsi* _fontitalics = ezxml_attr(_element, "FontItalics");
-			BLBool _fontitalicsvar = strcmp(_fontitalics, "true") ? FALSE : TRUE;
-			const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
-			BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
-			const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
-			const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
-			const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
-			BLF32 _commontexvar[4];
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_commontex, ",");
-			while (_tmp)
-			{
-				_commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-			const BLAnsi* _odditemmap = ezxml_attr(_element, "OddItemMap");
-			const BLAnsi* _evenitemmap = ezxml_attr(_element, "EvenItemMap");
-			const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-		}
-		else if (!strcmp(_type, "Dial"))
-		{
-			_typevar = BL_UT_DIAL;
-			const BLAnsi* _clockwise = ezxml_attr(_element, "Clockwise");
-			BLBool _clockwisevar = strcmp(_clockwise, "true") ? FALSE : TRUE;
-			const BLAnsi* _anglecut = ezxml_attr(_element, "AngleCut");
-			BLBool _anglecutvar = strcmp(_anglecut, "true") ? FALSE : TRUE;
-			const BLAnsi* _startangle = ezxml_attr(_element, "StartAngle");
-			BLU32 _startanglevar = (BLU32)strtoul(_startangle, NULL, 0);
-			const BLAnsi* _endangle = ezxml_attr(_element, "EndAngle");
-			BLU32 _endanglevar = (BLU32)strtoul(_endangle, NULL, 0);
-			const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
-			const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
-			const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-		}
-		else if (!strcmp(_type, "Primitive"))
-		{
-			_typevar = BL_UT_PRIMITIVE;
-			const BLAnsi* _fill = ezxml_attr(_element, "Fill");
-			BLBool _fillvar = strcmp(_fill, "true") ? FALSE : TRUE;
-			const BLAnsi* _closed = ezxml_attr(_element, "Closed");
-			BLBool _closedvar = strcmp(_closed, "true") ? FALSE : TRUE;
-			const BLAnsi* _color = ezxml_attr(_element, "Color");
-			BLU32 _colorvar = (BLU32)strtoul(_color, NULL, 10);
-			BLF32* _xpath = (BLF32*)alloca(2048 * sizeof(BLF32));
-			BLF32* _ypath = (BLF32*)alloca(2048 * sizeof(BLF32));
-			BLU32 _pathnum = 0;
-			const BLAnsi* _path = ezxml_attr(_element, "Path");
-			_idx = 0;
-			_tmp = strtok((BLAnsi*)_path, ",");
-			while (_tmp)
-			{
-				if (_idx % 2 == 0)
-					_xpath[_pathnum] = (BLF32)strtod(_tmp, NULL);
-				else
-				{
-					_ypath[_pathnum] = (BLF32)strtod(_tmp, NULL);
-					_pathnum++;
-				}
-				_tmp = strtok(NULL, ",");
-				_idx++;
-			}
-		}
-		if (_element->sibling)
-			_element = _element->sibling;
-		else
-		{
-			do {
-				_element = _element->parent;
-				if (!_element)
-					break;
-			} while (!_element->next);
-			_element = _element ? _element->next : NULL;
-		}
-	} while (_element);
-	ezxml_free(_doc);
-	blDeleteStream(_layout);
+    strcat(_path, _Filename);
+    BLGuid _layout = blGenStream(_path, _PrUIMem->aArchive[0] ? _PrUIMem->aArchive : NULL);
+    ezxml_t _doc = ezxml_parse_str(blStreamData(_layout), blStreamLength(_layout));
+    ezxml_t _element = ezxml_child(_doc, "Element");
+    BLU32 _idx = 0;
+    BLAnsi* _tmp;
+    do {
+        const BLAnsi* _rpt = ezxml_attr(_element, "ReferencePt");
+        BLEnum _ha, _va;
+        if (!strcmp(_rpt, "LT")) { _ha = BL_UA_LEFT; _va = BL_UA_TOP; }
+        else if (!strcmp(_rpt, "LM")) { _ha = BL_UA_LEFT; _va = BL_UA_VCENTER; }
+        else if (!strcmp(_rpt, "LB")) { _ha = BL_UA_LEFT; _va = BL_UA_BOTTOM; }
+        else if (!strcmp(_rpt, "MT")) { _ha = BL_UA_HCENTER; _va = BL_UA_TOP; }
+        else if (!strcmp(_rpt, "MM")) { _ha = BL_UA_HCENTER; _va = BL_UA_VCENTER; }
+        else if (!strcmp(_rpt, "MB")) { _ha = BL_UA_HCENTER; _va = BL_UA_BOTTOM; }
+        else if (!strcmp(_rpt, "RT")) { _ha = BL_UA_RIGHT; _va = BL_UA_TOP; }
+        else if (!strcmp(_rpt, "RM")) { _ha = BL_UA_RIGHT; _va = BL_UA_VCENTER; }
+        else { _ha = BL_UA_RIGHT; _va = BL_UA_BOTTOM; }
+        const BLAnsi* _geo = ezxml_attr(_element, "Geometry");
+        _idx = 0;
+        BLS32 _geovar[4];
+        _tmp = strtok((BLAnsi*)_geo, ",");
+        while (_tmp)
+        {
+            _geovar[_idx] = (BLS32)strtol(_tmp, NULL, 10);
+            _tmp = strtok(NULL, ",");
+            _idx++;
+        }
+        const BLAnsi* _name = ezxml_attr(_element, "Name");
+        BLEnum _typevar;
+        const BLAnsi* _type = ezxml_attr(_element, "Type");
+        const BLAnsi* _parent = ezxml_attr(_element, "Parent");
+        BLU32 _parentvar = (BLU32)strtoul(_parent, NULL, 10);
+        const BLAnsi* _policy = ezxml_attr(_element, "Policy");
+        BLEnum _policyvar;
+        if (!strcmp(_policy, "Fixed"))
+            _policyvar = BL_UP_FIXED;
+        else if (!strcmp(_policy, "V-Match"))
+            _policyvar = BL_UP_VMatch;
+        else if (!strcmp(_policy, "H-Match"))
+            _policyvar = BL_UP_HMatch;
+        else
+            _policyvar = BL_UP_STRETCH;
+        _element = ezxml_child(_element, "Base");
+        const BLAnsi* _penetration = ezxml_attr(_element, "Penetration");
+        BLBool _penetrationvar = strcmp(_penetration, "true") ? FALSE : TRUE;
+        const BLAnsi* _cliped = ezxml_attr(_element, "Cliped");
+        BLBool _clipedvar = strcmp(_cliped, "true") ? FALSE : TRUE;
+        const BLAnsi* _abs = ezxml_attr(_element, "AbsScissor");
+        BLBool _absvar = strcmp(_abs, "true") ? FALSE : TRUE;
+        const BLAnsi* _tooltip = ezxml_attr(_element, "Tooltip");
+        const BLAnsi* _minsize = ezxml_attr(_element, "MinSize");
+        BLF32 _minsizevar[2];
+        _tmp = strtok((BLAnsi*)_minsize, ",");
+        _minsizevar[0] = (BLF32)strtod(_tmp, NULL);
+        _minsizevar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
+        const BLAnsi* _maxsize = ezxml_attr(_element, "MaxSize");
+        BLF32 _maxsizevar[2];
+        _tmp = strtok((BLAnsi*)_maxsize, ",");
+        _maxsizevar[0] = (BLF32)strtod(_tmp, NULL);
+        _maxsizevar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
+        _element = _element->sibling;
+        if (strcmp(ezxml_name(_element), "Ext"))
+            continue;
+        if (!strcmp(_type, "Panel"))
+        {
+            _typevar = BL_UT_PANEL;
+            const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
+            BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
+            BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
+            const BLAnsi* _dragable = ezxml_attr(_element, "Dragable");
+            BLBool _dragablevar = strcmp(_dragable, "true") ? FALSE : TRUE;
+            const BLAnsi* _modal = ezxml_attr(_element, "Modal");
+            BLBool _modalvar = strcmp(_modal, "true") ? FALSE : TRUE;
+            const BLAnsi* _baseplate = ezxml_attr(_element, "BasePlate");
+            BLBool _baseplatevar = strcmp(_baseplate, "true") ? FALSE : TRUE;
+            const BLAnsi* _scrollable = ezxml_attr(_element, "Scrollable");
+            BLBool _scrollablevar = strcmp(_scrollable, "true") ? FALSE : TRUE;
+            const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
+            const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
+            const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
+            BLF32 _commontexvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_commontex, ",");
+            while (_tmp)
+            {
+                _commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+            blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _QueryWidget(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_PANEL);
+        }
+        else if (!strcmp(_type, "Button"))
+        {
+            _typevar = BL_UT_BUTTON;
+            const BLAnsi* _enable = ezxml_attr(_element, "Enable");
+            BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
+            BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
+            BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
+            const BLAnsi* _text = ezxml_attr(_element, "Text");
+            BLEnum _txtha, _txtva;
+            const BLAnsi* _alignmenth = ezxml_attr(_element, "AlignmentH");
+            if (!strcmp(_alignmenth, "Left"))
+                _txtha = BL_UA_LEFT;
+            else if (!strcmp(_alignmenth, "Right"))
+                _txtha = BL_UA_RIGHT;
+            else
+                _txtha = BL_UA_HCENTER;
+            const BLAnsi* _alignmentv = ezxml_attr(_element, "AlignmentV");
+            if (!strcmp(_alignmentv, "Top"))
+                _txtva = BL_UA_LEFT;
+            else if (!strcmp(_alignmentv, "Bottom"))
+                _txtva = BL_UA_RIGHT;
+            else
+                _txtva = BL_UA_HCENTER;
+            const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
+            const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
+            BLU32 _fontsizevar = (BLU32)strtoul(_fontsize, NULL, 10);
+            const BLAnsi* _fontoutline = ezxml_attr(_element, "FontOutline");
+            BLBool _fontoutlinevar = strcmp(_fontoutline, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontbold = ezxml_attr(_element, "FontBold");
+            BLBool _fontboldvar = strcmp(_fontbold, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontshadow = ezxml_attr(_element, "FontShadow");
+            BLBool _fontshadowvar = strcmp(_fontshadow, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontitalics = ezxml_attr(_element, "FontItalics");
+            BLBool _fontitalicsvar = strcmp(_fontitalics, "true") ? FALSE : TRUE;
+            const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
+            BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
+            const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
+            const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
+            const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
+            BLF32 _commontexvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_commontex, ",");
+            while (_tmp)
+            {
+                _commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _hoveredmap = ezxml_attr(_element, "HoveredMap");
+            const BLAnsi* _hoveredtexcoord = ezxml_attr(_element, "HoveredTexcoord");
+            BLF32 _hoveredtexcoordvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_hoveredtexcoord, ",");
+            while (_tmp)
+            {
+                _hoveredtexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _pressedmap = ezxml_attr(_element, "PressedMap");
+            const BLAnsi* _pressedtexcoord = ezxml_attr(_element, "PressedTexcoord");
+            BLF32 _pressedtexcoordvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_pressedtexcoord, ",");
+            while (_tmp)
+            {
+                _pressedtexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _disablemap = ezxml_attr(_element, "DisableMap");
+            const BLAnsi* _disabletexcoord = ezxml_attr(_element, "DisableTexcoord");
+            BLF32 _disabletexcoordvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_disabletexcoord, ",");
+            while (_tmp)
+            {
+                _disabletexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+            BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _QueryWidget(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_BUTTON);
+            blUIReferencePoint(_widguid, _ha, _va);
+            blUISizePolicy(_widguid, _policyvar);
+            blUISizeLimit(_widguid, _maxsizevar[0], _maxsizevar[1], _minsizevar[0], _minsizevar[1]);
+            blUIScissor(_widguid, _clipedvar, _absvar);
+            blUITooltip(_widguid, (const BLUtf8*)_tooltip);
+            blUIPenetration(_widguid, _penetrationvar);
+            blUIButtonPixmap(_widguid, _pixmap);
+            blUIButtonStencil(_widguid, _stencilmap);
+            blUIButtonCommon(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+            blUIButtonHover(_widguid, _hoveredmap, _hoveredtexcoordvar[0], _hoveredtexcoordvar[1], _hoveredtexcoordvar[2], _hoveredtexcoordvar[3]);
+            blUIButtonPress(_widguid, _pressedmap, _pressedtexcoordvar[0], _pressedtexcoordvar[1], _pressedtexcoordvar[2], _pressedtexcoordvar[3]);
+            blUIButtonDisable(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
+            blUIButtonFont(_widguid, _fontsrc, _fontsizevar, _fontoutlinevar, _fontboldvar, _fontshadowvar, _fontitalicsvar);
+            blUIButtonFlip(_widguid, _flipxvar, _flipyvar);
+            blUIButtonText(_widguid, (const BLUtf8*)_text, _textcolorvar, _txtha, _txtva);
+            blUIButtonEnable(_widguid, _enablevar);
+        }
+        else if (!strcmp(_type, "Label"))
+        {
+            _typevar = BL_UT_LABEL;
+            const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
+            BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
+            BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
+            const BLAnsi* _text = ezxml_attr(_element, "Text");
+            const BLAnsi* _padding = ezxml_attr(_element, "Padding");
+            BLF32 _paddingvar[2];
+            _tmp = strtok((BLAnsi*)_padding, ",");
+            _paddingvar[0] = (BLF32)strtod(_tmp, NULL);
+            _paddingvar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
+            const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
+            const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
+            const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
+            BLF32 _commontexvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_commontex, ",");
+            while (_tmp)
+            {
+                _commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+        }
+        else if (!strcmp(_type, "Check"))
+        {
+            _typevar = BL_UT_CHECK;
+            const BLAnsi* _enable = ezxml_attr(_element, "Enable");
+            BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
+            BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
+            BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
+            const BLAnsi* _text = ezxml_attr(_element, "Text");
+            BLEnum _txtha, _txtva;
+            const BLAnsi* _alignmenth = ezxml_attr(_element, "AlignmentH");
+            if (!strcmp(_alignmenth, "Left"))
+                _txtha = BL_UA_LEFT;
+            else if (!strcmp(_alignmenth, "Right"))
+                _txtha = BL_UA_RIGHT;
+            else
+                _txtha = BL_UA_HCENTER;
+            const BLAnsi* _alignmentv = ezxml_attr(_element, "AlignmentV");
+            if (!strcmp(_alignmentv, "Top"))
+                _txtva = BL_UA_LEFT;
+            else if (!strcmp(_alignmentv, "Bottom"))
+                _txtva = BL_UA_RIGHT;
+            else
+                _txtva = BL_UA_HCENTER;
+            const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
+            const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
+            BLU32 _fontsizevar = (BLU32)strtoul(_fontsize, NULL, 10);
+            const BLAnsi* _fontoutline = ezxml_attr(_element, "FontOutline");
+            BLBool _fontoutlinevar = strcmp(_fontoutline, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontbold = ezxml_attr(_element, "FontBold");
+            BLBool _fontboldvar = strcmp(_fontbold, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontshadow = ezxml_attr(_element, "FontShadow");
+            BLBool _fontshadowvar = strcmp(_fontshadow, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontitalics = ezxml_attr(_element, "FontItalics");
+            BLBool _fontitalicsvar = strcmp(_fontitalics, "true") ? FALSE : TRUE;
+            const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
+            BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
+            const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
+            const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
+            const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
+            BLF32 _commontexvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_commontex, ",");
+            while (_tmp)
+            {
+                _commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _checkedmap = ezxml_attr(_element, "CheckedMap");
+            const BLAnsi* _checkedtexcoord = ezxml_attr(_element, "CheckedTexcoord");
+            BLF32 _checkedtexcoordvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_checkedtexcoord, ",");
+            while (_tmp)
+            {
+                _checkedtexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _disablemap = ezxml_attr(_element, "DisableMap");
+            const BLAnsi* _disabletexcoord = ezxml_attr(_element, "DisableTexcoord");
+            BLF32 _disabletexcoordvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_disabletexcoord, ",");
+            while (_tmp)
+            {
+                _disabletexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+        }
+        else if (!strcmp(_type, "Text"))
+        {
+            _typevar = BL_UT_TEXT;
+            const BLAnsi* _enable = ezxml_attr(_element, "Enable");
+            BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
+            BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
+            BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
+            const BLAnsi* _wordwrap = ezxml_attr(_element, "Wordwrap");
+            BLBool _wordwrapvar = strcmp(_wordwrap, "true") ? FALSE : TRUE;
+            const BLAnsi* _numeric = ezxml_attr(_element, "Numeric");
+            BLBool _numericvar = strcmp(_numeric, "true") ? FALSE : TRUE;
+            const BLAnsi* _password = ezxml_attr(_element, "Password");
+            BLBool _passwordvar = strcmp(_password, "true") ? FALSE : TRUE;
+            const BLAnsi* _autoscroll = ezxml_attr(_element, "Autoscroll");
+            BLBool _autoscrollvar = strcmp(_autoscroll, "true") ? FALSE : TRUE;
+            const BLAnsi* _multiline = ezxml_attr(_element, "Multiline");
+            BLBool _multilinevar = strcmp(_multiline, "true") ? FALSE : TRUE;
+            const BLAnsi* _maxlength = ezxml_attr(_element, "MaxLength");
+            BLU32 _maxlengthvar = (BLU32)strtoul(_maxlength, NULL, 10);
+            const BLAnsi* _numericrange = ezxml_attr(_element, "NumericRange");
+            BLS32 _numericrangevar[2];
+            _tmp = strtok((BLAnsi*)_numericrange, ",");
+            _numericrangevar[0] = (BLS32)strtol(_tmp, NULL, 10);
+            _numericrangevar[1] = (BLS32)strtol(strtok(NULL, ","), NULL, 10);
+            const BLAnsi* _placeholder = ezxml_attr(_element, "Placeholder");
+            BLEnum _txtha, _txtva;
+            const BLAnsi* _alignmenth = ezxml_attr(_element, "AlignmentH");
+            if (!strcmp(_alignmenth, "Left"))
+                _txtha = BL_UA_LEFT;
+            else if (!strcmp(_alignmenth, "Right"))
+                _txtha = BL_UA_RIGHT;
+            else
+                _txtha = BL_UA_HCENTER;
+            const BLAnsi* _alignmentv = ezxml_attr(_element, "AlignmentV");
+            if (!strcmp(_alignmentv, "Top"))
+                _txtva = BL_UA_LEFT;
+            else if (!strcmp(_alignmentv, "Bottom"))
+                _txtva = BL_UA_RIGHT;
+            else
+                _txtva = BL_UA_HCENTER;
+            const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
+            const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
+            BLU32 _fontsizevar = (BLU32)strtoul(_fontsize, NULL, 10);
+            const BLAnsi* _fontoutline = ezxml_attr(_element, "FontOutline");
+            BLBool _fontoutlinevar = strcmp(_fontoutline, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontbold = ezxml_attr(_element, "FontBold");
+            BLBool _fontboldvar = strcmp(_fontbold, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontshadow = ezxml_attr(_element, "FontShadow");
+            BLBool _fontshadowvar = strcmp(_fontshadow, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontitalics = ezxml_attr(_element, "FontItalics");
+            BLBool _fontitalicsvar = strcmp(_fontitalics, "true") ? FALSE : TRUE;
+            const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
+            BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
+            const BLAnsi* _padding = ezxml_attr(_element, "Padding");
+            BLF32 _paddingvar[2];
+            _tmp = strtok((BLAnsi*)_padding, ",");
+            _paddingvar[0] = (BLF32)strtod(_tmp, NULL);
+            _paddingvar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
+            const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
+            const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
+            const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
+            BLF32 _commontexvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_commontex, ",");
+            while (_tmp)
+            {
+                _commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+        }
+        else if (!strcmp(_type, "Progress"))
+        {
+            _typevar = BL_UT_PROGRESS;
+            const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
+            BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
+            BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
+            const BLAnsi* _percent = ezxml_attr(_element, "Percent");
+            BLU32 _percentvar = (BLU32)strtoul(_percent, NULL, 10);
+            const BLAnsi* _border = ezxml_attr(_element, "Border");
+            BLF32 _bordevarr[2];
+            _tmp = strtok((BLAnsi*)_border, ",");
+            _bordevarr[0] = (BLF32)strtod(_tmp, NULL);
+            _bordevarr[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
+            const BLAnsi* _text = ezxml_attr(_element, "Text");
+            const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
+            const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
+            BLU32 _fontsizevar = (BLU32)strtoul(_fontsize, NULL, 10);
+            const BLAnsi* _fontoutline = ezxml_attr(_element, "FontOutline");
+            BLBool _fontoutlinevar = strcmp(_fontoutline, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontbold = ezxml_attr(_element, "FontBold");
+            BLBool _fontboldvar = strcmp(_fontbold, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontshadow = ezxml_attr(_element, "FontShadow");
+            BLBool _fontshadowvar = strcmp(_fontshadow, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontitalics = ezxml_attr(_element, "FontItalics");
+            BLBool _fontitalicsvar = strcmp(_fontitalics, "true") ? FALSE : TRUE;
+            const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
+            BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
+            const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
+            const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
+            const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
+            BLF32 _commontexvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_commontex, ",");
+            while (_tmp)
+            {
+                _commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _fillmap = ezxml_attr(_element, "FillMap");
+            const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+        }
+        else if (!strcmp(_type, "Slider"))
+        {
+            _typevar = BL_UT_SLIDER;
+            const BLAnsi* _enable = ezxml_attr(_element, "Enable");
+            BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
+            BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
+            BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
+            const BLAnsi* _orientation = ezxml_attr(_element, "Orientation");
+            BLBool _orientationvar = strcmp(_orientation, "Horizontal") ? FALSE : TRUE;
+            const BLAnsi* _sliderstep = ezxml_attr(_element, "SliderStep");
+            BLU32 _sliderstepvar = (BLU32)strtoul(_sliderstep, NULL, 10);
+            const BLAnsi* _sliderposition = ezxml_attr(_element, "SliderPosition");
+            BLU32 _sliderpositionvar = (BLU32)strtoul(_sliderposition, NULL, 10);
+            const BLAnsi* _slidersize = ezxml_attr(_element, "SliderSize");
+            BLU32 _slidersizevar[2];
+            _tmp = strtok((BLAnsi*)_slidersize, ",");
+            _slidersizevar[0] = (BLU32)strtoul(_tmp, NULL, 10);
+            _slidersizevar[1] = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+            const BLAnsi* _range = ezxml_attr(_element, "Range");
+            BLF32 _rangevar[2];
+            _tmp = strtok((BLAnsi*)_range, ",");
+            _rangevar[0] = (BLF32)strtod(_tmp, NULL);
+            _rangevar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
+            const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
+            const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
+            const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
+            BLF32 _commontexvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_commontex, ",");
+            while (_tmp)
+            {
+                _commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _slidercommonmap = ezxml_attr(_element, "SliderCommonMap");
+            const BLAnsi* _slidersisablemap = ezxml_attr(_element, "SliderDisableMap");
+            const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+        }
+        else if (!strcmp(_type, "Table"))
+        {
+            _typevar = BL_UT_TABLE;
+            const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
+            BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
+            const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
+            BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
+            const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
+            BLU32 _fontsizevar = (BLU32)strtol(_fontsize, NULL, 10);
+            const BLAnsi* _fontoutline = ezxml_attr(_element, "FontOutline");
+            BLBool _fontoutlinevar = strcmp(_fontoutline, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontbold = ezxml_attr(_element, "FontBold");
+            BLBool _fontboldvar = strcmp(_fontbold, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontshadow = ezxml_attr(_element, "FontShadow");
+            BLBool _fontshadowvar = strcmp(_fontshadow, "true") ? FALSE : TRUE;
+            const BLAnsi* _fontitalics = ezxml_attr(_element, "FontItalics");
+            BLBool _fontitalicsvar = strcmp(_fontitalics, "true") ? FALSE : TRUE;
+            const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
+            BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
+            const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
+            const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
+            const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
+            BLF32 _commontexvar[4];
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_commontex, ",");
+            while (_tmp)
+            {
+                _commontexvar[_idx] = (BLF32)strtod(_tmp, NULL);
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+            const BLAnsi* _odditemmap = ezxml_attr(_element, "OddItemMap");
+            const BLAnsi* _evenitemmap = ezxml_attr(_element, "EvenItemMap");
+            const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+        }
+        else if (!strcmp(_type, "Dial"))
+        {
+            _typevar = BL_UT_DIAL;
+            const BLAnsi* _clockwise = ezxml_attr(_element, "Clockwise");
+            BLBool _clockwisevar = strcmp(_clockwise, "true") ? FALSE : TRUE;
+            const BLAnsi* _anglecut = ezxml_attr(_element, "AngleCut");
+            BLBool _anglecutvar = strcmp(_anglecut, "true") ? FALSE : TRUE;
+            const BLAnsi* _startangle = ezxml_attr(_element, "StartAngle");
+            BLU32 _startanglevar = (BLU32)strtoul(_startangle, NULL, 0);
+            const BLAnsi* _endangle = ezxml_attr(_element, "EndAngle");
+            BLU32 _endanglevar = (BLU32)strtoul(_endangle, NULL, 0);
+            const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
+            const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
+            const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+        }
+        else if (!strcmp(_type, "Primitive"))
+        {
+            _typevar = BL_UT_PRIMITIVE;
+            const BLAnsi* _fill = ezxml_attr(_element, "Fill");
+            BLBool _fillvar = strcmp(_fill, "true") ? FALSE : TRUE;
+            const BLAnsi* _closed = ezxml_attr(_element, "Closed");
+            BLBool _closedvar = strcmp(_closed, "true") ? FALSE : TRUE;
+            const BLAnsi* _color = ezxml_attr(_element, "Color");
+            BLU32 _colorvar = (BLU32)strtoul(_color, NULL, 10);
+            BLF32* _xpath = (BLF32*)alloca(2048 * sizeof(BLF32));
+            BLF32* _ypath = (BLF32*)alloca(2048 * sizeof(BLF32));
+            BLU32 _pathnum = 0;
+            const BLAnsi* _path = ezxml_attr(_element, "Path");
+            _idx = 0;
+            _tmp = strtok((BLAnsi*)_path, ",");
+            while (_tmp)
+            {
+                if (_idx % 2 == 0)
+                    _xpath[_pathnum] = (BLF32)strtod(_tmp, NULL);
+                else
+                {
+                    _ypath[_pathnum] = (BLF32)strtod(_tmp, NULL);
+                    _pathnum++;
+                }
+                _tmp = strtok(NULL, ",");
+                _idx++;
+            }
+        }
+        if (_element->sibling)
+            _element = _element->sibling;
+        else
+        {
+            do {
+                _element = _element->parent;
+                if (!_element)
+                    break;
+            } while (!_element->next);
+            _element = _element ? _element->next : NULL;
+        }
+    } while (_element);
+    ezxml_free(_doc);
+    blDeleteStream(_layout);
 }
 BLGuid 
 blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width, IN BLU32 _Height, IN BLGuid _Parent, IN BLEnum _Type)
@@ -1642,6 +1689,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 	_widget->bPenetration = TRUE;
 	_widget->bAbsScissor = FALSE;
 	_widget->bInteractive = TRUE;
+    _widget->bValid = FALSE;
 	switch (_widget->eType)
 	{
 		case BL_UT_PANEL:
@@ -1656,6 +1704,8 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sPanel.bScrollable = TRUE;
 			_widget->uExtension.sPanel.bFlipX = FALSE;
 			_widget->uExtension.sPanel.bFlipY = FALSE;
+            _widget->uExtension.sPanel.nPixmapTex = INVALID_GUID;
+            _widget->uExtension.sPanel.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_LABEL:
@@ -1666,7 +1716,9 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sLabel.aCommonTex, 0, sizeof(BLRect) * 9);
 			memset(_widget->uExtension.sLabel.aStencilMap, 0, sizeof(BLAnsi) * 128);
 			_widget->uExtension.sLabel.bFlipX = FALSE;
-			_widget->uExtension.sLabel.bFlipY = FALSE;
+            _widget->uExtension.sLabel.bFlipY = FALSE;
+            _widget->uExtension.sLabel.nPixmapTex = INVALID_GUID;
+            _widget->uExtension.sLabel.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_BUTTON:
@@ -1693,7 +1745,9 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sButton.nTxtColor = 0xFFFFFFFF;
 			_widget->uExtension.sButton.bFlipX = FALSE;
 			_widget->uExtension.sButton.bFlipY = FALSE;
-			_widget->uExtension.sButton.nState = 0;
+            _widget->uExtension.sButton.nState = 0;
+            _widget->uExtension.sButton.nPixmapTex = INVALID_GUID;
+            _widget->uExtension.sButton.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_CHECK:
@@ -1718,7 +1772,9 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sCheck.nTxtColor = 0xFFFFFFFF;
 			_widget->uExtension.sCheck.bFlipX = FALSE;
 			_widget->uExtension.sCheck.bFlipY = FALSE;
-			_widget->uExtension.sCheck.nState = 0;
+            _widget->uExtension.sCheck.nState = 0;
+            _widget->uExtension.sCheck.nPixmapTex = INVALID_GUID;
+            _widget->uExtension.sCheck.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_SLIDER:
@@ -1739,7 +1795,9 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sSlider.sSliderSize.fY = 10.f;
 			_widget->uExtension.sSlider.bFlipX = FALSE;
 			_widget->uExtension.sSlider.bFlipY = FALSE;
-			_widget->uExtension.sSlider.nState = 0;
+            _widget->uExtension.sSlider.nState = 0;
+            _widget->uExtension.sSlider.nPixmapTex = INVALID_GUID;
+            _widget->uExtension.sSlider.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_TEXT:
@@ -1777,7 +1835,9 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sText.nPaddingY = 0;
 			_widget->uExtension.sText.bFlipX = FALSE;
 			_widget->uExtension.sText.bFlipY = FALSE;
-			_widget->uExtension.sText.nState = 0;
+            _widget->uExtension.sText.nState = 0;
+            _widget->uExtension.sText.nPixmapTex = INVALID_GUID;
+            _widget->uExtension.sText.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_PROGRESS:
@@ -1797,7 +1857,9 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sProgress.nTxtColor = 0xFFFFFFFF;
 			_widget->uExtension.sProgress.bFlipX = FALSE;
 			_widget->uExtension.sProgress.bFlipY = FALSE;
-			_widget->uExtension.sProgress.nPercent = 0;
+            _widget->uExtension.sProgress.nPercent = 0;
+            _widget->uExtension.sProgress.nPixmapTex = INVALID_GUID;
+            _widget->uExtension.sProgress.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_DIAL:
@@ -1808,7 +1870,9 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sDial.nStartAngle = 0;
 			_widget->uExtension.sDial.nEndAngle = 270;
 			_widget->uExtension.sDial.bAngleCut = FALSE;
-			_widget->uExtension.sDial.bClockWise = FALSE;
+            _widget->uExtension.sDial.bClockWise = FALSE;
+            _widget->uExtension.sDial.nPixmapTex = INVALID_GUID;
+            _widget->uExtension.sDial.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_TABLE:
@@ -1827,7 +1891,9 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sTable.bItalics = FALSE;
 			_widget->uExtension.sTable.nTxtColor = 0xFFFFFFFF;
 			_widget->uExtension.sTable.bFlipX = FALSE;
-			_widget->uExtension.sTable.bFlipY = FALSE;
+            _widget->uExtension.sTable.bFlipY = FALSE;
+            _widget->uExtension.sTable.nPixmapTex = INVALID_GUID;
+            _widget->uExtension.sTable.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		default:
@@ -1849,77 +1915,167 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 BLVoid
 blDeleteUI(IN BLGuid _ID)
 {
-	_BLWidget* _widget = blGuidAsPointer(_ID);
-	if (!_widget)
-		return;
-	BLU32 _idx = 0;
-	if (_widget->pParent)
-	{
-		FOREACH_ARRAY(_BLWidget*, _iter, _widget->pParent->pChildren)
-		{
-			if (_iter == _widget)
-				break;
-			_idx++;
-		}
-		blArrayErase(_widget->pParent->pChildren, _idx);
-	}
-	if (_widget->pTooltip)
-		free(_widget->pTooltip);
-	switch (_widget->eType)
-	{
-		case BL_UT_LABEL:
-		{
-			if (_widget->uExtension.sLabel.pText)
-				free(_widget->uExtension.sLabel.pText);
-		}
-		break;
-		case BL_UT_BUTTON:
-		{
-			if (_widget->uExtension.sButton.pText)
-				free(_widget->uExtension.sButton.pText);
-		}
-		break;
-		case BL_UT_CHECK:
-		{
-			if (_widget->uExtension.sCheck.pText)
-				free(_widget->uExtension.sCheck.pText);
-		}
-		break;
-		case BL_UT_TEXT:
-		{
-			if (_widget->uExtension.sText.pText)
-				free(_widget->uExtension.sText.pText);
-			if (_widget->uExtension.sText.pPlaceholder)
-				free(_widget->uExtension.sText.pPlaceholder);
-		}
-		break;
-		case BL_UT_PROGRESS:
-		{
-			if (_widget->uExtension.sProgress.pText)
-				free(_widget->uExtension.sProgress.pText);
-		}
-		break;
-		case BL_UT_PRIMITIVE:
-		{
-			if (_widget->uExtension.sPrimitive.pXPath)
-				free(_widget->uExtension.sPrimitive.pXPath);
-			if (_widget->uExtension.sPrimitive.pYPath)
-				free(_widget->uExtension.sPrimitive.pYPath);
-		}
-		break;
-		default:break;
-	}
-	{
-		FOREACH_ARRAY(_BLWidget*, _iter, _widget->pChildren)
-		{
-			_iter->pParent = NULL;
-			blDeleteUI(_iter->nID);
-		}
-	}
-	blDeleteArray(_widget->pChildren);
-	free(_widget);
-	blDeleteGuid(_ID);
-	_PrUIMem->bDirty = TRUE;
+    if (_ID == INVALID_GUID)
+        return;
+    _BLWidget* _widget = blGuidAsPointer(_ID);
+    if (!_widget)
+        return;
+    BLU32 _idx = 0;
+    if (_widget->pParent)
+    {
+        FOREACH_ARRAY(_BLWidget*, _iter, _widget->pParent->pChildren)
+        {
+            if (_iter == _widget)
+                break;
+            _idx++;
+        }
+        blArrayErase(_widget->pParent->pChildren, _idx);
+    }
+    if (_widget->pTooltip)
+        free(_widget->pTooltip);
+    switch (_widget->eType)
+    {
+        case BL_UT_PANEL:
+        {
+            if (_widget->uExtension.sPanel.pPixmapSheetDct)
+            {
+                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sPanel.pPixmapSheetDct)
+                {
+                    free(_iter);
+                }
+                blDeleteDict(_widget->uExtension.sPanel.pPixmapSheetDct);
+            }
+        }
+        break;
+        case BL_UT_LABEL:
+        {
+            if (_widget->uExtension.sLabel.pText)
+                free(_widget->uExtension.sLabel.pText);
+            if (_widget->uExtension.sLabel.pPixmapSheetDct)
+            {
+                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sLabel.pPixmapSheetDct)
+                {
+                    free(_iter);
+                }
+                blDeleteDict(_widget->uExtension.sLabel.pPixmapSheetDct);
+            }
+        }
+        break;
+        case BL_UT_BUTTON:
+        {
+            if (_widget->uExtension.sButton.pText)
+                free(_widget->uExtension.sButton.pText);
+            if (_widget->uExtension.sButton.pPixmapSheetDct)
+            {
+                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sButton.pPixmapSheetDct)
+                {
+                    free(_iter);
+                }
+                blDeleteDict(_widget->uExtension.sButton.pPixmapSheetDct);
+            }
+        }
+        break;
+        case BL_UT_CHECK:
+        {
+            if (_widget->uExtension.sCheck.pText)
+                free(_widget->uExtension.sCheck.pText);
+            if (_widget->uExtension.sCheck.pPixmapSheetDct)
+            {
+                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sCheck.pPixmapSheetDct)
+                {
+                    free(_iter);
+                }
+                blDeleteDict(_widget->uExtension.sCheck.pPixmapSheetDct);
+            }
+        }
+        break;
+        case BL_UT_SLIDER:
+        {
+            if (_widget->uExtension.sSlider.pPixmapSheetDct)
+            {
+                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sSlider.pPixmapSheetDct)
+                {
+                    free(_iter);
+                }
+                blDeleteDict(_widget->uExtension.sSlider.pPixmapSheetDct);
+            }
+        }
+        break;
+        case BL_UT_TEXT:
+        {
+            if (_widget->uExtension.sText.pText)
+                free(_widget->uExtension.sText.pText);
+            if (_widget->uExtension.sText.pPlaceholder)
+                free(_widget->uExtension.sText.pPlaceholder);
+            if (_widget->uExtension.sText.pPixmapSheetDct)
+            {
+                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sText.pPixmapSheetDct)
+                {
+                    free(_iter);
+                }
+                blDeleteDict(_widget->uExtension.sText.pPixmapSheetDct);
+            }
+        }
+        break;
+        case BL_UT_PROGRESS:
+        {
+            if (_widget->uExtension.sProgress.pText)
+                free(_widget->uExtension.sProgress.pText);
+            if (_widget->uExtension.sProgress.pPixmapSheetDct)
+            {
+                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sProgress.pPixmapSheetDct)
+                {
+                    free(_iter);
+                }
+                blDeleteDict(_widget->uExtension.sProgress.pPixmapSheetDct);
+            }
+        }
+        break;
+        case BL_UT_DIAL:
+        {
+            if (_widget->uExtension.sDial.pPixmapSheetDct)
+            {
+                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sDial.pPixmapSheetDct)
+                {
+                    free(_iter);
+                }
+                blDeleteDict(_widget->uExtension.sDial.pPixmapSheetDct);
+            }
+        }
+        break;
+        case BL_UT_TABLE:
+        {
+            if (_widget->uExtension.sTable.pPixmapSheetDct)
+            {
+                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sTable.pPixmapSheetDct)
+                {
+                    free(_iter);
+                }
+                blDeleteDict(_widget->uExtension.sTable.pPixmapSheetDct);
+            }
+        }
+        break;
+        case BL_UT_PRIMITIVE:
+        {
+            if (_widget->uExtension.sPrimitive.pXPath)
+                free(_widget->uExtension.sPrimitive.pXPath);
+            if (_widget->uExtension.sPrimitive.pYPath)
+                free(_widget->uExtension.sPrimitive.pYPath);
+        }
+        break;
+        default:break;
+    }
+    {
+        FOREACH_ARRAY(_BLWidget*, _iter, _widget->pChildren)
+        {
+            _iter->pParent = NULL;
+            blDeleteUI(_iter->nID);
+        }
+    }
+    blDeleteArray(_widget->pChildren);
+    free(_widget);
+    blDeleteGuid(_ID);
+    _PrUIMem->bDirty = TRUE;
 }
 BLVoid
 blUIReferencePoint(IN BLGuid _ID, IN BLEnum _ReferenceH, IN BLEnum _ReferenceV)
@@ -2163,6 +2319,29 @@ blUIPanelFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_widget->uExtension.sPanel.bFlipY = _FlipY;
 	_PrUIMem->bDirty = TRUE;
 }
+BLGuid
+_LoadBmg(IN BLAnsi* _Pixmap, BLU32 _Hash)
+{
+    BLAnsi _texfile[260] = { 0 };
+    memset(_texfile, 0, sizeof(_texfile));
+    BLAnsi _path[260] = { 0 };
+    if (_PrUIMem->aArchive[0] == 0)
+    {
+        strcpy(_path, blWorkingDir(TRUE));
+        strcat(_path, _PrUIMem->aDir);
+    }
+    else
+        strcpy(_path, _PrUIMem->aDir);
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+    strcat(_path, "\\pixmap\\");
+#else
+    strcat(_path, "/pixmap/");
+#endif
+    strcat(_path, _Pixmap);
+    strcat(_path, ".bmg");
+    BLGuid _tex = blGenStream(_path, _PrUIMem->aArchive[0] ? _PrUIMem->aArchive : NULL);
+    return 0;
+}
 BLVoid
 blUIButtonPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 {
@@ -2173,6 +2352,12 @@ blUIButtonPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sButton.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aPixmap, _Pixmap);
+    BLAnsi _texfile[260] = { 0 };
+    sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
+    BLU32 _hash = blHashUtf8((const BLUtf8*)_texfile);
+    _widget->uExtension.sButton.nPixmapTex = blGainTexture(_hash);
+    if (INVALID_GUID == _widget->uExtension.sButton.nPixmapTex)
+        _widget->uExtension.sButton.nPixmapTex = _LoadBmg(_Pixmap, _hash);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid

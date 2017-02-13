@@ -154,7 +154,10 @@ BL_API BLGuid blGenTexture(
 
 BL_API BLVoid blDeleteTexture(
 	IN BLGuid _Tex);
-
+    
+BL_API BLGuid blGainTexture(
+    IN BLU32 _Hash);
+    
 BL_API BLVoid blTextureFilter(
     IN BLGuid _Tex,
     IN BLEnum _MinFilter,
@@ -203,6 +206,9 @@ BL_API BLGuid blGenGeometryBuffer(
 BL_API BLVoid blDeleteGeometryBuffer(
     IN BLGuid _GBO);
     
+BL_API BLGuid blGainGeometryBuffer(
+    IN BLU32 _Hash);
+    
 BL_API BLVoid blUpdateGeometryBuffer(
     IN BLGuid _GBO,
     IN BLU32 _VBOffset,
@@ -211,6 +217,19 @@ BL_API BLVoid blUpdateGeometryBuffer(
     IN BLU32 _IBOffset,
     IN BLU8* _IBO,
     IN BLU32 _IBSz);
+    
+BL_API BLVoid blInstanceGeometryBuffer(
+    IN BLGuid _GBO,
+    IN BLEnum* _Semantic,
+    IN BLEnum* _Decl,
+    IN BLU32 _DeclNum,
+    IN BLU32 _Instance);
+
+BL_API BLVoid blInstanceUpdate(
+    IN BLGuid _GBO,
+    IN BLEnum _Semantic,
+    IN BLVoid* _Buffer,
+    IN BLU32 _BufferSz);
 
 BL_API BLGuid blGenTechnique(
     IN BLAnsi* _Filename,
@@ -236,7 +255,8 @@ BL_API BLVoid blTechSampler(
     
 BL_API BLVoid blDraw(
     IN BLGuid _Tech,
-    IN BLGuid _GBO);
+    IN BLGuid _GBO,
+    IN BLU32 _Instance);
 #ifdef __cplusplus
 }
 #endif

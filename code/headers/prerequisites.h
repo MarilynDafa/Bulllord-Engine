@@ -45,11 +45,6 @@
 #	include <time.h>
 #	include <io.h>
 #	include <assert.h>
-#	ifdef _DEBUG
-#	define _CRTDBG_MAP_ALLOC
-#	undef _malloca
-#	include <crtdbg.h>
-#	endif
 #   define BL_GL_BACKEND
 #   define BL_VK_BACKEND
 #elif defined(BL_PLATFORM_OSX)
@@ -97,10 +92,6 @@
 #	include <X11/Xutil.h>
 #   include <X11/Xatom.h>
 #   include <errno.h>
-#	ifdef _DEBUG
-#	include <stdlib.h>
-#	include <mcheck.h>
-#	endif
 #   define BL_GL_BACKEND
 #   define BL_VK_BACKEND
 #elif defined(BL_PLATFORM_IOS)
@@ -539,6 +530,7 @@ typedef unsigned long long BLGuid;
 #define BL_SE_DISCONNECTED	1
 #define BL_SE_VIDEOOVER		2
 #define BL_SE_TIMER			3
+#define BL_SE_RESOLUTION    4
 
 /* _EVENT_TYPE */
 #define BL_ET_NET		0
@@ -620,8 +612,8 @@ typedef unsigned long long BLGuid;
 #define BL_TT_ARRAYCUBE     6
 
 /* _TEXTURE_FORMAT */
-#define BL_TF_BC1		0		//Cutout Color | Normal(Low)
-#define BL_TF_BC1A1     1
+#define BL_TF_BC1		0		//Color(No Alpha) | Normal(Low)
+#define BL_TF_BC1A1     1       //Cutout Color
 #define BL_TF_BC3		2		//Color(Mid)
 #define BL_TF_ETC2		3		//Color(No Alpha) | Normal(Low)
 #define BL_TF_ETC2A1	4		//Cutout Color | Normal(Low)
@@ -693,53 +685,39 @@ typedef unsigned long long BLGuid;
 #define BL_PT_TRIANGLESTRIP 5
 #define BL_PT_TRIANGLEFAN   6
 
-/* _LAYOUT_LOCATION */
-#define BL_LL_POSITION		0
-#define BL_LL_NORMAL		1
-#define BL_LL_TANGENT		2
-#define BL_LL_BITANGENT		3
-#define BL_LL_COLOR0		4
-#define BL_LL_COLOR1		5
-#define BL_LL_INDICES		6
-#define BL_LL_WEIGHT		7
-#define BL_LL_TEXCOORD0		8
-#define BL_LL_TEXCOORD1		9
-#define BL_LL_TEXCOORD2		10
-#define BL_LL_TEXCOORD3		11
-#define BL_LL_TEXCOORD4		12
-#define BL_LL_TEXCOORD5		13
-#define BL_LL_TEXCOORD6		14
-#define BL_LL_TEXCOORD7		15
+/* _SEMANTIC_LAYOUT */
+#define BL_SL_INVALID       -1
+#define BL_SL_POSITION		0
+#define BL_SL_NORMAL		1
+#define BL_SL_TANGENT		2
+#define BL_SL_BITANGENT		3
+#define BL_SL_COLOR0		4
+#define BL_SL_COLOR1		5
+#define BL_SL_INDICES		6
+#define BL_SL_WEIGHT		7
+#define BL_SL_TEXCOORD0		8
+#define BL_SL_TEXCOORD1		9
+#define BL_SL_TEXCOORD2		10
+#define BL_SL_TEXCOORD3		11
+#define BL_SL_TEXCOORD4		12
+#define BL_SL_TEXCOORD5		13
+#define BL_SL_INSTANCE1     14
+#define BL_SL_INSTANCE2     15
 
 /* _VERTEX_DECL */
-#define BL_VD_S8X1          0
-#define BL_VD_S8X2          1
-#define BL_VD_S8X3          2
-#define BL_VD_S8X4          3
-#define BL_VD_U8X1          4
-#define BL_VD_U8X2          5
-#define BL_VD_U8X3          6
-#define BL_VD_U8X4          7
-#define BL_VD_S16X1         8
-#define BL_VD_S16X2         9
-#define BL_VD_S16X3         10
-#define BL_VD_S16X4         11
-#define BL_VD_U16X1         12
-#define BL_VD_U16X2         13
-#define BL_VD_U16X3         14
-#define BL_VD_U16X4         15
-#define BL_VD_S32X1         16
-#define BL_VD_S32X2         17
-#define BL_VD_S32X3         18
-#define BL_VD_S32X4         19
-#define BL_VD_U32X1         20
-#define BL_VD_U32X2         21
-#define BL_VD_U32X3         22
-#define BL_VD_U32X4         23
-#define BL_VD_F32X1         24
-#define BL_VD_F32X2         25
-#define BL_VD_F32X3         26
-#define BL_VD_F32X4         27
+#define BL_VD_INVALID       -1
+#define BL_VD_BOOLX1        0
+#define BL_VD_BOOLX2        1
+#define BL_VD_BOOLX3        2
+#define BL_VD_BOOLX4        3
+#define BL_VD_INTX1         4
+#define BL_VD_INTX2         5
+#define BL_VD_INTX3         6
+#define BL_VD_INTX4         7
+#define BL_VD_FLOATX1       8
+#define BL_VD_FLOATX2       9
+#define BL_VD_FLOATX3       10
+#define BL_VD_FLOATX4       11
 
 /* _UNIFORM_BUFFER*/
 #define BL_UB_S32X1         0
@@ -760,11 +738,6 @@ typedef unsigned long long BLGuid;
 #define BL_UB_MAT3X4        15
 #define BL_UB_MAT4X3        16
 #define BL_UB_SAMPLER       17
-
-/* _PARTICLE_EMITTER */
-#define BL_PE_POINT			0x0000
-#define BL_PE_RECT			0x0001
-#define BL_PE_Circle		0x0002
 
 /* _UI_TYPE */
 #define BL_UT_PANEL			0x0000
