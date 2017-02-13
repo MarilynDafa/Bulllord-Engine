@@ -1,0 +1,378 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src-IL\include\altivec_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\altivec_typeconversion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_alloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_bits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_bmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_dcx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_dds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_doompal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_dpx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_endian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_exr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_files.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_gif.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_hdr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_icns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_icon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_jp2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_jpeg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_lif.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_manip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_mdl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_pal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_pcx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_pic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_pnm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_psd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_psp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_q2pal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_register.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_rle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_sgi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_stack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_states.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_targa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_utx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_vtf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src-IL\include\il_wdp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src-IL\src\altivec_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\altivec_typeconversion.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_alloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_bits.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_blp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_bmp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_convbuff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_convert.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_cut.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_dcx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_dds.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_dds-save.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_devil.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_dicom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_doom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_dpx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_endian.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_error.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_exr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_exr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_fastconv.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_files.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_fits.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_ftx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_gif.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_hdr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_header.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_icns.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_icon.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_iff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_ilbm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_internal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_io.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_iwi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_jp2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_jpeg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_ktx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_lif.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_manip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_mdl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_mng.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_mp3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_neuquant.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_nvidia.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_pal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_pcd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_pcx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_pic.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_pix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_png.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_pnm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_profiles.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_psd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_psp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_pxr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_quantizer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_raw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_rawdata.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_register.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_rle.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_rot.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_sgi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_size.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_squish.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_stack.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_states.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_sun.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_targa.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_texture.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_tiff.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_tpl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_utility.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_utx.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_utx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_vtf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_wal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_wbmp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_wdp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src-IL\src\il_xpm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

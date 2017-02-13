@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="encode">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="decode">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="encode\Etc.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcBlock4x4.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcBlock4x4Encoding.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcBlock4x4Encoding_ETC1.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcBlock4x4Encoding_R11.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcBlock4x4Encoding_RG11.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcBlock4x4Encoding_RGB8.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcBlock4x4Encoding_RGB8A1.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcBlock4x4Encoding_RGBA8.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcDifferentialTrys.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcImage.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcIndividualTrys.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcMath.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcSortedBlockList.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\bits.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\bptc-tables.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\clamp.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\convert.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\dds.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\decompress-bc.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\decompress-bptc.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\decompress-bptc-float.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\decompress-eac.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\decompress-etc.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\decompress-rgtc.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\division-tables.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\file-info.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\hdr.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\ktx.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\misc.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\raw.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\texture.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="decode\half-float.c">
+      <Filter>decode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcFile.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+    <ClCompile Include="encode\EtcFileHeader.cpp">
+      <Filter>encode</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="encode\Etc.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcBlock4x4.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcBlock4x4Encoding.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcBlock4x4Encoding_ETC1.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcBlock4x4Encoding_R11.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcBlock4x4Encoding_RG11.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcBlock4x4Encoding_RGB8.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcBlock4x4Encoding_RGB8A1.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcBlock4x4Encoding_RGBA8.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcBlock4x4EncodingBits.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcColor.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcColorFloatRGBA.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcConfig.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcDifferentialTrys.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcErrorMetric.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcImage.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcIndividualTrys.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcMath.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcSortedBlockList.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="decode\bits.h">
+      <Filter>decode</Filter>
+    </ClInclude>
+    <ClInclude Include="decode\bptc-tables.h">
+      <Filter>decode</Filter>
+    </ClInclude>
+    <ClInclude Include="decode\detex.h">
+      <Filter>decode</Filter>
+    </ClInclude>
+    <ClInclude Include="decode\file-info.h">
+      <Filter>decode</Filter>
+    </ClInclude>
+    <ClInclude Include="decode\hdr.h">
+      <Filter>decode</Filter>
+    </ClInclude>
+    <ClInclude Include="decode\misc.h">
+      <Filter>decode</Filter>
+    </ClInclude>
+    <ClInclude Include="decode\half-float.h">
+      <Filter>decode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcFile.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+    <ClInclude Include="encode\EtcFileHeader.h">
+      <Filter>encode</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

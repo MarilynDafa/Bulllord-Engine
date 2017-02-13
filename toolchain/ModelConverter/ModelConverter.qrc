@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/ModelConverter">
+        <file>Resources/MC.png</file>
+    </qresource>
+</RCC>

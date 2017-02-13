@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/FXEditor">
+        <file>Resources/FX.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,403 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="externals">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="externals\freetype2">
+      <UniqueIdentifier>{9c95767f-964a-4dee-88a7-eb67eb418218}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\zlib">
+      <UniqueIdentifier>{19bff056-fe08-4228-ac16-693245f3b53c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\sqlite3">
+      <UniqueIdentifier>{d171f8e7-32ac-416b-830f-7a4d66023344}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\mpaudec">
+      <UniqueIdentifier>{c4996c57-a015-49d4-9395-8f6c106d166f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\freetype2\FT_MODULES">
+      <UniqueIdentifier>{03a4f40c-cd94-48de-a5ee-82783f5e581a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\gl">
+      <UniqueIdentifier>{e0915440-23dd-41fc-a06b-d96d33096a72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\internal">
+      <UniqueIdentifier>{7d917549-24dc-4674-bdf8-6f384a480226}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\vulkan">
+      <UniqueIdentifier>{5fbb0f9b-ab3e-4665-8752-350299d8ba27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\xxtea">
+      <UniqueIdentifier>{6c8af9be-f847-46b5-b9a1-cad6fd452181}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\fastlz">
+      <UniqueIdentifier>{9fcfdd3c-ff37-4d6f-9de0-e7f49603407d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\xml">
+      <UniqueIdentifier>{b65d4abf-d4f9-4557-bfdd-d6a41da71db5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\code\config.h" />
+    <ClInclude Include="..\..\code\headers\audio.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\headers\network.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\headers\prerequisites.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\headers\streamio.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\headers\system.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\headers\utils.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\crc32.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\deflate.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\gzguts.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\inffast.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\inffixed.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\inflate.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\inftrees.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\trees.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\zconf.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\zlib.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\zlib\zutil.h">
+      <Filter>externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\mpaudec\internal.h">
+      <Filter>externals\mpaudec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\mpaudec\mpaudec.h">
+      <Filter>externals\mpaudec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\mpaudec\mpaudectab.h">
+      <Filter>externals\mpaudec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\mpaudec\mpegaudio.h">
+      <Filter>externals\mpaudec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\headers\gpu.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\gl\wglext.h">
+      <Filter>externals\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\gl\glcorearb.h">
+      <Filter>externals\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\gl\glxext.h">
+      <Filter>externals\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\freetype2\include\ft2build.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\freetype2\include\freetype\config\ftconfig.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\freetype2\include\freetype\config\ftheader.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\freetype2\include\freetype\config\ftmodule.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\freetype2\include\freetype\config\ftoption.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\freetype2\include\freetype\config\ftstdlib.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\src\internal\array.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\src\internal\dictionary.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\src\internal\list.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\src\internal\mathematics.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\src\internal\thread.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\src\internal\internal.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\headers\sprite.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\headers\ui.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\xxtea\xxtea.h">
+      <Filter>externals\xxtea</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\fastlz\fastlz.h">
+      <Filter>externals\fastlz</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\xml\ezxml.h">
+      <Filter>externals\xml</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\code\src\array.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\dictionary.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\list.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\mathematics.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\network.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\streamio.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\thread.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\utils.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\adler32.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\compress.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\crc32.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\deflate.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\gzclose.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\gzlib.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\gzread.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\gzwrite.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\infback.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\inffast.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\inflate.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\inftrees.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\trees.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\uncompr.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\zlib\zutil.c">
+      <Filter>externals\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\sqlite3\sqlite3secure.c">
+      <Filter>externals\sqlite3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\mpaudec\bits.c">
+      <Filter>externals\mpaudec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\mpaudec\mpaudec.c">
+      <Filter>externals\mpaudec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftbbox.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftgxval.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftlcdfil.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftmm.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftotval.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftpatent.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftpfr.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftsynth.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\fttype1.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftwinfnt.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\pcf\pcf.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\pfr\pfr.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\psaux\psaux.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\pshinter\pshinter.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\psnames\psmodule.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\raster\raster.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\sfnt\sfnt.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\truetype\truetype.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\type1\type1.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\cid\type1cid.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\type42\type42.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\winfonts\winfnt.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\autofit\autofit.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\bdf\bdf.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\cff\cff.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftbase.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftbitmap.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\cache\ftcache.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftdebug.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftfstype.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftgasp.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftglyph.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\gzip\ftgzip.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftinit.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\lzw\ftlzw.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftstroke.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftsystem.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\smooth\smooth.c">
+      <Filter>externals\freetype2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\sprite.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\ui.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\xxtea\xxtea.c">
+      <Filter>externals\xxtea</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\fastlz\fastlz.c">
+      <Filter>externals\fastlz</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\internal.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\system.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\audio.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\gpu.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\freetype2\src\base\ftfntfmt.c">
+      <Filter>externals\freetype2\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\xml\ezxml.c">
+      <Filter>externals\xml</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

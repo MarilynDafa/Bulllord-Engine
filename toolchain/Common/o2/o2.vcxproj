@@ -1,0 +1,328 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{456F660F-97B3-435F-AABD-2B7FC7F19507}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>o2</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>.</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>FT2_BUILD_LIBRARY;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./freetype2/include/;../bmg;../devil;../png;../jpeg;../tiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>FT2_BUILD_LIBRARY;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./freetype2/include/;../bmg;../devil;../png;../jpeg;../tiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <PreprocessorDefinitions>FT2_BUILD_LIBRARY;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./freetype2/include/;../bmg;../devil;../png;../jpeg;../tiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>FT2_BUILD_LIBRARY;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./freetype2/include/;../bmg;../devil;../png;../jpeg;../tiff;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AABBox.cpp" />
+    <ClCompile Include="Algorithm.cpp" />
+    <ClCompile Include="Applet.cpp" />
+    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CartoonBox.cpp" />
+    <ClCompile Include="CFGFile.cpp" />
+    <ClCompile Include="Color.cpp" />
+    <ClCompile Include="ConditionVariable.cpp" />
+    <ClCompile Include="CoreProfile.cpp" />
+    <ClCompile Include="Device.cpp" />
+    <ClCompile Include="Dialog.cpp" />
+    <ClCompile Include="DragDropSlot.cpp" />
+    <ClCompile Include="EditBox.cpp" />
+    <ClCompile Include="FileMgr.cpp" />
+    <ClCompile Include="Float2.cpp" />
+    <ClCompile Include="Float3.cpp" />
+    <ClCompile Include="Font.cpp" />
+    <ClCompile Include="FrameBuffer.cpp" />
+    <ClCompile Include="Freetype2\src\autofit\autofit.c" />
+    <ClCompile Include="Freetype2\src\base\ftbase.c" />
+    <ClCompile Include="Freetype2\src\base\ftbbox.c" />
+    <ClCompile Include="Freetype2\src\base\ftbitmap.c" />
+    <ClCompile Include="Freetype2\src\base\ftdebug.c" />
+    <ClCompile Include="Freetype2\src\base\ftfntfmt.c" />
+    <ClCompile Include="Freetype2\src\base\ftfstype.c" />
+    <ClCompile Include="Freetype2\src\base\ftgasp.c" />
+    <ClCompile Include="Freetype2\src\base\ftglyph.c" />
+    <ClCompile Include="Freetype2\src\base\ftgxval.c" />
+    <ClCompile Include="Freetype2\src\base\ftinit.c" />
+    <ClCompile Include="Freetype2\src\base\ftlcdfil.c" />
+    <ClCompile Include="Freetype2\src\base\ftmm.c" />
+    <ClCompile Include="Freetype2\src\base\ftotval.c" />
+    <ClCompile Include="Freetype2\src\base\ftpatent.c" />
+    <ClCompile Include="Freetype2\src\base\ftpfr.c" />
+    <ClCompile Include="Freetype2\src\base\ftstroke.c" />
+    <ClCompile Include="Freetype2\src\base\ftsynth.c" />
+    <ClCompile Include="Freetype2\src\base\ftsystem.c" />
+    <ClCompile Include="Freetype2\src\base\fttype1.c" />
+    <ClCompile Include="Freetype2\src\base\ftwinfnt.c" />
+    <ClCompile Include="Freetype2\src\bdf\bdf.c" />
+    <ClCompile Include="Freetype2\src\cache\ftcache.c" />
+    <ClCompile Include="Freetype2\src\cff\cff.c" />
+    <ClCompile Include="Freetype2\src\cid\type1cid.c" />
+    <ClCompile Include="Freetype2\src\gzip\ftgzip.c" />
+    <ClCompile Include="Freetype2\src\lzw\ftlzw.c" />
+    <ClCompile Include="Freetype2\src\pcf\pcf.c" />
+    <ClCompile Include="Freetype2\src\pfr\pfr.c" />
+    <ClCompile Include="Freetype2\src\psaux\psaux.c" />
+    <ClCompile Include="Freetype2\src\pshinter\pshinter.c" />
+    <ClCompile Include="Freetype2\src\psnames\psmodule.c" />
+    <ClCompile Include="Freetype2\src\raster\raster.c" />
+    <ClCompile Include="Freetype2\src\sfnt\sfnt.c" />
+    <ClCompile Include="Freetype2\src\smooth\smooth.c" />
+    <ClCompile Include="Freetype2\src\truetype\truetype.c" />
+    <ClCompile Include="Freetype2\src\type1\type1.c" />
+    <ClCompile Include="Freetype2\src\type42\type42.c" />
+    <ClCompile Include="Freetype2\src\winfonts\winfnt.c" />
+    <ClCompile Include="GeometryBuffer.cpp" />
+    <ClCompile Include="InputMgr.cpp" />
+    <ClCompile Include="Interface.cpp" />
+    <ClCompile Include="Label.cpp" />
+    <ClCompile Include="ListBox.cpp" />
+    <ClCompile Include="ManagedRes.cpp" />
+    <ClCompile Include="ManualLoader.cpp" />
+    <ClCompile Include="Matrix4.cpp" />
+    <ClCompile Include="MemPool.cpp" />
+    <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Mutex.cpp" />
+    <ClCompile Include="NameGen.cpp" />
+    <ClCompile Include="Pass.cpp" />
+    <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="ProgressBar.cpp" />
+    <ClCompile Include="Quaternion.cpp" />
+    <ClCompile Include="Radio.cpp" />
+    <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="ResMgr.cpp" />
+    <ClCompile Include="RichBox.cpp" />
+    <ClCompile Include="ScrollBox.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Skin.cpp" />
+    <ClCompile Include="Slider.cpp" />
+    <ClCompile Include="Str.cpp" />
+    <ClCompile Include="Stream.cpp" />
+    <ClCompile Include="System.cpp" />
+    <ClCompile Include="TabCtl.cpp" />
+    <ClCompile Include="TableBox.cpp" />
+    <ClCompile Include="Technique.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Thread.cpp" />
+    <ClCompile Include="Tools.cpp" />
+    <ClCompile Include="TreeBox.cpp" />
+    <ClCompile Include="UIMgr.cpp" />
+    <ClCompile Include="Widget.cpp" />
+    <ClCompile Include="Win32Window.cpp" />
+    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="XmlReader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AABBox.h" />
+    <ClInclude Include="Algorithm.h" />
+    <ClInclude Include="Applet.h" />
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CartoonBox.h" />
+    <ClInclude Include="CFGFile.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="ConditionVariable.h" />
+    <ClInclude Include="CoreProfile.h" />
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="Dialog.h" />
+    <ClInclude Include="DragDropSlot.h" />
+    <ClInclude Include="EditBox.h" />
+    <ClInclude Include="FileMgr.h" />
+    <ClInclude Include="Float2.h" />
+    <ClInclude Include="Float3.h" />
+    <ClInclude Include="Font.h" />
+    <ClInclude Include="FrameBuffer.h" />
+    <ClInclude Include="Freetype2\include\freetype\config\ftconfig.h" />
+    <ClInclude Include="Freetype2\include\freetype\config\ftheader.h" />
+    <ClInclude Include="Freetype2\include\freetype\config\ftmodule.h" />
+    <ClInclude Include="Freetype2\include\freetype\config\ftoption.h" />
+    <ClInclude Include="Freetype2\include\freetype\config\ftstdlib.h" />
+    <ClInclude Include="Freetype2\include\ft2build.h" />
+    <ClInclude Include="Frustum.h" />
+    <ClInclude Include="GeometryBuffer.h" />
+    <ClInclude Include="InputMgr.h" />
+    <ClInclude Include="Interface.h" />
+    <ClInclude Include="Label.h" />
+    <ClInclude Include="List.h" />
+    <ClInclude Include="ListBox.h" />
+    <ClInclude Include="Macro.h" />
+    <ClInclude Include="ManagedRes.h" />
+    <ClInclude Include="ManualLoader.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="Mapping.h" />
+    <ClInclude Include="Matrix4.h" />
+    <ClInclude Include="MemPool.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="Mutex.h" />
+    <ClInclude Include="NameGen.h" />
+    <ClInclude Include="Pass.h" />
+    <ClInclude Include="Plane.h" />
+    <ClInclude Include="Prerequisites.h" />
+    <ClInclude Include="ProgressBar.h" />
+    <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="Radio.h" />
+    <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="ResMgr.h" />
+    <ClInclude Include="RichBox.h" />
+    <ClInclude Include="SafeList.h" />
+    <ClInclude Include="SafeMap.h" />
+    <ClInclude Include="SafeVector.h" />
+    <ClInclude Include="ScrollBox.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Signals.h" />
+    <ClInclude Include="Singleton.h" />
+    <ClInclude Include="Skin.h" />
+    <ClInclude Include="Slider.h" />
+    <ClInclude Include="Str.h" />
+    <ClInclude Include="Stream.h" />
+    <ClInclude Include="System.h" />
+    <ClInclude Include="TabCtl.h" />
+    <ClInclude Include="TableBox.h" />
+    <ClInclude Include="Technique.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="Thread.h" />
+    <ClInclude Include="Tools.h" />
+    <ClInclude Include="TreeBox.h" />
+    <ClInclude Include="UIMgr.h" />
+    <ClInclude Include="Vector.h" />
+    <ClInclude Include="Widget.h" />
+    <ClInclude Include="Win32Window.h" />
+    <ClInclude Include="Window.h" />
+    <ClInclude Include="XmlReader.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

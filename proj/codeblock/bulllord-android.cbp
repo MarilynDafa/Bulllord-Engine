@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="bulllord-android" />
+		<Option pch_mode="2" />
+		<Option compiler="arm-elf-gcc" />
+		<Option virtualFolders="externals/;headers/;srcs/;srcs/internals/;externals/fastlz/;externals/freetype2/;externals/gl/;externals/mpaudec/;externals/sqlite3/;externals/vulkan/;externals/xxtea/;externals/yaml/;externals/zlib/;" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../../bin/android/bulllord" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Debug/" />
+				<Option type="2" />
+				<Option compiler="arm-elf-gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-D_DEBUG" />
+				</Compiler>
+				<Linker>
+					<Add directory="/home/marilyndafa/android-ndk-r10b/platforms/android-15/arch-arm/usr/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="../../bin/android/bulllord" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Release/" />
+				<Option type="2" />
+				<Option compiler="arm-elf-gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c99" />
+			<Add option="-fpic" />
+			<Add option="-fstack-protector" />
+			<Add option="-fno-strict-aliasing" />
+			<Add option="-fno-rtti" />
+			<Add option="-fno-omit-frame-pointer" />
+			<Add option="-fno-exceptions" />
+			<Add option="-fno-short-enums" />
+			<Add option="-Wno-unused-parameter" />
+			<Add option="-Wno-unused-result" />
+			<Add option="-Wno-missing-field-initializers" />
+			<Add option="-Wno-missing-declarations" />
+			<Add option="-DSQLITE_HAS_CODEC" />
+			<Add option="-DCODEC_TYPE=CODEC_TYPE_AES128" />
+			<Add option="-DSQLITE_CORE" />
+			<Add option="-DTHREADSAFE=1" />
+			<Add option="-DSQLITE_SECURE_DELETE" />
+			<Add option="-DSQLITE_SOUNDEX" />
+			<Add option="-DSQLITE_ENABLE_COLUMN_METADATA" />
+			<Add option="-DSQLITE_ENABLE_FTS3" />
+			<Add option="-DSQLITE_ENABLE_FTS3_PARENTHESIS" />
+			<Add option="-DSQLITE_ENABLE_RTREE" />
+			<Add option="-DFT2_BUILD_LIBRARY" />
+			<Add option="-DYAML_DECLARE_STATIC" />
+			<Add option="-DZ_HAVE_UNISTD_H" />
+			<Add option="-DANDROID" />
+			<Add directory="$$(NDK_PATH)/platforms/android-18/arch-arm/usr/include" />
+			<Add directory="../../code/externals/freetype2/include" />
+			<Add directory="../../code/externals/yaml" />
+		</Compiler>
+		<Unit filename="../../code/config.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Unit filename="../../code/externals/fastlz/fastlz.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/fastlz/" />
+		</Unit>
+		<Unit filename="../../code/externals/fastlz/fastlz.h">
+			<Option virtualFolder="externals/fastlz/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/include/freetype/config/ftconfig.h">
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/include/freetype/config/ftheader.h">
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/include/freetype/config/ftmodule.h">
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/include/freetype/config/ftoption.h">
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/include/freetype/config/ftstdlib.h">
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/autofit/autofit.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftbase.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftbbox.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftbitmap.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftdebug.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftfstype.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftgasp.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftglyph.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftgxval.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftinit.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftlcdfil.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftmm.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftotval.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftpatent.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftpfr.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftstroke.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftsynth.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftsystem.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/fttype1.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/base/ftwinfnt.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/bdf/bdf.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/cache/ftcache.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/cff/cff.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/cid/type1cid.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/gzip/ftgzip.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/lzw/ftlzw.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/pcf/pcf.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/pfr/pfr.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/psaux/psaux.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/pshinter/pshinter.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/psnames/psmodule.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/raster/raster.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/sfnt/sfnt.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/smooth/smooth.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/truetype/truetype.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/type1/type1.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/type42/type42.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/freetype2/src/winfonts/winfnt.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/freetype2/" />
+		</Unit>
+		<Unit filename="../../code/externals/mpaudec/bits.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/mpaudec/" />
+		</Unit>
+		<Unit filename="../../code/externals/mpaudec/internal.h">
+			<Option virtualFolder="externals/mpaudec/" />
+		</Unit>
+		<Unit filename="../../code/externals/mpaudec/mpaudec.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/mpaudec/" />
+		</Unit>
+		<Unit filename="../../code/externals/mpaudec/mpaudec.h">
+			<Option virtualFolder="externals/mpaudec/" />
+		</Unit>
+		<Unit filename="../../code/externals/mpaudec/mpaudectab.h">
+			<Option virtualFolder="externals/mpaudec/" />
+		</Unit>
+		<Unit filename="../../code/externals/mpaudec/mpegaudio.h">
+			<Option virtualFolder="externals/mpaudec/" />
+		</Unit>
+		<Unit filename="../../code/externals/sqlite3/sqlite3secure.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/sqlite3/" />
+		</Unit>
+		<Unit filename="../../code/externals/xxtea/xxtea.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/xxtea/" />
+		</Unit>
+		<Unit filename="../../code/externals/xxtea/xxtea.h">
+			<Option virtualFolder="externals/xxtea/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/api.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/config.h">
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/dumper.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/emitter.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/loader.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/parser.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/reader.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/scanner.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/writer.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/yaml.h">
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/yaml/yaml_private.h">
+			<Option virtualFolder="externals/yaml/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/adler32.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/compress.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/crc32.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/crc32.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/deflate.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/deflate.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/gzclose.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/gzguts.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/gzlib.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/gzread.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/gzwrite.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/infback.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/inffast.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/inffast.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/inffixed.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/inflate.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/inflate.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/inftrees.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/inftrees.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/trees.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/trees.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/uncompr.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/zconf.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/zlib.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/zutil.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/externals/zlib/zutil.h">
+			<Option virtualFolder="externals/zlib/" />
+		</Unit>
+		<Unit filename="../../code/headers/audio.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Unit filename="../../code/headers/gpu.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Unit filename="../../code/headers/network.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Unit filename="../../code/headers/prerequisites.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Unit filename="../../code/headers/sprite.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Unit filename="../../code/headers/streamio.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Unit filename="../../code/headers/system.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Unit filename="../../code/headers/ui.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Unit filename="../../code/headers/utils.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Unit filename="../../code/src/array.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Unit filename="../../code/src/audio.xc">
+			<Option compile="1" />
+			<Option link="1" />
+			<Option virtualFolder="srcs/" />
+			<Option compiler="arm-elf-gcc" use="1" buildCommand="$compiler $options $includes -x c++ -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -x c++ -c $file -o $object" />
+		</Unit>
+		<Unit filename="../../code/src/dictionary.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Unit filename="../../code/src/gpu.xc">
+			<Option compile="1" />
+			<Option link="1" />
+			<Option virtualFolder="srcs/" />
+			<Option compiler="arm-elf-gcc" use="1" buildCommand="$compiler $options $includes -x c++ -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -x c++ -c $file -o $object" />
+		</Unit>
+		<Unit filename="../../code/src/internal.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Unit filename="../../code/src/internal/array.h">
+			<Option virtualFolder="srcs/internals/" />
+		</Unit>
+		<Unit filename="../../code/src/internal/dictionary.h">
+			<Option virtualFolder="srcs/internals/" />
+		</Unit>
+		<Unit filename="../../code/src/internal/internal.h">
+			<Option virtualFolder="srcs/internals/" />
+		</Unit>
+		<Unit filename="../../code/src/internal/list.h">
+			<Option virtualFolder="srcs/internals/" />
+		</Unit>
+		<Unit filename="../../code/src/internal/mathematics.h">
+			<Option virtualFolder="srcs/internals/" />
+		</Unit>
+		<Unit filename="../../code/src/internal/thread.h">
+			<Option virtualFolder="srcs/internals/" />
+		</Unit>
+		<Unit filename="../../code/src/list.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Unit filename="../../code/src/mathematics.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Unit filename="../../code/src/network.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Unit filename="../../code/src/sprite.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Unit filename="../../code/src/streamio.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Unit filename="../../code/src/system.xc">
+			<Option compile="1" />
+			<Option link="1" />
+			<Option virtualFolder="srcs/" />
+			<Option compiler="arm-elf-gcc" use="1" buildCommand="$compiler $options $includes -x c++ -c $file -o $object" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -x c++ -c $file -o $object" />
+			<Option compiler="zpu-gcc" use="1" buildCommand="$compiler $options $includes -x c++ -c $file -o $object" />
+		</Unit>
+		<Unit filename="../../code/src/thread.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Unit filename="../../code/src/ui.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Unit filename="../../code/src/utils.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="srcs/" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

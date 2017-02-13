@@ -1,0 +1,42 @@
+const char* framefx = "<?xml version=\"1.0\"?>\
+<glfx>\
+	 <vert name=\"frame_vs\">\
+		 <variant qualifier=\"attribute\" type=\"vec2\" name=\"position\" semantic=\"POSITION\" index=\"0\"/>\
+		 <variant qualifier=\"attribute\" type=\"float\" name=\"position1\" semantic=\"POSITION\" index=\"1\"/>\
+		 <variant qualifier=\"uniform\" type=\"vec2\" count=\"1\" name=\"screensz\"/>\
+		 <variant qualifier=\"varying\" type=\"float\" name=\"clr\"/>\
+		 <shader>\
+			 <![CDATA[\
+void main()\
+{\
+	clr = position1;\
+	gl_Position = vec4(position.x*2.0*screensz.x - 1.0, 1.0 - position.y*2.0*screensz.y , 0.0 , 1.0);\
+}\
+			]]>\
+		</shader>\
+	</vert>\
+	<frag name=\"frame_fs\">\
+		<variant qualifier=\"varying\" type=\"float\" name=\"clr\"/>\
+	<shader>\
+			<![CDATA[\
+void main()\
+{\
+	gl_FragColor = vec4(1.0 , clr , 0.0 , 1.0);\
+}\
+			]]>\
+		</shader>\
+	</frag>\
+	<tech name = \"frame\">\
+		<pass name=\"p0\" vert=\"frame_vs\" frag=\"frame_fs\">\
+			<renderstate name=\"depth_enable\" value=\"GL_FALSE\"/>\
+			<renderstate name=\"depth_func\" value=\"GL_LESS\"/>\
+			<renderstate name=\"blend_enable\" value=\"GL_TRUE\"/>\
+			<renderstate name=\"blend_op\" value=\"GL_FUNC_ADD\"/>\
+			<renderstate name=\"blend_op_alpha\" value=\"GL_FUNC_ADD\"/>\
+			<renderstate name=\"src_factor\" value=\"GL_SRC_ALPHA\"/>\
+			<renderstate name=\"dst_factor\" value=\"GL_ONE_MINUS_SRC_ALPHA\"/>\
+			<renderstate name=\"src_alpha_factor\" value=\"GL_ONE_MINUS_DST_ALPHA\"/>\
+			<renderstate name=\"dst_alpha_factor\" value=\"GL_ONE\"/>\
+		</pass>\
+	</tech>\
+</glfx>";

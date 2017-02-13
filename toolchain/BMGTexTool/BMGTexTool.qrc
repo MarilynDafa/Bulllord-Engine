@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/BMGTexTool">
+        <file>Resources/TX.png</file>
+        <file>Resources/save.png</file>
+        <file>Resources/close.png</file>
+        <file>Resources/generate.png</file>
+        <file>Resources/reset.png</file>
+        <file>Resources/TXs.png</file>
+        <file>Resources/background.png</file>
+        <file>Resources/nx.png</file>
+        <file>Resources/ny.png</file>
+        <file>Resources/nz.png</file>
+        <file>Resources/px.png</file>
+        <file>Resources/py.png</file>
+        <file>Resources/pz.png</file>
+        <file>Resources/logo.png</file>
+    </qresource>
+</RCC>
