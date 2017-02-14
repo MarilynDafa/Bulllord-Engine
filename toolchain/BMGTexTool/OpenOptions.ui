@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>295</width>
-    <height>120</height>
+    <height>124</height>
    </rect>
   </property>
   <property name="font">
@@ -315,7 +315,7 @@ QMenu::separator {
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>80</y>
+     <y>90</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -336,7 +336,7 @@ QMenu::separator {
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>80</y>
+     <y>90</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -351,7 +351,7 @@ QMenu::separator {
      <x>30</x>
      <y>30</y>
      <width>231</width>
-     <height>31</height>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">
@@ -359,6 +359,22 @@ QMenu::separator {
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>60</y>
+     <width>51</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trim</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

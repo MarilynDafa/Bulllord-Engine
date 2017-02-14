@@ -6,6 +6,7 @@
 #include "Image2D.h"
 #include "Image3D.h"
 #include "ImageCube.h"
+#include "BMGTexTool.h"
 #include "Codec.h"
 
 int ImageOp::pack(Data_block &db)
@@ -672,6 +673,11 @@ Image *Image::createImage(const QString &fileName, int& offsetx, int& offsety, Q
 		ilConvertImage(IL_RGBA,IL_UNSIGNED_BYTE);
 	if (trim)
 		imageID = trimImage(imageID, offsetx, offsety);
+	else
+	{
+		offsetx = 0;
+		offsety = 0;
+	}
 	ilBindImage(imageID);
 	if (ilGetInteger(IL_IMAGE_FORMAT) != IL_RGBA ||
 		ilGetInteger(IL_IMAGE_TYPE) != IL_UNSIGNED_BYTE)
@@ -758,7 +764,7 @@ QList<Image*> Image::createImages(const QString &fileName, std::vector<SpriteShe
 
 	if(fileName.right(4).toLower() != QString(".bmg"))
 	{
-		Image *img = createImage(fileName,offsetx, offsety, parent);
+		Image *img = createImage(fileName,offsetx, offsety, parent, BMGTexTool::g_Trim);
 		if(img != 0)
 			images.append(img);
 	}

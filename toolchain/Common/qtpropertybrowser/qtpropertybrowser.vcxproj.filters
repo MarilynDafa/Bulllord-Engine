@@ -105,11 +105,14 @@
     <ClCompile Include="qtpropertymanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="qttreepropertybrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qteditorfactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="qteditorfactory.cpp">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="GeneratedFiles\Debug\qteditorfactory.moc">
       <Filter>Generated Files\Debug</Filter>
     </CustomBuild>
@@ -121,9 +124,6 @@
     </CustomBuild>
     <CustomBuild Include="GeneratedFiles\Release\qtpropertymanager.moc">
       <Filter>Generated Files\Release</Filter>
-    </CustomBuild>
-    <CustomBuild Include="qttreepropertybrowser.cpp">
-      <Filter>Source Files</Filter>
     </CustomBuild>
     <CustomBuild Include="GeneratedFiles\Debug\qttreepropertybrowser.moc">
       <Filter>Generated Files\Debug</Filter>

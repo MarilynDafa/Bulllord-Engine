@@ -268,4 +268,7 @@ Global
 		{518398A0-069E-40AB-95AB-3DBCCE5473D0} = {140ED1EC-22EA-4AE7-B1C2-784979491B9E}
 		{E8CAA951-9ABF-4CD2-99A3-EE8871FE2FE5} = {140ED1EC-22EA-4AE7-B1C2-784979491B9E}
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		Qt5Version = $(DefaultQtVersion)
+	EndGlobalSection
 EndGlobal

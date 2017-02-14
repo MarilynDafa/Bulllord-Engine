@@ -96,6 +96,8 @@ protected:
 
 	
     void on_actionSave_As_triggered();
+public:
+	static bool g_Trim;
 
 private:
 	int m_nIndex;

@@ -14,6 +14,7 @@
 #include <QtCore/QMimeData>
 #include <future>
 
+bool BMGTexTool::g_Trim = true;
 BMGTexTool::BMGTexTool(QWidget *parent)
 	: QMainWindow(parent)
 {
