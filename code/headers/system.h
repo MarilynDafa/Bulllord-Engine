@@ -134,13 +134,13 @@ BL_API BLVoid blSystemRun(
 	IN BLBool _Profiler,
 	IN BLEnum _Quality,
 	IN BLVoid(*_Begin)(BLVoid),
-	IN BLVoid(*_Step)(BLF32),
+	IN BLVoid(*_Step)(BLU32),
 	IN BLVoid(*_End)(BLVoid));
 
 BL_API BLVoid blSystemEmbedRun(
 	IN BLS32 _Handle,
 	IN BLVoid(*_Begin)(BLVoid),
-	IN BLVoid(*_Step)(BLF32),
+	IN BLVoid(*_Step)(BLU32),
 	IN BLVoid(*_End)(BLVoid));
 
 #ifdef __cplusplus

@@ -21,10 +21,12 @@
 #include "../headers/utils.h"
 #include "../headers/gpu.h"
 #include "../headers/system.h"
+#include "../headers/streamio.h"
 #include "internal/dictionary.h"
 #include "internal/array.h"
 #include "internal/mathematics.h"
 #include "internal/internal.h"
+#include "../externals/xml/ezxml.h"
 #if defined BL_PLATFORM_OSX
 #   include <AppKit/NSOpenGL.h>
 #   include <AppKit/NSApplication.h>
@@ -33,9 +35,13 @@
 #	include <EGL/eglext.h>
 #	include <android/native_window.h>
 #endif
+typedef struct _GpuRes{
+    void* pRes;
+    BLS32 nRefCount;
+}_BLGpuRes;
 typedef struct _HardwareCaps{
 	BLEnum eApiType;
-	BLU64 nFuncSupported;
+    BLU32 nApiVersion;
 	BLU16 nMaxTextureSize;
 	BLU8  nMaxFBAttachments;
     BLBool bCSSupport;
@@ -43,37 +49,182 @@ typedef struct _HardwareCaps{
     BLBool bAnisotropy;
     BLBool bTessellationSupport;
     BLBool bFloatRTSupport;
-	BLU16 aTexFormats[BL_TF_COUNT];
+    BLF32 fMaxAnisotropy;
+	BLBool aTexFormats[BL_TF_COUNT];
 }_BLHardwareCaps;
-typedef struct _UniformBuffer{
-	struct _UniformInfo {
-		union {
-			BLS32 aS32Var[4];
-			BLU32 aU32Var[4];
-			BLF32 aF32Var[4];
-			BLF32 aMatVar[16];
-			void* pAddr;
-		} uData;
-		BLEnum eType;
-		BLU16 nHandle;
-	};
-	BLDictionary* pUniforms;
-}_BLUniformBuffer;
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX)
+typedef struct _PipelineState{
+    BLEnum eCullMode;
+    BLS32 nDepthBias;
+    BLF32 fSlopeScaledDepthBias;
+    BLBool bScissor;
+    BLU32 nLTX;
+    BLU32 nLTY;
+    BLU32 nRTX;
+    BLU32 nRTY;
+    BLBool bDepth;
+    BLBool bDepthMask;
+    BLEnum eDepthCompFunc;
+    BLBool bStencil;
+    BLU8 nStencilReadMask;
+    BLU8 nStencilWriteMask;
+    BLEnum eFrontStencilFailOp;
+    BLEnum eFrontStencilDepthFailOp;
+    BLEnum eFrontStencilPassOp;
+    BLEnum eFrontStencilCompFunc;
+    BLEnum eBackStencilFailOp;
+    BLEnum eBackStencilDepthFailOp;
+    BLEnum eBackStencilPassOp;
+    BLEnum eBackStencilCompFunc;
+    BLBool bAlphaToCoverage;
+    BLBool bBlend;
+    BLEnum eSrcBlendFactor;
+    BLEnum eDestBlendFactor;
+    BLEnum eSrcBlendAlphaFactor;
+    BLEnum eDestBlendAlphaFactor;
+    BLEnum eBlendOp;
+    BLEnum eBlendOpAlpha;
+    BLU8 aBlendFactor[4];
+    BLBool bRasterStateDirty;
+    BLBool bDSStateDirty;
+    BLBool bBlendStateDirty;
+    union {
+#if defined(BL_GL_BACKEND)
+        struct _GL {
+        } sGL;
+#elif defined(BL_VK_BACKEND)
+        struct _VK {
+        } sVK;
+#elif defined(BL_MTL_BACKEND)
+        struct _MTL{
+        } sMTL;
+#elif defined(BL_DX_BACKEND)
+        struct _DX{
+        } sDX;
+#endif
+    } uData;
+}_BLPipelineState;
 typedef struct _TextureBuffer {
-	GLuint nID;
-	GLuint nRBO;
-	BLU8* pData;
-	BLU32 nFlags;
-	BLU32 nWidth;
-	BLU32 nHeight;
-	BLU32 nDepth;
-	BLU32 nLayer;
-	BLU8 nType;
-	BLU8 nTextureFormat;
-	BLU8 nNumMips;
-}_BLTextureBufferGL;
-#elif defined(BL_PLATFORM_UWP)
+    BLEnum eTarget;
+    BLEnum eFormat;
+    BLGuid nID;
+    BLU32 nHash;
+    BLU32 nWidth;
+    BLU32 nHeight;
+    BLU32 nDepth;
+    BLU32 nLayer;
+    BLU8 nNumMips;
+    BLU32 nBpp;
+    union {
+#if defined(BL_GL_BACKEND)
+        struct _GL {
+            GLuint nHandle;
+            GLuint nRTHandle;
+            GLenum eInternalFmt;
+            GLenum eType;
+            GLenum eFormat;
+        } sGL;
+#elif defined(BL_VK_BACKEND)
+        struct _VK {
+        } sVK;
+#elif defined(BL_MTL_BACKEND)
+        struct _MTL{
+        } sMTL;
+#elif defined(BL_DX_BACKEND)
+        struct _DX{
+        } sDX;
+#endif
+    } uData;
+}_BLTextureBuffer;
+typedef struct _FrameBuffer {
+    struct _Attachment{
+        _BLTextureBuffer* pAttachments;
+        BLU32 nMip;
+        BLU32 nFace;
+    } aAttachments[8];
+    _BLTextureBuffer* pDSAttachment;
+    BLU32 nAttachmentNum;
+    BLU32 nWidth;
+    BLU32 nHeight;
+    union {
+#if defined(BL_GL_BACKEND)
+        struct _GL {
+            GLuint nHandle;
+            GLuint nResolveHandle;
+        } sGL;
+#elif defined(BL_VK_BACKEND)
+        struct _VK {
+        } sVK;
+#elif defined(BL_MTL_BACKEND)
+        struct _MTL{
+        } sMTL;
+#elif defined(BL_DX_BACKEND)
+        struct _DX{
+        } sDX;
+#endif
+    } uData;
+}_BLFrameBuffer;
+typedef struct _GeometryBuffer {
+    BLGuid nID;
+    BLEnum eVBTopology;
+    BLEnum eIBFormat;
+    BLU32 nHash;
+    BLU32 nVertexNum;
+    BLU32 nVBSize;
+    BLU32 nIBSize;
+    BLBool bDynamic;
+    BLEnum aInsSem[4];
+    union {
+#if defined(BL_GL_BACKEND)
+        struct _GL {
+            GLuint nVBHandle;
+            GLuint nIBHandle;
+            GLuint nVAHandle;
+            GLuint nInsHandle[4];
+        } sGL;
+#elif defined(BL_VK_BACKEND)
+        struct _VK {
+        } sVK;
+#elif defined(BL_MTL_BACKEND)
+        struct _MTL{
+        } sMTL;
+#elif defined(BL_DX_BACKEND)
+        struct _DX{
+        } sDX;
+#endif
+    } uData;
+}_BLGeometryBuffer;
+typedef struct _Technique{
+    struct _UniformVar{
+        BLAnsi aName[128];
+        BLEnum eType;
+        BLU32 nCount;
+        BLVoid* pVar;
+    } aUniformVars[16];
+    struct _SamplerVar{
+        BLAnsi aName[128];
+        BLEnum eType;
+        BLU32 nUnit;
+        BLVoid* pTex;
+    } aSamplerVars[16];
+    union {
+#if defined(BL_GL_BACKEND)
+        struct _GL {
+            GLuint nHandle;
+        } sGL;
+#elif defined(BL_VK_BACKEND)
+        struct _VK {
+        } sVK;
+#elif defined(BL_MTL_BACKEND)
+        struct _MTL{
+        } sMTL;
+#elif defined(BL_DX_BACKEND)
+        struct _DX{
+        } sDX;
+#endif
+    } uData;
+}_BLTechnique;
+#if defined(BL_GL_BACKEND)
+#elif defined(BL_DX_BACKEND)
 typedef struct _CommandQueue {
 	struct _CommandList {
 		ID3D12GraphicsCommandList* pCommandList;
@@ -122,21 +273,6 @@ typedef struct _SamplerBuffer {
 	BLU32 nIncrementSize;
 	BLU16 nDescriptorsPerBlock;
 }_BLSamplerBufferDX;
-typedef struct _TextureBuffer {
-	D3D12_SHADER_RESOURCE_VIEW_DESC  sSrvd;
-	D3D12_UNORDERED_ACCESS_VIEW_DESC sUavd;
-	ID3D12Resource* pPtr;
-	D3D12_RESOURCE_STATES eState;
-	BLU8* pData;
-	BLU32 nFlags;
-	BLU32 nWidth;
-	BLU32 nHeight;
-	BLU32 nDepth;
-	BLU32 nLayer;
-	BLU8 nType;
-	BLU8 nTextureFormat;
-	BLU8 nNumMips;
-}_BLTextureBufferDX;
 typedef struct _BatchBuffer {
 	struct _DrawVertexIndirectCommand {
 		D3D12_GPU_VIRTUAL_ADDRESS nCbv;
@@ -157,29 +293,13 @@ typedef struct _BatchBuffer {
 	_DrawIndexedIndirectCommand aCurrent;
 	_BLGenericBufferDX aIndirect[32];
 	_Stats sStats;
-	void* nCmds[2];
+	BLVoid* aCmds[2];
 	BLU32 aNum[2];
 	BLU32 nCurrIndirect;
 	BLU32 nMaxDrawPerBatch;
 	BLU32 nMinIndirect;
 	BLU32 nFlushPerBatch;
 }_BLBatchBufferDX;
-typedef struct _FrameBuffer {
-	struct _Attachment {
-		BLU16 nHandle;
-		BLU16 nMip;
-		BLU16 nLayer;
-	};
-	IDXGISwapChain* pSwapChain;
-	BLU16 aTexture[8];
-	_Attachment aAttachment[8];
-	BLU16 nDepth;
-	BLU32 nWidth;
-	BLU32 nHeight;
-	BLU16 nDenseIdx;
-	BLU8 nNum;
-	BLU8 nNumTh;
-}_BLFrameBufferDX;
 typedef struct _ShaderBuffer {
 	struct _Buffer {
 		BLU32 nSize;
@@ -191,21 +311,23 @@ typedef struct _ShaderBuffer {
 		BLU16 nCount;
 		BLU8 nType;
 	}aPredefined[UNIFORM_COUNT_INTERNAL];
-	void* pCode;
+	BLVoid* pCode;
 	BLU32 nHash;
 	BLU16 nAttrMask[SHADERATR_COUNT_INTERNAL];
 	BLU16 nUniforms;
 	BLU16 nSize;
 	BLU8 nPredefined;
 }_BLShaderBufferDX;
-#elif defined(BL_PLATFORM_IOS) || defined(BL_PLATFORM_ANDROID)
 #endif
 typedef struct _GpuMember {
 	_BLHardwareCaps sHardwareCaps;
+    _BLPipelineState sPipelineState;
 	BLF32 fPresentElapsed;
 	BLBool bVsync;
 	BLU16 nCurFramebufferHandle;
 	BLU16 nBackBufferIdx;
+    BLDictionary* pTextureCache;
+    BLDictionary* pBufferCache;
 #if defined(BL_PLATFORM_WIN32)
 	HGLRC sGLRC;
 #elif defined(BL_PLATFORM_UWP)
@@ -245,159 +367,1149 @@ typedef struct _GpuMember {
 #endif
 }_BLGpuMember;
 static _BLGpuMember* _PrGpuMem = NULL;
-
-#if defined(BL_PLATFORM_WIN32)
-static BLBool
-_IsTextureFormatValid(BLEnum _Fmt, BLBool _Srgb)
+static BLU32
+_TextureSize(BLEnum _BLFmt, BLU32 _Width, BLU32 _Height, BLU32 _Depth)
 {
-	const GLenum _glinternalfmt[] = {
-		GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_COMPRESSED_RGB8_ETC2, GL_COMPRESSED_RGBA8_ETC2_EAC, GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2,
-		GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG, GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG, GL_ATC_RGB_AMD, GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD, GL_ZERO, GL_R8, GL_R8I, GL_R8UI, GL_R8_SNORM,
-		GL_R16, GL_R16I, GL_R16UI, GL_R16F, GL_R16_SNORM, GL_R32I, GL_R32UI, GL_R32F, GL_RG8, GL_RG8I, GL_RG8UI, GL_RG8_SNORM, GL_RG16, GL_RG16I, GL_RG16UI, GL_RG16F, GL_RG16_SNORM,
-		GL_RG32I, GL_RG32UI, GL_RG32F, GL_RGB8, GL_RGB8I, GL_RGB8UI, GL_RGB8_SNORM, GL_RGB9_E5, GL_RGBA8, GL_RGBA8, GL_RGBA8I, GL_RGBA8UI, GL_RGBA8_SNORM, GL_RGBA16, GL_RGBA16I,
-		GL_RGBA16UI, GL_RGBA16F, GL_RGBA16_SNORM, GL_RGBA32I, GL_RGBA32UI, GL_RGBA32F, GL_RGB10_A2, GL_R11F_G11F_B10F, GL_ZERO, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT24, GL_DEPTH24_STENCIL8,
-		GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT32F, GL_STENCIL_INDEX8
-	};
-	const GLenum _glsrgbfmt[] = {
-		GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_COMPRESSED_SRGB8_ETC2, GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2,
-		GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO,
-		GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_SRGB8, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_SRGB8_ALPHA8, GL_SRGB8_ALPHA8,
-		GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO,
-		GL_ZERO, GL_ZERO, GL_ZERO
-	};
-	const GLenum _glfmt[] = {
-		GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_COMPRESSED_RGB8_ETC2, GL_COMPRESSED_RGBA8_ETC2_EAC, GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2,
-		GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG, GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG, GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG, GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG, GL_ZERO, GL_RED, GL_RED_INTEGER,
-		GL_RED_INTEGER, GL_RED, GL_RED, GL_RED_INTEGER, GL_RED_INTEGER, GL_RED, GL_RED, GL_RED_INTEGER, GL_RED_INTEGER, GL_RED, GL_RG, GL_RG_INTEGER, GL_RG_INTEGER, GL_RG, GL_RG, GL_RG_INTEGER,
-		GL_RG_INTEGER, GL_RG, GL_RG, GL_RG_INTEGER, GL_RG_INTEGER, GL_RG, GL_RGB, GL_RGB_INTEGER, GL_RGB_INTEGER, GL_RGB, GL_RGB, GL_BGRA, GL_RGBA, GL_RGBA_INTEGER, GL_RGBA_INTEGER,
-		GL_RGBA, GL_RGBA, GL_RGBA_INTEGER, GL_RGBA_INTEGER, GL_RGBA, GL_RGBA, GL_RGBA_INTEGER, GL_RGBA_INTEGER, GL_RGBA, GL_RGBA, GL_RGB, GL_ZERO, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,
-		GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_STENCIL_INDEX
-	};
-	const GLenum _gltype[] = {
-		GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT,
-		GL_SHORT, GL_UNSIGNED_SHORT, GL_HALF_FLOAT, GL_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT,
-		GL_UNSIGNED_SHORT, GL_FLOAT, GL_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_INT_5_9_9_9_REV, GL_UNSIGNED_BYTE,
-		GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_SHORT, GL_HALF_FLOAT, GL_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT,
-		GL_UNSIGNED_INT_2_10_10_10_REV, GL_UNSIGNED_INT_10F_11F_11F_REV, GL_ZERO, GL_UNSIGNED_SHORT, GL_UNSIGNED_INT, GL_UNSIGNED_INT_24_8, GL_UNSIGNED_INT, GL_FLOAT, GL_FLOAT, GL_FLOAT,GL_UNSIGNED_BYTE
-	};
-	GLenum _internalfmt = _Srgb ? _glsrgbfmt[_Fmt] : _glinternalfmt[_Fmt];
-	if (GL_ZERO == _internalfmt)
-		return FALSE;
+    switch (_BLFmt)
+    {
+        case BL_TF_BC1:
+            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
+        case BL_TF_BC1A1:
+            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
+        case BL_TF_BC3:
+            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+        case BL_TF_ETC2:
+            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
+        case BL_TF_ETC2A1:
+            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
+        case BL_TF_ETC2A:
+            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+        case BL_TF_ASTC:
+            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+        case BL_TF_BC5:
+            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+        case BL_TF_ETC2RG:
+            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+        case BL_TF_R8:
+            return _Width * _Height * _Depth * 1;
+        case BL_TF_R8I:
+            return _Width * _Height * _Depth * 1;
+        case BL_TF_R8U:
+            return _Width * _Height * _Depth * 1;
+        case BL_TF_R8S:
+            return _Width * _Height * _Depth * 1;
+        case BL_TF_R32I:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_R32U:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_R32F:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_RG8:
+            return _Width * _Height * _Depth * 2;
+        case BL_TF_RG8I:
+            return _Width * _Height * _Depth * 2;
+        case BL_TF_RG8U:
+            return _Width * _Height * _Depth * 2;
+        case BL_TF_RG8S:
+            return _Width * _Height * _Depth * 2;
+        case BL_TF_RG32I:
+            return _Width * _Height * _Depth * 8;
+        case BL_TF_RG32U:
+            return _Width * _Height * _Depth * 8;
+        case BL_TF_RG32F:
+            return _Width * _Height * _Depth * 8;
+        case BL_TF_RGB8:
+            return _Width * _Height * _Depth * 3;
+        case BL_TF_RGB8I:
+            return _Width * _Height * _Depth * 3;
+        case BL_TF_RGB8U:
+            return _Width * _Height * _Depth * 3;
+        case BL_TF_RGB8S:
+            return _Width * _Height * _Depth * 3;
+        case BL_TF_RGB9E5F:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_R11G11B10F:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_BGRA8:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_RGBA8:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_RGBA8I:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_RGBA8U:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_RGBA8S:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_RGBA32I:
+            return _Width * _Height * _Depth * 16;
+        case BL_TF_RGBA32U:
+            return _Width * _Height * _Depth * 16;
+        case BL_TF_RGBA32F:
+            return _Width * _Height * _Depth * 16;
+        case BL_TF_RGB10A2:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_D16:
+            return _Width * _Height * _Depth * 2;
+        case BL_TF_D24:
+            return _Width * _Height * _Depth * 3;
+        case BL_TF_D32:
+            return _Width * _Height * _Depth * 4;
+        case BL_TF_D24S8:
+            return _Width * _Height * _Depth * 4;
+        default:
+            return 0;
+    }
+}
+#if defined(BL_GL_BACKEND)
+static BLVoid
+_PipelineStateDefaultGL(BLU32 _Width, BLU32 _Height)
+{
+    GL_CHECK_INTERNAL(glEnable(GL_CULL_FACE));
+    GL_CHECK_INTERNAL(glCullFace(GL_BACK));
+    GL_CHECK_INTERNAL(glFrontFace(GL_CW));
+    _PrGpuMem->sPipelineState.eCullMode = BL_CM_CW;
+    GL_CHECK_INTERNAL(glDisable(GL_POLYGON_OFFSET_FILL));
+    GL_CHECK_INTERNAL(glPolygonOffset(0.f, 0.f));
+    _PrGpuMem->sPipelineState.nDepthBias = 0;
+    _PrGpuMem->sPipelineState.fSlopeScaledDepthBias = 0.f;
+    GL_CHECK_INTERNAL(glEnable(GL_SCISSOR_TEST));
+    GL_CHECK_INTERNAL(glScissor(0, 0, _Width, _Height));
+    _PrGpuMem->sPipelineState.nLTX = 0;
+    _PrGpuMem->sPipelineState.nLTY = 0;
+    _PrGpuMem->sPipelineState.nRTX = _Width;
+    _PrGpuMem->sPipelineState.nRTY = _Height;
+    _PrGpuMem->sPipelineState.bScissor = TRUE;
+    GL_CHECK_INTERNAL(glEnable(GL_DEPTH_TEST));
+    _PrGpuMem->sPipelineState.bDepth = TRUE;
+    GL_CHECK_INTERNAL(glDepthFunc(GL_LESS));
+    _PrGpuMem->sPipelineState.eDepthCompFunc = BL_CF_LESS;
+    GL_CHECK_INTERNAL(glDepthMask(GL_TRUE));
+    _PrGpuMem->sPipelineState.bDepthMask = TRUE;
+    GL_CHECK_INTERNAL(glDisable(GL_STENCIL_TEST));
+    _PrGpuMem->sPipelineState.bStencil = FALSE;
+    _PrGpuMem->sPipelineState.nStencilReadMask = _PrGpuMem->sPipelineState.nStencilWriteMask = 0xFF;
+    GL_CHECK_INTERNAL(glStencilMask(_PrGpuMem->sPipelineState.nStencilWriteMask));
+    GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+    GL_CHECK_INTERNAL(glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_KEEP));
+    _PrGpuMem->sPipelineState.eFrontStencilFailOp = BL_SO_KEEP;
+    _PrGpuMem->sPipelineState.eFrontStencilDepthFailOp = BL_SO_KEEP;
+    _PrGpuMem->sPipelineState.eFrontStencilPassOp = BL_SO_KEEP;
+    GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+    GL_CHECK_INTERNAL(glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_KEEP));
+    _PrGpuMem->sPipelineState.eBackStencilFailOp = BL_SO_KEEP;
+    _PrGpuMem->sPipelineState.eBackStencilDepthFailOp = BL_SO_KEEP;
+    _PrGpuMem->sPipelineState.eBackStencilPassOp = BL_SO_KEEP;
+    GL_CHECK_INTERNAL(glDisable(GL_BLEND));
+    _PrGpuMem->sPipelineState.bBlend = FALSE;
+    GL_CHECK_INTERNAL(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+    _PrGpuMem->sPipelineState.bAlphaToCoverage = FALSE;
+    GL_CHECK_INTERNAL(glBlendEquationSeparate(GL_FUNC_ADD , GL_FUNC_ADD));
+    GL_CHECK_INTERNAL(glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO));
+    GL_CHECK_INTERNAL(glBlendColor(0.f, 0.f, 0.f, 0.f));
+    memset(_PrGpuMem->sPipelineState.aBlendFactor, 0 , 4 * sizeof(BLU8));
+    _PrGpuMem->sPipelineState.eBlendOp = BL_BO_ADD;
+    _PrGpuMem->sPipelineState.eBlendOpAlpha = BL_BO_ADD;
+    _PrGpuMem->sPipelineState.eSrcBlendFactor = BL_BF_ONE;
+    _PrGpuMem->sPipelineState.eSrcBlendAlphaFactor = BL_BF_ONE;
+    _PrGpuMem->sPipelineState.eDestBlendFactor = BL_BF_ZERO;
+    _PrGpuMem->sPipelineState.eDestBlendAlphaFactor = BL_BF_ZERO;
+    _PrGpuMem->sPipelineState.bRasterStateDirty = FALSE;
+    _PrGpuMem->sPipelineState.bDSStateDirty = FALSE;
+    _PrGpuMem->sPipelineState.bBlendStateDirty = FALSE;
+}
+static BLVoid
+_PipelineStateRefreshGL()
+{
+    if (_PrGpuMem->sPipelineState.bRasterStateDirty)
+    {
+        switch (_PrGpuMem->sPipelineState.eCullMode)
+        {
+            case BL_CM_NONE:
+            {
+                GL_CHECK_INTERNAL(glDisable(GL_CULL_FACE));
+            }
+            break;
+            case BL_CM_CCW:
+            {
+                GL_CHECK_INTERNAL(glEnable(GL_CULL_FACE));
+                GL_CHECK_INTERNAL(glCullFace(GL_BACK));
+                GL_CHECK_INTERNAL(glFrontFace(GL_CCW));
+            }
+            break;
+            default:
+            {
+                GL_CHECK_INTERNAL(glEnable(GL_CULL_FACE));
+                GL_CHECK_INTERNAL(glCullFace(GL_BACK));
+                GL_CHECK_INTERNAL(glFrontFace(GL_CW));
+            }
+            break;
+        }
+        if (!blScalarApproximate(_PrGpuMem->sPipelineState.fSlopeScaledDepthBias, 0.f) || _PrGpuMem->sPipelineState.nDepthBias)
+        {
+            GL_CHECK_INTERNAL(glEnable(GL_POLYGON_OFFSET_FILL));
+            GL_CHECK_INTERNAL(glPolygonOffset(0.f, 0.f));
+        }
+        else
+        {
+            GL_CHECK_INTERNAL(glDisable(GL_POLYGON_OFFSET_FILL));
+        }
+        GL_CHECK_INTERNAL(glScissor(0, 0, _PrGpuMem->sPipelineState.nRTX - _PrGpuMem->sPipelineState.nLTX, _PrGpuMem->sPipelineState.nRTY - _PrGpuMem->sPipelineState.nLTY));
+        _PrGpuMem->sPipelineState.bRasterStateDirty = FALSE;
+    }
+    if (_PrGpuMem->sPipelineState.bDSStateDirty)
+    {
+        if (_PrGpuMem->sPipelineState.bDepth)
+        {
+            GL_CHECK_INTERNAL(glEnable(GL_DEPTH_TEST));
+        }
+        else
+        {
+            GL_CHECK_INTERNAL(glDisable(GL_DEPTH_TEST));
+        }
+        switch (_PrGpuMem->sPipelineState.eDepthCompFunc)
+        {
+            case BL_CF_NEVER:
+            {
+                GL_CHECK_INTERNAL(glDepthFunc(GL_NEVER));
+            }
+            break;
+            case BL_CF_LESS:
+            {
+                GL_CHECK_INTERNAL(glDepthFunc(GL_LESS));
+            }
+            break;
+            case BL_CF_EQUAL:
+            {
+                GL_CHECK_INTERNAL(glDepthFunc(GL_EQUAL));
+            }
+            break;
+            case BL_CF_LESSEQUAL:
+            {
+                GL_CHECK_INTERNAL(glDepthFunc(GL_LEQUAL));
+            }
+            break;
+            case BL_CF_GREATER:
+            {
+                GL_CHECK_INTERNAL(glDepthFunc(GL_GREATER));
+            }
+            break;
+            case BL_CF_NOTEQUAL:
+            {
+                GL_CHECK_INTERNAL(glDepthFunc(GL_NOTEQUAL));
+            }
+            break;
+            case BL_CF_GREATEREQUAL:
+            {
+                GL_CHECK_INTERNAL(glDepthFunc(GL_GEQUAL));
+            }
+            break;
+            default:
+            {
+                GL_CHECK_INTERNAL(glDepthFunc(GL_ALWAYS));
+            }
+            break;
+        }
+        if (_PrGpuMem->sPipelineState.bDepthMask)
+        {
+            GL_CHECK_INTERNAL(glDepthMask(GL_TRUE));
+        }
+        else
+        {
+            GL_CHECK_INTERNAL(glDepthMask(GL_FALSE));
+        }
+        if (_PrGpuMem->sPipelineState.bStencil)
+        {
+            GL_CHECK_INTERNAL(glEnable(GL_STENCIL_TEST));
+        }
+        else
+        {
+            GL_CHECK_INTERNAL(glDisable(GL_STENCIL_TEST));
+        }
+        GL_CHECK_INTERNAL(glStencilMask(_PrGpuMem->sPipelineState.nStencilWriteMask));
+        switch (_PrGpuMem->sPipelineState.eFrontStencilCompFunc)
+        {
+            case BL_CF_NEVER:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_FRONT, GL_NEVER, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_LESS:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_FRONT, GL_LESS, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_EQUAL:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_FRONT, GL_EQUAL, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_LESSEQUAL:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_FRONT, GL_LEQUAL, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_GREATER:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_FRONT, GL_GREATER, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_NOTEQUAL:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_FRONT, GL_NOTEQUAL, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_GREATEREQUAL:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_FRONT, GL_GEQUAL, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            default:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+        }
+        switch (_PrGpuMem->sPipelineState.eBackStencilCompFunc)
+        {
+            case BL_CF_NEVER:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_BACK, GL_NEVER, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_LESS:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_BACK, GL_LESS, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_EQUAL:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_BACK, GL_EQUAL, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_LESSEQUAL:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_BACK, GL_LEQUAL, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_GREATER:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_BACK, GL_GREATER, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_NOTEQUAL:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_BACK, GL_NOTEQUAL, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            case BL_CF_GREATEREQUAL:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_BACK, GL_GEQUAL, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+            default:
+            {
+                GL_CHECK_INTERNAL(glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, _PrGpuMem->sPipelineState.nStencilReadMask));
+            }
+            break;
+        }
+        GLenum _sfailf, _zfailf, _zpassf;
+        switch (_PrGpuMem->sPipelineState.eFrontStencilFailOp)
+        {
+            case BL_SO_KEEP: _sfailf = GL_KEEP; break;
+            case BL_SO_ZERO: _sfailf = GL_ZERO; break;
+            case BL_SO_REPLACE: _sfailf = GL_REPLACE; break;
+            case BL_SO_INCRSAT: _sfailf = GL_INCR_WRAP; break;
+            case BL_SO_DECRSAT: _sfailf = GL_DECR_WRAP; break;
+            case BL_SO_INVERT: _sfailf = GL_INVERT; break;
+            case BL_SO_INCR: _sfailf = GL_INCR; break;
+            default: _sfailf = GL_DECR; break;
+        }
+        switch (_PrGpuMem->sPipelineState.eFrontStencilDepthFailOp)
+        {
+            case BL_SO_KEEP: _zfailf = GL_KEEP; break;
+            case BL_SO_ZERO: _zfailf = GL_ZERO; break;
+            case BL_SO_REPLACE: _zfailf = GL_REPLACE; break;
+            case BL_SO_INCRSAT: _zfailf = GL_INCR_WRAP; break;
+            case BL_SO_DECRSAT: _zfailf = GL_DECR_WRAP; break;
+            case BL_SO_INVERT: _zfailf = GL_INVERT; break;
+            case BL_SO_INCR: _zfailf = GL_INCR; break;
+            default: _zfailf = GL_DECR; break;
+        }
+        switch (_PrGpuMem->sPipelineState.eFrontStencilPassOp)
+        {
+            case BL_SO_KEEP: _zpassf = GL_KEEP; break;
+            case BL_SO_ZERO: _zpassf = GL_ZERO; break;
+            case BL_SO_REPLACE: _zpassf = GL_REPLACE; break;
+            case BL_SO_INCRSAT: _zpassf = GL_INCR_WRAP; break;
+            case BL_SO_DECRSAT: _zpassf = GL_DECR_WRAP; break;
+            case BL_SO_INVERT: _zpassf = GL_INVERT; break;
+            case BL_SO_INCR: _zpassf = GL_INCR; break;
+            default: _zpassf = GL_DECR; break;
+        }
+        GL_CHECK_INTERNAL(glStencilOpSeparate(GL_FRONT, _sfailf, _zfailf, _zpassf));
+        GLenum _sfailb, _zfailb, _zpassb;
+        switch (_PrGpuMem->sPipelineState.eBackStencilFailOp)
+        {
+            case BL_SO_KEEP: _sfailb = GL_KEEP; break;
+            case BL_SO_ZERO: _sfailb = GL_ZERO; break;
+            case BL_SO_REPLACE: _sfailb = GL_REPLACE; break;
+            case BL_SO_INCRSAT: _sfailb = GL_INCR_WRAP; break;
+            case BL_SO_DECRSAT: _sfailb = GL_DECR_WRAP; break;
+            case BL_SO_INVERT: _sfailb = GL_INVERT; break;
+            case BL_SO_INCR: _sfailb = GL_INCR; break;
+            default: _sfailb = GL_DECR; break;
+        }
+        switch (_PrGpuMem->sPipelineState.eBackStencilDepthFailOp)
+        {
+            case BL_SO_KEEP: _zfailb = GL_KEEP; break;
+            case BL_SO_ZERO: _zfailb = GL_ZERO; break;
+            case BL_SO_REPLACE: _zfailb = GL_REPLACE; break;
+            case BL_SO_INCRSAT: _zfailb = GL_INCR_WRAP; break;
+            case BL_SO_DECRSAT: _zfailb = GL_DECR_WRAP; break;
+            case BL_SO_INVERT: _zfailb = GL_INVERT; break;
+            case BL_SO_INCR: _zfailb = GL_INCR; break;
+            default: _zfailb = GL_DECR; break;
+        }
+        switch (_PrGpuMem->sPipelineState.eBackStencilPassOp)
+        {
+            case BL_SO_KEEP: _zpassb = GL_KEEP; break;
+            case BL_SO_ZERO: _zpassb = GL_ZERO; break;
+            case BL_SO_REPLACE: _zpassb = GL_REPLACE; break;
+            case BL_SO_INCRSAT: _zpassb = GL_INCR_WRAP; break;
+            case BL_SO_DECRSAT: _zpassb = GL_DECR_WRAP; break;
+            case BL_SO_INVERT: _zpassb = GL_INVERT; break;
+            case BL_SO_INCR: _zpassb = GL_INCR; break;
+            default: _zpassb = GL_DECR; break;
+        }
+        GL_CHECK_INTERNAL(glStencilOpSeparate(GL_BACK, _sfailb, _zfailb, _zpassb));
+        _PrGpuMem->sPipelineState.bDSStateDirty = FALSE;
+    }
+    if (_PrGpuMem->sPipelineState.bBlendStateDirty)
+    {
+        if (_PrGpuMem->sPipelineState.bBlend)
+        {
+            GL_CHECK_INTERNAL(glEnable(GL_BLEND));
+        }
+        else
+        {
+            GL_CHECK_INTERNAL(glDisable(GL_BLEND));
+        }
+        if (_PrGpuMem->sPipelineState.bAlphaToCoverage)
+        {
+            GL_CHECK_INTERNAL(glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+        }
+        else
+        {
+            GL_CHECK_INTERNAL(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+        }
+        GLenum _es, _eas;
+        switch (_PrGpuMem->sPipelineState.eBlendOp)
+        {
+            case BL_BO_ADD: _es = GL_FUNC_ADD; break;
+            case BL_BO_SUBTRACT: _es = GL_FUNC_SUBTRACT; break;
+            case BL_BO_REVSUBTRACT: _es = GL_FUNC_REVERSE_SUBTRACT; break;
+            case BL_BO_MIN: _es = GL_MIN; break;
+            default: _es = GL_MAX; break;
+        }
+        switch (_PrGpuMem->sPipelineState.eBlendOpAlpha)
+        {
+            case BL_BO_ADD: _eas = GL_FUNC_ADD; break;
+            case BL_BO_SUBTRACT: _eas = GL_FUNC_SUBTRACT; break;
+            case BL_BO_REVSUBTRACT: _eas = GL_FUNC_REVERSE_SUBTRACT; break;
+            case BL_BO_MIN: _eas = GL_MIN; break;
+            default: _eas = GL_MAX; break;
+        }
+        GLenum _srgb, _drgb, _srgba, _drgba;
+        switch (_PrGpuMem->sPipelineState.eSrcBlendFactor)
+        {
+            case BL_BF_ZERO: _srgb = GL_ZERO; break;
+            case BL_BF_ONE: _srgb = GL_ONE; break;
+            case BL_BF_SRCCOLOR: _srgb = GL_SRC_COLOR; break;
+            case BL_BF_INVSRCCOLOR: _srgb = GL_ONE_MINUS_SRC_COLOR; break;
+            case BL_BF_SRCALPHA: _srgb = GL_SRC_ALPHA; break;
+            case BL_BF_INVSRCALPHA: _srgb = GL_ONE_MINUS_SRC_ALPHA; break;
+            case BL_BF_DESTCOLOR: _srgb = GL_DST_COLOR; break;
+            case BL_BF_INVDESTCOLOR: _srgb = GL_ONE_MINUS_DST_COLOR; break;
+            case BL_BF_DESTALPHA: _srgb = GL_DST_ALPHA; break;
+            case BL_BF_INVDESTALPHA: _srgb = GL_ONE_MINUS_DST_ALPHA; break;
+            case BL_BF_SRCALPHASAT: _srgb = GL_SRC_ALPHA_SATURATE; break;
+            case BL_BF_FACTOR: _srgb = GL_CONSTANT_COLOR; break;
+            default: _srgb = GL_ONE_MINUS_CONSTANT_COLOR; break;
+        }
+        switch (_PrGpuMem->sPipelineState.eDestBlendFactor)
+        {
+            case BL_BF_ZERO: _drgb = GL_ZERO; break;
+            case BL_BF_ONE: _drgb = GL_ONE; break;
+            case BL_BF_SRCCOLOR: _drgb = GL_SRC_COLOR; break;
+            case BL_BF_INVSRCCOLOR: _drgb = GL_ONE_MINUS_SRC_COLOR; break;
+            case BL_BF_SRCALPHA: _drgb = GL_SRC_ALPHA; break;
+            case BL_BF_INVSRCALPHA: _drgb = GL_ONE_MINUS_SRC_ALPHA; break;
+            case BL_BF_DESTCOLOR: _drgb = GL_DST_COLOR; break;
+            case BL_BF_INVDESTCOLOR: _drgb = GL_ONE_MINUS_DST_COLOR; break;
+            case BL_BF_DESTALPHA: _drgb = GL_DST_ALPHA; break;
+            case BL_BF_INVDESTALPHA: _drgb = GL_ONE_MINUS_DST_ALPHA; break;
+            case BL_BF_SRCALPHASAT: _drgb = GL_SRC_ALPHA_SATURATE; break;
+            case BL_BF_FACTOR: _drgb = GL_CONSTANT_COLOR; break;
+            default: _drgb = GL_ONE_MINUS_CONSTANT_COLOR; break;
+        }
+        switch (_PrGpuMem->sPipelineState.eSrcBlendAlphaFactor)
+        {
+            case BL_BF_ZERO: _srgba = GL_ZERO; break;
+            case BL_BF_ONE: _srgba = GL_ONE; break;
+            case BL_BF_SRCCOLOR: _srgba = GL_SRC_COLOR; break;
+            case BL_BF_INVSRCCOLOR: _srgba = GL_ONE_MINUS_SRC_COLOR; break;
+            case BL_BF_SRCALPHA: _srgba = GL_SRC_ALPHA; break;
+            case BL_BF_INVSRCALPHA: _srgba = GL_ONE_MINUS_SRC_ALPHA; break;
+            case BL_BF_DESTCOLOR: _srgba = GL_DST_COLOR; break;
+            case BL_BF_INVDESTCOLOR: _srgba = GL_ONE_MINUS_DST_COLOR; break;
+            case BL_BF_DESTALPHA: _srgba = GL_DST_ALPHA; break;
+            case BL_BF_INVDESTALPHA: _srgba = GL_ONE_MINUS_DST_ALPHA; break;
+            case BL_BF_SRCALPHASAT: _srgba = GL_SRC_ALPHA_SATURATE; break;
+            case BL_BF_FACTOR: _srgba = GL_CONSTANT_COLOR; break;
+            default: _srgba = GL_ONE_MINUS_CONSTANT_COLOR; break;
+        }
+        switch (_PrGpuMem->sPipelineState.eDestBlendAlphaFactor)
+        {
+            case BL_BF_ZERO: _drgba = GL_ZERO; break;
+            case BL_BF_ONE: _drgba = GL_ONE; break;
+            case BL_BF_SRCCOLOR: _drgba = GL_SRC_COLOR; break;
+            case BL_BF_INVSRCCOLOR: _drgba = GL_ONE_MINUS_SRC_COLOR; break;
+            case BL_BF_SRCALPHA: _drgba = GL_SRC_ALPHA; break;
+            case BL_BF_INVSRCALPHA: _drgba = GL_ONE_MINUS_SRC_ALPHA; break;
+            case BL_BF_DESTCOLOR: _drgba = GL_DST_COLOR; break;
+            case BL_BF_INVDESTCOLOR: _drgba = GL_ONE_MINUS_DST_COLOR; break;
+            case BL_BF_DESTALPHA: _drgba = GL_DST_ALPHA; break;
+            case BL_BF_INVDESTALPHA: _drgba = GL_ONE_MINUS_DST_ALPHA; break;
+            case BL_BF_SRCALPHASAT: _drgba = GL_SRC_ALPHA_SATURATE; break;
+            case BL_BF_FACTOR: _drgba = GL_CONSTANT_COLOR; break;
+            default: _drgba = GL_ONE_MINUS_CONSTANT_COLOR; break;
+        }
+        GL_CHECK_INTERNAL(glBlendFuncSeparate(_srgb, _drgb, _srgba, _drgba));
+        GL_CHECK_INTERNAL(glBlendColor((GLfloat)_PrGpuMem->sPipelineState.aBlendFactor[0] / 255.f,
+                                       (GLfloat)_PrGpuMem->sPipelineState.aBlendFactor[1] / 255.f,
+                                       (GLfloat)_PrGpuMem->sPipelineState.aBlendFactor[2] / 255.f,
+                                       (GLfloat)_PrGpuMem->sPipelineState.aBlendFactor[3] / 255.f));
+        _PrGpuMem->sPipelineState.bBlendStateDirty = FALSE;
+    }
+}
+static BLBool
+_TextureFormatValidGL(GLenum _InternalFmt, GLenum _Fmt, GLenum _Type, BLU32 _Bpp)
+{
+    BLBool _compressed = FALSE;
+    if (_InternalFmt == GL_COMPRESSED_RGB_S3TC_DXT1_EXT ||
+        _InternalFmt == GL_COMPRESSED_SRGB_S3TC_DXT1_EXT ||
+        _InternalFmt == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT ||
+        _InternalFmt == GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT ||
+        _InternalFmt == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT ||
+        _InternalFmt == GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT ||
+        _InternalFmt == GL_COMPRESSED_RGB8_ETC2 ||
+        _InternalFmt == GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2 ||
+        _InternalFmt == GL_COMPRESSED_RGBA8_ETC2_EAC ||
+        _InternalFmt == GL_COMPRESSED_SRGB8_ETC2 ||
+        _InternalFmt == GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2 ||
+        _InternalFmt == GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC ||
+        _InternalFmt == GL_COMPRESSED_RGBA_ASTC_4x4_KHR ||
+        _InternalFmt == GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR ||
+        _InternalFmt == GL_COMPRESSED_RG_RGTC2 ||
+        _InternalFmt == GL_COMPRESSED_RG11_EAC)
+        _compressed = TRUE;
 	GLuint _id;
-	glGenTextures(1, &_id);
-	glBindTexture(GL_TEXTURE_2D, _id);
-	GLsizei _size = (16 * 16 * BLOCK_INFO_BPP_INTERNAL[_Fmt]) / 8;
-	void* _ptr;
-	union { void* ptr; BLU32 addr; } _un;
+	GL_CHECK_INTERNAL(glGenTextures(1, &_id));
+	GL_CHECK_INTERNAL(glBindTexture(GL_TEXTURE_2D, _id));
+	GLsizei _size = (16 * 16 * _Bpp) / 8;
+	BLVoid* _ptr;
+	union {	BLVoid* ptr; BLU32 addr; } _un;
 	_un.ptr = alloca(_size + 16);
-	BLU32 unaligned = _un.addr;
-	BLU32 mask = 15;
-	BLU32 aligned = (((unaligned)+(mask)) & ((~0)&(~(mask))));
-	_un.addr = aligned;
+	BLU32 _unalignedvar = _un.addr;
+	BLU32 _mask = 15;
+	BLU32 _aligned = (((_unalignedvar) + (_mask)) & ((~0) & (~(_mask))));
+	_un.addr = _aligned;
 	_ptr = _un.ptr;
 	memset(_ptr, 1, _size);
-	if (_Fmt < BL_TF_UNKNOWN)
-		glCompressedTexImage2D(GL_TEXTURE_2D, 0, _glinternalfmt[_Fmt], 16, 16, GL_ZERO, _size, _ptr);
+	if (_compressed)
+		glCompressedTexImage2D(GL_TEXTURE_2D, 0, _InternalFmt, 16, 16, 0, _size, _ptr);
 	else
-		glTexImage2D(GL_TEXTURE_2D, 0, _glinternalfmt[_Fmt], 16, 16, 0, _glfmt[_Fmt], _gltype[_Fmt], _ptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, _InternalFmt, 16, 16, 0, _Fmt, _Type, _ptr);
 	glDeleteTextures(1, &_id);
 	if (glGetError())
 		return FALSE;
 	else
 		return TRUE;
 }
-
-static BLBool
-_IsFramebufferFormatValid(BLEnum _Fmt, BLBool _Srgb)
+static BLVoid
+_FillTextureFormatGL(BLEnum _BLFmt, GLenum* _IFmt, GLenum* _Fmt, GLenum* _Type, GLenum* _SrgbFmt, GLenum* _RtFmt)
 {
-	const GLenum _glinternalfmt[] = {
-		GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ETC1_RGB8_OES, GL_COMPRESSED_RGB8_ETC2, GL_COMPRESSED_RGBA8_ETC2_EAC, GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2,
-		GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG, GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG, GL_ATC_RGB_AMD, GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD, GL_ZERO, GL_R8, GL_R8I, GL_R8UI, GL_R8_SNORM,
-		GL_R16, GL_R16I, GL_R16UI, GL_R16F, GL_R16_SNORM, GL_R32I, GL_R32UI, GL_R32F, GL_RG8, GL_RG8I, GL_RG8UI, GL_RG8_SNORM, GL_RG16, GL_RG16I, GL_RG16UI, GL_RG16F, GL_RG16_SNORM,
-		GL_RG32I, GL_RG32UI, GL_RG32F, GL_RGB8, GL_RGB8I, GL_RGB8UI, GL_RGB8_SNORM, GL_RGB9_E5, GL_RGBA8, GL_RGBA8, GL_RGBA8I, GL_RGBA8UI, GL_RGBA8_SNORM, GL_RGBA16, GL_RGBA16I,
-		GL_RGBA16UI, GL_RGBA16F, GL_RGBA16_SNORM, GL_RGBA32I, GL_RGBA32UI, GL_RGBA32F, GL_RGB10_A2, GL_R11F_G11F_B10F, GL_ZERO, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT24, GL_DEPTH24_STENCIL8,
-		GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT32F, GL_STENCIL_INDEX8
-	};
-	const GLenum _glsrgbfmt[] = {
-		GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, GL_COMPRESSED_SRGB8_ETC2, GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2,
-		GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO,
-		GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_SRGB8, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_SRGB8_ALPHA8, GL_SRGB8_ALPHA8,
-		GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO,
-		GL_ZERO, GL_ZERO, GL_ZERO
-	};
-	const GLenum _glfmt[] = {
-		GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ETC1_RGB8_OES, GL_COMPRESSED_RGB8_ETC2, GL_COMPRESSED_RGBA8_ETC2_EAC, GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2,
-		GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG, GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG, GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG, GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG, GL_ZERO, GL_RED, GL_RED_INTEGER,
-		GL_RED_INTEGER, GL_RED, GL_RED, GL_RED_INTEGER, GL_RED_INTEGER, GL_RED, GL_RED, GL_RED, GL_RED_INTEGER, GL_RED, GL_RG, GL_RG, GL_RG, GL_RG, GL_RG, GL_RG, GL_RG, GL_RG, GL_RG,
-		GL_RG, GL_RED_INTEGER, GL_RG, GL_RGB, GL_RGB, GL_RGB, GL_RGB, GL_RGB, GL_BGRA, GL_RGBA, GL_RGBA, GL_RGBA, GL_RGBA, GL_RGBA, GL_RGBA, GL_RGBA, GL_RGBA, GL_RGBA, GL_RGBA, GL_RGBA_INTEGER,
-		GL_RGBA, GL_RGBA, GL_RGB, GL_ZERO, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_STENCIL_INDEX
-	};
-	const GLenum _gltype[] = {
-		GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT,
-		GL_SHORT, GL_UNSIGNED_SHORT, GL_HALF_FLOAT, GL_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT,
-		GL_UNSIGNED_SHORT, GL_FLOAT, GL_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_INT_5_9_9_9_REV, GL_UNSIGNED_BYTE,
-		GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_SHORT, GL_HALF_FLOAT, GL_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT,
-		GL_UNSIGNED_INT_2_10_10_10_REV, GL_UNSIGNED_INT_10F_11F_11F_REV, GL_ZERO, GL_UNSIGNED_SHORT, GL_UNSIGNED_INT, GL_UNSIGNED_INT_24_8, GL_UNSIGNED_INT, GL_FLOAT, GL_FLOAT, GL_FLOAT,GL_UNSIGNED_BYTE
-	};
-	GLenum _internalfmt = _Srgb ? _glsrgbfmt[_Fmt] : _glinternalfmt[_Fmt];
-	if (GL_ZERO == _internalfmt)
-		return FALSE;
-	GLuint _fbo;
-	glGenFramebuffers(1, &_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
-	GLuint _id;
-	glGenTextures(1, &_id);
-	glBindTexture(GL_TEXTURE_2D, _id);
-	GLsizei _size = (16 * 16 * BLOCK_INFO_BPP_INTERNAL[_Fmt]) / 8;
-	void* _ptr;
-	union { void* ptr; BLU32 addr; } _un;
-	_un.ptr = alloca(_size + 16);
-	BLU32 unaligned = _un.addr;
-	BLU32 mask = 15;
-	BLU32 aligned = (((unaligned)+(mask)) & ((~0)&(~(mask))));
-	_un.addr = aligned;
-	_ptr = _un.ptr;
-	if (_Fmt < BL_TF_UNKNOWN)
-		glCompressedTexImage2D(GL_TEXTURE_2D, 0, _glinternalfmt[_Fmt], 16, 16, GL_ZERO, _size, _ptr);
-	else
-		glTexImage2D(GL_TEXTURE_2D, 0, _glinternalfmt[_Fmt], 16, 16, 0, _glfmt[_Fmt], _gltype[_Fmt], _ptr);
-	GLenum _attachment;
-	if (_Fmt > BL_TF_DEPTH_UNKNOWN && _Fmt < BL_TF_COUNT)
-	{
-		if (_Fmt == BL_TF_D16 || _Fmt == BL_TF_D24 || _Fmt == BL_TF_D32 || _Fmt == BL_TF_D16F || _Fmt == BL_TF_D24F || _Fmt == BL_TF_D32F)
-			_attachment = GL_DEPTH_ATTACHMENT;
-		else if (_Fmt == BL_TF_D0S8)
-			_attachment = GL_STENCIL_ATTACHMENT;
-		else
-			_attachment = GL_DEPTH_STENCIL_ATTACHMENT;
-	}
-	else
-		_attachment = GL_COLOR_ATTACHMENT0;
-	glFramebufferTexture2D(GL_FRAMEBUFFER, _attachment, GL_TEXTURE_2D, _id, 0);
-	glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDeleteFramebuffers(1, &_fbo);
-	glDeleteTextures(1, &_id);
-	return GL_FRAMEBUFFER_COMPLETE == glGetError();
+    switch (_BLFmt)
+    {
+        case BL_TF_BC1:
+            *_IFmt = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+            *_SrgbFmt = GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
+            *_Fmt = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+            *_Type = GL_ZERO;
+            *_RtFmt = GL_ZERO;
+            break;
+        case BL_TF_BC1A1:
+            *_IFmt = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+            *_SrgbFmt = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT;
+            *_Fmt = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+            *_Type = GL_ZERO;
+            *_RtFmt = GL_ZERO;
+            break;
+        case BL_TF_BC3:
+            *_IFmt = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+            *_SrgbFmt = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
+            *_Fmt = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+            *_Type = GL_ZERO;
+            *_RtFmt = GL_ZERO;
+            break;
+        case BL_TF_ETC2:
+            *_IFmt = GL_COMPRESSED_RGB8_ETC2;
+            *_SrgbFmt = GL_COMPRESSED_SRGB8_ETC2;
+            *_Fmt = GL_COMPRESSED_RGB8_ETC2;
+            *_Type = GL_ZERO;
+            *_RtFmt = GL_ZERO;
+            break;
+        case BL_TF_ETC2A1:
+            *_IFmt = GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+            *_SrgbFmt = GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+            *_Fmt = GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+            *_Type = GL_ZERO;
+            *_RtFmt = GL_ZERO;
+            break;
+        case BL_TF_ETC2A:
+            *_IFmt = GL_COMPRESSED_RGBA8_ETC2_EAC;
+            *_SrgbFmt = GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC;
+            *_Fmt = GL_COMPRESSED_RGBA8_ETC2_EAC;
+            *_Type = GL_ZERO;
+            *_RtFmt = GL_ZERO;
+            break;
+        case BL_TF_ASTC:
+            *_IFmt = GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
+            *_SrgbFmt = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR;
+            *_Fmt = GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
+            *_Type = GL_ZERO;
+            *_RtFmt = GL_ZERO;
+            break;
+        case BL_TF_BC5:
+            *_IFmt = GL_COMPRESSED_RG_RGTC2;
+            *_SrgbFmt = GL_COMPRESSED_RG_RGTC2;
+            *_Fmt = GL_COMPRESSED_RG_RGTC2;
+            *_Type = GL_ZERO;
+            *_RtFmt = GL_ZERO;
+            break;
+        case BL_TF_ETC2RG:
+            *_IFmt = GL_COMPRESSED_RG11_EAC;
+            *_SrgbFmt = GL_COMPRESSED_RG11_EAC;
+            *_Fmt = GL_COMPRESSED_RG11_EAC;
+            *_Type = GL_ZERO;
+            *_RtFmt = GL_ZERO;
+            break;
+        case BL_TF_R8:
+            *_IFmt = GL_R8;
+            *_SrgbFmt = GL_R8;
+            *_Fmt = GL_RED;
+            *_Type = GL_UNSIGNED_BYTE;
+            *_RtFmt = GL_R8;
+            break;
+        case BL_TF_R8I:
+            *_IFmt = GL_R8I;
+            *_SrgbFmt = GL_R8I;
+            *_Fmt = GL_RED;
+            *_Type = GL_BYTE;
+            *_RtFmt = GL_R8I;
+            break;
+        case BL_TF_R8U:
+            *_IFmt = GL_R8UI;
+            *_SrgbFmt = GL_R8UI;
+            *_Fmt = GL_RED;
+            *_Type = GL_UNSIGNED_BYTE;
+            *_RtFmt = GL_R8UI;
+            break;
+        case BL_TF_R8S:
+            *_IFmt = GL_R8_SNORM;
+            *_SrgbFmt = GL_R8_SNORM;
+            *_Fmt = GL_RED;
+            *_Type = GL_BYTE;
+            *_RtFmt = GL_R8_SNORM;
+            break;
+        case BL_TF_R32I:
+            *_IFmt = GL_R32I;
+            *_SrgbFmt = GL_R32I;
+            *_Fmt = GL_RED;
+            *_Type = GL_INT;
+            *_RtFmt = GL_R32I;
+            break;
+        case BL_TF_R32U:
+            *_IFmt = GL_R32UI;
+            *_SrgbFmt = GL_R32UI;
+            *_Fmt = GL_RED;
+            *_Type = GL_UNSIGNED_INT;
+            *_RtFmt = GL_R32UI;
+            break;
+        case BL_TF_R32F:
+            *_IFmt = GL_R32F;
+            *_SrgbFmt = GL_R32F;
+            *_Fmt = GL_RED;
+            *_Type = GL_FLOAT;
+            *_RtFmt = GL_R32F;
+            break;
+        case BL_TF_RG8:
+            *_IFmt = GL_RG8;
+            *_SrgbFmt = GL_RG8;
+            *_Fmt = GL_RG;
+            *_Type = GL_UNSIGNED_BYTE;
+            *_RtFmt = GL_RG8;
+            break;
+        case BL_TF_RG8I:
+            *_IFmt = GL_RG8I;
+            *_SrgbFmt = GL_RG8I;
+            *_Fmt = GL_RG;
+            *_Type = GL_BYTE;
+            *_RtFmt = GL_RG8I;
+            break;
+        case BL_TF_RG8U:
+            *_IFmt = GL_RG8UI;
+            *_SrgbFmt = GL_RG8UI;
+            *_Fmt = GL_RG;
+            *_Type = GL_UNSIGNED_BYTE;
+            *_RtFmt = GL_RG8UI;
+            break;
+        case BL_TF_RG8S:
+            *_IFmt = GL_RG8_SNORM;
+            *_SrgbFmt = GL_RG8_SNORM;
+            *_Fmt = GL_RG;
+            *_Type = GL_BYTE;
+            *_RtFmt = GL_RG8_SNORM;
+            break;
+        case BL_TF_RG32I:
+            *_IFmt = GL_RG32I;
+            *_SrgbFmt = GL_RG32I;
+            *_Fmt = GL_RG;
+            *_Type = GL_INT;
+            *_RtFmt = GL_RG32I;
+            break;
+        case BL_TF_RG32U:
+            *_IFmt = GL_RG32UI;
+            *_SrgbFmt = GL_RG32UI;
+            *_Fmt = GL_RG;
+            *_Type = GL_UNSIGNED_INT;
+            *_RtFmt = GL_RG32UI;
+            break;
+        case BL_TF_RG32F:
+            *_IFmt = GL_RG32F;
+            *_SrgbFmt = GL_RG32F;
+            *_Fmt = GL_RG;
+            *_Type = GL_FLOAT;
+            *_RtFmt = GL_RG32F;
+            break;
+        case BL_TF_RGB8:
+            *_IFmt = GL_RGB8;
+            *_SrgbFmt = GL_SRGB8;
+            *_Fmt = GL_RGB;
+            *_Type = GL_UNSIGNED_BYTE;
+            *_RtFmt = GL_RGB8;
+            break;
+        case BL_TF_RGB8I:
+            *_IFmt = GL_RGB8I;
+            *_SrgbFmt = GL_RGB8I;
+            *_Fmt = GL_RGB;
+            *_Type = GL_BYTE;
+            *_RtFmt = GL_RGB8I;
+            break;
+        case BL_TF_RGB8U:
+            *_IFmt = GL_RGB8UI;
+            *_SrgbFmt = GL_RGB8UI;
+            *_Fmt = GL_RGB;
+            *_Type = GL_UNSIGNED_BYTE;
+            *_RtFmt = GL_RGB8UI;
+            break;
+        case BL_TF_RGB8S:
+            *_IFmt = GL_RGB8_SNORM;
+            *_SrgbFmt = GL_RGB8_SNORM;
+            *_Fmt = GL_RGB;
+            *_Type = GL_BYTE;
+            *_RtFmt = GL_RGB8_SNORM;
+            break;
+        case BL_TF_RGB9E5F:
+            *_IFmt = GL_RGB9_E5;
+            *_SrgbFmt = GL_RGB9_E5;
+            *_Fmt = GL_RGB;
+            *_Type = GL_UNSIGNED_INT_5_9_9_9_REV;
+            *_RtFmt = GL_RGB9_E5;
+            break;
+        case BL_TF_R11G11B10F:
+            *_IFmt = GL_R11F_G11F_B10F;
+            *_SrgbFmt = GL_R11F_G11F_B10F;
+            *_Fmt = GL_RGBA;
+            *_Type = GL_UNSIGNED_INT_10F_11F_11F_REV;
+            *_RtFmt = GL_R11F_G11F_B10F;
+            break;
+        case BL_TF_BGRA8:
+            *_IFmt = GL_RGBA8;
+            *_SrgbFmt = GL_SRGB8_ALPHA8;
+            *_Fmt = GL_BGRA;
+            *_Type = GL_UNSIGNED_BYTE;
+            *_RtFmt = GL_RGBA8;
+            break;
+        case BL_TF_RGBA8:
+            *_IFmt = GL_RGBA8;
+            *_SrgbFmt = GL_SRGB8_ALPHA8;
+            *_Fmt = GL_RGBA;
+            *_Type = GL_UNSIGNED_BYTE;
+            *_RtFmt = GL_RGBA8;
+            break;
+        case BL_TF_RGBA8I:
+            *_IFmt = GL_RGBA8I;
+            *_SrgbFmt = GL_RGBA8I;
+            *_Fmt = GL_RGBA;
+            *_Type = GL_BYTE;
+            *_RtFmt = GL_RGBA8I;
+            break;
+        case BL_TF_RGBA8U:
+            *_IFmt = GL_RGBA8UI;
+            *_SrgbFmt = GL_RGBA8UI;
+            *_Fmt = GL_RGBA;
+            *_Type = GL_UNSIGNED_BYTE;
+            *_RtFmt = GL_RGBA8UI;
+            break;
+        case BL_TF_RGBA8S:
+            *_IFmt = GL_RGBA8_SNORM;
+            *_SrgbFmt = GL_RGBA8_SNORM;
+            *_Fmt = GL_RGBA;
+            *_Type = GL_BYTE;
+            *_RtFmt = GL_RGBA8_SNORM;
+            break;
+        case BL_TF_RGBA32I:
+            *_IFmt = GL_RGBA32I;
+            *_SrgbFmt = GL_RGBA32I;
+            *_Fmt = GL_RGBA;
+            *_Type = GL_INT;
+            *_RtFmt = GL_RGBA32I;
+            break;
+        case BL_TF_RGBA32U:
+            *_IFmt = GL_RGBA32UI;
+            *_SrgbFmt = GL_RGBA32UI;
+            *_Fmt = GL_RGBA;
+            *_Type = GL_UNSIGNED_INT;
+            *_RtFmt = GL_RGBA32UI;
+            break;
+        case BL_TF_RGBA32F:
+            *_IFmt = GL_RGBA32F;
+            *_SrgbFmt = GL_RGBA32F;
+            *_Fmt = GL_RGBA;
+            *_Type = GL_FLOAT;
+            *_RtFmt = GL_RGBA32F;
+            break;
+        case BL_TF_RGB10A2:
+            *_IFmt = GL_RGB10_A2;
+            *_SrgbFmt = GL_RGB10_A2;
+            *_Fmt = GL_RGBA;
+            *_Type = GL_UNSIGNED_INT_2_10_10_10_REV;
+            *_RtFmt = GL_RGB10_A2;
+            break;
+        case BL_TF_D16:
+            *_IFmt = GL_DEPTH_COMPONENT16;
+            *_SrgbFmt = GL_DEPTH_COMPONENT16;
+            *_Fmt = GL_DEPTH_COMPONENT;
+            *_Type = GL_UNSIGNED_SHORT;
+            *_RtFmt = GL_DEPTH_COMPONENT16;
+            break;
+        case BL_TF_D24:
+            *_IFmt = GL_DEPTH_COMPONENT24;
+            *_SrgbFmt = GL_DEPTH_COMPONENT24;
+            *_Fmt = GL_DEPTH_COMPONENT;
+            *_Type = GL_UNSIGNED_INT;
+            *_RtFmt = GL_DEPTH_COMPONENT24;
+            break;
+        case BL_TF_D32:
+            *_IFmt = GL_DEPTH_COMPONENT32F;
+            *_SrgbFmt = GL_DEPTH_COMPONENT32F;
+            *_Fmt = GL_DEPTH_COMPONENT;
+            *_Type = GL_FLOAT;
+            *_RtFmt = GL_DEPTH_COMPONENT32F;
+            break;
+        case BL_TF_D24S8:
+            *_IFmt = GL_DEPTH24_STENCIL8;
+            *_SrgbFmt = GL_DEPTH24_STENCIL8;
+            *_Fmt = GL_DEPTH_STENCIL;
+            *_Type = GL_UNSIGNED_INT_24_8;
+            *_RtFmt = GL_DEPTH24_STENCIL8;
+            break;
+        default:
+            *_IFmt = GL_ZERO;
+            *_SrgbFmt = GL_ZERO;
+            *_Fmt = GL_ZERO;
+            *_Type = GL_ZERO;
+            *_RtFmt = GL_ZERO;
+            break;
+    }
 }
-
-void
-_GpuIntervention(HWND _Hwnd, BLBool _Vsync)
+#elif defined(BL_DX_BACKEND)
+static ID3D12GraphicsCommandList*
+_AllocCmdList()
+{
+    do
+    {
+        BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nRead - _PrGpuMem->sCmdQueue.sControl.nWrite + _PrGpuMem->sCmdQueue.sControl.nSize;
+        BLU32 _dist = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nRead - (BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nRead - _PrGpuMem->sCmdQueue.sControl.nWrite) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nRead - (BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite) >> 31)) - 1;
+        BLU32 _maxsz = ((_PrGpuMem->sCmdQueue.sControl.nSize - 1) & (((BLS32)_dist) >> 31)) | (_dist & ~(((BLS32)_dist) >> 31));
+        BLU32 _sizenosign = 1 & 0x7fffffff;
+        BLU32 _test = _sizenosign - _maxsz;
+        BLU32 _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
+        BLU32 _advance = _PrGpuMem->sCmdQueue.sControl.nWrite + _size;
+        BLU32 _write = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
+        _PrGpuMem->sCmdQueue.sControl.nWrite = _write;
+        if (_size == 0)
+        {
+            _BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nRead];
+            if (WAIT_OBJECT_0 == WaitForSingleObject(_cmdlist.pEvent, INFINITE))
+            {
+                CloseHandle(_cmdlist.pEvent);
+                _cmdlist.pEvent = NULL;
+                _PrGpuMem->sCmdQueue.nCompletedFence = _PrGpuMem->sCmdQueue.pFence->GetCompletedValue();
+                _PrGpuMem->sCmdQueue.pCommandQueue->Wait(_PrGpuMem->sCmdQueue.pFence, _PrGpuMem->sCmdQueue.nCompletedFence);
+                FOREACH_ARRAY(ID3D12Resource*, _iter, _PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead])
+                {
+                    _iter->Release();
+                }
+                blClearArray(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead]);
+                BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead + _PrGpuMem->sCmdQueue.sControl.nSize;
+                _maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31));
+                _sizenosign = 1 & 0x7fffffff;
+                _test = _sizenosign - _maxsz;
+                _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
+                _advance = _PrGpuMem->sCmdQueue.sControl.nRead + _size;
+                BLU32 _read = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
+                _PrGpuMem->sCmdQueue.sControl.nRead = _read;
+            }
+        }
+        else
+            break;
+    } while (1);
+    _BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nCurrent];
+    DX_CHECK_INTERNAL(_cmdlist.pCommandAllocator->Reset());
+    DX_CHECK_INTERNAL(_cmdlist.pCommandList->Reset(_cmdlist.pCommandAllocator, NULL));
+    return _cmdlist.pCommandList;
+}
+static BLU64
+_KickCmdList()
+{
+    _BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nCurrent];
+    DX_CHECK_INTERNAL(_cmdlist.pCommandList->Close());
+    ID3D12CommandList* _dx12cmdlist[] = { _cmdlist.pCommandList };
+    _PrGpuMem->sCmdQueue.pCommandQueue->ExecuteCommandLists(sizeof(_dx12cmdlist) / sizeof(_dx12cmdlist[0]), _dx12cmdlist);
+    _cmdlist.pEvent = CreateEventExW(NULL, NULL, 0, EVENT_ALL_ACCESS);
+    BLU64 _fence = _PrGpuMem->sCmdQueue.nCurrentFence++;
+    _PrGpuMem->sCmdQueue.pCommandQueue->Signal(_PrGpuMem->sCmdQueue.pFence, _fence);
+    _PrGpuMem->sCmdQueue.pFence->SetEventOnCompletion(_fence, _cmdlist.pEvent);
+    BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nWrite - _PrGpuMem->sCmdQueue.sControl.nCurrent + _PrGpuMem->sCmdQueue.sControl.nSize;
+    BLU32 _maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite - (BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nWrite - _PrGpuMem->sCmdQueue.sControl.nCurrent) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite - (BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent) >> 31));
+    BLU32 _sizenosign = 1 & 0x7fffffff;
+    BLU32 _test = _sizenosign - _maxsz;
+    BLU32 _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
+    BLU32 _advance = _PrGpuMem->sCmdQueue.sControl.nCurrent + _size;
+    BLU32 _current = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
+    _PrGpuMem->sCmdQueue.sControl.nCurrent = _current;
+    return _fence;
+}
+static BLVoid
+_UpdateBuffer(_BLGenericBufferDX* _Buf, ID3D12GraphicsCommandList* _CommandList, BLU32 _Offset, BLU32 _Size, BLVoid* _Data)
+{
+    D3D12_RESOURCE_DESC _desc;
+    _desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    _desc.Alignment = 0;
+    _desc.Width = _Size;
+    _desc.Height = 1;
+    _desc.DepthOrArraySize = 1;
+    _desc.MipLevels = 1;
+    _desc.Format = DXGI_FORMAT_UNKNOWN;
+    _desc.SampleDesc.Count = 1;
+    _desc.SampleDesc.Quality = 0;
+    _desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    _desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+    ID3D12Resource* _staging;
+    D3D12_HEAP_PROPERTIES _hp = { D3D12_HEAP_TYPE_UPLOAD, D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
+    DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_hp, D3D12_HEAP_FLAG_NONE, &_desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_ID3D12Resource, (BLVoid**)&_staging));
+    BLU8* _data;
+    DX_CHECK_INTERNAL(_staging->Map(0, NULL, (BLVoid**)&_data));
+    memcpy(_data, _Data, _Size);
+    _staging->Unmap(0, NULL);
+    D3D12_RESOURCE_STATES _state = D3D12_RESOURCE_STATE_COPY_DEST;
+    if (_Buf->eState != D3D12_RESOURCE_STATE_COPY_DEST)
+    {
+        _state = _Buf->eState;
+        D3D12_RESOURCE_BARRIER _barrier;
+        _barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        _barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        _barrier.Transition.pResource = const_cast<ID3D12Resource*>(_Buf->pPtr);
+        _barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        _barrier.Transition.StateBefore = _Buf->eState;
+        _barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+        _PrGpuMem->pCommandList->ResourceBarrier(1, &_barrier);
+        _Buf->eState = D3D12_RESOURCE_STATE_COPY_DEST;
+    }
+    _CommandList->CopyBufferRegion(_Buf->pPtr, _Offset, _staging, 0, _Size);
+    if (_Buf->eState != _state)
+    {
+        D3D12_RESOURCE_BARRIER _barrier;
+        _barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        _barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        _barrier.Transition.pResource = (ID3D12Resource*)(_Buf->pPtr);
+        _barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        _barrier.Transition.StateBefore = _Buf->eState;
+        _barrier.Transition.StateAfter = _state;
+        _PrGpuMem->pCommandList->ResourceBarrier(1, &_barrier);
+        _Buf->eState = _state;
+    }
+    blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _staging);
+}
+static BLVoid
+_CreateBuffer(_BLGenericBufferDX* _Buf, BLU32 _Size, BLVoid* _Data, BLU16 _Flags, BLBool _Vertex, BLU32 _Stride)
+{
+    _Buf->nSize = _Size;
+    _Buf->nFags = _Flags;
+    BLBool _needuav = 0 != (_Flags & (BUFFER_COMPUTE_WRITE_INTERNAL | BUFFER_DRAW_INDIRECT_INTERNAL));
+    BLBool _drawindirect = 0 != (_Flags & BUFFER_DRAW_INDIRECT_INTERNAL);
+    _Buf->bDynamic = (NULL == _Data || _needuav);
+    DXGI_FORMAT _format;
+    BLU32 _stride;
+    BLU32 _flags = _needuav	? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
+    if (_drawindirect)
+    {
+        _format = DXGI_FORMAT_R32G32B32A32_UINT;
+        _stride = 16;
+    }
+    else
+    {
+        BLU32 _uavformat = (_Flags & BUFFER_COMPUTE_FORMAT_MASK_INTERNAL) >> BUFFER_COMPUTE_FORMAT_SHIFT_INTERNAL;
+        if (0 == _uavformat)
+        {
+            if (_Vertex)
+            {
+                _format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+                _stride = 16;
+            }
+            else
+            {
+                if (0 == (_Flags & BUFFER_INDEX32_INTERNAL))
+                {
+                    _format = DXGI_FORMAT_R16_UINT;
+                    _stride = 2;
+                }
+                else
+                {
+                    _format = DXGI_FORMAT_R32_UINT;
+                    _stride = 4;
+                }
+            }
+        }
+        else
+        {
+            BLU32 _sub = (((_Flags & BUFFER_COMPUTE_TYPE_MASK_INTERNAL) >> BUFFER_COMPUTE_TYPE_SHIFT_INTERNAL) - 1);
+            BLU32 _le = -(_sub <= (BLU32)((_Flags & BUFFER_COMPUTE_TYPE_MASK_INTERNAL) >> BUFFER_COMPUTE_TYPE_SHIFT_INTERNAL));
+            BLU32 _uavtype = _sub & _le;
+            const DXGI_FORMAT _auavformat[][3] =
+            {
+                DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,
+                DXGI_FORMAT_R8_SINT,           DXGI_FORMAT_R8_UINT,            DXGI_FORMAT_UNKNOWN,
+                DXGI_FORMAT_R8G8_SINT,         DXGI_FORMAT_R8G8_UINT,          DXGI_FORMAT_UNKNOWN,
+                DXGI_FORMAT_R8G8B8A8_SINT,     DXGI_FORMAT_R8G8B8A8_UINT,      DXGI_FORMAT_UNKNOWN,
+                DXGI_FORMAT_R16_SINT,          DXGI_FORMAT_R16_UINT,           DXGI_FORMAT_R16_FLOAT ,
+                DXGI_FORMAT_R16G16_SINT,       DXGI_FORMAT_R16G16_UINT,        DXGI_FORMAT_R16G16_FLOAT,
+                DXGI_FORMAT_R16G16B16A16_SINT, DXGI_FORMAT_R16G16B16A16_UINT,  DXGI_FORMAT_R16G16B16A16_FLOAT,
+                DXGI_FORMAT_R32_SINT,          DXGI_FORMAT_R32_UINT,           DXGI_FORMAT_R32_FLOAT,
+                DXGI_FORMAT_R32G32_SINT,       DXGI_FORMAT_R32G32_UINT,        DXGI_FORMAT_R32G32_FLOAT,
+                DXGI_FORMAT_R32G32B32A32_SINT, DXGI_FORMAT_R32G32B32A32_UINT,  DXGI_FORMAT_R32G32B32A32_FLOAT
+            };
+            const BLU32 _auavstride[] =	{ 0, 1,	2, 4, 2, 4, 8, 4, 8, 16 };
+            _format = _auavformat[_uavformat][_uavtype];
+            _stride = _auavstride[_uavformat];
+        }
+    }
+    _stride = (0 == _Stride ? _stride : _Stride);
+    _Buf->sSrvd.Format = _format;
+    _Buf->sSrvd.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+    _Buf->sSrvd.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    _Buf->sSrvd.Buffer.FirstElement = 0;
+    _Buf->sSrvd.Buffer.NumElements = _Buf->nSize / _stride;
+    _Buf->sSrvd.Buffer.StructureByteStride = 0;
+    _Buf->sSrvd.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+    _Buf->sUavd.Format = _format;
+    _Buf->sUavd.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+    _Buf->sUavd.Buffer.FirstElement = 0;
+    _Buf->sUavd.Buffer.NumElements = _Buf->nSize / _stride;
+    _Buf->sUavd.Buffer.StructureByteStride = 0;
+    _Buf->sUavd.Buffer.CounterOffsetInBytes = 0;
+    _Buf->sUavd.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+    D3D12_RESOURCE_DESC _desc;
+    _desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    _desc.Alignment = 0;
+    _desc.Width = _Size;
+    _desc.Height = 1;
+    _desc.DepthOrArraySize = 1;
+    _desc.MipLevels = 1;
+    _desc.Format = DXGI_FORMAT_UNKNOWN;
+    _desc.SampleDesc.Count = 1;
+    _desc.SampleDesc.Quality = 0;
+    _desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    _desc.Flags = D3D12_RESOURCE_FLAGS(_flags);
+    D3D12_HEAP_PROPERTIES _hp = { D3D12_HEAP_TYPE_DEFAULT,  D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
+    DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_hp, D3D12_HEAP_FLAG_NONE, &_desc, D3D12_RESOURCE_STATE_COMMON, NULL, IID_ID3D12Resource, (BLVoid**)&_Buf->pPtr));
+    _Buf->nGpuVA = _Buf->pPtr->GetGPUVirtualAddress();
+    if (_Buf->eState != (_drawindirect ? D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT : D3D12_RESOURCE_STATE_GENERIC_READ))
+    {
+        D3D12_RESOURCE_BARRIER _barrier;
+        _barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        _barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        _barrier.Transition.pResource = (ID3D12Resource*)(_Buf->pPtr);
+        _barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        _barrier.Transition.StateBefore = _Buf->eState;
+        _barrier.Transition.StateAfter = (_drawindirect ? D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT : D3D12_RESOURCE_STATE_GENERIC_READ);
+        _PrGpuMem->pCommandList->ResourceBarrier(1, &_barrier);
+        _Buf->eState = (_drawindirect ? D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT : D3D12_RESOURCE_STATE_GENERIC_READ);
+    }
+    if (!_Buf->bDynamic)
+        _UpdateBuffer(_Buf, _PrGpuMem->pCommandList, 0, _Size, _Data);
+}
+static BLVoid
+_DestroyBuffer(_BLGenericBufferDX* _Buf)
+{
+    if (_Buf->pPtr)
+    {
+        blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _Buf->pPtr);
+        _Buf->bDynamic = FALSE;
+    }
+}
+#elif defined(BL_VK_BACKEND)
+#else
+#endif
+#if defined(BL_PLATFORM_WIN32)
+BLVoid
+_GpuIntervention(HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
 	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
 	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
 	_PrGpuMem->nBackBufferIdx = 0;
-	_PrGpuMem->sHardwareCaps.nFuncSupported = 0;
+	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
+	_PrGpuMem->pTextureCache = blGenDict(TRUE);
+	_PrGpuMem->pBufferCache = blGenDict(TRUE);
+	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
+		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	BLBool _vkinited = FALSE;
 	BLBool _gpuok = FALSE;
-	if (!_vkinited)
-	{
+	if (_vkinited)
+    {
+        _PrGpuMem->sHardwareCaps.eApiType = BL_VULKAN_API;
 	}
-	if (!_vkinited)
+	else
 	{
-		BLS32 _glversion;
 		_PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
 		PIXELFORMATDESCRIPTOR _pfd;
 		memset(&_pfd, 0, sizeof(_pfd));
@@ -415,7 +1527,7 @@ _GpuIntervention(HWND _Hwnd, BLBool _Vsync)
 		_PrGpuMem->sGLRC = wglCreateContext(GetDC(_Hwnd));
 		wglMakeCurrent(GetDC(_Hwnd), _PrGpuMem->sGLRC);
 		HMODULE _lib = LoadLibraryW(L"opengl32.dll");
-		GL_LOAD_INTERNAL(_lib);
+        GL_LOAD_INTERNAL(_lib);
 		GL_SYMBOL_INTERNAL(PFNWGLCREATECONTEXTATTRIBSARBPROC, wglCreateContextAttribsARB, _lib);
 		GL_SYMBOL_INTERNAL(PFNWGLSWAPINTERVALEXTPROC, wglSwapIntervalEXT, _lib);
 		FreeLibrary(_lib);
@@ -442,12 +1554,11 @@ _GpuIntervention(HWND _Hwnd, BLBool _Vsync)
 			if (_hwgl)
 			{
 				_gpuok = TRUE;
-				blDebugOutput("Opengl %d.%d boost", _versions[_idx][0], _versions[_idx][1]);
-				_glversion = _versions[_idx][0] * 10 + _versions[_idx][1];
 				wglMakeCurrent(GetDC(_Hwnd), 0);
 				wglDeleteContext(_PrGpuMem->sGLRC);
 				_PrGpuMem->sGLRC = _hwgl;
 				wglMakeCurrent(GetDC(_Hwnd), _PrGpuMem->sGLRC);
+				_PrGpuMem->sHardwareCaps.nApiVersion = _attribus[1] * 100 + _attribus[3] * 10;
 				break;
 			}
 		}
@@ -459,79 +1570,34 @@ _GpuIntervention(HWND _Hwnd, BLBool _Vsync)
 		{
 			blDebugOutput("bulllord needs opengl 4.1 or above");
 			return;
-		}
-		const GLenum _glinternalfmt[] = {
-			GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_COMPRESSED_RGB8_ETC2, GL_COMPRESSED_RGBA8_ETC2_EAC, GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2,
-			GL_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG, GL_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG, GL_ATC_RGB_AMD, GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD, GL_ZERO, GL_R8, GL_R8I, GL_R8UI, GL_R8_SNORM,
-			GL_R16, GL_R16I, GL_R16UI, GL_R16F, GL_R16_SNORM, GL_R32I, GL_R32UI, GL_R32F, GL_RG8, GL_RG8I, GL_RG8UI, GL_RG8_SNORM, GL_RG16, GL_RG16I, GL_RG16UI, GL_RG16F, GL_RG16_SNORM,
-			GL_RG32I, GL_RG32UI, GL_RG32F, GL_RGB8, GL_RGB8I, GL_RGB8UI, GL_RGB8_SNORM, GL_RGB9_E5, GL_RGBA8, GL_RGBA8, GL_RGBA8I, GL_RGBA8UI, GL_RGBA8_SNORM, GL_RGBA16, GL_RGBA16I,
-			GL_RGBA16UI, GL_RGBA16F, GL_RGBA16_SNORM, GL_RGBA32I, GL_RGBA32UI, GL_RGBA32F, GL_RGB10_A2, GL_R11F_G11F_B10F, GL_ZERO, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT24, GL_DEPTH24_STENCIL8,
-			GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT32F, GL_STENCIL_INDEX8
-		};
-		GLint _numcmpformats = 0;
-		GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS, &_numcmpformats));
-		GLint* _cmpformat = NULL;
-		BLBool _texsupport[BL_TF_COUNT] = { FALSE };
-		if (0 < _numcmpformats)
+        }
+		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValidGL(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
+		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1A1] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
+		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
+		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
+		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
+		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValidGL(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
+		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
+		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValidGL(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
+		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValidGL(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
+		GLint _extensions = 0;
+		GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
+		for (GLint _idx = 0; _idx < _extensions; ++_idx)
 		{
-			_numcmpformats = _numcmpformats > 256 ? 256 : _numcmpformats;
-			_cmpformat = (GLint*)malloc(sizeof(GLint)*_numcmpformats);
-			GL_CHECK_INTERNAL(glGetIntegerv(GL_COMPRESSED_TEXTURE_FORMATS, _cmpformat));
-			for (BLS32 _i = 0; _i < _numcmpformats; ++_i)
+			const BLAnsi* _name = (const BLAnsi*)glGetStringi(GL_EXTENSIONS, _idx);
+			if (!strcmp(_name, "GL_EXT_texture_filter_anisotropic"))
 			{
-				GLint _internalfmt = _cmpformat[_i];
-				BLU32 _fmt = BL_TF_UNKNOWN;
-				for (BLU32 _j = 0; _j < _fmt; ++_j)
-				{
-					if (_glinternalfmt[_j] == (GLenum)_internalfmt)
-					{
-						_texsupport[_j] = TRUE;
-						_fmt = _j;
-					}
-				}
+				GL_CHECK_INTERNAL(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &_PrGpuMem->sHardwareCaps.fMaxAnisotropy));
 			}
 		}
-		GLint _tmp = 0;
-		GL_CHECK_INTERNAL(glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_tmp));
-		_PrGpuMem->sHardwareCaps.nMaxTextureSize = _tmp;
-		GL_CHECK_INTERNAL(glGetIntegerv(GL_MAX_DRAW_BUFFERS, &_tmp));
-		_PrGpuMem->sHardwareCaps.nMaxFBAttachments = MIN_INTERNAL(_tmp, 8);
-		_PrGpuMem->sHardwareCaps.nFuncSupported |= CAP_TEXTURE2D_ARRAY_INTERNAL;
-		_PrGpuMem->sHardwareCaps.nFuncSupported |= CAP_TEXTURECUBE_ARRAY_INTERNAL;
-		_PrGpuMem->sHardwareCaps.nFuncSupported |= CAP_DRAW_INDIRECT_INTERNAL;
-		_PrGpuMem->sHardwareCaps.nFuncSupported |= CAP_PROGRAM_PIPELINE_INTERNAL;
-		if (_glversion >= 43)
-		{
-			_PrGpuMem->sHardwareCaps.nFuncSupported |= CAP_COMPUTE_SHADER_INTERNAL;
-			_PrGpuMem->sHardwareCaps.nFuncSupported |= CAP_DRAW_MULTIINDIRECT_INTERNAL;
-		}
-		for (BLU32 _i =  0; _i < BL_TF_COUNT; ++_i)
-		{
-			if (BL_TF_UNKNOWN != _i &&  BL_TF_DEPTH_UNKNOWN != _i)
-				_texsupport[_i] = _IsTextureFormatValid(_i, FALSE);
-		}
-		GLuint _vao;
-		glGenVertexArrays(1, &_vao);
-		glDeleteVertexArrays(1, &_vao);
-		if (!glGetError())
-			_PrGpuMem->sHardwareCaps.nFuncSupported |= CAP_VAO_INTERNAL;
-		for (BLU32 _i = 0; _i < BL_TF_COUNT; ++_i)
-		{
-			BLU16 _supported = BL_TS_NONE;
-			_supported |= _texsupport[_i] ? BL_TS_2D | BL_TS_3D | BL_TS_CUBE : BL_TS_NONE;
-			_supported |= _IsTextureFormatValid(_i, TRUE) ? BL_TS_2D_SRGB | BL_TS_3D_SRGB | BL_TS_CUBE_SRGB : BL_TS_NONE;
-			_supported |= (_PrGpuMem->sHardwareCaps.nFuncSupported & CAP_COMPUTE_SHADER_INTERNAL) && _IsTextureFormatValid(_i, FALSE) ? BL_TS_IMAGE : BL_TS_NONE;
-			_supported |= _IsFramebufferFormatValid(_i, FALSE) ? BL_TS_FRAMEBUFFER : BL_TS_NONE;
-			_PrGpuMem->sHardwareCaps.aTexFormats[_i] = _supported;
-		}
-		free(_cmpformat);
+		_PipelineStateDefaultGL(_Width, _Height);
 	}
 }
-void
+BLVoid
 _GpuSwapBuffer(BLBool _Discard)
 {
 }
-void
+BLVoid
 _GpuAnitIntervention(HWND _Hwnd)
 {
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
@@ -545,244 +1611,7 @@ _GpuAnitIntervention(HWND _Hwnd)
 	free(_PrGpuMem);
 }
 #elif defined(BL_PLATFORM_UWP)
-static ID3D12GraphicsCommandList*
-_AllocCmdList()
-{
-	do
-	{
-		BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nRead - _PrGpuMem->sCmdQueue.sControl.nWrite + _PrGpuMem->sCmdQueue.sControl.nSize;
-		BLU32 _dist = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nRead - (BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nRead - _PrGpuMem->sCmdQueue.sControl.nWrite) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nRead - (BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite) >> 31)) - 1;
-		BLU32 _maxsz = ((_PrGpuMem->sCmdQueue.sControl.nSize - 1) & (((BLS32)_dist) >> 31)) | (_dist & ~(((BLS32)_dist) >> 31));
-		BLU32 _sizenosign = 1 & 0x7fffffff;
-		BLU32 _test = _sizenosign - _maxsz;
-		BLU32 _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
-		BLU32 _advance = _PrGpuMem->sCmdQueue.sControl.nWrite + _size;
-		BLU32 _write = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
-		_PrGpuMem->sCmdQueue.sControl.nWrite = _write;
-		if (_size == 0)
-		{
-			_BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nRead];
-			if (WAIT_OBJECT_0 == WaitForSingleObject(_cmdlist.pEvent, INFINITE))
-			{
-				CloseHandle(_cmdlist.pEvent);
-				_cmdlist.pEvent = NULL;
-				_PrGpuMem->sCmdQueue.nCompletedFence = _PrGpuMem->sCmdQueue.pFence->GetCompletedValue();
-				_PrGpuMem->sCmdQueue.pCommandQueue->Wait(_PrGpuMem->sCmdQueue.pFence, _PrGpuMem->sCmdQueue.nCompletedFence);
-				FOREACH_ARRAY(ID3D12Resource*, _iter, _PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead])
-				{
-					_iter->Release();
-				}
-				blClearArray(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead]);
-				BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead + _PrGpuMem->sCmdQueue.sControl.nSize;
-				_maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31));
-				_sizenosign = 1 & 0x7fffffff;
-				_test = _sizenosign - _maxsz;
-				_size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
-				_advance = _PrGpuMem->sCmdQueue.sControl.nRead + _size;
-				BLU32 _read = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
-				_PrGpuMem->sCmdQueue.sControl.nRead = _read;
-			}
-		}
-		else
-			break;
-	} while (1);
-	_BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nCurrent];
-	DX_CHECK_INTERNAL(_cmdlist.pCommandAllocator->Reset());
-	DX_CHECK_INTERNAL(_cmdlist.pCommandList->Reset(_cmdlist.pCommandAllocator, NULL));
-	return _cmdlist.pCommandList;
-}
-static BLU64
-_KickCmdList()
-{
-	_BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nCurrent];
-	DX_CHECK_INTERNAL(_cmdlist.pCommandList->Close());
-	ID3D12CommandList* _dx12cmdlist[] = { _cmdlist.pCommandList };
-	_PrGpuMem->sCmdQueue.pCommandQueue->ExecuteCommandLists(sizeof(_dx12cmdlist) / sizeof(_dx12cmdlist[0]), _dx12cmdlist);
-	_cmdlist.pEvent = CreateEventExW(NULL, NULL, 0, EVENT_ALL_ACCESS);
-	BLU64 _fence = _PrGpuMem->sCmdQueue.nCurrentFence++;
-	_PrGpuMem->sCmdQueue.pCommandQueue->Signal(_PrGpuMem->sCmdQueue.pFence, _fence);
-	_PrGpuMem->sCmdQueue.pFence->SetEventOnCompletion(_fence, _cmdlist.pEvent);
-	BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nWrite - _PrGpuMem->sCmdQueue.sControl.nCurrent + _PrGpuMem->sCmdQueue.sControl.nSize;
-	BLU32 _maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite - (BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nWrite - _PrGpuMem->sCmdQueue.sControl.nCurrent) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite - (BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent) >> 31));
-	BLU32 _sizenosign = 1 & 0x7fffffff;
-	BLU32 _test = _sizenosign - _maxsz;
-	BLU32 _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
-	BLU32 _advance = _PrGpuMem->sCmdQueue.sControl.nCurrent + _size;
-	BLU32 _current = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
-	_PrGpuMem->sCmdQueue.sControl.nCurrent = _current;
-	return _fence;
-}
-static void
-_UpdateBuffer(_BLGenericBufferDX* _Buf, ID3D12GraphicsCommandList* _CommandList, BLU32 _Offset, BLU32 _Size, void* _Data)
-{
-	D3D12_RESOURCE_DESC _desc;
-	_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	_desc.Alignment = 0;
-	_desc.Width = _Size;
-	_desc.Height = 1;
-	_desc.DepthOrArraySize = 1;
-	_desc.MipLevels = 1;
-	_desc.Format = DXGI_FORMAT_UNKNOWN;
-	_desc.SampleDesc.Count = 1;
-	_desc.SampleDesc.Quality = 0;
-	_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-	ID3D12Resource* _staging;
-	D3D12_HEAP_PROPERTIES _hp = { D3D12_HEAP_TYPE_UPLOAD, D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_hp, D3D12_HEAP_FLAG_NONE, &_desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_ID3D12Resource, (void**)&_staging));
-	BLU8* _data;
-	DX_CHECK_INTERNAL(_staging->Map(0, NULL, (void**)&_data));
-	memcpy(_data, _Data, _Size);
-	_staging->Unmap(0, NULL);
-	D3D12_RESOURCE_STATES _state = D3D12_RESOURCE_STATE_COPY_DEST;
-	if (_Buf->eState != D3D12_RESOURCE_STATE_COPY_DEST)
-	{
-		_state = _Buf->eState;
-		D3D12_RESOURCE_BARRIER _barrier;
-		_barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		_barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		_barrier.Transition.pResource = const_cast<ID3D12Resource*>(_Buf->pPtr);
-		_barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		_barrier.Transition.StateBefore = _Buf->eState;
-		_barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-		_PrGpuMem->pCommandList->ResourceBarrier(1, &_barrier);
-		_Buf->eState = D3D12_RESOURCE_STATE_COPY_DEST;
-	}
-	_CommandList->CopyBufferRegion(_Buf->pPtr, _Offset, _staging, 0, _Size);
-	if (_Buf->eState != _state)
-	{
-		D3D12_RESOURCE_BARRIER _barrier;
-		_barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		_barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		_barrier.Transition.pResource = (ID3D12Resource*)(_Buf->pPtr);
-		_barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		_barrier.Transition.StateBefore = _Buf->eState;
-		_barrier.Transition.StateAfter = _state;
-		_PrGpuMem->pCommandList->ResourceBarrier(1, &_barrier);
-		_Buf->eState = _state;
-	}
-	blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _staging);
-}
-static void
-_CreateBuffer(_BLGenericBufferDX* _Buf, BLU32 _Size, void* _Data, BLU16 _Flags, BLBool _Vertex, BLU32 _Stride)
-{
-	_Buf->nSize = _Size;
-	_Buf->nFags = _Flags;
-	BLBool _needuav = 0 != (_Flags & (BUFFER_COMPUTE_WRITE_INTERNAL | BUFFER_DRAW_INDIRECT_INTERNAL));
-	BLBool _drawindirect = 0 != (_Flags & BUFFER_DRAW_INDIRECT_INTERNAL);
-	_Buf->bDynamic = (NULL == _Data || _needuav);
-	DXGI_FORMAT _format;
-	BLU32 _stride;
-	BLU32 _flags = _needuav	? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
-	if (_drawindirect)
-	{
-		_format = DXGI_FORMAT_R32G32B32A32_UINT;
-		_stride = 16;
-	}
-	else
-	{
-		BLU32 _uavformat = (_Flags & BUFFER_COMPUTE_FORMAT_MASK_INTERNAL) >> BUFFER_COMPUTE_FORMAT_SHIFT_INTERNAL;
-		if (0 == _uavformat)
-		{
-			if (_Vertex)
-			{
-				_format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-				_stride = 16;
-			}
-			else
-			{
-				if (0 == (_Flags & BUFFER_INDEX32_INTERNAL))
-				{
-					_format = DXGI_FORMAT_R16_UINT;
-					_stride = 2;
-				}
-				else
-				{
-					_format = DXGI_FORMAT_R32_UINT;
-					_stride = 4;
-				}
-			}
-		}
-		else
-		{
-			BLU32 _sub = (((_Flags & BUFFER_COMPUTE_TYPE_MASK_INTERNAL) >> BUFFER_COMPUTE_TYPE_SHIFT_INTERNAL) - 1);
-			BLU32 _le = -(_sub <= (BLU32)((_Flags & BUFFER_COMPUTE_TYPE_MASK_INTERNAL) >> BUFFER_COMPUTE_TYPE_SHIFT_INTERNAL));
-			BLU32 _uavtype = _sub & _le;
-			const DXGI_FORMAT _auavformat[][3] =
-			{
-				DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,
-				DXGI_FORMAT_R8_SINT,           DXGI_FORMAT_R8_UINT,            DXGI_FORMAT_UNKNOWN,
-				DXGI_FORMAT_R8G8_SINT,         DXGI_FORMAT_R8G8_UINT,          DXGI_FORMAT_UNKNOWN,
-				DXGI_FORMAT_R8G8B8A8_SINT,     DXGI_FORMAT_R8G8B8A8_UINT,      DXGI_FORMAT_UNKNOWN,
-				DXGI_FORMAT_R16_SINT,          DXGI_FORMAT_R16_UINT,           DXGI_FORMAT_R16_FLOAT ,
-				DXGI_FORMAT_R16G16_SINT,       DXGI_FORMAT_R16G16_UINT,        DXGI_FORMAT_R16G16_FLOAT,
-				DXGI_FORMAT_R16G16B16A16_SINT, DXGI_FORMAT_R16G16B16A16_UINT,  DXGI_FORMAT_R16G16B16A16_FLOAT,
-				DXGI_FORMAT_R32_SINT,          DXGI_FORMAT_R32_UINT,           DXGI_FORMAT_R32_FLOAT,
-				DXGI_FORMAT_R32G32_SINT,       DXGI_FORMAT_R32G32_UINT,        DXGI_FORMAT_R32G32_FLOAT,
-				DXGI_FORMAT_R32G32B32A32_SINT, DXGI_FORMAT_R32G32B32A32_UINT,  DXGI_FORMAT_R32G32B32A32_FLOAT
-			};
-			const BLU32 _auavstride[] =	{ 0, 1,	2, 4, 2, 4, 8, 4, 8, 16 };
-			_format = _auavformat[_uavformat][_uavtype];
-			_stride = _auavstride[_uavformat];
-		}
-	}
-	_stride = (0 == _Stride ? _stride : _Stride);
-	_Buf->sSrvd.Format = _format;
-	_Buf->sSrvd.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-	_Buf->sSrvd.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	_Buf->sSrvd.Buffer.FirstElement = 0;
-	_Buf->sSrvd.Buffer.NumElements = _Buf->nSize / _stride;
-	_Buf->sSrvd.Buffer.StructureByteStride = 0;
-	_Buf->sSrvd.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	_Buf->sUavd.Format = _format;
-	_Buf->sUavd.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-	_Buf->sUavd.Buffer.FirstElement = 0;
-	_Buf->sUavd.Buffer.NumElements = _Buf->nSize / _stride;
-	_Buf->sUavd.Buffer.StructureByteStride = 0;
-	_Buf->sUavd.Buffer.CounterOffsetInBytes = 0;
-	_Buf->sUavd.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-	D3D12_RESOURCE_DESC _desc;
-	_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-	_desc.Alignment = 0;
-	_desc.Width = _Size;
-	_desc.Height = 1;
-	_desc.DepthOrArraySize = 1;
-	_desc.MipLevels = 1;
-	_desc.Format = DXGI_FORMAT_UNKNOWN;
-	_desc.SampleDesc.Count = 1;
-	_desc.SampleDesc.Quality = 0;
-	_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-	_desc.Flags = D3D12_RESOURCE_FLAGS(_flags);
-	D3D12_HEAP_PROPERTIES _hp = { D3D12_HEAP_TYPE_DEFAULT,  D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_hp, D3D12_HEAP_FLAG_NONE, &_desc, D3D12_RESOURCE_STATE_COMMON, NULL, IID_ID3D12Resource, (void**)&_Buf->pPtr));
-	_Buf->nGpuVA = _Buf->pPtr->GetGPUVirtualAddress();
-	if (_Buf->eState != (_drawindirect ? D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT : D3D12_RESOURCE_STATE_GENERIC_READ))
-	{
-		D3D12_RESOURCE_BARRIER _barrier;
-		_barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		_barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		_barrier.Transition.pResource = (ID3D12Resource*)(_Buf->pPtr);
-		_barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		_barrier.Transition.StateBefore = _Buf->eState;
-		_barrier.Transition.StateAfter = (_drawindirect ? D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT : D3D12_RESOURCE_STATE_GENERIC_READ);
-		_PrGpuMem->pCommandList->ResourceBarrier(1, &_barrier);
-		_Buf->eState = (_drawindirect ? D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT : D3D12_RESOURCE_STATE_GENERIC_READ);
-	}
-	if (!_Buf->bDynamic)
-		_UpdateBuffer(_Buf, _PrGpuMem->pCommandList, 0, _Size, _Data);
-}
-
-static void
-_DestroyBuffer(_BLGenericBufferDX* _Buf)
-{
-	if (_Buf->pPtr)
-	{
-		blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _Buf->pPtr);
-		_Buf->bDynamic = FALSE;
-	}
-}
-
-void
+BLVoid
 _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 	BLBool _gpuok = FALSE;
@@ -868,11 +1697,13 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 			_tmpadapter = NULL;
 			break;
 		}
-	}
-#if defined(_DEBUG) && !defined(BL_PLATFORM_UWP)
+    }
+#if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
+#   if defined(_DEBUG)
 	ID3D12Debug* _debug;
-	DX_CHECK_INTERNAL(D3D12GetDebugInterface(IID_ID3D12Debug, (void**)&_debug));
+	DX_CHECK_INTERNAL(D3D12GetDebugInterface(IID_ID3D12Debug, (BLVoid**)&_debug));
 	_debug->EnableDebugLayer();
+#   endif
 #endif
 	D3D_FEATURE_LEVEL _featurelevel[4] =
 	{
@@ -883,7 +1714,7 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 	};
 	for (_idx = 0; _idx < 4; ++_idx)
 	{
-		if (SUCCEEDED(D3D12CreateDevice(_PrGpuMem->pAdapter, _featurelevel[_idx], IID_ID3D12Device, (void**)&_PrGpuMem->pDevice)))
+		if (SUCCEEDED(D3D12CreateDevice(_PrGpuMem->pAdapter, _featurelevel[_idx], IID_ID3D12Device, (BLVoid**)&_PrGpuMem->pDevice)))
 		{
 			_gpuok = TRUE;
 			break;
@@ -893,7 +1724,7 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 	{
 		DX_CHECK_INTERNAL(_PrGpuMem->pDxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&_PrGpuMem->pAdapter)));
 		if (_PrGpuMem->pAdapter)
-			if (SUCCEEDED(D3D12CreateDevice(_PrGpuMem->pAdapter, D3D_FEATURE_LEVEL_11_0, IID_ID3D12Device, (void**)&_PrGpuMem->pDevice)))
+			if (SUCCEEDED(D3D12CreateDevice(_PrGpuMem->pAdapter, D3D_FEATURE_LEVEL_11_0, IID_ID3D12Device, (BLVoid**)&_PrGpuMem->pDevice)))
 				_gpuok = TRUE;
 		if (!_gpuok)
 		{
@@ -917,12 +1748,12 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 	_queuedesc.Priority = 0;
 	_queuedesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	_queuedesc.NodeMask = 1;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandQueue(&_queuedesc, IID_ID3D12CommandQueue, (void**)&_PrGpuMem->sCmdQueue.pCommandQueue));
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_ID3D12Fence, (void**)&_PrGpuMem->sCmdQueue.pFence));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandQueue(&_queuedesc, IID_ID3D12CommandQueue, (BLVoid**)&_PrGpuMem->sCmdQueue.pCommandQueue));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_ID3D12Fence, (BLVoid**)&_PrGpuMem->sCmdQueue.pFence));
 	for (_idx = 0; _idx < 256; ++_idx)
 	{
-		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_ID3D12CommandAllocator, (void**)&_PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandAllocator));
-		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandAllocator, NULL, IID_ID3D12GraphicsCommandList, (void**)&_PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandList));
+		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_ID3D12CommandAllocator, (BLVoid**)&_PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandAllocator));
+		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandAllocator, NULL, IID_ID3D12GraphicsCommandList, (BLVoid**)&_PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandList));
 		DX_CHECK_INTERNAL(_PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandList->Close());
 	}
 	DXGI_SWAP_CHAIN_DESC1 _scd;
@@ -945,7 +1776,7 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 	DX_CHECK_INTERNAL(_PrGpuMem->pDxgiFactory->CreateSwapChainForCoreWindow(_PrGpuMem->sCmdQueue.pCommandQueue, (IUnknown*)(_Hwnd), &_scd, NULL, &_PrGpuMem->pSwapChain));
 #ifdef _DEBUG
 	ID3D12InfoQueue* _infoqueue;
-	if (SUCCEEDED(_PrGpuMem->pDevice->QueryInterface(IID_ID3D12InfoQueue, (void**)&_infoqueue)))
+	if (SUCCEEDED(_PrGpuMem->pDevice->QueryInterface(IID_ID3D12InfoQueue, (BLVoid**)&_infoqueue)))
 	{
 		_infoqueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
 		_infoqueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
@@ -964,13 +1795,13 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 	_rtvdescheap.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	_rtvdescheap.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	_rtvdescheap.NodeMask = 1;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_rtvdescheap, IID_ID3D12DescriptorHeap, (void**)&_PrGpuMem->pRtvHeap));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_rtvdescheap, IID_ID3D12DescriptorHeap, (BLVoid**)&_PrGpuMem->pRtvHeap));
 	D3D12_DESCRIPTOR_HEAP_DESC _dsvdescheap;
 	_dsvdescheap.NumDescriptors = 1	+ 128;
 	_dsvdescheap.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	_dsvdescheap.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	_dsvdescheap.NodeMask = 1;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_dsvdescheap, IID_ID3D12DescriptorHeap, (void**)&_PrGpuMem->pDsvHeap));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_dsvdescheap, IID_ID3D12DescriptorHeap, (BLVoid**)&_PrGpuMem->pDsvHeap));
 	for (_idx = 0; _idx < 3; ++_idx)
 	{
 		BLU32 _maxdesc = (4 << 10) + 128 + ((64 << 10) - 1);
@@ -980,7 +1811,7 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 		_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		_desc.NodeMask = 1;
-		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_desc, IID_ID3D12DescriptorHeap, (void**)&_PrGpuMem->aScratchBuffer[_idx].pHeap));
+		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_desc, IID_ID3D12DescriptorHeap, (BLVoid**)&_PrGpuMem->aScratchBuffer[_idx].pHeap));
 		D3D12_HEAP_PROPERTIES _hp = { D3D12_HEAP_TYPE_UPLOAD, D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
 		D3D12_RESOURCE_DESC _resdesc;
 		_resdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
@@ -994,9 +1825,9 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 		_resdesc.SampleDesc.Quality = 0;
 		_resdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 		_resdesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_hp, D3D12_HEAP_FLAG_NONE, &_resdesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_ID3D12Resource, (void**)&_PrGpuMem->aScratchBuffer[_idx].pUpload));
+		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_hp, D3D12_HEAP_FLAG_NONE, &_resdesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_ID3D12Resource, (BLVoid**)&_PrGpuMem->aScratchBuffer[_idx].pUpload));
 		_PrGpuMem->aScratchBuffer[_idx].nGpuVA = _PrGpuMem->aScratchBuffer[_idx].pUpload->GetGPUVirtualAddress();
-		_PrGpuMem->aScratchBuffer[_idx].pUpload->Map(0, NULL, (void**)&_PrGpuMem->aScratchBuffer[_idx].pData);
+		_PrGpuMem->aScratchBuffer[_idx].pUpload->Map(0, NULL, (BLVoid**)&_PrGpuMem->aScratchBuffer[_idx].pData);
 		_PrGpuMem->aScratchBuffer[_idx].nPos = 0;
 		_PrGpuMem->aScratchBuffer[_idx].sCpuHandle = _PrGpuMem->aScratchBuffer[_idx].pHeap->GetCPUDescriptorHandleForHeapStart();
 		_PrGpuMem->aScratchBuffer[_idx].sGpuHandle = _PrGpuMem->aScratchBuffer[_idx].pHeap->GetGPUDescriptorHandleForHeapStart();
@@ -1008,7 +1839,7 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 	_samplerdesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
 	_samplerdesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	_samplerdesc.NodeMask = 1;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_samplerdesc, IID_ID3D12DescriptorHeap, (void**)&_PrGpuMem->sSamplerBuffer.pHeap));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_samplerdesc, IID_ID3D12DescriptorHeap, (BLVoid**)&_PrGpuMem->sSamplerBuffer.pHeap));
 	_PrGpuMem->sSamplerBuffer.sCpuHandle = _PrGpuMem->sSamplerBuffer.pHeap->GetCPUDescriptorHandleForHeapStart();
 	_PrGpuMem->sSamplerBuffer.sGpuHandle = _PrGpuMem->sSamplerBuffer.pHeap->GetGPUDescriptorHandleForHeapStart();
 	D3D12_DESCRIPTOR_RANGE _descrange[] =
@@ -1036,7 +1867,7 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 	ID3DBlob* _out;
 	ID3DBlob* _error;
 	DX_CHECK_INTERNAL(D3D12SerializeRootSignature(&_signature, D3D_ROOT_SIGNATURE_VERSION_1, &_out, &_error));
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateRootSignature(0, _out->GetBufferPointer(), _out->GetBufferSize(), IID_ID3D12RootSignature, (void**)&_PrGpuMem->pRootSignature));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateRootSignature(0, _out->GetBufferPointer(), _out->GetBufferSize(), IID_ID3D12RootSignature, (BLVoid**)&_PrGpuMem->pRootSignature));
 	for (_idx = 0; _idx < UNIFORM_COUNT_INTERNAL; ++_idx)
 	{
 		struct _BLUniformBuffer::_UniformInfo* _ele = (struct _BLUniformBuffer::_UniformInfo*)malloc(sizeof(struct _BLUniformBuffer::_UniformInfo));
@@ -1137,7 +1968,7 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 	{
 		D3D12_CPU_DESCRIPTOR_HANDLE _handle = _PrGpuMem->pRtvHeap->GetCPUDescriptorHandleForHeapStart();
 		_handle.ptr += _idx * _rtvdesc;
-		DX_CHECK_INTERNAL(_PrGpuMem->pSwapChain->GetBuffer(_idx, IID_ID3D12Resource, (void**)&_PrGpuMem->aBackColor[_idx]));
+		DX_CHECK_INTERNAL(_PrGpuMem->pSwapChain->GetBuffer(_idx, IID_ID3D12Resource, (BLVoid**)&_PrGpuMem->aBackColor[_idx]));
 		_PrGpuMem->pDevice->CreateRenderTargetView(_PrGpuMem->aBackColor[_idx], NULL, _handle);
 	}
 	D3D12_RESOURCE_DESC _backdsdesc;
@@ -1157,7 +1988,7 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 	_clearclr.DepthStencil.Depth = 1.0f;
 	_clearclr.DepthStencil.Stencil = 0;
 	D3D12_HEAP_PROPERTIES _dsvhp = { D3D12_HEAP_TYPE_DEFAULT,  D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_dsvhp, D3D12_HEAP_FLAG_NONE, &_backdsdesc, D3D12_RESOURCE_STATE_COMMON, &_clearclr, IID_ID3D12Resource, (void**)&_PrGpuMem->pDepthStencil));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_dsvhp, D3D12_HEAP_FLAG_NONE, &_backdsdesc, D3D12_RESOURCE_STATE_COMMON, &_clearclr, IID_ID3D12Resource, (BLVoid**)&_PrGpuMem->pDepthStencil));
 	D3D12_DEPTH_STENCIL_VIEW_DESC _dsvdesc;
 	memset(&_dsvdesc, 0, sizeof(_dsvdesc));
 	_dsvdesc.Format = _backdsdesc.Format;
@@ -1176,7 +2007,7 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 		{ D3D12_INDIRECT_ARGUMENT_TYPE_DRAW,{ { 0 } } }
 	};
 	D3D12_COMMAND_SIGNATURE_DESC _drawvertexcmdsig ={ sizeof(_BLBatchBufferDX::_DrawVertexIndirectCommand), 4,_drawvertexarg, 1};
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandSignature(&_drawvertexcmdsig, _PrGpuMem->pRootSignature, IID_ID3D12CommandSignature, (void**)&_PrGpuMem->sBatchBuffer.aCommandSignature[0]));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandSignature(&_drawvertexcmdsig, _PrGpuMem->pRootSignature, IID_ID3D12CommandSignature, (BLVoid**)&_PrGpuMem->sBatchBuffer.aCommandSignature[0]));
 	D3D12_INDIRECT_ARGUMENT_DESC _drawindexedarg[] =
 	{
 		{ D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW,{ { 2 } } },
@@ -1186,13 +2017,13 @@ _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Heig
 		{ D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED,{ { 0 } } },
 	};
 	D3D12_COMMAND_SIGNATURE_DESC _drawindexedcmdsig ={ sizeof(_BLBatchBufferDX::_DrawIndexedIndirectCommand), 5, _drawindexedarg, 1};
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandSignature(&_drawindexedcmdsig, _PrGpuMem->pRootSignature, IID_ID3D12CommandSignature, (void**)&_PrGpuMem->sBatchBuffer.aCommandSignature[1]));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandSignature(&_drawindexedcmdsig, _PrGpuMem->pRootSignature, IID_ID3D12CommandSignature, (BLVoid**)&_PrGpuMem->sBatchBuffer.aCommandSignature[1]));
 	_PrGpuMem->sBatchBuffer.nCmds[0] = malloc((4 << 10) * sizeof(_BLBatchBufferDX::_DrawVertexIndirectCommand));
 	_PrGpuMem->sBatchBuffer.nCmds[1] = malloc((4 << 10) * sizeof(_BLBatchBufferDX::_DrawIndexedIndirectCommand));
 	for (_idx = 0; _idx < 32; ++_idx)
 		_CreateBuffer(&_PrGpuMem->sBatchBuffer.aIndirect[_idx], (4 << 10) * sizeof(_BLBatchBufferDX::_DrawIndexedIndirectCommand), NULL, BUFFER_DRAW_INDIRECT_INTERNAL, FALSE, sizeof(_BLBatchBufferDX::_DrawIndexedIndirectCommand));
 }
-void
+BLVoid
 _GpuSwapBuffer(BLBool _Discard)
 {
 	if (_Discard)
@@ -1251,7 +2082,7 @@ _GpuSwapBuffer(BLBool _Discard)
 		}
 	}
 }
-void
+BLVoid
 _GpuAnitIntervention()
 {
 	BLU32 _idx = 0, _num;
@@ -1416,23 +2247,29 @@ _CtxErrorHandler(Display*, XErrorEvent*)
     _PrGpuMem->bCtxError = TRUE;
     return 0;
 }
-void
-_GpuIntervention(Display* _Display, Window _Window, GLXFBConfig _Config, void* _Lib, BLBool _Vsync)
+BLVoid
+_GpuIntervention(Display* _Display, Window _Window, GLXFBConfig _Config, BLVoid* _Lib, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
 	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
 	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
 	_PrGpuMem->nBackBufferIdx = 0;
-	_PrGpuMem->sHardwareCaps.nFuncSupported = 0;
+    _PrGpuMem->sHardwareCaps.nFuncSupported = 0;
+    for (BLU32 _idx = 0 ; _idx < BL_TF_COUNT ; ++_idx)
+        _PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	_PrGpuMem->bCtxError = FALSE;
 	BLBool _vkinited = FALSE;
-	BLBool _gpuok = FALSE;
-	if (!_vkinited)
-	{
-		BLS32 _glversion;
-		_PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
-		GL_LOAD_INTERNAL(_Lib);
+    BLBool _gpuok = FALSE;
+    if (_vkinited)
+    {
+        _PrGpuMem->sHardwareCaps.eApiType = BL_VULKAN_API;
+    }
+    else
+    {
+        BLS32 _glversion;
+        _PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
+        GL_LOAD_INTERNAL(_lib);
         glxSwapBuffersARB = (PFNGLXSWAPBUFFERSPROC)glXGetProcAddress((const GLubyte*)"glxSwapBuffersARB");
         PFNGLXMAKECONTEXTCURRENTPROC glXMakeContextCurrent = (PFNGLXMAKECONTEXTCURRENTPROC)glXGetProcAddress((const GLubyte*)"glXMakeContextCurrent");
         PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC)glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
@@ -1473,18 +2310,26 @@ _GpuIntervention(Display* _Display, Window _Window, GLXFBConfig _Config, void* _
 			}
 		}
         XSetErrorHandler(_err);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValid(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValid(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValid(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) & _TextureFormatValid(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValid(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValid(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValid(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValid(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValid(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) & _TextureFormatValid(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValid(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) & _TextureFormatValid(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValid(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValid(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
     }
 }
-void
+BLVoid
 _GpuSwapBuffer(BLBool _Discard)
 {
 }
-void
+BLVoid
 _GpuAnitIntervention()
 {
 }
 #elif defined(BL_PLATFORM_ANDROID)
-void
+BLVoid
 _GpuIntervention(ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
@@ -1492,7 +2337,9 @@ _GpuIntervention(ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync
 	_PrGpuMem->bVsync = _Vsync;
 	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
 	_PrGpuMem->nBackBufferIdx = 0;
-	_PrGpuMem->sHardwareCaps.nFuncSupported = 0;
+    _PrGpuMem->sHardwareCaps.nFuncSupported = 0;
+    for (BLU32 _idx = 0 ; _idx < BL_TF_COUNT ; ++_idx)
+        _PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	_PrGpuMem->pEglConfig = _PrGpuMem->pEglContext = _PrGpuMem->pEglDisplay = _PrGpuMem->pEglSurface = 0;
 	BLBool _vkinited = FALSE;
 	BLBool _gpuok = FALSE;
@@ -1559,14 +2406,22 @@ _GpuIntervention(ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync
 			blDebugOutput("egl can not make current");
 			return;
 		}
-		eglSwapInterval(_PrGpuMem->pEglDisplay, _Vsync ? 1 : 0);
-	}
+        eglSwapInterval(_PrGpuMem->pEglDisplay, _Vsync ? 1 : 0);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValid(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValid(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValid(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) & _TextureFormatValid(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValid(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValid(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValid(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValid(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValid(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) & _TextureFormatValid(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValid(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) & _TextureFormatValid(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValid(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValid(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
+    }
 }
-void 
+BLVoid
 _GpuSwapBuffer(BLBool)
 {
 }
-void 
+BLVoid
 _GpuAnitIntervention()
 {
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
@@ -1582,18 +2437,31 @@ _GpuAnitIntervention()
 	free(_PrGpuMem);
 }
 #elif defined(BL_PLATFORM_OSX)
-void
-_GpuIntervention(NSView* _View, BLBool _Vsync)
+BLVoid
+_GpuIntervention(NSView* _View, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
     _PrGpuMem->fPresentElapsed = 0.f;
     _PrGpuMem->bVsync = _Vsync;
     _PrGpuMem->nCurFramebufferHandle = 0xFFFF;
     _PrGpuMem->nBackBufferIdx = 0;
-    _PrGpuMem->sHardwareCaps.nFuncSupported = 0;
+    _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
+    _PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
+    _PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
+    _PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+    _PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
+    _PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
+    _PrGpuMem->pTextureCache = blGenDict(TRUE);
+    _PrGpuMem->pBufferCache = blGenDict(TRUE);
+    for (BLU32 _idx = 0 ; _idx < BL_TF_COUNT ; ++_idx)
+        _PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
     _PrGpuMem->pGLC = nil;
-    _PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
-    if (BL_GL_API == _PrGpuMem->sHardwareCaps.eApiType)
+    BLBool _vkinited = FALSE;
+    if (_vkinited)
+    {
+        _PrGpuMem->sHardwareCaps.eApiType = BL_VULKAN_API;
+    }
+    else
     {
         CGDisplayCount _numdisplays;
         CGDirectDisplayID* _displays, _maindis;
@@ -1621,7 +2489,7 @@ _GpuIntervention(NSView* _View, BLBool _Vsync)
         GL_LOAD_INTERNAL(_lib);
         CFRelease(_lib);
         CFRelease(_dir);
-        NSOpenGLPixelFormatAttribute _attr[32] = {0};
+        NSOpenGLPixelFormatAttribute _attr[32] = { 0 };
         _attr[0] = NSOpenGLPFAOpenGLProfile;
         _attr[1] = NSOpenGLProfileVersion4_1Core;
         _attr[2] = NSOpenGLPFAColorSize;
@@ -1659,9 +2527,30 @@ _GpuIntervention(NSView* _View, BLBool _Vsync)
         [_PrGpuMem->pGLC makeCurrentContext];
         GLint _sync = _Vsync ? 1 : 0;
         [_PrGpuMem->pGLC setValues:&_sync forParameter:NSOpenGLCPSwapInterval];
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValidGL(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1A1] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValidGL(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValidGL(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValidGL(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
+        GLint _extensions = 0;
+        GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
+        for (GLint _idx = 0; _idx < _extensions; ++_idx)
+        {
+            const BLAnsi* _name = (const BLAnsi*)glGetStringi(GL_EXTENSIONS, _idx);
+            if (!strcmp(_name, "GL_EXT_texture_filter_anisotropic"))
+            {
+                GL_CHECK_INTERNAL(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &_PrGpuMem->sHardwareCaps.fMaxAnisotropy));
+            }
+        }
+        _PipelineStateDefaultGL(_Width, _Height);
+        _PrGpuMem->sHardwareCaps.nApiVersion = 410;
     }
 }
-void
+BLVoid
 _GpuSwapBuffer(BLBool _Discard)
 {
     if (BL_GL_API == _PrGpuMem->sHardwareCaps.eApiType)
@@ -1684,7 +2573,7 @@ _GpuSwapBuffer(BLBool _Discard)
             [_PrGpuMem->pGLC flushBuffer];
     }
 }
-void
+BLVoid
 _GpuAnitIntervention()
 {
     if (BL_GL_API == _PrGpuMem->sHardwareCaps.eApiType)
@@ -1693,26 +2582,55 @@ _GpuAnitIntervention()
         [_PrGpuMem->pGLC update];
         [_PrGpuMem->pGLC release];
     }
+    {
+        FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+        {
+            _BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
+            blDebugOutput("detected texture resource leak: hash>%u",  _tex->nHash);
+        }
+    }
+    {
+        FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+        {
+            _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
+            blDebugOutput("detected geometry buffer resource leak: hash>%u",  _geo->nHash);
+        }
+    }
+    blDeleteDict(_PrGpuMem->pTextureCache);
+    blDeleteDict(_PrGpuMem->pBufferCache);
     free(_PrGpuMem);
 }
 #elif defined(BL_PLATFORM_IOS)
-void
-_GpuIntervention()
+BLVoid
+_GpuIntervention(BLBool _Vsync)
 {
+    _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
+    _PrGpuMem->fPresentElapsed = 0.f;
+    _PrGpuMem->bVsync = _Vsync;
+    _PrGpuMem->nCurFramebufferHandle = 0xFFFF;
+    _PrGpuMem->nBackBufferIdx = 0;
+    _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
+    _PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
+    _PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
+    _PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
+    _PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
+    _PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
+    _PrGpuMem->pTextureCache = blGenDict(TRUE);
+    _PrGpuMem->pBufferCache = blGenDict(TRUE);
 }
-void
+BLVoid
 _GpuSwapBuffer(BLBool _Discard)
 {
 }
-void
+BLVoid
 _GpuAnitIntervention()
 {
 }
 #else
 #   "error what's the fucking platform"
 #endif
-void
-blQueryHardwareCaps(OUT BLEnum* _Api, OUT BLU32* _MaxTexSize, OUT BLU32* _MaxFramebuffer, OUT BLU16 _TexSupport[BL_TF_COUNT])
+BLVoid
+blQueryHardwareCaps(OUT BLEnum* _Api, OUT BLU32* _MaxTexSize, OUT BLU32* _MaxFramebuffer, OUT BLBool _TexSupport[BL_TF_COUNT])
 {
 	*_Api = _PrGpuMem->sHardwareCaps.eApiType;
 	*_MaxTexSize = _PrGpuMem->sHardwareCaps.nMaxTextureSize;
@@ -1720,105 +2638,1761 @@ blQueryHardwareCaps(OUT BLEnum* _Api, OUT BLU32* _MaxTexSize, OUT BLU32* _MaxFra
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
 		_TexSupport[_idx] = _PrGpuMem->sHardwareCaps.aTexFormats[_idx];
 }
-void
-blRasterState(IN BLEnum _FillMode, IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _DepthBiasClamp, IN BLF32 _SlopeScaledDepthBias, IN BLBool _DepthClip, IN BLBool _Scissor)
+BLVoid
+blRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDepthBias, IN BLBool _Scissor, IN BLU32 _LTX, IN BLU32 _LTY, IN BLU32 _RTX, IN BLU32 _RTY)
 {
+    if (_PrGpuMem->sPipelineState.eCullMode != _CullMode ||
+        _PrGpuMem->sPipelineState.nDepthBias != _DepthBias ||
+        !blScalarApproximate(_PrGpuMem->sPipelineState.fSlopeScaledDepthBias, _SlopeScaledDepthBias) ||
+        _PrGpuMem->sPipelineState.bScissor != _Scissor ||
+        _PrGpuMem->sPipelineState.nLTX != _LTX ||
+        _PrGpuMem->sPipelineState.nLTY != _LTY ||
+        _PrGpuMem->sPipelineState.nRTX != _RTX ||
+        _PrGpuMem->sPipelineState.nRTY != _RTY)
+    {
+        _PrGpuMem->sPipelineState.eCullMode = _CullMode;
+        _PrGpuMem->sPipelineState.nDepthBias = _DepthBias;
+        _PrGpuMem->sPipelineState.fSlopeScaledDepthBias = _SlopeScaledDepthBias;
+        _PrGpuMem->sPipelineState.bScissor = _Scissor;
+        _PrGpuMem->sPipelineState.nLTX = _LTX;
+        _PrGpuMem->sPipelineState.nLTY = _LTY;
+        _PrGpuMem->sPipelineState.nRTX = _RTX;
+        _PrGpuMem->sPipelineState.nRTY = _RTY;
+        _PrGpuMem->sPipelineState.bRasterStateDirty = TRUE;
+    }
 }
-void
+BLVoid
 blDepthStencilState(IN BLBool _Depth, IN BLBool _Mask, IN BLEnum _DepthCompFunc, IN BLBool _Stencil, IN BLU8 _StencilReadMask, IN BLU8 _StencilWriteMask, IN BLEnum _FrontStencilFailOp, IN BLEnum _FrontStencilDepthFailOp, IN BLEnum _FrontStencilPassOp, IN BLEnum _FrontStencilCompFunc, IN BLEnum _BackStencilFailOp, IN BLEnum _BackStencilDepthFailOp, IN BLEnum _BackStencilPassOp, IN BLEnum _BackStencilCompFunc)
 {
+    if (_PrGpuMem->sPipelineState.bDepth != _Depth ||
+        _PrGpuMem->sPipelineState.bDepthMask != _Mask ||
+        _PrGpuMem->sPipelineState.eDepthCompFunc != _DepthCompFunc ||
+        _PrGpuMem->sPipelineState.bStencil != _Stencil ||
+        _PrGpuMem->sPipelineState.nStencilReadMask != _StencilReadMask ||
+        _PrGpuMem->sPipelineState.nStencilWriteMask != _StencilWriteMask ||
+        _PrGpuMem->sPipelineState.eFrontStencilFailOp != _FrontStencilFailOp ||
+        _PrGpuMem->sPipelineState.eFrontStencilDepthFailOp != _FrontStencilDepthFailOp ||
+        _PrGpuMem->sPipelineState.eFrontStencilPassOp != _FrontStencilPassOp ||
+        _PrGpuMem->sPipelineState.eFrontStencilCompFunc != _FrontStencilCompFunc ||
+        _PrGpuMem->sPipelineState.eBackStencilFailOp != _BackStencilFailOp ||
+        _PrGpuMem->sPipelineState.eBackStencilDepthFailOp != _BackStencilDepthFailOp ||
+        _PrGpuMem->sPipelineState.eBackStencilPassOp != _BackStencilPassOp ||
+        _PrGpuMem->sPipelineState.eBackStencilCompFunc != _BackStencilCompFunc)
+    {
+        _PrGpuMem->sPipelineState.bDepth = _Depth;
+        _PrGpuMem->sPipelineState.bDepthMask = _Mask;
+        _PrGpuMem->sPipelineState.eDepthCompFunc = _DepthCompFunc;
+        _PrGpuMem->sPipelineState.bStencil = _Stencil;
+        _PrGpuMem->sPipelineState.nStencilReadMask = _StencilReadMask;
+        _PrGpuMem->sPipelineState.nStencilWriteMask = _StencilWriteMask;
+        _PrGpuMem->sPipelineState.eFrontStencilFailOp = _FrontStencilFailOp;
+        _PrGpuMem->sPipelineState.eFrontStencilDepthFailOp = _FrontStencilDepthFailOp;
+        _PrGpuMem->sPipelineState.eFrontStencilPassOp = _FrontStencilPassOp;
+        _PrGpuMem->sPipelineState.eFrontStencilCompFunc = _FrontStencilCompFunc;
+        _PrGpuMem->sPipelineState.eBackStencilFailOp = _BackStencilFailOp;
+        _PrGpuMem->sPipelineState.eBackStencilDepthFailOp = _BackStencilDepthFailOp;
+        _PrGpuMem->sPipelineState.eBackStencilPassOp = _BackStencilPassOp;
+        _PrGpuMem->sPipelineState.eBackStencilCompFunc = _BackStencilCompFunc;
+        _PrGpuMem->sPipelineState.bDSStateDirty = TRUE;
+    }
 }
-void
-blBlendState(IN BLBool _AlphaToCoverage, IN BLBool _IndependentBlend, IN BLBool _Blend, IN BLEnum _SrcBlendFactor, IN BLEnum _DestBlendFactor, IN BLEnum _SrcBlendAlphaFactor, IN BLEnum _DestBlendAlphaFactor, IN BLEnum _BlendOp, IN BLEnum _BlendOpAlpha, IN BLBool _RBitWrite, IN BLBool _GBitWrite, IN BLBool _BBitWrite, IN BLBool _ABitWrite)
+BLVoid
+blBlendState(IN BLBool _AlphaToCoverage, IN BLBool _Blend, IN BLEnum _SrcBlendFactor, IN BLEnum _DestBlendFactor, IN BLEnum _SrcBlendAlphaFactor, IN BLEnum _DestBlendAlphaFactor, IN BLEnum _BlendOp, IN BLEnum _BlendOpAlpha, IN BLU8 _BlendFactor[4])
 {
+    if (_PrGpuMem->sPipelineState.bAlphaToCoverage != _AlphaToCoverage ||
+        _PrGpuMem->sPipelineState.bBlend != _Blend ||
+        _PrGpuMem->sPipelineState.eSrcBlendFactor != _SrcBlendFactor ||
+        _PrGpuMem->sPipelineState.eDestBlendFactor != _DestBlendFactor ||
+        _PrGpuMem->sPipelineState.eSrcBlendAlphaFactor != _SrcBlendAlphaFactor ||
+        _PrGpuMem->sPipelineState.eDestBlendAlphaFactor != _DestBlendAlphaFactor ||
+        _PrGpuMem->sPipelineState.eBlendOp != _BlendOp ||
+        _PrGpuMem->sPipelineState.eBlendOpAlpha != _BlendOpAlpha ||
+        _PrGpuMem->sPipelineState.aBlendFactor[0] != _BlendFactor[0] ||
+        _PrGpuMem->sPipelineState.aBlendFactor[1] != _BlendFactor[1] ||
+        _PrGpuMem->sPipelineState.aBlendFactor[2] != _BlendFactor[2] ||
+        _PrGpuMem->sPipelineState.aBlendFactor[3] != _BlendFactor[3])
+    {
+        _PrGpuMem->sPipelineState.bAlphaToCoverage = _AlphaToCoverage;
+        _PrGpuMem->sPipelineState.bBlend = _Blend;
+        _PrGpuMem->sPipelineState.eSrcBlendFactor = _SrcBlendFactor;
+        _PrGpuMem->sPipelineState.eDestBlendFactor = _DestBlendFactor;
+        _PrGpuMem->sPipelineState.eSrcBlendAlphaFactor = _SrcBlendAlphaFactor;
+        _PrGpuMem->sPipelineState.eDestBlendAlphaFactor = _DestBlendAlphaFactor;
+        _PrGpuMem->sPipelineState.eBlendOp = _BlendOp;
+        _PrGpuMem->sPipelineState.eBlendOpAlpha = _BlendOpAlpha;
+        _PrGpuMem->sPipelineState.aBlendFactor[0] = _BlendFactor[0];
+        _PrGpuMem->sPipelineState.aBlendFactor[1] = _BlendFactor[1];
+        _PrGpuMem->sPipelineState.aBlendFactor[2] = _BlendFactor[2];
+        _PrGpuMem->sPipelineState.aBlendFactor[3] = _BlendFactor[3];
+        _PrGpuMem->sPipelineState.bBlendStateDirty = TRUE;
+    }
 }
 BLGuid
-blGenFramebuffer()
+blGenFrameBuffer()
 {
-    return INVALID_GUID;
+    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)malloc(sizeof(_BLFrameBuffer));
+    memset(_fbo, 0, sizeof(_BLFrameBuffer));
+    _fbo->nAttachmentNum = 0;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GL_CHECK_INTERNAL(glGenFramebuffers(1, &_fbo->uData.sGL.nHandle));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+    return blGenGuid(_fbo, 0xFFFFFFFF);
 }
-void
-blDeleteFramebuffer(IN BLGuid _FBO)
+BLVoid
+blDeleteFrameBuffer(IN BLGuid _FBO)
 {
+    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
+    if (!_fbo)
+        return;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GL_CHECK_INTERNAL(glDeleteFramebuffers(1, &_fbo->uData.sGL.nHandle));
+        if (_fbo->uData.sGL.nResolveHandle)
+            GL_CHECK_INTERNAL(glDeleteFramebuffers(1, &_fbo->uData.sGL.nResolveHandle));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+    free(_fbo);
+    blDeleteGuid(_FBO);
 }
-void
-blClearFramebuffer(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN BLBool _StencilBit, IN BLU32 _Color, IN BLF32 _Depth, IN BLS32 _Stencil)
+BLVoid
+blClearFrameBuffer(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN BLBool _StencilBit)
 {
+    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        if (_fbo)
+        {
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+        }
+        else
+        {
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+        }
+        BLU32 _clearbuf = 0;
+        if (_ColorBit)
+            _clearbuf |= GL_COLOR_BUFFER_BIT;
+        if (_DepthBit)
+            _clearbuf |= GL_DEPTH_BUFFER_BIT;
+        if (_StencilBit)
+            _clearbuf |= GL_STENCIL_BUFFER_BIT;
+        if(_clearbuf != 0)
+            GL_CHECK_INTERNAL(glClear(_clearbuf));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
 }
-void
-blBindFramebuffer(IN BLGuid _FBO)
+BLVoid
+blBindFrameBuffer(IN BLGuid _FBO)
 {
+    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
+    if (!_fbo)
+        return;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLVoid
+blResolveFrameBuffer(IN BLGuid _FBO)
+{
+    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
+    if (!_fbo)
+        return;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        if (_fbo->uData.sGL.nResolveHandle)
+        {
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+            GL_CHECK_INTERNAL(glReadBuffer(GL_COLOR_ATTACHMENT0));
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo->uData.sGL.nResolveHandle));
+            GL_CHECK_INTERNAL(glBlitFramebuffer(0, 0, _fbo->nWidth, _fbo->nHeight, 0, 0, _fbo->nWidth, _fbo->nHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+            GL_CHECK_INTERNAL(glReadBuffer(GL_NONE) );
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+        }
+        if (_fbo->nAttachmentNum)
+        {
+            for (BLU32 _idx = 0; _idx < _fbo->nAttachmentNum; ++_idx)
+            {
+                _BLTextureBuffer* _tex = _fbo->aAttachments[_idx].pAttachments;
+                if (_tex->nNumMips > 1)
+                {
+                    GLenum _target = GL_TEXTURE_2D;
+                    switch (_tex->eTarget)
+                    {
+                        case BL_TT_1D: _target = GL_TEXTURE_2D; break;
+                        case BL_TT_2D: _target = GL_TEXTURE_2D; break;
+                        case BL_TT_3D: _target = GL_TEXTURE_3D; break;
+                        case BL_TT_CUBE: _target = GL_TEXTURE_CUBE_MAP; break;
+                        case BL_TT_ARRAY1D: _target = GL_TEXTURE_2D_ARRAY; break;
+                        case BL_TT_ARRAY2D: _target = GL_TEXTURE_2D_ARRAY; break;
+                        case BL_TT_ARRAYCUBE: _target = GL_TEXTURE_CUBE_MAP_ARRAY; break;
+                        default:break;
+                    }
+                    GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+                    GL_CHECK_INTERNAL(glGenerateMipmap(_target));
+                    GL_CHECK_INTERNAL(glBindTexture(_target, 0));
+                }
+            }
+        }
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLVoid
+blDiscardFrameBuffer(IN BLGuid _FBO, IN BLBool _DiscardColor, IN BLBool _DiscardDepth, IN BLBool _DiscardStencil)
+{
+    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
+    if (!_fbo)
+        return;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GLenum _buffers[10];
+        BLU32 _idx = 0;
+        if (_DiscardColor)
+        {
+            for (BLU32 _jdx = 0; _jdx < _fbo->nAttachmentNum; ++_jdx)
+                _buffers[_idx++] = GL_COLOR_ATTACHMENT0 + _jdx;
+        }
+        if (_DiscardDepth && _DiscardStencil)
+            _buffers[_idx++] = GL_DEPTH_STENCIL_ATTACHMENT;
+        else if (_DiscardDepth && !_DiscardStencil)
+            _buffers[_idx++] = GL_DEPTH_ATTACHMENT;
+        else if (!_DiscardDepth && _DiscardStencil)
+            _buffers[_idx++] = GL_STENCIL_ATTACHMENT;
+        GL_CHECK_INTERNAL(glInvalidateFramebuffer(GL_FRAMEBUFFER, _idx, _buffers));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
 }
 BLU32
-blAttachFramebuffer(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _CFace, IN BLS32 _ZOffset)
+blAttachFrameBuffer(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _CFace)
 {
-    return -1;
+    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
+    if (!_fbo)
+        return -1;
+    BLEnum _type;
+    BLEnum _format;
+    BLU32 _array;
+    BLU32 _mipmap;
+    BLU32 _width;
+    BLU32 _height;
+    BLU32 _depth;
+    BLU32 _size;
+    blQueryTexture(_Tex, &_type, &_format, &_array, &_mipmap, &_width, &_height, &_depth, &_size);
+    _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+        if (0 == _fbo->nAttachmentNum)
+        {
+            _fbo->nWidth  = MAX_INTERNAL(_width  >> _Level, 1);
+            _fbo->nHeight = MAX_INTERNAL(_height >> _Level, 1);
+        }
+        GLenum _attachment;
+        if (_format < BL_TF_DS_UNKNOWN)
+        {
+            _attachment = GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentNum;
+            _fbo->aAttachments[_fbo->nAttachmentNum].pAttachments = _tex;
+            _fbo->aAttachments[_fbo->nAttachmentNum].nFace = _CFace;
+            _fbo->aAttachments[_fbo->nAttachmentNum].nMip = _Level;
+            _fbo->nAttachmentNum++;
+        }
+        else if (_format == BL_TF_D24S8)
+        {
+            _attachment = GL_DEPTH_STENCIL_ATTACHMENT;
+            _fbo->pDSAttachment = _tex;
+        }
+        else
+        {
+            _attachment = GL_DEPTH_ATTACHMENT;
+            _fbo->pDSAttachment = _tex;
+        }
+        if (_tex->uData.sGL.nRTHandle)
+        {
+            GL_CHECK_INTERNAL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, _attachment, GL_RENDERBUFFER, _tex->uData.sGL.nRTHandle));
+        }
+        else
+        {
+            GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _CFace : GL_TEXTURE_2D;
+            if (_tex->eTarget == BL_TT_2D || _tex->eTarget == BL_TT_CUBE)
+            {
+                GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, _attachment, _target, _tex->uData.sGL.nHandle, _Level));
+            }
+        }
+        if (_tex->uData.sGL.nRTHandle && _tex->uData.sGL.nHandle)
+        {
+            GL_CHECK_INTERNAL(glGenFramebuffers(1, &_tex->uData.sGL.nRTHandle));
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _tex->uData.sGL.nRTHandle));
+            for (BLU32 _idx = 0; _idx < _fbo->nAttachmentNum; ++_idx)
+            {
+                _tex = _fbo->aAttachments[_idx].pAttachments;
+                _attachment = GL_COLOR_ATTACHMENT0 + _idx;
+                if (_tex->eFormat < BL_TF_DS_UNKNOWN)
+                {
+                    GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_idx].nFace : GL_TEXTURE_2D;
+                    GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, _attachment, _target, _tex->uData.sGL.nHandle, _fbo->aAttachments[_idx].nMip));
+                }
+            }
+        }
+        assert(GL_FRAMEBUFFER_COMPLETE == glCheckFramebufferStatus(GL_FRAMEBUFFER));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+    return _fbo->nAttachmentNum;
 }
-void
-blDetachFramebuffer(IN BLGuid _FBO, IN BLU32 _Index)
+BLVoid
+blDetachFrameBuffer(IN BLGuid _FBO, IN BLU32 _Index, IN BLBool _DepthStencil)
 {
+    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
+    if (!_fbo)
+        return;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        if (_fbo->pDSAttachment && _DepthStencil)
+        {
+            GLenum _attachment;
+            if (_fbo->pDSAttachment->eTarget == BL_TF_D24S8)
+                _attachment = GL_DEPTH_STENCIL_ATTACHMENT;
+            else
+                _attachment = GL_DEPTH_ATTACHMENT;
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+            GL_CHECK_INTERNAL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, _attachment, GL_RENDERBUFFER, 0));
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nResolveHandle));
+            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, _attachment, GL_TEXTURE_2D, 0, 0));
+            _fbo->pDSAttachment = NULL;
+        }
+        GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+        _BLTextureBuffer* _tex = _fbo->aAttachments[_Index].pAttachments;
+        if (_fbo->uData.sGL.nResolveHandle)
+        {
+            GL_CHECK_INTERNAL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _Index, GL_RENDERBUFFER, 0));
+        }
+        else
+        {
+            GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_Index].nFace : GL_TEXTURE_2D;
+            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _Index, _target, 0, _fbo->aAttachments[_Index].nMip));
+        }
+        if (_fbo->uData.sGL.nResolveHandle)
+        {
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nResolveHandle));
+            GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_Index].nFace : GL_TEXTURE_2D;
+            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _Index, _target, 0, _fbo->aAttachments[_Index].nMip));
+        }
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
 }
 BLGuid
-blGenUniformbuffer(IN BLU32 _BufferSz)
+blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Srgb, IN BLBool _Immutable, IN BLBool _RenderTarget, IN BLU32 _Layer, IN BLU32 _Mipmap, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, IN BLU8* _Data)
 {
-    return INVALID_GUID;
+    _BLTextureBuffer* _tex = NULL;
+    BLBool _cache = FALSE;
+    if (_Immutable)
+    {
+        blMutexLock(_PrGpuMem->pTextureCache->pMutex);
+        _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _Hash);
+        _tex = _res ? (_BLTextureBuffer*)_res->pRes : NULL;
+        if (_res)
+            _res->nRefCount++;
+        blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
+    }
+    if (!_tex)
+    {
+        _tex = (_BLTextureBuffer*)malloc(sizeof(_BLTextureBuffer));
+        memset(_tex, 0, sizeof(_BLTextureBuffer));
+        _cache = _Immutable;
+    }
+    _tex->nWidth = _Width;
+    _tex->nHeight = _Height;
+    _tex->nDepth = _Depth;
+    _tex->nLayer = _Layer;
+    _tex->nNumMips = _Mipmap;
+    _tex->nHash = _Hash;
+    _tex->eTarget = _Target;
+    _tex->eFormat = _Format;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GLenum _ifmt, _fmt, _type, _sfmt, _rtfmt;
+        _FillTextureFormatGL(_Format, &_ifmt, &_fmt, &_type, &_sfmt, &_rtfmt);
+        GL_CHECK_INTERNAL(glGenTextures(1, &_tex->uData.sGL.nHandle));
+        GLenum _target;
+        switch (_Target)
+        {
+            case BL_TT_1D: _target = GL_TEXTURE_2D; break;
+            case BL_TT_2D: _target = GL_TEXTURE_2D; break;
+            case BL_TT_3D: _target = GL_TEXTURE_3D; break;
+            case BL_TT_CUBE: _target = GL_TEXTURE_CUBE_MAP; break;
+            case BL_TT_ARRAY1D: _target = GL_TEXTURE_2D_ARRAY; break;
+            case BL_TT_ARRAY2D: _target = GL_TEXTURE_2D_ARRAY; break;
+            case BL_TT_ARRAYCUBE: _target = GL_TEXTURE_CUBE_MAP_ARRAY; break;
+            default:break;
+        }
+        GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+        if (_Immutable)
+        {
+            switch (_Target)
+            {
+            case BL_TT_1D:
+                GL_CHECK_INTERNAL(glTexStorage2D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height));
+                break;
+            case BL_TT_2D:
+                GL_CHECK_INTERNAL(glTexStorage2D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height));
+                break;
+            case BL_TT_3D:
+                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height, _Depth));
+                break;
+            case BL_TT_CUBE:
+                GL_CHECK_INTERNAL(glTexStorage2D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height));
+                break;
+            case BL_TT_ARRAY1D:
+                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height, _Layer));
+                break;
+            case BL_TT_ARRAY2D:
+                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height, _Layer));
+                break;
+            case BL_TT_ARRAYCUBE:
+                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height, _Layer));
+                break;
+            default:break;
+            }
+        }
+        if (_RenderTarget)
+        {
+            GL_CHECK_INTERNAL(glGenRenderbuffers(1, &_tex->uData.sGL.nRTHandle));
+            GL_CHECK_INTERNAL(glBindRenderbuffer(GL_RENDERBUFFER, _tex->uData.sGL.nRTHandle));
+            GL_CHECK_INTERNAL(glRenderbufferStorage(GL_RENDERBUFFER, _rtfmt, _Width, _Height));
+            GL_CHECK_INTERNAL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+        }
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAX_LEVEL, _Mipmap - 1));
+        if (_Data)
+        {
+            BLU32 _faces = (_target == GL_TEXTURE_CUBE_MAP) || (_target == GL_TEXTURE_CUBE_MAP_ARRAY) ? 6:1;
+            for (BLU32 _aidx = 0; _aidx < _Layer; ++ _aidx)
+            {
+                BLU32 _w = _Width;
+                BLU32 _h = _Height;
+                BLU32 _d = _Depth;
+                for(BLU32 _face = 0; _face < _faces; ++_face)
+                {
+                    for (BLU32 _level = 0; _level < _Mipmap; ++_level)
+                    {
+                        GLsizei _imagesz = _TextureSize(_Format, _w, _h, _d);
+                        switch(_target)
+                        {
+                            case GL_TEXTURE_2D:
+                            {
+                                if(_Format > BL_TF_UNKNOWN)
+                                {
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glTexSubImage2D(_target, _level, 0, 0, _w, _h, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glTexImage2D(_target, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                }
+                                else
+                                {
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexSubImage2D(_target, _level, 0, 0, _w, _h, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexImage2D(_target, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                }
+                            }
+                            break;
+                            case GL_TEXTURE_2D_ARRAY:
+                            {
+                                if(_Format > BL_TF_UNKNOWN)
+                                {
+                                    if (0 == _aidx && !_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _Layer, 0, _fmt, _type, 0));
+                                    }
+                                    GL_CHECK_INTERNAL(glTexSubImage3D(_target, _level, 0, 0, _aidx, _w, _h, 1, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                }
+                                else
+                                {
+                                    if (0 == _aidx && !_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _Layer, 0, _imagesz*_Layer, 0));
+                                    }
+                                    GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _level, 0, 0, _aidx, _w, _h, 1, _ifmt , _imagesz, _Data + _aidx * _Mipmap + _level));
+                                }
+                            }
+                            break;
+                            case GL_TEXTURE_CUBE_MAP:
+                            {
+                                if(_Format > BL_TF_UNKNOWN)
+                                {
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0 , 0, _w, _h, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                }
+                                else
+                                {
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _w, _h, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
+                                    }
+                                }
+                            }
+                            break;
+                            case GL_TEXTURE_CUBE_MAP_ARRAY:
+                            {
+                                if(_Format > BL_TF_UNKNOWN)
+                                {
+                                    if (0 == _aidx)
+                                    {
+                                        GL_CHECK_INTERNAL(glTexImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, _Layer, 0, _fmt, _type, 0));
+                                    }
+                                    GL_CHECK_INTERNAL(glTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _aidx, _w, _h, 1, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+                                }
+                                else
+                                {
+                                    if (0 == _aidx)
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, _Layer, 0, _imagesz * _Layer, 0));
+                                    }
+                                    GL_CHECK_INTERNAL(glCompressedTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _aidx, _w, _h, 1, _ifmt, _imagesz, _Data + _aidx * _Layer + _level));
+                                }
+                            }
+                            break;
+                            case GL_TEXTURE_3D:
+                            {
+                                if(_Format > BL_TF_UNKNOWN)
+                                {
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glTexSubImage3D(_target, _level, 0, 0, 0, _w, _h, _d, _fmt, _type, _Data + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _fmt, _type, _Data + _level));
+                                    }
+                                }
+                                else
+                                {
+                                    if (_Immutable)
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _level, 0, 0, 0, _w, _h, _d, _ifmt, _imagesz, _Data + _level));
+                                    }
+                                    else
+                                    {
+                                        GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _imagesz, _Data + _level));
+                                    }
+                                }
+                            }
+                            break;
+                            default:assert(0);break;
+                        }
+                        _w = MAX_INTERNAL(1U, _w / 2);
+                        _h = MAX_INTERNAL(1U, _h / 2);
+                        _d = MAX_INTERNAL(1U, _d / 2);
+                    }
+                }
+            }
+        }
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+    if (_cache)
+    {
+        blMutexLock(_PrGpuMem->pTextureCache->pMutex);
+        blDictInsert(_PrGpuMem->pTextureCache, _Hash, _tex);
+        blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
+    }
+    _tex->nID = blGenGuid(_tex, _Hash);
+    return _tex->nID;
 }
-void
-blDeleteUniformbuffer(IN BLGuid _UBO)
-{
-}
-void
-blUpdateUniformbuffer(IN BLGuid _UBO, IN BLU32 _Offset, IN BLU8* const _Data, IN BLU32 _DataSz)
-{
-}
-BLGuid
-blGenTexture(IN BLEnum _Type, IN BLEnum _Format, IN BLU32 _Array, IN BLU32 _Mipmap, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, IN BLU8* _Data)
-{
-    return INVALID_GUID;
-}
-void
+BLVoid
 blDeleteTexture(IN BLGuid _Tex)
 {
-}
-void
-blTextureFilter(IN BLGuid _Tex, IN BLEnum _MinFilter, IN BLEnum _MagFilter, IN BLBool _Anisotropy)
-{
-}
-BLBool
-blUploadTexture(IN BLGuid _Tex, IN BLU32 _Layer, IN BLU32 _Level, IN BLEnum _Face, IN BLU32 _XOffset, IN BLU32 _YOffset, IN BLU32 _ZOffset, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, IN void* const _Data, IN BLU32 _DataSz)
-{
-    return TRUE;
-}
-BLBool blDownloadTexture(IN BLGuid _Tex, IN BLU32 _Layer, IN BLU32 _Level, IN BLEnum _Face, IN BLU32 _XOffset, IN BLU32 _YOffset, IN BLU32 _ZOffset, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, OUT void* _Data, IN BLU32 _DataSz)
-{
-    return TRUE;
-}
-void blQueryTexture(IN BLGuid _Tex, OUT BLEnum* _Type, OUT BLEnum* _Format, OUT BLU32* _Array, OUT BLU32* _Mipmap, OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _Depth, OUT BLU32* _Size)
-{
+    BLBool _discard = FALSE;
+    _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+    blMutexLock(_PrGpuMem->pTextureCache->pMutex);
+    _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _tex->nHash);
+    if (_res)
+    {
+        _res->nRefCount--;
+        if (_res->nRefCount <= 0)
+        {
+            _discard = TRUE;
+            free(_res);
+            blDictErase(_PrGpuMem->pTextureCache, _tex->nHash);
+        }
+    }
+    else
+        _discard = TRUE;
+    blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
+    if (!_discard)
+        return;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GLenum _target;
+        switch (_tex->eTarget)
+        {
+            case BL_TT_1D: _target = GL_TEXTURE_2D; break;
+            case BL_TT_2D: _target = GL_TEXTURE_2D; break;
+            case BL_TT_3D: _target = GL_TEXTURE_3D; break;
+            case BL_TT_CUBE: _target = GL_TEXTURE_CUBE_MAP; break;
+            case BL_TT_ARRAY1D: _target = GL_TEXTURE_2D_ARRAY; break;
+            case BL_TT_ARRAY2D: _target = GL_TEXTURE_2D_ARRAY; break;
+            case BL_TT_ARRAYCUBE: _target = GL_TEXTURE_CUBE_MAP_ARRAY; break;
+            default:break;
+        }
+        GL_CHECK_INTERNAL(glBindTexture(_target, 0));
+        GL_CHECK_INTERNAL(glDeleteTextures(1, &_tex->uData.sGL.nHandle));
+        if (_tex->uData.sGL.nRTHandle)
+            GL_CHECK_INTERNAL(glDeleteRenderbuffers(1, &_tex->uData.sGL.nRTHandle));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+    free(_tex);
+    blDeleteGuid(_Tex);
 }
 BLGuid
-blGenGeometryBuffer(IN BLEnum _Topology, IN BLBool _Dynamic, IN void* const _VBO, IN BLU32 _VBSz, IN BLU32 _VBStride, IN void* const _IBO, IN BLU32 _IBSz)
+blGainTexture(IN BLU32 _Hash)
 {
-    return INVALID_GUID;
+    blMutexLock(_PrGpuMem->pTextureCache->pMutex);
+    _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _Hash);
+    blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
+    if (_res)
+    {
+        _res->nRefCount++;
+        return ((_BLTextureBuffer*)_res->pRes)->nID;
+    }
+    else
+        return INVALID_GUID;
 }
-void
+BLVoid
+blTextureFilter(IN BLGuid _Tex, IN BLEnum _MinFilter, IN BLEnum _MagFilter, IN BLEnum _WrapS, IN BLEnum _WrapT, IN BLBool _Anisotropy)
+{
+    _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GLenum _target;
+        switch (_tex->eTarget)
+        {
+            case BL_TT_1D: _target = GL_TEXTURE_2D; break;
+            case BL_TT_2D: _target = GL_TEXTURE_2D; break;
+            case BL_TT_3D: _target = GL_TEXTURE_3D; break;
+            case BL_TT_CUBE: _target = GL_TEXTURE_CUBE_MAP; break;
+            case BL_TT_ARRAY1D: _target = GL_TEXTURE_2D_ARRAY; break;
+            case BL_TT_ARRAY2D: _target = GL_TEXTURE_2D_ARRAY; break;
+            case BL_TT_ARRAYCUBE: _target = GL_TEXTURE_CUBE_MAP_ARRAY; break;
+            default:break;
+        }
+        GLenum _minfilter;
+        if (BL_TF_NEAREST == _MinFilter)
+            _minfilter = GL_NEAREST;
+        else
+            _minfilter = GL_LINEAR;
+        GLenum _magfilter;
+        if (BL_TF_NEAREST == _MagFilter)
+            _magfilter = GL_NEAREST;
+        else
+            _magfilter = GL_LINEAR;
+        GLenum _wraps, _wrapt;
+        switch (_WrapS)
+        {
+            case BL_TW_REPEAT:
+                _wraps = GL_REPEAT;
+                break;
+            case BL_TW_CLAMP:
+                _wraps = GL_CLAMP_TO_EDGE;
+                break;
+            case BL_TW_MIRROR:
+                _wraps = GL_MIRRORED_REPEAT;
+                break;
+            default:break;
+        }
+        switch (_WrapT)
+        {
+            case BL_TW_REPEAT:
+                _wrapt = GL_REPEAT;
+                break;
+            case BL_TW_CLAMP:
+                _wrapt = GL_CLAMP_TO_EDGE;
+                break;
+            case BL_TW_MIRROR:
+                _wrapt = GL_MIRRORED_REPEAT;
+                break;
+            default:break;
+        }
+        GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_WRAP_S, _wraps));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_WRAP_T, _wrapt));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, _magfilter));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, _minfilter));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAX_LEVEL, _tex->nNumMips - 1));
+        if (_Anisotropy && _PrGpuMem->sHardwareCaps.fMaxAnisotropy >= 1.f)
+        {
+            GL_CHECK_INTERNAL(glTexParameterf(_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, _PrGpuMem->sHardwareCaps.fMaxAnisotropy));
+        }
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLVoid
+blUpdateTexture(IN BLGuid _Tex, IN BLU32 _Layer, IN BLU32 _Level, IN BLEnum _Face, IN BLU32 _XOffset, IN BLU32 _YOffset, IN BLU32 _ZOffset, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, IN BLVoid* _Data)
+{
+    _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GLenum _ifmt, _fmt, _type, _sfmt, _rtfmt;
+        _FillTextureFormatGL(_tex->eFormat, &_ifmt, &_fmt, &_type, &_sfmt, &_rtfmt);
+        GLenum _target;
+        switch (_tex->eTarget)
+        {
+            case BL_TT_1D:
+                _target = GL_TEXTURE_2D;
+                GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+                GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+                if(_tex->eFormat > BL_TF_UNKNOWN)
+                {
+                    GL_CHECK_INTERNAL(glTexSubImage2D(_target, _Level, _XOffset, _YOffset, _Width, _Height, _fmt, _type, _Data));
+                }
+                else
+                {
+                    GL_CHECK_INTERNAL(glCompressedTexSubImage2D(_target, _Level, _XOffset, _YOffset, _Width, _Height, _ifmt, _TextureSize(_tex->eFormat, _Width, _Height, 1), _Data));
+                }
+                break;
+            case BL_TT_2D:
+                _target = GL_TEXTURE_2D;
+                GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+                GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+                if(_tex->eFormat > BL_TF_UNKNOWN)
+                {
+                    GL_CHECK_INTERNAL(glTexSubImage2D(_target, _Level, _XOffset, _YOffset, _Width, _Height, _fmt, _type, _Data));
+                }
+                else
+                {
+                    GL_CHECK_INTERNAL(glCompressedTexSubImage2D(_target, _Level, _XOffset, _YOffset, _Width, _Height, _ifmt, _TextureSize(_tex->eFormat, _Width, _Height, 1), _Data));
+                }
+                break;
+            case BL_TT_3D:
+                _target = GL_TEXTURE_3D;
+                GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+                GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+                if(_tex->eFormat > BL_TF_UNKNOWN)
+                {
+                    GL_CHECK_INTERNAL(glTexSubImage3D(_target, _Level, _XOffset, _YOffset, _ZOffset, _Width, _Height, _Depth, _fmt, _type, _Data));
+                }
+                else
+                {
+                    GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _Level, _XOffset, _YOffset, _ZOffset, _Width, _Height, _Depth, _ifmt, _TextureSize(_tex->eFormat, _Width, _Height, 1), _Data));
+                }
+                break;
+            case BL_TT_CUBE:
+                _target = GL_TEXTURE_CUBE_MAP;
+                GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+                GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+                if(_tex->eFormat > BL_TF_UNKNOWN)
+                {
+                    GL_CHECK_INTERNAL(glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _Face, _Level, _XOffset, _YOffset, _Width, _Height, _fmt, _type, _Data));
+                }
+                else
+                {
+                    GL_CHECK_INTERNAL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _Face, _Level, _XOffset, _YOffset, _Width, _Height, _ifmt, _TextureSize(_tex->eFormat, _Width, _Height, 1), _Data));
+                }
+
+                break;
+            case BL_TT_ARRAY1D:
+                _target = GL_TEXTURE_2D_ARRAY;
+                GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+                GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+                if(_tex->eFormat > BL_TF_UNKNOWN)
+                {
+                    GL_CHECK_INTERNAL(glTexSubImage3D(_target, _Level, _XOffset, _YOffset, _Layer, _Width, _Height, _Depth, _fmt, _type, _Data));
+                }
+                else
+                {
+                    GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _Level, _XOffset, _YOffset, _Layer, _Width, _Height, _Depth, _ifmt, _TextureSize(_tex->eFormat, _Width, _Height, 1), _Data));
+                }
+                break;
+            case BL_TT_ARRAY2D:
+                _target = GL_TEXTURE_2D_ARRAY;
+                GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+                GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+                if(_tex->eFormat > BL_TF_UNKNOWN)
+                {
+                    GL_CHECK_INTERNAL(glTexSubImage3D(_target, _Level, _XOffset, _YOffset, _Layer, _Width, _Height, _Depth, _fmt, _type, _Data));
+                }
+                else
+                {
+                    GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _Level, _XOffset, _YOffset, _Layer, _Width, _Height, _Depth, _ifmt, _TextureSize(_tex->eFormat, _Width, _Height, 1), _Data));
+                }
+                break;
+            case BL_TT_ARRAYCUBE:
+                _target = GL_TEXTURE_CUBE_MAP_ARRAY;
+                GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+                GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
+                if(_tex->eFormat > BL_TF_UNKNOWN)
+                {
+                    GL_CHECK_INTERNAL(glTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _Face, _Level, _XOffset, _YOffset, _Layer, _Width, _Height, _Layer, _fmt, _type, _Data));
+                }
+                else
+                {
+                    GL_CHECK_INTERNAL(glCompressedTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _Face, _Level, _XOffset, _YOffset, _Layer, _Width, _Height, _Layer, _ifmt, _TextureSize(_tex->eFormat, _Width, _Height, 1), _Data));
+                }
+                break;
+            default:break;
+        }
+        GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLVoid
+blQueryTexture(IN BLGuid _Tex, OUT BLEnum* _Target, OUT BLEnum* _Format, OUT BLU32* _Layer, OUT BLU32* _Mipmap, OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _Depth, OUT BLU32* _Size)
+{
+    _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+    *_Target = _tex->eTarget;
+    *_Format = _tex->eFormat;
+    *_Layer = _tex->nLayer;
+    *_Mipmap = _tex->nNumMips;
+    *_Width = _tex->nWidth;
+    *_Height = _tex->nHeight;
+    *_Depth = _tex->nDepth;
+    *_Size = _TextureSize(_tex->eFormat, _tex->nWidth, _tex->nHeight, _tex->nDepth);
+}
+BLGuid
+blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN BLEnum* _Semantic, IN BLEnum* _Decl, IN BLU32 _DeclNum,IN BLVoid* _VBO, IN BLU32 _VBSz, IN BLVoid* _IBO, IN BLU32 _IBSz, IN BLEnum _IBFmt)
+{
+    _BLGeometryBuffer* _geo = NULL;
+    BLBool _cache = FALSE;
+    if (!_Dynamic)
+    {
+        blMutexLock(_PrGpuMem->pBufferCache->pMutex);
+        _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _Hash);
+        _geo = _res ? (_BLGeometryBuffer*)_res->pRes : NULL;
+        if (_res)
+            _res->nRefCount++;
+        blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
+    }
+    if (!_geo)
+    {
+        _geo = (_BLGeometryBuffer*)malloc(sizeof(_BLGeometryBuffer));
+        memset(_geo, 0, sizeof(_BLGeometryBuffer));
+        _cache = !_Dynamic;
+    }
+    _geo->nHash = _Hash;
+    _geo->eVBTopology = _Topology;
+    _geo->eIBFormat = _IBFmt;
+    _geo->bDynamic = _Dynamic;
+    _geo->nVBSize = _VBSz;
+    _geo->nIBSize = _IBSz;
+    _geo->aInsSem[0] = _geo->aInsSem[1] = _geo->aInsSem[2] = _geo->aInsSem[3] = BL_SL_INVALID;
+    BLU32 _stride = 0;
+    for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
+    {
+        switch(_Decl[_idx])
+        {
+            case BL_VD_BOOLX1: _stride += 1 * 1; break;
+            case BL_VD_BOOLX2: _stride += 1 * 2; break;
+            case BL_VD_BOOLX3: _stride += 1 * 3; break;
+            case BL_VD_BOOLX4: _stride += 1 * 4; break;
+            case BL_VD_INTX1: _stride += 4 * 1; break;
+            case BL_VD_INTX2: _stride += 4 * 2; break;
+            case BL_VD_INTX3: _stride += 4 * 3; break;
+            case BL_VD_INTX4: _stride += 4 * 4; break;
+            case BL_VD_FLOATX1: _stride += 4 * 1; break;
+            case BL_VD_FLOATX2: _stride += 4 * 2; break;
+            case BL_VD_FLOATX3: _stride += 4 * 3; break;
+            case BL_VD_FLOATX4: _stride += 4 * 4; break;
+            default:assert(0);break;
+        }
+    }
+    _geo->nVertexNum = _VBSz / _stride;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        _geo->uData.sGL.nIBHandle = -1;
+        _geo->uData.sGL.nInsHandle[0] = _geo->uData.sGL.nInsHandle[1] = _geo->uData.sGL.nInsHandle[2] = _geo->uData.sGL.nInsHandle[3] = -1;
+        GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nVBHandle));
+        GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
+        GL_CHECK_INTERNAL(glBufferData(GL_ARRAY_BUFFER, _VBSz, _VBO, _Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
+        GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+        if (_IBFmt != BL_IF_INVALID)
+        {
+            GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nIBHandle));
+            GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
+            GL_CHECK_INTERNAL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, _IBSz, _IBO, _Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
+            GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+        }
+        GL_CHECK_INTERNAL(glGenVertexArrays(1, &_geo->uData.sGL.nVAHandle));
+        GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
+        BLU8* _offset = NULL;
+        BLU32 _used[16] = { 0 };
+        for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
+        {
+            BLU32 _gtsize;
+            GLint _numele;
+            GLenum _gtype;
+            switch(_Decl[_idx])
+            {
+                case BL_VD_BOOLX1: _numele = 1; _gtype = GL_BYTE; _gtsize = 1 * 1; break;
+                case BL_VD_BOOLX2: _numele = 2; _gtype = GL_BYTE; _gtsize = 2 * 1; break;
+                case BL_VD_BOOLX3: _numele = 3; _gtype = GL_BYTE; _gtsize = 3 * 1; break;
+                case BL_VD_BOOLX4: _numele = 4; _gtype = GL_BYTE; _gtsize = 4 * 1; break;
+                case BL_VD_INTX1: _numele = 1; _gtype = GL_INT; _gtsize = 1 * 4; break;
+                case BL_VD_INTX2: _numele = 2; _gtype = GL_INT; _gtsize = 2 * 4; break;
+                case BL_VD_INTX3: _numele = 3; _gtype = GL_INT; _gtsize = 3 * 4; break;
+                case BL_VD_INTX4: _numele = 4; _gtype = GL_INT; _gtsize = 4 * 4; break;
+                case BL_VD_FLOATX1: _numele = 1; _gtype = GL_FLOAT; _gtsize = 1 * 4; break;
+                case BL_VD_FLOATX2: _numele = 2; _gtype = GL_FLOAT; _gtsize = 2 * 4; break;
+                case BL_VD_FLOATX3: _numele = 3; _gtype = GL_FLOAT; _gtsize = 3 * 4; break;
+                case BL_VD_FLOATX4: _numele = 4; _gtype = GL_FLOAT; _gtsize = 4 * 4; break;
+                default: assert(0); break;
+            }
+            GL_CHECK_INTERNAL(glEnableVertexAttribArray(_Semantic[_idx]));
+            GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
+            GL_CHECK_INTERNAL(glVertexAttribPointer(_Semantic[_idx], _numele, _gtype, GL_FALSE, _stride, _offset));
+            _used[_Semantic[_idx]] = 1;
+            _offset += _gtsize;
+        }
+        for (BLU32 _idx = 0; _idx < 16; ++_idx)
+        {
+            if (!_used[_idx])
+            {
+                GL_CHECK_INTERNAL(glDisableVertexAttribArray(_idx));
+            }
+        }
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+    if (_cache)
+    {
+        blMutexLock(_PrGpuMem->pBufferCache->pMutex);
+        _BLGpuRes* _res = (_BLGpuRes*)malloc(sizeof(_BLGpuRes));
+        _res->nRefCount = 0;
+        _res->pRes = _geo;
+        blDictInsert(_PrGpuMem->pBufferCache, _Hash, _res);
+        blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
+    }
+    _geo->nID = blGenGuid(_geo, _Hash);
+    return _geo->nID;
+}
+BLVoid
 blDeleteGeometryBuffer(IN BLGuid _GBO)
 {
-}
-void
-blReloadGeometryBuffer(IN BLGuid _GBO, IN BLU32 _VBOffset, IN BLU8* const _VBO, IN BLU32 _VBSz, IN BLU32 _IBOffset, IN BLU8* const _IBO, IN BLU32 _IBSz)
-{
+    BLBool _discard = FALSE;
+    _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+    blMutexLock(_PrGpuMem->pBufferCache->pMutex);
+    _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pBufferCache, _geo->nHash);
+    if (_res)
+    {
+        _res->nRefCount--;
+        if (_res->nRefCount <= 0)
+        {
+            _discard = TRUE;
+            free(_res);
+            blDictErase(_PrGpuMem->pBufferCache, _geo->nHash);
+        }
+    }
+    else
+        _discard = TRUE;
+    blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
+    if (!_discard)
+        return;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GL_CHECK_INTERNAL(glDeleteVertexArrays(1, &_geo->uData.sGL.nVAHandle));
+        GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nVBHandle));
+        if (_geo->uData.sGL.nIBHandle != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nIBHandle));
+        }
+        if (_geo->uData.sGL.nInsHandle[0] != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[0]));
+        }
+        if (_geo->uData.sGL.nInsHandle[1] != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[1]));
+        }
+        if (_geo->uData.sGL.nInsHandle[2] != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[2]));
+        }
+        if (_geo->uData.sGL.nInsHandle[3] != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[3]));
+        }
+        GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
 }
 BLGuid
-blGenTechnique(IN BLAnsi* const _Filename)
+blGainGeometryBuffer(IN BLU32 _Hash)
 {
-    return INVALID_GUID;
+    blMutexLock(_PrGpuMem->pBufferCache->pMutex);
+    _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pBufferCache, _Hash);
+    blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
+    if (_res)
+    {
+        _res->nRefCount++;
+        return ((_BLGeometryBuffer*)_res->pRes)->nID;
+    }
+    else
+        return INVALID_GUID;
 }
-void
+BLVoid
+blUpdateGeometryBuffer(IN BLGuid _GBO, IN BLU32 _VBOffset, IN BLU8* _VBO, IN BLU32 _VBSz, IN BLU32 _IBOffset, IN BLU8* _IBO, IN BLU32 _IBSz)
+{
+    _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
+        GL_CHECK_INTERNAL(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, _VBOffset, _VBSz, _VBO));
+        GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+        if (_geo->uData.sGL.nIBHandle != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
+            GL_CHECK_INTERNAL(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, _IBOffset, _IBSz, _IBO));
+            GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+        }
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLVoid
+blInstanceGeometryBuffer(IN BLGuid _GBO, IN BLEnum* _Semantic, IN BLEnum* _Decl, IN BLU32 _DeclNum, IN BLU32 _Instance)
+{
+    if (_DeclNum > 4)
+        return;
+    _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
+        for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
+        {
+            GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nInsHandle[_idx]));
+            BLU32 _vbsz = 0, _numele = 0;
+            GLenum _type;
+            switch(_Decl[_idx])
+            {
+                case BL_VD_BOOLX1: _numele = 1; _type = GL_BYTE; _vbsz = 1 * 1; break;
+                case BL_VD_BOOLX2: _numele = 2; _type = GL_BYTE; _vbsz = 2 * 1; break;
+                case BL_VD_BOOLX3: _numele = 3; _type = GL_BYTE; _vbsz = 3 * 1; break;
+                case BL_VD_BOOLX4: _numele = 4; _type = GL_BYTE; _vbsz = 4 * 1; break;
+                case BL_VD_INTX1: _numele = 1; _type = GL_INT; _vbsz = 1 * 4; break;
+                case BL_VD_INTX2: _numele = 2; _type = GL_INT; _vbsz = 2 * 4; break;
+                case BL_VD_INTX3: _numele = 3; _type = GL_INT; _vbsz = 3 * 4; break;
+                case BL_VD_INTX4: _numele = 4; _type = GL_INT; _vbsz = 4 * 4; break;
+                case BL_VD_FLOATX1: _numele = 1; _type = GL_FLOAT; _vbsz = 1 * 4; break;
+                case BL_VD_FLOATX2: _numele = 2; _type = GL_FLOAT; _vbsz = 2 * 4; break;
+                case BL_VD_FLOATX3: _numele = 3; _type = GL_FLOAT; _vbsz = 3 * 4; break;
+                case BL_VD_FLOATX4: _numele = 4; _type = GL_FLOAT; _vbsz = 4 * 4; break;
+                default: assert(0); break;
+            }
+            _vbsz *= _Instance;
+            GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nInsHandle[_idx]));
+            GL_CHECK_INTERNAL(glBufferData(GL_ARRAY_BUFFER, _vbsz, NULL, GL_DYNAMIC_DRAW));
+            GL_CHECK_INTERNAL(glEnableVertexAttribArray(_Semantic[_idx]));
+            GL_CHECK_INTERNAL(glVertexAttribPointer(_Semantic[_idx], _numele, GL_FLOAT, GL_FALSE, 0, NULL));
+            GL_CHECK_INTERNAL(glVertexAttribDivisor(_Semantic[_idx], 1));
+            _geo->aInsSem[_idx] = _Semantic[_idx];
+        }
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLVoid
+blInstanceUpdate(IN BLGuid _GBO, IN BLEnum _Semantic, IN BLVoid* _Buffer, IN BLU32 _BufferSz)
+{
+    _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        BLU32 _idx = 0;
+        for (; _idx < 4; ++_idx)
+        {
+            if (_geo->aInsSem[_idx] == _Semantic)
+                break;
+        }
+        GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nInsHandle[_idx]));
+        GL_CHECK_INTERNAL(glBufferSubData(GL_ARRAY_BUFFER, 0, _BufferSz, _Buffer));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLGuid
+blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompile, IN BLBool _ContentDir)
+{
+    _BLTechnique* _tech = (_BLTechnique*)malloc(sizeof(_BLTechnique));
+    for (BLU32 _idx = 0; _idx < 16; ++_idx)
+    {
+        memset(_tech->aUniformVars[_idx].aName, 0, 128 * sizeof(BLAnsi));
+        _tech->aUniformVars[_idx].pVar = NULL;
+        memset(_tech->aSamplerVars[_idx].aName, 0, 128 * sizeof(BLAnsi));
+        _tech->aSamplerVars[_idx].pTex = NULL;
+    }
+    BLU32 _hash = blHashUtf8((const BLUtf8*)_Filename);
+    BLGuid _stream = INVALID_GUID;
+    BLAnsi _path[260] = { 0 };
+    BLBool _findbinary = FALSE;
+    ezxml_t _doc = NULL;
+    const BLAnsi* _vert = NULL, *_frag = NULL, *_geom = NULL, *_tesc = NULL, *_tess = NULL, *_comp = NULL;
+    if (!_ForceCompile)
+    {
+        memset(_path, 0, 260 * sizeof(BLAnsi));
+        strcpy(_path, blUserFolderDir());
+        strcat(_path, _Filename);
+        _stream = blGenStream(_path, NULL);
+        _findbinary = (_stream == INVALID_GUID) ? FALSE : TRUE;
+    }
+    if (!_findbinary)
+    {
+        if (_Archive)
+            _stream = blGenStream(_Filename, _Archive);
+        else
+        {
+            BLU32 _idx;
+            BLAnsi _tmpname[260];
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+            strcpy_s(_tmpname, 260, (const BLAnsi*)_Filename);
+            strcpy_s(_path, 260, blWorkingDir(_ContentDir));
+            strcat_s(_path, 260, _tmpname);
+#else
+            strcpy(_tmpname, (const BLAnsi*)_Filename);
+            strcpy(_path, blWorkingDir(_ContentDir));
+            strcat(_path, _tmpname);
+#endif
+            for (_idx = 0; _idx < strlen(_path); ++_idx)
+            {
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+                if (_path[_idx] == '/')
+                    _path[_idx] = '\\';
+#else
+                if (_path[_idx] == '\\')
+                    _path[_idx] = '/';
+#endif
+            }
+            _stream = blGenStream(_path, NULL);
+        }
+        _doc = ezxml_parse_str((BLAnsi*)blStreamData(_stream), blStreamLength(_stream));
+        const BLAnsi* _tag;
+        switch (_PrGpuMem->sHardwareCaps.eApiType)
+        {
+            case BL_GL_API: _tag = "GL"; break;
+            case BL_DX_API: _tag = "DX"; break;
+            case BL_METAL_API: _tag = "MTL"; break;
+            case BL_VULKAN_API: _tag = "VK"; break;
+        }
+        ezxml_t _element = ezxml_child(_doc, _tag);
+        _element = ezxml_child(_element, "Vert");
+        do {
+            if (!strcmp(ezxml_name(_element), "Vert"))
+                _vert = ezxml_txt(_element);
+            else if (!strcmp(ezxml_name(_element), "Frag"))
+                _frag = ezxml_txt(_element);
+            else if (!strcmp(ezxml_name(_element), "Geom"))
+                _geom = ezxml_txt(_element);
+            else if (!strcmp(ezxml_name(_element), "Tesc"))
+                _tesc = ezxml_txt(_element);
+            else if (!strcmp(ezxml_name(_element), "Tess"))
+                _tess = ezxml_txt(_element);
+            else if (!strcmp(ezxml_name(_element), "Comp"))
+                _comp = ezxml_txt(_element);
+            _element = _element->sibling;
+        } while (_element);
+    }
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        BLAnsi _glslver[64] = { 0 };
+        sprintf(_glslver, "#version %d core\n", _PrGpuMem->sHardwareCaps.nApiVersion);
+        if (!_findbinary)
+        {
+            GLint _compiled = 0;
+            GLint _linked = 0;
+            GLuint _vs = 0, _fs = 0, _gs = 0;
+            _tech->uData.sGL.nHandle = glCreateProgram();
+            if (_vert)
+            {
+                BLAnsi* _tmp = (BLAnsi*)alloca(strlen(_glslver) + strlen(_vert) + 1);
+                strcpy(_tmp, _glslver);
+                strcat(_tmp, _vert);
+                _tmp[strlen(_glslver) + strlen(_vert)] = 0;
+                _vs = glCreateShader(GL_VERTEX_SHADER);
+                GL_CHECK_INTERNAL(glShaderSource(_vs, 1, &_tmp, NULL));
+                GL_CHECK_INTERNAL(glCompileShader(_vs));
+                GL_CHECK_INTERNAL(glGetShaderiv(_vs, GL_COMPILE_STATUS, &_compiled));
+                if (!_compiled)
+                {
+                    GLint _len = 0;
+                    GL_CHECK_INTERNAL(glGetShaderiv(_vs, GL_INFO_LOG_LENGTH, &_len));
+                    if (_len)
+                    {
+                        BLAnsi* _info = (BLAnsi*)alloca((_len+1)*sizeof(BLAnsi));
+                        GL_CHECK_INTERNAL(glGetShaderInfoLog(_vs, _len, &_len, _info));
+                        blDebugOutput(_info);
+                    }
+                }
+                else
+                {
+                    GL_CHECK_INTERNAL(glAttachShader(_tech->uData.sGL.nHandle, _vs));
+                }
+            }
+            if (_frag)
+            {
+                BLAnsi* _tmp = (BLAnsi*)alloca(strlen(_glslver) + strlen(_frag) + 1);
+                strcpy(_tmp, _glslver);
+                strcat(_tmp, _frag);
+                _tmp[strlen(_glslver) + strlen(_frag)] = 0;
+                _fs = glCreateShader(GL_FRAGMENT_SHADER);
+                GL_CHECK_INTERNAL(glShaderSource(_fs, 1, &_tmp, NULL));
+                GL_CHECK_INTERNAL(glCompileShader(_fs));
+                GL_CHECK_INTERNAL(glGetShaderiv(_fs, GL_COMPILE_STATUS, &_compiled));
+                if (!_compiled)
+                {
+                    GLint _len = 0;
+                    GL_CHECK_INTERNAL(glGetShaderiv(_fs, GL_INFO_LOG_LENGTH, &_len));
+                    if (_len)
+                    {
+                        BLAnsi* _info = (BLAnsi*)alloca((_len+1)*sizeof(BLAnsi));
+                        GL_CHECK_INTERNAL(glGetShaderInfoLog(_fs, _len, &_len, _info));
+                        blDebugOutput(_info);
+                    }
+                }
+                else
+                {
+                    GL_CHECK_INTERNAL(glAttachShader(_tech->uData.sGL.nHandle, _fs));
+                }
+            }
+            if (_geom && _PrGpuMem->sHardwareCaps.bGSSupport)
+            {
+                _gs = glCreateShader(GL_GEOMETRY_SHADER);
+                GL_CHECK_INTERNAL(glShaderSource(_gs, 1, &_geom, NULL));
+                GL_CHECK_INTERNAL(glCompileShader(_gs));
+                GL_CHECK_INTERNAL(glGetShaderiv(_gs, GL_COMPILE_STATUS, &_compiled));
+                if (!_compiled)
+                {
+                    GLint _len = 0;
+                    GL_CHECK_INTERNAL(glGetShaderiv(_gs, GL_INFO_LOG_LENGTH, &_len));
+                    if (_len)
+                    {
+                        BLAnsi* _info = (BLAnsi*)alloca((_len+1)*sizeof(BLAnsi));
+                        GL_CHECK_INTERNAL(glGetShaderInfoLog(_gs, _len, &_len, _info));
+                        blDebugOutput(_info);
+                    }
+                }
+                else
+                {
+                    GL_CHECK_INTERNAL(glAttachShader(_tech->uData.sGL.nHandle, _gs));
+                }
+            }
+            GL_CHECK_INTERNAL(glProgramParameteri(_tech->uData.sGL.nHandle, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE));
+            GL_CHECK_INTERNAL(glLinkProgram(_tech->uData.sGL.nHandle));
+            GL_CHECK_INTERNAL(glGetProgramiv(_tech->uData.sGL.nHandle, GL_LINK_STATUS, &_linked));
+            if (!_linked)
+            {
+                GLint _len = 0;
+                GL_CHECK_INTERNAL(glGetProgramiv(_tech->uData.sGL.nHandle, GL_INFO_LOG_LENGTH, &_len));
+                if (_len > 0)
+                {
+                    BLAnsi* _info = (BLAnsi*)alloca((_len+1)*sizeof(BLAnsi));
+                    GL_CHECK_INTERNAL(glGetProgramInfoLog(_tech->uData.sGL.nHandle, _len, &_len, _info));
+                    blDebugOutput(_info);
+                }
+            }
+            GLint _len = 0;
+            GL_CHECK_INTERNAL(glGetProgramiv(_tech->uData.sGL.nHandle, GL_PROGRAM_BINARY_LENGTH, &_len));
+            if (_len)
+            {
+                BLU8* _binary = (BLU8*)malloc(_len * sizeof(BLU8) + sizeof(GLenum));
+                GL_CHECK_INTERNAL(glGetProgramBinary(_tech->uData.sGL.nHandle, _len, NULL, (GLenum*)_binary, _binary + sizeof(GLenum)));
+                blWriteFile(_Filename, _len * sizeof(BLU8) + sizeof(GLenum), _binary);
+            }
+            if (_vs)
+            {
+                GL_CHECK_INTERNAL(glDeleteShader(_vs));
+            }
+            if (_fs)
+            {
+                GL_CHECK_INTERNAL(glDeleteShader(_fs));
+            }
+            if (_gs)
+            {
+                GL_CHECK_INTERNAL(glDeleteShader(_gs));
+            }
+        }
+        else
+        {
+            GLint _linked = 0;
+            _tech->uData.sGL.nHandle = glCreateProgram();
+            GLenum _format = 0;
+            blStreamRead(_stream, sizeof(GLenum), &_format);
+            BLU32 _len = blStreamLength(_stream) - sizeof(GLenum);
+            GL_CHECK_INTERNAL(glProgramBinary(_tech->uData.sGL.nHandle, _format, (BLU8*)blStreamData(_stream) + sizeof(GLenum), _len));
+            GL_CHECK_INTERNAL(glGetProgramiv(_tech->uData.sGL.nHandle, GL_LINK_STATUS, &_linked));
+            if (!_linked)
+            {
+                GLint _len = 0;
+                GL_CHECK_INTERNAL(glGetProgramiv(_tech->uData.sGL.nHandle, GL_INFO_LOG_LENGTH, &_len));
+                if (_len > 0)
+                {
+                    BLAnsi* _info = (BLAnsi*)alloca((_len+1)*sizeof(BLAnsi));
+                    GL_CHECK_INTERNAL(glGetProgramInfoLog(_tech->uData.sGL.nHandle, _len, &_len, _info));
+                    blDebugOutput(_info);
+                }
+            }
+        }
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+    if (!_findbinary)
+        ezxml_free(_doc);
+    blDeleteStream(_stream);
+    return blGenGuid(_tech, _hash);
+}
+BLVoid
 blDeleteTechnique(IN BLGuid _Tech)
 {
+    _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
+    for (BLU32 _idx = 0; _idx < 16; ++_idx)
+    {
+        if (_tech->aUniformVars[_idx].pVar)
+            free(_tech->aUniformVars[_idx].pVar);
+    }
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GL_CHECK_INTERNAL(glDeleteProgram(_tech->uData.sGL.nHandle));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+    free(_tech);
+    blDeleteGuid(_Tech);
 }
-void
-blDraw(IN BLGuid _Tech, IN BLGuid _GBO)
+BLVoid
+blTechUniform(IN BLGuid _Tech, IN BLEnum _Type, IN BLAnsi* _Name, IN BLVoid* _Data, IN BLU32 _DataSz)
 {
+    _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
+    BLU32 _idx = 0;
+    for (_idx = 0; _idx < 16; ++_idx)
+    {
+        if (_tech->aUniformVars[_idx].aName[0] == 0)
+        {
+            strcpy(_tech->aUniformVars[_idx].aName, _Name);
+            _tech->aUniformVars[_idx].eType = _Type;
+            _tech->aUniformVars[_idx].pVar = malloc(_DataSz);
+            memcpy(_tech->aUniformVars[_idx].pVar, _Data, _DataSz);
+            break;
+        }
+        else if (!strcmp(_tech->aUniformVars[_idx].aName, _Name))
+        {
+            _tech->aUniformVars[_idx].eType = _Type;
+            _tech->aUniformVars[_idx].pVar = realloc(_tech->aUniformVars[_idx].pVar, _DataSz);
+            memcpy(_tech->aUniformVars[_idx].pVar, _Data, _DataSz);
+            break;
+        }
+    }
+    switch (_Type)
+    {
+        case BL_UB_MAT2:
+        case BL_UB_MAT3:
+        case BL_UB_MAT4:
+        case BL_UB_MAT2X3:
+        case BL_UB_MAT3X2:
+        case BL_UB_MAT2X4:
+        case BL_UB_MAT4X2:
+        case BL_UB_MAT3X4:
+        case BL_UB_MAT4X3:
+            _tech->aUniformVars[_idx].nCount = 1;
+            break;
+        case BL_UB_S32X1:
+        case BL_UB_F32X1:
+            _tech->aUniformVars[_idx].nCount = _DataSz / 4;
+            break;
+        case BL_UB_S32X2:
+        case BL_UB_F32X2:
+            _tech->aUniformVars[_idx].nCount = _DataSz / 8;
+            break;
+        case BL_UB_S32X3:
+        case BL_UB_F32X3:
+            _tech->aUniformVars[_idx].nCount = _DataSz / 12;
+            break;
+        case BL_UB_S32X4:
+        case BL_UB_F32X4:
+            _tech->aUniformVars[_idx].nCount = _DataSz / 16;
+            break;
+        default: _tech->aUniformVars[_idx].nCount = 0; break;
+    }
+}
+BLVoid
+blTechSampler(IN BLGuid _Tech, IN BLAnsi* _Name, IN BLGuid _Tex, IN BLU32 _Unit)
+{
+    _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
+    _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+    BLU32 _idx = 0;
+    for (_idx = 0; _idx < 16; ++_idx)
+    {
+        if (_tech->aSamplerVars[_idx].aName[0] == 0)
+        {
+            strcpy(_tech->aSamplerVars[_idx].aName, _Name);
+            _tech->aSamplerVars[_idx].eType = BL_UB_SAMPLER;
+            _tech->aSamplerVars[_idx].nUnit = _Unit;
+            _tech->aSamplerVars[_idx].pTex = _tex;
+            break;
+        }
+        else if (!strcmp(_tech->aSamplerVars[_idx].aName, _Name))
+        {
+            _tech->aSamplerVars[_idx].eType = BL_UB_SAMPLER;
+            _tech->aSamplerVars[_idx].nUnit = _Unit;
+            _tech->aSamplerVars[_idx].pTex = _tex;
+            break;
+        }
+    }
+}
+BLVoid
+blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
+{
+    _PipelineStateRefreshGL();
+    _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
+    _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
+        GL_CHECK_INTERNAL(glUseProgram(_tech->uData.sGL.nHandle));
+        for (BLU32 _idx = 0; _idx < 16; ++_idx)
+        {
+            if (_tech->aUniformVars[_idx].aName[0])
+            {
+                GLint _handle = glGetUniformLocation(_tech->uData.sGL.nHandle, _tech->aUniformVars[_idx].aName);
+                void* _data = _tech->aUniformVars[_idx].pVar;
+                BLU32 _count = _tech->aUniformVars[_idx].nCount;
+                switch(_tech->aUniformVars[_idx].eType)
+                {
+                    case BL_UB_S32X1: GL_CHECK_INTERNAL(glUniform1iv(_handle, _count, (GLint*)_data)); break;
+                    case BL_UB_S32X2: GL_CHECK_INTERNAL(glUniform2iv(_handle, _count, (GLint*)_data)); break;
+                    case BL_UB_S32X3: GL_CHECK_INTERNAL(glUniform3iv(_handle, _count, (GLint*)_data)); break;
+                    case BL_UB_S32X4: GL_CHECK_INTERNAL(glUniform4iv(_handle, _count, (GLint*)_data)); break;
+                    case BL_UB_F32X1: GL_CHECK_INTERNAL(glUniform1fv(_handle, _count, (GLfloat*)_data)); break;
+                    case BL_UB_F32X2: GL_CHECK_INTERNAL(glUniform2fv(_handle, _count, (GLfloat*)_data)); break;
+                    case BL_UB_F32X3: GL_CHECK_INTERNAL(glUniform3fv(_handle, _count, (GLfloat*)_data)); break;
+                    case BL_UB_F32X4: GL_CHECK_INTERNAL(glUniform4fv(_handle, _count, (GLfloat*)_data)); break;
+                    case BL_UB_MAT2: GL_CHECK_INTERNAL(glUniformMatrix2fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+                    case BL_UB_MAT3: GL_CHECK_INTERNAL(glUniformMatrix3fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+                    case BL_UB_MAT4: GL_CHECK_INTERNAL(glUniformMatrix4fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+                    case BL_UB_MAT2X3: GL_CHECK_INTERNAL(glUniformMatrix2x3fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+                    case BL_UB_MAT3X2: GL_CHECK_INTERNAL(glUniformMatrix3x2fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+                    case BL_UB_MAT2X4: GL_CHECK_INTERNAL(glUniformMatrix2x4fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+                    case BL_UB_MAT4X2: GL_CHECK_INTERNAL(glUniformMatrix4x2fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+                    case BL_UB_MAT3X4: GL_CHECK_INTERNAL(glUniformMatrix3x4fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+                    case BL_UB_MAT4X3: GL_CHECK_INTERNAL(glUniformMatrix4x3fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+                    default:assert(0);break;
+                }
+            }
+        }
+        for (BLU32 _idx = 0; _idx < 16; ++_idx)
+        {
+            if (_tech->aSamplerVars[_idx].aName[0])
+            {
+                GLint _handle = glGetUniformLocation(_tech->uData.sGL.nHandle, _tech->aSamplerVars[_idx].aName);
+                GL_CHECK_INTERNAL(glActiveTexture(GL_TEXTURE0 + _tech->aSamplerVars[_idx].nUnit));
+                GL_CHECK_INTERNAL(glUniform1i(_handle, _tech->aSamplerVars[_idx].nUnit));
+            }
+        }
+        GLenum _prim;
+        switch (_geo->eVBTopology)
+        {
+            case BL_PT_POINTS: _prim = GL_POINTS; break;
+            case BL_PT_LINES: _prim = GL_LINES; break;
+            case BL_PI_LINELOOP: _prim = GL_LINE_LOOP; break;
+            case BL_PT_LINESTRIP: _prim = GL_LINE_STRIP; break;
+            case BL_PT_TRIANGLES: _prim = GL_TRIANGLES; break;
+            case BL_PT_TRIANGLESTRIP: _prim = GL_TRIANGLE_STRIP; break;
+            case BL_PT_TRIANGLEFAN: _prim = GL_TRIANGLE_FAN; break;
+            default: _prim = GL_TRIANGLES; break;
+        }
+        if (_geo->uData.sGL.nIBHandle != 0xFFFFFFFF)
+        {
+            GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
+            if (1 == _Instance)
+            {
+                GL_CHECK_INTERNAL(glDrawElements(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT :  GL_UNSIGNED_SHORT, NULL));
+            }
+            else
+            {
+                GL_CHECK_INTERNAL(glDrawElementsInstanced(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT :  GL_UNSIGNED_SHORT, NULL, _Instance));
+            }
+        }
+        else
+        {
+            GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
+            if (1 == _Instance)
+            {
+                GL_CHECK_INTERNAL(glDrawArrays(_prim, 0, _geo->nVertexNum));
+            }
+            else
+            {
+                GL_CHECK_INTERNAL(glDrawArraysInstanced(_prim, 0, _geo->nVertexNum, _Instance));
+            }
+        }
+        GL_CHECK_INTERNAL(glUseProgram(0));
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
 }

@@ -1293,7 +1293,7 @@ blUIFile(IN BLAnsi* _Filename)
             BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _QueryWidget(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_BUTTON);
             blUIReferencePoint(_widguid, _ha, _va);
             blUISizePolicy(_widguid, _policyvar);
-            blUISizeLimit(_widguid, _maxsizevar[0], _maxsizevar[1], _minsizevar[0], _minsizevar[1]);
+            blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
             blUIScissor(_widguid, _clipedvar, _absvar);
             blUITooltip(_widguid, (const BLUtf8*)_tooltip);
             blUIPenetration(_widguid, _penetrationvar);

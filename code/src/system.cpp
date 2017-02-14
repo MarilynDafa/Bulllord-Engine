@@ -22,12 +22,9 @@
 #include "../headers/audio.h"
 #include "../headers/utils.h"
 #include "../headers/streamio.h"
+#include "../headers/gpu.h"
 #include "internal/internal.h"
 #include "internal/dictionary.h"
-#include "../externals/mpeg2/a52.h"
-#include "../externals/mpeg2/mpeg2.h"
-#include "../externals/mpeg2/video_out.h"
-#include "../externals/mpeg2/audio_out.h"
 #if defined BL_PLATFORM_WIN32
 #	pragma comment(lib, "ws2_32.lib")
 #	pragma comment(lib, "opengl32.lib")
@@ -56,55 +53,55 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	extern void _StreamIOInit(void*);
-	extern void _StreamIOStep(BLF32);
-    extern void _StreamIODestroy();
-    extern void _NetworkInit();
-    extern void _NetworkStep(BLF32);
-	extern void _NetworkDestroy();
-	extern void _UtilsInit();
-	extern void _UtilsStep(BLF32);
-	extern void _UtilsDestroy();
-    extern void _SpriteInit();
-    extern void _SpriteStep(BLF32);
-    extern void _SpriteDestroy();
-	extern void _UIInit();
-	extern void _UIStep(BLF32, BLBool);
-	extern void _UIDestroy();
+	extern BLVoid _StreamIOInit(BLVoid*);
+	extern BLVoid _StreamIOStep(BLU32);
+    extern BLVoid _StreamIODestroy();
+    extern BLVoid _NetworkInit();
+    extern BLVoid _NetworkStep(BLU32);
+	extern BLVoid _NetworkDestroy();
+	extern BLVoid _UtilsInit();
+	extern BLVoid _UtilsStep(BLU32);
+	extern BLVoid _UtilsDestroy();
+    extern BLVoid _SpriteInit();
+    extern BLVoid _SpriteStep(BLU32, BLBool);
+    extern BLVoid _SpriteDestroy();
+	extern BLVoid _UIInit();
+	extern BLVoid _UIStep(BLU32, BLBool);
+	extern BLVoid _UIDestroy();
 	extern BLBool _UseCustomCursor();
 #ifdef __cplusplus
 }
 #endif
-extern void _AudioInit();
-extern void _AudioStep(BLF32);
-extern void _AudioDestroy();
-extern void _SystemInit();
-extern void _SystemStep();
-extern void _SystemDestroy();
+extern BLVoid _AudioInit();
+extern BLVoid _AudioStep(BLU32);
+extern BLVoid _AudioDestroy();
+extern BLVoid _SystemInit();
+extern BLVoid _SystemStep();
+extern BLVoid _SystemDestroy();
 #if defined(BL_PLATFORM_WIN32)
-extern void _GpuIntervention(HWND, BLBool);
-extern void _GpuSwapBuffer(BLBool);
-extern void _GpuAnitIntervention(HWND);
+extern BLVoid _GpuIntervention(HWND, BLU32, BLU32, BLBool);
+extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuAnitIntervention(HWND);
 #elif defined(BL_PLATFORM_UWP)
-extern void _GpuIntervention(Windows::UI::Core::CoreWindow^, BLU32, BLU32, BLBool);
-extern void _GpuSwapBuffer(BLBool);
-extern void _GpuAnitIntervention();
+extern BLVoid _GpuIntervention(Windows::UI::Core::CoreWindow^, BLU32, BLU32, BLBool);
+extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_OSX)
-extern void _GpuIntervention(NSView*, BLBool);
-extern void _GpuSwapBuffer(BLBool);
-extern void _GpuAnitIntervention();
+extern BLVoid _GpuIntervention(NSView*, BLU32, BLU32, BLBool);
+extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_IOS)
-extern void _GpuIntervention();
-extern void _GpuSwapBuffer(BLBool);
-extern void _GpuAnitIntervention();
+extern BLVoid _GpuIntervention(BLBool);
+extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_LINUX)
-extern void _GpuIntervention(Display*, Window, GLXFBConfig, void*, BLBool);
-extern void _GpuSwapBuffer(BLBool);
-extern void _GpuAnitIntervention();
+extern BLVoid _GpuIntervention(Display*, Window, GLXFBConfig, BLVoid*, BLBool);
+extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_ANDROID)
-extern void _GpuIntervention(ANativeWindow*, BLU32, BLU32, BLBool);
-extern void _GpuSwapBuffer(BLBool);
-extern void _GpuAnitIntervention();
+extern BLVoid _GpuIntervention(ANativeWindow*, BLU32, BLU32, BLBool);
+extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuAnitIntervention();
 #else
 #	"error what's the fucking platform"
 #endif
@@ -122,7 +119,7 @@ typedef struct _Event {
 	{
 		struct _NetEvent {
 			BLU32 nID;
-			void* pBuf;
+			BLVoid* pBuf;
 			BLU32 nLength;
 		} sNet;
 		struct _UiEvent {
@@ -142,7 +139,7 @@ typedef struct _Event {
 		struct _UserEvent {
 			BLS32 nSParam;
 			BLU32 nUParam;
-			void* pPParam;
+			BLVoid* pPParam;
 		} sUser;
 	} uEvent;
 	BLEnum eType;
@@ -150,33 +147,23 @@ typedef struct _Event {
 typedef struct _Timer {
 	BLS32 nId;
 	BLF32 fElapse;
-	BLF32 fLastTime;
+	BLU32 nLastTime;
 }_BLTimer;
-typedef struct _VideoSection {
-	BLGuid nVideoStream;
-	mpeg2dec_t* pVideoDec;
-	mpeg2_info_t* pVideoInfo;
-	vo_instance_t* pVOInst;
-	ao_instance_t* pAOInst;
-	a52_state_t * pAudioDec;
-	BLU8* pTmpBuffer;
-}_BLVideoSection;
 typedef struct _SystemMember {
 	_BLBoostParam sBoostParam;
-	const void(*pSubscriber[BL_ET_COUNT][128])(BLEnum, BLU32, BLS32, void*);
-	const void(*pBeginFunc)(void);
-	const void(*pStepFunc)(BLF32);
-	const void(*pEndFunc)(void);
+	const BLVoid(*pSubscriber[BL_ET_COUNT][128])(BLEnum, BLU32, BLS32, BLVoid*);
+	const BLVoid(*pBeginFunc)(BLVoid);
+	const BLVoid(*pStepFunc)(BLU32);
+	const BLVoid(*pEndFunc)(BLVoid);
 	_BLEvent* pEvents;
 	_BLTimer aTimers[8];
 	BLAnsi aWorkDir[260];
 	BLAnsi aContentDir[260];
 	BLAnsi aUserDir[260];
 	BLU8 aClipboard[1024];
-	_BLVideoSection sVideoSec;
 	BLU32 nEventsSz;
 	BLU32 nEventIdx;
-	BLF32 fSysTime;
+	BLU32 nSysTime;
 	BLS32 nOrientation;
 #if defined(BL_PLATFORM_WIN32)
 	HWND nHwnd;
@@ -200,8 +187,8 @@ typedef struct _SystemMember {
     KeyCode nLastCode;
     XIM pIME;
     XIC pIC;
-    void* pLib;
-    void* pCurPlugin;
+    BLVoid* pLib;
+    BLVoid* pCurPlugin;
     BLU32 nMouseX;
     BLU32 nMouseY;
     BLBool bCtrlPressed;
@@ -218,8 +205,8 @@ typedef struct _SystemMember {
 	pthread_cond_t sCond;
 	pthread_t nThread;
 	jobject pBLJava;
-    void* pSavedState;
-    void* pCurPlugin;
+    BLVoid* pSavedState;
+    BLVoid* pCurPlugin;
 	BLS32 nActivityState;
 	BLS32 nStateSaved;
 	BLU32 nSavedStateSize;
@@ -232,14 +219,14 @@ typedef struct _SystemMember {
     NSPoint sIMEpos;
     NSTextView* pTICcxt;
     NSResponder<NSWindowDelegate>* pDelegate;
-    void* pCurPlugin;
+    BLVoid* pCurPlugin;
     BLBool bCtrlPressed;
 #elif defined(BL_PLATFORM_IOS)
 	NSAutoreleasePool* pPool;
     UIWindow* pWindow;
     UITextField* pTICcxt;
     UIView* pCtlView;
-    void* pCurPlugin;
+    BLVoid* pCurPlugin;
     BLS32 nKeyboardHeight;
     BLU32 nRetinaScale;
 #endif
@@ -624,7 +611,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 	}
 	return 0;
 }
-void
+BLVoid
 _EnterFullscreen()
 {
     DEVMODEW _settings;
@@ -643,7 +630,7 @@ _EnterFullscreen()
 	ShowWindow(_PrSystemMem->nHwnd, SW_MAXIMIZE);
 	SetWindowLongPtrW(_PrSystemMem->nHwnd, GWLP_USERDATA, 0);
 }
-void
+BLVoid
 _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 {
     if (ChangeDisplaySettingsW(NULL, CDS_RESET) != DISP_CHANGE_SUCCESSFUL)
@@ -665,7 +652,7 @@ _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 	ShowWindow(_PrSystemMem->nHwnd, SW_RESTORE);
 	SetWindowLongPtrW(_PrSystemMem->nHwnd, GWLP_USERDATA, 0);
 }
-void
+BLVoid
 _ShowWindow()
 {
     const BLUtf16* _title = blGenUtf16Str(_PrSystemMem->sBoostParam.pAppName);
@@ -702,7 +689,7 @@ _ShowWindow()
 	UpdateWindow(_PrSystemMem->nHwnd);
 	SetWindowLongPtrW(_PrSystemMem->nHwnd, GWLP_USERDATA, 0);
     blDeleteUtf16Str((BLUtf16*)_title);
-	_GpuIntervention(_PrSystemMem->nHwnd, !_PrSystemMem->sBoostParam.bProfiler);
+	_GpuIntervention(_PrSystemMem->nHwnd, _width, _height, !_PrSystemMem->sBoostParam.bProfiler);
 	_PrSystemMem->nIMC = ImmGetContext(_PrSystemMem->nHwnd);
 	if (_PrSystemMem->nIMC)
 	{
@@ -711,7 +698,7 @@ _ShowWindow()
 		SetFocus(_PrSystemMem->nHwnd);
 	}
 }
-void
+BLVoid
 _PollMsg()
 {
     BOOL _gotmsg;
@@ -726,7 +713,7 @@ _PollMsg()
         ::DispatchMessage(&_msg);
     }
 }
-void
+BLVoid
 _CloseWindow()
 {
 	_GpuAnitIntervention(_PrSystemMem->nHwnd);
@@ -739,14 +726,14 @@ _CloseWindow()
 ref class UWPView sealed : public Windows::ApplicationModel::Core::IFrameworkView
 {
 public:
-    virtual void Initialize(Windows::ApplicationModel::Core::CoreApplicationView^ _Appview)
+    virtual BLVoid Initialize(Windows::ApplicationModel::Core::CoreApplicationView^ _Appview)
 	{
 		_Appview->Activated += ref new Windows::Foundation::TypedEventHandler<Windows::ApplicationModel::Core::CoreApplicationView^, Windows::ApplicationModel::Activation::IActivatedEventArgs^>(this, &UWPView::OnActivated);
 		Windows::ApplicationModel::Core::CoreApplication::Suspending += ref new Windows::Foundation::EventHandler<Windows::ApplicationModel::SuspendingEventArgs^>(this, &UWPView::OnSuspending);
 		Windows::ApplicationModel::Core::CoreApplication::Resuming += ref new Windows::Foundation::EventHandler<Platform::Object^>(this, &UWPView::OnResuming);
     }
-	virtual void Uninitialize() {}
-    virtual void SetWindow(Windows::UI::Core::CoreWindow^ _Window)
+	virtual BLVoid Uninitialize() {}
+    virtual BLVoid SetWindow(Windows::UI::Core::CoreWindow^ _Window)
     {
 		if (_PrSystemMem->nOrientation == SCREEN_PORTRAIT_INTERNAL)
 			Windows::Graphics::Display::DisplayInformation::AutoRotationPreferences = Windows::Graphics::Display::DisplayOrientations::Portrait;
@@ -782,7 +769,7 @@ public:
 		_cachestr = L"";
 		_initcursor = 100;
 	}
-	virtual void Load(Platform::String^)
+	virtual BLVoid Load(Platform::String^)
 	{
 		if (!_GbSystemRunning)
 		{
@@ -795,7 +782,7 @@ public:
 			_PrSystemMem->pBeginFunc();
 		}
 	}
-    virtual void Run()
+    virtual BLVoid Run()
 	{
 		do {
 			if (_GbSystemRunning == 1)
@@ -814,7 +801,7 @@ public:
 		_SystemDestroy();
 	}
 protected:
-	void OnActivated(Windows::ApplicationModel::Core::CoreApplicationView^ _View, Windows::ApplicationModel::Activation::IActivatedEventArgs^ _Args)
+	BLVoid OnActivated(Windows::ApplicationModel::Core::CoreApplicationView^ _View, Windows::ApplicationModel::Activation::IActivatedEventArgs^ _Args)
 	{
 		if (_Args->Kind == Windows::ApplicationModel::Activation::ActivationKind::Launch)
 		{
@@ -826,7 +813,7 @@ protected:
 		}
 		Windows::UI::Core::CoreWindow::GetForCurrentThread()->Activate();
 	}
-	void OnSuspending(Platform::Object^ _Sender, Windows::ApplicationModel::SuspendingEventArgs^ _Args)
+	BLVoid OnSuspending(Platform::Object^ _Sender, Windows::ApplicationModel::SuspendingEventArgs^ _Args)
 	{
 		if (_GbSystemRunning == 2)
 		{
@@ -840,45 +827,45 @@ protected:
 			_deferral->Complete();
 		});
 	}
-	void OnResuming(Platform::Object^ _Sender, Platform::Object^ _Args)
+	BLVoid OnResuming(Platform::Object^ _Sender, Platform::Object^ _Args)
 	{
 	}
-	void OnWindowSizeChanged(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::WindowSizeChangedEventArgs^ _Args)
+	BLVoid OnWindowSizeChanged(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::WindowSizeChangedEventArgs^ _Args)
 	{
 		_PrSystemMem->sBoostParam.nScreenWidth = ((BLS32)(0.5f + (((BLF32)(_Sender->Bounds.Width) * (BLF32)Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi) / 96.f)));
 		_PrSystemMem->sBoostParam.nScreenHeight = ((BLS32)(0.5f + (((BLF32)(_Sender->Bounds.Height) * (BLF32)Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi) / 96.f)));
 	}
-	void OnVisibilityChanged(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::VisibilityChangedEventArgs^ _Args)
+	BLVoid OnVisibilityChanged(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::VisibilityChangedEventArgs^ _Args)
 	{
 		_GbSystemRunning = _Args->Visible ? 1 : 2;
 	}
-	void OnWindowClosed(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::CoreWindowEventArgs^ _Args)
+	BLVoid OnWindowClosed(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::CoreWindowEventArgs^ _Args)
 	{
 		_GbSystemRunning = FALSE;
 	}
 #if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
-	void OnBackButtonPressed(Platform::Object^ _Sender, Windows::Phone::UI::Input::BackPressedEventArgs^ _Args)
+	BLVoid OnBackButtonPressed(Platform::Object^ _Sender, Windows::Phone::UI::Input::BackPressedEventArgs^ _Args)
 	{
 		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_ESCAPE, TRUE), BL_ET_KEY, NULL);
 	}
 #endif
-	void OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ _Sender, Platform::Object^ _Args)
+	BLVoid OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ _Sender, Platform::Object^ _Args)
 	{
 	}
-	void OnPointerPressed(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
+	BLVoid OnPointerPressed(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
 	{
 		_leftmouse = _Args->CurrentPoint->Properties->IsLeftButtonPressed;
 		blInvokeEvent(BL_ET_MOUSE, MAKEU32(_Args->CurrentPoint->Position.Y, _Args->CurrentPoint->Position.X), _leftmouse ? BL_ME_LDOWN : BL_ME_RDOWN, NULL);
 	}
-	void OnPointerReleased(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
+	BLVoid OnPointerReleased(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
 	{
 		blInvokeEvent(BL_ET_MOUSE, MAKEU32(_Args->CurrentPoint->Position.Y, _Args->CurrentPoint->Position.X), _leftmouse ? BL_ME_LUP : BL_ME_RUP, NULL);
 	}
-	void OnPointerMoved(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
+	BLVoid OnPointerMoved(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
 	{
 		blInvokeEvent(BL_ET_MOUSE, MAKEU32(_Args->CurrentPoint->Position.Y, _Args->CurrentPoint->Position.X), BL_ME_MOVE, NULL);
 	}
-	void OnPointerEntered(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
+	BLVoid OnPointerEntered(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
 	{
 #if WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP
 		if (_UseCustomCursor())
@@ -887,13 +874,13 @@ protected:
 			_Sender->PointerCursor = ref new Windows::UI::Core::CoreCursor(Windows::UI::Core::CoreCursorType::Arrow, 0);
 #endif
 	}
-	void OnPointerExited(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
+	BLVoid OnPointerExited(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
 	{
 #if WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP
 		_Sender->PointerCursor = ref new Windows::UI::Core::CoreCursor(Windows::UI::Core::CoreCursorType::Arrow, 0);
 #endif
 	}
-	void OnPointerWheelChanged(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
+	BLVoid OnPointerWheelChanged(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
 	{
 		BLS32 _val = (BLS32)((BLF32)_Args->CurrentPoint->Properties->MouseWheelDelta / WHEEL_DELTA);
 		if (_val > 0)
@@ -901,7 +888,7 @@ protected:
 		else
 			blInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL);
 	}
-	void OnKeyDown(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::KeyEventArgs^ _Args)
+	BLVoid OnKeyDown(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::KeyEventArgs^ _Args)
 	{
 		BLBool _shift = FALSE;
 		BLEnum _scancode = BL_KC_UNKNOWN;
@@ -986,7 +973,7 @@ protected:
 		else
 			blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL);
 	}
-	void OnKeyUp(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::KeyEventArgs^ _Args)
+	BLVoid OnKeyUp(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::KeyEventArgs^ _Args)
 	{
 		BLBool _shift = FALSE;
 		BLEnum _scancode = BL_KC_UNKNOWN;
@@ -1049,7 +1036,7 @@ protected:
 			_PrSystemMem->bCtrlPressed = FALSE;
 		blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, FALSE), BL_ET_KEY, NULL);
 	}
-	void OnLayoutRequested(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextLayoutRequestedEventArgs^ _Args)
+	BLVoid OnLayoutRequested(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextLayoutRequestedEventArgs^ _Args)
 	{
 		Windows::Foundation::Rect _r;
 		_r.X = _PrSystemMem->sIMEpos.X + Windows::UI::Core::CoreWindow::GetForCurrentThread()->Bounds.Left;
@@ -1059,30 +1046,30 @@ protected:
 		_Args->Request->LayoutBounds->TextBounds = _r;
 		_Args->Request->LayoutBounds->ControlBounds = _r;
 	}
-	void OnTextUpdating(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextTextUpdatingEventArgs^ _Args)
+	BLVoid OnTextUpdating(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextTextUpdatingEventArgs^ _Args)
 	{
 		_cachestr = _Args->Text;
 	}
-	void OnFormatUpdating(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextFormatUpdatingEventArgs^ _Args)
+	BLVoid OnFormatUpdating(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextFormatUpdatingEventArgs^ _Args)
 	{
 	}
-	void OnCompositionStarted(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextCompositionStartedEventArgs^ _Args)
+	BLVoid OnCompositionStarted(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextCompositionStartedEventArgs^ _Args)
 	{
 	}
-	void OnCompositionCompleted(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextCompositionCompletedEventArgs^ _Args)
+	BLVoid OnCompositionCompleted(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextCompositionCompletedEventArgs^ _Args)
 	{
 		BLUtf8 _tmp[1024] = { 0 };
 		WideCharToMultiByte(CP_UTF8, 0, _cachestr->Data(), -1, (LPSTR)_tmp, 1024, NULL, NULL);
 		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _tmp);
 		_cachestr = L"";
 	}
-	void OnSelectionRequested(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextSelectionRequestedEventArgs^ _Args){}
-	void OnTextRequested(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextTextRequestedEventArgs^ _Args)
+	BLVoid OnSelectionRequested(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextSelectionRequestedEventArgs^ _Args){}
+	BLVoid OnTextRequested(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextTextRequestedEventArgs^ _Args)
 	{
 		_Args->Request->Text = ref new Platform::String(_cachestr->Data());
 	}
-	void OnSelectionUpdating(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextSelectionUpdatingEventArgs^ _Args){}
-	void OnFocusRemoved(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Platform::Object^ _Args)
+	BLVoid OnSelectionUpdating(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextSelectionUpdatingEventArgs^ _Args){}
+	BLVoid OnFocusRemoved(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Platform::Object^ _Args)
 	{
 		_cachestr = L"";
 	}
@@ -1099,14 +1086,14 @@ public:
 		return ref new UWPView();
 	}
 };
-void
+BLVoid
 _EnterFullscreen()
 {
 #if WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP
 	Windows::UI::ViewManagement::ApplicationView::GetForCurrentView()->TryEnterFullScreenMode();
 #endif
 }
-void
+BLVoid
 _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 {
 #if WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP
@@ -1115,7 +1102,7 @@ _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 	Windows::UI::ViewManagement::ApplicationView::GetForCurrentView()->TryResizeView(_sz);
 #endif
 }
-void
+BLVoid
 _ShowWindow()
 {
 	auto _window = ref new UWPSource();
@@ -1135,17 +1122,17 @@ _ShowWindow()
 		_PrSystemMem->nOrientation = SCREEN_PORTRAIT_INTERNAL;
 	Windows::ApplicationModel::Core::CoreApplication::Run(_window);
 }
-void
+BLVoid
 _PollMsg()
 {
 }
-void
+BLVoid
 _CloseWindow()
 {
 	_GpuAnitIntervention();
 }
 #elif defined(BL_PLATFORM_LINUX)
-static void
+static BLVoid
 _WndProc(XEvent* _Event)
 {
     BLBool _filtered = FALSE;
@@ -1319,7 +1306,7 @@ _WndProc(XEvent* _Event)
     default: break;
     }
 }
-void
+BLVoid
 _EnterFullscreen()
 {
     Atom _wmstate = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_STATE", False);
@@ -1337,7 +1324,7 @@ _EnterFullscreen()
     XSendEvent(_PrSystemMem->pDisplay, DefaultRootWindow(_PrSystemMem->pDisplay), False, SubstructureRedirectMask | SubstructureNotifyMask, &_xev);
     XFlush(_PrSystemMem->pDisplay);
 }
-void
+BLVoid
 _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 {
     Atom _wmstate = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_STATE", False);
@@ -1371,7 +1358,7 @@ _ExitFullscreen(BLU32 _Width, BLU32 _Height)
     XResizeWindow(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _Width, _Height);
     XFlush(_PrSystemMem->pDisplay);
 }
-void
+BLVoid
 _ShowWindow()
 {
     if (setlocale(LC_ALL, "") == NULL)
@@ -1505,7 +1492,7 @@ _ShowWindow()
     _GpuIntervention(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _bestfbconfig, _PrSystemMem->pLib, !_PrSystemMem->sBoostParam.bProfiler);
     XFlush(_PrSystemMem->pDisplay);
 }
-void
+BLVoid
 _PollMsg()
 {
     BLS32 _count = XPending(_PrSystemMem->pDisplay);
@@ -1517,7 +1504,7 @@ _PollMsg()
     }
     XFlush(_PrSystemMem->pDisplay);
 }
-void
+BLVoid
 _CloseWindow()
 {
     XLockDisplay(_PrSystemMem->pDisplay);
@@ -1533,14 +1520,14 @@ _CloseWindow()
 }
 #elif defined(BL_PLATFORM_ANDROID)
 extern "C" {
-	JNIEXPORT void JNICALL _TextChanged(JNIEnv* _Env, jclass, jstring _Text)
+	JNIEXPORT BLVoid JNICALL _TextChanged(JNIEnv* _Env, jclass, jstring _Text)
 	{
 		const BLUtf8* _utf8str = (const BLUtf8*)_Env->GetStringUTFChars(_Text, NULL);
 		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str);
 	}
 }
-static void
-_WndProc(BLS32 _Msg, void* _Userdata)
+static BLVoid
+_WndProc(BLS32 _Msg, BLVoid* _Userdata)
 {
 	int8_t _cmd = _Msg;
 	switch (_Msg)
@@ -1649,7 +1636,7 @@ _WndProc(BLS32 _Msg, void* _Userdata)
 		break;
 	}
 }
-void
+BLVoid
 _ShowWindow()
 {
 	pthread_mutex_lock(&_PrSystemMem->sMutex);
@@ -1762,7 +1749,7 @@ _ShowWindow()
 	while (!_PrSystemMem->pWindow);
 	_GpuIntervention(_PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler);
 }
-void
+BLVoid
 _PollMsg()
 {
 	BLS32 _ident;
@@ -1972,7 +1959,7 @@ _PollMsg()
 		}
 	}
 }
-void
+BLVoid
 _CloseWindow()
 {
 	JNIEnv* _env = _PrSystemMem->pActivity->env;
@@ -1981,9 +1968,9 @@ _CloseWindow()
 	_PrSystemMem->pActivity->vm->DetachCurrentThread();
 	_GpuAnitIntervention();
 }
-static void
+static BLVoid
 _Start(ANativeActivity* _Activity) { _WndProc(10, NULL); }
-static void
+static BLVoid
 _Destroy(ANativeActivity* _Activity)
 {
 	int8_t _cmd = 15;
@@ -1999,30 +1986,30 @@ _Destroy(ANativeActivity* _Activity)
 	free(_PrSystemMem);
 	_PrSystemMem = NULL;
 }
-static void
+static BLVoid
 _Resume(ANativeActivity* _Activity){ _WndProc(11, NULL); _GbSystemRunning = 1; }
-static void
+static BLVoid
 _Pause(ANativeActivity* _Activity) { _WndProc(13, NULL); _GbSystemRunning = 2; }
-static void
+static BLVoid
 _Stop(ANativeActivity* _Activity) { _WndProc(14, NULL);}
-static void
+static BLVoid
 _LowMemory(ANativeActivity* _Activity) { _WndProc(9, NULL); }
-static void
+static BLVoid
 _WindowFocusChanged(ANativeActivity* _Activity, BLS32 _Focused) { _WndProc(_Focused ? 6 : 7, NULL); _GbSystemRunning = _Focused ? 1 : 2; }
-static void
+static BLVoid
 _ConfigurationChanged(ANativeActivity* _Activity) { _WndProc(8, NULL); }
-static void
+static BLVoid
 _NativeWindowCreated(ANativeActivity* _Activity, ANativeWindow* _Window) { _WndProc(21, _Window); }
-static void
+static BLVoid
 _NativeWindowDestroyed(ANativeActivity* _Activity, ANativeWindow* _Window) { _WndProc(22, NULL); }
-static void
+static BLVoid
 _InputQueueCreated(ANativeActivity* _Activity, AInputQueue* _Queue) { _WndProc(23, _Queue); }
-static void
+static BLVoid
 _InputQueueDestroyed(ANativeActivity* _Activity, AInputQueue* _Queue) { _WndProc(24, NULL); }
-static void*
+static BLVoid*
 _SaveInstanceState(ANativeActivity* _Activity, size_t* _Len)
 {
-	void* _saved = NULL;
+	BLVoid* _saved = NULL;
 	pthread_mutex_lock(&_PrSystemMem->sMutex);
 	_PrSystemMem->nStateSaved = 0;
 	_WndProc(12, NULL);
@@ -2038,8 +2025,8 @@ _SaveInstanceState(ANativeActivity* _Activity, size_t* _Len)
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 	return _saved;
 }
-static void*
-_AppEntry(void* _Param)
+static BLVoid*
+_AppEntry(BLVoid* _Param)
 {
 	_PrSystemMem->pConfig = AConfiguration_new();
 	AConfiguration_setOrientation(_PrSystemMem->pConfig, ACONFIGURATION_ORIENTATION);
@@ -2080,8 +2067,8 @@ _AppEntry(void* _Param)
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 	return NULL;
 }
-void
-ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _StateSize)
+BLVoid
+ANativeActivity_onCreate(ANativeActivity* _Activity, BLVoid* _State, size_t _StateSize)
 {
 	_Activity->callbacks->onDestroy = _Destroy;
 	_Activity->callbacks->onStart = _Start;
@@ -2116,7 +2103,7 @@ ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _State
 	_PrSystemMem->nMsgWrite = _msgpipe[1];
 	_PrSystemMem->sNativeMethod.name = "textChanged";
 	_PrSystemMem->sNativeMethod.signature = "(Ljava/lang/String;)V";
-	_PrSystemMem->sNativeMethod.fnPtr = (void*)_TextChanged;
+	_PrSystemMem->sNativeMethod.fnPtr = (BLVoid*)_TextChanged;
 	pthread_attr_t _attr;
 	pthread_attr_init(&_attr);
 	pthread_attr_setdetachstate(&_attr, PTHREAD_CREATE_DETACHED);
@@ -2129,16 +2116,16 @@ ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _State
 #elif defined(BL_PLATFORM_OSX)
 @interface OSXDelegate : NSResponder <NSWindowDelegate> @end
 @implementation OSXDelegate
-- (void)flagsChanged:(NSEvent *)_Event{ }
-- (void)keyDown:(NSEvent *)_Event{ }
-- (void)keyUp:(NSEvent *)_Event{ }
-- (void)doCommandBySelector:(SEL)_Selector{ }
+- (BLVoid)flagsChanged:(NSEvent *)_Event{ }
+- (BLVoid)keyDown:(NSEvent *)_Event{ }
+- (BLVoid)keyUp:(NSEvent *)_Event{ }
+- (BLVoid)doCommandBySelector:(SEL)_Selector{ }
 - (BOOL)windowShouldClose:(id)_Sender{_GbSystemRunning = FALSE; return YES; }
-- (void)windowDidMiniaturize:(NSNotification*)_Notification{ _GbSystemRunning = 2; }
-- (void)windowDidDeminiaturize:(NSNotification*)_Notification{ _GbSystemRunning = 1; }
-- (void)windowWillMove:(NSNotification*)_Notification{ _GbSystemRunning = 2; }
-- (void)windowDidMove:(NSNotification*)_Notification{ _GbSystemRunning = 1; }
-- (void)windowDidResize:(NSNotification *)_Notification
+- (BLVoid)windowDidMiniaturize:(NSNotification*)_Notification{ _GbSystemRunning = 2; }
+- (BLVoid)windowDidDeminiaturize:(NSNotification*)_Notification{ _GbSystemRunning = 1; }
+- (BLVoid)windowWillMove:(NSNotification*)_Notification{ _GbSystemRunning = 2; }
+- (BLVoid)windowDidMove:(NSNotification*)_Notification{ _GbSystemRunning = 1; }
+- (BLVoid)windowDidResize:(NSNotification *)_Notification
 {
     NSRect _rect = [_PrSystemMem->pWindow contentRectForFrameRect:[_PrSystemMem->pWindow frame]];
     _PrSystemMem->sBoostParam.nScreenWidth = _rect.size.width;
@@ -2150,7 +2137,7 @@ ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _State
     _area = [[NSTrackingArea alloc] initWithRect:_view.bounds options:_options owner:_view userInfo:nil];
     [_view addTrackingArea:_area];
 }
-- (void)close
+- (BLVoid)close
 {
     _GbSystemRunning = FALSE;
     [_PrSystemMem->pWindow setDelegate:nil];
@@ -2170,13 +2157,13 @@ ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _State
 @end
 @interface OSXTextInput : NSTextView @end
 @implementation OSXTextInput
-- (void)doCommandBySelector:(SEL)_Selector{}
+- (BLVoid)doCommandBySelector:(SEL)_Selector{}
 - (BOOL)canBecomeFirstResponder{ return YES; }
 - (NSInteger)conversationIdentifier{ return (NSInteger) self; }
 - (NSAttributedString*)attributedSubstringForProposedRange:(NSRange)_R actualRange:(NSRangePointer)_A{ return nil; }
 - (NSUInteger)characterIndexForPoint:(NSPoint)_Point { return 0; }
 - (NSArray *)validAttributesForMarkedText{ return [NSArray array]; }
-- (void)insertText:(id)_String replacementRange:(NSRange)_ReplacementRange
+- (BLVoid)insertText:(id)_String replacementRange:(NSRange)_ReplacementRange
 {
     const BLUtf8* _str;
     if ([_String isKindOfClass: [NSAttributedString class]])
@@ -2185,7 +2172,7 @@ ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _State
         _str = (const BLUtf8*)[_String UTF8String];
     blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _str);
 }
-- (void)insertText:(id)_String
+- (BLVoid)insertText:(id)_String
 {
     [self insertText:_String replacementRange:NSMakeRange(0, 0)];
 }
@@ -2201,7 +2188,7 @@ ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _State
     return _rect;
 }
 @end
-void
+BLVoid
 _EnterFullscreen()
 {
     NSRect _rect;
@@ -2213,7 +2200,7 @@ _EnterFullscreen()
     [_PrSystemMem->pWindow setStyleMask:NSBorderlessWindowMask];
     [_PrSystemMem->pWindow setFrame:[_PrSystemMem->pWindow frameRectForContentRect:_rect] display:NO];
 }
-void
+BLVoid
 _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 {
     NSRect _rect;
@@ -2226,7 +2213,7 @@ _ExitFullscreen(BLU32 _Width, BLU32 _Height)
     [_PrSystemMem->pWindow setFrame:[_PrSystemMem->pWindow frameRectForContentRect:_rect] display:YES];
     [_PrSystemMem->pWindow setTitle:[NSString stringWithUTF8String : (const BLAnsi*)_PrSystemMem->sBoostParam.pAppName]];
 }
-void
+BLVoid
 _ShowWindow()
 {
     _PrSystemMem->pPool = [[NSAutoreleasePool alloc] init];
@@ -2304,7 +2291,7 @@ _ShowWindow()
     NSTrackingAreaOptions _options = NSTrackingMouseEnteredAndExited|NSTrackingActiveAlways|NSTrackingAssumeInside;
     NSTrackingArea* _area = [[NSTrackingArea alloc] initWithRect:_view.bounds options:_options owner:_view userInfo:nil];
     [_view addTrackingArea:_area];
-    _GpuIntervention(_view, !_PrSystemMem->sBoostParam.bProfiler);
+    _GpuIntervention(_view, _rect.size.width, _rect.size.height, !_PrSystemMem->sBoostParam.bProfiler);
 #   ifndef DEBUG
     if (_PrSystemMem->sBoostParam.bFullscreen)
         [_PrSystemMem->pWindow setLevel:CGShieldingWindowLevel()];
@@ -2312,7 +2299,7 @@ _ShowWindow()
         [_PrSystemMem->pWindow setLevel:kCGNormalWindowLevel];
 #   endif
 }
-void
+BLVoid
 _PollMsg()
 {
     @autoreleasepool
@@ -2508,7 +2495,7 @@ _PollMsg()
         }
     }
 }
-void
+BLVoid
 _CloseWindow()
 {
     _GpuAnitIntervention();
@@ -2519,10 +2506,10 @@ _CloseWindow()
 }
 #elif defined(BL_PLATFORM_IOS)
 @interface IOSWindow : UIWindow
-- (void)layoutSubviews;
+- (BLVoid)layoutSubviews;
 @end
 @implementation IOSWindow
-- (void)layoutSubviews
+- (BLVoid)layoutSubviews
 {
     self.frame = self.screen.bounds;
     [super layoutSubviews];
@@ -2531,9 +2518,9 @@ _CloseWindow()
 @interface IOSView : UIView
 - (instancetype)initWithFrame:(CGRect)_Frame;
 - (CGPoint)touchLocation:(UITouch*)_Touch shouldNormalize:(BOOL)_Normalize;
-- (void)touchesBegan:(NSSet*)_Touches withEvent:(UIEvent*)_Event;
-- (void)touchesEnded:(NSSet*)_Touches withEvent:(UIEvent*)_Event;
-- (void)touchesMoved:(NSSet*)_Touches withEvent:(UIEvent*)_Event;
+- (BLVoid)touchesBegan:(NSSet*)_Touches withEvent:(UIEvent*)_Event;
+- (BLVoid)touchesEnded:(NSSet*)_Touches withEvent:(UIEvent*)_Event;
+- (BLVoid)touchesMoved:(NSSet*)_Touches withEvent:(UIEvent*)_Event;
 @end
 @implementation IOSView{
     UITouch* _FFDown;
@@ -2559,7 +2546,7 @@ _CloseWindow()
     }
     return _point;
 }
-- (void)touchesBegan:(NSSet*)_Touches withEvent:(UIEvent *)_Event
+- (BLVoid)touchesBegan:(NSSet*)_Touches withEvent:(UIEvent *)_Event
 {
     for (UITouch* _touch in _Touches)
     {
@@ -2577,7 +2564,7 @@ _CloseWindow()
         }
     }
 }
-- (void)touchesEnded:(NSSet*)_Touches withEvent:(UIEvent*)_Event
+- (BLVoid)touchesEnded:(NSSet*)_Touches withEvent:(UIEvent*)_Event
 {
     for (UITouch* _touch in _Touches)
     {
@@ -2594,11 +2581,11 @@ _CloseWindow()
         }
     }
 }
-- (void)touchesCancelled:(NSSet*)_Touches withEvent:(UIEvent*)_Event
+- (BLVoid)touchesCancelled:(NSSet*)_Touches withEvent:(UIEvent*)_Event
 {
     [self touchesEnded:_Touches withEvent:_Event];
 }
-- (void)touchesMoved:(NSSet*)_Touches withEvent:(UIEvent*)_Event
+- (BLVoid)touchesMoved:(NSSet*)_Touches withEvent:(UIEvent*)_Event
 {
     for (UITouch* _touch in _Touches)
     {
@@ -2609,11 +2596,11 @@ _CloseWindow()
 @end
 @interface IOSLaunchController : UIViewController
 - (instancetype)init;
-- (void)loadView;
+- (BLVoid)loadView;
 - (NSUInteger)supportedInterfaceOrientations;
 @end
 @implementation IOSLaunchController
-- (void)loadView{}
+- (BLVoid)loadView{}
 - (BOOL)shouldAutorotate{ return NO; }
 - (NSUInteger)supportedInterfaceOrientations{ return UIInterfaceOrientationMaskAll; }
 - (instancetype)init
@@ -2743,15 +2730,15 @@ _CloseWindow()
 @end
 @interface IOSController : UIViewController <UITextFieldDelegate>
 - (instancetype)initWithNil;
-- (void)loadView;
-- (void)viewDidLayoutSubviews;
+- (BLVoid)loadView;
+- (BLVoid)viewDidLayoutSubviews;
 - (NSUInteger)supportedInterfaceOrientations;
 - (BOOL)prefersStatusBarHidden;
-- (void)initKeyboard;
-- (void)deinitKeyboard;
-- (void)keyboardWillShow:(NSNotification*)_Notification;
-- (void)keyboardWillHide:(NSNotification*)_Notification;
-- (void)updateKeyboard;
+- (BLVoid)initKeyboard;
+- (BLVoid)deinitKeyboard;
+- (BLVoid)keyboardWillShow:(NSNotification*)_Notification;
+- (BLVoid)keyboardWillHide:(NSNotification*)_Notification;
+- (BLVoid)updateKeyboard;
 @end
 @implementation IOSController{
     dispatch_source_t _timer;
@@ -2769,13 +2756,13 @@ _CloseWindow()
     dispatch_resume(_timer);
     return self;
 }
-- (void)dealloc
+- (BLVoid)dealloc
 {
     dispatch_source_cancel(_timer);
     [self deinitKeyboard];
     [super dealloc];
 }
-- (void)loadView{}
+- (BLVoid)loadView{}
 - (BOOL)prefersStatusBarHidden{ return YES; }
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)_Orientation
 {
@@ -2800,17 +2787,17 @@ _CloseWindow()
     }
     return _mask;
 }
-- (void)viewDidLayoutSubviews
+- (BLVoid)viewDidLayoutSubviews
 {
     const CGSize _size = self.view.bounds.size;
     _PrSystemMem->sBoostParam.nScreenWidth = _size.width * 2;
     _PrSystemMem->sBoostParam.nScreenHeight = _size.height * 2;
 }
-- (void)doLoop:(CADisplayLink*)_Sender
+- (BLVoid)doLoop:(CADisplayLink*)_Sender
 {
     _SystemStep();
 }
-- (void)initKeyboard
+- (BLVoid)initKeyboard
 {
     _PrSystemMem->pTICcxt = [[UITextField alloc] initWithFrame:CGRectZero];
     _PrSystemMem->pTICcxt.delegate = self;
@@ -2827,28 +2814,28 @@ _CloseWindow()
     [_center addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
     [_center addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
-- (void)deinitKeyboard
+- (BLVoid)deinitKeyboard
 {
     NSNotificationCenter* _center = [NSNotificationCenter defaultCenter];
     [_center removeObserver:self name:UIKeyboardWillShowNotification object:nil];
     [_center removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
-- (void)setView:(UIView*)_View
+- (BLVoid)setView:(UIView*)_View
 {
     [super setView:_View];
     [_View addSubview:_PrSystemMem->pTICcxt];
 }
-- (void)keyboardWillShow:(NSNotification*)_Notification
+- (BLVoid)keyboardWillShow:(NSNotification*)_Notification
 {
     CGRect _kbrect = [[_Notification userInfo][UIKeyboardFrameBeginUserInfoKey] CGRectValue];
     _kbrect = [self.view convertRect:_kbrect fromView:nil];
     [self setKeyboardHeight:(int)_kbrect.size.height];
 }
-- (void)keyboardWillHide:(NSNotification *)_Notification
+- (BLVoid)keyboardWillHide:(NSNotification *)_Notification
 {
     [self setKeyboardHeight:0];
 }
-- (void)updateKeyboard
+- (BLVoid)updateKeyboard
 {
     CGAffineTransform _t = self.view.transform;
     CGPoint _offset = CGPointMake(0.0, 0.0);
@@ -2867,7 +2854,7 @@ _CloseWindow()
     _frame.origin.y += _offset.y;
     self.view.frame = _frame;
 }
-- (void)setKeyboardHeight:(int)_Height
+- (BLVoid)setKeyboardHeight:(int)_Height
 {
     _PrSystemMem->nKeyboardHeight = _Height;
     [self updateKeyboard];
@@ -2902,7 +2889,7 @@ _CloseWindow()
 {
     return @"IOSDelegate";
 }
-- (void)hideLaunchScreen
+- (BLVoid)hideLaunchScreen
 {
     _launch = nil;
     [UIView animateWithDuration:0.0 animations:^
@@ -2912,7 +2899,7 @@ _CloseWindow()
         _launch.hidden = YES;
     }];
 }
-- (void)postFinishLaunch
+- (BLVoid)postFinishLaunch
 {
     [self performSelector:@selector(hideLaunchScreen) withObject:nil afterDelay:0.0];
     CGRect _frame = [[UIScreen mainScreen] bounds];
@@ -2969,15 +2956,15 @@ _CloseWindow()
     [self performSelector:@selector(postFinishLaunch) withObject:nil afterDelay:0.0];
     return YES;
 }
-- (void)applicationDidBecomeActive:(UIApplication*)_App { _GbSystemRunning = 1; }
-- (void)applicationDidEnterBackground:(UIApplication*)_App { _GbSystemRunning = 2; }
-- (void)applicationWillTerminate:(UIApplication*)_App
+- (BLVoid)applicationDidBecomeActive:(UIApplication*)_App { _GbSystemRunning = 1; }
+- (BLVoid)applicationDidEnterBackground:(UIApplication*)_App { _GbSystemRunning = 2; }
+- (BLVoid)applicationWillTerminate:(UIApplication*)_App
 {
     _GbSystemRunning = FALSE;
     _SystemDestroy();
 }
 @end
-void
+BLVoid
 _ShowWindow()
 {
 	if (_PrSystemMem->sBoostParam.nScreenWidth > _PrSystemMem->sBoostParam.nScreenHeight)
@@ -2987,7 +2974,7 @@ _ShowWindow()
     _PrSystemMem->pPool = [[NSAutoreleasePool alloc] init];
     UIApplicationMain(0, nil, nil, [IOSDelegate getAppDelegateClassName]);
 }
-void
+BLVoid
 _PollMsg()
 {
     SInt32 _result;
@@ -2995,7 +2982,7 @@ _PollMsg()
         _result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.000001, TRUE);
     } while (_result == kCFRunLoopRunHandledSource);
 }
-void
+BLVoid
 _CloseWindow()
 {
     [_PrSystemMem->pCtlView release];
@@ -3004,7 +2991,7 @@ _CloseWindow()
     [_PrSystemMem->pPool release];
 }
 #endif
-static void
+static BLVoid
 _PollEvent()
 {
 #ifdef BL_PLATFORM_ANDROID
@@ -3026,7 +3013,7 @@ _PollEvent()
 					}
 				}
                 if (_PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf)
-                    free((void*)_PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf);
+                    free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf);
             } break;
             case BL_ET_UI:
             {
@@ -3068,7 +3055,7 @@ _PollEvent()
 					}
 				}
                 if (_PrSystemMem->pEvents[_idx].uEvent.sKey.pString)
-                    free((void*)_PrSystemMem->pEvents[_idx].uEvent.sKey.pString);
+                    free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sKey.pString);
             } break;
             case BL_ET_SYSTEM:
 			{
@@ -3091,71 +3078,46 @@ _PollEvent()
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
 }
-
-void
+BLVoid
 _SystemInit()
 {
-	_PrSystemMem->fSysTime = blSystemSecTime();
-#if defined(_DEBUG)
-#	if defined(BL_PLATFORM_WIN32)
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#	elif defined(BL_PLATFORM_LINUX)
-    mtrace();
-#	endif
-#endif
-	_UtilsInit();
+	_PrSystemMem->nSysTime = blSystemTicks();
+    _ShowWindow();
+    _UtilsInit();
     _AudioInit();
-	_NetworkInit();
-	_UIInit();
+    _NetworkInit();
+    _UIInit();
     _SpriteInit();
 #ifdef BL_PLATFORM_ANDROID
-	_StreamIOInit(_PrSystemMem->pActivity->assetManager);
+    _StreamIOInit(_PrSystemMem->pActivity->assetManager);
 #else
-	_StreamIOInit(NULL);
+    _StreamIOInit(NULL);
 #endif
-    _ShowWindow();
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
 	_GbSystemRunning = TRUE;
 	_PrSystemMem->pBeginFunc();
 #endif
 }
-
-void
+BLVoid
 _SystemStep()
 {
-    BLF32 _delta = blSystemSecTime() - _PrSystemMem->fSysTime;
-	_PrSystemMem->fSysTime = blSystemSecTime();
+    blClearFrameBuffer(INVALID_GUID, TRUE, TRUE, FALSE);
+    BLU32 _now = blSystemTicks();
+    BLU32 _delta = _now - _PrSystemMem->nSysTime;
+    _PrSystemMem->nSysTime = _now;
 	for (BLU32 _idx = 0 ; _idx < 8; ++_idx)
 	{
 		if (_PrSystemMem->aTimers[_idx].nId != -1)
 		{
-			if (_PrSystemMem->fSysTime - _PrSystemMem->aTimers[_idx].fLastTime >= _PrSystemMem->aTimers[_idx].fElapse)
+			if (_PrSystemMem->nSysTime - _PrSystemMem->aTimers[_idx].nLastTime >= (BLU32)_PrSystemMem->aTimers[_idx].fElapse * 1000)
 			{
 				blInvokeEvent(BL_ET_SYSTEM, BL_SE_TIMER, _PrSystemMem->aTimers[_idx].nId, NULL);
-				_PrSystemMem->aTimers[_idx].fLastTime = _PrSystemMem->fSysTime;
+				_PrSystemMem->aTimers[_idx].nLastTime = _PrSystemMem->nSysTime;
 			}
 		}
 	}
 	if (_GbVideoPlaying && _GbSystemRunning == TRUE)
 	{
-		BLU32 _read = blStreamRead(_PrSystemMem->sVideoSec.nVideoStream, 4096, _PrSystemMem->sVideoSec.pTmpBuffer);
-		BLU8* _end = _PrSystemMem->sVideoSec.pTmpBuffer + _read;
-		if (demux(_PrSystemMem->sVideoSec.pTmpBuffer, _end, 0, &_PrSystemMem->sVideoSec.pVideoDec, &_PrSystemMem->sVideoSec.pVideoInfo, _PrSystemMem->sVideoSec.pVOInst, &_PrSystemMem->sVideoSec.pAudioDec, _PrSystemMem->sVideoSec.pAOInst) || !_read)
-		{
-			mpeg2_close(_PrSystemMem->sVideoSec.pVideoDec);
-			a52_free(_PrSystemMem->sVideoSec.pAudioDec);
-			if (_PrSystemMem->sVideoSec.pVOInst->close)
-				_PrSystemMem->sVideoSec.pVOInst->close(_PrSystemMem->sVideoSec.pVOInst);
-			if (_PrSystemMem->sVideoSec.pAOInst->close)
-				_PrSystemMem->sVideoSec.pAOInst->close(_PrSystemMem->sVideoSec.pAOInst);
-			free(_PrSystemMem->sVideoSec.pTmpBuffer);
-			blDeleteStream(_PrSystemMem->sVideoSec.nVideoStream);
-			blInvokeEvent(BL_ET_SYSTEM, BL_SE_VIDEOOVER, 0, NULL);
-            _GbVideoPlaying = FALSE;
-#if defined(BL_PLATFORM_OSX)
-                _GpuSwapBuffer(3);
-#endif
-		}
         _PollMsg();
 		_PollEvent();
         _PrSystemMem->pStepFunc(_delta);
@@ -3170,44 +3132,33 @@ _SystemStep()
 		_AudioStep(_delta);
 		_NetworkStep(_delta);
 		_UIStep(_delta, TRUE);
-        _SpriteStep(_delta);
+        _SpriteStep(_delta, FALSE);
 		_UIStep(_delta, FALSE);
+        _SpriteStep(_delta, TRUE);
 		_StreamIOStep(_delta);
         _PrSystemMem->pStepFunc(_delta);
 		if (_GbSystemRunning == 1)
 			_GpuSwapBuffer(FALSE);
 	}
 }
-
-void
+BLVoid
 _SystemDestroy()
 {
-	if (_PrSystemMem->pEvents)
-		free(_PrSystemMem->pEvents);
 	if (_GbVideoPlaying)
 	{
-		mpeg2_close(_PrSystemMem->sVideoSec.pVideoDec);
-		a52_free(_PrSystemMem->sVideoSec.pAudioDec);
-		if (_PrSystemMem->sVideoSec.pVOInst->close)
-			_PrSystemMem->sVideoSec.pVOInst->close(_PrSystemMem->sVideoSec.pVOInst);
-		if (_PrSystemMem->sVideoSec.pAOInst->close)
-			_PrSystemMem->sVideoSec.pAOInst->close(_PrSystemMem->sVideoSec.pAOInst);
-		free(_PrSystemMem->sVideoSec.pTmpBuffer);
-		blDeleteStream(_PrSystemMem->sVideoSec.nVideoStream);
 		blInvokeEvent(BL_ET_SYSTEM, BL_SE_VIDEOOVER, 0, NULL);
 		_GbVideoPlaying = FALSE;
 	}
 	_PrSystemMem->pEndFunc();
-	_CloseWindow();
 	_StreamIODestroy();
     _SpriteDestroy();
 	_UIDestroy();
     _NetworkDestroy();
     _AudioDestroy();
-	_UtilsDestroy();
-#if defined(_DEBUG) && defined(BL_PLATFORM_LINUX)
-    muntrace();
-#endif
+    _UtilsDestroy();
+    _CloseWindow();
+    if (_PrSystemMem->pEvents)
+        free(_PrSystemMem->pEvents);
 #if defined(BL_PLATFORM_UWP)
 	delete _PrSystemMem;
 	_PrSystemMem = NULL;
@@ -3217,9 +3168,27 @@ _SystemDestroy()
 	_PrSystemMem = NULL;
 #endif
 }
-
-BLF32
-blSystemSecTime()
+BLEnum
+blPlatformIdentity()
+{
+#if defined(BL_PLATFORM_WIN32)
+    return BL_PLATFORM_WIN32;
+#elif defined(BL_PLATFORM_UWP)
+    return BL_PLATFORM_UWP;
+#elif defined(BL_PLATFORM_LINUX)
+    return BL_PLATFORM_LINUX;
+#elif defined(BL_PLATFORM_ANDROID)
+    return BL_PLATFORM_ANDROID;
+#elif defined(BL_PLATFORM_OSX)
+    return BL_PLATFORM_OSX;
+#elif defined(BL_PLATFORM_IOS)
+    return BL_PLATFORM_IOS;
+#else
+    return -1;
+#endif
+}
+BLU32
+blSystemTicks()
 {
 #if defined(BL_PLATFORM_WIN32)
     LARGE_INTEGER _litime, _lifreq;
@@ -3227,7 +3196,7 @@ blSystemSecTime()
     QueryPerformanceCounter(&_lifreq);
     long _sec = (long)(_litime.QuadPart / _lifreq.QuadPart);
     long _usec = (long)(_litime.QuadPart * 1000000.0 / _lifreq.QuadPart - _sec * 1000000.0);
-    return _sec + _usec / 1000000.0f;
+    return (BLU32)(_sec * 1000 + _usec / 1000.0f);
 #elif defined(BL_PLATFORM_UWP)
     LARGE_INTEGER _litime, _lifreq;
     QueryPerformanceFrequency(&_litime);
@@ -3243,15 +3212,14 @@ blSystemSecTime()
     struct timeval _val;
     gettimeofday(&_val, NULL);
     return _val.tv_sec + _val.tv_usec / 1000000.0f;
-#elif defined(BL_PLATFORM_OSX)
-    struct timeval _val;
-    gettimeofday(&_val, NULL);
-    return _val.tv_sec + _val.tv_usec / 1000000.0f;
-#elif defined(BL_PLATFORM_IOS)
-    struct timeval _val;
-    gettimeofday(&_val, NULL);
-    return _val.tv_sec + _val.tv_usec / 1000000.0f;
+#elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
+    static mach_timebase_info_data_t _frequency = { 0 , 0 };
+    if (_frequency.denom == 0)
+        mach_timebase_info(&_frequency);
+    BLU64 _now = mach_absolute_time();
+    return (BLU32)((((_now) * _frequency.numer) / _frequency.denom) / 1000000);
 #endif
+    return 0;
 }
 const BLAnsi*
 blUserFolderDir()
@@ -3363,7 +3331,6 @@ blUserFolderDir()
     return _PrSystemMem->aUserDir;
 #endif
 }
-
 const BLAnsi*
 blWorkingDir(IN BLBool _Content)
 {
@@ -3387,7 +3354,7 @@ blWorkingDir(IN BLBool _Content)
 		}
 		while (TRUE) 
 		{
-			void* _ptr = realloc(_path, _buflen * sizeof(WCHAR));
+			BLVoid* _ptr = realloc(_path, _buflen * sizeof(WCHAR));
 			if (!_ptr)
 			{
 				free(_path);
@@ -3479,9 +3446,8 @@ blWorkingDir(IN BLBool _Content)
 	else
 		return _PrSystemMem->aWorkDir;
 }
-
 BLBool
-blSetClipboard(IN BLUtf8* const _Text)
+blSetClipboard(IN BLUtf8* _Text)
 {
 	if (!_Text)
 		return FALSE;
@@ -3560,7 +3526,6 @@ blSetClipboard(IN BLUtf8* const _Text)
     return TRUE;
 #endif
 }
-
 const BLUtf8*
 blGetClipboard()
 {
@@ -3634,9 +3599,8 @@ blGetClipboard()
 #endif
 	return _PrSystemMem->aClipboard;
 }
-
 BLBool
-blEnvString(IN BLUtf8* const _Section, INOUT BLUtf8 _Value[256])
+blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 {
 	BLBool _set = (_Value[0] == 0) ? FALSE : TRUE;
 	BLAnsi _path[260] = { 0 };
@@ -3826,9 +3790,8 @@ blEnvString(IN BLUtf8* const _Section, INOUT BLUtf8 _Value[256])
 	blDeleteDict(_tmpdic);
 	return TRUE;
 }
-
-void
-blOpenURL(IN BLUtf8* const _Url)
+BLVoid
+blOpenURL(IN BLUtf8* _Url)
 {
 	BLUtf8* _absurl;
 	BLBool _malloc = FALSE;
@@ -3899,7 +3862,6 @@ blOpenURL(IN BLUtf8* const _Url)
 	if (_malloc)
 		free(_absurl);
 }
-
 BLBool
 blOpenPlugin(IN BLAnsi* _Basename)
 {
@@ -3939,8 +3901,8 @@ blOpenPlugin(IN BLAnsi* _Basename)
 #endif
     return _PrSystemMem->pCurPlugin ? TRUE : FALSE;
 }
-
-BLBool blClosePlugin()
+BLBool
+blClosePlugin()
 {
     if (!_PrSystemMem->pCurPlugin)
         return FALSE;
@@ -3960,13 +3922,12 @@ BLBool blClosePlugin()
     _PrSystemMem->pCurPlugin = 0;
     return TRUE;
 }
-
-void*
-blGetPluginProcAddress(IN BLAnsi* const _Function)
+BLVoid*
+blGetPluginProcAddress(IN BLAnsi* _Function)
 {
     if (!_PrSystemMem->pCurPlugin)
         return NULL;
-    void* _ret;
+    BLVoid* _ret;
 #if defined(BL_PLATFORM_WIN32)
     _ret = GetProcAddress(_PrSystemMem->pCurPlugin, _Function);
 #elif defined(BL_PLATFORM_UWP)
@@ -3982,101 +3943,12 @@ blGetPluginProcAddress(IN BLAnsi* const _Function)
 #endif
     return _ret;
 }
-
 BLBool
-blVideoOperation(IN BLAnsi* const _Filename, IN BLAnsi* const _Archive, IN BLBool _Play)
+blVideoOperation(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _Play)
 {
-	if (_Play)
-	{
-		if (_Archive)
-			_PrSystemMem->sVideoSec.nVideoStream = blGenStream(_Filename, _Archive);
-		else
-		{
-			BLU32 _idx;
-			BLAnsi _tmpname[260];
-			BLAnsi _path[260] = { 0 };
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-			strcpy_s(_tmpname, 260, (const BLAnsi*)_Filename);
-			strcpy_s(_path, 260, blWorkingDir(TRUE));
-			strcat_s(_path, 260, _tmpname);
-#else
-			strcpy(_tmpname, (const BLAnsi*)_Filename);
-			strcpy(_path, blWorkingDir(TRUE));
-			strcat(_path, _tmpname);
-#endif
-			for (_idx = 0; _idx < strlen(_path); ++_idx)
-			{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-				if (_path[_idx] == '/')
-					_path[_idx] = '\\';
-#else
-				if (_path[_idx] == '\\')
-					_path[_idx] = '/';
-#endif
-			}
-			_PrSystemMem->sVideoSec.nVideoStream = blGenStream(_path, NULL);
-			if (INVALID_GUID == _PrSystemMem->sVideoSec.nVideoStream)
-			{
-				memset(_path, 0, sizeof(_path));
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-				strcpy_s(_path, 260, blUserFolderDir());
-				strcat_s(_path, 260, _tmpname);
-#else
-				strcpy(_path, blUserFolderDir());
-				strcat(_path, _tmpname);
-#endif
-				for (_idx = 0; _idx < strlen(_path); ++_idx)
-				{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-					if (_path[_idx] == '/')
-						_path[_idx] = '\\';
-#else
-					if (_path[_idx] == '\\')
-						_path[_idx] = '/';
-#endif
-				}
-				_PrSystemMem->sVideoSec.nVideoStream = blGenStream(_path, NULL);
-			}
-		}
-		if (INVALID_GUID == _PrSystemMem->sVideoSec.nVideoStream)
-			return FALSE;
-		_PrSystemMem->sVideoSec.pVOInst = vo_drivers()[0].open();
-		_PrSystemMem->sVideoSec.pAOInst = ao_drivers()[0].open();
-		mpeg2_accel(0);
-		_PrSystemMem->sVideoSec.pVideoDec = mpeg2_init();
-		_PrSystemMem->sVideoSec.pAudioDec = a52_init(0);
-		if (!_PrSystemMem->sVideoSec.pVideoDec)
-			return FALSE;
-		_PrSystemMem->sVideoSec.pVideoInfo = (mpeg2_info_t*)mpeg2_info(_PrSystemMem->sVideoSec.pVideoDec);
-		mpeg2_malloc_hooks(_Malloc_hook, NULL);
-		_PrSystemMem->sVideoSec.pTmpBuffer = (BLU8*)malloc(4096);
-#if defined(BL_PLATFORM_OSX)
-        _GpuSwapBuffer(2);
-#endif
-		_GbVideoPlaying = TRUE;
-	}
-	else
-	{
-		if (!_GbVideoPlaying)
-			return FALSE;
-		mpeg2_close(_PrSystemMem->sVideoSec.pVideoDec);
-		a52_free(_PrSystemMem->sVideoSec.pAudioDec);
-		if (_PrSystemMem->sVideoSec.pVOInst->close)
-			_PrSystemMem->sVideoSec.pVOInst->close(_PrSystemMem->sVideoSec.pVOInst);
-		if (_PrSystemMem->sVideoSec.pAOInst->close)
-			_PrSystemMem->sVideoSec.pAOInst->close(_PrSystemMem->sVideoSec.pAOInst);
-		free(_PrSystemMem->sVideoSec.pTmpBuffer);
-		blDeleteStream(_PrSystemMem->sVideoSec.nVideoStream);
-        blInvokeEvent(BL_ET_SYSTEM, BL_SE_VIDEOOVER, 0, NULL);
-#if defined(BL_PLATFORM_OSX)
-            _GpuSwapBuffer(3);
-#endif
-		_GbVideoPlaying = FALSE;
-	}
     return TRUE;
 }
-
-void
+BLVoid
 blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
 {
 #if defined(BL_PLATFORM_WIN32)
@@ -4143,7 +4015,7 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
 }
-void
+BLVoid
 blDetachIME()
 {
 #if defined(BL_PLATFORM_WIN32)
@@ -4186,30 +4058,27 @@ blDetachIME()
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
 }
-
-void
-blSubscribeEvent(IN BLEnum _Type, IN void(*_Subscriber)(BLEnum, BLU32, BLS32, void*))
+BLVoid
+blSubscribeEvent(IN BLEnum _Type, IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*))
 {
 	BLU32 _idx = 0;
 	while (_PrSystemMem->pSubscriber[_Type][_idx])
 		_idx++;
 	_PrSystemMem->pSubscriber[_Type][_idx] = _Subscriber;
 }
-
-void
-blUnsubscribeEvent(IN BLEnum _Type, IN void(*_Subscriber)(BLEnum, BLU32, BLS32, void*))
+BLVoid
+blUnsubscribeEvent(IN BLEnum _Type, IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*))
 {
 	BLU32 _idx = 0, _num = 0;
 	while (_PrSystemMem->pSubscriber[_Type][_num])
 		_num++;
 	while (_PrSystemMem->pSubscriber[_Type][_idx] != _Subscriber)
 		_idx++;
-	memmove(_PrSystemMem->pSubscriber[_Type] + _idx, _PrSystemMem->pSubscriber[_Type] + _idx + 1, (_num - _idx - 1) * sizeof(void*));
+	memmove(_PrSystemMem->pSubscriber[_Type] + _idx, _PrSystemMem->pSubscriber[_Type] + _idx + 1, (_num - _idx - 1) * sizeof(BLVoid*));
 	_PrSystemMem->pSubscriber[_Type][_num - 1] = NULL;
 }
-
-void
-blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN void* _Pparam)
+BLVoid
+blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _Pparam)
 {
 #ifdef BL_PLATFORM_ANDROID
 	pthread_mutex_lock(&_PrSystemMem->sMutex);
@@ -4224,7 +4093,7 @@ blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN void* _Ppa
     {
         _PrSystemMem->pEvents[_PrSystemMem->nEventIdx].eType = _Type;
         _PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sNet.nID = _Uparam;
-        _PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sNet.pBuf = (void*)_Pparam;
+        _PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sNet.pBuf = (BLVoid*)_Pparam;
         _PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sNet.nLength = _Sparam;
     }
     else if (_etype == BL_ET_UI)
@@ -4261,15 +4130,14 @@ blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN void* _Ppa
         _PrSystemMem->pEvents[_PrSystemMem->nEventIdx].eType = _etype;
         _PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sUser.nSParam = _Sparam;
 		_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sUser.nUParam = _Uparam;
-		_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sUser.pPParam = (void*)_Pparam;
+		_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sUser.pPParam = (BLVoid*)_Pparam;
     }
 	_PrSystemMem->nEventIdx++;
 #ifdef BL_PLATFORM_ANDROID
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
 }
-
-void
+BLVoid
 blSystemDateTime(OUT BLS32* _Year, OUT BLS32* _Month, OUT BLS32* _Day, OUT BLS32* _Hour, OUT BLS32* _Minute, OUT BLS32* _Second, OUT BLS32* _Wday, OUT BLS32* _Yday, OUT BLS32* _Dst)
 {
 	time_t _timer;
@@ -4286,7 +4154,6 @@ blSystemDateTime(OUT BLS32* _Year, OUT BLS32* _Month, OUT BLS32* _Day, OUT BLS32
 	*_Yday = _tblock->tm_yday;
 	*_Dst = _tblock->tm_isdst;
 }
-
 BLBool
 blSystemTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
 {
@@ -4304,18 +4171,16 @@ blSystemTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
 		return FALSE;
 	_PrSystemMem->aTimers[_idx].nId = _PositiveID;
 	_PrSystemMem->aTimers[_idx].fElapse = _Elapse;
-	_PrSystemMem->aTimers[_idx].fLastTime = blSystemSecTime();
+	_PrSystemMem->aTimers[_idx].nLastTime = blSystemTicks();
 	return TRUE;
 }
-
-void
+BLVoid
 blWindowSize(OUT BLU32* _Width, OUT BLU32* _Height)
 {
 	*_Width = _PrSystemMem->sBoostParam.nScreenWidth;
 	*_Height = _PrSystemMem->sBoostParam.nScreenHeight;
 }
-
-void
+BLVoid
 blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
 {
 #if defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_UWP)
@@ -4325,9 +4190,8 @@ blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
         _ExitFullscreen(_Width, _Height);
 #endif
 }
-
-void
-blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN void(*_Begin)(void), IN void(*_Step)(BLF32), IN void(*_End)(void))
+BLVoid
+blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))
 {
 #if defined(BL_PLATFORM_UWP)
 	_PrSystemMem = new _BLSystemMember;
@@ -4345,15 +4209,8 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _F
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
 	_PrSystemMem->nEventsSz = 0;
 	_PrSystemMem->nEventIdx = 0;
-	_PrSystemMem->fSysTime = 0.f;
+	_PrSystemMem->nSysTime = 0;
 	_PrSystemMem->nOrientation = SCREEN_LANDSCAPE_INTERNAL;
-	_PrSystemMem->sVideoSec.nVideoStream = INVALID_GUID;
-	_PrSystemMem->sVideoSec.pAOInst = NULL;
-	_PrSystemMem->sVideoSec.pAudioDec = NULL;
-	_PrSystemMem->sVideoSec.pVideoDec = NULL;
-	_PrSystemMem->sVideoSec.pVideoInfo = NULL;
-	_PrSystemMem->sVideoSec.pTmpBuffer = NULL;
-	_PrSystemMem->sVideoSec.pVOInst = NULL;
 #if defined(BL_PLATFORM_WIN32)
 	_PrSystemMem->bCtrlPressed = FALSE;
     _PrSystemMem->pCurPlugin = 0;
@@ -4401,7 +4258,6 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _F
     _PrSystemMem->pBeginFunc = _Begin;
     _PrSystemMem->pStepFunc = _Step;
     _PrSystemMem->pEndFunc = _End;
-    _PrSystemMem->fSysTime = blSystemSecTime();
     _SystemInit();
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
     do {
@@ -4410,9 +4266,8 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _F
     _SystemDestroy();
 #endif
 }
-
-void
-blSystemEmbedRun(IN BLS32 _Handle, IN void(*_Begin)(void), IN void(*_Step)(BLF32), IN void(*_End)(void))
+BLVoid
+blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))
 {
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX)
 	_PrSystemMem = (_BLSystemMember*)malloc(sizeof(_BLSystemMember));
@@ -4426,15 +4281,8 @@ blSystemEmbedRun(IN BLS32 _Handle, IN void(*_Begin)(void), IN void(*_Step)(BLF32
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
 	_PrSystemMem->nEventsSz = 0;
 	_PrSystemMem->nEventIdx = 0;
-	_PrSystemMem->fSysTime = 0.f;
+	_PrSystemMem->nSysTime = 0;
 	_PrSystemMem->nOrientation = SCREEN_LANDSCAPE_INTERNAL;
-	_PrSystemMem->sVideoSec.nVideoStream = INVALID_GUID;
-	_PrSystemMem->sVideoSec.pAOInst = NULL;
-	_PrSystemMem->sVideoSec.pAudioDec = NULL;
-	_PrSystemMem->sVideoSec.pVideoDec = NULL;
-	_PrSystemMem->sVideoSec.pVideoInfo = NULL;
-	_PrSystemMem->sVideoSec.pTmpBuffer = NULL;
-	_PrSystemMem->sVideoSec.pVOInst = NULL;
 #if defined(BL_PLATFORM_WIN32)
     _PrSystemMem->bCtrlPressed = FALSE;
     _PrSystemMem->pCurPlugin = 0;

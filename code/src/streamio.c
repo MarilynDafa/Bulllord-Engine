@@ -716,10 +716,10 @@ blWriteFile(IN BLAnsi* _Filename, IN BLU32 _Count, IN BLU8* _Data)
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 	WCHAR _wfilename[260] = { 0 };
-	MultiByteToWideChar(CP_UTF8, 0, _Filename, -1, _wfilename, sizeof(_wfilename));
+	MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
 	HANDLE _fp = CreateFile2(_wfilename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, CREATE_ALWAYS, NULL);
 #else
-	HANDLE _fp = CreateFileA(_Filename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE _fp = CreateFileA(_path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
 	if (FILE_INVALID_INTERNAL(_fp))
 	{

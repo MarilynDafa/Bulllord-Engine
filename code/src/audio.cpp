@@ -52,8 +52,8 @@
 #endif
 #ifdef __cplusplus
 extern "C" {
-extern BLBool _FetchResource(const BLAnsi*, const BLAnsi*, void**, BLGuid, BLBool(*)(void*, const BLAnsi*, const BLAnsi*),BLBool(*)(void*), BLBool);
-extern BLBool _DiscardResource(BLGuid, BLBool(*)(void*), BLBool(*)(void*));
+extern BLBool _FetchResource(const BLAnsi*, const BLAnsi*, BLVoid**, BLGuid, BLBool(*)(BLVoid*, const BLAnsi*, const BLAnsi*),BLBool(*)(BLVoid*), BLBool);
+extern BLBool _DiscardResource(BLGuid, BLBool(*)(BLVoid*), BLBool(*)(BLVoid*));
 #endif
 #ifdef __cplusplus
 }
@@ -156,7 +156,6 @@ _Format(_BLAudioSource* _Src)
 			return 0x1103;
 	}
 }
-
 static BLBool
 _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx)
 {
@@ -268,9 +267,8 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx)
 #endif
     return _ret;
 }
-
 static BLBool
-_LoadAudio(void* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
+_LoadAudio(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
 	_src->bCompressed = blUtf8Equal(blGetExtNameUtf8((BLUtf8*)_Filename), (const BLUtf8*)"mp3");
@@ -467,9 +465,8 @@ _LoadAudio(void* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 	}
 	return TRUE;
 }
-
 static BLBool
-_UnloadAudio(void* _Src)
+_UnloadAudio(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
 	BLBool _com = _src->bCompressed;
@@ -494,7 +491,7 @@ _UnloadAudio(void* _Src)
 }
 #if defined(BL_USE_AL_API)
 static BLBool
-_ALSoundSetup(void* _Src)
+_ALSoundSetup(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
     ALsizei _queuesz = 0;
@@ -539,9 +536,8 @@ _ALSoundSetup(void* _Src)
 	_src->bValid = TRUE;
 	return TRUE;
 }
-
 static BLBool
-_ALSoundRelease(void* _Src)
+_ALSoundRelease(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
 	BLBool _com = _src->bCompressed;
@@ -568,7 +564,6 @@ _ALSoundRelease(void* _Src)
 		blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 	return TRUE;
 }
-
 static BLBool
 _ALUpdate(_BLAudioSource* _Src)
 {
@@ -609,7 +604,7 @@ _ALUpdate(_BLAudioSource* _Src)
 }
 #elif defined(BL_USE_SL_API)
 static BLBool
-_SLSoundSetup(void* _Src)
+_SLSoundSetup(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
 	_src->pSoundBufA = (BLU8*)malloc(65536);
@@ -710,7 +705,7 @@ _SLSoundSetup(void* _Src)
 	return TRUE;
 }
 static BLBool
-_SLSoundRelease(void* _Src)
+_SLSoundRelease(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
 	BLBool _com = _src->bCompressed;
@@ -770,7 +765,7 @@ _SLUpdate(_BLAudioSource* _Src)
 }
 #elif defined(BL_USE_COREAUDIO_API)
 static BLBool
-_CASoundSetup(void* _Src)
+_CASoundSetup(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
 	_src->pSoundBufA = (BLU8*)malloc(65536 * sizeof(BLU8));
@@ -816,9 +811,8 @@ _CASoundSetup(void* _Src)
 	_src->bValid = TRUE;
 	return TRUE;
 }
-
 static BLBool
-_CASoundRelease(void* _Src)
+_CASoundRelease(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
 	BLBool _com = _src->bCompressed;
@@ -838,7 +832,6 @@ _CASoundRelease(void* _Src)
 		blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 	return TRUE;
 }
-
 static BLBool
 _CAUpdate(_BLAudioSource* _Src)
 {
@@ -863,13 +856,12 @@ _CAUpdate(_BLAudioSource* _Src)
 	return TRUE;
 }
 #endif
-
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 static DWORD __stdcall
-_AudioThreadFunc(void* _Userdata)
+_AudioThreadFunc(BLVoid* _Userdata)
 #else
-static void*
-_AudioThreadFunc(void* _Userdata)
+static BLVoid*
+_AudioThreadFunc(BLVoid* _Userdata)
 #endif
 {
     while (!_GbSystemRunning)
@@ -918,11 +910,11 @@ _AudioThreadFunc(void* _Userdata)
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
     return 0xDEAD;
 #else
-    return (void*)0xDEAD;
+    return (BLVoid*)0xDEAD;
 #endif
 }
 #if defined(BL_USE_AL_API)
-static void
+static BLVoid
 _ALInit()
 {
 	_PrAudioMem->pAudioDev.fMusicVolume = _PrAudioMem->pAudioDev.fSystemVolume = _PrAudioMem->pAudioDev.fEnvVolume = 0.7f;
@@ -945,8 +937,7 @@ _ALInit()
 	blThreadRun(_PrAudioMem->pAudioDev.pThread);
 	blDebugOutput("Audio initialize successfully");
 }
-
-static void
+static BLVoid
 _ALDestroy()
 {
     blDeleteThread(_PrAudioMem->pAudioDev.pThread);
@@ -961,7 +952,7 @@ _ALDestroy()
 	_PrAudioMem->pAudioDev.pALDevice = NULL;
 }
 #elif defined(BL_USE_SL_API)
-static void
+static BLVoid
 _SLInit()
 {
 	_PrAudioMem->pAudioDev.fMusicVolume = _PrAudioMem->pAudioDev.fSystemVolume = _PrAudioMem->pAudioDev.fEnvVolume = 0.7f;
@@ -983,8 +974,7 @@ _SLInit()
 	blThreadRun(_PrAudioMem->pAudioDev.pThread);
 	blDebugOutput("Audio initialize successfully");
 }
-
-static void
+static BLVoid
 _SLDestroy()
 {
 	blDeleteThread(_PrAudioMem->pAudioDev.pThread);
@@ -999,7 +989,7 @@ _SLDestroy()
 	mpaudec_cleanup();
 }
 #elif defined(BL_USE_COREAUDIO_API)
-static void
+static BLVoid
 _CAInit()
 {
 	_PrAudioMem->pAudioDev.fMusicVolume = _PrAudioMem->pAudioDev.fSystemVolume = _PrAudioMem->pAudioDev.fEnvVolume = 0.7f;
@@ -1038,7 +1028,7 @@ _CAInit()
 	blThreadRun(_PrAudioMem->pAudioDev.pThread);
 	blDebugOutput("Audio initialize successfully");
 }
-static void
+static BLVoid
 _CADestroy()
 {
 	blDeleteThread(_PrAudioMem->pAudioDev.pThread);
@@ -1054,18 +1044,17 @@ _CADestroy()
 	_PrAudioMem->pAudioDev.pCADevice = NULL;
 }
 #endif
-void
-_GetDeviceDetial(void** _Pr1, void** _Pr2)
+BLVoid
+_GetDeviceDetial(BLVoid** _Pr1, BLVoid** _Pr2)
 {
 #if defined(BL_USE_COREAUDIO_API)
 	*_Pr1 = _PrAudioMem->pAudioDev.pCADevice;
 #elif defined(BL_USE_SL_API)
-	*_Pr1 = (void*)_PrAudioMem->pAudioDev.pDevice;
-	*_Pr2 = (void*)_PrAudioMem->pAudioDev.pMixObj;
+	*_Pr1 = (BLVoid*)_PrAudioMem->pAudioDev.pDevice;
+	*_Pr2 = (BLVoid*)_PrAudioMem->pAudioDev.pMixObj;
 #endif
 }
-
-void
+BLVoid
 _AudioInit()
 {
 	_PrAudioMem = (_BLAudioMember*)malloc(sizeof(_BLAudioMember));
@@ -1082,12 +1071,9 @@ _AudioInit()
 #endif
 	mpaudec_open();
 }
-
-void
-_AudioStep(BLF32 _Delta)
+BLVoid
+_AudioStep(BLU32 _Delta)
 {
-	if (_Delta <= 0.f)
-		return;
 	blMutexLock(_PrAudioMem->pSounds->pMutex);
 	FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
 	{
@@ -1163,8 +1149,7 @@ _AudioStep(BLF32 _Delta)
     }
     blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 }
-
-void
+BLVoid
 _AudioDestroy()
 {
 #if defined(BL_USE_AL_API)
@@ -1177,8 +1162,7 @@ _AudioDestroy()
 	blDebugOutput("Audio shutdown");
 	free(_PrAudioMem);
 }
-
-void
+BLVoid
 blUseMusicVolume(IN BLF32 _Vol)
 {
     if (!_PrAudioMem->pBackMusic)
@@ -1196,8 +1180,7 @@ blUseMusicVolume(IN BLF32 _Vol)
 #endif
     blMutexUnlock(_PrAudioMem->pMusicMutex);
 }
-
-void
+BLVoid
 blUseEnvironmentVolume(IN BLF32 _Vol)
 {
 	_PrAudioMem->pAudioDev.fEnvVolume = _Vol;
@@ -1219,8 +1202,7 @@ blUseEnvironmentVolume(IN BLF32 _Vol)
     }
     blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 }
-
-void
+BLVoid
 blUseSystemVolume(IN BLF32 _Vol)
 {
 	_PrAudioMem->pAudioDev.fSystemVolume = _Vol;
@@ -1242,40 +1224,35 @@ blUseSystemVolume(IN BLF32 _Vol)
     }
     blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 }
-
-void
+BLVoid
 blQueryAudioVolume(OUT BLF32* _Music, OUT BLF32* _System, OUT BLF32* _Env)
 {
 	*_Music = _PrAudioMem->pAudioDev.fMusicVolume;
 	*_System = _PrAudioMem->pAudioDev.fSystemVolume;
 	*_Env = _PrAudioMem->pAudioDev.fEnvVolume;
 }
-
-void
+BLVoid
 blSetListenerPos(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
 	_PrAudioMem->sListenerPos.fX = _Xpos;
 	_PrAudioMem->sListenerPos.fY = _Ypos;
 	_PrAudioMem->sListenerPos.fZ = _Zpos;
 }
-
-void
+BLVoid
 blSetListenerUp(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
 	_PrAudioMem->sListenerUp.fX = _Xpos;
 	_PrAudioMem->sListenerUp.fY = _Ypos;
 	_PrAudioMem->sListenerUp.fZ = _Zpos;
 }
-
-void
+BLVoid
 blSetListenerDir(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
 	_PrAudioMem->sListenerDir.fX = _Xpos;
 	_PrAudioMem->sListenerDir.fY = _Ypos;
 	_PrAudioMem->sListenerDir.fZ = _Zpos;
 }
-
-void
+BLVoid
 blSetEmitterPos(IN BLGuid _ID, IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
 	FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
@@ -1289,9 +1266,8 @@ blSetEmitterPos(IN BLGuid _ID, IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 		}
 	}
 }
-
 BLGuid
-blGenAudio(IN BLAnsi* const _Filename, IN BLAnsi* const _Archive, IN BLBool _Loop, IN BLBool _3D, IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
+blGenAudio(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _Loop, IN BLBool _3D, IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
 	BLBool _com = blUtf8Equal(blGetExtNameUtf8((BLUtf8*)_Filename) , (const BLUtf8*)"mp3");
 	if (_com)
@@ -1312,16 +1288,15 @@ blGenAudio(IN BLAnsi* const _Filename, IN BLAnsi* const _Archive, IN BLBool _Loo
 	else
 		blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 #if defined(BL_USE_AL_API)
-	_FetchResource(_Filename, _Archive, (void**)&_sound, _sound->nID, _LoadAudio, _ALSoundSetup, TRUE);
+	_FetchResource(_Filename, _Archive, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _ALSoundSetup, TRUE);
 #elif defined(BL_USE_SL_API)
-	_FetchResource(_Filename, _Archive, (void**)&_sound, _sound->nID, _LoadAudio, _SLSoundSetup, TRUE);
+	_FetchResource(_Filename, _Archive, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _SLSoundSetup, TRUE);
 #elif defined(BL_USE_COREAUDIO_API)
-	_FetchResource(_Filename, _Archive, (void**)&_sound, _sound->nID, _LoadAudio, _CASoundSetup, TRUE);
+	_FetchResource(_Filename, _Archive, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _CASoundSetup, TRUE);
 #endif
 	return _sound->nID;
 }
-
-void
+BLVoid
 blDeleteAudio(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)

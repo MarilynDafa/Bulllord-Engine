@@ -143,7 +143,10 @@ extern BLBool _DiscardResource(BLGuid, BLBool(*)(BLVoid*), BLBool(*)(BLVoid*));
 BLBool
 _UseCustomCursor()
 {
-	return _PrSpriteMem->pCursor ? TRUE : FALSE;
+	if (_PrSpriteMem)
+		return _PrSpriteMem->pCursor ? TRUE : FALSE;
+	else
+		return FALSE;
 }
 static const BLVoid
 _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
@@ -582,7 +585,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
     BLF32 _rby = (_maxx * _Mat[1]) + (_maxy * _Mat[3]) + _Mat[5];
     if (_Node->pEmitParam)
     {
-        BLU32 _gen = _Node->pEmitParam->fGenPerMSec * _Delta;
+        BLU32 _gen = (BLU32)(_Node->pEmitParam->fGenPerMSec * _Delta);
         _Node->pEmitParam->nCurAlive = MIN_INTERNAL(_Node->pEmitParam->nMaxAlive, _gen + _Node->pEmitParam->nCurAlive);
         BLF32* _clrbuf = (BLF32*)alloca(_Node->pEmitParam->nMaxAlive * 4 * sizeof(BLF32));
         BLF32* _tranbuf = (BLF32*)alloca(_Node->pEmitParam->nMaxAlive * 4 * sizeof(BLF32));
@@ -594,8 +597,8 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
                 _Node->pEmitParam->pPositionY[_idx] = _Node->sPos.fY + sinf(blRandRangeF(0.f , PI_INTERNAL * 2.f)) * _Node->pEmitParam->fEmitterRadius * blRandF();
                 _Node->pEmitParam->pEmitAngle[_idx] = blRandRangeF(-_Node->pEmitParam->fEmitAngle, _Node->pEmitParam->fEmitAngle);
                 _Node->pEmitParam->pVelocity[_idx] = _Node->pEmitParam->fVelocity + blRandRangeF(-_Node->pEmitParam->fVelVariance, _Node->pEmitParam->fVelVariance);
-                BLS32 _initrot = 100 * (_Node->pEmitParam->fRotation + blRandRangeF(-_Node->pEmitParam->fRotVariance, _Node->pEmitParam->fRotVariance));
-                BLS32 _initscale = 100 * (_Node->pEmitParam->fScale + blRandRangeF(-_Node->pEmitParam->fScaleVariance, _Node->pEmitParam->fScaleVariance));
+                BLS32 _initrot = 100 * (BLS32)(_Node->pEmitParam->fRotation + blRandRangeF(-_Node->pEmitParam->fRotVariance, _Node->pEmitParam->fRotVariance));
+                BLS32 _initscale = 100 * (BLS32)(_Node->pEmitParam->fScale + blRandRangeF(-_Node->pEmitParam->fScaleVariance, _Node->pEmitParam->fScaleVariance));
                 _Node->pEmitParam->pRotScale[_idx] = MAKEU32(MAX_INTERNAL(0, _initrot), MAX_INTERNAL(0, _initscale));
             }
             else
@@ -717,15 +720,15 @@ _SpriteInit()
     _PrSpriteMem->bShaking = FALSE;
 	_PrSpriteMem->pTileArray = blGenArray(FALSE);
 	blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
-    _PrSpriteMem->nSpriteTech = blGenTechnique("test.bsl", NULL, TRUE, FALSE);
-    _PrSpriteMem->nEmitTech = blGenTechnique("test2.bsl", NULL, TRUE, FALSE);
+    _PrSpriteMem->nSpriteTech = blGenTechnique("test.bsl", NULL, FALSE, FALSE);
+    _PrSpriteMem->nEmitTech = blGenTechnique("test2.bsl", NULL, FALSE, FALSE);
 }
 BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 {
     BLU32 _w, _h;
     blUIQueryResolution(&_w, &_h);
-    BLF32 _screensz[] = { 2.0 / (BLF32)_w, 2.0 / (BLF32)_h };
+    BLF32 _screensz[] = { 2.f / (BLF32)_w, 2.f / (BLF32)_h };
     blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "screensz", _screensz, sizeof(_screensz));
     blTechUniform(_PrSpriteMem->nEmitTech, BL_UB_F32X2, "screensz", _screensz, sizeof(_screensz));
     if (_Cursor)
@@ -1294,7 +1297,7 @@ blSpriteAsEmit(IN BLGuid _ID, IN BLF32 _EmitAngle, IN BLF32 _EmitterRadius, IN B
         _node->pEmitParam->pRotScale = (BLU32*)malloc(_MaxAlive * sizeof(BLU32));
     }
 	_node->pEmitParam->fEmitterRadius = _EmitterRadius;
-	_node->pEmitParam->nLife = _Life * 1000;
+	_node->pEmitParam->nLife = (BLU32)(_Life * 1000);
 	_node->pEmitParam->nMaxAlive = _MaxAlive;
 	_node->pEmitParam->fGenPerMSec = (BLF32)_GenPerSec / 1000.f;
     BLVec2 _dir;
