@@ -1045,16 +1045,6 @@ _CADestroy()
 }
 #endif
 BLVoid
-_GetDeviceDetial(BLVoid** _Pr1, BLVoid** _Pr2)
-{
-#if defined(BL_USE_COREAUDIO_API)
-	*_Pr1 = _PrAudioMem->pAudioDev.pCADevice;
-#elif defined(BL_USE_SL_API)
-	*_Pr1 = (BLVoid*)_PrAudioMem->pAudioDev.pDevice;
-	*_Pr2 = (BLVoid*)_PrAudioMem->pAudioDev.pMixObj;
-#endif
-}
-BLVoid
 _AudioInit()
 {
 	_PrAudioMem = (_BLAudioMember*)malloc(sizeof(_BLAudioMember));

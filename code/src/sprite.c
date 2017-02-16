@@ -23,6 +23,7 @@
 #include "../headers/system.h"
 #include "../headers/utils.h"
 #include "../headers/ui.h"
+#include "internal/dictionary.h"
 #include "internal/array.h"
 #include "internal/internal.h"
 #include "internal/mathematics.h"
@@ -88,14 +89,28 @@ typedef struct _EmitParam {
     BLF32* pVelocity;
     BLU32* pRotScale;
 }_BLEmitParam;
+typedef struct _SpriteSheet{
+	BLU32 nTag;
+	BLU32 nLTx;
+	BLU32 nLTy;
+	BLU32 nRBx;
+	BLU32 nRBy;
+	BLU32 nOffsetX;
+	BLU32 nOffsetY;
+}_BLSpriteSheet;
 typedef struct _SpriteNode{
     struct _SpriteNode* pParent;
     struct _SpriteNode** pChildren;
 	_BLSpriteAction* pAction;
 	_BLSpriteAction* pCurAction;
 	_BLEmitParam* pEmitParam;
+	BLDictionary* pTagSheet;
+	BLU8* pTexData;
+	BLEnum eTexFormat;
+	BLU32 nTexWidth;
+	BLU32 nTexHeight;
     BLGuid nID;
-    BLAnsi aTag[32];
+    BLU32 aTag[64];
 	BLAnsi aFilename[260];
 	BLAnsi aArchive[260];
     BLGuid nGBO;
@@ -311,6 +326,9 @@ _SpriteSetup(BLVoid* _Src)
         BLEnum _decle[] = { BL_VD_FLOATX4, BL_VD_FLOATX4 };
         blInstanceGeometryBuffer(_node->nGBO, _semantice, _decle, 2, _node->pEmitParam->nMaxAlive);
     }
+	_node->nTex = blGenTexture(blHashUtf8(_node->aFilename), BL_TT_2D, _node->eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->nTexWidth, _node->nTexHeight, 1, _node->pTexData);
+	free(_node->pTexData);
+	_node->pTexData = NULL;
     _node->bValid = TRUE;
     return TRUE;
 }
@@ -354,11 +372,169 @@ _SpriteRelease(BLVoid* _Src)
 		}
 	}
     blDeleteGeometryBuffer(_node->nGBO);
+	blDeleteTexture(_node->nTex);
     return TRUE;
 }
 static BLBool
 _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 {
+	_BLSpriteNode* _src = (_BLSpriteNode*)_Src;
+	BLGuid _stream;
+	if (_Archive)
+		_stream = blGenStream(_Filename, _Archive);
+	else
+	{
+		BLAnsi _tmpname[260];
+		strcpy(_tmpname, _Filename);
+		for (BLU32 _i = 0; _i < strlen(_tmpname); ++_i)
+		{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+			if (_tmpname[_i] == '/')
+				_tmpname[_i] = '\\';
+#else
+			if (_tmpname[_i] == '\\')
+				_tmpname[_i] = '/';
+#endif
+		}
+		BLAnsi _path[260] = { 0 };
+		strcpy(_path, blWorkingDir(TRUE));
+		strcat(_path, _tmpname);
+		_stream = blGenStream(_path, NULL);
+		if (INVALID_GUID == _stream)
+		{
+			memset(_path, 0, sizeof(_path));
+			strcpy(_path, blUserFolderDir());
+			_stream = blGenStream(_path, NULL);
+		}
+		if (INVALID_GUID == _stream)
+			return FALSE;
+	}
+	BLU8 _identifier[12];
+	blStreamRead(_stream, sizeof(_identifier), _identifier);
+	if (_identifier[0] != 0xDD ||
+		_identifier[1] != 0xDD ||
+		_identifier[2] != 0xDD ||
+		_identifier[3] != 0xEE ||
+		_identifier[4] != 0xEE ||
+		_identifier[5] != 0xEE ||
+		_identifier[6] != 0xAA ||
+		_identifier[7] != 0xAA ||
+		_identifier[8] != 0xAA ||
+		_identifier[9] != 0xDD ||
+		_identifier[10] != 0xDD ||
+		_identifier[11] != 0xDD)
+	{
+		blDeleteStream(_stream);
+		return FALSE;
+	}
+	BLU32 _width, _height, _depth;
+	blStreamRead(_stream, sizeof(BLU32), &_width);
+	blStreamRead(_stream, sizeof(BLU32), &_height);
+	blStreamRead(_stream, sizeof(BLU32), &_depth);
+	BLU32 _array, _faces, _mipmap;
+	blStreamRead(_stream, sizeof(BLU32), &_array);
+	blStreamRead(_stream, sizeof(BLU32), &_faces);
+	blStreamRead(_stream, sizeof(BLU32), &_mipmap);
+	BLU32 _fourcc, _channels, _offset;
+	blStreamRead(_stream, sizeof(BLU32), &_fourcc);
+	blStreamRead(_stream, sizeof(BLU32), &_channels);
+	blStreamRead(_stream, sizeof(BLU32), &_offset);
+	_src->nTexWidth = _width;
+	_src->nTexHeight = _height;
+	BLEnum _type;
+	if (_height == 1)
+		_type = BL_TT_1D;
+	else
+	{
+		if (_depth == 1)
+			_type = (_faces != 6) ? BL_TT_2D : BL_TT_CUBE;
+		else
+			_type = BL_TT_3D;
+	}
+	if (_type != BL_TT_2D)
+	{
+		blDeleteStream(_stream);
+		return FALSE;
+	}
+	_src->pTagSheet = blGenDict(FALSE);
+	while (blStreamTell(_stream) < _offset)
+	{
+		_BLSpriteSheet* _ss = (_BLSpriteSheet*)malloc(sizeof(_BLSpriteSheet));
+		BLU32 _taglen;
+		blStreamRead(_stream, sizeof(BLU32), &_taglen);
+		BLAnsi _tag[256] = { 0 };
+		blStreamRead(_stream, _taglen, _tag);
+		_ss->nTag = blHashUtf8(_tag);
+		blStreamRead(_stream, sizeof(BLU32), &_ss->nLTx);
+		blStreamRead(_stream, sizeof(BLU32), &_ss->nLTy);
+		blStreamRead(_stream, sizeof(BLU32), &_ss->nRBx);
+		blStreamRead(_stream, sizeof(BLU32), &_ss->nRBy);
+		blStreamRead(_stream, sizeof(BLU32), &_ss->nOffsetX);
+		blStreamRead(_stream, sizeof(BLU32), &_ss->nOffsetY);
+		blDictInsert(_src->pTagSheet, _ss->nTag, _ss);
+	}
+	blStreamSeek(_stream, _offset);
+	BLU32 _imagesz;
+	switch (_fourcc)
+	{
+	case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
+		blStreamRead(_stream, sizeof(BLU32), &_imagesz);
+		_src->eTexFormat = BL_TF_RGBA8;
+		break;
+	case FOURCC_INTERNAL('S', '3', 'T', '1'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+		_src->eTexFormat = BL_TF_BC1;
+		break;
+	case FOURCC_INTERNAL('S', '3', 'T', '2'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+		_src->eTexFormat = BL_TF_BC1A1;
+		break;
+	case FOURCC_INTERNAL('S', '3', 'T', '3'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+		_src->eTexFormat = BL_TF_BC3;
+		break;
+	case FOURCC_INTERNAL('A', 'S', 'T', '1'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+		_src->eTexFormat = BL_TF_ASTC;
+		break;
+	case FOURCC_INTERNAL('A', 'S', 'T', '2'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+		_src->eTexFormat = BL_TF_ASTC;
+		break;
+	case FOURCC_INTERNAL('A', 'S', 'T', '3'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+		_src->eTexFormat = BL_TF_ASTC;
+		break;
+	case FOURCC_INTERNAL('E', 'T', 'C', '1'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+		_src->eTexFormat = BL_TF_ETC2;
+		break;
+	case FOURCC_INTERNAL('E', 'T', 'C', '2'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+		_src->eTexFormat = BL_TF_ETC2A1;
+		break;
+	case FOURCC_INTERNAL('E', 'T', 'C', '3'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+		_src->eTexFormat = BL_TF_ETC2A;
+		break;
+	default:assert(0); break;
+	}
+	if (_fourcc == FOURCC_INTERNAL('B', 'M', 'G', 'T'))
+	{
+		BLU8* _data = (BLU8*)malloc(_imagesz);
+		blStreamRead(_stream, _imagesz, _data);
+		BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
+		blRLEDecode(_data, _width * _height * _channels, _data2);
+		free(_data);
+		_src->pTexData = _data2;
+	}
+	else
+	{
+		BLU8* _data = (BLU8*)malloc(_imagesz);
+		blStreamRead(_stream, _imagesz, _data);
+		_src->pTexData = _data;
+	}	
+	blDeleteStream(_stream);
     return TRUE;
 }
 static BLBool
@@ -405,6 +581,13 @@ _UnloadSprite(BLVoid* _Src)
         free(_node->pEmitParam->pAge);
         free(_node->pEmitParam);
     }
+	{
+		FOREACH_DICT(_BLSpriteSheet*, _iter, _node->pTagSheet)
+		{
+			free(_iter);
+		}
+		blDeleteDict(_node->pTagSheet);
+	}
 	_node->bValid = FALSE;
     return TRUE;
 }
@@ -901,8 +1084,23 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLAnsi* _Tag, IN BLF32
 	strcpy(_node->aFilename, _Filename);
     if (_Archive)
         strcpy(_node->aArchive, _Archive);
-    if (_Tag)
-        strcpy(_node->aTag, _Tag);
+	if (_Tag)
+	{
+		BLAnsi* _tmp;
+		BLAnsi* _tag = (BLAnsi*)alloca(strlen(_Tag) + 1);
+		memset(_tag, 0, strlen(_Tag) + 1);
+		strcpy(_tag, _Tag);
+		BLU32 _idx = 0;
+		_tmp = strtok((BLAnsi*)_tag, ",");
+		while (_tmp)
+		{
+			_node->aTag[_idx] = blHashUtf8(_tmp);
+			_tmp = strtok(NULL, ",");
+			_idx++;
+			if (_idx >= 63)
+				break;
+		}
+	}
     _node->nID = blGenGuid(_node, blHashUtf8((const BLUtf8*)_Filename));
 	if (!_node->bTile)
 		_FetchResource(_Filename, _Archive, (BLVoid**)&_node, _node->nID, _LoadSprite, _SpriteSetup, TRUE);

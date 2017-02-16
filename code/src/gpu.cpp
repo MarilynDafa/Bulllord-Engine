@@ -464,6 +464,7 @@ _TextureSize(BLEnum _BLFmt, BLU32 _Width, BLU32 _Height, BLU32 _Depth)
 static BLVoid
 _PipelineStateDefaultGL(BLU32 _Width, BLU32 _Height)
 {
+	GL_CHECK_INTERNAL(glClearColor(0.f, 0.f, 0.f, 0.f));
     GL_CHECK_INTERNAL(glEnable(GL_CULL_FACE));
     GL_CHECK_INTERNAL(glCullFace(GL_BACK));
     GL_CHECK_INTERNAL(glFrontFace(GL_CW));
@@ -1608,6 +1609,22 @@ _GpuAnitIntervention(HWND _Hwnd)
 		wglMakeCurrent(GetDC(_Hwnd), 0);
 		wglDeleteContext(_PrGpuMem->sGLRC);
 	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		{
+			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
+			blDebugOutput("detected texture resource leak: hash>%u", _tex->nHash);
+		}
+	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		{
+			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
+			blDebugOutput("detected geometry buffer resource leak: hash>%u", _geo->nHash);
+		}
+	}
+	blDeleteDict(_PrGpuMem->pTextureCache);
+	blDeleteDict(_PrGpuMem->pBufferCache);
 	free(_PrGpuMem);
 }
 #elif defined(BL_PLATFORM_UWP)
@@ -2238,6 +2255,22 @@ _GpuAnitIntervention()
 	blDeleteDict(_PrGpuMem->sUniformBuffer.pUniforms);
 	for (_idx = 0; _idx < 256; ++_idx)
 		blDeleteArray(_PrGpuMem->sCmdQueue.pRelease[_idx]);
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		{
+			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
+			blDebugOutput("detected texture resource leak: hash>%u", _tex->nHash);
+		}
+	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		{
+			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
+			blDebugOutput("detected geometry buffer resource leak: hash>%u", _geo->nHash);
+		}
+	}
+	blDeleteDict(_PrGpuMem->pTextureCache);
+	blDeleteDict(_PrGpuMem->pBufferCache);
 	free(_PrGpuMem);
 }
 #elif defined(BL_PLATFORM_LINUX)
@@ -2434,6 +2467,22 @@ _GpuAnitIntervention()
 		eglDestroyContext(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglContext);
 		eglTerminate(_PrGpuMem->pEglDisplay);
 	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		{
+			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
+			blDebugOutput("detected texture resource leak: hash>%u", _tex->nHash);
+		}
+	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		{
+			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
+			blDebugOutput("detected geometry buffer resource leak: hash>%u", _geo->nHash);
+		}
+	}
+	blDeleteDict(_PrGpuMem->pTextureCache);
+	blDeleteDict(_PrGpuMem->pBufferCache);
 	free(_PrGpuMem);
 }
 #elif defined(BL_PLATFORM_OSX)
@@ -3329,7 +3378,10 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
     if (_cache)
     {
         blMutexLock(_PrGpuMem->pTextureCache->pMutex);
-        blDictInsert(_PrGpuMem->pTextureCache, _Hash, _tex);
+		_BLGpuRes* _res = (_BLGpuRes*)malloc(sizeof(_BLGpuRes));
+		_res->nRefCount = 1;
+		_res->pRes = _tex;
+        blDictInsert(_PrGpuMem->pTextureCache, _Hash, _res);
         blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
     }
     _tex->nID = blGenGuid(_tex, _Hash);
@@ -3813,6 +3865,7 @@ blDeleteGeometryBuffer(IN BLGuid _GBO)
     {
     }
 #endif
+	free(_geo);
 }
 BLGuid
 blGainGeometryBuffer(IN BLU32 _Hash)

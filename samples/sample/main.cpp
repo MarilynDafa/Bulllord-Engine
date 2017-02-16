@@ -1,13 +1,15 @@
+#include "vld.h"
 #include "../../code/headers/sprite.h"
 #include "../../code/headers/system.h"
 
-
+BLGuid s1;
 const void BeginSystem(void)
 {
 	float x[2] = { 2.0, 4.0 };
 	float y[2] = { 2.0, 4.0 };
-	
-	BLGuid s1;// = blGenSprite("s1", "", "s1", 12, 12, 23, 1);
+	const char* tag = "a1,a2,a3,a4,a5,a6,a7,a8,a9";
+	s1 = blGenSprite("sss.bmg", NULL, tag, 30, 30, 12, 5, 0);
+	// = blGenSprite("s1", "", "s1", 12, 12, 23, 1);
 			  /*
 			  blSpriteActionBegin(s1);
 			  blSpriteParallelBegin(s1);
@@ -36,6 +38,7 @@ const void StepSystem(BLU32)
 
 const void EndSystem(void)
 {
+	blDeleteSprite(s1);
 }
 
 

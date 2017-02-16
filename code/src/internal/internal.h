@@ -57,6 +57,7 @@ extern "C" {
 #define MAX_INTERNAL(x,y) ((x)>(y)?(x):(y))
 /* File */
 #define FILE_INVALID_INTERNAL(fp) ((fp) && (fp) != (BLVoid*)0xFFFFFFFF)
+#define FOURCC_INTERNAL(ch0, ch1, ch2, ch3) ((ch0<<0) + (ch1<<8) + (ch2<<16) + (ch3<<24))
 /* GUID */
 #define URIPART_INTERNAL(val) ((BLU32)(((BLU64)(val)) & 0xFFFFFFFF))
 #define PTRPART_INTERNAL(val) ((BLU32)((((BLU64)(val)) >> 32) & 0xFFFFFFFF))

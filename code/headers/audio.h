@@ -37,8 +37,7 @@ BL_API BLVoid blUseSystemVolume(
 BL_API BLVoid blQueryAudioVolume(
 	OUT BLF32* _Music,
 	OUT BLF32* _System,
-	OUT BLF32* _Env
-	);
+	OUT BLF32* _Env);
 
 BL_API BLVoid blSetListenerPos(
 	IN BLF32 _Xpos,
