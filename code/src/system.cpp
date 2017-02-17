@@ -80,27 +80,27 @@ extern BLVoid _SystemStep();
 extern BLVoid _SystemDestroy();
 #if defined(BL_PLATFORM_WIN32)
 extern BLVoid _GpuIntervention(HWND, BLU32, BLU32, BLBool);
-extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention(HWND);
 #elif defined(BL_PLATFORM_UWP)
 extern BLVoid _GpuIntervention(Windows::UI::Core::CoreWindow^, BLU32, BLU32, BLBool);
-extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_OSX)
 extern BLVoid _GpuIntervention(NSView*, BLU32, BLU32, BLBool);
-extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_IOS)
 extern BLVoid _GpuIntervention(BLBool);
-extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_LINUX)
 extern BLVoid _GpuIntervention(Display*, Window, GLXFBConfig, BLVoid*, BLBool);
-extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_ANDROID)
 extern BLVoid _GpuIntervention(ANativeWindow*, BLU32, BLU32, BLBool);
-extern BLVoid _GpuSwapBuffer(BLBool);
+extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #else
 #	"error what's the fucking platform"
@@ -823,7 +823,6 @@ protected:
 		Windows::ApplicationModel::SuspendingDeferral^ _deferral = _Args->SuspendingOperation->GetDeferral();
 		concurrency::create_task([this, _deferral]()
 		{
-			_GpuSwapBuffer(TRUE);
 			_deferral->Complete();
 		});
 	}
@@ -3101,7 +3100,7 @@ _SystemInit()
 BLVoid
 _SystemStep()
 {
-    blClearFrameBuffer(INVALID_GUID, TRUE, TRUE, FALSE);
+    blClearFrameBuffer(INVALID_GUID, TRUE, TRUE, TRUE);
     BLU32 _now = blSystemTicks();
     BLU32 _delta = _now - _PrSystemMem->nSysTime;
     _PrSystemMem->nSysTime = _now;
@@ -3122,7 +3121,7 @@ _SystemStep()
 		_PollEvent();
         _PrSystemMem->pStepFunc(_delta);
         if (_GbSystemRunning == 1)
-            _GpuSwapBuffer(FALSE);
+            _GpuSwapBuffer();
 	}
 	else
 	{
@@ -3138,7 +3137,7 @@ _SystemStep()
 		_StreamIOStep(_delta);
         _PrSystemMem->pStepFunc(_delta);
 		if (_GbSystemRunning == 1)
-			_GpuSwapBuffer(FALSE);
+			_GpuSwapBuffer();
 	}
 }
 BLVoid
@@ -3190,20 +3189,13 @@ blPlatformIdentity()
 BLU32
 blSystemTicks()
 {
-#if defined(BL_PLATFORM_WIN32)
-    LARGE_INTEGER _litime, _lifreq;
-    QueryPerformanceFrequency(&_litime);
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+	static LARGE_INTEGER _litime = { 0 };
+	if (_litime.QuadPart == 0)
+		QueryPerformanceFrequency(&_litime);
+    LARGE_INTEGER _lifreq;
     QueryPerformanceCounter(&_lifreq);
-    long _sec = (long)(_litime.QuadPart / _lifreq.QuadPart);
-    long _usec = (long)(_litime.QuadPart * 1000000.0 / _lifreq.QuadPart - _sec * 1000000.0);
-    return (BLU32)(_sec * 1000 + _usec / 1000.0f);
-#elif defined(BL_PLATFORM_UWP)
-    LARGE_INTEGER _litime, _lifreq;
-    QueryPerformanceFrequency(&_litime);
-    QueryPerformanceCounter(&_lifreq);
-    long _sec = (long)(_litime.QuadPart / _lifreq.QuadPart);
-    long _usec = (long)(_litime.QuadPart * 1000000.0 / _lifreq.QuadPart - _sec * 1000000.0);
-    return _sec + _usec / 1000000.0f;
+    return (BLU32)((_lifreq.QuadPart) * 1000 / _litime.QuadPart);
 #elif defined(BL_PLATFORM_LINUX)
     struct timeval _val;
     gettimeofday(&_val, NULL);

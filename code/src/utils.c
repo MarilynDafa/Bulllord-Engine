@@ -1136,10 +1136,14 @@ BLVoid
 blDeColor4F(IN BLU32 _Clr, OUT BLF32 _Clrf[4])
 {
     BLF32 _inv = 1.0f / 255.0f;
-    _Clrf[3] = _inv * (BLF32)(_Clr >> 24);
-    _Clrf[2] = _inv * (BLF32)(_Clr >> 16);
-    _Clrf[1] = _inv * (BLF32)(_Clr >>  8);
-    _Clrf[0] = _inv * (BLF32)(_Clr >>  0);
+	BLU8 _a = (BLU8)(_Clr >> 24);
+	BLU8 _b = (BLU8)(_Clr >> 16);
+	BLU8 _g = (BLU8)(_Clr >> 8);
+	BLU8 _r = (BLU8)(_Clr >> 0);
+	_Clrf[3] = _inv * _a;
+	_Clrf[2] = _inv * _b;
+	_Clrf[1] = _inv * _g;
+	_Clrf[0] = _inv * _r;
 }
 BLVoid
 blRLEDecode(IN BLU8* _Src, IN BLU32 _Dstlen, INOUT BLU8* _Dst)

@@ -111,6 +111,9 @@ typedef struct _SpriteNode{
 	BLU32 nTexHeight;
     BLGuid nID;
     BLU32 aTag[64];
+	BLU32 nFrameNum;
+	BLU32 nCurFrame;
+	BLU32 nTimePassed;
 	BLAnsi aFilename[260];
 	BLAnsi aArchive[260];
     BLGuid nGBO;
@@ -285,37 +288,39 @@ _SpriteSetup(BLVoid* _Src)
         _AddToNodeList(_node);
     BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
     BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+	BLF32 _rgba[4];
+	blDeColor4F(_node->nDyeColor, _rgba);
     BLF32 _vbo[] = {
         -_node->sSize.fX * 0.5f,
         -_node->sSize.fY * 0.5f,
-        1.f,
-        1.f,
-        1.f,
-        1.f,
+		_rgba[0],
+		_rgba[1],
+		_rgba[2],
+		_rgba[3],
         0.f,
         0.f,
         _node->sSize.fX * 0.5f,
         -_node->sSize.fY * 0.5f,
-        1.f,
-        1.f,
-        1.f,
-        1.f,
+		_rgba[0],
+		_rgba[1],
+		_rgba[2],
+		_rgba[3],
         1.f,
         0.f,
         -_node->sSize.fX * 0.5f,
         _node->sSize.fY * 0.5f,
-        1.f,
-        1.f,
-        1.f,
-        1.f,
+		_rgba[0],
+		_rgba[1],
+		_rgba[2],
+		_rgba[3],
         0.f,
         1.f,
         _node->sSize.fX * 0.5f,
         _node->sSize.fY * 0.5f,
-        1.f,
-        1.f,
-        1.f,
-        1.f,
+		_rgba[0],
+		_rgba[1],
+		_rgba[2],
+		_rgba[3],
         1.f,
         1.f
     };
@@ -754,10 +759,33 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
         if (_PrSpriteMem->fShakingTime < 0.f)
             _PrSpriteMem->bShaking = FALSE;
     }
-    BLF32 _minx = -_Node->sSize.fX * 0.5f;
-    BLF32 _miny = -_Node->sSize.fY * 0.5f;
-    BLF32 _maxx = _Node->sSize.fX * 0.5f;
-    BLF32 _maxy = _Node->sSize.fY * 0.5f;
+	if (_Node->nFrameNum > 1)
+	{
+		_Node->nTimePassed += _Delta;
+		if (_Node->nTimePassed >= 1000 / _Node->nFPS)
+		{
+			_Node->nTimePassed = 0;
+			_Node->nCurFrame++;
+			if (_Node->nCurFrame >= _Node->nFrameNum)
+				_Node->nCurFrame = 0;
+		}
+	}
+	_BLSpriteSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
+	BLF32 _minx, _miny, _maxx, _maxy;
+	if (!_ss)
+	{
+		_minx = -_Node->sSize.fX * 0.5f;
+		_miny = -_Node->sSize.fY * 0.5f;
+		_maxx = _Node->sSize.fX * 0.5f;
+		_maxy = _Node->sSize.fY * 0.5f;
+	}
+	else
+	{
+		_minx = -_Node->sSize.fX * 0.5f + _ss->nOffsetX;
+		_miny = -_Node->sSize.fY * 0.5f + _ss->nOffsetY;
+		_maxx = _minx + _ss->nRBx - _ss->nLTx;
+		_maxy = _miny + _ss->nRBy - _ss->nLTy;
+	}
     BLF32 _ltx = (_minx * _Mat[0]) + (_miny * _Mat[2]) + _Mat[4];
     BLF32 _lty = (_minx * _Mat[1]) + (_miny * _Mat[3]) + _Mat[5];
     BLF32 _rtx = (_maxx * _Mat[0]) + (_miny * _Mat[2]) + _Mat[4];
@@ -828,61 +856,70 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
                 break;
             }
         }
-        blDraw(_PrSpriteMem->nEmitTech, _Node->nGBO, _Node->pEmitParam->nCurAlive);
     }
-    else
-    {
-        BLF32 _vbo[] = {
-            _ltx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-            _lty + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            0.f,
-            0.f,
-            _rtx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-            _rty + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            0.f,
-            _lbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-            _lby + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            0.f,
-            1.f,
-            _rbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-            _rby + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            1.f
-        };
-        blUpdateGeometryBuffer(_Node->nGBO, 0, (const BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-        blDraw(_PrSpriteMem->nSpriteTech, _Node->nGBO, 1);
-    }
+	if (_ss)
+	{
+		BLF32 _lttx, _ltty, _rttx, _rtty, _lbtx, _lbty, _rbtx, _rbty;
+		_lbtx = _lttx = (BLF32)_ss->nLTx / (BLF32)_Node->nTexWidth;
+		_rtty = _ltty = (BLF32)_ss->nLTy / (BLF32)_Node->nTexHeight;
+		_rbtx = _rttx = (BLF32)_ss->nRBx / (BLF32)_Node->nTexWidth;
+		_rbty = _lbty = (BLF32)_ss->nRBy / (BLF32)_Node->nTexHeight;
+		BLF32 _rgba[4];
+		blDeColor4F(_Node->nDyeColor, _rgba);
+		BLF32 _vbo[] = {
+			_ltx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+			_lty + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+			_rgba[0],
+			_rgba[1],
+			_rgba[2],
+			_rgba[3],
+			_lttx,
+			_ltty,
+			_rtx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+			_rty + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+			_rgba[0],
+			_rgba[1],
+			_rgba[2],
+			_rgba[3],
+			_rttx,
+			_rtty,
+			_lbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+			_lby + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+			_rgba[0],
+			_rgba[1],
+			_rgba[2],
+			_rgba[3],
+			_lbtx,
+			_lbty,
+			_rbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+			_rby + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+			_rgba[0],
+			_rgba[1],
+			_rgba[2],
+			_rgba[3],
+			_rbtx,
+			_rbty
+		};
+		blUpdateGeometryBuffer(_Node->nGBO, 0, (const BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		if (_Node->pEmitParam)
+			blDraw(_PrSpriteMem->nEmitTech, _Node->nGBO, _Node->pEmitParam->nCurAlive);
+		else
+			blDraw(_PrSpriteMem->nSpriteTech, _Node->nGBO, 1);
+	}
 	for (BLU32 _idx = 0; _idx < _Node->nChildren; ++_idx)
 	{
 		_BLSpriteNode* _chnode = _Node->pChildren[_idx];
 		BLF32 _mat[6], _rmat[6];
 		BLF32 _cos = cosf(_chnode->fRotate);
 		BLF32 _sin = sinf(_chnode->fRotate);
-		BLF32 _pivotx = (0.5f - _chnode->sPivot.fX) * _chnode->sSize.fX;
-		BLF32 _pivoty = (0.5f - _chnode->sPivot.fY) * _chnode->sSize.fY;
+		BLF32 _pivotx = (_chnode->sPivot.fX - 0.5f) * _chnode->sSize.fX;
+		BLF32 _pivoty = (_chnode->sPivot.fY - 0.5f) * _chnode->sSize.fY;
 		_mat[0] = (_chnode->fScaleX * _cos);
 		_mat[1] = (_chnode->fScaleX * _sin);
 		_mat[2] = (-_chnode->fScaleY * _sin);
 		_mat[3] = (_chnode->fScaleY * _cos);
-		_mat[4] = ((-_pivotx * _chnode->fScaleX) * _cos) + ((_pivoty * _chnode->fScaleY) * _sin) + _pivotx + _chnode->sPos.fX;
-		_mat[5] = ((-_pivotx * _chnode->fScaleX) * _sin) + ((-_pivoty * _chnode->fScaleY) * _cos) + _pivoty + _chnode->sPos.fY;
+		_mat[4] = ((-_pivotx * _chnode->fScaleX) * _cos) + ((_pivoty * _chnode->fScaleY) * _sin) + _chnode->sPos.fX;
+		_mat[5] = ((-_pivotx * _chnode->fScaleX) * _sin) + ((-_pivoty * _chnode->fScaleY) * _cos) + _chnode->sPos.fY;
 		_rmat[0] = (_mat[0] * _Mat[0]) + (_mat[1] * _Mat[2]);
 		_rmat[1] = (_mat[0] * _Mat[1]) + (_mat[1] * _Mat[3]);
 		_rmat[2] = (_mat[2] * _Mat[0]) + (_mat[3] * _Mat[2]);
@@ -997,14 +1034,14 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
                         BLF32 _mat[6];
                         BLF32 _cos = cosf(_nodeiter->fRotate);
                         BLF32 _sin = sinf(_nodeiter->fRotate);
-                        BLF32 _pivotx = (0.5f - _nodeiter->sPivot.fX) * _nodeiter->sSize.fX;
-                        BLF32 _pivoty = (0.5f - _nodeiter->sPivot.fY) * _nodeiter->sSize.fY;
+                        BLF32 _pivotx = (_nodeiter->sPivot.fX - 0.5f) * _nodeiter->sSize.fX;
+                        BLF32 _pivoty = (_nodeiter->sPivot.fY - 0.5f) * _nodeiter->sSize.fY;
                         _mat[0] = (_nodeiter->fScaleX * _cos);
                         _mat[1] = (_nodeiter->fScaleX * _sin);
                         _mat[2] = (-_nodeiter->fScaleY * _sin);
                         _mat[3] = (_nodeiter->fScaleY * _cos);
-                        _mat[4] = ((-_pivotx * _nodeiter->fScaleX) * _cos) + ((_pivoty * _nodeiter->fScaleY) * _sin) + _pivotx + _nodeiter->sPos.fX;
-                        _mat[5] = ((-_pivotx * _nodeiter->fScaleX) * _sin) + ((-_pivoty * _nodeiter->fScaleY) * _cos) + _pivoty + _nodeiter->sPos.fY;
+                        _mat[4] = ((-_pivotx * _nodeiter->fScaleX) * _cos) + ((_pivoty * _nodeiter->fScaleY) * _sin) + _nodeiter->sPos.fX;
+                        _mat[5] = ((-_pivotx * _nodeiter->fScaleX) * _sin) + ((-_pivoty * _nodeiter->fScaleY) * _cos) + _nodeiter->sPos.fY;
                         _SpriteDraw(_Delta, _nodeiter, _mat);
                     }
                 }
@@ -1022,8 +1059,8 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
             _mat[1] = (_node->fScaleX * _sin);
             _mat[2] = (-_node->fScaleY * _sin);
             _mat[3] = (_node->fScaleY * _cos);
-            _mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _pivotx + _node->sPos.fX;
-            _mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _pivoty + _node->sPos.fY;
+            _mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX;
+            _mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY;
             _SpriteDraw(_Delta, _node, _mat);
         }
     }
@@ -1078,6 +1115,9 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLAnsi* _Tag, IN BLF32
 	_node->bTile = _AsTile;
     _node->bShow = _AsTile ? FALSE : TRUE;
 	_node->bValid = FALSE;
+	_node->nTimePassed = 0;
+	_node->nCurFrame = 0;
+	_node->nFrameNum = 1;
     memset(_node->aTag, 0, sizeof(_node->aTag));
 	memset(_node->aFilename, 0, sizeof(_node->aFilename));
 	memset(_node->aArchive, 0, sizeof(_node->aArchive));
@@ -1090,14 +1130,14 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLAnsi* _Tag, IN BLF32
 		BLAnsi* _tag = (BLAnsi*)alloca(strlen(_Tag) + 1);
 		memset(_tag, 0, strlen(_Tag) + 1);
 		strcpy(_tag, _Tag);
-		BLU32 _idx = 0;
+		_node->nFrameNum = 0;
 		_tmp = strtok((BLAnsi*)_tag, ",");
 		while (_tmp)
 		{
-			_node->aTag[_idx] = blHashUtf8(_tmp);
+			_node->aTag[_node->nFrameNum] = blHashUtf8(_tmp);
 			_tmp = strtok(NULL, ",");
-			_idx++;
-			if (_idx >= 63)
+			_node->nFrameNum++;
+			if (_node->nFrameNum >= 63)
 				break;
 		}
 	}

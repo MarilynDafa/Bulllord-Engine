@@ -24,6 +24,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+BL_API BLVoid blVSync(
+	IN BLBool _On);
 
 BL_API BLVoid blQueryHardwareCaps(
 	OUT BLEnum* _Api,
