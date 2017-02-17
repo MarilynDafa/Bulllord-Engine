@@ -1180,27 +1180,6 @@ extern "C" {
         BL_KC_POWER
     };
 #endif
-    /* Image Block Info*/
-    static const BLU8 BLOCK_INFO_BPP_INTERNAL[] =
-    {
-        4, 8, 4, 8, 4, 2, 4, 4, 8, 0, 8, 8, 8, 8, 16, 16, 16, 16, 16, 32, 32, 32, 16, 16, 16, 16, 32, 32, 32, 32, 32, 64, 64, 64, 24, 24, 24,
-        24, 32, 32, 32, 32, 32, 32, 64, 64, 64, 64, 64, 128, 128, 128, 32, 32, 0, 16, 24, 32, 32, 16, 24, 32, 8
-    };
-    static const BLU8 BLOCK_INFO_W_INTERNAL[] =
-    {
-        4, 4, 4, 4, 4, 8, 4, 4, 4, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1
-    };
-    static const BLU8 BLOCK_INFO_H_INTERNAL[] =
-    {
-        4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1
-    };
-    static const BLU8 BLOCK_INFO_MIN_INTERNAL[] =
-    {
-        1, 1, 1, 1, 1, 2, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1
-    };
 #if (defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX))
 #define GL_PROTO_INTERNAL(type, func) extern type func;
     GL_PROTO_INTERNAL(PFNGLCULLFACEPROC, glCullFace)

@@ -1,6 +1,10 @@
 #include "vld.h"
 #include "../../code/headers/sprite.h"
 #include "../../code/headers/system.h"
+//glow
+//Scissor
+//srgb
+//framebuffer
 
 BLGuid s1;
 const void BeginSystem(void)
@@ -9,8 +13,15 @@ const void BeginSystem(void)
 	float y[2] = { 2.0, 4.0 };
 	const char* tag = "a1,a2,a3,a4,a5,a6,a7,a8,a9";
 	s1 = blGenSprite("sss.bmg", NULL, tag, 640, 480, 12, 6, 0);
-	blSpritePivot(s1, 0, 0, 1);
-	//blSpriteMove(s1, 400, 400);
+	//s1 = blGenSprite("cursor.bmg", NULL, "cursor", 60, 60, 12, 1, 0);
+	//s1 = blGenSprite("uv.bmg", NULL, NULL, 200, 200, 12, 1, 0);
+	
+	//blSpriteAsCursor(s1);
+	//blSpritePivot(s1, 0, 0, 1);
+	blSpriteMove(s1, 400, 400);
+	blSpriteStroke(s1, 0xFF00FFFF, 2, 0);
+	blSpriteScissor(s1, 0, 0, 390, 390);
+	//blSpriteAlpha(s1, 0.1, 1);
 	// = blGenSprite("s1", "", "s1", 12, 12, 23, 1);
 			  /*
 			  blSpriteParallelBegin(s1);

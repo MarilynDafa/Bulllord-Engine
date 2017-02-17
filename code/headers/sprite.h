@@ -82,12 +82,6 @@ BL_API BLBool blSpriteZValue(
     IN BLF32 _Zv,
     IN BLBool _Passdown);
 
-BL_API BLBool blSpriteUV(
-	IN BLGuid _ID,
-	IN BLF32 _Uu,
-	IN BLF32 _Vv,
-	IN BLBool _Passdown);
-
 BL_API BLBool blSpriteStroke(
 	IN BLGuid _ID,
 	IN BLU32 _Color,
@@ -201,10 +195,11 @@ BL_API BLBool blSpriteActionScale(
 BL_API BLBool blSpriteActionAlpha(
 	IN BLGuid _ID,
 	IN BLF32 _Alpha,
+	IN BLBool _Reverse,
 	IN BLF32 _Time,
 	IN BLBool _Loop);
     
-BL_API BLVoid blViewport(
+BL_API BLVoid blViewportQuery(
     OUT BLF32* _LTPosX,
     OUT BLF32* _LTPosY,
     OUT BLF32* _RBPosX,

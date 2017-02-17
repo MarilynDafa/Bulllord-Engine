@@ -60,6 +60,7 @@ typedef struct _SpriteAction{
 		struct _Alpha {
 			BLF32 fInitAlpha;
 			BLF32 fAlpha;
+			BLBool bReverse;
 		}sAlpha;
 		struct _Dead {
 			BLBool bDead;
@@ -121,7 +122,6 @@ typedef struct _SpriteNode{
     BLVec2 sSize;
     BLVec2 sPos;
     BLVec2 sPivot;
-	BLVec2 sUVScroll;
     BLRect sScissor;
 	BLU32 nFPS;
     BLF32 fRotate;
@@ -142,7 +142,8 @@ typedef struct _SpriteNode{
 }_BLSpriteNode;
 typedef struct _SpriteMember {
     BLGuid nSpriteTech;
-    BLGuid nEmitTech;
+    BLGuid nSpriteInstTech;
+	BLGuid nSpriteStrokeTech;
     _BLSpriteNode** pNodeList;
 	_BLSpriteNode* pCursor;
 	BLArray* pTileArray;
@@ -296,7 +297,7 @@ _SpriteSetup(BLVoid* _Src)
 		_rgba[0],
 		_rgba[1],
 		_rgba[2],
-		_rgba[3],
+		_node->fAlpha,
         0.f,
         0.f,
         _node->sSize.fX * 0.5f,
@@ -304,7 +305,7 @@ _SpriteSetup(BLVoid* _Src)
 		_rgba[0],
 		_rgba[1],
 		_rgba[2],
-		_rgba[3],
+		_node->fAlpha,
         1.f,
         0.f,
         -_node->sSize.fX * 0.5f,
@@ -312,7 +313,7 @@ _SpriteSetup(BLVoid* _Src)
 		_rgba[0],
 		_rgba[1],
 		_rgba[2],
-		_rgba[3],
+		_node->fAlpha,
         0.f,
         1.f,
         _node->sSize.fX * 0.5f,
@@ -320,7 +321,7 @@ _SpriteSetup(BLVoid* _Src)
 		_rgba[0],
 		_rgba[1],
 		_rgba[2],
-		_rgba[3],
+		_node->fAlpha,
         1.f,
         1.f
     };
@@ -477,6 +478,8 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 		blStreamRead(_stream, sizeof(BLU32), &_ss->nOffsetX);
 		blStreamRead(_stream, sizeof(BLU32), &_ss->nOffsetY);
 		blDictInsert(_src->pTagSheet, _ss->nTag, _ss);
+		if (_src->nFrameNum == 1)
+			_src->aTag[0] = _ss->nTag;
 	}
 	blStreamSeek(_stream, _offset);
 	BLU32 _imagesz;
@@ -484,7 +487,7 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 	{
 	case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
 		blStreamRead(_stream, sizeof(BLU32), &_imagesz);
-		_src->eTexFormat = BL_TF_RGBA8;
+		_src->eTexFormat = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
 		break;
 	case FOURCC_INTERNAL('S', '3', 'T', '1'):
 		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
@@ -660,7 +663,15 @@ _SpriteUpdate(BLU32 _Delta)
 				break;
 				case SPACTION_ALPHA_INTERNAL:
 				{
-					_node->fAlpha = _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;
+					if (_action->uAction.sAlpha.bReverse)
+					{
+						if (_action->fCurTime * 2 <= _action->fTotalTime)
+							_node->fAlpha = 2 * _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;
+						else
+							_node->fAlpha = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fAlpha;
+					}
+					else
+						_node->fAlpha = _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;
 				}
 				break;
 				case SPACTION_DEAD_INTERNAL:
@@ -752,6 +763,12 @@ _SpriteUpdate(BLU32 _Delta)
 static BLVoid
 _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 {
+	BLU32 _w, _h;
+	blUIQueryResolution(&_w, &_h);
+	if (_Node->sScissor.sLT.fX < 0.f)
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _w, _h);
+	else
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_Node->sScissor.sLT.fX, (BLU32)_Node->sScissor.sLT.fY, (BLU32)_Node->sScissor.sRB.fX, (BLU32)_Node->sScissor.sRB.fY);
     if (_PrSpriteMem->bShaking)
     {
         _PrSpriteMem->fShakingForce = - _PrSpriteMem->fShakingForce;
@@ -781,10 +798,10 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 	}
 	else
 	{
-		_minx = -_Node->sSize.fX * 0.5f + _ss->nOffsetX;
-		_miny = -_Node->sSize.fY * 0.5f + _ss->nOffsetY;
-		_maxx = _minx + _ss->nRBx - _ss->nLTx;
-		_maxy = _miny + _ss->nRBy - _ss->nLTy;
+		_minx = -_Node->sSize.fX * 0.5f + _ss->nOffsetX - _Node->nStrokePixel;
+		_miny = -_Node->sSize.fY * 0.5f + _ss->nOffsetY - _Node->nStrokePixel;
+		_maxx = _minx + _ss->nRBx - _ss->nLTx + _Node->nStrokePixel;
+		_maxy = _miny + _ss->nRBy - _ss->nLTy + _Node->nStrokePixel;
 	}
     BLF32 _ltx = (_minx * _Mat[0]) + (_miny * _Mat[2]) + _Mat[4];
     BLF32 _lty = (_minx * _Mat[1]) + (_miny * _Mat[3]) + _Mat[5];
@@ -856,14 +873,29 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
                 break;
             }
         }
+		blTechSampler(_PrSpriteMem->nSpriteInstTech, "Texture0", _Node->nTex, 0);
     }
-	if (_ss)
+	else if (_Node->nStrokePixel > 0)
+	{
+		blTechSampler(_PrSpriteMem->nSpriteStrokeTech, "Texture0", _Node->nTex, 0);
+		BLF32 _stroke[4];
+		blDeColor4F(_Node->nStrokeColor, _stroke);
+		_stroke[3] = (BLF32)_Node->nStrokePixel;
+		blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X4, "Stroke", _stroke, sizeof(_stroke));
+		BLF32 _texsize[] = { (BLF32)_Node->nTexWidth, (BLF32)_Node->nTexHeight };
+		blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "TexSize", _texsize, sizeof(_texsize));
+		BLF32 _border[] = { (BLF32)_ss->nLTx - (BLF32)_Node->nStrokePixel, (BLF32)_ss->nLTy - (BLF32)_Node->nStrokePixel, (BLF32)_ss->nRBx + (BLF32)_Node->nStrokePixel, (BLF32)_ss->nRBy + (BLF32)_Node->nStrokePixel };
+		blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X4, "Border", _border, sizeof(_border));
+	}
+	else
+		blTechSampler(_PrSpriteMem->nSpriteTech, "Texture0", _Node->nTex, 0);
+	if (_ss && _Node->bShow)
 	{
 		BLF32 _lttx, _ltty, _rttx, _rtty, _lbtx, _lbty, _rbtx, _rbty;
-		_lbtx = _lttx = (BLF32)_ss->nLTx / (BLF32)_Node->nTexWidth;
-		_rtty = _ltty = (BLF32)_ss->nLTy / (BLF32)_Node->nTexHeight;
-		_rbtx = _rttx = (BLF32)_ss->nRBx / (BLF32)_Node->nTexWidth;
-		_rbty = _lbty = (BLF32)_ss->nRBy / (BLF32)_Node->nTexHeight;
+		_lbtx = _lttx = (BLF32)((BLS32)_ss->nLTx - (BLS32)_Node->nStrokePixel) / (BLF32)_Node->nTexWidth;
+		_rtty = _ltty = (BLF32)((BLS32)_ss->nLTy - (BLS32)_Node->nStrokePixel) / (BLF32)_Node->nTexHeight;
+		_rbtx = _rttx = (BLF32)((BLS32)_ss->nRBx + (BLS32)_Node->nStrokePixel) / (BLF32)_Node->nTexWidth;
+		_rbty = _lbty = (BLF32)((BLS32)_ss->nRBy + (BLS32)_Node->nStrokePixel) / (BLF32)_Node->nTexHeight;
 		BLF32 _rgba[4];
 		blDeColor4F(_Node->nDyeColor, _rgba);
 		BLF32 _vbo[] = {
@@ -872,7 +904,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			_rgba[0],
 			_rgba[1],
 			_rgba[2],
-			_rgba[3],
+			_Node->fAlpha,
 			_lttx,
 			_ltty,
 			_rtx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
@@ -880,7 +912,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			_rgba[0],
 			_rgba[1],
 			_rgba[2],
-			_rgba[3],
+			_Node->fAlpha,
 			_rttx,
 			_rtty,
 			_lbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
@@ -888,7 +920,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			_rgba[0],
 			_rgba[1],
 			_rgba[2],
-			_rgba[3],
+			_Node->fAlpha,
 			_lbtx,
 			_lbty,
 			_rbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
@@ -896,13 +928,15 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			_rgba[0],
 			_rgba[1],
 			_rgba[2],
-			_rgba[3],
+			_Node->fAlpha,
 			_rbtx,
 			_rbty
 		};
 		blUpdateGeometryBuffer(_Node->nGBO, 0, (const BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 		if (_Node->pEmitParam)
-			blDraw(_PrSpriteMem->nEmitTech, _Node->nGBO, _Node->pEmitParam->nCurAlive);
+			blDraw(_PrSpriteMem->nSpriteInstTech, _Node->nGBO, _Node->pEmitParam->nCurAlive);
+		else if (_Node->nStrokePixel > 0)
+			blDraw(_PrSpriteMem->nSpriteStrokeTech, _Node->nGBO, 1);
 		else
 			blDraw(_PrSpriteMem->nSpriteTech, _Node->nGBO, 1);
 	}
@@ -940,8 +974,9 @@ _SpriteInit()
     _PrSpriteMem->bShaking = FALSE;
 	_PrSpriteMem->pTileArray = blGenArray(FALSE);
 	blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
-    _PrSpriteMem->nSpriteTech = blGenTechnique("test.bsl", NULL, FALSE, FALSE);
-    _PrSpriteMem->nEmitTech = blGenTechnique("test2.bsl", NULL, FALSE, FALSE);
+    _PrSpriteMem->nSpriteTech = blGenTechnique("2D.bsl", NULL, FALSE, FALSE);
+    _PrSpriteMem->nSpriteInstTech = blGenTechnique("2DInstance.bsl", NULL, FALSE, FALSE);
+	_PrSpriteMem->nSpriteStrokeTech = blGenTechnique("2DStroke.bsl", NULL, FALSE, FALSE);
 }
 BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)
@@ -949,54 +984,27 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
     BLU32 _w, _h;
     blUIQueryResolution(&_w, &_h);
     BLF32 _screensz[] = { 2.f / (BLF32)_w, 2.f / (BLF32)_h };
-    blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "screensz", _screensz, sizeof(_screensz));
-    blTechUniform(_PrSpriteMem->nEmitTech, BL_UB_F32X2, "screensz", _screensz, sizeof(_screensz));
+    blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
+    blTechUniform(_PrSpriteMem->nSpriteInstTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
+	blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
+	BLU8 _blendfactor[4] = { 0 };
+	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor);
     if (_Cursor)
     {
         if (!_PrSpriteMem->pCursor)
             return;
         if (!_PrSpriteMem->pCursor->bValid)
             return;
-        BLF32 _minx = -_PrSpriteMem->pCursor->sSize.fX * 0.5f;
-        BLF32 _miny = -_PrSpriteMem->pCursor->sSize.fY * 0.5f;
-        BLF32 _maxx = _PrSpriteMem->pCursor->sSize.fX * 0.5f;
-        BLF32 _maxy = _PrSpriteMem->pCursor->sSize.fY * 0.5f;
-        BLF32 _vbo[] = {
-            _minx + _PrSpriteMem->pCursor->sPos.fX + _PrSpriteMem->pCursor->sPivot.fX,
-            _miny + _PrSpriteMem->pCursor->sPos.fY + _PrSpriteMem->pCursor->sPivot.fY,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            0.f,
-            0.f,
-            _maxx + _PrSpriteMem->pCursor->sPos.fX + _PrSpriteMem->pCursor->sPivot.fX,
-            _miny + _PrSpriteMem->pCursor->sPos.fY + _PrSpriteMem->pCursor->sPivot.fY,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            0.f,
-            _minx + _PrSpriteMem->pCursor->sPos.fX + _PrSpriteMem->pCursor->sPivot.fX,
-            _maxy + _PrSpriteMem->pCursor->sPos.fY + _PrSpriteMem->pCursor->sPivot.fY,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            0.f,
-            1.f,
-            _maxx + _PrSpriteMem->pCursor->sPos.fX + _PrSpriteMem->pCursor->sPivot.fX,
-            _maxy + _PrSpriteMem->pCursor->sPos.fY + _PrSpriteMem->pCursor->sPivot.fY,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            1.f
-        };
-        blUpdateGeometryBuffer(_PrSpriteMem->pCursor->nGBO, 0, (const BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-        blDraw(_PrSpriteMem->nSpriteTech, _PrSpriteMem->pCursor->nGBO, 1);
+		BLF32 _mat[6];
+		BLF32 _pivotx = (_PrSpriteMem->pCursor->sPivot.fX - 0.5f) * _PrSpriteMem->pCursor->sSize.fX;
+		BLF32 _pivoty = (_PrSpriteMem->pCursor->sPivot.fY - 0.5f) * _PrSpriteMem->pCursor->sSize.fY;
+		_mat[0] = _PrSpriteMem->pCursor->fScaleX;
+		_mat[1] = 0;
+		_mat[2] = 0;
+		_mat[3] = _PrSpriteMem->pCursor->fScaleY;
+		_mat[4] = (-_pivotx * _PrSpriteMem->pCursor->fScaleX) + _PrSpriteMem->pCursor->sPos.fX;
+		_mat[5] = (-_pivoty * _PrSpriteMem->pCursor->fScaleY) + _PrSpriteMem->pCursor->sPos.fY;
+		_SpriteDraw(_Delta, _PrSpriteMem->pCursor, _mat);
     }
     else
     {
@@ -1079,7 +1087,8 @@ _SpriteDestroy()
     if (_PrSpriteMem->pNodeList)
         free(_PrSpriteMem->pNodeList);
     blDeleteTechnique(_PrSpriteMem->nSpriteTech);
-    blDeleteTechnique(_PrSpriteMem->nEmitTech);
+    blDeleteTechnique(_PrSpriteMem->nSpriteInstTech);
+	blDeleteTechnique(_PrSpriteMem->nSpriteStrokeTech);
     free(_PrSpriteMem);
 }
 BLGuid
@@ -1091,9 +1100,8 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLAnsi* _Tag, IN BLF32
     _node->sSize.fY = _Height;
     _node->sPos.fX = _node->sPos.fY = 0.f;
     _node->sPivot.fX = _node->sPivot.fY = 0.5f;
-    _node->sScissor.sLT.fX = _node->sScissor.sLT.fY = 0.f;
-    _node->sScissor.sRB.fX = _node->sScissor.sRB.fY = 0.f;
-	_node->sUVScroll.fX = _node->sUVScroll.fY = 0.f;
+    _node->sScissor.sLT.fX = _node->sScissor.sLT.fY = -1.f;
+    _node->sScissor.sRB.fX = _node->sScissor.sRB.fY = -1.f;
     _node->pParent = NULL;
     _node->pChildren = NULL;
     _node->pAction = NULL;
@@ -1376,23 +1384,6 @@ blSpriteZValue(IN BLGuid _ID, IN BLF32 _Zv, IN BLBool _Passdown)
             blSpriteZValue(_tmp[_idx]->nID, _Zv, _Passdown);
     }
     return TRUE;
-}
-BLBool 
-blSpriteUV(IN BLGuid _ID, IN BLF32 _Uu, IN BLF32 _Vv, IN BLBool _Passdown)
-{
-	if (_ID == INVALID_GUID)
-		return FALSE;
-	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
-	if (!_node)
-		return FALSE;
-	_node->sUVScroll.fX = blScalarClamp(_Uu, 0.f, 1.f);
-	_node->sUVScroll.fY = blScalarClamp(_Vv, 0.f, 1.f);
-	if (_Passdown)
-	{
-		for (BLU32 _idx = 0; _idx < _node->nChildren; ++_idx)
-			blSpriteUV(_node->pChildren[_idx]->nID, _Uu, _Vv, _Passdown);
-	}
-	return TRUE;
 }
 BLBool
 blSpriteStroke(IN BLGuid _ID, IN BLU32 _Color, IN BLU32 _Pixel, IN BLBool _Passdown)
@@ -1840,7 +1831,7 @@ blSpriteActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool
     return TRUE;
 }
 BLBool
-blSpriteActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLF32 _Time, IN BLBool _Loop)
+blSpriteActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
 {
     if (_ID == INVALID_GUID)
         return FALSE;
@@ -1859,6 +1850,7 @@ blSpriteActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLF32 _Time, IN BLBool _L
 	_act->fTotalTime = _Time;
 	_act->uAction.sAlpha.fInitAlpha = _node->fAlpha;
 	_act->uAction.sAlpha.fAlpha = _Alpha;
+	_act->uAction.sAlpha.bReverse = _Reverse;
 	if (!_node->pAction)
 	{
 		_node->pAction = _act;
@@ -1881,7 +1873,7 @@ blSpriteActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLF32 _Time, IN BLBool _L
     return TRUE;
 }
 BLVoid
-blViewport(OUT BLF32* _LTPosX, OUT BLF32* _LTPosY, OUT BLF32* _RBPosX, OUT BLF32* _RBPosY)
+blViewportQuery(OUT BLF32* _LTPosX, OUT BLF32* _LTPosY, OUT BLF32* _RBPosX, OUT BLF32* _RBPosY)
 {
     *_LTPosX = _PrSpriteMem->sViewport.sLT.fX;
     *_LTPosY = _PrSpriteMem->sViewport.sLT.fY;
