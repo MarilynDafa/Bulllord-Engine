@@ -2,10 +2,11 @@
 #include "../../code/headers/sprite.h"
 #include "../../code/headers/system.h"
 //glow
-//Scissor
-//srgb
-//framebuffer
+//tmx
+//ui
 
+//framebuffer
+//srgb
 BLGuid s1;
 const void BeginSystem(void)
 {
@@ -19,8 +20,9 @@ const void BeginSystem(void)
 	//blSpriteAsCursor(s1);
 	//blSpritePivot(s1, 0, 0, 1);
 	blSpriteMove(s1, 400, 400);
-	blSpriteStroke(s1, 0xFF00FFFF, 2, 0);
-	blSpriteScissor(s1, 0, 0, 390, 390);
+	blSpriteGlow(s1, 0xFFdd8805, 3, 0);
+	blSpriteFlip(s1, 1, 1, 1);
+	//blSpriteScissor(s1, 0, 0, 390, 390);
 	//blSpriteAlpha(s1, 0.1, 1);
 	// = blGenSprite("s1", "", "s1", 12, 12, 23, 1);
 			  /*

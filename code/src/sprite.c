@@ -131,10 +131,12 @@ typedef struct _SpriteNode{
     BLF32 fZValue;
     BLU32 nDyeColor;
     BLBool bDye;
+	BLBool bFlipX;
+	BLBool bFlipY;
     BLU32 nStrokeColor;
     BLU32 nStrokePixel;
     BLU32 nGlowColor;
-    BLU32 nGlowPixel;
+    BLU32 nBrightness;
     BLU32 nChildren;
 	BLBool bTile;
 	BLBool bValid;
@@ -144,6 +146,7 @@ typedef struct _SpriteMember {
     BLGuid nSpriteTech;
     BLGuid nSpriteInstTech;
 	BLGuid nSpriteStrokeTech;
+	BLGuid nSpriteGlowTech;
     _BLSpriteNode** pNodeList;
 	_BLSpriteNode* pCursor;
 	BLArray* pTileArray;
@@ -798,10 +801,27 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 	}
 	else
 	{
-		_minx = -_Node->sSize.fX * 0.5f + _ss->nOffsetX - _Node->nStrokePixel;
-		_miny = -_Node->sSize.fY * 0.5f + _ss->nOffsetY - _Node->nStrokePixel;
-		_maxx = _minx + _ss->nRBx - _ss->nLTx + _Node->nStrokePixel;
-		_maxy = _miny + _ss->nRBy - _ss->nLTy + _Node->nStrokePixel;
+		BLF32 _dif = (BLF32)MAX_INTERNAL(_Node->nStrokePixel, 3);
+		if (_Node->bFlipX)
+		{
+			_maxx = _Node->sSize.fX * 0.5f + _dif - _ss->nOffsetX;
+			_minx = _maxx - _ss->nRBx + _ss->nLTx - _dif;
+		}
+		else
+		{
+			_minx = -_Node->sSize.fX * 0.5f + _ss->nOffsetX - _dif;
+			_maxx = _minx + _ss->nRBx - _ss->nLTx + _dif;
+		}
+		if (_Node->bFlipY)
+		{
+			_maxy = _Node->sSize.fY * 0.5f + _dif - _ss->nOffsetY;
+			_miny = _maxy - _ss->nRBy + _ss->nLTy - _dif;
+		}
+		else
+		{
+			_miny = -_Node->sSize.fY * 0.5f + _ss->nOffsetY - _dif;
+			_maxy = _miny + _ss->nRBy - _ss->nLTy + _dif;
+		}
 	}
     BLF32 _ltx = (_minx * _Mat[0]) + (_miny * _Mat[2]) + _Mat[4];
     BLF32 _lty = (_minx * _Mat[1]) + (_miny * _Mat[3]) + _Mat[5];
@@ -875,6 +895,18 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
         }
 		blTechSampler(_PrSpriteMem->nSpriteInstTech, "Texture0", _Node->nTex, 0);
     }
+	else if (_Node->nBrightness > 0)
+	{
+		blTechSampler(_PrSpriteMem->nSpriteGlowTech, "Texture0", _Node->nTex, 0);
+		BLF32 _glow[4];
+		blDeColor4F(_Node->nGlowColor, _glow);
+		_glow[3] = (BLF32)_Node->nBrightness;
+		blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X4, "Glow", _glow, sizeof(_glow));
+		BLF32 _texsize[] = { (BLF32)_Node->nTexWidth, (BLF32)_Node->nTexHeight };
+		blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X2, "TexSize", _texsize, sizeof(_texsize));
+		BLF32 _border[] = { (BLF32)_ss->nLTx, (BLF32)_ss->nLTy, (BLF32)_ss->nRBx, (BLF32)_ss->nRBy };
+		blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X4, "Border", _border, sizeof(_border));
+	}
 	else if (_Node->nStrokePixel > 0)
 	{
 		blTechSampler(_PrSpriteMem->nSpriteStrokeTech, "Texture0", _Node->nTex, 0);
@@ -892,10 +924,25 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 	if (_ss && _Node->bShow)
 	{
 		BLF32 _lttx, _ltty, _rttx, _rtty, _lbtx, _lbty, _rbtx, _rbty;
-		_lbtx = _lttx = (BLF32)((BLS32)_ss->nLTx - (BLS32)_Node->nStrokePixel) / (BLF32)_Node->nTexWidth;
-		_rtty = _ltty = (BLF32)((BLS32)_ss->nLTy - (BLS32)_Node->nStrokePixel) / (BLF32)_Node->nTexHeight;
-		_rbtx = _rttx = (BLF32)((BLS32)_ss->nRBx + (BLS32)_Node->nStrokePixel) / (BLF32)_Node->nTexWidth;
-		_rbty = _lbty = (BLF32)((BLS32)_ss->nRBy + (BLS32)_Node->nStrokePixel) / (BLF32)_Node->nTexHeight;
+		BLS32 _dif = MAX_INTERNAL(_Node->nStrokePixel, 3);
+		_lbtx = _lttx = (BLF32)((BLS32)_ss->nLTx - _dif) / (BLF32)_Node->nTexWidth;
+		_rtty = _ltty = (BLF32)((BLS32)_ss->nLTy - _dif) / (BLF32)_Node->nTexHeight;
+		_rbtx = _rttx = (BLF32)((BLS32)_ss->nRBx + _dif) / (BLF32)_Node->nTexWidth;
+		_rbty = _lbty = (BLF32)((BLS32)_ss->nRBy + _dif) / (BLF32)_Node->nTexHeight;
+		if (_Node->bFlipX)
+		{ 
+			BLF32 _tmp;
+			_tmp = _lbtx;
+			_lbtx = _lttx = _rbtx;
+			_rbtx = _rttx = _tmp;
+		}
+		if (_Node->bFlipY)
+		{
+			BLF32 _tmp;
+			_tmp = _ltty;
+			_rtty = _ltty = _rbty;
+			_rbty = _lbty = _tmp;
+		}
 		BLF32 _rgba[4];
 		blDeColor4F(_Node->nDyeColor, _rgba);
 		BLF32 _vbo[] = {
@@ -935,6 +982,8 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 		blUpdateGeometryBuffer(_Node->nGBO, 0, (const BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 		if (_Node->pEmitParam)
 			blDraw(_PrSpriteMem->nSpriteInstTech, _Node->nGBO, _Node->pEmitParam->nCurAlive);
+		else if (_Node->nBrightness > 0)
+			blDraw(_PrSpriteMem->nSpriteGlowTech, _Node->nGBO, 1);
 		else if (_Node->nStrokePixel > 0)
 			blDraw(_PrSpriteMem->nSpriteStrokeTech, _Node->nGBO, 1);
 		else
@@ -977,6 +1026,7 @@ _SpriteInit()
     _PrSpriteMem->nSpriteTech = blGenTechnique("2D.bsl", NULL, FALSE, FALSE);
     _PrSpriteMem->nSpriteInstTech = blGenTechnique("2DInstance.bsl", NULL, FALSE, FALSE);
 	_PrSpriteMem->nSpriteStrokeTech = blGenTechnique("2DStroke.bsl", NULL, FALSE, FALSE);
+	_PrSpriteMem->nSpriteGlowTech = blGenTechnique("2DGlow.bsl", NULL, FALSE, FALSE);
 }
 BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)
@@ -987,6 +1037,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
     blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
     blTechUniform(_PrSpriteMem->nSpriteInstTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 	blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
+	blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 	BLU8 _blendfactor[4] = { 0 };
 	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor);
     if (_Cursor)
@@ -1089,6 +1140,7 @@ _SpriteDestroy()
     blDeleteTechnique(_PrSpriteMem->nSpriteTech);
     blDeleteTechnique(_PrSpriteMem->nSpriteInstTech);
 	blDeleteTechnique(_PrSpriteMem->nSpriteStrokeTech);
+	blDeleteTechnique(_PrSpriteMem->nSpriteGlowTech);
     free(_PrSpriteMem);
 }
 BLGuid
@@ -1119,7 +1171,7 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLAnsi* _Tag, IN BLF32
     _node->nStrokeColor = 0xFFFFFFFF;
     _node->nStrokePixel = 0;
     _node->nGlowColor = 0xFFFFFFFF;
-    _node->nGlowPixel = 0;
+    _node->nBrightness = 0;
 	_node->bTile = _AsTile;
     _node->bShow = _AsTile ? FALSE : TRUE;
 	_node->bValid = FALSE;
@@ -1221,7 +1273,7 @@ blSpriteAttach(IN BLGuid _Parent, IN BLGuid _Child, IN BLBool _AttrInherit)
         blSpriteDyeing(_Child, _parent->nDyeColor, _parent->bDye, TRUE);
         blSpriteVisibility(_Child, _parent->bShow, TRUE);
         blSpriteAlpha(_Child, _parent->fAlpha, TRUE);
-        blSpriteGlow(_Child, _parent->nGlowColor, _parent->nGlowPixel, TRUE);
+        blSpriteGlow(_Child, _parent->nGlowColor, _parent->nBrightness, TRUE);
         blSpriteStroke(_Child, _parent->nStrokeColor, _parent->nStrokePixel, TRUE);
 		blSpritePivot(_Child, _parent->sPivot.fX, _parent->sPivot.fY, TRUE);
         blSpriteZValue(_Child, _parent->fZValue, TRUE);
@@ -1295,6 +1347,23 @@ blSpriteVisibility(IN BLGuid _ID, IN BLBool _Show, IN BLBool _Passdown)
             blSpriteVisibility(_node->pChildren[_idx]->nID, _Show, _Passdown);
     }
     return TRUE;
+}
+BLBool 
+blSpriteFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY, IN BLBool _Passdown)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return FALSE;
+	_node->bFlipX = _FlipX;
+	_node->bFlipY = _FlipY;
+	if (_Passdown)
+	{
+		for (BLU32 _idx = 0; _idx < _node->nChildren; ++_idx)
+			blSpriteFlip(_node->pChildren[_idx]->nID, _FlipX, _FlipY, _Passdown);
+	}
+	return TRUE;
 }
 BLBool
 blSpritePivot(IN BLGuid _ID, IN BLF32 _PivotX, IN BLF32 _PivotY, IN BLBool _Passdown)
@@ -1403,7 +1472,7 @@ blSpriteStroke(IN BLGuid _ID, IN BLU32 _Color, IN BLU32 _Pixel, IN BLBool _Passd
     return TRUE;    
 }
 BLBool
-blSpriteGlow(IN BLGuid _ID, IN BLU32 _Color, IN BLU32 _Pixel, IN BLBool _Passdown)
+blSpriteGlow(IN BLGuid _ID, IN BLU32 _Color, IN BLU32 _Brightness, IN BLBool _Passdown)
 {
     if (_ID == INVALID_GUID)
         return FALSE;
@@ -1411,11 +1480,11 @@ blSpriteGlow(IN BLGuid _ID, IN BLU32 _Color, IN BLU32 _Pixel, IN BLBool _Passdow
     if (!_node)
         return FALSE;
     _node->nGlowColor = _Color;
-    _node->nGlowPixel = _Pixel;
+    _node->nBrightness = _Brightness;
     if (_Passdown)
     {
         for (BLU32 _idx = 0; _idx < _node->nChildren ; ++_idx)
-            blSpriteGlow(_node->pChildren[_idx]->nID, _Color, _Pixel, _Passdown);
+            blSpriteGlow(_node->pChildren[_idx]->nID, _Color, _Brightness, _Passdown);
     }
     return TRUE;
 }

@@ -4362,6 +4362,8 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
     {
     }
 #endif
+	if (!_findbinary)
+		ezxml_free(_doc);
 	if (_cache)
 	{
 		blMutexLock(_PrGpuMem->pTechCache->pMutex);
@@ -4371,8 +4373,6 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
 		blDictInsert(_PrGpuMem->pTechCache, _hash, _res);
 		blMutexUnlock(_PrGpuMem->pTechCache->pMutex);
 	}
-    if (!_findbinary)
-        ezxml_free(_doc);
     blDeleteStream(_stream);
 	_tech->nID = blGenGuid(_tech, _hash);
 	return _tech->nID;

@@ -65,6 +65,12 @@ BL_API BLBool blSpriteVisibility(
 	IN BLGuid _ID,
 	IN BLBool _Show,
     IN BLBool _Passdown);
+
+BL_API BLBool blSpriteFlip(
+	IN BLGuid _ID,
+	IN BLBool _FlipX,
+	IN BLBool _FlipY,
+	IN BLBool _Passdown);
     
 BL_API BLBool blSpritePivot(
     IN BLGuid _ID,
@@ -91,7 +97,7 @@ BL_API BLBool blSpriteStroke(
 BL_API BLBool blSpriteGlow(
 	IN BLGuid _ID,
 	IN BLU32 _Color,
-    IN BLU32 _Pixel,
+    IN BLU32 _Brightness,
     IN BLBool _Passdown);
 
 BL_API BLBool blSpriteDyeing(
