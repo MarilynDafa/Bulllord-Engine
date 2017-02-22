@@ -1,7 +1,7 @@
 #include "vld.h"
 #include "../../code/headers/sprite.h"
 #include "../../code/headers/system.h"
-//glow
+#include "../../plugins/tmx/tmx.h"
 //tmx
 //ui
 
@@ -22,6 +22,11 @@ const void BeginSystem(void)
 	blSpriteMove(s1, 400, 400);
 	blSpriteGlow(s1, 0xFFdd8805, 3, 0);
 	blSpriteFlip(s1, 1, 1, 1);
+	blOpenPlugin("blTMX");
+
+	BLBool (*_open)(IN BLAnsi*,IN BLAnsi*) = (BLBool(*)(IN BLAnsi*, IN BLAnsi*))blGetPluginProcAddress("blTMX", "blTMXFileEXT");
+	blWorkingDir(FALSE);
+	_open("m2.tmx",NULL);
 	//blSpriteScissor(s1, 0, 0, 390, 390);
 	//blSpriteAlpha(s1, 0.1, 1);
 	// = blGenSprite("s1", "", "s1", 12, 12, 23, 1);

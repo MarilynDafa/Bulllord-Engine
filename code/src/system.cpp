@@ -149,6 +149,16 @@ typedef struct _Timer {
 	BLF32 fElapse;
 	BLU32 nLastTime;
 }_BLTimer;
+typedef struct _Plugins {
+	BLU32 nHash;
+#if defined(BL_PLATFORM_WIN32) 
+	HMODULE pHandle;
+#elif defined(BL_PLATFORM_UWP)
+	HINSTANCE pHandle;
+#else
+	BLVoid* pHandle;
+#endif
+}_BLPlugin;
 typedef struct _SystemMember {
 	_BLBoostParam sBoostParam;
 	const BLVoid(*pSubscriber[BL_ET_COUNT][128])(BLEnum, BLU32, BLS32, BLVoid*);
@@ -157,6 +167,7 @@ typedef struct _SystemMember {
 	const BLVoid(*pEndFunc)(BLVoid);
 	_BLEvent* pEvents;
 	_BLTimer aTimers[8];
+	_BLPlugin aPlugins[64];
 	BLAnsi aWorkDir[260];
 	BLAnsi aContentDir[260];
 	BLAnsi aUserDir[260];
@@ -169,11 +180,9 @@ typedef struct _SystemMember {
 	HWND nHwnd;
 	HIMC nIMC;
 	BLBool bCtrlPressed;
-    HMODULE pCurPlugin;
 #elif defined(BL_PLATFORM_UWP)
 	Windows::UI::Text::Core::CoreTextEditContext^ pCTEcxt;
 	Windows::Foundation::Point sIMEpos;
-    HINSTANCE pCurPlugin;
 	BLBool bCtrlPressed;
 #elif defined(BL_PLATFORM_LINUX)
     Display* pDisplay;
@@ -188,7 +197,6 @@ typedef struct _SystemMember {
     XIM pIME;
     XIC pIC;
     BLVoid* pLib;
-    BLVoid* pCurPlugin;
     BLU32 nMouseX;
     BLU32 nMouseY;
     BLBool bCtrlPressed;
@@ -206,7 +214,6 @@ typedef struct _SystemMember {
 	pthread_t nThread;
 	jobject pBLJava;
     BLVoid* pSavedState;
-    BLVoid* pCurPlugin;
 	BLS32 nActivityState;
 	BLS32 nStateSaved;
 	BLU32 nSavedStateSize;
@@ -219,14 +226,12 @@ typedef struct _SystemMember {
     NSPoint sIMEpos;
     NSTextView* pTICcxt;
     NSResponder<NSWindowDelegate>* pDelegate;
-    BLVoid* pCurPlugin;
     BLBool bCtrlPressed;
 #elif defined(BL_PLATFORM_IOS)
 	NSAutoreleasePool* pPool;
     UIWindow* pWindow;
     UITextField* pTICcxt;
     UIView* pCtlView;
-    BLVoid* pCurPlugin;
     BLS32 nKeyboardHeight;
     BLU32 nRetinaScale;
 #endif
@@ -3161,7 +3166,6 @@ _SystemDestroy()
 #if defined(BL_PLATFORM_UWP)
 	delete _PrSystemMem;
 	_PrSystemMem = NULL;
-#elif defined(BL_PLATFORM_ANDROID)
 #else
 	free(_PrSystemMem);
 	_PrSystemMem = NULL;
@@ -3329,8 +3333,7 @@ blWorkingDir(IN BLBool _Content)
 #if defined(BL_PLATFORM_WIN32)
     if (!_PrSystemMem->aWorkDir[0])
     {
-		typedef DWORD(WINAPI *GetModuleFileNameExW_t)(HANDLE, HMODULE, LPWSTR, DWORD);
-		GetModuleFileNameExW_t _modulemid;
+		DWORD(WINAPI* _modulemid)(HANDLE, HMODULE, LPWSTR, DWORD);
 		DWORD _buflen = 128;
 		WCHAR* _path = NULL;
 		HMODULE _psapi = LoadLibraryW(L"psapi.dll");
@@ -3338,7 +3341,7 @@ blWorkingDir(IN BLBool _Content)
 		INT _idx;
 		if (!_psapi)
 			return NULL;
-		_modulemid = (GetModuleFileNameExW_t)GetProcAddress(_psapi, "GetModuleFileNameExW");
+		_modulemid = (DWORD(WINAPI*)(HANDLE, HMODULE, LPWSTR, DWORD))GetProcAddress(_psapi, "GetModuleFileNameExW");
 		if (!_modulemid)
 		{
 			FreeLibrary(_psapi);
@@ -3857,6 +3860,18 @@ blOpenURL(IN BLUtf8* _Url)
 BLBool
 blOpenPlugin(IN BLAnsi* _Basename)
 {
+	BLU32 _hashname = blHashUtf8((const BLUtf8*)_Basename);
+	BLU32 _idx = 0;
+	for (; _idx < 64; ++_idx)
+	{
+		if (_PrSystemMem->aPlugins[_idx].nHash == 0)
+			break;
+		else if (_PrSystemMem->aPlugins[_idx].nHash == _hashname)
+			return TRUE;
+	}
+	if (_idx >= 64)
+		return FALSE;
+	_PrSystemMem->aPlugins[_idx].nHash = _hashname;
     BLAnsi _path[260] = { 0 };
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
     strcpy_s(_path, 260, blWorkingDir(FALSE));
@@ -3877,61 +3892,97 @@ blOpenPlugin(IN BLAnsi* _Basename)
 #if defined(BL_PLATFORM_WIN32)
     WCHAR _wfilename[260] = { 0 };
     MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
-    _PrSystemMem->pCurPlugin = LoadLibraryW(_wfilename);
+    _PrSystemMem->aPlugins[_idx].pHandle = LoadLibraryW(_wfilename);
 #elif defined(BL_PLATFORM_UWP)
     WCHAR _wfilename[260] = { 0 };
     MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
-    _PrSystemMem->pCurPlugin = LoadPackagedLibrary(_wfilename, 0);
+	_PrSystemMem->aPlugins[_idx].pHandle = LoadPackagedLibrary(_wfilename, 0);
 #elif defined(BL_PLATFORM_LINUX)
-    _PrSystemMem->pCurPlugin = dlopen(_path, RTLD_LAZY | RTLD_GLOBAL);
+	_PrSystemMem->aPlugins[_idx].pHandle = dlopen(_path, RTLD_LAZY | RTLD_GLOBAL);
 #elif defined(BL_PLATFORM_ANDROID)
-    _PrSystemMem->pCurPlugin = dlopen(_path, RTLD_LAZY | RTLD_GLOBAL);
+	_PrSystemMem->aPlugins[_idx].pHandle = dlopen(_path, RTLD_LAZY | RTLD_GLOBAL);
 #elif defined(BL_PLATFORM_OSX)
-    _PrSystemMem->pCurPlugin = dlopen(_path, RTLD_LAZY | RTLD_GLOBAL);
+	_PrSystemMem->aPlugins[_idx].pHandle = dlopen(_path, RTLD_LAZY | RTLD_GLOBAL);
 #elif defined(BL_PLATFORM_IOS)
-    _PrSystemMem->pCurPlugin = dlopen(_path, RTLD_LAZY | RTLD_GLOBAL);
+	_PrSystemMem->aPlugins[_idx].pHandle = dlopen(_path, RTLD_LAZY | RTLD_GLOBAL);
 #endif
-    return _PrSystemMem->pCurPlugin ? TRUE : FALSE;
+	memset(_path, 0, sizeof(_path));
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+	strcpy_s(_path, 260, _Basename);
+	strcat_s(_path, 260, "OpenEXT");
+#else
+	strcpy(_path, _Basename);
+	strcat(_path, "OpenEXT");
+#endif
+	BLVoid(*_open)(BLVoid);
+	_open = (BLVoid(*)(BLVoid))blGetPluginProcAddress(_Basename, _path);
+	_open();
+    return TRUE;
 }
 BLBool
-blClosePlugin()
+blClosePlugin(IN BLAnsi* _Basename)
 {
-    if (!_PrSystemMem->pCurPlugin)
-        return FALSE;
-#if defined(BL_PLATFORM_WIN32)
-    FreeLibrary(_PrSystemMem->pCurPlugin);
-#elif defined(BL_PLATFORM_UWP)
-    FreeLibrary(_PrSystemMem->pCurPlugin);
-#elif defined(BL_PLATFORM_LINUX)
-    dlclose(_PrSystemMem->pCurPlugin);
-#elif defined(BL_PLATFORM_ANDROID)
-    dlclose(_PrSystemMem->pCurPlugin);
-#elif defined(BL_PLATFORM_OSX)
-    dlclose(_PrSystemMem->pCurPlugin);
-#elif defined(BL_PLATFORM_IOS)
-    dlclose(_PrSystemMem->pCurPlugin);
+	BLU32 _hashname = blHashUtf8((const BLUtf8*)_Basename);
+	BLU32 _idx = 0;
+	for (; _idx < 64; ++_idx)
+	{
+		if (_PrSystemMem->aPlugins[_idx].nHash == _hashname)
+			break;
+	}
+	if (_idx >= 64)
+		return FALSE;
+	BLAnsi _path[260] = { 0 };
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+	strcpy_s(_path, 260, _Basename);
+	strcat_s(_path, 260, "CloseEXT");
+#else
+	strcpy(_path, _Basename);
+	strcat(_path, "CloseEXT");
 #endif
-    _PrSystemMem->pCurPlugin = 0;
+	BLVoid(*_close)(BLVoid);
+	_close = (BLVoid(*)(BLVoid))blGetPluginProcAddress(_Basename, _path);
+	_close();
+#if defined(BL_PLATFORM_WIN32)
+    FreeLibrary(_PrSystemMem->aPlugins[_idx].pHandle);
+#elif defined(BL_PLATFORM_UWP)
+    FreeLibrary(_PrSystemMem->aPlugins[_idx].pHandle);
+#elif defined(BL_PLATFORM_LINUX)
+    dlclose(_PrSystemMem->aPlugins[_idx].pHandle);
+#elif defined(BL_PLATFORM_ANDROID)
+    dlclose(_PrSystemMem->aPlugins[_idx].pHandle);
+#elif defined(BL_PLATFORM_OSX)
+    dlclose(_PrSystemMem->aPlugins[_idx].pHandle);
+#elif defined(BL_PLATFORM_IOS)
+    dlclose(_PrSystemMem->aPlugins[_idx].pHandle);
+#endif
+	_PrSystemMem->aPlugins[_idx].nHash = 0;
     return TRUE;
 }
 BLVoid*
-blGetPluginProcAddress(IN BLAnsi* _Function)
+blGetPluginProcAddress(IN BLAnsi* _Basename, IN BLAnsi* _Function)
 {
-    if (!_PrSystemMem->pCurPlugin)
-        return NULL;
+	BLU32 _hashname = blHashUtf8((const BLUtf8*)_Basename);
+	BLU32 _idx = 0;
+	for (; _idx < 64; ++_idx)
+	{
+		if (_PrSystemMem->aPlugins[_idx].nHash == _hashname)
+			break;
+	}
+	if (_idx >= 64)
+		return NULL;
     BLVoid* _ret;
 #if defined(BL_PLATFORM_WIN32)
-    _ret = GetProcAddress(_PrSystemMem->pCurPlugin, _Function);
+    _ret = GetProcAddress(_PrSystemMem->aPlugins[_idx].pHandle, _Function);
 #elif defined(BL_PLATFORM_UWP)
-    _ret = GetProcAddress(_PrSystemMem->pCurPlugin, _Function);
+    _ret = GetProcAddress(_PrSystemMem->aPlugins[_idx].pHandle, _Function);
 #elif defined(BL_PLATFORM_LINUX)
-    _ret = dlsym(_PrSystemMem->pCurPlugin, _Function);
+    _ret = dlsym(_PrSystemMem->aPlugins[_idx].pHandle, _Function);
 #elif defined(BL_PLATFORM_ANDROID)
-    _ret = dlsym(_PrSystemMem->pCurPlugin, _Function);
+	_ret = dlsym(_PrSystemMem->aPlugins[_idx].pHandle, _Function);
 #elif defined(BL_PLATFORM_OSX)
-    _ret = dlsym(_PrSystemMem->pCurPlugin, _Function);
+	_ret = dlsym(_PrSystemMem->aPlugins[_idx].pHandle, _Function);
 #elif defined(BL_PLATFORM_IOS)
-    _ret = dlsym(_PrSystemMem->pCurPlugin, _Function);
+	_ret = dlsym(_PrSystemMem->aPlugins[_idx].pHandle, _Function);
 #endif
     return _ret;
 }
@@ -4203,9 +4254,10 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _F
 	_PrSystemMem->nEventIdx = 0;
 	_PrSystemMem->nSysTime = 0;
 	_PrSystemMem->nOrientation = SCREEN_LANDSCAPE_INTERNAL;
+	for (BLU32 _idx = 0; _idx < 64; ++_idx)
+		_PrSystemMem->aPlugins[_idx].nHash = 0;
 #if defined(BL_PLATFORM_WIN32)
 	_PrSystemMem->bCtrlPressed = FALSE;
-    _PrSystemMem->pCurPlugin = 0;
 #elif defined(BL_PLATFORM_UWP)
 	_PrSystemMem->bCtrlPressed = FALSE;
 #elif defined(BL_PLATFORM_LINUX)
@@ -4214,24 +4266,20 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _F
     _PrSystemMem->pIC = NULL;
     _PrSystemMem->pLib = NULL;
     _PrSystemMem->bCtrlPressed = FALSE;
-    _PrSystemMem->pCurPlugin = 0;
 #elif defined(BL_PLATFORM_ANDROID)
     _PrSystemMem->bAvtivityFocus = FALSE;
-    _PrSystemMem->pCurPlugin = 0;
 #elif defined(BL_PLATFORM_OSX)
 	_PrSystemMem->pPool = nil;
 	_PrSystemMem->pWindow = nil;
     _PrSystemMem->pTICcxt = nil;
     _PrSystemMem->pDelegate = nil;
     _PrSystemMem->bCtrlPressed = FALSE;
-    _PrSystemMem->pCurPlugin = 0;
 #elif defined(BL_PLATFORM_IOS)
 	_PrSystemMem->pPool = nil;
     _PrSystemMem->pWindow = nil;
     _PrSystemMem->pTICcxt = nil;
     _PrSystemMem->nKeyboardHeight = 0;
     _PrSystemMem->pCtlView = nil;
-    _PrSystemMem->pCurPlugin = 0;
 #endif
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 		_PrSystemMem->aTimers[_idx].nId = -1;
@@ -4275,23 +4323,22 @@ blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)
 	_PrSystemMem->nEventIdx = 0;
 	_PrSystemMem->nSysTime = 0;
 	_PrSystemMem->nOrientation = SCREEN_LANDSCAPE_INTERNAL;
+	for (BLU32 _idx = 0; _idx < 64; ++_idx)
+		_PrSystemMem->aPlugins[_idx].nHash = 0;
 #if defined(BL_PLATFORM_WIN32)
     _PrSystemMem->bCtrlPressed = FALSE;
-    _PrSystemMem->pCurPlugin = 0;
 #elif defined(BL_PLATFORM_LINUX)
     _PrSystemMem->pDisplay = NULL;
     _PrSystemMem->pIME = NULL;
     _PrSystemMem->pIC = NULL;
     _PrSystemMem->pLib = NULL;
     _PrSystemMem->bCtrlPressed = FALSE;
-    _PrSystemMem->pCurPlugin = 0;
 #elif defined(BL_PLATFORM_OSX)
     _PrSystemMem->pPool = nil;
     _PrSystemMem->pWindow = nil;
     _PrSystemMem->pDelegate = nil;
     _PrSystemMem->pTICcxt = nil;
     _PrSystemMem->bCtrlPressed = FALSE;
-    _PrSystemMem->pCurPlugin = 0;
 #endif
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 		_PrSystemMem->aTimers[_idx].nId = -1;

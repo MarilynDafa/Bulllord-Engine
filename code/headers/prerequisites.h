@@ -191,8 +191,19 @@ typedef unsigned long long BLGuid;
 #if defined BL_API
 #	undef BL_API
 #endif
-#define BL_API extern
-
+#if defined(_MSC_VER)
+#	ifdef BL_EXPORT
+#		define BL_API __declspec(dllexport)
+#	else
+#		define BL_API __declspec(dllimport)
+#	endif
+#else
+#	ifdef PLUGIN_EXPORT
+#       define BL_API __attribute__ ((visibility("default")))
+#	else
+#		define BL_API
+#	endif
+#endif
 
 /**
  * Uniform Entry Point

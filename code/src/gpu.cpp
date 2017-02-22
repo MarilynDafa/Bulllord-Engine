@@ -4422,7 +4422,7 @@ blDeleteTechnique(IN BLGuid _Tech)
     {
     }
 #endif
-    free(_tech);
+	free(_tech);
     blDeleteGuid(_Tech);
 }
 BLVoid

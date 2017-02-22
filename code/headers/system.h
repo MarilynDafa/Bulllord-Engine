@@ -68,9 +68,11 @@ BL_API BLVoid blOpenURL(
 BL_API BLBool blOpenPlugin(
     IN BLAnsi* _Basename);
     
-BL_API BLBool blClosePlugin();
+BL_API BLBool blClosePlugin(
+	IN BLAnsi* _Basename);
     
 BL_API BLVoid* blGetPluginProcAddress(
+	IN BLAnsi* _Basename,
     IN BLAnsi* _Function);
 
 /**
