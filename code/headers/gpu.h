@@ -111,31 +111,31 @@ BL_API BLGuid blGenFrameBuffer();
 BL_API BLVoid blDeleteFramebuffer(
 	IN BLGuid _FBO);
     
-BL_API BLVoid blClearFrameBuffer(
+BL_API BLVoid blFrameBufferClear(
     IN BLGuid _FBO,
     IN BLBool _ColorBit,
     IN BLBool _DepthBit,
     IN BLBool _StencilBit);
 
-BL_API BLVoid blBindFrameBuffer(
+BL_API BLVoid blFrameBufferBind(
     IN BLGuid _FBO);
     
-BL_API BLVoid blResolveFrameBuffer(
+BL_API BLVoid blFrameBufferResolve(
     IN BLGuid _FBO);
     
-BL_API BLVoid blDiscardFrameBuffer(
+BL_API BLVoid blFrameBufferDiscard(
     IN BLGuid _FBO,
     IN BLBool _DiscardColor,
     IN BLBool _DiscardDepth,
     IN BLBool _DiscardStencil);
     
-BL_API BLU32 blAttachFrameBuffer(
+BL_API BLU32 blFrameBufferAttach(
     IN BLGuid _FBO,
 	IN BLGuid _Tex,
     IN BLS32 _Level,
     IN BLEnum _CFace);
 
-BL_API BLVoid blDetachFrameBuffer(
+BL_API BLVoid blFrameBufferDetach(
     IN BLGuid _FBO,
     IN BLU32 _Index,
     IN BLBool _DepthStencil);
@@ -168,7 +168,7 @@ BL_API BLVoid blTextureFilter(
     IN BLEnum _WrapT,
     IN BLBool _Anisotropy);
 
-BL_API BLVoid blUpdateTexture(
+BL_API BLVoid blTextureUpdate(
 	IN BLGuid _Tex,
     IN BLU32 _Layer,
     IN BLU32 _Level,
@@ -181,7 +181,7 @@ BL_API BLVoid blUpdateTexture(
 	IN BLU32 _Depth,
 	IN BLVoid* _Data);
 
-BL_API BLVoid blQueryTexture(
+BL_API BLVoid blTextureQuery(
 	IN BLGuid _Tex,
 	OUT BLEnum* _Target,
     OUT BLEnum* _Format,
@@ -211,7 +211,7 @@ BL_API BLVoid blDeleteGeometryBuffer(
 BL_API BLGuid blGainGeometryBuffer(
     IN BLU32 _Hash);
     
-BL_API BLVoid blUpdateGeometryBuffer(
+BL_API BLVoid blGeometryBufferUpdate(
     IN BLGuid _GBO,
     IN BLU32 _VBOffset,
     IN BLU8* _VBO,
@@ -220,7 +220,7 @@ BL_API BLVoid blUpdateGeometryBuffer(
     IN BLU8* _IBO,
     IN BLU32 _IBSz);
     
-BL_API BLVoid blInstanceGeometryBuffer(
+BL_API BLVoid blGeometryBufferInstance(
     IN BLGuid _GBO,
     IN BLEnum* _Semantic,
     IN BLEnum* _Decl,

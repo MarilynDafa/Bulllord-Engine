@@ -125,7 +125,7 @@ _FetchResource(const BLAnsi* _Filename, const BLAnsi* _Archive, BLVoid** _Res, B
 	{
 		blMutexLock(_PrStreamIOMem->pLoadingQueue->pMutex);
 		{
-			FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
+			FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
 			{
 				if (_iter->nGuid == _ID)
 				{
@@ -137,7 +137,7 @@ _FetchResource(const BLAnsi* _Filename, const BLAnsi* _Archive, BLVoid** _Res, B
 		blMutexUnlock(_PrStreamIOMem->pLoadingQueue->pMutex);
 		blMutexLock(_PrStreamIOMem->pSetupQueue->pMutex);
 		{
-			FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
+			FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
 			{
 				if (_iter->nGuid == _ID)
 				{
@@ -177,7 +177,7 @@ _DiscardResource(BLGuid _ID, BLBool(*_Unload)(BLVoid*), BLBool(*_Release)(BLVoid
 {
 	blMutexLock(_PrStreamIOMem->pLoadingQueue->pMutex);
 	{
-		FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
+		FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
 		{
 			if (_iter->nGuid == _ID)
 			{
@@ -191,7 +191,7 @@ _DiscardResource(BLGuid _ID, BLBool(*_Unload)(BLVoid*), BLBool(*_Release)(BLVoid
 	blMutexUnlock(_PrStreamIOMem->pLoadingQueue->pMutex);
 	blMutexLock(_PrStreamIOMem->pSetupQueue->pMutex);
 	{
-		FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
+		FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
 		{
 			if (_iter->nGuid == _ID)
 			{
@@ -280,9 +280,9 @@ BLVoid
 _StreamIODestroy()
 {
 	{
-		FOREACH_ARRAY(_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
+		FOREACH_ARRAY (_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
 		{
-			FOREACH_DICT(_BLBpkFileEntry*, _iter2, _iter->pFiles)
+			FOREACH_DICT (_BLBpkFileEntry*, _iter2, _iter->pFiles)
 			{
 				if (_iter2->pPatch)
 					free(_iter2->pPatch);
@@ -296,13 +296,13 @@ _StreamIODestroy()
 	}
 	blDeleteThread(_PrStreamIOMem->pLoadThread);
 	{
-		FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
+		FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
 		{
 			free(_iter);
 		}
 	}
 	{
-		FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
+		FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
 		{
 			free(_iter);
 		}
@@ -316,16 +316,30 @@ _StreamIODestroy()
 BLGuid
 blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 {
-	if (!_Archive)
+    if (!_Archive)
 	{
 		_BLStream* _ret = NULL;
+        BLAnsi _trfilename[260] = { 0 };
+        BLU32 _filelen = strlen(_Filename);
+        for (BLU32 _idx = 0; _idx < _filelen; ++_idx)
+        {
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+            if (_Filename[_idx] == '/')
+                _trfilename[_idx] = '\\';
+#else
+            if (_Filename[_idx] == '\\')
+                _trfilename[_idx] = '/';
+#endif
+            else
+                _trfilename[_idx] = _Filename[_idx];
+        }
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 		WCHAR _wfilename[260] = { 0 };
-		MultiByteToWideChar(CP_UTF8, 0, _Filename, -1, _wfilename, sizeof(_wfilename));
+		MultiByteToWideChar(CP_UTF8, 0, _trfilename, -1, _wfilename, sizeof(_wfilename));
 		HANDLE _fp = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
 #else
-		HANDLE _fp = CreateFileA(_Filename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		HANDLE _fp = CreateFileA(_trfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
 		if (FILE_INVALID_INTERNAL(_fp))
 		{
@@ -340,12 +354,12 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 			_ret->pPos = (BLU8*)_ret->pBuffer;
 			_ret->pEnd = _ret->pPos + _ret->nLen;
 			CloseHandle(_fp);
-			return blGenGuid(_ret, blHashUtf8(_Filename));
+			return blGenGuid(_ret, blHashUtf8(_trfilename));
 		}
 		else
 			return INVALID_GUID;
 #elif defined(BL_PLATFORM_ANDROID)
-		AAsset* _fp = AAssetManager_open(_PrStreamIOMem->pAndroidAM, _Filename, AASSET_MODE_UNKNOWN);
+		AAsset* _fp = AAssetManager_open(_PrStreamIOMem->pAndroidAM, _trfilename, AASSET_MODE_UNKNOWN);
 		if (FILE_INVALID_INTERNAL(_fp))
 		{
 			BLU32 _datasz;
@@ -357,12 +371,12 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 			_ret->pPos = (BLU8*)_ret->pBuffer;
 			_ret->pEnd = _ret->pPos + _ret->nLen;
 			AAsset_close(_fp);
-			return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_Filename));
+			return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_trfilename));
 		}
 		else
 			return INVALID_GUID;
 #else
-		FILE* _fp = fopen(_Filename, "rb");
+		FILE* _fp = fopen(_trfilename, "rb");
 		if (FILE_INVALID_INTERNAL(_fp))
 		{
 			BLU32 _datasz;
@@ -376,7 +390,7 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 			_ret->pPos = (BLU8*)_ret->pBuffer;
 			_ret->pEnd = _ret->pPos + _ret->nLen;
 			fclose(_fp);
-			return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_Filename));
+			return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_trfilename));
         }
 		else
 			return INVALID_GUID;
@@ -388,13 +402,14 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 		BLAnsi _tmpname[260];
 		_BLStream* _ret = NULL;
 		_BLBpkFileEntry* _file = NULL;
-		FOREACH_ARRAY(_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
+		FOREACH_ARRAY (_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
 		{
 			if (!strcmp(_iter->pArchive, _Archive))
 				break;
 		}
 		strcpy(_tmpname, _Filename);
-		for (_i = 0; _i < strlen(_tmpname); ++_i)
+        BLU32 _tmplen = strlen(_tmpname);
+		for (_i = 0; _i < _tmplen; ++_i)
 		{
 			if (_tmpname[_i] == '\\')
 				_tmpname[_i] = '/';
@@ -407,8 +422,9 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 			_BLStream* _ret = NULL;
 			BLAnsi _path[260] = { 0 };
 			strcpy(_path, blWorkingDir(TRUE));
-			strcat(_path, _Filename);
-			for (_i = 0; _i < strlen(_path); ++_i)
+            strcat(_path, _Filename);
+            _tmplen = strlen(_path);
+			for (_i = 0; _i < _tmplen; ++_i)
 			{
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 				if (_path[_i] == '/')
@@ -936,7 +952,7 @@ blPatchArchive(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 	if (!_PrStreamIOMem->pArchives->nSize)
 		return FALSE;
     {
-		FOREACH_ARRAY(_BLBpkArchive*, _biter, _PrStreamIOMem->pArchives)
+		FOREACH_ARRAY (_BLBpkArchive*, _biter, _PrStreamIOMem->pArchives)
 		{
 			if (!strcmp(_Archive, _biter->pArchive))
 			{
@@ -1157,7 +1173,7 @@ blPatchArchive(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 BLU32
 blQueryArchiveVer(IN BLAnsi* _Archive)
 {
-    FOREACH_ARRAY(_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
+    FOREACH_ARRAY (_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
     {
         if(!strcmp(_Archive , _iter->pArchive))
             return _iter->nVersion;

@@ -19,175 +19,156 @@
  3. This notice may not be removed or altered from any source distribution.
  */
 #include "internal/dictionary.h"
-static BLVoid
-_FreeNodes(struct _DictNode *_Node)
+static struct _DictNode* 
+_MinNode(struct _DictNode* _Node)
 {
-	if (!_Node) 
-		return;
-	if (_Node->pLeft)
-		_FreeNodes(_Node->pLeft);
-	if (_Node->pRight)
-		_FreeNodes(_Node->pRight);
-	if (_Node)
+	while (_Node != NULL && (_Node->pLeft != NULL || _Node->pRight != NULL))
 	{
-		free(_Node->pData);
-		free(_Node);
+		if (_Node->pLeft) 
+			_Node = _Node->pLeft;
+		else 
+			_Node = _Node->pRight;
 	}
+	return _Node;
+}
+static struct _DictNode*
+_FindNode(BLDictionary* _Dct, BLU32 _Key)
+{
+	struct _DictNode* _node = _Dct->pRoot;
+	while (_node != NULL)
+	{
+		BLU32 key = _node->nKey;
+		if (_Key == key)
+			return _node;
+		else if (_Key < key)
+			_node = _node->pLeft;
+		else
+			_node = _node->pRight;
+	}
+	return NULL;
 }
 static BLBool
-_IsNodeRed(struct _DictNode* _Node)
+_IsLeftChild(struct _DictNode* _Dct) 
 {
-	return (_Node != NULL) ? _Node->bRed : FALSE;
+	return (_Dct->pParent != 0) && (_Dct->pParent->pLeft == _Dct);
 }
-static struct _DictNode*
-_FlipNodeClr(struct _DictNode* _Node)
+static BLBool
+_IsRightChild(struct _DictNode* _Dct)
 {
-	_Node->bRed = !(_Node->bRed);
-	_Node->pLeft->bRed = !(_Node->pLeft->bRed);
-	_Node->pRight->bRed = !(_Node->pRight->bRed);
-	return _Node;
+	return (_Dct->pParent != 0) && (_Dct->pParent->pRight == _Dct);
 }
-static struct _DictNode*
-_RotateLeft(struct _DictNode* _Node)
+static void
+_SetLeftChild(struct _DictNode* _Dct, struct _DictNode* _Node)
 {
-	struct _DictNode* _x = _Node->pRight;
-	_Node->pRight = _x->pLeft;
-	_x->pLeft = _Node;
-	_x->bRed = _x->pLeft->bRed;
-	_x->pLeft->bRed = TRUE;
-	return _x;
+	_Dct->pLeft = _Node;
+	if (_Node)
+		_Node->pParent = (_Dct);
 }
-static struct _DictNode*
-_RotateRight(struct _DictNode* _Node)
+static void
+_SetRightChild(struct _DictNode* _Dct, struct _DictNode* _Node)
 {
-	struct _DictNode* _x = _Node->pLeft;
-	_Node->pLeft = _x->pRight;
-	_x->pRight = _Node;
-	_x->bRed = _x->pRight->bRed;
-	_x->pRight->bRed = TRUE;
-	return _x;
+	_Dct->pRight = _Node;
+	if (_Node)
+		_Node->pParent = (_Dct);
 }
-static struct _DictNode*
-_MoveRedLeft(struct _DictNode* _Node)
+static void
+_SetRoot(BLDictionary* _Dct, struct _DictNode* _Root)
 {
-	_FlipNodeClr(_Node);
-	if (_Node->pRight && _IsNodeRed(_Node->pRight->pLeft)) 
+	_Dct->pRoot = _Root;
+	if (_Dct->pRoot != NULL)
 	{
-		_Node->pRight = _RotateRight(_Node->pRight);
-		_Node = _RotateLeft(_Node);
-		_FlipNodeClr(_Node);
+		_Dct->pRoot->pParent = NULL;
+		_Dct->pRoot->bRed = FALSE;
 	}
-	return _Node;
 }
-static struct _DictNode*
-_MoveRedRight(struct _DictNode* _Node)
+static void
+_RotateLeft(BLDictionary* _Dct, struct _DictNode* _Node)
 {
-	_FlipNodeClr(_Node);
-	if (_Node->pLeft && _IsNodeRed(_Node->pLeft->pLeft)) 
+	struct _DictNode* right = _Node->pRight;
+	_SetRightChild(_Node, right->pLeft);
+	if (_IsLeftChild(_Node))
+		_SetLeftChild(_Node->pParent, right);
+	else if (_IsRightChild(_Node))
+		_SetRightChild(_Node->pParent, right);
+	else
+		_SetRoot(_Dct, right);
+	_SetLeftChild(right, _Node);
+}
+static void
+RotateRight(BLDictionary* _Dct, struct _DictNode* _Node)
+{
+	struct _DictNode* left = _Node->pLeft;
+	_SetLeftChild(_Node, left->pRight);
+	if (_IsLeftChild(_Node))
+		_SetLeftChild(_Node->pParent, left);
+	else if (_IsRightChild(_Node))
+		_SetRightChild(_Node->pParent, left);
+	else
+		_SetRoot(_Dct, left);
+	_SetRightChild(left, _Node);
+}
+static BLBool
+_InsertNode(BLDictionary* _Dct, struct _DictNode* _Node)
+{
+	BLBool _result = TRUE;
+	if (!_Dct->pRoot)
 	{
-		_Node = _RotateRight(_Node);
-		_FlipNodeClr(_Node);
+		_SetRoot(_Dct, _Node);
+		_Dct->nSize = 1;
 	}
-	return _Node;
-}
-static struct _DictNode*
-_FixNode(struct _DictNode* _Node)
-{
-	if (_IsNodeRed(_Node->pRight))
-		_Node = _RotateLeft(_Node);
-	if (_Node->pLeft && _IsNodeRed(_Node->pLeft) && _IsNodeRed(_Node->pLeft->pLeft))
-		_Node = _RotateRight(_Node);
-	if (_IsNodeRed(_Node->pLeft) && _IsNodeRed(_Node->pRight))
-		_FlipNodeClr(_Node);
-	return _Node;
-}
-static struct _DictNode*
-_EraseMinNode(struct _DictNode* _Node)
-{
-	if (_Node->pLeft == NULL) 
-	{
-		free(_Node->pData);
-		return NULL;
-	}
-	if (!_IsNodeRed(_Node->pLeft) && !_IsNodeRed(_Node->pLeft->pLeft))
-		_Node = _MoveRedLeft(_Node);
-	_Node->pLeft = _EraseMinNode(_Node->pLeft);
-	return _FixNode(_Node);
-}
-static struct _DictNode*
-_EraseNode(BLDictionary* _Dct, struct _DictNode* _Node, BLU32 _Key)
-{
-	if (_Key < _Node->nKey)
-	{
-		if (_Node->pLeft && (!_IsNodeRed(_Node->pLeft) && !_IsNodeRed(_Node->pLeft->pLeft)))
-			_Node = _MoveRedLeft(_Node);
-		_Node->pLeft = _EraseNode(_Dct, _Node->pLeft, _Key);
-	} 
 	else
 	{
-		if (_IsNodeRed(_Node->pLeft))
-			_Node = _RotateRight(_Node);
-		if (_Key == _Node->nKey&& _Node->pRight == NULL) 
+		struct _DictNode* _node = _Dct->pRoot;
+		BLU32 _newkey = _Node->nKey;
+		while (_node)
 		{
-			free(_Node->pData);
-			free(_Node);
-			_Dct->nSize--;
-			return NULL;
+			BLU32 _key = (_node->nKey);
+			if (_newkey == _key)
+			{
+				_result = FALSE;
+				_node = NULL;
+			}
+			else if (_newkey < _key)
+			{
+				if (_node->pLeft == NULL)
+				{
+					_SetLeftChild(_node, _Node);
+					_node = NULL;
+				}
+				else
+					_node = _node->pLeft;
+			}
+			else
+			{
+				if (_node->pRight == NULL)
+				{
+					_SetRightChild(_node, _Node);
+					_node = NULL;
+				}
+				else
+					_node = _node->pRight;
+			}
 		}
-		if (_Node->pRight != NULL && (!_IsNodeRed(_Node->pRight) && !_IsNodeRed(_Node->pRight->pLeft))) 
-			_Node = _MoveRedRight(_Node);
-		if (_Key == _Node->nKey)
-		{
-			struct _DictNode* _minnode;
-			for (_minnode = _Node->pRight; _minnode->pLeft != NULL; _minnode = _minnode->pLeft)
-				;
-			_Node->nKey = _minnode->nKey;
-			memcpy(_Node->pData ,_minnode->pData, sizeof(BLVoid*));
-			_Node->pRight = _EraseMinNode(_Node->pRight);
-			_Dct->nSize--;
-		} 
-		else 
-			_Node->pRight = _EraseNode(_Dct, _Node->pRight, _Key);
+		if (_result)
+			++_Dct->nSize;
 	}
-	return _FixNode(_Node);
+	return _result;
 }
-static struct _DictNode*
-_InsertNode(BLDictionary* _Dct, struct _DictNode* _Node, BLU32 _Key, const BLVoid* _Data)
+static void
+_NodeInc(struct _DictNode** _Node)
 {
-	struct _DictNode* _ret;
-	if (_Node == NULL)
-	{
-		_Dct->nSize++;
-		_ret = (struct _DictNode*)malloc(sizeof(struct _DictNode));
-		_Node = _ret;
-		_Node->bRed = TRUE;
-		_Node->nKey = _Key;
-		_Node->pData = (BLVoid**)malloc(sizeof(BLVoid*));
-		_Node->pNext = _Node->pLeft = _Node->pRight = NULL;
-		_Node->nTid = 0;
-		memcpy(_Node->pData, &_Data, sizeof(BLVoid*));
-		return _Node;
-	}
-	if (_IsNodeRed(_Node->pLeft) && _IsNodeRed(_Node->pRight))
-		_FlipNodeClr(_Node);
-	if (_Node->nKey == _Key)
-		memcpy(_Node->pData, &_Data, sizeof(BLVoid*));
-	else if (_Node->nKey < _Key)
-		_Node->pRight = _InsertNode(_Dct, _Node->pRight,_Key, _Data);
+	if (*_Node == NULL)
+		return;
+	if (_IsLeftChild(*_Node) && (*_Node)->pParent->pRight)
+		*_Node = _MinNode((*_Node)->pParent->pRight);
 	else
-		_Node->pLeft = _InsertNode(_Dct, _Node->pLeft, _Key, _Data);
-	if (_IsNodeRed(_Node->pRight))
-		_Node = _RotateLeft(_Node);
-	if (_IsNodeRed(_Node->pLeft) && _IsNodeRed(_Node->pLeft->pLeft))
-		_Node = _RotateRight(_Node);
-	return _Node;
+		*_Node = (*_Node)->pParent;
 }
 BLDictionary* 
 blGenDict(IN BLBool _Withthread)
 {
 	BLDictionary* _ret = (BLDictionary*)malloc(sizeof(BLDictionary));
 	_ret->nSize = 0;
-	_ret->nTid = 1;
 	_ret->pRoot = NULL;
 	if (_Withthread)
 		_ret->pMutex = blGenMutex();
@@ -198,7 +179,13 @@ blGenDict(IN BLBool _Withthread)
 BLVoid
 blDeleteDict(INOUT BLDictionary* _Dct)
 {
-	_FreeNodes(_Dct->pRoot);
+	struct _DictNode* _current = _MinNode(_Dct->pRoot);
+	while (_current != NULL)
+	{
+		struct _DictNode* _node = _current;
+		_NodeInc(&_current);
+		free(_node);
+	}
 	_Dct->pRoot = NULL;
 	_Dct->nSize = 0;
 	if (_Dct->pMutex)
@@ -209,75 +196,129 @@ blDeleteDict(INOUT BLDictionary* _Dct)
 BLVoid
 blClearDict(INOUT BLDictionary* _Dct)
 {
-	_FreeNodes(_Dct->pRoot);
+	struct _DictNode* _current = _MinNode(_Dct->pRoot);
+	while (_current != NULL)
+	{
+		struct _DictNode* _node = _current;
+		_NodeInc(&_current);
+		free(_node);
+	}
 	_Dct->pRoot = NULL;
 	_Dct->nSize = 0;
 }
 BLVoid*
 blDictElement(IN BLDictionary* _Dct, IN BLU32 _Key)
 {
-	struct _DictNode* _node;
-	for (_node = _Dct->pRoot; _node != NULL;) 
-	{
-		if (_Key == _node->nKey)
-			return *_node->pData;
-		_node = (_Key < _node->nKey) ? _node->pLeft : _node->pRight;
-	}
-	return _node?*_node->pData:NULL;
+	struct _DictNode* _node = _FindNode((BLDictionary*)_Dct, _Key);
+	if (_node)
+		return _node->pValue;
+	else
+		return NULL;
 }
 BLVoid
 blDictInsert(INOUT BLDictionary* _Dct, IN BLU32 _Key, IN BLVoid* _Data)
 {
-	struct _DictNode* _root;
-	_root = _InsertNode(_Dct, _Dct->pRoot, _Key, _Data);
-	_root->bRed = FALSE;
-	_Dct->pRoot = _root;
+	struct _DictNode* _newnode = (struct _DictNode*)malloc(sizeof(struct _DictNode));
+	_newnode->nKey = _Key;
+	_newnode->pLeft = NULL;
+	_newnode->pRight = NULL;
+	_newnode->pParent = NULL;
+	_newnode->bRed = TRUE;
+	_newnode->pValue = (BLVoid*)_Data;
+	if (!_InsertNode(_Dct, _newnode))
+	{
+		free(_newnode);
+		return;
+	}
+	while (_newnode->pParent != NULL && (_newnode->pParent->bRed))
+	{
+		if (_IsLeftChild(_newnode->pParent))
+		{
+			struct _DictNode* _newnodesuncle = _newnode->pParent->pParent->pRight;
+			if (_newnodesuncle != NULL && _newnodesuncle->bRed)
+			{
+				_newnode->pParent->bRed = FALSE;
+				_newnodesuncle->bRed = FALSE;
+				_newnode->pParent->pParent->bRed = TRUE;
+				_newnode = _newnode->pParent->pParent;
+			}
+			else
+			{
+				if (_IsRightChild(_newnode))
+				{
+					_newnode = _newnode->pParent;
+					_RotateLeft(_Dct, _newnode);
+				}
+				_newnode->pParent->bRed = FALSE;
+				_newnode->pParent->pParent->bRed = TRUE;
+				RotateRight(_Dct, _newnode->pParent->pParent);
+			}
+		}
+		else
+		{
+			struct _DictNode* _newnodesuncle = _newnode->pParent->pParent->pLeft;
+			if (_newnodesuncle != NULL && _newnodesuncle->bRed)
+			{
+				_newnode->pParent->bRed = FALSE;
+				_newnodesuncle->bRed = FALSE;
+				_newnode->pParent->pParent->bRed = TRUE;
+				_newnode = _newnode->pParent->pParent;
+			}
+			else
+			{
+				if (_IsLeftChild(_newnode))
+				{
+					_newnode = _newnode->pParent;
+					RotateRight(_Dct, _newnode);
+				}
+				_newnode->pParent->bRed = FALSE;
+				_newnode->pParent->pParent->bRed = TRUE;
+				_RotateLeft(_Dct, _newnode->pParent->pParent);
+			}
+		}
+	}
+	_Dct->pRoot->bRed = FALSE;
 }
 BLVoid
 blDictErase(INOUT BLDictionary* _Dct, IN BLU32 _Key)
 {
-	_Dct->pRoot = _EraseNode(_Dct, _Dct->pRoot, _Key);
-	if (_Dct->pRoot)
-		_Dct->pRoot->bRed = FALSE;
+	struct _DictNode* _node = _FindNode(_Dct, _Key);
+	if (!_node)
+		return;
+	while (_node->pRight)
+		_RotateLeft(_Dct, _node);
+	struct _DictNode* left = _node->pLeft;
+	if (_IsLeftChild(_node))
+		_SetLeftChild(_node->pParent, left);
+	else if (_IsRightChild(_node))
+		_SetRightChild(_node->pParent, left);
+	else
+		_SetRoot(_Dct, left);
+	free(_node);
+	--_Dct->nSize;
 }
 BLBool 
-blDictTraval(INOUT BLDictionary* _Dct, OUT BLVoid* _Node, OUT BLVoid** _Data)
+blDictTraval(INOUT BLDictionary* _Dct, OUT BLVoid** _Node, OUT BLVoid** _Data)
 {
-	struct _DictNode* _cursor;
-	struct _DictNode* _node = (struct _DictNode*) _Node;
-	BLU8 _tid = _node->nTid;
-	if (!_node->pNext)
+	if (!_Dct->nSize)
+		return FALSE;
+	struct _DictNode* _node = (struct _DictNode*)*_Node;
+	if (*_Data == NULL)
 	{
-		if (!_Dct->pRoot)
-			return FALSE;
-		_tid = (++_Dct->nTid);
+		_node = _MinNode(_Dct->pRoot);
+		*_Data = _node->pValue;
+		_NodeInc(&_node);
+		*_Node = _node;
+		return TRUE;
 	}
-	_cursor = ((_node->pNext) ? _node->pNext : _Dct->pRoot);
-	while (_cursor)
+	else if (*_Node != NULL)
 	{
-		if (_cursor->pLeft && _cursor->pLeft->nTid != _tid)
-		{
-			_cursor->pLeft->pNext = _cursor;
-			_cursor = _cursor->pLeft;
-			continue;
-		}
-		else if (_cursor->nTid != _tid)
-		{
-			_cursor->nTid = _tid;
-			*_node = *_cursor;
-			*_Data = *_node->pData;
-			_node->pNext = _cursor;
-			return TRUE;
-		}
-		else if (_cursor->pRight && _cursor->pRight->nTid != _tid)
-		{
-			_cursor->pRight->pNext = _cursor;
-			_cursor = _cursor->pRight;
-			continue;
-		}
-		_cursor = _cursor->pNext;
+		*_Data = ((struct _DictNode*)*_Node)->pValue;
+		_NodeInc(&_node);
+		*_Node = _node;
+		return TRUE;
 	}
-	(++_Dct->nTid);
-	return FALSE;
+	else
+		return FALSE;
 }
 

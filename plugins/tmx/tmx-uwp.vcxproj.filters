@@ -16,9 +16,15 @@
     <ClCompile Include="tmx.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\code\externals\xml\ezxml.c">
+      <Filter>externals</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tmx.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\xml\ezxml.h">
       <Filter>externals</Filter>
     </ClInclude>
   </ItemGroup>

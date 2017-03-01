@@ -310,7 +310,8 @@ _FontFace(const BLAnsi* _Filename, const BLAnsi* _Archive)
 		return NULL;
 	}
 	BLU32 _endi = 0, _starti = 0;
-	for (BLS32 _idx = (BLS32)strlen(_Filename); _idx > 0; --_idx)
+    BLS32 _filelen = (BLS32)strlen(_Filename);
+	for (BLS32 _idx = _filelen; _idx > 0; --_idx)
 	{
 		if (_Filename[_idx] == '.')
 			_endi = _idx - 1;
@@ -573,7 +574,7 @@ _QueryGlyph(_BLFont* _Font, BLU32 _Char, BLU32 _FontHeight)
 				_buf += _imgw;
 			}
 		}
-		blUpdateTexture(_glyphatlas->nCurTexture, 0, 0, BL_CTF_IGNORE, _glyphatlas->nRecordX, _glyphatlas->nRecordY, 0, _imgw, _imgh, 1, _buf);
+		blTextureUpdate(_glyphatlas->nCurTexture, 0, 0, BL_CTF_IGNORE, _glyphatlas->nRecordX, _glyphatlas->nRecordY, 0, _imgw, _imgh, 1, _buf);
 		free(_buf);
 		_glyphatlas->nRecordX = _xnext;
 		if (_ybot > _glyphatlas->nYB)
@@ -682,7 +683,7 @@ static _BLWidget*
 _QueryWidget(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren_)
 {
 	_BLWidget* _ret = _PrUIMem->pRoot;
-	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
+	FOREACH_ARRAY (_BLWidget*, _iter, _Node->pChildren)
 	{
 		if (URIPART_INTERNAL(_iter->nID) == _HashName)
 			return _iter;
@@ -699,7 +700,7 @@ _FrontWidget(_BLWidget* _Node)
 	if (!_Node->pParent)
 		return;
 	BLU32 _idx = 0;
-	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pParent->pChildren)
+	FOREACH_ARRAY (_BLWidget*, _iter, _Node->pParent->pChildren)
 	{
 		if (_Node == _iter)
 		{
@@ -862,7 +863,7 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 		_x = _PrUIMem->nFboWidth * 0.5f;
 		_y = _PrUIMem->nFboHeight * 0.5f;
 	}
-	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
+	FOREACH_ARRAY (_BLWidget*, _iter, _Node->pChildren)
 	{
 		_DrawWidget(_iter, _x, _y);
 	}
@@ -994,19 +995,19 @@ _UIDestroy()
     FT_Done_FreeType(_PrUIMem->sFtLibrary);
 	blDeleteUI(_PrUIMem->pRoot->nID);
 	{
-		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
+		FOREACH_ARRAY (_BLFont*, _iter, _PrUIMem->pFonts)
 		{
 			FT_Done_Face(_iter->sFtFace);
 			{
-				FOREACH_DICT(_BLGlyphAtlas*, _iter2, _iter->pAtlasDict)
+				FOREACH_DICT (_BLGlyphAtlas*, _iter2, _iter->pAtlasDict)
 				{
-					FOREACH_ARRAY(BLGuid*, _iter3, _iter2->pTextures)
+					FOREACH_ARRAY (BLGuid*, _iter3, _iter2->pTextures)
 					{
 						blDeleteTexture(*_iter3);
 						free(_iter3);
 					}
 					blDeleteArray(_iter2->pTextures);
-					FOREACH_DICT(_BLGlyph*, _iter4, _iter2->pGlyphs)
+					FOREACH_DICT (_BLGlyph*, _iter4, _iter2->pGlyphs)
 					{
 						free(_iter4);
 					}
@@ -1018,7 +1019,7 @@ _UIDestroy()
 		blDeleteArray(_PrUIMem->pFonts);
 	}
 	{
-		FOREACH_ARRAY(BLGuid*, _iter, _PrUIMem->pPixmaps)
+		FOREACH_ARRAY (BLGuid*, _iter, _PrUIMem->pPixmaps)
 		{
 			blDeleteTexture(*_iter);
 			free(_iter);
@@ -1923,7 +1924,7 @@ blDeleteUI(IN BLGuid _ID)
     BLU32 _idx = 0;
     if (_widget->pParent)
     {
-        FOREACH_ARRAY(_BLWidget*, _iter, _widget->pParent->pChildren)
+        FOREACH_ARRAY (_BLWidget*, _iter, _widget->pParent->pChildren)
         {
             if (_iter == _widget)
                 break;
@@ -1939,7 +1940,7 @@ blDeleteUI(IN BLGuid _ID)
         {
             if (_widget->uExtension.sPanel.pPixmapSheetDct)
             {
-                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sPanel.pPixmapSheetDct)
+                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sPanel.pPixmapSheetDct)
                 {
                     free(_iter);
                 }
@@ -1953,7 +1954,7 @@ blDeleteUI(IN BLGuid _ID)
                 free(_widget->uExtension.sLabel.pText);
             if (_widget->uExtension.sLabel.pPixmapSheetDct)
             {
-                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sLabel.pPixmapSheetDct)
+                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sLabel.pPixmapSheetDct)
                 {
                     free(_iter);
                 }
@@ -1967,7 +1968,7 @@ blDeleteUI(IN BLGuid _ID)
                 free(_widget->uExtension.sButton.pText);
             if (_widget->uExtension.sButton.pPixmapSheetDct)
             {
-                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sButton.pPixmapSheetDct)
+                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sButton.pPixmapSheetDct)
                 {
                     free(_iter);
                 }
@@ -1981,7 +1982,7 @@ blDeleteUI(IN BLGuid _ID)
                 free(_widget->uExtension.sCheck.pText);
             if (_widget->uExtension.sCheck.pPixmapSheetDct)
             {
-                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sCheck.pPixmapSheetDct)
+                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sCheck.pPixmapSheetDct)
                 {
                     free(_iter);
                 }
@@ -1993,7 +1994,7 @@ blDeleteUI(IN BLGuid _ID)
         {
             if (_widget->uExtension.sSlider.pPixmapSheetDct)
             {
-                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sSlider.pPixmapSheetDct)
+                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sSlider.pPixmapSheetDct)
                 {
                     free(_iter);
                 }
@@ -2009,7 +2010,7 @@ blDeleteUI(IN BLGuid _ID)
                 free(_widget->uExtension.sText.pPlaceholder);
             if (_widget->uExtension.sText.pPixmapSheetDct)
             {
-                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sText.pPixmapSheetDct)
+                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sText.pPixmapSheetDct)
                 {
                     free(_iter);
                 }
@@ -2023,7 +2024,7 @@ blDeleteUI(IN BLGuid _ID)
                 free(_widget->uExtension.sProgress.pText);
             if (_widget->uExtension.sProgress.pPixmapSheetDct)
             {
-                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sProgress.pPixmapSheetDct)
+                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sProgress.pPixmapSheetDct)
                 {
                     free(_iter);
                 }
@@ -2035,7 +2036,7 @@ blDeleteUI(IN BLGuid _ID)
         {
             if (_widget->uExtension.sDial.pPixmapSheetDct)
             {
-                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sDial.pPixmapSheetDct)
+                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sDial.pPixmapSheetDct)
                 {
                     free(_iter);
                 }
@@ -2047,7 +2048,7 @@ blDeleteUI(IN BLGuid _ID)
         {
             if (_widget->uExtension.sTable.pPixmapSheetDct)
             {
-                FOREACH_DICT(_BLPixmapSheet*, _iter, _widget->uExtension.sTable.pPixmapSheetDct)
+                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sTable.pPixmapSheetDct)
                 {
                     free(_iter);
                 }
@@ -2066,7 +2067,7 @@ blDeleteUI(IN BLGuid _ID)
         default:break;
     }
     {
-        FOREACH_ARRAY(_BLWidget*, _iter, _widget->pChildren)
+        FOREACH_ARRAY (_BLWidget*, _iter, _widget->pChildren)
         {
             _iter->pParent = NULL;
             blDeleteUI(_iter->nID);

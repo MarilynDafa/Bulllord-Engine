@@ -24,20 +24,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 typedef struct _Dictionary{
 	struct _DictNode {
-		BLU32 nKey;
-		BLVoid** pData;
-		BLBool bRed;
 		struct _DictNode* pLeft;
 		struct _DictNode* pRight;
-		struct _DictNode* pNext;
-		BLU8 nTid;
+		struct _DictNode* pParent;
+		BLU32 nKey;
+		BLVoid* pValue;
+		BLBool bRed;
 	}*pRoot;
 	BLU32 nSize;
 	blMutex* pMutex;
-	BLU8 nTid;
 }BLDictionary;
 
 BLDictionary* blGenDict(
@@ -64,17 +61,17 @@ BLVoid blDictErase(
 
 BLBool blDictTraval(
 	INOUT BLDictionary* _Dct, 
-	OUT BLVoid* _Node,
+	OUT BLVoid** _Node,
 	OUT BLVoid** _Data);
 
 #ifdef __cplusplus
-#define FOREACH_DICT(type , var , container) struct BLDictionary::_DictNode _iterator##var = {0};\
+#define FOREACH_DICT(type , var , container) struct BLDictionary::_DictNode* _iterator##var;\
 	type var = NULL;\
-	while (blDictTraval(container, &_iterator##var , (BLVoid**)&var))
+	while (blDictTraval(container, (BLVoid**)&_iterator##var , (BLVoid**)&var))
 #else
-#define FOREACH_DICT(type , var , container) struct _DictNode _iterator##var = {0};\
+#define FOREACH_DICT(type , var , container) struct _DictNode* _iterator##var;\
     type var = NULL;\
-    while (blDictTraval(container, &_iterator##var , (BLVoid**)&var))
+    while (blDictTraval(container, (BLVoid**)&_iterator##var , (BLVoid**)&var))
 #endif
 
 #ifdef __cplusplus

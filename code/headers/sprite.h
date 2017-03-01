@@ -38,7 +38,11 @@ BL_API BLGuid blGenSprite(
 
 BL_API BLVoid blDeleteSprite(
 	IN BLGuid _ID);
-
+    
+BL_API BLVoid blSpriteClear(
+    IN BLBool _Tiles,
+    IN BLBool _Actors);
+    
 BL_API BLBool blSpriteAttach(
 	IN BLGuid _Parent,
 	IN BLGuid _Child,
@@ -134,6 +138,18 @@ BL_API BLBool blSpriteScissor(
     IN BLF32 _YPos,
     IN BLF32 _Width,
     IN BLF32 _Height);
+    
+BL_API BLVoid blSpriteTile(
+    IN BLGuid _ID,
+    IN BLAnsi* _ImageFile,
+    IN BLAnsi* _Archive,
+    IN BLBool _FlipX,
+    IN BLBool _FlipY,
+    IN BLBool _Diagonal,
+    IN BLF32 _TexLTx,
+    IN BLF32 _TexLTy,
+    IN BLF32 _TexRBx,
+    IN BLF32 _TexRBy);
     
 BL_API BLBool blSpriteAsEmit(
     IN BLGuid _ID,

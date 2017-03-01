@@ -2803,7 +2803,7 @@ _CloseWindow()
 }
 - (BLVoid)initKeyboard
 {
-    _PrSystemMem->pTICcxt = [[UITextField alloc] initWithFrame:CGRectZero];
+    _PrSystemMem->pTICcxt = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
     _PrSystemMem->pTICcxt.delegate = self;
     _PrSystemMem->pTICcxt.text = @" ";
     _PrSystemMem->pTICcxt.autocapitalizationType = UITextAutocapitalizationTypeNone;
@@ -3087,16 +3087,16 @@ _SystemInit()
 {
 	_PrSystemMem->nSysTime = blSystemTicks();
     _ShowWindow();
+#ifdef BL_PLATFORM_ANDROID
+	_StreamIOInit(_PrSystemMem->pActivity->assetManager);
+#else
+	_StreamIOInit(NULL);
+#endif
     _UtilsInit();
     _AudioInit();
     _NetworkInit();
     _UIInit();
     _SpriteInit();
-#ifdef BL_PLATFORM_ANDROID
-    _StreamIOInit(_PrSystemMem->pActivity->assetManager);
-#else
-    _StreamIOInit(NULL);
-#endif
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
 	_GbSystemRunning = TRUE;
 	_PrSystemMem->pBeginFunc();
@@ -3105,7 +3105,7 @@ _SystemInit()
 BLVoid
 _SystemStep()
 {
-    blClearFrameBuffer(INVALID_GUID, TRUE, TRUE, TRUE);
+	blFrameBufferClear(INVALID_GUID, TRUE, TRUE, TRUE);
     BLU32 _now = blSystemTicks();
     BLU32 _delta = _now - _PrSystemMem->nSysTime;
     _PrSystemMem->nSysTime = _now;
@@ -3154,12 +3154,12 @@ _SystemDestroy()
 		_GbVideoPlaying = FALSE;
 	}
 	_PrSystemMem->pEndFunc();
-	_StreamIODestroy();
     _SpriteDestroy();
 	_UIDestroy();
     _NetworkDestroy();
     _AudioDestroy();
     _UtilsDestroy();
+	_StreamIODestroy();
     _CloseWindow();
     if (_PrSystemMem->pEvents)
         free(_PrSystemMem->pEvents);
@@ -3718,7 +3718,7 @@ blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 			memcpy(_Value, _str, strlen((const BLAnsi*)_str));
 		else
 		{
-			FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
+			FOREACH_DICT (BLUtf8*, _iter, _tmpdic)
 			{
 				free(_iter);
 			}
@@ -3754,9 +3754,9 @@ blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 #else
 		_fp = CreateFileA(_path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
-		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
+		FOREACH_DICT (BLUtf8*, _iter, _tmpdic)
 		{
-			WriteFile(_fp, &_iterator_iter.nKey, sizeof(BLU32), NULL, NULL);
+			WriteFile(_fp, &_iterator_iter->nKey, sizeof(BLU32), NULL, NULL);
 			_sz = strlen((const BLAnsi*)_iter);
 			WriteFile(_fp, &_sz, sizeof(BLU32), NULL, NULL);
 			WriteFile(_fp, _iter, _sz, NULL, NULL);
@@ -3766,7 +3766,7 @@ blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 		CloseHandle(_fp);
 #else
 		_fp = fopen(_path, "wb");
-		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
+		FOREACH_DICT (BLUtf8*, _iter, _tmpdic)
 		{
 			fwrite(&_iterator_iter.nKey, sizeof(BLU32), 1, _fp);
 			_sz = (BLU32)strlen((const BLAnsi*)_iter);
@@ -3778,7 +3778,7 @@ blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 		fclose(_fp);
 #endif
 	}
-	FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
+	FOREACH_DICT (BLUtf8*, _iter, _tmpdic)
 	{
 		free(_iter);
 	}

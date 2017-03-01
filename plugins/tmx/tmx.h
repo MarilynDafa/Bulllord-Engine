@@ -39,24 +39,10 @@ BL_API BLVoid blTMXQueryEXT(
 	OUT BLU32* _TileWidth,
 	OUT BLU32* _TileHeight);
 
-BL_API BLVoid blTMXTilesetQueryEXT(
-	IN BLAnsi* _Name,
-	OUT BLU32* _FirstGid,
-	OUT BLU32* _Width,
-	OUT BLU32* _Height,
-	OUT BLU32* _TileWidth,
-	OUT BLU32* _TileHeight);
-
-BL_API BLVoid blTMXLayerQueryEXT(
-	IN BLAnsi* _Name,
-	OUT BLU32* _Width,
-	OUT BLU32* _Height);
-
 BL_API BLVoid blTMXObjectGroupQueryEXT(
 	IN BLAnsi* _GroupName,
 	OUT BLU32* _ObjectNum,
-	OUT BLU32* _Width,
-	OUT BLU32* _Height);
+	OUT BLBool* _Visible);
 
 //name0:valye0,name1:value1,name2:value2
 BL_API BLVoid blTMXObjectQueryEXT(

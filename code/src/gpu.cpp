@@ -1626,21 +1626,21 @@ _GpuAnitIntervention(HWND _Hwnd)
 		wglDeleteContext(_PrGpuMem->sGLRC);
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2216,7 +2216,7 @@ _GpuAnitIntervention()
 		}
 	}
 	{
-		FOREACH_DICT(_BLTextureBufferDX*, _iter, _PrGpuMem->pTextureDict)
+		FOREACH_DICT (_BLTextureBufferDX*, _iter, _PrGpuMem->pTextureDict)
 		{
 			if (NULL != _iter->pPtr)
 				blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _iter->pPtr);
@@ -2270,7 +2270,7 @@ _GpuAnitIntervention()
 	_PrGpuMem->pAdapter->Release();
 	_PrGpuMem->pDxgiFactory->Release();
 	{
-		FOREACH_DICT(struct _BLUniformBuffer::_UniformInfo*, _iter, _PrGpuMem->sUniformBuffer.pUniforms)
+		FOREACH_DICT (struct _BLUniformBuffer::_UniformInfo*, _iter, _PrGpuMem->sUniformBuffer.pUniforms)
 		{
 			free(_iter);
 		}
@@ -2280,21 +2280,21 @@ _GpuAnitIntervention()
 	for (_idx = 0; _idx < 256; ++_idx)
 		blDeleteArray(_PrGpuMem->sCmdQueue.pRelease[_idx]);
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2393,21 +2393,21 @@ BLVoid
 _GpuAnitIntervention()
 {
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2524,21 +2524,21 @@ _GpuAnitIntervention()
 		eglTerminate(_PrGpuMem->pEglDisplay);
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2566,6 +2566,7 @@ _GpuIntervention(NSView* _View, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
     _PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
     _PrGpuMem->pTextureCache = blGenDict(TRUE);
     _PrGpuMem->pBufferCache = blGenDict(TRUE);
+    _PrGpuMem->pTechCache = blGenDict(TRUE);
     for (BLU32 _idx = 0 ; _idx < BL_TF_COUNT ; ++_idx)
         _PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
     _PrGpuMem->pGLC = nil;
@@ -2681,21 +2682,21 @@ _GpuAnitIntervention()
         [_PrGpuMem->pGLC release];
     }
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2732,21 +2733,21 @@ BLVoid
 _GpuAnitIntervention()
 {
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2946,7 +2947,7 @@ blDeleteFrameBuffer(IN BLGuid _FBO)
     blDeleteGuid(_FBO);
 }
 BLVoid
-blClearFrameBuffer(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN BLBool _StencilBit)
+blFrameBufferClear(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN BLBool _StencilBit)
 {
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
 #if defined(BL_GL_BACKEND)
@@ -2985,7 +2986,7 @@ blClearFrameBuffer(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN 
 #endif
 }
 BLVoid
-blBindFrameBuffer(IN BLGuid _FBO)
+blFrameBufferBind(IN BLGuid _FBO)
 {
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
     if (!_fbo)
@@ -3010,7 +3011,7 @@ blBindFrameBuffer(IN BLGuid _FBO)
 #endif
 }
 BLVoid
-blResolveFrameBuffer(IN BLGuid _FBO)
+blFrameBufferResolve(IN BLGuid _FBO)
 {
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
     if (!_fbo)
@@ -3069,7 +3070,7 @@ blResolveFrameBuffer(IN BLGuid _FBO)
 #endif
 }
 BLVoid
-blDiscardFrameBuffer(IN BLGuid _FBO, IN BLBool _DiscardColor, IN BLBool _DiscardDepth, IN BLBool _DiscardStencil)
+blFrameBufferDiscard(IN BLGuid _FBO, IN BLBool _DiscardColor, IN BLBool _DiscardDepth, IN BLBool _DiscardStencil)
 {
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
     if (!_fbo)
@@ -3107,7 +3108,7 @@ blDiscardFrameBuffer(IN BLGuid _FBO, IN BLBool _DiscardColor, IN BLBool _Discard
 #endif
 }
 BLU32
-blAttachFrameBuffer(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _CFace)
+blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _CFace)
 {
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
     if (!_fbo)
@@ -3120,7 +3121,7 @@ blAttachFrameBuffer(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
     BLU32 _height;
     BLU32 _depth;
     BLU32 _size;
-    blQueryTexture(_Tex, &_type, &_format, &_array, &_mipmap, &_width, &_height, &_depth, &_size);
+    blTextureQuery(_Tex, &_type, &_format, &_array, &_mipmap, &_width, &_height, &_depth, &_size);
     _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
@@ -3195,7 +3196,7 @@ blAttachFrameBuffer(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
     return _fbo->nAttachmentNum;
 }
 BLVoid
-blDetachFrameBuffer(IN BLGuid _FBO, IN BLU32 _Index, IN BLBool _DepthStencil)
+blFrameBufferDetach(IN BLGuid _FBO, IN BLU32 _Index, IN BLBool _DepthStencil)
 {
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
     if (!_fbo)
@@ -3507,6 +3508,8 @@ blDeleteTexture(IN BLGuid _Tex)
 {
     BLBool _discard = FALSE;
     _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+	if (!_tex)
+		return;
     blMutexLock(_PrGpuMem->pTextureCache->pMutex);
     _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, URIPART_INTERNAL(_Tex));
     if (_res)
@@ -3578,6 +3581,8 @@ BLVoid
 blTextureFilter(IN BLGuid _Tex, IN BLEnum _MinFilter, IN BLEnum _MagFilter, IN BLEnum _WrapS, IN BLEnum _WrapT, IN BLBool _Anisotropy)
 {
     _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+	if (!_tex)
+		return;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -3656,9 +3661,11 @@ blTextureFilter(IN BLGuid _Tex, IN BLEnum _MinFilter, IN BLEnum _MagFilter, IN B
 #endif
 }
 BLVoid
-blUpdateTexture(IN BLGuid _Tex, IN BLU32 _Layer, IN BLU32 _Level, IN BLEnum _Face, IN BLU32 _XOffset, IN BLU32 _YOffset, IN BLU32 _ZOffset, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, IN BLVoid* _Data)
+blTextureUpdate(IN BLGuid _Tex, IN BLU32 _Layer, IN BLU32 _Level, IN BLEnum _Face, IN BLU32 _XOffset, IN BLU32 _YOffset, IN BLU32 _ZOffset, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, IN BLVoid* _Data)
 {
     _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+	if (!_tex)
+		return;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -3778,9 +3785,11 @@ blUpdateTexture(IN BLGuid _Tex, IN BLU32 _Layer, IN BLU32 _Level, IN BLEnum _Fac
 #endif
 }
 BLVoid
-blQueryTexture(IN BLGuid _Tex, OUT BLEnum* _Target, OUT BLEnum* _Format, OUT BLU32* _Layer, OUT BLU32* _Mipmap, OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _Depth, OUT BLU32* _Size)
+blTextureQuery(IN BLGuid _Tex, OUT BLEnum* _Target, OUT BLEnum* _Format, OUT BLU32* _Layer, OUT BLU32* _Mipmap, OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _Depth, OUT BLU32* _Size)
 {
     _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+	if (!_tex)
+		return;
     *_Target = _tex->eTarget;
     *_Format = _tex->eFormat;
     *_Layer = _tex->nLayer;
@@ -3798,7 +3807,7 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
     if (!_Dynamic)
     {
         blMutexLock(_PrGpuMem->pBufferCache->pMutex);
-        _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _Hash);
+        _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pBufferCache, _Hash);
         _geo = _res ? (_BLGeometryBuffer*)_res->pRes : NULL;
         if (_res)
             _res->nRefCount++;
@@ -3924,6 +3933,8 @@ blDeleteGeometryBuffer(IN BLGuid _GBO)
 {
     BLBool _discard = FALSE;
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+	if (!_geo)
+		return;
     blMutexLock(_PrGpuMem->pBufferCache->pMutex);
     _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pBufferCache, URIPART_INTERNAL(_geo->nID));
     if (_res)
@@ -3932,7 +3943,7 @@ blDeleteGeometryBuffer(IN BLGuid _GBO)
         if (_res->nRefCount <= 0)
         {
             _discard = TRUE;
-            free(_res);
+			free(_res);
             blDictErase(_PrGpuMem->pBufferCache, URIPART_INTERNAL(_geo->nID));
         }
     }
@@ -3998,9 +4009,11 @@ blGainGeometryBuffer(IN BLU32 _Hash)
         return INVALID_GUID;
 }
 BLVoid
-blUpdateGeometryBuffer(IN BLGuid _GBO, IN BLU32 _VBOffset, IN BLU8* _VBO, IN BLU32 _VBSz, IN BLU32 _IBOffset, IN BLU8* _IBO, IN BLU32 _IBSz)
+blGeometryBufferUpdate(IN BLGuid _GBO, IN BLU32 _VBOffset, IN BLU8* _VBO, IN BLU32 _VBSz, IN BLU32 _IBOffset, IN BLU8* _IBO, IN BLU32 _IBSz)
 {
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+	if (!_geo)
+		return;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -4029,11 +4042,13 @@ blUpdateGeometryBuffer(IN BLGuid _GBO, IN BLU32 _VBOffset, IN BLU8* _VBO, IN BLU
 #endif
 }
 BLVoid
-blInstanceGeometryBuffer(IN BLGuid _GBO, IN BLEnum* _Semantic, IN BLEnum* _Decl, IN BLU32 _DeclNum, IN BLU32 _Instance)
+blGeometryBufferInstance(IN BLGuid _GBO, IN BLEnum* _Semantic, IN BLEnum* _Decl, IN BLU32 _DeclNum, IN BLU32 _Instance)
 {
     if (_DeclNum > 4)
         return;
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+	if (!_geo)
+		return;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -4086,6 +4101,8 @@ BLVoid
 blInstanceUpdate(IN BLGuid _GBO, IN BLEnum _Semantic, IN BLVoid* _Buffer, IN BLU32 _BufferSz)
 {
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+	if (!_geo)
+		return;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -4157,7 +4174,6 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
             _stream = blGenStream(_Filename, _Archive);
         else
         {
-            BLU32 _idx;
             BLAnsi _tmpname[260];
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
             strcpy_s(_tmpname, 260, (const BLAnsi*)_Filename);
@@ -4168,16 +4184,6 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
             strcpy(_path, blWorkingDir(_ContentDir));
             strcat(_path, _tmpname);
 #endif
-            for (_idx = 0; _idx < strlen(_path); ++_idx)
-            {
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-                if (_path[_idx] == '/')
-                    _path[_idx] = '\\';
-#else
-                if (_path[_idx] == '\\')
-                    _path[_idx] = '/';
-#endif
-            }
             _stream = blGenStream(_path, NULL);
         }
         _doc = ezxml_parse_str((BLAnsi*)blStreamData(_stream), blStreamLength(_stream));
@@ -4429,6 +4435,8 @@ BLVoid
 blTechUniform(IN BLGuid _Tech, IN BLEnum _Type, IN BLAnsi* _Name, IN BLVoid* _Data, IN BLU32 _DataSz)
 {
     _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
+    if (!_tech)
+        return;
     BLU32 _idx = 0;
     for (_idx = 0; _idx < 16; ++_idx)
     {
@@ -4485,6 +4493,8 @@ blTechSampler(IN BLGuid _Tech, IN BLAnsi* _Name, IN BLGuid _Tex, IN BLU32 _Unit)
 {
     _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
     _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+    if (!_tech || !_tex)
+        return;
     BLU32 _idx = 0;
     for (_idx = 0; _idx < 16; ++_idx)
     {

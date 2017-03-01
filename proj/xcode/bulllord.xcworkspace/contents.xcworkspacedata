@@ -3,9 +3,19 @@
    version = "1.0">
    <Group
       location = "container:"
-      name = "test">
+      name = "Plugins">
       <FileRef
-         location = "group:ghgh/ghgh.xcodeproj">
+         location = "group:../../plugins/tmx/tmx-ios.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:../../plugins/tmx/tmx-osx.xcodeproj">
+      </FileRef>
+   </Group>
+   <Group
+      location = "container:"
+      name = "sample">
+      <FileRef
+         location = "group:../../samples/sample/sample.xcodeproj">
       </FileRef>
    </Group>
    <Group

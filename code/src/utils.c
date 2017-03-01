@@ -38,12 +38,8 @@ typedef struct _UtilsMember {
 	blMutex* pMutex;
 	_BLCtx sContext;
 	BLAnsi aMd5Buf[64];
-	BLAnsi aPusBuf[256];
-	BLU8 aDigest[16];
 	BLUtf8 aU8Buf[32];
 	BLUtf16 aU16Buf[32];
-	BLU8 aPadding[64];
-	BLAnsi inalphabet[256];
     BLU32 nUriCount;
 }_BLUtilsMember;
 static _BLUtilsMember* _PrUtilsMem = NULL;
@@ -183,9 +179,7 @@ _UtilsInit()
 	_PrUtilsMem = (_BLUtilsMember*)malloc(sizeof(_BLUtilsMember));
 	memset(_PrUtilsMem->aU8Buf, 0, sizeof(_PrUtilsMem->aU8Buf));
 	memset(_PrUtilsMem->aU16Buf, 0, sizeof(_PrUtilsMem->aU16Buf));
-	memset(_PrUtilsMem->aPadding, 0, sizeof(_PrUtilsMem->aPadding));
 	memset(_PrUtilsMem->aPtrBuf, 0, sizeof(_PrUtilsMem->aPtrBuf));
-	_PrUtilsMem->aPadding[0] = 0x80;
 	_PrUtilsMem->sMemCache.nUsed = 0;
 	_PrUtilsMem->sMemCache.nMax = MEMCACHE_CAP_INTERNAL;
 	_PrUtilsMem->sMemCache.pDense = (BLU32*)malloc(_PrUtilsMem->sMemCache.nMax * sizeof(BLU32));
@@ -234,6 +228,8 @@ blGenGuid(IN BLVoid* _Ptr, IN BLU32 _Uri)
 			_inptr = _PrUtilsMem->sMemCache.pDense[_index];
 			_PrUtilsMem->sMemCache.pSparse[_inptr] = _index;
 		}
+        else
+            blDebugOutput("GUID gen error");
 		_PrUtilsMem->aPtrBuf[_inptr] = (BLVoid*)_Ptr;
 	}
 	BLGuid _gid;
@@ -323,19 +319,22 @@ blMD5String(IN BLAnsi* _Str)
 	}
 	_index = (BLU32)((_PrUtilsMem->sContext.aCount[0] >> 3) & 0x3f);
 	_padlen = (_index < 56) ? (56 - _index) : (120 - _index);
-	_MD5Update(_PrUtilsMem->aPadding, _padlen);
+	BLU8 _padding[64] = { 0 };
+	_padding[0] = 0x80;
+	_MD5Update(_padding, _padlen);
 	_MD5Update(_bits, 8);
+	BLU8 _digest[16];
 	for (_i = 0, _j = 0; _j < 16; _i++, _j += 4)
 	{
-		_PrUtilsMem->aDigest[_j] = (BLU8)(_PrUtilsMem->sContext.aState[_i] & 0xff);
-		_PrUtilsMem->aDigest[_j + 1] = (BLU8)((_PrUtilsMem->sContext.aState[_i] >> 8) & 0xff);
-		_PrUtilsMem->aDigest[_j + 2] = (BLU8)((_PrUtilsMem->sContext.aState[_i] >> 16) & 0xff);
-		_PrUtilsMem->aDigest[_j + 3] = (BLU8)((_PrUtilsMem->sContext.aState[_i] >> 24) & 0xff);
+		_digest[_j] = (BLU8)(_PrUtilsMem->sContext.aState[_i] & 0xff);
+		_digest[_j + 1] = (BLU8)((_PrUtilsMem->sContext.aState[_i] >> 8) & 0xff);
+		_digest[_j + 2] = (BLU8)((_PrUtilsMem->sContext.aState[_i] >> 16) & 0xff);
+		_digest[_j + 3] = (BLU8)((_PrUtilsMem->sContext.aState[_i] >> 24) & 0xff);
 	}
 	memset(&_PrUtilsMem->sContext, 0, sizeof(_BLCtx));
 	memset(_PrUtilsMem->aMd5Buf, 0, sizeof(_PrUtilsMem->aMd5Buf));
 	for (_i = 0; _i<16; _i++)
-		sprintf(_PrUtilsMem->aMd5Buf, "%s%02x", _PrUtilsMem->aMd5Buf, _PrUtilsMem->aDigest[_i]);
+		sprintf(_PrUtilsMem->aMd5Buf, "%s%02x", _PrUtilsMem->aMd5Buf, _digest[_i]);
 	return _PrUtilsMem->aMd5Buf;
 }
 BLU32
@@ -982,47 +981,38 @@ blGetExtNameUtf16(IN BLUtf16* _Filename)
 const BLAnsi*
 blGenBase64Encoder(IN BLU8* _Blob, IN BLU32 _Size)
 {
-	const BLAnsi _alphabet[] = "ABCDEFGH" "IJKLMNOP" "QRSTUVWX" "YZabcdef"	"ghijklmn" "opqrstuv" "wxyz0123" "456789+/";
-	const BLAnsi _padchar = '=';
-	BLS32 _padlen = 0;
-	BLAnsi* _tmp = (BLAnsi*)malloc((_Size * 4) / 3 + 3);
-	BLU32 _i = 0;
-	BLAnsi* _out = (BLAnsi*)_tmp;
-	while (_i < _Size)
-	{
-		BLS32 _chunk = 0;
-		_chunk |= (BLS32)((BLU8)(_Blob[_i++])) << 16;
-		if (_i == _Size)
-			_padlen = 2;
-		else
-		{
-			_chunk |= (BLS32)((BLU8)(_Blob[_i++])) << 8;
-			if (_i == _Size)
-				_padlen = 1;
-			else
-				_chunk |= (BLS32)((BLU8)(_Blob[_i++]));
-		}
-		BLS32 j = (_chunk & 0x00fc0000) >> 18;
-		BLS32 k = (_chunk & 0x0003f000) >> 12;
-		BLS32 l = (_chunk & 0x00000fc0) >> 6;
-		BLS32 m = (_chunk & 0x0000003f);
-		*_out++ = _alphabet[j];
-		*_out++ = _alphabet[k];
-		if (_padlen > 1)
-			*_out++ = _padchar;
-		else
-			*_out++ = _alphabet[l];
-		if (_padlen > 0)
-			*_out++ = _padchar;
-		else
-			*_out++ = _alphabet[m];
-	}
-	BLU32 _sz = (BLU32)(_out - _tmp);
-	BLAnsi* _ret = (BLAnsi*)malloc(_sz + 1);
-	strncpy(_ret, _tmp, _sz);
-	_ret[_sz] = 0;
-	free(_tmp);
-	return _ret;
+    const BLAnsi _b64enc[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "abcdefghijklmnopqrstuvwxyz" "0123456789" "+/";
+    BLU32 _idx, _jdx, _mlen, _rpos, _dif;
+    BLU32 _frame = 0;
+    BLAnsi _out[5];
+    BLAnsi* _res;
+    _mlen = 4 * _Size / 3 + 1;
+    if (_Size % 3)
+        _mlen += 4;
+    _res = (BLAnsi*)malloc(_mlen);
+    if (!_res)
+        return NULL;
+    _res[_mlen - 1] = '\0';
+    _out[4] = '\0';
+    for (_idx = 0; _idx < _Size; _idx += 3)
+    {
+        _dif = (_Size - _idx) / 3 ? 3 : (_Size - _idx) % 3;
+        for (_jdx = 0; _jdx < _dif; ++_jdx)
+            memcpy(((BLAnsi*)&_frame) + 2 - _jdx, _Blob + _idx + _jdx, 1);
+        for (_jdx = 0; _jdx < _dif + 1; ++_jdx)
+        {
+            _out[_jdx] = (BLAnsi)((_frame & 0xFC0000) >> 18);
+            _out[_jdx] = _b64enc[_out[_jdx]];
+            _frame = _frame << 6;
+        }
+        if (_dif == 1)
+            _out[2] = _out [3] = '=';
+        else if (_dif == 2)
+            _out [3] = '=';
+        _rpos = (_idx / 3) * 4;
+        strcpy(_res + _rpos, _out);
+    }
+    return _res;
 }
 BLVoid
 blDeleteBase64Encoder(INOUT BLAnsi* _String)
@@ -1032,78 +1022,52 @@ blDeleteBase64Encoder(INOUT BLAnsi* _String)
 const BLU8*
 blGenBase64Decoder(IN BLAnsi* _String, OUT BLU32* _Size)
 {
-	BLU32 _inlen = (BLU32)strlen(_String);
-	BLU32 _outlength = 0;
-	BLU8* _ret = (BLU8*)malloc((BLU32)(_inlen * 3.0f / 4.0f) + 1);
-	if (_ret)
-	{
-		BLS32 _i, _bits, _c = 0, _charcount, _errors = 0;
-		BLU32 _inputidx = 0;
-		BLU32 _outputidx = 0;
-		BLU8 _alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-		BLAnsi _inalphabet[256];
-		BLAnsi _decoder[256];
-		for (_i = (sizeof(_alphabet)) - 1; _i >= 0; _i--)
-		{
-			_inalphabet[_alphabet[_i]] = 1;
-			_decoder[_alphabet[_i]] = _i;
-		}
-		_charcount = 0;
-		_bits = 0;
-		for (_inputidx = 0; _inputidx < _inlen; _inputidx++)
-		{
-			_c = _String[_inputidx];
-			if (_c == '=')
-				break;
-			if (_c > 255 || !_inalphabet[_c])
-				continue;
-			_bits += _decoder[_c];
-			_charcount++;
-			if (_charcount == 4)
-			{
-				_ret[_outputidx++] = (_bits >> 16);
-				_ret[_outputidx++] = ((_bits >> 8) & 0xff);
-				_ret[_outputidx++] = (_bits & 0xff);
-				_bits = 0;
-				_charcount = 0;
-			}
-			else
-				_bits <<= 6;
-		}
-		if (_c == '=')
-		{
-			switch (_charcount)
-			{
-			case 1:
-				_errors++;
-				break;
-			case 2:
-				_ret[_outputidx++] = (_bits >> 10);
-				break;
-			case 3:
-				_ret[_outputidx++] = (_bits >> 16);
-				_ret[_outputidx++] = ((_bits >> 8) & 0xff);
-				break;
-            default:
-                assert(0);
-                break;
-			}
-		}
-		else if (_inputidx < _inlen)
-		{
-			if (_charcount)
-				_errors++;
-		}
-		_outlength = _outputidx;
-		if (_errors > 0)
-		{
-			free(_ret);
-			_ret = NULL;
-			_outlength = 0;
-		}
-	}
-	*_Size = _outlength;
-	return _ret;
+    BLU8* _res, _v;
+    BLU32 _jdx, _idx;
+    BLU32 _in = 0;
+    BLU32 _srclen = (BLU32)(strlen(_String));
+    if (_srclen % 4)
+        return NULL;
+    *_Size = (_srclen / 4) * 3;
+    _res = (BLU8*)malloc(*_Size);
+    if (!_res)
+        return NULL;
+    for (_idx = 0; _idx < _srclen; _idx += 4)
+    {
+        _in = 0;
+        for (_jdx = 0; _jdx < 4; ++_jdx)
+        {
+            BLAnsi _c = _String[_idx + _jdx];
+            if (_c >= 'A' && _c <= 'Z')
+                _v = _c - 'A';
+            else if (_c >= 'a' && _c <= 'z')
+                _v = _c - 'a' + 26;
+            else if (_c >= '0' && _c <= '9')
+                _v = _c - '0' + 52;
+            else if (_c == '+')
+                _v = 62;
+            else if (_c == '/')
+                _v = 63;
+            else if (_c == '=')
+                _v = 0;
+            else
+                _v = 0xFF;
+            if (_v == 0xFF)
+            {
+                free(_res);
+                return NULL;
+            }
+            _in = _in << 6;
+            _in += _v;
+        }
+        for (_jdx = 0; _jdx < 3; ++_jdx)
+            memcpy(_res + (_idx / 4) * 3 + _jdx, ((BLU8*)&_in) + 2 - _jdx, 1);
+    }
+    if (_String[_srclen-1] == '=')
+        (*_Size)--;
+    if (_String[_srclen-2] == '=')
+        (*_Size)--;
+    return _res;
 }
 BLVoid
 blDeleteBase64Decoder(INOUT BLU8* _Blob)
