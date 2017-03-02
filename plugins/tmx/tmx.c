@@ -123,6 +123,7 @@ blTMXFileEXT(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 	_PrTmxMem->nLayerNum = 0;
 	_PrTmxMem->pGroups = NULL;
 	_PrTmxMem->nGroupNum = 0;
+	blSpriteClear(TRUE, FALSE);
 	memset(_PrTmxMem->aOrientation, 0, sizeof(_PrTmxMem->aOrientation));
 	BLGuid _stream;
     BLAnsi _dir[260] = { 0 };
@@ -258,14 +259,12 @@ blTMXFileEXT(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
                                     _gid &= ~(0x80000000 | 0x40000000 | 0x20000000);
                                     memset(_buf, 0, 32);
                                     sprintf(_buf, "@#tilesprite_%d#@", _gid);
-                                    BLGuid _id = blGenSprite(_buf, _Archive, NULL, (BLF32)_PrTmxMem->nTileWidth, (BLF32)_PrTmxMem->nTileHeight, 0, 1, TRUE);
-                                    blSpritePivot(_id, 0.f, 0.f, TRUE);
+                                    BLGuid _id = blGenSprite(_buf, _Archive, "0", (BLF32)_PrTmxMem->nTileWidth, (BLF32)_PrTmxMem->nTileHeight, 0, 1, TRUE);
                                     BLF32 _ltx = (BLF32)_x * _PrTmxMem->nTileWidth / 2048.f;
                                     BLF32 _lty = (BLF32)_y  * _PrTmxMem->nTileHeight / 2048.f;
                                     BLF32 _rbx = (BLF32)(_x + 1) * _PrTmxMem->nTileWidth / 2048.f;
                                     BLF32 _rby = (BLF32)(_y + 1) * _PrTmxMem->nTileHeight / 2048.f;
-                                    blSpriteTile(_id, _source, _Archive, _flippedh, _flippedv, _flippedd, _ltx, _lty, _rbx, _rby);
-                                    blSpriteMove(_id, (BLF32)_x * _PrTmxMem->nTileWidth, (BLF32)_y * _PrTmxMem->nTileHeight);
+                                    blSpriteTile(_id, _source, _Archive, _flippedh, _flippedv, _flippedd, _ltx, _lty, _rbx, _rby, (BLF32)_x * _PrTmxMem->nTileWidth, (BLF32)_y * _PrTmxMem->nTileHeight);
                                 }
                             }
                             free(_orimem);

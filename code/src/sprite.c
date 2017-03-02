@@ -99,6 +99,22 @@ typedef struct _SpriteSheet{
 	BLU32 nOffsetX;
 	BLU32 nOffsetY;
 }_BLSpriteSheet;
+typedef struct _TileInfo{
+	BLGuid nID;
+	BLAnsi aFilename[260];
+	BLAnsi aArchive[260];
+	BLGuid nTex;
+	BLVec2 sSize;
+	BLVec2 sPos;
+	BLF32 fTexLTx;
+	BLF32 fTexLTy;
+	BLF32 fTexRBx;
+	BLF32 fTexRBy;
+	BLBool bFlipX;
+	BLBool bFlipY;
+	BLBool bFlipD;
+	BLBool bShow;
+}_BLTileInfo;
 typedef struct _SpriteNode{
     struct _SpriteNode* pParent;
     struct _SpriteNode** pChildren;
@@ -138,7 +154,6 @@ typedef struct _SpriteNode{
     BLU32 nGlowColor;
     BLU32 nBrightness;
     BLU32 nChildren;
-	BLBool bTile;
 	BLBool bValid;
     BLBool bShow;
 }_BLSpriteNode;
@@ -149,7 +164,7 @@ typedef struct _SpriteMember {
 	BLGuid nSpriteGlowTech;
     _BLSpriteNode** pNodeList;
 	_BLSpriteNode* pCursor;
-	BLArray* pTileArray;
+	BLArray* pTileArray[8];
 	BLRect sViewport;
 	BLBool bParallelEdit;
     BLU32 nNodeNum;
@@ -186,8 +201,6 @@ static BLVoid
 _AddToNodeList(_BLSpriteNode* _Node)
 {
     BLS32 _mid = -1, _left = 0, _right = _PrSpriteMem->nNodeNum;
-	if (_Node->bTile)
-		return;
     while (_left < _right)
     {
         _mid = (_left + _right) >> 1;
@@ -230,8 +243,6 @@ _RemoveFromNodeList(_BLSpriteNode* _Node)
 {
     BLBool _found = FALSE;
     BLS32 _mid = -1, _left = 0, _right = _PrSpriteMem->nNodeNum;
-	if (_Node->bTile)
-		return;
     while (_left < _right)
     {
         _mid = (_left + _right) >> 1;
@@ -294,82 +305,41 @@ _SpriteSetup(BLVoid* _Src)
     BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	BLF32 _rgba[4];
 	blDeColor4F(_node->nDyeColor, _rgba);
-    if (_node->bTile)
-    {
-        BLF32 _vbo[] = {
-            -_node->sSize.fX * 0.5f + _node->sPos.fX,
-            -_node->sSize.fY * 0.5f + _node->sPos.fY,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            _node->fScaleX,
-            _node->fScaleY,
-            _node->sSize.fX * 0.5f + _node->sPos.fX,
-            -_node->sSize.fY * 0.5f + _node->sPos.fY,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            _node->fRotate,
-            _node->fScaleY,
-            -_node->sSize.fX * 0.5f + _node->sPos.fX,
-            _node->sSize.fY * 0.5f + _node->sPos.fY,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            _node->fScaleX,
-            _node->fZValue,
-            _node->sSize.fX * 0.5f + _node->sPos.fX,
-            _node->sSize.fY * 0.5f + _node->sPos.fY,
-            1.f,
-            1.f,
-            1.f,
-            1.f,
-            _node->fRotate,
-            _node->fZValue
-        };
-        _node->nGBO = blGenGeometryBuffer(URIPART_INTERNAL(_node->nID), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-    }
-    else
-    {
-        BLF32 _vbo[] = {
-            -_node->sSize.fX * 0.5f,
-            -_node->sSize.fY * 0.5f,
-            _rgba[0],
-            _rgba[1],
-            _rgba[2],
-            _node->fAlpha,
-            0.f,
-            0.f,
-            _node->sSize.fX * 0.5f,
-            -_node->sSize.fY * 0.5f,
-            _rgba[0],
-            _rgba[1],
-            _rgba[2],
-            _node->fAlpha,
-            1.f,
-            0.f,
-            -_node->sSize.fX * 0.5f,
-            _node->sSize.fY * 0.5f,
-            _rgba[0],
-            _rgba[1],
-            _rgba[2],
-            _node->fAlpha,
-            0.f,
-            1.f,
-            _node->sSize.fX * 0.5f,
-            _node->sSize.fY * 0.5f,
-            _rgba[0],
-            _rgba[1],
-            _rgba[2],
-            _node->fAlpha,
-            1.f,
-            1.f
-        };
-        _node->nGBO = blGenGeometryBuffer(URIPART_INTERNAL(_node->nID), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-    }
+    BLF32 _vbo[] = {
+        -_node->sSize.fX * 0.5f,
+        -_node->sSize.fY * 0.5f,
+        _rgba[0],
+        _rgba[1],
+        _rgba[2],
+        _node->fAlpha,
+        0.f,
+        0.f,
+        _node->sSize.fX * 0.5f,
+        -_node->sSize.fY * 0.5f,
+        _rgba[0],
+        _rgba[1],
+        _rgba[2],
+        _node->fAlpha,
+        1.f,
+        0.f,
+        -_node->sSize.fX * 0.5f,
+        _node->sSize.fY * 0.5f,
+        _rgba[0],
+        _rgba[1],
+        _rgba[2],
+        _node->fAlpha,
+        0.f,
+        1.f,
+        _node->sSize.fX * 0.5f,
+        _node->sSize.fY * 0.5f,
+        _rgba[0],
+        _rgba[1],
+        _rgba[2],
+        _node->fAlpha,
+        1.f,
+        1.f
+    };
+    _node->nGBO = blGenGeometryBuffer(URIPART_INTERNAL(_node->nID), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
     if (_node->pEmitParam)
     {
         BLEnum _semantice[] = { BL_SL_COLOR1, BL_SL_INSTANCE1 };
@@ -386,41 +356,25 @@ static BLBool
 _SpriteRelease(BLVoid* _Src)
 {
     _BLSpriteNode* _node = (_BLSpriteNode*)_Src;
-	if (!_node->bTile)
+	if (_node->pParent)
 	{
-		if (_node->pParent)
+		BLBool _found = FALSE;
+		for (BLU32 _idx = 0; _idx < _node->pParent->nChildren; ++_idx)
 		{
-			BLBool _found = FALSE;
-			for (BLU32 _idx = 0; _idx < _node->pParent->nChildren; ++_idx)
+			if (_node->pParent->pChildren[_idx] == _node)
 			{
-				if (_node->pParent->pChildren[_idx] == _node)
-				{
-					memmove(_node->pParent->pChildren + _idx, _node->pParent->pChildren + _idx + 1, (_node->pParent->nChildren - _idx - 1) * sizeof(_BLSpriteNode*));
-					_found = TRUE;
-					break;
-				}
-			}
-			if (!_found)
-				return FALSE;
-			_node->pParent->nChildren--;
-			_node->pParent = NULL;
-		}
-		else
-			_RemoveFromNodeList(_node);
-	}
-	else
-	{
-		BLU32 _idx = 0;
-		FOREACH_ARRAY (_BLSpriteNode*, _nodeiter, _PrSpriteMem->pTileArray)
-		{			
-			if (_nodeiter == _node)
-			{
-				blArrayErase(_PrSpriteMem->pTileArray, _idx);
+				memmove(_node->pParent->pChildren + _idx, _node->pParent->pChildren + _idx + 1, (_node->pParent->nChildren - _idx - 1) * sizeof(_BLSpriteNode*));
+				_found = TRUE;
 				break;
 			}
-			_idx++;
 		}
+		if (!_found)
+			return FALSE;
+		_node->pParent->nChildren--;
+		_node->pParent = NULL;
 	}
+	else
+		_RemoveFromNodeList(_node);
     blDeleteGeometryBuffer(_node->nGBO);
 	blDeleteTexture(_node->nTex);
     return TRUE;
@@ -928,7 +882,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
         }
 		blTechSampler(_PrSpriteMem->nSpriteInstTech, "Texture0", _Node->nTex, 0);
     }
-	else if (_Node->nBrightness > 0 && !_Node->bTile)
+	else if (_Node->nBrightness > 0)
 	{
 		blTechSampler(_PrSpriteMem->nSpriteGlowTech, "Texture0", _Node->nTex, 0);
 		BLF32 _glow[4];
@@ -940,7 +894,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 		BLF32 _border[] = { (BLF32)_ss->nLTx, (BLF32)_ss->nLTy, (BLF32)_ss->nRBx, (BLF32)_ss->nRBy };
 		blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X4, "Border", _border, sizeof(_border));
 	}
-	else if (_Node->nStrokePixel > 0 && !_Node->bTile)
+	else if (_Node->nStrokePixel > 0)
 	{
 		blTechSampler(_PrSpriteMem->nSpriteStrokeTech, "Texture0", _Node->nTex, 0);
 		BLF32 _stroke[4];
@@ -954,7 +908,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 	}
 	else
 		blTechSampler(_PrSpriteMem->nSpriteTech, "Texture0", _Node->nTex, 0);
-	if (_ss && !_Node->bTile)
+	if (_ss)
 	{
 		BLF32 _lttx, _ltty, _rttx, _rtty, _lbtx, _lbty, _rbtx, _rbty;
 		BLS32 _dif = MAX_INTERNAL(_Node->nStrokePixel, 3);
@@ -1015,9 +969,9 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 		blGeometryBufferUpdate(_Node->nGBO, 0, (const BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 		if (_Node->pEmitParam)
 			blDraw(_PrSpriteMem->nSpriteInstTech, _Node->nGBO, _Node->pEmitParam->nCurAlive);
-		else if (_Node->nBrightness > 0 && !_Node->bTile)
+		else if (_Node->nBrightness > 0)
 			blDraw(_PrSpriteMem->nSpriteGlowTech, _Node->nGBO, 1);
-		else if (_Node->nStrokePixel > 0 && !_Node->bTile)
+		else if (_Node->nStrokePixel > 0)
 			blDraw(_PrSpriteMem->nSpriteStrokeTech, _Node->nGBO, 1);
 		else
 			blDraw(_PrSpriteMem->nSpriteTech, _Node->nGBO, 1);
@@ -1056,7 +1010,8 @@ _SpriteInit()
     _PrSpriteMem->nNodeCap = 0;
 	_PrSpriteMem->pCursor = NULL;
     _PrSpriteMem->bShaking = FALSE;
-	_PrSpriteMem->pTileArray = blGenArray(FALSE);
+	for (BLU32 _idx = 0; _idx < 8; ++_idx)
+		_PrSpriteMem->pTileArray[_idx] = blGenArray(FALSE);
     _PrSpriteMem->nSpriteTech = blGenTechnique("2D.bsl", NULL, FALSE, FALSE);
     _PrSpriteMem->nSpriteInstTech = blGenTechnique("2DInstance.bsl", NULL, FALSE, FALSE);
 	_PrSpriteMem->nSpriteStrokeTech = blGenTechnique("2DStroke.bsl", NULL, FALSE, FALSE);
@@ -1099,95 +1054,212 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
     }
     else
     {
-        _SpriteUpdate(_Delta);
         BLRect _scalevp = _PrSpriteMem->sViewport;
         _scalevp.sLT.fX -= (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.25f;
         _scalevp.sRB.fX += (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.25f;
         _scalevp.sLT.fY -= (_PrSpriteMem->sViewport.sRB.fY - _PrSpriteMem->sViewport.sLT.fY) * 0.25f;
         _scalevp.sRB.fY += (_PrSpriteMem->sViewport.sRB.fY - _PrSpriteMem->sViewport.sLT.fY) * 0.25f;
+		_BLTileInfo* _first = blArrayFrontElement(_PrSpriteMem->pTileArray[0]);
+		BLU32 _totalnum = (BLU32)((_scalevp.sRB.fX - _scalevp.sLT.fX) * (_scalevp.sRB.fY - _scalevp.sLT.fY) / (_first->sSize.fX * _first->sSize.fY));
+		BLU8* _geomeme = (BLU8*)alloca(_totalnum * 48 * sizeof(BLF32));
+		BLGuid _layertex;
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _w, _h);
+		for (BLU32 _idx = 0; _idx < 8; ++_idx)
         {
-            FOREACH_ARRAY (_BLSpriteNode*, _nodeiter, _PrSpriteMem->pTileArray)
+			BLU32 _tilenum = 0;
+            FOREACH_ARRAY (_BLTileInfo*, _tile, _PrSpriteMem->pTileArray[_idx])
             {
-                if (!blRectContains(&_scalevp, &_nodeiter->sPos))
+                if (blRectContains(&_scalevp, &_tile->sPos))
                 {
-                    if (_nodeiter->bValid)
-                    {
-                        blDeleteGeometryBuffer(_nodeiter->nGBO);
-                        blDeleteTexture(_nodeiter->nTex);
-                    }
-                }
-                else
-                {
-                    if (!_nodeiter->bValid)
-                    {
-                        _nodeiter->nTex = blGainTexture(blHashUtf8((const BLUtf8*)_nodeiter->aFilename));
-                        if (_nodeiter->nTex != INVALID_GUID)
-                        {
-							BLEnum _target, _format;
-							BLU32 _layer, _mipmap, _width, _height, _depth, _size;
-							blTextureQuery(_nodeiter->nTex, &_target, &_format, &_layer, &_mipmap, &_width, &_height, &_depth, &_size);
-							_nodeiter->nTexWidth = _width;
-							_nodeiter->nTexHeight = _height;
-							_nodeiter->eTexFormat = _format;
-                            BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-                            BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-                            BLF32 _vbo[] = {
-                                -_nodeiter->sSize.fX * 0.5f + _nodeiter->sPos.fX,
-                                -_nodeiter->sSize.fY * 0.5f + _nodeiter->sPos.fY,
-                                1.f,
-                                1.f,
-                                1.f,
-                                1.f,
-                                _nodeiter->fScaleX,
-                                _nodeiter->fScaleY,
-                                _nodeiter->sSize.fX * 0.5f + _nodeiter->sPos.fX,
-                                -_nodeiter->sSize.fY * 0.5f + _nodeiter->sPos.fY,
-                                1.f,
-                                1.f,
-                                1.f,
-                                1.f,
-                                _nodeiter->fRotate,
-                                _nodeiter->fScaleY,
-                                -_nodeiter->sSize.fX * 0.5f + _nodeiter->sPos.fX,
-                                _nodeiter->sSize.fY * 0.5f + _nodeiter->sPos.fY,
-                                1.f,
-                                1.f,
-                                1.f,
-                                1.f,
-                                _nodeiter->fScaleX,
-                                _nodeiter->fZValue,
-                                _nodeiter->sSize.fX * 0.5f + _nodeiter->sPos.fX,
-                                _nodeiter->sSize.fY * 0.5f + _nodeiter->sPos.fY,
-                                1.f,
-                                1.f,
-                                1.f,
-                                1.f,
-                                _nodeiter->fRotate,
-                                _nodeiter->fZValue
-                            };
-                            _nodeiter->nGBO = blGenGeometryBuffer(URIPART_INTERNAL(_nodeiter->nID), BL_PT_TRIANGLESTRIP, FALSE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-                            _nodeiter->bValid = TRUE;
-                        }
+					_layertex = blGainTexture(blHashUtf8((const BLUtf8*)_tile->aFilename));
+					if (_layertex == INVALID_GUID)
+					{
+						BLGuid _stream;
+						if (_tile->aArchive[0] != 0)
+							_stream = blGenStream(_tile->aFilename, _tile->aArchive);
 						else
 						{
-							_FetchResource(_nodeiter->aFilename, _nodeiter->aArchive, (BLVoid**)&_nodeiter, _nodeiter->nID, _LoadSprite, _SpriteSetup, FALSE);
-							_nodeiter->bValid = TRUE;
+							BLAnsi _tmpname[260];
+							strcpy(_tmpname, _tile->aFilename);
+							BLAnsi _path[260] = { 0 };
+							strcpy(_path, blWorkingDir(TRUE));
+							strcat(_path, _tmpname);
+							_stream = blGenStream(_path, NULL);
+							if (INVALID_GUID == _stream)
+							{
+								memset(_path, 0, sizeof(_path));
+								strcpy(_path, blUserFolderDir());
+								_stream = blGenStream(_path, NULL);
+							}
+							if (INVALID_GUID == _stream)
+								continue;
 						}
-                    }
-                    else
-                    {
-                        BLF32 _mat[6];
-                        _mat[0] = 1.f;
-                        _mat[1] = 0.f;
-                        _mat[2] = 0.f;
-                        _mat[3] = 1.f;
-                        _mat[4] = _nodeiter->sPos.fX;
-                        _mat[5] = _nodeiter->sPos.fY;
-                        _SpriteDraw(_Delta, _nodeiter, _mat);
-                    }
+						BLU8 _identifier[12];
+						blStreamRead(_stream, sizeof(_identifier), _identifier);
+						if (_identifier[0] != 0xDD ||
+							_identifier[1] != 0xDD ||
+							_identifier[2] != 0xDD ||
+							_identifier[3] != 0xEE ||
+							_identifier[4] != 0xEE ||
+							_identifier[5] != 0xEE ||
+							_identifier[6] != 0xAA ||
+							_identifier[7] != 0xAA ||
+							_identifier[8] != 0xAA ||
+							_identifier[9] != 0xDD ||
+							_identifier[10] != 0xDD ||
+							_identifier[11] != 0xDD)
+						{
+							blDeleteStream(_stream);
+							continue;
+						}
+						BLU32 _width, _height, _depth;
+						blStreamRead(_stream, sizeof(BLU32), &_width);
+						blStreamRead(_stream, sizeof(BLU32), &_height);
+						blStreamRead(_stream, sizeof(BLU32), &_depth);
+						BLU32 _array, _faces, _mipmap;
+						blStreamRead(_stream, sizeof(BLU32), &_array);
+						blStreamRead(_stream, sizeof(BLU32), &_faces);
+						blStreamRead(_stream, sizeof(BLU32), &_mipmap);
+						BLU32 _fourcc, _channels, _offset;
+						blStreamRead(_stream, sizeof(BLU32), &_fourcc);
+						blStreamRead(_stream, sizeof(BLU32), &_channels);
+						blStreamRead(_stream, sizeof(BLU32), &_offset);
+						BLEnum _type = BL_TT_2D;
+						blStreamSeek(_stream, _offset);
+						BLU32 _imagesz;
+						BLEnum _format;
+						switch (_fourcc)
+						{
+						case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
+							blStreamRead(_stream, sizeof(BLU32), &_imagesz);
+							_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+							break;
+						case FOURCC_INTERNAL('S', '3', 'T', '1'):
+							_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+							_format = BL_TF_BC1;
+							break;
+						case FOURCC_INTERNAL('S', '3', 'T', '2'):
+							_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+							_format = BL_TF_BC1A1;
+							break;
+						case FOURCC_INTERNAL('S', '3', 'T', '3'):
+							_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+							_format = BL_TF_BC3;
+							break;
+						case FOURCC_INTERNAL('A', 'S', 'T', '1'):
+							_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+							_format = BL_TF_ASTC;
+							break;
+						case FOURCC_INTERNAL('A', 'S', 'T', '2'):
+							_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+							_format = BL_TF_ASTC;
+							break;
+						case FOURCC_INTERNAL('A', 'S', 'T', '3'):
+							_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+							_format = BL_TF_ASTC;
+							break;
+						case FOURCC_INTERNAL('E', 'T', 'C', '1'):
+							_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+							_format = BL_TF_ETC2;
+							break;
+						case FOURCC_INTERNAL('E', 'T', 'C', '2'):
+							_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+							_format = BL_TF_ETC2A1;
+							break;
+						case FOURCC_INTERNAL('E', 'T', 'C', '3'):
+							_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+							_format = BL_TF_ETC2A;
+							break;
+						default:assert(0); break;
+						}
+						BLU8* _texdata;
+						if (_fourcc == FOURCC_INTERNAL('B', 'M', 'G', 'T'))
+						{
+							BLU8* _data = (BLU8*)malloc(_imagesz);
+							blStreamRead(_stream, _imagesz, _data);
+							BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
+							blRLEDecode(_data, _width * _height * _channels, _data2);
+							free(_data);
+							_texdata = _data2;
+						}
+						else
+						{
+							BLU8* _data = (BLU8*)malloc(_imagesz);
+							blStreamRead(_stream, _imagesz, _data);
+							_texdata = _data;
+						}
+						_layertex = blGenTexture(blHashUtf8(_tile->aFilename), BL_TT_2D, _format, FALSE, TRUE, FALSE, 1, 1, _width, _height, 1, _texdata);
+						free(_texdata);
+						blDeleteStream(_stream);
+					}
+					_tile->nTex = _layertex;
+					BLF32 _vbo[] = {
+						-_tile->sSize.fX * 0.5f + _tile->sPos.fX,
+						-_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+						1.f,
+						1.f,
+						1.f,
+						1.f,
+						_tile->fTexLTx,
+						_tile->fTexLTy,
+						_tile->sSize.fX * 0.5f + _tile->sPos.fX,
+						-_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+						1.f,
+						1.f,
+						1.f,
+						1.f,
+						_tile->fTexRBx,
+						_tile->fTexLTy,
+						-_tile->sSize.fX * 0.5f + _tile->sPos.fX,
+						_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+						1.f,
+						1.f,
+						1.f,
+						1.f,
+						_tile->fTexLTx,
+						_tile->fTexRBy,
+						-_tile->sSize.fX * 0.5f + _tile->sPos.fX,
+						_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+						1.f,
+						1.f,
+						1.f,
+						1.f,
+						_tile->fTexLTx,
+						_tile->fTexRBy,
+						_tile->sSize.fX * 0.5f + _tile->sPos.fX,
+						-_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+						1.f,
+						1.f,
+						1.f,
+						1.f,
+						_tile->fTexRBx,
+						_tile->fTexLTy,
+						_tile->sSize.fX * 0.5f + _tile->sPos.fX,
+						_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+						1.f,
+						1.f,
+						1.f,
+						1.f,
+						_tile->fTexRBx,
+						_tile->fTexRBy
+					};
+					memcpy(_geomeme + _tilenum * 48 * sizeof(BLF32), _vbo, sizeof(_vbo));
+					++_tilenum;
                 }
             }
+			if (_tilenum)
+			{
+				blTechSampler(_PrSpriteMem->nSpriteTech, "Texture0", _layertex, 0);
+				BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+				BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+				BLAnsi _buf[32] = { 0 };
+				sprintf(_buf, "@#tilelayer_%d#@", _idx);
+				BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)_buf), BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _geomeme, _tilenum * 48 * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
+				blDraw(_PrSpriteMem->nSpriteTech, _geo, 1);
+				blDeleteGeometryBuffer(_geo);
+			}
         }
+		_SpriteUpdate(_Delta);
         for (BLU32 _idx = 0; _idx < _PrSpriteMem->nNodeNum; ++_idx)
         {
             _BLSpriteNode* _node = _PrSpriteMem->pNodeList[_idx];
@@ -1210,13 +1282,16 @@ BLVoid
 _SpriteDestroy()
 {
     blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
-	{
-		FOREACH_ARRAY (_BLSpriteNode*, _nodeiter, _PrSpriteMem->pTileArray)
+	for (BLU32 _idx = 0; _idx < 8; ++_idx)
+	{		
+		FOREACH_ARRAY (_BLTileInfo*, _tileiter, _PrSpriteMem->pTileArray[_idx])
 		{
-			blDeleteSprite(_nodeiter->nID);
+			blDeleteTexture(_tileiter->nTex);
+			blDeleteGuid(_tileiter->nID);
+			free(_tileiter);
 		}
+		blDeleteArray(_PrSpriteMem->pTileArray[_idx]);
 	}
-	blDeleteArray(_PrSpriteMem->pTileArray);
     if (_PrSpriteMem->pNodeList)
         free(_PrSpriteMem->pNodeList);
     blDeleteTechnique(_PrSpriteMem->nSpriteTech);
@@ -1228,72 +1303,84 @@ _SpriteDestroy()
 BLGuid
 blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLAnsi* _Tag, IN BLF32 _Width, IN BLF32 _Height, IN BLF32 _Zv, IN BLU32 _FPS, IN BLBool _AsTile)
 {
-    _BLSpriteNode* _node = (_BLSpriteNode*)malloc(sizeof(_BLSpriteNode));
-    _node->nTex = INVALID_GUID;
-	_node->nGBO = INVALID_GUID;
-    _node->sSize.fX = _Width;
-    _node->sSize.fY = _Height;
-    _node->sPos.fX = _node->sPos.fY = 0.f;
-    _node->sPivot.fX = _node->sPivot.fY = 0.5f;
-    _node->sScissor.sLT.fX = _node->sScissor.sLT.fY = -1.f;
-    _node->sScissor.sRB.fX = _node->sScissor.sRB.fY = -1.f;
-    _node->pParent = NULL;
-    _node->pChildren = NULL;
-    _node->pAction = NULL;
-	_node->pCurAction = NULL;
-	_node->pEmitParam = NULL;
-	_node->nFPS = _FPS;
-    _node->nChildren = 0;
-    _node->fRotate = 0.f;
-    _node->fScaleX = 1.f;
-    _node->fScaleY = 1.f;
-    _node->fAlpha = 1.f;
-    _node->fZValue = _Zv;
-    _node->nDyeColor  = 0xFFFFFFFF;
-    _node->bDye = FALSE;
-    _node->nStrokeColor = 0xFFFFFFFF;
-    _node->nStrokePixel = 0;
-    _node->nGlowColor = 0xFFFFFFFF;
-    _node->nBrightness = 0;
-	_node->bTile = _AsTile;
-    _node->bShow = TRUE;
-	_node->bValid = FALSE;
-	_node->nTimePassed = 0;
-	_node->nCurFrame = 0;
-	_node->nFrameNum = 1;
-    memset(_node->aTag, 0, sizeof(_node->aTag));
-	memset(_node->aFilename, 0, sizeof(_node->aFilename));
-	memset(_node->aArchive, 0, sizeof(_node->aArchive));
-	strcpy(_node->aFilename, _Filename);
-    if (_Archive)
-        strcpy(_node->aArchive, _Archive);
-	if (_Tag)
+	if (_AsTile)
 	{
-		BLAnsi* _tmp;
-		BLAnsi* _tag = (BLAnsi*)alloca(strlen(_Tag) + 1);
-		memset(_tag, 0, strlen(_Tag) + 1);
-		strcpy(_tag, _Tag);
-		_node->nFrameNum = 0;
-		_tmp = strtok((BLAnsi*)_tag, ",");
-		while (_tmp)
-		{
-			_node->aTag[_node->nFrameNum] = blHashUtf8(_tmp);
-			_tmp = strtok(NULL, ",");
-			_node->nFrameNum++;
-			if (_node->nFrameNum >= 63)
-				break;
-		}
+		_BLTileInfo* _tile = (_BLTileInfo*)malloc(sizeof(_BLTileInfo));
+		_tile->nTex = INVALID_GUID;
+		_tile->sSize.fX = _Width;
+		_tile->sSize.fY = _Height;
+		_tile->sPos.fX = _tile->sPos.fY = 0.f;
+		_tile->bShow = TRUE;
+		memset(_tile->aFilename, 0, sizeof(_tile->aFilename));
+		memset(_tile->aArchive, 0, sizeof(_tile->aArchive));
+		strcpy(_tile->aFilename, _Filename);
+		if (_Archive)
+			strcpy(_tile->aArchive, _Archive);
+		_tile->nID = blGenGuid(_tile, blHashUtf8((const BLUtf8*)_Filename));
+		blArrayPushBack(_PrSpriteMem->pTileArray[strtol(_Tag, NULL, 10)], _tile);
+		return _tile->nID;
 	}
-    _node->nID = blGenGuid(_node, blHashUtf8((const BLUtf8*)_Filename));
-	if (!_node->bTile)
-		_FetchResource(_Filename, _Archive, (BLVoid**)&_node, _node->nID, _LoadSprite, _SpriteSetup, TRUE);
 	else
 	{
-		_node->pTexData = NULL;
-		_node->pTagSheet = blGenDict(FALSE);
-		blArrayPushBack(_PrSpriteMem->pTileArray, _node);
+		_BLSpriteNode* _node = (_BLSpriteNode*)malloc(sizeof(_BLSpriteNode));
+		_node->nTex = INVALID_GUID;
+		_node->nGBO = INVALID_GUID;
+		_node->sSize.fX = _Width;
+		_node->sSize.fY = _Height;
+		_node->sPos.fX = _node->sPos.fY = 0.f;
+		_node->sPivot.fX = _node->sPivot.fY = 0.5f;
+		_node->sScissor.sLT.fX = _node->sScissor.sLT.fY = -1.f;
+		_node->sScissor.sRB.fX = _node->sScissor.sRB.fY = -1.f;
+		_node->pParent = NULL;
+		_node->pChildren = NULL;
+		_node->pAction = NULL;
+		_node->pCurAction = NULL;
+		_node->pEmitParam = NULL;
+		_node->nFPS = _FPS;
+		_node->nChildren = 0;
+		_node->fRotate = 0.f;
+		_node->fScaleX = 1.f;
+		_node->fScaleY = 1.f;
+		_node->fAlpha = 1.f;
+		_node->fZValue = _Zv;
+		_node->nDyeColor = 0xFFFFFFFF;
+		_node->bDye = FALSE;
+		_node->nStrokeColor = 0xFFFFFFFF;
+		_node->nStrokePixel = 0;
+		_node->nGlowColor = 0xFFFFFFFF;
+		_node->nBrightness = 0;
+		_node->bShow = TRUE;
+		_node->bValid = FALSE;
+		_node->nTimePassed = 0;
+		_node->nCurFrame = 0;
+		_node->nFrameNum = 1;
+		memset(_node->aTag, 0, sizeof(_node->aTag));
+		memset(_node->aFilename, 0, sizeof(_node->aFilename));
+		memset(_node->aArchive, 0, sizeof(_node->aArchive));
+		strcpy(_node->aFilename, _Filename);
+		if (_Archive)
+			strcpy(_node->aArchive, _Archive);
+		if (_Tag)
+		{
+			BLAnsi* _tmp;
+			BLAnsi* _tag = (BLAnsi*)alloca(strlen(_Tag) + 1);
+			memset(_tag, 0, strlen(_Tag) + 1);
+			strcpy(_tag, _Tag);
+			_node->nFrameNum = 0;
+			_tmp = strtok((BLAnsi*)_tag, ",");
+			while (_tmp)
+			{
+				_node->aTag[_node->nFrameNum] = blHashUtf8(_tmp);
+				_tmp = strtok(NULL, ",");
+				_node->nFrameNum++;
+				if (_node->nFrameNum >= 63)
+					break;
+			}
+		}
+		_node->nID = blGenGuid(_node, blHashUtf8((const BLUtf8*)_Filename));
+		_FetchResource(_Filename, _Archive, (BLVoid**)&_node, _node->nID, _LoadSprite, _SpriteSetup, TRUE);
+		return _node->nID;
 	}
-    return _node->nID;
 }
 BLVoid
 blDeleteSprite(IN BLGuid _ID)
@@ -1314,11 +1401,16 @@ blSpriteClear(IN BLBool _Tiles, IN BLBool _Actors)
 {
     if (_Tiles)
     {
-        FOREACH_ARRAY (_BLSpriteNode*, _nodeiter, _PrSpriteMem->pTileArray)
-        {
-            blDeleteSprite(_nodeiter->nID);
-        }
-        blClearArray(_PrSpriteMem->pTileArray);
+		for (BLU32 _idx = 0; _idx < 8; ++_idx)
+		{
+			FOREACH_ARRAY(_BLTileInfo*, _tileiter, _PrSpriteMem->pTileArray[_idx])
+			{
+				blDeleteTexture(_tileiter->nTex);
+				blDeleteGuid(_tileiter->nID);
+				free(_tileiter);
+			}
+			blClearArray(_PrSpriteMem->pTileArray[_idx]);
+		}
     }
     if (_Actors)
     {
@@ -1341,8 +1433,6 @@ blSpriteAttach(IN BLGuid _Parent, IN BLGuid _Child, IN BLBool _AttrInherit)
         return FALSE;
     if (_Parent == _Child)
         return FALSE;
-	if (_child->bTile || _parent->bTile)
-		return FALSE;
     for (BLU32 _idx = 0 ; _idx < _parent->nChildren ; ++_idx)
     {
         if (_parent->pChildren[_idx] == _child)
@@ -1401,8 +1491,6 @@ blSpriteDetach(IN BLGuid _Parent, IN BLGuid _Child)
         return FALSE;
     if (_child->pParent->nID != _Parent || _Parent == _Child)
         return FALSE;
-	if (_child->bTile || _parent->bTile)
-		return FALSE;
     BLBool _found = FALSE;
     for (BLU32 _idx = 0 ; _idx < _parent->nChildren ; ++_idx)
     {
@@ -1671,8 +1759,6 @@ blSpriteScissor(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos, IN BLF32 _Width, 
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	if (_node->bTile)
-		return FALSE;
     _node->sScissor.sLT.fX = _XPos;
     _node->sScissor.sLT.fY = _YPos;
     _node->sScissor.sRB.fX = _XPos + _Width;
@@ -1682,26 +1768,26 @@ blSpriteScissor(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos, IN BLF32 _Width, 
     return TRUE;
 }
 BLVoid
-blSpriteTile(IN BLGuid _ID, IN BLAnsi* _ImageFile, IN BLAnsi* _Archive, IN BLBool _FlipX, IN BLBool _FlipY, IN BLBool _Diagonal, IN BLF32 _TexLTx, IN BLF32 _TexLTy, IN BLF32 _TexRBx, IN BLF32 _TexRBy)
+blSpriteTile(IN BLGuid _ID, IN BLAnsi* _ImageFile, IN BLAnsi* _Archive, IN BLBool _FlipX, IN BLBool _FlipY, IN BLBool _Diagonal, IN BLF32 _TexLTx, IN BLF32 _TexLTy, IN BLF32 _TexRBx, IN BLF32 _TexRBy, IN BLF32 _PosX, IN BLF32 _PosY)
 {
     if (_ID == INVALID_GUID)
         return;
-    _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
-    if (!_node)
+	_BLTileInfo* _tile = (_BLTileInfo*)blGuidAsPointer(_ID);
+    if (!_tile)
         return;
-    if (!_node->bTile)
-        return;
-    memset(_node->aFilename, 0, sizeof(_node->aFilename));
-    strcpy(_node->aFilename, _ImageFile);
-    memset(_node->aArchive, 0, sizeof(_node->aArchive));
+    memset(_tile->aFilename, 0, sizeof(_tile->aFilename));
+    strcpy(_tile->aFilename, _ImageFile);
+    memset(_tile->aArchive, 0, sizeof(_tile->aArchive));
     if (_Archive)
-        strcpy(_node->aArchive, _Archive);
-    _node->bFlipX = _FlipX;
-    _node->bFlipY = _FlipY;
-    _node->fScaleX = _TexLTx;
-    _node->fScaleY = _TexLTy;
-    _node->fRotate = _TexRBx;
-    _node->fZValue = _TexRBy;
+        strcpy(_tile->aArchive, _Archive);
+    _tile->bFlipX = _FlipX;
+    _tile->bFlipY = _FlipY;
+    _tile->fTexLTx = _TexLTx;
+    _tile->fTexLTy = _TexLTy;
+    _tile->fTexRBx = _TexRBx;
+    _tile->fTexRBy = _TexRBy;
+	_tile->sPos.fX = _PosX;
+	_tile->sPos.fY = _PosY;
 }
 BLBool
 blSpriteAsEmit(IN BLGuid _ID, IN BLF32 _EmitAngle, IN BLF32 _EmitterRadius, IN BLF32 _Life, IN BLU32 _MaxAlive, IN BLU32 _GenPerSec, IN BLF32 _DirectionX, IN BLF32 _DirectionY, IN BLF32 _Velocity, IN BLF32 _VelVariance, IN BLF32 _Rotation, IN BLF32 _RotVariance, IN BLF32 _Scale, IN BLF32 _ScaleVariance, IN BLU32 _FadeColor)
@@ -1710,8 +1796,6 @@ blSpriteAsEmit(IN BLGuid _ID, IN BLF32 _EmitAngle, IN BLF32 _EmitterRadius, IN B
         return FALSE;
 	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
 	if (!_node)
-		return FALSE;
-	if (_node->bTile)
 		return FALSE;
 	if (!_node->pEmitParam)
     {
@@ -1753,8 +1837,6 @@ blSpriteAsCursor(IN BLGuid _ID)
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	if (_node->bTile)
-		return FALSE;
 	_PrSpriteMem->pCursor = _node;
     return TRUE;
 }
@@ -1766,8 +1848,6 @@ blSpriteActionBegin(IN BLGuid _ID)
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	if (_node->bTile)
-		return FALSE;
     if (_node->pAction)
     {
         _BLSpriteAction* _tmp = _node->pAction;
@@ -1812,8 +1892,6 @@ blSpriteActionEnd(IN BLGuid _ID, IN BLBool _Delete)
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	if (_node->bTile)
-		return FALSE;
     if (!_node->pAction)
         return FALSE;
 	if (_Delete)
@@ -1844,8 +1922,6 @@ blSpriteActionPlay(IN BLGuid _ID)
 	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
 	if (!_node)
 		return FALSE;
-	if (_node->bTile)
-		return FALSE;
 	if (!_node->pAction)
 		return FALSE;
 	_node->pCurAction = _node->pAction;
@@ -1858,8 +1934,6 @@ blSpriteActionStop(IN BLGuid _ID)
 		return FALSE;
 	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
 	if (!_node)
-		return FALSE;
-	if (_node->bTile)
 		return FALSE;
 	if (!_node->pAction)
 		return FALSE;
@@ -1899,8 +1973,6 @@ blSpriteActionMove(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	if (_node->bTile)
-		return FALSE;
 	if (_PathNum <= 0 || _Time <= 0.f)
 		return FALSE;
 	_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
@@ -1952,8 +2024,6 @@ blSpriteActionRotate(IN BLGuid _ID, IN BLF32 _Angle, IN BLBool _ClockWise, IN BL
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	if (_node->bTile)
-		return FALSE;
 	_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
 	_act->pNeighbor = NULL;
 	_act->pNext = NULL;
@@ -1993,8 +2063,6 @@ blSpriteActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	if (_node->bTile)
-		return FALSE;
 	_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
 	_act->pNeighbor = NULL;
 	_act->pNext = NULL;
@@ -2037,8 +2105,6 @@ blSpriteActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	if (_node->bTile)
-		return FALSE;
 	_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
 	_act->pNeighbor = NULL;
 	_act->pNext = NULL;
