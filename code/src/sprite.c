@@ -111,9 +111,6 @@ typedef struct _TileInfo{
 	BLF32 fTexRBx;
 	BLF32 fTexRBy;
 	BLF32 fAlpha;
-	BLBool bFlipX;
-	BLBool bFlipY;
-	BLBool bFlipD;
 	BLBool bShow;
 }_BLTileInfo;
 typedef struct _SpriteNode{
@@ -1780,7 +1777,7 @@ blSpriteScissor(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos, IN BLF32 _Width, 
     return TRUE;
 }
 BLVoid
-blSpriteTile(IN BLGuid _ID, IN BLAnsi* _ImageFile, IN BLAnsi* _Archive, IN BLBool _FlipX, IN BLBool _FlipY, IN BLBool _Diagonal, IN BLF32 _TexLTx, IN BLF32 _TexLTy, IN BLF32 _TexRBx, IN BLF32 _TexRBy, IN BLF32 _PosX, IN BLF32 _PosY, IN BLF32 _Alpha, IN BLBool _Show)
+blSpriteTile(IN BLGuid _ID, IN BLAnsi* _ImageFile, IN BLAnsi* _Archive, IN BLF32 _TexLTx, IN BLF32 _TexLTy, IN BLF32 _TexRBx, IN BLF32 _TexRBy, IN BLF32 _PosX, IN BLF32 _PosY, IN BLF32 _Alpha, IN BLBool _Show)
 {
     if (_ID == INVALID_GUID)
         return;
@@ -1796,8 +1793,6 @@ blSpriteTile(IN BLGuid _ID, IN BLAnsi* _ImageFile, IN BLAnsi* _Archive, IN BLBoo
 		memset(_tile->aArchive, 0, sizeof(_tile->aArchive));
 		if (_Archive)
 			strcpy(_tile->aArchive, _Archive);
-		_tile->bFlipX = _FlipX;
-		_tile->bFlipY = _FlipY;
 		_tile->fTexLTx = _TexLTx;
 		_tile->fTexLTy = _TexLTy;
 		_tile->fTexRBx = _TexRBx;

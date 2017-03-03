@@ -61,6 +61,11 @@ BL_API BLVoid blTMXObjectQueryEXT(
 BL_API BLVoid blTMXLayerVisibilityEXT(
 	IN BLAnsi* _Layer,
 	IN BLBool _Show);
+
+BL_API BLBool blTMXLayerTileAtEXT(
+	IN BLAnsi* _Layer,
+	IN BLS32 _XPos,
+	IN BLS32 _YPos);
 #ifdef __cplusplus
 }
 #endif
