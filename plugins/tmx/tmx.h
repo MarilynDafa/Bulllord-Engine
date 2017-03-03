@@ -28,6 +28,9 @@ BL_API BLVoid blTMXOpenEXT();
 
 BL_API BLVoid blTMXCloseEXT();
 
+//Base64
+//Base64 Zip
+//CSV
 BL_API BLBool blTMXFileEXT(
 	IN BLAnsi* _Filename,
 	IN BLAnsi* _Archive);
@@ -54,6 +57,10 @@ BL_API BLVoid blTMXObjectQueryEXT(
 	OUT BLU32* _Width,
 	OUT BLU32* _Height,
 	OUT BLAnsi** _Properties);
+
+BL_API BLVoid blTMXLayerVisibilityEXT(
+	IN BLAnsi* _Layer,
+	IN BLBool _Show);
 #ifdef __cplusplus
 }
 #endif

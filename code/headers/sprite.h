@@ -151,7 +151,9 @@ BL_API BLVoid blSpriteTile(
     IN BLF32 _TexRBx,
     IN BLF32 _TexRBy,
 	IN BLF32 _PosX,
-	IN BLF32 _PosY);
+	IN BLF32 _PosY, 
+	IN BLF32 _Alpha,
+	IN BLBool _Show);
     
 BL_API BLBool blSpriteAsEmit(
     IN BLGuid _ID,

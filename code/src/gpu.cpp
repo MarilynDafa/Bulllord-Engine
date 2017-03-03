@@ -3853,19 +3853,17 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
     {
         _geo->uData.sGL.nIBHandle = -1;
         _geo->uData.sGL.nInsHandle[0] = _geo->uData.sGL.nInsHandle[1] = _geo->uData.sGL.nInsHandle[2] = _geo->uData.sGL.nInsHandle[3] = -1;
+		GL_CHECK_INTERNAL(glGenVertexArrays(1, &_geo->uData.sGL.nVAHandle));
+		GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
         GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nVBHandle));
         GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
         GL_CHECK_INTERNAL(glBufferData(GL_ARRAY_BUFFER, _VBSz, _VBO, _Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
-        GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, 0));
         if (_IBFmt != BL_IF_INVALID)
         {
             GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nIBHandle));
             GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
             GL_CHECK_INTERNAL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, _IBSz, _IBO, _Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
-            GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
         }
-        GL_CHECK_INTERNAL(glGenVertexArrays(1, &_geo->uData.sGL.nVAHandle));
-        GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
         BLU8* _offset = NULL;
         BLU32 _used[16] = { 0 };
         for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
@@ -3890,7 +3888,7 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
                 default: assert(0); break;
             }
             GL_CHECK_INTERNAL(glEnableVertexAttribArray(_Semantic[_idx]));
-            GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
+			GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
             GL_CHECK_INTERNAL(glVertexAttribPointer(_Semantic[_idx], _numele, _gtype, GL_FALSE, _stride, _offset));
             _used[_Semantic[_idx]] = 1;
             _offset += _gtsize;
@@ -3902,6 +3900,10 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
                 GL_CHECK_INTERNAL(glDisableVertexAttribArray(_idx));
             }
         }
+		GL_CHECK_INTERNAL(glBindVertexArray(0));
+		GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+		if (_IBFmt != BL_IF_INVALID)
+			GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
@@ -3977,7 +3979,6 @@ blDeleteGeometryBuffer(IN BLGuid _GBO)
         {
             GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[3]));
         }
-        GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, 0));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
@@ -4017,9 +4018,9 @@ blGeometryBufferUpdate(IN BLGuid _GBO, IN BLU32 _VBOffset, IN BLU8* _VBO, IN BLU
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
-        GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
-        GL_CHECK_INTERNAL(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, _VBOffset, _VBSz, _VBO));
-        GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+        GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
+        GL_CHECK_INTERNAL(glBufferSubData(GL_ARRAY_BUFFER, _VBOffset, _VBSz, _VBO));
+        GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, 0));
         if (_geo->uData.sGL.nIBHandle != 0xFFFFFFFF)
         {
             GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
@@ -4098,7 +4099,7 @@ blGeometryBufferInstance(IN BLGuid _GBO, IN BLEnum* _Semantic, IN BLEnum* _Decl,
 #endif
 }
 BLVoid
-blInstanceUpdate(IN BLGuid _GBO, IN BLEnum _Semantic, IN BLVoid* _Buffer, IN BLU32 _BufferSz)
+blGeometryInstanceUpdate(IN BLGuid _GBO, IN BLEnum _Semantic, IN BLVoid* _Buffer, IN BLU32 _BufferSz)
 {
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
 	if (!_geo)
@@ -4518,14 +4519,133 @@ blTechSampler(IN BLGuid _Tech, IN BLAnsi* _Name, IN BLGuid _Tex, IN BLU32 _Unit)
 BLVoid
 blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 {
+	_PipelineStateRefreshGL();
+	_BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
+	_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
+#if defined(BL_GL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+	{
+		GL_CHECK_INTERNAL(glUseProgram(_tech->uData.sGL.nHandle));
+		for (BLU32 _idx = 0; _idx < 16; ++_idx)
+		{
+			if (_tech->aUniformVars[_idx].aName[0])
+			{
+				GLint _handle = glGetUniformLocation(_tech->uData.sGL.nHandle, _tech->aUniformVars[_idx].aName);
+				void* _data = _tech->aUniformVars[_idx].pVar;
+				BLU32 _count = _tech->aUniformVars[_idx].nCount;
+				switch (_tech->aUniformVars[_idx].eType)
+				{
+				case BL_UB_S32X1: GL_CHECK_INTERNAL(glUniform1iv(_handle, _count, (GLint*)_data)); break;
+				case BL_UB_S32X2: GL_CHECK_INTERNAL(glUniform2iv(_handle, _count, (GLint*)_data)); break;
+				case BL_UB_S32X3: GL_CHECK_INTERNAL(glUniform3iv(_handle, _count, (GLint*)_data)); break;
+				case BL_UB_S32X4: GL_CHECK_INTERNAL(glUniform4iv(_handle, _count, (GLint*)_data)); break;
+				case BL_UB_F32X1: GL_CHECK_INTERNAL(glUniform1fv(_handle, _count, (GLfloat*)_data)); break;
+				case BL_UB_F32X2: GL_CHECK_INTERNAL(glUniform2fv(_handle, _count, (GLfloat*)_data)); break;
+				case BL_UB_F32X3: GL_CHECK_INTERNAL(glUniform3fv(_handle, _count, (GLfloat*)_data)); break;
+				case BL_UB_F32X4: GL_CHECK_INTERNAL(glUniform4fv(_handle, _count, (GLfloat*)_data)); break;
+				case BL_UB_MAT2: GL_CHECK_INTERNAL(glUniformMatrix2fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+				case BL_UB_MAT3: GL_CHECK_INTERNAL(glUniformMatrix3fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+				case BL_UB_MAT4: GL_CHECK_INTERNAL(glUniformMatrix4fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+				case BL_UB_MAT2X3: GL_CHECK_INTERNAL(glUniformMatrix2x3fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+				case BL_UB_MAT3X2: GL_CHECK_INTERNAL(glUniformMatrix3x2fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+				case BL_UB_MAT2X4: GL_CHECK_INTERNAL(glUniformMatrix2x4fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+				case BL_UB_MAT4X2: GL_CHECK_INTERNAL(glUniformMatrix4x2fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+				case BL_UB_MAT3X4: GL_CHECK_INTERNAL(glUniformMatrix3x4fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+				case BL_UB_MAT4X3: GL_CHECK_INTERNAL(glUniformMatrix4x3fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
+				default:assert(0); break;
+				}
+			}
+		}
+		for (BLU32 _idx = 0; _idx < 16; ++_idx)
+		{
+			if (_tech->aSamplerVars[_idx].aName[0])
+			{
+				GLint _handle = glGetUniformLocation(_tech->uData.sGL.nHandle, _tech->aSamplerVars[_idx].aName);
+				GL_CHECK_INTERNAL(glActiveTexture(GL_TEXTURE0 + _tech->aSamplerVars[_idx].nUnit));
+				_BLTextureBuffer* _tex = (_BLTextureBuffer*)_tech->aSamplerVars[_idx].pTex;
+				GLenum _target = GL_TEXTURE_2D;
+				switch (_tex->eTarget)
+				{
+				case BL_TT_1D: _target = GL_TEXTURE_2D;	break;
+				case BL_TT_2D: _target = GL_TEXTURE_2D;	break;
+				case BL_TT_3D: _target = GL_TEXTURE_3D;	break;
+				case BL_TT_CUBE: _target = GL_TEXTURE_CUBE_MAP; break;
+				case BL_TT_ARRAY1D: _target = GL_TEXTURE_2D_ARRAY; break;
+				case BL_TT_ARRAY2D: _target = GL_TEXTURE_2D_ARRAY; break;
+				case BL_TT_ARRAYCUBE: _target = GL_TEXTURE_CUBE_MAP_ARRAY; break;
+				default:break;
+				}
+				GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+				GL_CHECK_INTERNAL(glUniform1i(_handle, _tech->aSamplerVars[_idx].nUnit));
+			}
+		}
+		GLenum _prim;
+		switch (_geo->eVBTopology)
+		{
+		case BL_PT_POINTS: _prim = GL_POINTS; break;
+		case BL_PT_LINES: _prim = GL_LINES; break;
+		case BL_PI_LINELOOP: _prim = GL_LINE_LOOP; break;
+		case BL_PT_LINESTRIP: _prim = GL_LINE_STRIP; break;
+		case BL_PT_TRIANGLES: _prim = GL_TRIANGLES; break;
+		case BL_PT_TRIANGLESTRIP: _prim = GL_TRIANGLE_STRIP; break;
+		case BL_PT_TRIANGLEFAN: _prim = GL_TRIANGLE_FAN; break;
+		default: _prim = GL_TRIANGLES; break;
+		}
+		if (_geo->uData.sGL.nIBHandle != 0xFFFFFFFF)
+		{
+			GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
+			GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
+			if (1 == _Instance)
+			{
+				GL_CHECK_INTERNAL(glDrawElements(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT, NULL));
+			}
+			else
+			{
+				GL_CHECK_INTERNAL(glDrawElementsInstanced(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT, NULL, _Instance));
+			}
+			GL_CHECK_INTERNAL(glBindVertexArray(0));
+		}
+		else
+		{
+			GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
+			GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
+			if (1 == _Instance)
+			{
+				GL_CHECK_INTERNAL(glDrawArrays(_prim, 0, _geo->nVertexNum));
+			}
+			else
+			{
+				GL_CHECK_INTERNAL(glDrawArraysInstanced(_prim, 0, _geo->nVertexNum, _Instance));
+			}
+			GL_CHECK_INTERNAL(glBindVertexArray(0));
+		}
+		GL_CHECK_INTERNAL(glUseProgram(0));
+	}
+#elif defined(BL_MTL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+	{
+	}
+#elif defined(BL_VK_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+	{
+	}
+#elif defined(BL_DX_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+	{
+	}
+#endif
+}
+BLVoid
+blDraw2(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance, int debug)
+{
     _PipelineStateRefreshGL();
     _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
-        GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
-        GL_CHECK_INTERNAL(glUseProgram(_tech->uData.sGL.nHandle));
+
+		GL_CHECK_INTERNAL(glUseProgram(_tech->uData.sGL.nHandle));		
         for (BLU32 _idx = 0; _idx < 16; ++_idx)
         {
             if (_tech->aUniformVars[_idx].aName[0])
@@ -4577,9 +4697,11 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
             case BL_PT_TRIANGLEFAN: _prim = GL_TRIANGLE_FAN; break;
             default: _prim = GL_TRIANGLES; break;
         }
+
         if (_geo->uData.sGL.nIBHandle != 0xFFFFFFFF)
         {
             GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
+			GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
             if (1 == _Instance)
             {
                 GL_CHECK_INTERNAL(glDrawElements(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT :  GL_UNSIGNED_SHORT, NULL));
@@ -4588,20 +4710,29 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
             {
                 GL_CHECK_INTERNAL(glDrawElementsInstanced(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT :  GL_UNSIGNED_SHORT, NULL, _Instance));
             }
+			GL_CHECK_INTERNAL(glBindVertexArray(0));
         }
         else
         {
-            GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
+				GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
+				GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
             if (1 == _Instance)
             {
-                GL_CHECK_INTERNAL(glDrawArrays(_prim, 0, _geo->nVertexNum));
+				if (!debug)
+				{
+					GL_CHECK_INTERNAL(glDrawArrays(_prim, 0, _geo->nVertexNum));
+				//	glFlush();
+
+				}
+				
             }
             else
             {
                 GL_CHECK_INTERNAL(glDrawArraysInstanced(_prim, 0, _geo->nVertexNum, _Instance));
             }
+			GL_CHECK_INTERNAL(glBindVertexArray(0));
         }
-        GL_CHECK_INTERNAL(glUseProgram(0));
+		GL_CHECK_INTERNAL(glUseProgram(0));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)

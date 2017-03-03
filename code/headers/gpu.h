@@ -227,7 +227,7 @@ BL_API BLVoid blGeometryBufferInstance(
     IN BLU32 _DeclNum,
     IN BLU32 _Instance);
 
-BL_API BLVoid blInstanceUpdate(
+BL_API BLVoid blGeometryInstanceUpdate(
     IN BLGuid _GBO,
     IN BLEnum _Semantic,
     IN BLVoid* _Buffer,
@@ -259,6 +259,8 @@ BL_API BLVoid blDraw(
     IN BLGuid _Tech,
     IN BLGuid _GBO,
     IN BLU32 _Instance);
+BLVoid
+blDraw2(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance, int debug);
 #ifdef __cplusplus
 }
 #endif
