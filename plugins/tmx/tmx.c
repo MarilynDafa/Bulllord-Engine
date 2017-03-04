@@ -584,7 +584,7 @@ BLBool
 blTMXLayerTileAtEXT(IN BLAnsi* _Layer, IN BLS32 _XPos, IN BLS32 _YPos)
 {
 	if (!_PrTmxMem)
-		return;
+		return FALSE;
 	for (BLU32 _idx = 0; _idx < _PrTmxMem->nLayerNum; ++_idx)
 	{
 		if (!strcmp(_PrTmxMem->pLayers[_idx].aName, _Layer))

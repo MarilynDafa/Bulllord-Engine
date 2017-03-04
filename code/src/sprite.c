@@ -756,14 +756,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 	if (_Node->sScissor.sLT.fX < 0.f)
 		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _w, _h);
 	else
-		blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_Node->sScissor.sLT.fX, (BLU32)_Node->sScissor.sLT.fY, (BLU32)_Node->sScissor.sRB.fX, (BLU32)_Node->sScissor.sRB.fY);
-    if (_PrSpriteMem->bShaking)
-    {
-        _PrSpriteMem->fShakingForce = - _PrSpriteMem->fShakingForce;
-        _PrSpriteMem->fShakingTime -= _Delta / 1000.f;
-        if (_PrSpriteMem->fShakingTime < 0.f)
-            _PrSpriteMem->bShaking = FALSE;
-    }
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_Node->sScissor.sLT.fX, (BLU32)_Node->sScissor.sLT.fY, (BLU32)_Node->sScissor.sRB.fX, (BLU32)_Node->sScissor.sRB.fY);   
 	if (_Node->nFrameNum > 1)
 	{
 		_Node->nTimePassed += _Delta;
@@ -1053,6 +1046,13 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
     }
     else
     {
+		if (_PrSpriteMem->bShaking)
+		{
+			_PrSpriteMem->fShakingForce = -_PrSpriteMem->fShakingForce;
+			_PrSpriteMem->fShakingTime -= _Delta / 1000.f;
+			if (_PrSpriteMem->fShakingTime < 0.f)
+				_PrSpriteMem->bShaking = FALSE;
+		}
         BLRect _scalevp = _PrSpriteMem->sViewport;
         _scalevp.sLT.fX -= (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.25f;
         _scalevp.sRB.fX += (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.25f;
@@ -1061,7 +1061,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 		_BLTileInfo* _first = blArrayFrontElement(_PrSpriteMem->pTileArray[0]);
 		if (_first)
 		{
-			BLU32 _totalnum = (BLU32)((_scalevp.sRB.fX - _scalevp.sLT.fX) * (_scalevp.sRB.fY - _scalevp.sLT.fY) / (_first->sSize.fX * _first->sSize.fY));
+			BLU32 _totalnum = (BLU32)((_scalevp.sRB.fX - _scalevp.sLT.fX) * (_scalevp.sRB.fY - _scalevp.sLT.fY) / (_first->sSize.fX * _first->sSize.fY)) * 2;
 			BLGuid _layertex;
 			blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _w, _h);
 			BLU8* _geomem = (BLU8*)alloca(_totalnum * 48 * sizeof(BLF32));
@@ -1202,48 +1202,48 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 						}
 						_tile->nTex = _layertex;
 						BLF32 _vbo[] = {
-							-_tile->sSize.fX * 0.5f + _tile->sPos.fX,
-							-_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+							-_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							-_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
 							1.f,
 							1.f,
 							1.f,
 							_tile->fAlpha,
 							_tile->fTexLTx,
 							_tile->fTexLTy,
-							_tile->sSize.fX * 0.5f + _tile->sPos.fX,
-							-_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+							_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							-_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
 							1.f,
 							1.f,
 							1.f,
 							_tile->fAlpha,
 							_tile->fTexRBx,
 							_tile->fTexLTy,
-							-_tile->sSize.fX * 0.5f + _tile->sPos.fX,
-							_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+							-_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
 							1.f,
 							1.f,
 							1.f,
 							_tile->fAlpha,
 							_tile->fTexLTx,
 							_tile->fTexRBy,
-							-_tile->sSize.fX * 0.5f + _tile->sPos.fX,
-							_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+							-_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
 							1.f,
 							1.f,
 							1.f,
 							_tile->fAlpha,
 							_tile->fTexLTx,
 							_tile->fTexRBy,
-							_tile->sSize.fX * 0.5f + _tile->sPos.fX,
-							-_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+							_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							-_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
 							1.f,
 							1.f,
 							1.f,
 							_tile->fAlpha,
 							_tile->fTexRBx,
 							_tile->fTexLTy,
-							_tile->sSize.fX * 0.5f + _tile->sPos.fX,
-							_tile->sSize.fY * 0.5f + _tile->sPos.fY,
+							_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
 							1.f,
 							1.f,
 							1.f,
