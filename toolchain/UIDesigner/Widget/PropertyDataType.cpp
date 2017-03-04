@@ -64,6 +64,8 @@ void SkinFile::initNames()
 			fread(&ss.lty, 1, sizeof(int), fp);
 			fread(&ss.rbx, 1, sizeof(int), fp);
 			fread(&ss.rby, 1, sizeof(int), fp);
+			fread(&ss.offsetx, 1, sizeof(int), fp);
+			fread(&ss.offsety, 1, sizeof(int), fp);
 			ssv.push_back(ss);
 		}
 		_image = iter.value();
