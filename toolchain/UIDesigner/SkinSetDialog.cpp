@@ -291,7 +291,7 @@ void ImageSetWidget::mouseMoveEvent( QMouseEvent *me )
 	}
 }
 
-QRect ImageSetWidget::getSelRect()
+QRectF ImageSetWidget::getSelRect()
 {
 	QPoint stPt, endPt;
 	QRect imageRect = getImageRect();
@@ -323,17 +323,17 @@ QRect ImageSetWidget::getSelRect()
 	lt.setY(std::min(stPt.y(), endPt.y()));
 	rb.setX((std::max(stPt.x(), endPt.x()) - 1));
 	rb.setY((std::max(stPt.y(), endPt.y()) - 1));
-	_selRect = QRect(lt, rb);
+	_selRect = QRectF(lt, rb);
 	return _selRect;
 }
 
-const QRect & ImageSetWidget::getSelectRect( float &orgX, float &orgY, float &w, float &h )
+const QRectF & ImageSetWidget::getSelectRect( float &orgX, float &orgY, float &w, float &h )
 {
 	QRect imageRect = _image.rect();
 	int x = _selRect.x() + _selRect.width() / 2;
 	int y = _selRect.y() + _selRect.height() / 2;
-	orgX = x - imageRect.x() - imageRect.width() / 2;
-	orgY = y - imageRect.y() - imageRect.height() / 2;
+	orgX = x - imageRect.x() - (1 + imageRect.width()) / 2;
+	orgY = y - imageRect.y() - (1 + imageRect.height()) / 2;
 	w = _selRect.width();
 	h = _selRect.height();
 	return _selRect;
@@ -341,12 +341,12 @@ const QRect & ImageSetWidget::getSelectRect( float &orgX, float &orgY, float &w,
 
 void ImageSetWidget::setSelectRect( int orgX, int orgY, int w, int h )
 {
-	QRect imageRect = _image.rect();
-	int x = orgX + imageRect.center().x();
-	int y = imageRect.center().y() - orgY;
-	QRect recttmp(0, 0, w, h);
-	QPoint tl = QPoint(x - (recttmp.x() + recttmp.width() / 2), y - (recttmp.y() + recttmp.height() / 2));
-	_selRect = QRect(tl, QSize(w, h));
+	QRectF imageRect = _image.rect();
+	float x = orgX + (imageRect.width() + 1 )/2.f;
+	float y = (imageRect.height() +1)/2.f - orgY;
+	QRectF recttmp(0, 0, w, h);
+	QPointF tl = QPointF(x - (recttmp.x() + (recttmp.width()) / 2), y - (recttmp.y() + (recttmp.height())/ 2));
+	_selRect = QRectF(tl, QSize(w, h));
 	emit signalSelectRectChanged(_selRect);
 	emit signalImageSetChanged(orgX, orgY, w, h);
 	update();
@@ -453,18 +453,6 @@ void ImageSetControlWidget::setImageSet( const QPointF &center, const QSizeF &si
 	_wspin->setValue(size.width());
 	_hspin->setValue(size.height());
 	_emitSignalValueChanged = true;
-	if (!_fistset)
-	{
-		_xspin->setMinimum(-size.width()*0.5);
-		_xspin->setMaximum(size.width()*0.5);
-		_yspin->setMinimum(-size.height()*0.5);
-		_yspin->setMaximum(size.height()*0.5);
-		_wspin->setMinimum(1);
-		_wspin->setMaximum(size.width());
-		_hspin->setMinimum(1);
-		_hspin->setMaximum(size.height());
-		_fistset = true;
-	}
 }
 
 void ImageSetControlWidget::slotImageSetChanged( float x, float y, float w, float h )
@@ -878,7 +866,7 @@ void SkinSetDialog::slotCancelBtnClicked( bool )
 	setSelectRect(rc);
 }
 
-const QRect & SkinSetDialog::getSelectRect( float &orgX, float &orgY, float &w, float &h )
+const QRectF & SkinSetDialog::getSelectRect( float &orgX, float &orgY, float &w, float &h )
 {
 	orgX = _orgX;
 	orgY = _orgY;

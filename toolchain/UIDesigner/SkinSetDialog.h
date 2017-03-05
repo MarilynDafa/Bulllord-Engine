@@ -76,7 +76,7 @@ public:
 	ImageSetWidget(QWidget *parent = 0);
 	~ImageSetWidget();
 
-	const QRect &getSelectRect(float &orgX, float &orgY, float &w, float &h);
+	const QRectF &getSelectRect(float &orgX, float &orgY, float &w, float &h);
 	void setSelectRect(const QRectF &rect);
 	void setSelectRect( int orgX, int orgY, int w, int h );
 
@@ -86,7 +86,7 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent *me);
 	virtual void mouseMoveEvent(QMouseEvent *me);
 
-	QRect getSelRect();
+	QRectF getSelRect();
 
 protected slots:
 	void slotSetSelectRect(int x, int y, int w, int h);
@@ -95,9 +95,9 @@ protected:
 	bool _mousePressed;
 	QPoint _stPt;
 	QPoint _endPt;
-	QRect _selRect;
+	QRectF _selRect;
 signals:
-	void signalSelectRectChanged(const QRect &rect);
+	void signalSelectRectChanged(const QRectF &rect);
 	void signalImageSetChanged(float orgX, float orgY, float width, float height);
 };
 
@@ -146,7 +146,7 @@ public:
 	void initUi();
 	void initSignal();
 	void setImage(const QImage &image, const QSize &showSize, const SkinSet &skinSet);
-	const QRect& getSelectRect(float &orgX, float &orgY, float &w, float &h);
+	const QRectF& getSelectRect(float &orgX, float &orgY, float &w, float &h);
 
 private:
 	void setSelectRect(const QRectF &rect);
@@ -164,7 +164,7 @@ protected:
 	ImageSetControlWidget *_imageSetCtlWidget;
 
 	float _orgX, _orgY, _w, _h;
-	QRect _rect;//图片上的区域，作为辅助使用
+	QRectF _rect;//图片上的区域，作为辅助使用
 
 	QSize OriginSz;
 };

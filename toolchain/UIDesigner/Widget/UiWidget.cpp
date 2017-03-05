@@ -1262,6 +1262,7 @@ SkinImageEx UiWidget::createSkinImage( const QString &bgImg, const QStringList &
 	SkinSet skinSet;
 	skinSet.setPoint(pt);
 	skinSet.setSize(sz);
+	skinSet.setRect(QRect(pt, sz));
 	SkinImageEx skinImg;
 	skinImg.setSkinSet(skinSet);
 	skinImg.setSkinName(bgImg);
