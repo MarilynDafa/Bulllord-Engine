@@ -3332,8 +3332,8 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
             GL_CHECK_INTERNAL(glRenderbufferStorage(GL_RENDERBUFFER, _rtfmt, _Width, _Height));
             GL_CHECK_INTERNAL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
         }
-        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAX_LEVEL, _Mipmap - 1));
         if (_Data)
         {
@@ -4633,118 +4633,5 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
 	{
 	}
-#endif
-}
-BLVoid
-blDraw2(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance, int debug)
-{
-    _PipelineStateRefreshGL();
-    _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
-    _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
-#if defined(BL_GL_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
-    {
-
-		GL_CHECK_INTERNAL(glUseProgram(_tech->uData.sGL.nHandle));		
-        for (BLU32 _idx = 0; _idx < 16; ++_idx)
-        {
-            if (_tech->aUniformVars[_idx].aName[0])
-            {
-                GLint _handle = glGetUniformLocation(_tech->uData.sGL.nHandle, _tech->aUniformVars[_idx].aName);
-                void* _data = _tech->aUniformVars[_idx].pVar;
-                BLU32 _count = _tech->aUniformVars[_idx].nCount;
-                switch(_tech->aUniformVars[_idx].eType)
-                {
-                    case BL_UB_S32X1: GL_CHECK_INTERNAL(glUniform1iv(_handle, _count, (GLint*)_data)); break;
-                    case BL_UB_S32X2: GL_CHECK_INTERNAL(glUniform2iv(_handle, _count, (GLint*)_data)); break;
-                    case BL_UB_S32X3: GL_CHECK_INTERNAL(glUniform3iv(_handle, _count, (GLint*)_data)); break;
-                    case BL_UB_S32X4: GL_CHECK_INTERNAL(glUniform4iv(_handle, _count, (GLint*)_data)); break;
-                    case BL_UB_F32X1: GL_CHECK_INTERNAL(glUniform1fv(_handle, _count, (GLfloat*)_data)); break;
-                    case BL_UB_F32X2: GL_CHECK_INTERNAL(glUniform2fv(_handle, _count, (GLfloat*)_data)); break;
-                    case BL_UB_F32X3: GL_CHECK_INTERNAL(glUniform3fv(_handle, _count, (GLfloat*)_data)); break;
-                    case BL_UB_F32X4: GL_CHECK_INTERNAL(glUniform4fv(_handle, _count, (GLfloat*)_data)); break;
-                    case BL_UB_MAT2: GL_CHECK_INTERNAL(glUniformMatrix2fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
-                    case BL_UB_MAT3: GL_CHECK_INTERNAL(glUniformMatrix3fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
-                    case BL_UB_MAT4: GL_CHECK_INTERNAL(glUniformMatrix4fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
-                    case BL_UB_MAT2X3: GL_CHECK_INTERNAL(glUniformMatrix2x3fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
-                    case BL_UB_MAT3X2: GL_CHECK_INTERNAL(glUniformMatrix3x2fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
-                    case BL_UB_MAT2X4: GL_CHECK_INTERNAL(glUniformMatrix2x4fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
-                    case BL_UB_MAT4X2: GL_CHECK_INTERNAL(glUniformMatrix4x2fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
-                    case BL_UB_MAT3X4: GL_CHECK_INTERNAL(glUniformMatrix3x4fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
-                    case BL_UB_MAT4X3: GL_CHECK_INTERNAL(glUniformMatrix4x3fv(_handle, 1, GL_FALSE, (GLfloat*)_data)); break;
-                    default:assert(0);break;
-                }
-            }
-        }
-        for (BLU32 _idx = 0; _idx < 16; ++_idx)
-        {
-            if (_tech->aSamplerVars[_idx].aName[0])
-            {
-                GLint _handle = glGetUniformLocation(_tech->uData.sGL.nHandle, _tech->aSamplerVars[_idx].aName);
-                GL_CHECK_INTERNAL(glActiveTexture(GL_TEXTURE0 + _tech->aSamplerVars[_idx].nUnit));
-                GL_CHECK_INTERNAL(glUniform1i(_handle, _tech->aSamplerVars[_idx].nUnit));
-            }
-        }
-        GLenum _prim;
-        switch (_geo->eVBTopology)
-        {
-            case BL_PT_POINTS: _prim = GL_POINTS; break;
-            case BL_PT_LINES: _prim = GL_LINES; break;
-            case BL_PI_LINELOOP: _prim = GL_LINE_LOOP; break;
-            case BL_PT_LINESTRIP: _prim = GL_LINE_STRIP; break;
-            case BL_PT_TRIANGLES: _prim = GL_TRIANGLES; break;
-            case BL_PT_TRIANGLESTRIP: _prim = GL_TRIANGLE_STRIP; break;
-            case BL_PT_TRIANGLEFAN: _prim = GL_TRIANGLE_FAN; break;
-            default: _prim = GL_TRIANGLES; break;
-        }
-
-        if (_geo->uData.sGL.nIBHandle != 0xFFFFFFFF)
-        {
-            GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
-			GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
-            if (1 == _Instance)
-            {
-                GL_CHECK_INTERNAL(glDrawElements(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT :  GL_UNSIGNED_SHORT, NULL));
-            }
-            else
-            {
-                GL_CHECK_INTERNAL(glDrawElementsInstanced(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT :  GL_UNSIGNED_SHORT, NULL, _Instance));
-            }
-			GL_CHECK_INTERNAL(glBindVertexArray(0));
-        }
-        else
-        {
-				GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
-				GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
-            if (1 == _Instance)
-            {
-				if (!debug)
-				{
-					GL_CHECK_INTERNAL(glDrawArrays(_prim, 0, _geo->nVertexNum));
-				//	glFlush();
-
-				}
-				
-            }
-            else
-            {
-                GL_CHECK_INTERNAL(glDrawArraysInstanced(_prim, 0, _geo->nVertexNum, _Instance));
-            }
-			GL_CHECK_INTERNAL(glBindVertexArray(0));
-        }
-		GL_CHECK_INTERNAL(glUseProgram(0));
-    }
-#elif defined(BL_MTL_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
-    {
-    }
-#elif defined(BL_VK_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
-    {
-    }
-#elif defined(BL_DX_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
-    {
-    }
 #endif
 }

@@ -51,10 +51,12 @@ typedef struct __GLXcontextRec *GLXContext;
 extern "C" {
 #endif
 /* Math */
-#define EPSILON_INTERNAL 0.00001
+#define EPSILON_INTERNAL 0.00001f
 #define PI_INTERNAL 3.141592653589793f
 #define MIN_INTERNAL(x,y) ((x)<(y)?(x):(y))
 #define MAX_INTERNAL(x,y) ((x)>(y)?(x):(y))
+/* UI */
+#define PIXEL_ALIGNED_INTERNAL(pixel) ((BLF32)(BLS32)((pixel) + ((pixel)>0.0f?0.5f:-0.5f)))
 /* File */
 #define FILE_INVALID_INTERNAL(fp) ((fp) && (fp) != (BLVoid*)0xFFFFFFFF)
 #define FOURCC_INTERNAL(ch0, ch1, ch2, ch3) ((ch0<<0) + (ch1<<8) + (ch2<<16) + (ch3<<24))

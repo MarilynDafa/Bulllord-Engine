@@ -259,8 +259,6 @@ BL_API BLVoid blDraw(
     IN BLGuid _Tech,
     IN BLGuid _GBO,
     IN BLU32 _Instance);
-BLVoid
-blDraw2(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance, int debug);
 #ifdef __cplusplus
 }
 #endif

@@ -91,13 +91,13 @@ typedef struct _EmitParam {
     BLU32* pRotScale;
 }_BLEmitParam;
 typedef struct _SpriteSheet{
-	BLU32 nTag;
-	BLU32 nLTx;
-	BLU32 nLTy;
-	BLU32 nRBx;
-	BLU32 nRBy;
-	BLU32 nOffsetX;
-	BLU32 nOffsetY;
+	BLS32 nTag;
+	BLS32 nLTx;
+	BLS32 nLTy;
+	BLS32 nRBx;
+	BLS32 nRBy;
+	BLS32 nOffsetX;
+	BLS32 nOffsetY;
 }_BLSpriteSheet;
 typedef struct _TileInfo{
 	BLGuid nID;
@@ -752,7 +752,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
     if (!_Node->bShow || !_Node->bValid)
         return;
 	BLU32 _w, _h;
-	blUIQueryResolution(&_w, &_h);
+	blUIResolutionQuery(&_w, &_h);
 	if (_Node->sScissor.sLT.fX < 0.f)
 		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _w, _h);
 	else
@@ -1009,7 +1009,7 @@ _SpriteInit()
     _PrSpriteMem->nSpriteGlowTech = blGenTechnique("2DGlow.bsl", NULL, FALSE, FALSE);
     blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	BLU32 _w, _h;
-	blUIQueryResolution(&_w, &_h);
+	blUIResolutionQuery(&_w, &_h);
 	_PrSpriteMem->sViewport.sLT.fX = _PrSpriteMem->sViewport.sLT.fY = 0.f;
 	_PrSpriteMem->sViewport.sRB.fX = (BLF32)_w;
 	_PrSpriteMem->sViewport.sRB.fY = (BLF32)_h;
@@ -1018,7 +1018,7 @@ BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 {
     BLU32 _w, _h;
-    blUIQueryResolution(&_w, &_h);
+	blUIResolutionQuery(&_w, &_h);
     BLF32 _screensz[] = { 2.f / (BLF32)_w, 2.f / (BLF32)_h };
     blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
     blTechUniform(_PrSpriteMem->nSpriteInstTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
