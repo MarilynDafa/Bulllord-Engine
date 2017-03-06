@@ -51,12 +51,6 @@ typedef struct _Font {
 	BLDictionary* pAtlasDict;
 	FT_Face sFtFace;
 }_BLFont;
-typedef struct _PixmapSheet{
-    BLF32 fLTX;
-    BLF32 fLTY;
-    BLF32 fRBX;
-    BLF32 fRBY;
-}_BLPixmapSheet;
 typedef struct _Widget {
 	BLGuid nID;
 	BLEnum eType;
@@ -84,7 +78,9 @@ typedef struct _Widget {
 			BLAnsi aPixmap[128];
 			BLAnsi aCommonMap[128];
 			BLAnsi aStencilMap[128];
-			BLRect aCommonTex[9];
+			BLRect sCommonTex9;
+			BLRect sCommonTex;
+			BLRect sStenciTex;
 			BLBool bDragable;
 			BLBool bBasePlate;
 			BLBool bModal;
@@ -92,7 +88,10 @@ typedef struct _Widget {
 			BLBool bFlipX;
             BLBool bFlipY;
             BLGuid nPixmapTex;
-            BLDictionary* pPixmapSheetDct;
+			BLU32 nTexWidth;
+			BLU32 nTexHeight;
+			BLEnum eTexFormat;
+			BLU8* pTexData;
 		}sPanel;
 		struct _Button {
 			BLUtf8* pText;
@@ -102,10 +101,15 @@ typedef struct _Widget {
 			BLAnsi aPressedMap[128];
 			BLAnsi aDisableMap[128];
 			BLAnsi aStencilMap[128];
-			BLRect aCommonTex[9];
-			BLRect aHoveredTex[9];
-			BLRect aPressedTex[9];
-			BLRect aDisableTex[9];
+			BLRect sCommonTex9;
+			BLRect sCommonTex;
+			BLRect sHoveredTex9;
+			BLRect sHoveredTex;
+			BLRect sPressedTex9;
+			BLRect sPressedTex;
+			BLRect sDisableTex9;
+			BLRect sDisableTex;
+			BLRect sStencilTex;
 			BLU32 nFontHash;
 			BLU32 nFontHeight;
 			BLBool bOutline;
@@ -119,18 +123,26 @@ typedef struct _Widget {
 			BLBool bFlipY;
             BLU32 nState;
             BLGuid nPixmapTex;
-            BLDictionary* pPixmapSheetDct;
+			BLU32 nTexWidth;
+			BLU32 nTexHeight;
+			BLEnum eTexFormat;
+			BLU8* pTexData;
 		}sButton;
 		struct _Label {
 			BLUtf8* pText;
 			BLAnsi aPixmap[128];
 			BLAnsi aCommonMap[128];
-			BLRect aCommonTex[9];
 			BLAnsi aStencilMap[128];
+			BLRect sCommonTex9;
+			BLRect sCommonTex;
+			BLRect sStencilTex;
 			BLBool bFlipX;
             BLBool bFlipY;
             BLGuid nPixmapTex;
-            BLDictionary* pPixmapSheetDct;
+			BLU32 nTexWidth;
+			BLU32 nTexHeight;
+			BLEnum eTexFormat;
+			BLU8* pTexData;
 		}sLabel;
 		struct _Check {
 			BLUtf8* pText;
@@ -139,9 +151,13 @@ typedef struct _Widget {
 			BLAnsi aPressedMap[128];
 			BLAnsi aDisableMap[128];
 			BLAnsi aStencilMap[128];
-			BLRect aCommonTex[9];
-			BLRect aPressedTex[9];
-			BLRect aDisableTex[9];
+			BLRect sCommonTex9;
+			BLRect sCommonTex;
+			BLRect sPressedTex9;
+			BLRect sPressedTex;
+			BLRect sDisableTex9;
+			BLRect sDisableTex;
+			BLRect sStencilTex;
 			BLU32 nFontHash;
 			BLU32 nFontHeight;
 			BLBool bOutline;
@@ -155,7 +171,10 @@ typedef struct _Widget {
 			BLBool bFlipY;
             BLU32 nState;
             BLGuid nPixmapTex;
-            BLDictionary* pPixmapSheetDct;
+			BLU32 nTexWidth;
+			BLU32 nTexHeight;
+			BLEnum eTexFormat;
+			BLU8* pTexData;
 		}sCheck;
 		struct _Text {
 			BLUtf8* pText;
@@ -163,7 +182,9 @@ typedef struct _Widget {
 			BLAnsi aPixmap[128];
 			BLAnsi aCommonMap[128];
 			BLAnsi aStencilMap[128];
-			BLRect aCommonTex[9];
+			BLRect sCommonTex9;
+			BLRect sCommonTex;
+			BLRect sStencilTex;
 			BLU32 nFontHash;
 			BLU32 nFontHeight;
 			BLBool bOutline;
@@ -193,7 +214,10 @@ typedef struct _Widget {
 			BLBool bFlipY;
             BLU32 nState;
             BLGuid nPixmapTex;
-            BLDictionary* pPixmapSheetDct;
+			BLU32 nTexWidth;
+			BLU32 nTexHeight;
+			BLEnum eTexFormat;
+			BLU8* pTexData;
 		}sText;
 		struct _Progress {
 			BLUtf8* pText;
@@ -201,7 +225,10 @@ typedef struct _Widget {
 			BLAnsi aCommonMap[128];
 			BLAnsi aStencilMap[128];
 			BLAnsi aFillMap[128];
-			BLRect aCommonTex[9];
+			BLRect sCommonTex9;
+			BLRect sCommonTex;
+			BLRect sFillTex;
+			BLRect sStencilTex;
 			BLU32 nFontHash;
 			BLU32 nFontHeight;
 			BLBool bOutline;
@@ -213,7 +240,10 @@ typedef struct _Widget {
 			BLBool bFlipX;
             BLBool bFlipY;
             BLGuid nPixmapTex;
-            BLDictionary* pPixmapSheetDct;
+			BLU32 nTexWidth;
+			BLU32 nTexHeight;
+			BLEnum eTexFormat;
+			BLU8* pTexData;
 		}sProgress;
 		struct _Slider {
 			BLAnsi aPixmap[128];
@@ -221,7 +251,11 @@ typedef struct _Widget {
 			BLAnsi aSliderCommonMap[128];
 			BLAnsi aSliderDisableMap[128];
 			BLAnsi aStencilMap[128];
-			BLRect aCommonTex[9];
+			BLRect sCommonTex9;
+			BLRect sCommonTex;
+			BLRect sSliderCommonTex;
+			BLRect sSliderDisableTex;
+			BLRect sStencilTex;
 			BLBool bHorizontal;
 			BLBool bSliderDragged;
 			BLS32 nMinValue;
@@ -233,7 +267,10 @@ typedef struct _Widget {
 			BLBool bFlipY;
             BLU32 nState;
             BLGuid nPixmapTex;
-            BLDictionary* pPixmapSheetDct;
+			BLU32 nTexWidth;
+			BLU32 nTexHeight;
+			BLEnum eTexFormat;
+			BLU8* pTexData;
 		}sSlider;
 		struct _Table {
 			BLAnsi aPixmap[128];
@@ -241,7 +278,11 @@ typedef struct _Widget {
 			BLAnsi aStencilMap[128];
 			BLAnsi aOddItemMap[128];
 			BLAnsi aEvenItemMap[128];
-			BLRect aCommonTex[9];
+			BLRect sCommonTex9;
+			BLRect sCommonTex;
+			BLRect sOddItemTex;
+			BLRect sEvenItemTex;
+			BLRect sStencilTex;
 			BLU32 nFontHash;
 			BLU32 nFontHeight;
 			BLBool bOutline;
@@ -252,18 +293,26 @@ typedef struct _Widget {
 			BLBool bFlipX;
             BLBool bFlipY;
             BLGuid nPixmapTex;
-            BLDictionary* pPixmapSheetDct;
+			BLU32 nTexWidth;
+			BLU32 nTexHeight;
+			BLEnum eTexFormat;
+			BLU8* pTexData;
 		}sTable;
 		struct _Dial {
 			BLAnsi aPixmap[128];
 			BLAnsi aCommonMap[128];
 			BLAnsi aStencilMap[128];
+			BLRect sCommonTex;
+			BLRect sStencilTex;
 			BLS32 nStartAngle;
 			BLS32 nEndAngle;
 			BLBool bAngleCut;
 			BLBool bClockWise;
             BLGuid nPixmapTex;
-            BLDictionary* pPixmapSheetDct;
+			BLU32 nTexWidth;
+			BLU32 nTexHeight;
+			BLEnum eTexFormat;
+			BLU8* pTexData;
 		}sDial;
 		struct _Primitive {
 			BLBool bFill;
@@ -278,10 +327,13 @@ typedef struct _UIMember {
 	BLArray* pFonts;
 	_BLWidget* pRoot;
 	_BLWidget* pBasePlate;
+	_BLWidget* pHoveredWidget;
+	_BLWidget* pFocusWidget;
 	BLArray* pPixmaps;
 	BLAnsi aDir[260];
 	BLAnsi aArchive[260];
 	FT_Library sFtLibrary;
+	BLGuid nUITech;
 	BLU32 nFboWidth;
 	BLU32 nFboHeight;
 	BLU32 nCaretColor;
@@ -290,7 +342,644 @@ typedef struct _UIMember {
 	BLBool bDirty;
 }_BLUIMember;
 static _BLUIMember* _PrUIMem = NULL;
-
+extern BLBool _FetchResource(const BLAnsi*, const BLAnsi*, BLVoid**, BLGuid, BLBool(*)(BLVoid*, const BLAnsi*, const BLAnsi*), BLBool(*)(BLVoid*), BLBool);
+extern BLBool _DiscardResource(BLGuid, BLBool(*)(BLVoid*), BLBool(*)(BLVoid*));
+static BLBool
+_RectApproximate(BLRect* _R1, BLRect* _R2)
+{
+	if (!blScalarApproximate(_R1->sLT.fX, _R2->sLT.fX))
+		return FALSE;
+	if (!blScalarApproximate(_R1->sLT.fY, _R2->sLT.fY))
+		return FALSE;
+	if (!blScalarApproximate(_R1->sRB.fX, _R2->sRB.fX))
+		return FALSE;
+	if (!blScalarApproximate(_R1->sRB.fY, _R2->sRB.fY))
+		return FALSE;
+	return TRUE;
+}
+static BLBool
+_UISetup(BLVoid* _Src)
+{
+	_BLWidget* _node = (_BLWidget*)_Src;
+	switch (_node->eType)
+	{
+	case BL_UT_PANEL:
+		_node->uExtension.sPanel.nPixmapTex = blGenTexture(URIPART_INTERNAL(_node->nID), BL_TT_2D, _node->uExtension.sPanel.eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->uExtension.sPanel.nTexWidth, _node->uExtension.sPanel.nTexHeight, 1, _node->uExtension.sPanel.pTexData);
+		free(_node->uExtension.sPanel.pTexData);
+		_node->uExtension.sPanel.pTexData = NULL;
+		break;
+	case BL_UT_LABEL:
+		_node->uExtension.sLabel.nPixmapTex = blGenTexture(URIPART_INTERNAL(_node->nID), BL_TT_2D, _node->uExtension.sLabel.eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->uExtension.sLabel.nTexWidth, _node->uExtension.sLabel.nTexHeight, 1, _node->uExtension.sLabel.pTexData);
+		free(_node->uExtension.sLabel.pTexData);
+		_node->uExtension.sLabel.pTexData = NULL;
+		break;
+	case BL_UT_BUTTON:
+		_node->uExtension.sButton.nPixmapTex = blGenTexture(URIPART_INTERNAL(_node->nID), BL_TT_2D, _node->uExtension.sButton.eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->uExtension.sButton.nTexWidth, _node->uExtension.sButton.nTexHeight, 1, _node->uExtension.sButton.pTexData);
+		free(_node->uExtension.sButton.pTexData);
+		_node->uExtension.sButton.pTexData = NULL;
+		break;
+	case BL_UT_CHECK:
+		_node->uExtension.sCheck.nPixmapTex = blGenTexture(URIPART_INTERNAL(_node->nID), BL_TT_2D, _node->uExtension.sCheck.eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->uExtension.sCheck.nTexWidth, _node->uExtension.sCheck.nTexHeight, 1, _node->uExtension.sCheck.pTexData);
+		free(_node->uExtension.sCheck.pTexData);
+		_node->uExtension.sCheck.pTexData = NULL;
+		break;
+	case BL_UT_SLIDER:
+		_node->uExtension.sSlider.nPixmapTex = blGenTexture(URIPART_INTERNAL(_node->nID), BL_TT_2D, _node->uExtension.sSlider.eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->uExtension.sSlider.nTexWidth, _node->uExtension.sSlider.nTexHeight, 1, _node->uExtension.sSlider.pTexData);
+		free(_node->uExtension.sSlider.pTexData);
+		_node->uExtension.sSlider.pTexData = NULL;
+		break;
+	case BL_UT_TEXT:
+		_node->uExtension.sText.nPixmapTex = blGenTexture(URIPART_INTERNAL(_node->nID), BL_TT_2D, _node->uExtension.sText.eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->uExtension.sText.nTexWidth, _node->uExtension.sText.nTexHeight, 1, _node->uExtension.sText.pTexData);
+		free(_node->uExtension.sText.pTexData);
+		_node->uExtension.sText.pTexData = NULL;
+		break;
+	case BL_UT_PROGRESS:
+		_node->uExtension.sProgress.nPixmapTex = blGenTexture(URIPART_INTERNAL(_node->nID), BL_TT_2D, _node->uExtension.sProgress.eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->uExtension.sProgress.nTexWidth, _node->uExtension.sProgress.nTexHeight, 1, _node->uExtension.sProgress.pTexData);
+		free(_node->uExtension.sProgress.pTexData);
+		_node->uExtension.sProgress.pTexData = NULL;
+		break;
+	case BL_UT_DIAL:
+		_node->uExtension.sDial.nPixmapTex = blGenTexture(URIPART_INTERNAL(_node->nID), BL_TT_2D, _node->uExtension.sDial.eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->uExtension.sDial.nTexWidth, _node->uExtension.sDial.nTexHeight, 1, _node->uExtension.sDial.pTexData);
+		free(_node->uExtension.sDial.pTexData);
+		_node->uExtension.sDial.pTexData = NULL;
+		break;
+	case BL_UT_TABLE:
+		_node->uExtension.sTable.nPixmapTex = blGenTexture(URIPART_INTERNAL(_node->nID), BL_TT_2D, _node->uExtension.sTable.eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->uExtension.sTable.nTexWidth, _node->uExtension.sTable.nTexHeight, 1, _node->uExtension.sTable.pTexData);
+		free(_node->uExtension.sTable.pTexData);
+		_node->uExtension.sTable.pTexData = NULL;
+		break;
+	default: break;
+	}
+	_node->bValid = TRUE;
+	_PrUIMem->bDirty = TRUE;
+	return TRUE;
+}
+static BLBool
+_UIRelease(BLVoid* _Src)
+{
+	_BLWidget* _node = (_BLWidget*)_Src;
+	switch (_node->eType)
+	{
+	case BL_UT_PANEL:
+		blDeleteTexture(_node->uExtension.sPanel.nPixmapTex);
+		break;
+	case BL_UT_LABEL:
+		blDeleteTexture(_node->uExtension.sLabel.nPixmapTex);
+		break;
+	case BL_UT_BUTTON:
+		blDeleteTexture(_node->uExtension.sButton.nPixmapTex);
+		break;
+	case BL_UT_CHECK:
+		blDeleteTexture(_node->uExtension.sCheck.nPixmapTex);
+		break;
+	case BL_UT_SLIDER:
+		blDeleteTexture(_node->uExtension.sSlider.nPixmapTex);
+		break;
+	case BL_UT_TEXT:
+		blDeleteTexture(_node->uExtension.sText.nPixmapTex);
+		break;
+	case BL_UT_PROGRESS:
+		blDeleteTexture(_node->uExtension.sProgress.nPixmapTex);
+		break;
+	case BL_UT_DIAL:
+		blDeleteTexture(_node->uExtension.sDial.nPixmapTex);
+		break;
+	case BL_UT_TABLE:
+		blDeleteTexture(_node->uExtension.sTable.nPixmapTex);
+		break;
+	default: break;
+	}
+	return TRUE;
+}
+static BLBool
+_LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
+{
+	_BLWidget* _src = (_BLWidget*)_Src;
+	BLGuid _stream;
+	if (_Archive)
+		_stream = blGenStream(_Filename, _Archive);
+	else
+	{
+		BLAnsi _tmpname[260];
+		strcpy(_tmpname, _Filename);
+		BLAnsi _path[260] = { 0 };
+		strcpy(_path, blWorkingDir(TRUE));
+		strcat(_path, _tmpname);
+		_stream = blGenStream(_path, NULL);
+		if (INVALID_GUID == _stream)
+		{
+			memset(_path, 0, sizeof(_path));
+			strcpy(_path, blUserFolderDir());
+			_stream = blGenStream(_path, NULL);
+		}
+		if (INVALID_GUID == _stream)
+			return FALSE;
+	}
+	BLU8 _identifier[12];
+	blStreamRead(_stream, sizeof(_identifier), _identifier);
+	if (_identifier[0] != 0xDD ||
+		_identifier[1] != 0xDD ||
+		_identifier[2] != 0xDD ||
+		_identifier[3] != 0xEE ||
+		_identifier[4] != 0xEE ||
+		_identifier[5] != 0xEE ||
+		_identifier[6] != 0xAA ||
+		_identifier[7] != 0xAA ||
+		_identifier[8] != 0xAA ||
+		_identifier[9] != 0xDD ||
+		_identifier[10] != 0xDD ||
+		_identifier[11] != 0xDD)
+	{
+		blDeleteStream(_stream);
+		return FALSE;
+	}
+	BLU32 _width, _height, _depth;
+	blStreamRead(_stream, sizeof(BLU32), &_width);
+	blStreamRead(_stream, sizeof(BLU32), &_height);
+	blStreamRead(_stream, sizeof(BLU32), &_depth);
+	BLU32 _array, _faces, _mipmap;
+	blStreamRead(_stream, sizeof(BLU32), &_array);
+	blStreamRead(_stream, sizeof(BLU32), &_faces);
+	blStreamRead(_stream, sizeof(BLU32), &_mipmap);
+	BLU32 _fourcc, _channels, _offset;
+	blStreamRead(_stream, sizeof(BLU32), &_fourcc);
+	blStreamRead(_stream, sizeof(BLU32), &_channels);
+	blStreamRead(_stream, sizeof(BLU32), &_offset);
+	BLEnum _type = BL_TT_2D;
+	while (blStreamTell(_stream) < _offset)
+	{
+		BLS32 _ltx, _lty, _rbx, _rby, _offsetx, _offsety;
+		BLU32 _taglen;
+		blStreamRead(_stream, sizeof(BLU32), &_taglen);
+		BLAnsi _tag[256] = { 0 };
+		blStreamRead(_stream, _taglen, _tag);
+		blStreamRead(_stream, sizeof(BLU32), &_ltx);
+		blStreamRead(_stream, sizeof(BLU32), &_lty);
+		blStreamRead(_stream, sizeof(BLU32), &_rbx);
+		blStreamRead(_stream, sizeof(BLU32), &_rby);
+		blStreamRead(_stream, sizeof(BLU32), &_offsetx);
+		blStreamRead(_stream, sizeof(BLU32), &_offsety);
+		switch (_src->eType)
+		{
+		case BL_UT_PANEL:
+			if (!strcmp(_tag, _src->uExtension.sPanel.aCommonMap))
+			{
+				_src->uExtension.sPanel.sCommonTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sPanel.sCommonTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sPanel.sCommonTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sPanel.sCommonTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sPanel.sCommonTex9.sLT.fX += (BLF32)_ltx;
+				_src->uExtension.sPanel.sCommonTex9.sLT.fY += (BLF32)_lty;
+				_src->uExtension.sPanel.sCommonTex9.sRB.fX += (BLF32)_ltx;
+				_src->uExtension.sPanel.sCommonTex9.sRB.fY += (BLF32)_lty;
+			}
+			if (!strcmp(_tag, _src->uExtension.sPanel.aStencilMap))
+			{
+				_src->uExtension.sPanel.sStenciTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sPanel.sStenciTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sPanel.sStenciTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sPanel.sStenciTex.sRB.fY = (BLF32)_rby;
+			}
+			break;
+		case BL_UT_LABEL:
+			if (!strcmp(_tag, _src->uExtension.sLabel.aCommonMap))
+			{
+				_src->uExtension.sLabel.sCommonTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sLabel.sCommonTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sLabel.sCommonTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sLabel.sCommonTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sLabel.sCommonTex9.sLT.fX += (BLF32)_ltx;
+				_src->uExtension.sLabel.sCommonTex9.sLT.fY += (BLF32)_lty;
+				_src->uExtension.sLabel.sCommonTex9.sRB.fX += (BLF32)_ltx;
+				_src->uExtension.sLabel.sCommonTex9.sRB.fY += (BLF32)_lty;
+			}
+			if (!strcmp(_tag, _src->uExtension.sLabel.aStencilMap))
+			{
+				_src->uExtension.sLabel.sStencilTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sLabel.sStencilTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sLabel.sStencilTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sLabel.sStencilTex.sRB.fY = (BLF32)_rby;
+			}
+			break;
+		case BL_UT_BUTTON:
+			if (!strcmp(_tag, _src->uExtension.sButton.aCommonMap))
+			{
+				_src->uExtension.sButton.sCommonTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sButton.sCommonTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sButton.sCommonTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sButton.sCommonTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sButton.sCommonTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sButton.sCommonTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sButton.sCommonTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sButton.sCommonTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sButton.aHoveredMap))
+			{
+				_src->uExtension.sButton.sHoveredTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sButton.sHoveredTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sButton.sHoveredTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sButton.sHoveredTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sButton.sHoveredTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sButton.sHoveredTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sButton.sHoveredTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sButton.sHoveredTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sButton.aPressedMap))
+			{
+				_src->uExtension.sButton.sPressedTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sButton.sPressedTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sButton.sPressedTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sButton.sPressedTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sButton.sPressedTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sButton.sPressedTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sButton.sPressedTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sButton.sPressedTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sButton.aDisableMap))
+			{
+				_src->uExtension.sButton.sDisableTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sButton.sDisableTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sButton.sDisableTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sButton.sDisableTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sButton.sDisableTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sButton.sDisableTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sButton.sDisableTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sButton.sDisableTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sButton.aStencilMap))
+			{
+				_src->uExtension.sButton.sStencilTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sButton.sStencilTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sButton.sStencilTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sButton.sStencilTex.sRB.fY = (BLF32)_rby;
+			}
+			break;
+		case BL_UT_CHECK:
+			if (!strcmp(_tag, _src->uExtension.sCheck.aCommonMap))
+			{
+				_src->uExtension.sCheck.sCommonTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sCheck.sCommonTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sCheck.sCommonTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sCheck.sCommonTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sCheck.sCommonTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sCheck.sCommonTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sCheck.sCommonTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sCheck.sCommonTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sCheck.aPressedMap))
+			{
+				_src->uExtension.sCheck.sPressedTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sCheck.sPressedTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sCheck.sPressedTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sCheck.sPressedTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sCheck.sPressedTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sCheck.sPressedTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sCheck.sPressedTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sCheck.sPressedTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sCheck.aDisableMap))
+			{
+				_src->uExtension.sCheck.sDisableTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sCheck.sDisableTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sCheck.sDisableTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sCheck.sDisableTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sCheck.sDisableTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sCheck.sDisableTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sCheck.sDisableTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sCheck.sDisableTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sCheck.aStencilMap))
+			{
+				_src->uExtension.sCheck.sStencilTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sCheck.sStencilTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sCheck.sStencilTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sCheck.sStencilTex.sRB.fY = (BLF32)_rby;
+			}
+			break;
+		case BL_UT_SLIDER:
+			if (!strcmp(_tag, _src->uExtension.sSlider.aCommonMap))
+			{
+				_src->uExtension.sSlider.sCommonTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sSlider.sCommonTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sSlider.sCommonTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sSlider.sCommonTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sSlider.sCommonTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sSlider.sCommonTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sSlider.sCommonTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sSlider.sCommonTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sSlider.aSliderCommonMap))
+			{
+				_src->uExtension.sSlider.sSliderCommonTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sSlider.sSliderCommonTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sSlider.sSliderCommonTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sSlider.sSliderCommonTex.sRB.fY = (BLF32)_rby;
+			}
+			if (!strcmp(_tag, _src->uExtension.sSlider.aSliderDisableMap))
+			{
+				_src->uExtension.sSlider.sSliderDisableTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sSlider.sSliderDisableTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sSlider.sSliderDisableTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sSlider.sSliderDisableTex.sRB.fY = (BLF32)_rby;
+			}
+			if (!strcmp(_tag, _src->uExtension.sSlider.aStencilMap))
+			{
+				_src->uExtension.sSlider.sStencilTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sSlider.sStencilTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sSlider.sStencilTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sSlider.sStencilTex.sRB.fY = (BLF32)_rby;
+			}
+			break;
+		case BL_UT_TEXT:
+			if (!strcmp(_tag, _src->uExtension.sText.aCommonMap))
+			{
+				_src->uExtension.sText.sCommonTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sText.sCommonTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sText.sCommonTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sText.sCommonTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sText.sCommonTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sText.sCommonTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sText.sCommonTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sText.sCommonTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sText.aStencilMap))
+			{
+				_src->uExtension.sText.sStencilTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sText.sStencilTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sText.sStencilTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sText.sStencilTex.sRB.fY = (BLF32)_rby;
+			}
+			break;
+		case BL_UT_PROGRESS:
+			if (!strcmp(_tag, _src->uExtension.sProgress.aCommonMap))
+			{
+				_src->uExtension.sProgress.sCommonTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sProgress.sCommonTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sProgress.sCommonTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sProgress.sCommonTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sProgress.sCommonTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sProgress.sCommonTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sProgress.sCommonTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sProgress.sCommonTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sProgress.aFillMap))
+			{
+				_src->uExtension.sProgress.sFillTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sProgress.sFillTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sProgress.sFillTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sProgress.sFillTex.sRB.fY = (BLF32)_rby;
+			}
+			if (!strcmp(_tag, _src->uExtension.sProgress.aStencilMap))
+			{
+				_src->uExtension.sProgress.sStencilTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sProgress.sStencilTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sProgress.sStencilTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sProgress.sStencilTex.sRB.fY = (BLF32)_rby;
+			}
+			break;
+		case BL_UT_DIAL:
+			if (!strcmp(_tag, _src->uExtension.sDial.aCommonMap))
+			{
+				_src->uExtension.sDial.sCommonTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sDial.sCommonTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sDial.sCommonTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sDial.sCommonTex.sRB.fY = (BLF32)_rby;
+			}
+			if (!strcmp(_tag, _src->uExtension.sDial.aStencilMap))
+			{
+				_src->uExtension.sDial.sStencilTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sDial.sStencilTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sDial.sStencilTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sDial.sStencilTex.sRB.fY = (BLF32)_rby;
+			}
+			break;
+		case BL_UT_TABLE:
+			if (!strcmp(_tag, _src->uExtension.sTable.aCommonMap))
+			{
+				_src->uExtension.sTable.sCommonTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sTable.sCommonTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sTable.sCommonTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sTable.sCommonTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sTable.sCommonTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sTable.sCommonTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sTable.sCommonTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sTable.sCommonTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
+			if (!strcmp(_tag, _src->uExtension.sTable.aEvenItemMap))
+			{
+				_src->uExtension.sTable.sEvenItemTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sTable.sEvenItemTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sTable.sEvenItemTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sTable.sEvenItemTex.sRB.fY = (BLF32)_rby;
+			}
+			if (!strcmp(_tag, _src->uExtension.sTable.aOddItemMap))
+			{
+				_src->uExtension.sTable.sOddItemTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sTable.sOddItemTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sTable.sOddItemTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sTable.sOddItemTex.sRB.fY = (BLF32)_rby;
+			}
+			if (!strcmp(_tag, _src->uExtension.sTable.aStencilMap))
+			{
+				_src->uExtension.sTable.sStencilTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sTable.sStencilTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sTable.sStencilTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sTable.sStencilTex.sRB.fY = (BLF32)_rby;
+			}
+			break;
+		default: break;
+		}
+	}
+	blStreamSeek(_stream, _offset);
+	BLU32 _imagesz;
+	BLEnum _format;
+	switch (_fourcc)
+	{
+	case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
+		blStreamRead(_stream, sizeof(BLU32), &_imagesz);
+		_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+		break;
+	case FOURCC_INTERNAL('S', '3', 'T', '1'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+		_format = BL_TF_BC1;
+		break;
+	case FOURCC_INTERNAL('S', '3', 'T', '2'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+		_format = BL_TF_BC1A1;
+		break;
+	case FOURCC_INTERNAL('S', '3', 'T', '3'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+		_format = BL_TF_BC3;
+		break;
+	case FOURCC_INTERNAL('A', 'S', 'T', '1'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+		_format = BL_TF_ASTC;
+		break;
+	case FOURCC_INTERNAL('A', 'S', 'T', '2'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+		_format = BL_TF_ASTC;
+		break;
+	case FOURCC_INTERNAL('A', 'S', 'T', '3'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+		_format = BL_TF_ASTC;
+		break;
+	case FOURCC_INTERNAL('E', 'T', 'C', '1'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+		_format = BL_TF_ETC2;
+		break;
+	case FOURCC_INTERNAL('E', 'T', 'C', '2'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+		_format = BL_TF_ETC2A1;
+		break;
+	case FOURCC_INTERNAL('E', 'T', 'C', '3'):
+		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+		_format = BL_TF_ETC2A;
+		break;
+	default:assert(0); break;
+	}
+	BLU8* _texdata;
+	if (_fourcc == FOURCC_INTERNAL('B', 'M', 'G', 'T'))
+	{
+		BLU8* _data = (BLU8*)malloc(_imagesz);
+		blStreamRead(_stream, _imagesz, _data);
+		BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
+		blRLEDecode(_data, _width * _height * _channels, _data2);
+		free(_data);
+		_texdata = _data2;
+	}
+	else
+	{
+		BLU8* _data = (BLU8*)malloc(_imagesz);
+		blStreamRead(_stream, _imagesz, _data);
+		_texdata = _data;
+	}
+	switch (_src->eType)
+	{
+	case BL_UT_PANEL:
+		_src->uExtension.sPanel.eTexFormat = _format;
+		_src->uExtension.sPanel.pTexData = _texdata;
+		_src->uExtension.sPanel.nTexWidth = _width;
+		_src->uExtension.sPanel.nTexHeight = _height;
+		break;
+	case BL_UT_LABEL:
+		_src->uExtension.sLabel.eTexFormat = _format;
+		_src->uExtension.sLabel.pTexData = _texdata;
+		_src->uExtension.sLabel.nTexWidth = _width;
+		_src->uExtension.sLabel.nTexHeight = _height;
+		break;
+	case BL_UT_BUTTON:
+		_src->uExtension.sButton.eTexFormat = _format;
+		_src->uExtension.sButton.pTexData = _texdata;
+		_src->uExtension.sButton.nTexWidth = _width;
+		_src->uExtension.sButton.nTexHeight = _height;
+		break;
+	case BL_UT_CHECK:
+		_src->uExtension.sCheck.eTexFormat = _format;
+		_src->uExtension.sCheck.pTexData = _texdata;
+		_src->uExtension.sCheck.nTexWidth = _width;
+		_src->uExtension.sCheck.nTexHeight = _height;
+		break;
+	case BL_UT_SLIDER:
+		_src->uExtension.sSlider.eTexFormat = _format;
+		_src->uExtension.sSlider.pTexData = _texdata;
+		_src->uExtension.sSlider.nTexWidth = _width;
+		_src->uExtension.sSlider.nTexHeight = _height;
+		break;
+	case BL_UT_TEXT:
+		_src->uExtension.sText.eTexFormat = _format;
+		_src->uExtension.sText.pTexData = _texdata;
+		_src->uExtension.sText.nTexWidth = _width;
+		_src->uExtension.sText.nTexHeight = _height;
+		break;
+	case BL_UT_PROGRESS:
+		_src->uExtension.sProgress.eTexFormat = _format;
+		_src->uExtension.sProgress.pTexData = _texdata;
+		_src->uExtension.sProgress.nTexWidth = _width;
+		_src->uExtension.sProgress.nTexHeight = _height;
+		break;
+	case BL_UT_DIAL:
+		_src->uExtension.sDial.eTexFormat = _format;
+		_src->uExtension.sDial.pTexData = _texdata;
+		_src->uExtension.sDial.nTexWidth = _width;
+		_src->uExtension.sDial.nTexHeight = _height;
+		break;
+	case BL_UT_TABLE:
+		_src->uExtension.sTable.eTexFormat = _format;
+		_src->uExtension.sTable.pTexData = _texdata;
+		_src->uExtension.sTable.nTexWidth = _width;
+		_src->uExtension.sTable.nTexHeight = _height;
+		break;
+	default: break;
+	}
+	blDeleteStream(_stream);
+	return TRUE;
+}
+static BLBool
+_UnloadUI(BLVoid* _Src)
+{
+	_BLWidget* _widget = (_BLWidget*)_Src;
+	if (!_widget)
+		return FALSE;
+	BLU32 _idx = 0;
+	if (_widget->pParent)
+	{
+		FOREACH_ARRAY(_BLWidget*, _iter, _widget->pParent->pChildren)
+		{
+			if (_iter == _widget)
+				break;
+			_idx++;
+		}
+		blArrayErase(_widget->pParent->pChildren, _idx);
+	}
+	if (_widget->pTooltip)
+		free(_widget->pTooltip);
+	switch (_widget->eType)
+	{
+	case BL_UT_LABEL:
+	{
+		if (_widget->uExtension.sLabel.pText)
+			free(_widget->uExtension.sLabel.pText);
+	}
+	break;
+	case BL_UT_BUTTON:
+	{
+		if (_widget->uExtension.sButton.pText)
+			free(_widget->uExtension.sButton.pText);
+	}
+	break;
+	case BL_UT_CHECK:
+	{
+		if (_widget->uExtension.sCheck.pText)
+			free(_widget->uExtension.sCheck.pText);
+	}
+	break;
+	case BL_UT_TEXT:
+	{
+		if (_widget->uExtension.sText.pText)
+			free(_widget->uExtension.sText.pText);
+		if (_widget->uExtension.sText.pPlaceholder)
+			free(_widget->uExtension.sText.pPlaceholder);
+	}
+	break;
+	case BL_UT_PROGRESS:
+	{
+		if (_widget->uExtension.sProgress.pText)
+			free(_widget->uExtension.sProgress.pText);
+	}
+	break;
+	case BL_UT_PRIMITIVE:
+	{
+		if (_widget->uExtension.sPrimitive.pXPath)
+			free(_widget->uExtension.sPrimitive.pXPath);
+		if (_widget->uExtension.sPrimitive.pYPath)
+			free(_widget->uExtension.sPrimitive.pYPath);
+	}
+	break;
+	default:break;
+	}
+	_widget->bValid = FALSE;
+	return TRUE;
+}
 static _BLFont*
 _FontFace(const BLAnsi* _Filename, const BLAnsi* _Archive)
 {
@@ -694,6 +1383,99 @@ _QueryWidget(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren_)
 	}
 	return _ret;
 }
+static _BLWidget*
+_LocateWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _XOffset, BLF32 _YOffset)
+{
+	BLF32 _x = 0.f, _y = 0.f, _w = 0.f, _h = 0.f;
+	_BLWidget* _target = NULL;
+	if (_Node->pParent)
+	{
+		BLF32 _pw = _Node->pParent->sDimension.fX > 0.f ? _Node->pParent->sDimension.fX : _PrUIMem->nFboWidth;
+		BLF32 _ph = _Node->pParent->sDimension.fY > 0.f ? _Node->pParent->sDimension.fY : _PrUIMem->nFboHeight;
+		if (_Node->eReferenceH == BL_UA_LEFT && _Node->eReferenceV == BL_UA_TOP)
+		{
+			_x = _Node->sPosition.fX - 0.5f * _pw + _XOffset;
+			_y = _Node->sPosition.fY - 0.5f * _ph + _YOffset;
+		}
+		else if (_Node->eReferenceH == BL_UA_LEFT && _Node->eReferenceV == BL_UA_VCENTER)
+		{
+			_x = _Node->sPosition.fX - 0.5f * _pw + _XOffset;
+			_y = _Node->sPosition.fY + 0.0f * _ph + _YOffset;
+		}
+		else if (_Node->eReferenceH == BL_UA_LEFT && _Node->eReferenceV == BL_UA_BOTTOM)
+		{
+			_x = _Node->sPosition.fX - 0.5f * _pw + _XOffset;
+			_y = _Node->sPosition.fY + 0.5f * _ph + _YOffset;
+		}
+		else if (_Node->eReferenceH == BL_UA_HCENTER && _Node->eReferenceV == BL_UA_TOP)
+		{
+			_x = _Node->sPosition.fX + 0.0f * _pw + _XOffset;
+			_y = _Node->sPosition.fY - 0.5f * _ph + _YOffset;
+		}
+		else if (_Node->eReferenceH == BL_UA_HCENTER && _Node->eReferenceV == BL_UA_VCENTER)
+		{
+			_x = _Node->sPosition.fX + 0.0f * _pw + _XOffset;
+			_y = _Node->sPosition.fY + 0.0f * _ph + _YOffset;
+		}
+		else if (_Node->eReferenceH == BL_UA_HCENTER && _Node->eReferenceV == BL_UA_BOTTOM)
+		{
+			_x = _Node->sPosition.fX + 0.0f * _pw + _XOffset;
+			_y = _Node->sPosition.fY + 0.5f * _ph + _YOffset;
+		}
+		else if (_Node->eReferenceH == BL_UA_RIGHT && _Node->eReferenceV == BL_UA_TOP)
+		{
+			_x = _Node->sPosition.fX + 0.5f * _pw + _XOffset;
+			_y = _Node->sPosition.fY - 0.5f * _ph + _YOffset;
+		}
+		else if (_Node->eReferenceH == BL_UA_RIGHT && _Node->eReferenceV == BL_UA_VCENTER)
+		{
+			_x = _Node->sPosition.fX + 0.5f * _pw + _XOffset;
+			_y = _Node->sPosition.fY + 0.0f * _ph + _YOffset;
+		}
+		else
+		{
+			_x = _Node->sPosition.fX + 0.5f * _pw + _XOffset;
+			_y = _Node->sPosition.fY + 0.5f * _ph + _YOffset;
+		}
+		if (_Node->ePolicy == BL_UP_FIXED)
+		{
+			_w = _Node->sDimension.fX;
+			_h = _Node->sDimension.fY;
+		}
+		else if (_Node->ePolicy == BL_UP_HMatch)
+		{
+			_w = _pw;
+			_h = _pw / _Node->fRatio;
+		}
+		else if (_Node->ePolicy == BL_UP_VMatch)
+		{
+			_w = _ph * _Node->fRatio;
+			_h = _ph;
+		}
+		else
+		{
+			_w = _pw;
+			_h = _ph;
+		}
+	}
+	else
+	{
+		_x = _PrUIMem->nFboWidth * 0.5f;
+		_y = _PrUIMem->nFboHeight * 0.5f;
+	}
+	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
+	{
+		if (_iter->bVisible)
+		{
+			_target = _LocateWidget(_iter, _XPos, _YPos, _x, _y);
+			if (_target)
+				return _target;
+		}
+	}
+	if (_XPos >= _x - _w * 0.5f && _XPos <= _x + _w * 0.5f && _YPos >= _y - _h * 0.5f && _YPos <= _y + _h * 0.5f) 
+		_target = _Node;
+	return _target;
+}
 static BLVoid
 _FrontWidget(_BLWidget* _Node)
 {
@@ -712,43 +1494,738 @@ _FrontWidget(_BLWidget* _Node)
 	}
 }
 static BLVoid
-_DrawPanel(BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
+_WidgetScissorRect(_BLWidget* _Node, BLRect* _Rect)
+{
+	if (!_Node->pParent)
+	{
+		_Rect->sLT.fX = 0.f;
+		_Rect->sLT.fY = 0.f;
+		_Rect->sRB.fX = (BLF32)_PrUIMem->nFboWidth;
+		_Rect->sRB.fY = (BLF32)_PrUIMem->nFboHeight;
+		return;
+	}
+	if (_Node->bCliped)
+	{
+		if (_Node->pParent == _PrUIMem->pRoot)
+		{
+			_Rect->sLT.fX = 0.f;
+			_Rect->sLT.fY = 0.f;
+			_Rect->sRB.fX = (BLF32)_PrUIMem->nFboWidth;
+			_Rect->sRB.fY = (BLF32)_PrUIMem->nFboHeight;
+		}
+		else
+		{
+			_BLWidget* _tmp = _Node;
+			BLF32 _x = _Node->pParent->sPosition.fX;
+			BLF32 _y = _Node->pParent->sPosition.fY;
+			BLF32 _pw;
+			BLF32 _ph;
+			while (_tmp != _PrUIMem->pRoot)
+			{
+				_tmp = _tmp->pParent;
+				_pw = _tmp->pParent->sDimension.fX > 0.f ? _tmp->pParent->sDimension.fX : _PrUIMem->nFboWidth;
+				_ph = _tmp->pParent->sDimension.fY > 0.f ? _tmp->pParent->sDimension.fY : _PrUIMem->nFboHeight;
+				if (_tmp->eReferenceH == BL_UA_LEFT && _tmp->eReferenceV == BL_UA_TOP)
+				{
+					_x = 0.0f * _pw + _x;
+					_y = 0.0f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_LEFT && _tmp->eReferenceV == BL_UA_VCENTER)
+				{
+					_x = 0.0f * _pw + _x;
+					_y = 0.5f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_LEFT && _tmp->eReferenceV == BL_UA_BOTTOM)
+				{
+					_x = 0.0f * _pw + _x;
+					_y = 1.0f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_HCENTER && _tmp->eReferenceV == BL_UA_TOP)
+				{
+					_x = 0.5f * _pw + _x;
+					_y = 0.0f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_HCENTER && _tmp->eReferenceV == BL_UA_VCENTER)
+				{
+					_x = 0.5f * _pw + _x;
+					_y = 0.5f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_HCENTER && _tmp->eReferenceV == BL_UA_BOTTOM)
+				{
+					_x = 0.5f * _pw + _x;
+					_y = 1.0f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_RIGHT && _tmp->eReferenceV == BL_UA_TOP)
+				{
+					_x = 1.0f * _pw + _x;
+					_y = 0.0f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_RIGHT && _tmp->eReferenceV == BL_UA_VCENTER)
+				{
+					_x = 1.0f * _pw + _x;
+					_y = 0.5f * _ph + _y;
+				}
+				else
+				{
+					_x = 1.0f * _pw + _x;
+					_y = 1.0f * _ph + _y;
+				}
+			}
+			BLF32 _w, _h;
+			if (_tmp->pParent->ePolicy == BL_UP_FIXED)
+			{
+				_w = _pw;
+				_h = _ph;
+			}
+			else if (_tmp->pParent->ePolicy == BL_UP_HMatch)
+			{
+				_w = _pw;
+				_h = _pw / _tmp->pParent->fRatio;
+			}
+			else if (_tmp->pParent->ePolicy == BL_UP_VMatch)
+			{
+				_w = _ph * _tmp->pParent->fRatio;
+				_h = _ph;
+			}
+			else
+			{
+				_w = _pw;
+				_h = _ph;
+			}
+			_Rect->sLT.fX = _x - _pw * 0.5f;
+			_Rect->sLT.fY = _y - _ph * 0.5f;
+			_Rect->sRB.fX = _x + _pw * 0.5f;
+			_Rect->sRB.fY = _y + _ph * 0.5f;
+		}
+	}
+	else
+	{
+		_BLWidget* _tmp = _Node;
+		while (_tmp != _PrUIMem->pRoot)
+		{
+			_tmp = _tmp->pParent;
+			if (_tmp->bAbsScissor)
+				break;
+		}
+		if (_tmp == _PrUIMem->pRoot)
+		{
+			_Rect->sLT.fX = 0.f;
+			_Rect->sLT.fY = 0.f;
+			_Rect->sRB.fX = (BLF32)_PrUIMem->nFboWidth;
+			_Rect->sRB.fY = (BLF32)_PrUIMem->nFboHeight;
+		}
+		else
+		{
+			BLF32 _x = _tmp->pParent->sPosition.fX;
+			BLF32 _y = _tmp->pParent->sPosition.fY;
+			BLF32 _pw;
+			BLF32 _ph;
+			while (_tmp != _PrUIMem->pRoot)
+			{
+				_tmp = _tmp->pParent;
+				_pw = _tmp->pParent->sDimension.fX > 0.f ? _tmp->pParent->sDimension.fX : _PrUIMem->nFboWidth;
+				_ph = _tmp->pParent->sDimension.fY > 0.f ? _tmp->pParent->sDimension.fY : _PrUIMem->nFboHeight;
+				if (_tmp->eReferenceH == BL_UA_LEFT && _tmp->eReferenceV == BL_UA_TOP)
+				{
+					_x = 0.0f * _pw + _x;
+					_y = 0.0f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_LEFT && _tmp->eReferenceV == BL_UA_VCENTER)
+				{
+					_x = 0.0f * _pw + _x;
+					_y = 0.5f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_LEFT && _tmp->eReferenceV == BL_UA_BOTTOM)
+				{
+					_x = 0.0f * _pw + _x;
+					_y = 1.0f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_HCENTER && _tmp->eReferenceV == BL_UA_TOP)
+				{
+					_x = 0.5f * _pw + _x;
+					_y = 0.0f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_HCENTER && _tmp->eReferenceV == BL_UA_VCENTER)
+				{
+					_x = 0.5f * _pw + _x;
+					_y = 0.5f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_HCENTER && _tmp->eReferenceV == BL_UA_BOTTOM)
+				{
+					_x = 0.5f * _pw + _x;
+					_y = 1.0f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_RIGHT && _tmp->eReferenceV == BL_UA_TOP)
+				{
+					_x = 1.0f * _pw + _x;
+					_y = 0.0f * _ph + _y;
+				}
+				else if (_tmp->eReferenceH == BL_UA_RIGHT && _tmp->eReferenceV == BL_UA_VCENTER)
+				{
+					_x = 1.0f * _pw + _x;
+					_y = 0.5f * _ph + _y;
+				}
+				else
+				{
+					_x = 1.0f * _pw + _x;
+					_y = 1.0f * _ph + _y;
+				}
+			}
+			BLF32 _w, _h;
+			if (_tmp->pParent->ePolicy == BL_UP_FIXED)
+			{
+				_w = _pw;
+				_h = _ph;
+			}
+			else if (_tmp->pParent->ePolicy == BL_UP_HMatch)
+			{
+				_w = _pw;
+				_h = _pw / _tmp->pParent->fRatio;
+			}
+			else if (_tmp->pParent->ePolicy == BL_UP_VMatch)
+			{
+				_w = _ph * _tmp->pParent->fRatio;
+				_h = _ph;
+			}
+			else
+			{
+				_w = _pw;
+				_h = _ph;
+			}
+			_Rect->sLT.fX = _x - _pw * 0.5f;
+			_Rect->sLT.fY = _y - _ph * 0.5f;
+			_Rect->sRB.fX = _x + _pw * 0.5f;
+			_Rect->sRB.fY = _y + _ph * 0.5f;
+		}
+	}
+}
+static BLVoid
+_DrawPanel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
 }
 static BLVoid
-_DrawLabel(BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
+_DrawLabel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
 }
 static BLVoid
-_DrawButton(BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
+_DrawButton(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
+{
+	if (!_Node->bValid || !_Node->bVisible)
+		return;
+	BLRect _scissorrect;
+	_WidgetScissorRect(_Node, &_scissorrect);
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)_scissorrect.sRB.fX, (BLU32)_scissorrect.sRB.fY);
+	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sButton.nPixmapTex, 0);
+	BLF32 _gray = 1.f;
+	BLF32 _offsetx = 0.f, _offsety = 0.f;
+	BLF32 _stencil = 1.f;
+	BLRect _texcoord, _texcoord9;
+	BLRect _texcoords, _texcoords9;
+	BLBool _flipx = _Node->uExtension.sButton.bFlipX;
+	BLBool _flipy = _Node->uExtension.sButton.bFlipY;
+	switch (_Node->uExtension.sButton.nState)
+	{
+	case 0:
+		if (_Node->uExtension.sButton.aDisableMap[0] == 0 || !strcmp(_Node->uExtension.sButton.aDisableMap, "Nil"))
+		{
+			_texcoord = _Node->uExtension.sButton.sCommonTex;
+			_texcoord9 = _Node->uExtension.sButton.sCommonTex9;
+			_gray = -1.f;
+		}
+		else
+		{
+			_texcoord = _Node->uExtension.sButton.sDisableTex;
+			_texcoord9 = _Node->uExtension.sButton.sDisableTex9;
+			_gray = 1.f;
+		}
+		break;
+	case 1:
+		{
+			_texcoord = _Node->uExtension.sButton.sCommonTex;
+			_texcoord9 = _Node->uExtension.sButton.sCommonTex9;
+		}
+		break;
+	case 2:
+		if (_Node->uExtension.sButton.aHoveredMap[0] == 0 || !strcmp(_Node->uExtension.sButton.aHoveredMap, "Nil"))
+		{
+			_texcoord = _Node->uExtension.sButton.sCommonTex;
+			_texcoord9 = _Node->uExtension.sButton.sCommonTex9;
+		}
+		else
+		{
+			_texcoord = _Node->uExtension.sButton.sHoveredTex;
+			_texcoord9 = _Node->uExtension.sButton.sHoveredTex9;
+		}
+		break;
+	case 3:
+		if (_Node->uExtension.sButton.aPressedMap[0] == 0 || !strcmp(_Node->uExtension.sButton.aPressedMap, "Nil"))
+		{
+			_texcoord = _Node->uExtension.sButton.sCommonTex;
+			_texcoord9 = _Node->uExtension.sButton.sCommonTex9;
+			_offsetx = 3.f;
+			_offsety = _Height / _Width * 3.f;
+		}
+		else
+		{
+			_texcoord = _Node->uExtension.sButton.sPressedTex;
+			_texcoord9 = _Node->uExtension.sButton.sPressedTex9;
+			_offsetx = 0.f;
+			_offsety = 0.f;
+		}
+		break;
+	default:
+		_texcoord = _Node->uExtension.sButton.sCommonTex;
+		_texcoord9 = _Node->uExtension.sButton.sCommonTex9;
+		break;
+	}
+	if (_Node->uExtension.sButton.aStencilMap[0] && strcmp(_Node->uExtension.sButton.aStencilMap, "Nil"))
+	{
+		_stencil = -1.f;
+		_texcoords.sLT.fX = _Node->uExtension.sButton.sStencilTex.sLT.fX / _Node->uExtension.sButton.nTexWidth + 0.001f;
+		_texcoords.sLT.fY = _Node->uExtension.sButton.sStencilTex.sLT.fY / _Node->uExtension.sButton.nTexHeight + 0.001f;
+		_texcoords.sRB.fX = _Node->uExtension.sButton.sStencilTex.sRB.fX / _Node->uExtension.sButton.nTexWidth - 0.001f;
+		_texcoords.sRB.fY = _Node->uExtension.sButton.sStencilTex.sRB.fY / _Node->uExtension.sButton.nTexHeight - 0.001f;
+		BLF32 _oriw = _Node->uExtension.sButton.sCommonTex.sRB.fX - _Node->uExtension.sButton.sCommonTex.sLT.fX;
+		BLF32 _orih = _Node->uExtension.sButton.sCommonTex.sRB.fY - _Node->uExtension.sButton.sCommonTex.sLT.fY;
+		BLF32 _dstw = _Node->uExtension.sButton.sStencilTex.sRB.fX - _Node->uExtension.sButton.sStencilTex.sLT.fX;
+		BLF32 _dsth = _Node->uExtension.sButton.sStencilTex.sRB.fX - _Node->uExtension.sButton.sStencilTex.sLT.fX;
+		BLF32 _ratioax = (_Node->uExtension.sButton.sCommonTex9.sLT.fX - _Node->uExtension.sButton.sCommonTex.sLT.fX) / _oriw;
+		BLF32 _ratioay = (_Node->uExtension.sButton.sCommonTex9.sLT.fY - _Node->uExtension.sButton.sCommonTex.sLT.fY) / _orih;
+		BLF32 _rationx = (_Node->uExtension.sButton.sCommonTex.sRB.fX - _Node->uExtension.sButton.sCommonTex9.sRB.fX) / _oriw;
+		BLF32 _rationy = (_Node->uExtension.sButton.sCommonTex.sRB.fY - _Node->uExtension.sButton.sCommonTex9.sRB.fY) / _orih;
+		_texcoords9.sLT.fX = (_Node->uExtension.sButton.sStencilTex.sLT.fX + _ratioax * _dstw) / _Node->uExtension.sButton.nTexWidth;
+		_texcoords9.sLT.fY = (_Node->uExtension.sButton.sStencilTex.sLT.fY + _ratioay * _dsth) / _Node->uExtension.sButton.nTexHeight;
+		_texcoords9.sRB.fX = (_Node->uExtension.sButton.sStencilTex.sRB.fX - _rationx * _dstw) / _Node->uExtension.sButton.nTexWidth;
+		_texcoords9.sRB.fY = (_Node->uExtension.sButton.sStencilTex.sRB.fY - _rationy * _dsth) / _Node->uExtension.sButton.nTexHeight;
+	}
+	else
+	{
+		_texcoords.sLT.fX = 1.f;
+		_texcoords.sLT.fY = 1.f;
+		_texcoords.sRB.fX = 1.f;
+		_texcoords.sRB.fY = 1.f;
+		_texcoords9.sLT.fX = 1.f;
+		_texcoords9.sLT.fY = 1.f;
+		_texcoords9.sRB.fX = 1.f;
+		_texcoords9.sRB.fY = 1.f;
+	}
+	if (_RectApproximate(&_texcoord, &_texcoord9))
+	{
+		if (_flipx)
+		{
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
+			_tmp = _texcoords.sLT.fX;
+			_texcoords.sLT.fX = _texcoords.sRB.fX;
+			_texcoords.sRB.fX = _tmp;
+		}
+		if (_flipy)
+		{
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
+			_tmp = _texcoords.sLT.fY;
+			_texcoords.sLT.fY = _texcoords.sRB.fY;
+			_texcoords.sRB.fY = _tmp;
+		}
+		BLF32 _vbo[] = {
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight
+		};
+		BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
+	else
+	{
+		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
+		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
+		BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
+		BLF32 _marginny = _texcoord.sRB.fY - _texcoord9.sRB.fY;
+		if (_flipx)
+		{
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
+			_tmp = _texcoords.sLT.fX;
+			_texcoords.sLT.fX = _texcoords.sRB.fX;
+			_texcoords.sRB.fX = _tmp;
+			_tmp = _texcoord9.sLT.fX;
+			_texcoord9.sLT.fX = _texcoord9.sRB.fX;
+			_texcoord9.sRB.fX = _tmp;
+			_tmp = _texcoords9.sLT.fX;
+			_texcoords9.sLT.fX = _texcoords9.sRB.fX;
+			_texcoords9.sRB.fX = _tmp;
+		}
+		if (_flipy)
+		{
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
+			_tmp = _texcoords.sLT.fY;
+			_texcoords.sLT.fY = _texcoords.sRB.fY;
+			_texcoords.sRB.fY = _tmp;
+			_tmp = _texcoord9.sLT.fY;
+			_texcoord9.sLT.fY = _texcoord9.sRB.fY;
+			_texcoord9.sRB.fY = _tmp;
+			_tmp = _texcoords9.sLT.fY;
+			_texcoords9.sLT.fY = _texcoords9.sRB.fY;
+			_texcoords9.sRB.fY = _tmp;
+		}
+		BLF32 _vob[] = {
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil, 
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight
+		};
+		BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
+}
+static BLVoid
+_DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
 }
 static BLVoid
-_DrawCheck(BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
+_DrawSlider(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
 }
 static BLVoid
-_DrawSlider(BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
+_DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
 }
 static BLVoid
-_DrawText(BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
+_DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
 }
 static BLVoid
-_DrawProgress(BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
+_DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
 }
 static BLVoid
-_DrawDial(BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
+_DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
 }
 static BLVoid
-_DrawTable(BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
-{
-}
-static BLVoid
-_DrawPrimitive(BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
+_DrawPrimitive(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
 }
 static BLVoid
@@ -827,34 +2304,34 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 		switch (_Node->eType)
 		{
 		case BL_UT_PANEL:
-			_DrawPanel(_x, _y, _w, _h);
+			_DrawPanel(_Node, _x, _y, _w, _h);
 			break;
 		case BL_UT_LABEL:
-			_DrawLabel(_x, _y, _w, _h);
+			_DrawLabel(_Node, _x, _y, _w, _h);
 			break;
 		case BL_UT_BUTTON:
-			_DrawButton(_x, _y, _w, _h);
+			_DrawButton(_Node, _x, _y, _w, _h);
 			break;
 		case BL_UT_CHECK:
-			_DrawCheck(_x, _y, _w, _h);
+			_DrawCheck(_Node, _x, _y, _w, _h);
 			break;
 		case BL_UT_SLIDER:
-			_DrawSlider(_x, _y, _w, _h);
+			_DrawSlider(_Node, _x, _y, _w, _h);
 			break;
 		case BL_UT_TEXT:
-			_DrawText(_x, _y, _w, _h);
+			_DrawText(_Node, _x, _y, _w, _h);
 			break;
 		case BL_UT_PROGRESS:
-			_DrawProgress(_x, _y, _w, _h);
+			_DrawProgress(_Node, _x, _y, _w, _h);
 			break;
 		case BL_UT_DIAL:
-			_DrawDial(_x, _y, _w, _h);
+			_DrawDial(_Node, _x, _y, _w, _h);
 			break;
 		case BL_UT_TABLE:
-			_DrawTable(_x, _y, _w, _h);
+			_DrawTable(_Node, _x, _y, _w, _h);
 			break;
 		default:
-			_DrawPrimitive(_x, _y, _w, _h);
+			_DrawPrimitive(_Node, _x, _y, _w, _h);
 			break;
 		}
 	}
@@ -866,6 +2343,195 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 	FOREACH_ARRAY (_BLWidget*, _iter, _Node->pChildren)
 	{
 		_DrawWidget(_iter, _x, _y);
+	}
+}
+static const BLVoid
+_MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
+{
+	if (_Type == BL_ME_MOVE)
+	{
+		_BLWidget* _lasthovered = _PrUIMem->pHoveredWidget;
+		BLU32 _oriw, _orih;
+		blWindowSize(&_oriw, &_orih);
+		BLF32 _x = (BLF32)LOWU16(_UParam) * (BLF32)_PrUIMem->nFboWidth / (BLF32)_oriw;
+		BLF32 _y = (BLF32)HIGU16(_UParam) * (BLF32)_PrUIMem->nFboHeight / (BLF32)_orih;
+		_PrUIMem->pHoveredWidget = _LocateWidget(_PrUIMem->pRoot, _x, _y, 0.f, 0.f);
+		if (_PrUIMem->pHoveredWidget != _lasthovered)
+		{
+			if (_lasthovered && _lasthovered->bInteractive)
+			{
+				//	lasthovered->_sig_leave.emit();
+				if (_lasthovered->eType == BL_UT_BUTTON)
+				{
+					if (_lasthovered->uExtension.sButton.nState)
+					{
+						_lasthovered->uExtension.sButton.nState = 1;
+						_PrUIMem->bDirty = TRUE;
+					}
+				}
+			}
+			if (_PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bInteractive)
+			{
+				//m_hovered_widget->_sig_enter.emit();
+				if (_PrUIMem->pHoveredWidget->eType == BL_UT_BUTTON)
+				{
+					if (_PrUIMem->pHoveredWidget->uExtension.sButton.nState)
+					{
+						_PrUIMem->pHoveredWidget->uExtension.sButton.nState = 2;
+						_PrUIMem->bDirty = TRUE;
+					}
+				}
+			}
+		}
+		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
+		{
+			_BLWidget* _wid = _PrUIMem->pFocusWidget;
+			while (_wid->bPenetration)
+				_wid = _wid->pParent;
+			switch (_wid->eType)
+			{
+			default:break;
+			}
+		}
+		if (!_PrUIMem->pFocusWidget && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible && _PrUIMem->pHoveredWidget->bInteractive)
+		{
+			_BLWidget* _wid = _PrUIMem->pHoveredWidget;
+			while (_wid->bPenetration)
+				_wid = _wid->pParent;
+			switch (_wid->eType)
+			{
+			default:break;
+			}
+		}
+	}
+	else if (_Type == BL_ME_LDOWN || _Type == BL_ME_RDOWN)
+	{
+		_BLWidget* _lasthovered = _PrUIMem->pHoveredWidget;
+		BLU32 _oriw, _orih;
+		blWindowSize(&_oriw, &_orih);
+		BLF32 _x = (BLF32)LOWU16(_UParam) * (BLF32)_PrUIMem->nFboWidth / (BLF32)_oriw;
+		BLF32 _y = (BLF32)HIGU16(_UParam) * (BLF32)_PrUIMem->nFboHeight / (BLF32)_orih;
+		_PrUIMem->pHoveredWidget = _LocateWidget(_PrUIMem->pRoot, _x, _y, 0.f, 0.f);
+		if (_PrUIMem->pHoveredWidget != _lasthovered)
+		{
+			if (_lasthovered && _lasthovered->bInteractive)
+			{
+				//	lasthovered->_sig_leave.emit();
+				if (_lasthovered->eType == BL_UT_BUTTON)
+				{
+					if (_lasthovered->uExtension.sButton.nState)
+					{
+						_lasthovered->uExtension.sButton.nState = 1;
+						_PrUIMem->bDirty = TRUE;
+					}
+				}
+			}
+			if (_PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bInteractive)
+			{
+				//m_hovered_widget->_sig_enter.emit();
+				if (_PrUIMem->pHoveredWidget->eType == BL_UT_BUTTON)
+				{
+					if (_PrUIMem->pHoveredWidget->uExtension.sButton.nState)
+					{
+						_PrUIMem->pHoveredWidget->uExtension.sButton.nState = 2;
+						_PrUIMem->bDirty = TRUE;
+					}
+				}
+			}
+		}
+		if ((_PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget != _PrUIMem->pFocusWidget) || !_PrUIMem->pFocusWidget)
+		{
+			if (_PrUIMem->pFocusWidget != _PrUIMem->pHoveredWidget)
+			{
+				if (_PrUIMem->pHoveredWidget == _PrUIMem->pRoot)
+					_PrUIMem->pHoveredWidget = NULL;
+				if (_PrUIMem->pFocusWidget)
+				{
+					//lost focs;_PrUIMem->pFocusWidget
+				}
+				if (_PrUIMem->pHoveredWidget)
+				{
+					//gain focus;_PrUIMem->pHoveredWidget
+				}
+				_PrUIMem->pFocusWidget = _PrUIMem->pHoveredWidget;
+			}
+		}
+		_BLWidget* _lastfocus = _PrUIMem->pFocusWidget;
+		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
+		{
+			_BLWidget* _wid = _PrUIMem->pFocusWidget;
+			while (_wid->bPenetration)
+				_wid = _wid->pParent;
+			switch (_wid->eType)
+			{
+			case BL_UT_BUTTON:
+				if (_wid->uExtension.sButton.nState)
+				{
+					_wid->uExtension.sButton.nState = 3;
+					_PrUIMem->bDirty = TRUE;
+				}
+			default:break;
+			}
+		}
+		if (!_lastfocus && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible && _PrUIMem->pHoveredWidget->bInteractive)
+		{
+			_BLWidget* _wid = _PrUIMem->pHoveredWidget;
+			while (_wid->bPenetration)
+				_wid = _wid->pParent;
+			switch (_wid->eType)
+			{
+			case BL_UT_BUTTON:
+				if (_wid->uExtension.sButton.nState)
+				{
+					_wid->uExtension.sButton.nState = 3;
+					_PrUIMem->bDirty = TRUE;
+				}
+			default:break;
+			}
+		}
+	}
+	else if (_Type == BL_ME_LUP || _Type == BL_ME_RUP)
+	{
+		_BLWidget* _lastfocus = _PrUIMem->pFocusWidget;
+		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
+		{
+			_BLWidget* _wid = _PrUIMem->pFocusWidget;
+			while (_wid->bPenetration)
+				_wid = _wid->pParent;
+			switch (_wid->eType)
+			{
+			case BL_UT_BUTTON:
+				if (_wid->uExtension.sButton.nState)
+				{
+					_wid->uExtension.sButton.nState = 1;
+					_PrUIMem->bDirty = TRUE;
+				}
+			default:break;
+			}
+		}
+		if (!_lastfocus && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible && _PrUIMem->pHoveredWidget->bInteractive)
+		{
+			_BLWidget* _wid = _PrUIMem->pHoveredWidget;
+			while (_wid->bPenetration)
+				_wid = _wid->pParent;
+			switch (_wid->eType)
+			{
+			case BL_UT_BUTTON:
+				if (_wid->uExtension.sButton.nState)
+				{
+					_wid->uExtension.sButton.nState = 1;
+					_PrUIMem->bDirty = TRUE;
+				}
+			default:break;
+			}
+		}
+	}
+}
+static const BLVoid
+_KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
+{
+	if (_Type == BL_ME_MOVE)
+	{
 	}
 }
 BLVoid
@@ -889,12 +2555,19 @@ _UIInit()
 	_PrUIMem->pRoot->pChildren = blGenArray(FALSE);
 	_PrUIMem->pRoot->eType = BL_UT_PANEL;
 	_PrUIMem->pRoot->nID = blGenGuid(_PrUIMem->pRoot, blHashUtf8((const BLUtf8*)"Root"));
+	_PrUIMem->pHoveredWidget = NULL;
+	_PrUIMem->pFocusWidget = NULL;
     _PrUIMem->pPixmaps = blGenArray(FALSE);
+	_PrUIMem->nUITech = blGenTechnique("2D.bsl", NULL, FALSE, FALSE);
     blWindowSize(&_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight);
+	blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
+	blSubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
 }
 BLVoid
 _UIStep(BLU32 _Delta, BLBool _Baseplate)
 {
+	BLF32 _screensz[2] = { 2.f / (BLF32)_PrUIMem->nFboWidth, 2.f / (BLF32)_PrUIMem->nFboHeight };
+	blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 	if (_Baseplate)
 	{
 		BLF32 _x, _y, _w, _h;
@@ -981,7 +2654,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 	}
 	else
 	{
-		if (_PrUIMem->bDirty)
+		//if (_PrUIMem->bDirty)
 		{
 			_DrawWidget(_PrUIMem->pRoot, 0.f, 0.f);
 			_PrUIMem->bDirty = FALSE;
@@ -992,6 +2665,9 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 BLVoid
 _UIDestroy()
 {
+	blUnsubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
+	blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
+	blDeleteTechnique(_PrUIMem->nUITech);
     FT_Done_FreeType(_PrUIMem->sFtLibrary);
 	blDeleteUI(_PrUIMem->pRoot->nID);
 	{
@@ -1092,7 +2768,7 @@ blUIWorkspace(IN BLAnsi* _Dictionary, IN BLAnsi* _Archive, IN BLBool _UseDesignR
 	blDeleteStream(_stream);
 }
 BLVoid
-blUIQueryResolution(OUT BLU32* _Width, OUT BLU32* _Height)
+blUIResolutionQuery(OUT BLU32* _Width, OUT BLU32* _Height)
 {
 	*_Width = _PrUIMem->nFboWidth;
 	*_Height = _PrUIMem->nFboHeight;
@@ -1141,6 +2817,8 @@ blUIFile(IN BLAnsi* _Filename)
             _tmp = strtok(NULL, ",");
             _idx++;
         }
+		_geovar[2] = _geovar[2] - _geovar[0];
+		_geovar[3] = _geovar[3] - _geovar[1];
         const BLAnsi* _name = ezxml_attr(_element, "Name");
         BLEnum _typevar;
         const BLAnsi* _type = ezxml_attr(_element, "Type");
@@ -1299,11 +2977,11 @@ blUIFile(IN BLAnsi* _Filename)
             blUITooltip(_widguid, (const BLUtf8*)_tooltip);
             blUIPenetration(_widguid, _penetrationvar);
             blUIButtonPixmap(_widguid, _pixmap);
-            blUIButtonStencil(_widguid, _stencilmap);
-            blUIButtonCommon(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
-            blUIButtonHover(_widguid, _hoveredmap, _hoveredtexcoordvar[0], _hoveredtexcoordvar[1], _hoveredtexcoordvar[2], _hoveredtexcoordvar[3]);
-            blUIButtonPress(_widguid, _pressedmap, _pressedtexcoordvar[0], _pressedtexcoordvar[1], _pressedtexcoordvar[2], _pressedtexcoordvar[3]);
-            blUIButtonDisable(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
+            blUIButtonStencilMap(_widguid, _stencilmap);
+            blUIButtonCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+            blUIButtonHoverMap(_widguid, _hoveredmap, _hoveredtexcoordvar[0], _hoveredtexcoordvar[1], _hoveredtexcoordvar[2], _hoveredtexcoordvar[3]);
+            blUIButtonPressMap(_widguid, _pressedmap, _pressedtexcoordvar[0], _pressedtexcoordvar[1], _pressedtexcoordvar[2], _pressedtexcoordvar[3]);
+            blUIButtonDisableMap(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
             blUIButtonFont(_widguid, _fontsrc, _fontsizevar, _fontoutlinevar, _fontboldvar, _fontshadowvar, _fontitalicsvar);
             blUIButtonFlip(_widguid, _flipxvar, _flipyvar);
             blUIButtonText(_widguid, (const BLUtf8*)_text, _textcolorvar, _txtha, _txtva);
@@ -1647,17 +3325,7 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
         }
-        if (_element->sibling)
-            _element = _element->sibling;
-        else
-        {
-            do {
-                _element = _element->parent;
-                if (!_element)
-                    break;
-            } while (!_element->next);
-            _element = _element ? _element->next : NULL;
-        }
+		_element = _element->ordered;
     } while (_element);
     ezxml_free(_doc);
     blDeleteStream(_layout);
@@ -1668,7 +3336,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 	_BLWidget* _widget = (_BLWidget*)malloc(sizeof(_BLWidget));
 	_widget->sDimension.fX = (BLF32)_Width;
 	_widget->sDimension.fY = (BLF32)_Height;
-	_widget->fRatio = _widget->sDimension.fX / _widget->sDimension.fY;
 	_widget->pParent = blGuidAsPointer(_Parent);
 	if (!_widget->pParent)
 		_widget->pParent = _PrUIMem->pRoot;
@@ -1698,7 +3365,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sPanel.aPixmap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sPanel.aCommonMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sPanel.aStencilMap, 0, sizeof(BLAnsi) * 128);
-			memset(_widget->uExtension.sPanel.aCommonTex, 0, sizeof(BLRect) * 9);
 			_widget->uExtension.sPanel.bDragable = FALSE;
 			_widget->uExtension.sPanel.bBasePlate = FALSE;
 			_widget->uExtension.sPanel.bModal = FALSE;
@@ -1706,7 +3372,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sPanel.bFlipX = FALSE;
 			_widget->uExtension.sPanel.bFlipY = FALSE;
             _widget->uExtension.sPanel.nPixmapTex = INVALID_GUID;
-            _widget->uExtension.sPanel.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_LABEL:
@@ -1714,12 +3379,10 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sLabel.pText = NULL;
 			memset(_widget->uExtension.sLabel.aPixmap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sLabel.aCommonMap, 0, sizeof(BLAnsi) * 128);
-			memset(_widget->uExtension.sLabel.aCommonTex, 0, sizeof(BLRect) * 9);
 			memset(_widget->uExtension.sLabel.aStencilMap, 0, sizeof(BLAnsi) * 128);
 			_widget->uExtension.sLabel.bFlipX = FALSE;
             _widget->uExtension.sLabel.bFlipY = FALSE;
             _widget->uExtension.sLabel.nPixmapTex = INVALID_GUID;
-            _widget->uExtension.sLabel.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_BUTTON:
@@ -1731,10 +3394,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sButton.aPressedMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sButton.aDisableMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sButton.aStencilMap, 0, sizeof(BLAnsi) * 128);
-			memset(_widget->uExtension.sButton.aCommonTex, 0, sizeof(BLRect) * 9);
-			memset(_widget->uExtension.sButton.aHoveredTex, 0, sizeof(BLRect) * 9);
-			memset(_widget->uExtension.sButton.aPressedTex, 0, sizeof(BLRect) * 9);
-			memset(_widget->uExtension.sButton.aDisableTex, 0, sizeof(BLRect) * 9);
 			_widget->uExtension.sButton.eTxtAlignmentH = BL_UA_HCENTER;
 			_widget->uExtension.sButton.eTxtAlignmentV = BL_UA_VCENTER;
 			_widget->uExtension.sButton.nFontHash = 0xFFFFFFFF;
@@ -1746,9 +3405,8 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sButton.nTxtColor = 0xFFFFFFFF;
 			_widget->uExtension.sButton.bFlipX = FALSE;
 			_widget->uExtension.sButton.bFlipY = FALSE;
-            _widget->uExtension.sButton.nState = 0;
+            _widget->uExtension.sButton.nState = 1;
             _widget->uExtension.sButton.nPixmapTex = INVALID_GUID;
-            _widget->uExtension.sButton.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_CHECK:
@@ -1759,9 +3417,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sCheck.aPressedMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sCheck.aDisableMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sCheck.aStencilMap, 0, sizeof(BLAnsi) * 128);
-			memset(_widget->uExtension.sCheck.aCommonTex, 0, sizeof(BLRect) * 9);
-			memset(_widget->uExtension.sCheck.aPressedTex, 0, sizeof(BLRect) * 9);
-			memset(_widget->uExtension.sCheck.aDisableTex, 0, sizeof(BLRect) * 9);
 			_widget->uExtension.sCheck.eTxtAlignmentH = BL_UA_HCENTER;
 			_widget->uExtension.sCheck.eTxtAlignmentV = BL_UA_VCENTER;
 			_widget->uExtension.sCheck.nFontHash = 0xFFFFFFFF;
@@ -1773,9 +3428,8 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sCheck.nTxtColor = 0xFFFFFFFF;
 			_widget->uExtension.sCheck.bFlipX = FALSE;
 			_widget->uExtension.sCheck.bFlipY = FALSE;
-            _widget->uExtension.sCheck.nState = 0;
+            _widget->uExtension.sCheck.nState = 1;
             _widget->uExtension.sCheck.nPixmapTex = INVALID_GUID;
-            _widget->uExtension.sCheck.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_SLIDER:
@@ -1785,7 +3439,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sSlider.aSliderCommonMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sSlider.aSliderDisableMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sSlider.aStencilMap, 0, sizeof(BLAnsi) * 128);
-			memset(_widget->uExtension.sSlider.aCommonTex, 0, sizeof(BLRect) * 9);
 			_widget->uExtension.sSlider.bHorizontal = TRUE;
 			_widget->uExtension.sSlider.bSliderDragged = FALSE;
 			_widget->uExtension.sSlider.nMinValue = 0;
@@ -1796,9 +3449,8 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sSlider.sSliderSize.fY = 10.f;
 			_widget->uExtension.sSlider.bFlipX = FALSE;
 			_widget->uExtension.sSlider.bFlipY = FALSE;
-            _widget->uExtension.sSlider.nState = 0;
+            _widget->uExtension.sSlider.nState = 1;
             _widget->uExtension.sSlider.nPixmapTex = INVALID_GUID;
-            _widget->uExtension.sSlider.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_TEXT:
@@ -1808,7 +3460,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sText.aPixmap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sText.aCommonMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sText.aStencilMap, 0, sizeof(BLAnsi) * 128);
-			memset(_widget->uExtension.sText.aCommonTex, 0, sizeof(BLRect) * 9);
 			_widget->uExtension.sText.nMaxLength = 999999;
 			_widget->uExtension.sText.nMinValue = 0;
 			_widget->uExtension.sText.nMaxValue = 999999;
@@ -1836,9 +3487,8 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sText.nPaddingY = 0;
 			_widget->uExtension.sText.bFlipX = FALSE;
 			_widget->uExtension.sText.bFlipY = FALSE;
-            _widget->uExtension.sText.nState = 0;
+            _widget->uExtension.sText.nState = 1;
             _widget->uExtension.sText.nPixmapTex = INVALID_GUID;
-            _widget->uExtension.sText.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_PROGRESS:
@@ -1848,7 +3498,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sProgress.aCommonMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sProgress.aStencilMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sProgress.aFillMap, 0, sizeof(BLAnsi) * 128);
-			memset(_widget->uExtension.sProgress.aCommonTex, 0, sizeof(BLRect) * 9);
 			_widget->uExtension.sProgress.nFontHash = 0xFFFFFFFF;
 			_widget->uExtension.sProgress.nFontHeight = 0;
 			_widget->uExtension.sProgress.bOutline = FALSE;
@@ -1860,7 +3509,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sProgress.bFlipY = FALSE;
             _widget->uExtension.sProgress.nPercent = 0;
             _widget->uExtension.sProgress.nPixmapTex = INVALID_GUID;
-            _widget->uExtension.sProgress.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_DIAL:
@@ -1873,7 +3521,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sDial.bAngleCut = FALSE;
             _widget->uExtension.sDial.bClockWise = FALSE;
             _widget->uExtension.sDial.nPixmapTex = INVALID_GUID;
-            _widget->uExtension.sDial.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		case BL_UT_TABLE:
@@ -1883,7 +3530,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sTable.aStencilMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sTable.aOddItemMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sTable.aEvenItemMap, 0, sizeof(BLAnsi) * 128);
-			memset(_widget->uExtension.sTable.aCommonTex, 0, sizeof(BLRect) * 9);
 			_widget->uExtension.sTable.nFontHash = 0xFFFFFFFF;
 			_widget->uExtension.sTable.nFontHeight = 0;
 			_widget->uExtension.sTable.bOutline = FALSE;
@@ -1894,7 +3540,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sTable.bFlipX = FALSE;
             _widget->uExtension.sTable.bFlipY = FALSE;
             _widget->uExtension.sTable.nPixmapTex = INVALID_GUID;
-            _widget->uExtension.sTable.pPixmapSheetDct = blGenDict(FALSE);
 		}
 		break;
 		default:
@@ -1921,151 +3566,7 @@ blDeleteUI(IN BLGuid _ID)
     _BLWidget* _widget = blGuidAsPointer(_ID);
     if (!_widget)
         return;
-    BLU32 _idx = 0;
-    if (_widget->pParent)
-    {
-        FOREACH_ARRAY (_BLWidget*, _iter, _widget->pParent->pChildren)
-        {
-            if (_iter == _widget)
-                break;
-            _idx++;
-        }
-        blArrayErase(_widget->pParent->pChildren, _idx);
-    }
-    if (_widget->pTooltip)
-        free(_widget->pTooltip);
-    switch (_widget->eType)
-    {
-        case BL_UT_PANEL:
-        {
-            if (_widget->uExtension.sPanel.pPixmapSheetDct)
-            {
-                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sPanel.pPixmapSheetDct)
-                {
-                    free(_iter);
-                }
-                blDeleteDict(_widget->uExtension.sPanel.pPixmapSheetDct);
-            }
-        }
-        break;
-        case BL_UT_LABEL:
-        {
-            if (_widget->uExtension.sLabel.pText)
-                free(_widget->uExtension.sLabel.pText);
-            if (_widget->uExtension.sLabel.pPixmapSheetDct)
-            {
-                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sLabel.pPixmapSheetDct)
-                {
-                    free(_iter);
-                }
-                blDeleteDict(_widget->uExtension.sLabel.pPixmapSheetDct);
-            }
-        }
-        break;
-        case BL_UT_BUTTON:
-        {
-            if (_widget->uExtension.sButton.pText)
-                free(_widget->uExtension.sButton.pText);
-            if (_widget->uExtension.sButton.pPixmapSheetDct)
-            {
-                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sButton.pPixmapSheetDct)
-                {
-                    free(_iter);
-                }
-                blDeleteDict(_widget->uExtension.sButton.pPixmapSheetDct);
-            }
-        }
-        break;
-        case BL_UT_CHECK:
-        {
-            if (_widget->uExtension.sCheck.pText)
-                free(_widget->uExtension.sCheck.pText);
-            if (_widget->uExtension.sCheck.pPixmapSheetDct)
-            {
-                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sCheck.pPixmapSheetDct)
-                {
-                    free(_iter);
-                }
-                blDeleteDict(_widget->uExtension.sCheck.pPixmapSheetDct);
-            }
-        }
-        break;
-        case BL_UT_SLIDER:
-        {
-            if (_widget->uExtension.sSlider.pPixmapSheetDct)
-            {
-                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sSlider.pPixmapSheetDct)
-                {
-                    free(_iter);
-                }
-                blDeleteDict(_widget->uExtension.sSlider.pPixmapSheetDct);
-            }
-        }
-        break;
-        case BL_UT_TEXT:
-        {
-            if (_widget->uExtension.sText.pText)
-                free(_widget->uExtension.sText.pText);
-            if (_widget->uExtension.sText.pPlaceholder)
-                free(_widget->uExtension.sText.pPlaceholder);
-            if (_widget->uExtension.sText.pPixmapSheetDct)
-            {
-                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sText.pPixmapSheetDct)
-                {
-                    free(_iter);
-                }
-                blDeleteDict(_widget->uExtension.sText.pPixmapSheetDct);
-            }
-        }
-        break;
-        case BL_UT_PROGRESS:
-        {
-            if (_widget->uExtension.sProgress.pText)
-                free(_widget->uExtension.sProgress.pText);
-            if (_widget->uExtension.sProgress.pPixmapSheetDct)
-            {
-                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sProgress.pPixmapSheetDct)
-                {
-                    free(_iter);
-                }
-                blDeleteDict(_widget->uExtension.sProgress.pPixmapSheetDct);
-            }
-        }
-        break;
-        case BL_UT_DIAL:
-        {
-            if (_widget->uExtension.sDial.pPixmapSheetDct)
-            {
-                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sDial.pPixmapSheetDct)
-                {
-                    free(_iter);
-                }
-                blDeleteDict(_widget->uExtension.sDial.pPixmapSheetDct);
-            }
-        }
-        break;
-        case BL_UT_TABLE:
-        {
-            if (_widget->uExtension.sTable.pPixmapSheetDct)
-            {
-                FOREACH_DICT (_BLPixmapSheet*, _iter, _widget->uExtension.sTable.pPixmapSheetDct)
-                {
-                    free(_iter);
-                }
-                blDeleteDict(_widget->uExtension.sTable.pPixmapSheetDct);
-            }
-        }
-        break;
-        case BL_UT_PRIMITIVE:
-        {
-            if (_widget->uExtension.sPrimitive.pXPath)
-                free(_widget->uExtension.sPrimitive.pXPath);
-            if (_widget->uExtension.sPrimitive.pYPath)
-                free(_widget->uExtension.sPrimitive.pYPath);
-        }
-        break;
-        default:break;
-    }
+	_DiscardResource(_ID, _UnloadUI, _UIRelease);
     {
         FOREACH_ARRAY (_BLWidget*, _iter, _widget->pChildren)
         {
@@ -2077,6 +3578,36 @@ blDeleteUI(IN BLGuid _ID)
     free(_widget);
     blDeleteGuid(_ID);
     _PrUIMem->bDirty = TRUE;
+}
+BLGuid 
+blUIQuery(IN BLAnsi* _WidgetName)
+{
+	return _QueryWidget(_PrUIMem->pRoot, blHashUtf8((const BLUtf8*)_WidgetName), TRUE)->nID;
+}
+BLVoid 
+blUISize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	_widget->sDimension.fX = (BLF32)_Width;
+	_widget->sDimension.fY = (BLF32)_Height;
+	_widget->fRatio = (BLF32)_Width / (BLF32)_Height;
+	if (_widget->nMaxWidth)
+		_widget->sDimension.fX = (BLF32)MIN_INTERNAL(_widget->nMaxWidth, (BLU32)_widget->sDimension.fX);
+	if (_widget->nMaxHeight)
+		_widget->sDimension.fY = (BLF32)MIN_INTERNAL(_widget->nMaxHeight, (BLU32)_widget->sDimension.fY);
+	_widget->sDimension.fX = (BLF32)MAX_INTERNAL(MAX_INTERNAL(1, _widget->nMinWidth), (BLU32)_widget->sDimension.fX);
+	_widget->sDimension.fY = (BLF32)MAX_INTERNAL(MAX_INTERNAL(1, _widget->nMinHeight), (BLU32)_widget->sDimension.fY);
+}
+BLVoid 
+blUIGetSize(IN BLGuid _ID, OUT BLU32* _Width, OUT BLU32* _Height)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	*_Width = (BLU32)_widget->sDimension.fX;
+	*_Height = (BLU32)_widget->sDimension.fY;
 }
 BLVoid
 blUIReferencePoint(IN BLGuid _ID, IN BLEnum _ReferenceH, IN BLEnum _ReferenceV)
@@ -2124,6 +3655,12 @@ blUISizeLimit(IN BLGuid _ID, IN BLU32 _MaxWidth, IN BLU32 _MaxHeight, IN BLU32 _
 	_widget->nMinHeight = _MinHeight;
 	_widget->nMaxWidth = _MaxWidth;
 	_widget->nMaxHeight = _MaxHeight;
+	if (_MaxWidth)
+		_widget->sDimension.fX = (BLF32)MIN_INTERNAL(_MaxWidth, (BLU32)_widget->sDimension.fX);
+	if (_MaxHeight)
+		_widget->sDimension.fY = (BLF32)MIN_INTERNAL(_MaxHeight, (BLU32)_widget->sDimension.fY);
+	_widget->sDimension.fX = (BLF32)MAX_INTERNAL(MAX_INTERNAL(1, _MinWidth), (BLU32)_widget->sDimension.fX);
+	_widget->sDimension.fY = (BLF32)MAX_INTERNAL(MAX_INTERNAL(1, _MinHeight), (BLU32)_widget->sDimension.fY);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -2197,6 +3734,8 @@ blUITooltip(IN BLGuid _ID, IN BLUtf8* _Tooltip)
 	if (!_widget)
 		return;
 	BLU32 _strlen = blUtf8Length(_Tooltip);
+	if (!_strlen)
+		return;
 	_widget->pTooltip = malloc(_strlen + 1);
 	memset(_widget->pTooltip, 0, _strlen + 1);
 	strcpy((BLAnsi*)_widget->pTooltip, (const BLAnsi*)_Tooltip);
@@ -2240,7 +3779,7 @@ blUIPanelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIPanelStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
+blUIPanelStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2252,7 +3791,7 @@ blUIPanelStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIPanelCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIPanelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2320,29 +3859,6 @@ blUIPanelFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_widget->uExtension.sPanel.bFlipY = _FlipY;
 	_PrUIMem->bDirty = TRUE;
 }
-BLGuid
-_LoadBmg(IN BLAnsi* _Pixmap, BLU32 _Hash)
-{
-    BLAnsi _texfile[260] = { 0 };
-    memset(_texfile, 0, sizeof(_texfile));
-    BLAnsi _path[260] = { 0 };
-    if (_PrUIMem->aArchive[0] == 0)
-    {
-        strcpy(_path, blWorkingDir(TRUE));
-        strcat(_path, _PrUIMem->aDir);
-    }
-    else
-        strcpy(_path, _PrUIMem->aDir);
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-    strcat(_path, "\\pixmap\\");
-#else
-    strcat(_path, "/pixmap/");
-#endif
-    strcat(_path, _Pixmap);
-    strcat(_path, ".bmg");
-    BLGuid _tex = blGenStream(_path, _PrUIMem->aArchive[0] ? _PrUIMem->aArchive : NULL);
-    return 0;
-}
 BLVoid
 blUIButtonPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 {
@@ -2356,13 +3872,11 @@ blUIButtonPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
     BLAnsi _texfile[260] = { 0 };
     sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
     BLU32 _hash = blHashUtf8((const BLUtf8*)_texfile);
-    _widget->uExtension.sButton.nPixmapTex = blGainTexture(_hash);
-    if (INVALID_GUID == _widget->uExtension.sButton.nPixmapTex)
-        _widget->uExtension.sButton.nPixmapTex = _LoadBmg(_Pixmap, _hash);
+	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIButtonStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
+blUIButtonStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2374,7 +3888,7 @@ blUIButtonStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIButtonCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIButtonCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2383,10 +3897,18 @@ blUIButtonCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF
 		return;
 	memset(_widget->uExtension.sButton.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aCommonMap, _CommonMap);
+	_widget->uExtension.sButton.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sButton.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sButton.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sButton.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sButton.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sButton.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sButton.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sButton.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIButtonHover(IN BLGuid _ID, IN BLAnsi* _HoveredMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIButtonHoverMap(IN BLGuid _ID, IN BLAnsi* _HoveredMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2395,10 +3917,18 @@ blUIButtonHover(IN BLGuid _ID, IN BLAnsi* _HoveredMap, IN BLF32 _CenterX, IN BLF
 		return;
 	memset(_widget->uExtension.sButton.aHoveredMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aHoveredMap, _HoveredMap);
+	_widget->uExtension.sButton.sHoveredTex.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sButton.sHoveredTex.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sButton.sHoveredTex.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sButton.sHoveredTex.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sButton.sHoveredTex9.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sButton.sHoveredTex9.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sButton.sHoveredTex9.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sButton.sHoveredTex9.sRB.fY = _CenterY + _Height * 0.5f;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIButtonPress(IN BLGuid _ID, IN BLAnsi* _PressedMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIButtonPressMap(IN BLGuid _ID, IN BLAnsi* _PressedMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2407,10 +3937,18 @@ blUIButtonPress(IN BLGuid _ID, IN BLAnsi* _PressedMap, IN BLF32 _CenterX, IN BLF
 		return;
 	memset(_widget->uExtension.sButton.aPressedMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aPressedMap, _PressedMap);
+	_widget->uExtension.sButton.sPressedTex.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sButton.sPressedTex.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sButton.sPressedTex.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sButton.sPressedTex.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sButton.sPressedTex9.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sButton.sPressedTex9.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sButton.sPressedTex9.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sButton.sPressedTex9.sRB.fY = _CenterY + _Height * 0.5f;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIButtonDisable(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIButtonDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2419,6 +3957,14 @@ blUIButtonDisable(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN B
 		return;
 	memset(_widget->uExtension.sButton.aDisableMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aDisableMap, _DisableMap);
+	_widget->uExtension.sButton.sDisableTex.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sButton.sDisableTex.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sButton.sDisableTex.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sButton.sDisableTex.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sButton.sDisableTex9.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sButton.sDisableTex9.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sButton.sDisableTex9.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sButton.sDisableTex9.sRB.fY = _CenterY + _Height * 0.5f;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -2490,7 +4036,7 @@ blUILabelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUILabelStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
+blUILabelStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2502,7 +4048,7 @@ blUILabelStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUILabelCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUILabelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2599,7 +4145,7 @@ blUICheckPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUICheckStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
+blUICheckStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2611,7 +4157,7 @@ blUICheckStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUICheckCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUICheckCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2623,7 +4169,7 @@ blUICheckCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF3
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUICheckPress(IN BLGuid _ID, IN BLAnsi* _PressedMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUICheckPressMap(IN BLGuid _ID, IN BLAnsi* _PressedMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2635,7 +4181,7 @@ blUICheckPress(IN BLGuid _ID, IN BLAnsi* _PressedMap, IN BLF32 _CenterX, IN BLF3
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUICheckDisable(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUICheckDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2715,7 +4261,7 @@ blUITextPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUITextStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
+blUITextStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2727,7 +4273,7 @@ blUITextStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUITextCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUITextCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2877,7 +4423,7 @@ blUIProgressPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIProgressStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
+blUIProgressStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2889,7 +4435,7 @@ blUIProgressStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIProgressCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIProgressCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2901,7 +4447,7 @@ blUIProgressCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN B
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIProgressFill(IN BLGuid _ID, IN BLAnsi* _FillMap)
+blUIProgressFillMap(IN BLGuid _ID, IN BLAnsi* _FillMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2979,7 +4525,7 @@ blUISliderPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUISliderStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
+blUISliderStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -2991,7 +4537,7 @@ blUISliderStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUISliderCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUISliderCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -3003,7 +4549,7 @@ blUISliderCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUISliderSliderCommon(IN BLGuid _ID, IN BLAnsi* _SliderCommonMap)
+blUISliderSliderCommonMap(IN BLGuid _ID, IN BLAnsi* _SliderCommonMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -3015,7 +4561,7 @@ blUISliderSliderCommon(IN BLGuid _ID, IN BLAnsi* _SliderCommonMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUISliderSliderDisable(IN BLGuid _ID, IN BLAnsi* _SliderDisableMap)
+blUISliderSliderDisableMap(IN BLGuid _ID, IN BLAnsi* _SliderDisableMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -3119,7 +4665,7 @@ blUITablePixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUITableStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
+blUITableStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -3131,7 +4677,7 @@ blUITableStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUITableCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUITableCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -3143,7 +4689,7 @@ blUITableCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF3
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUITableOddItem(IN BLGuid _ID, IN BLAnsi* _OddItemMap)
+blUITableOddItemMap(IN BLGuid _ID, IN BLAnsi* _OddItemMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -3155,7 +4701,7 @@ blUITableOddItem(IN BLGuid _ID, IN BLAnsi* _OddItemMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUITableEvenItem(IN BLGuid _ID, IN BLAnsi* _EvenItemMap)
+blUITableEvenItemMap(IN BLGuid _ID, IN BLAnsi* _EvenItemMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -3247,7 +4793,7 @@ blUIDialPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIDialStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
+blUIDialStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -3259,7 +4805,7 @@ blUIDialStencil(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIDialCommon(IN BLGuid _ID, IN BLAnsi* _CommonMap)
+blUIDialCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
