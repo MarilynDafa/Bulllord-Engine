@@ -3335,148 +3335,145 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
         GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAX_LEVEL, _Mipmap - 1));
-        if (_Data)
-        {
-            BLU32 _faces = (_target == GL_TEXTURE_CUBE_MAP) || (_target == GL_TEXTURE_CUBE_MAP_ARRAY) ? 6:1;
-            for (BLU32 _aidx = 0; _aidx < _Layer; ++ _aidx)
-            {
-                BLU32 _w = _Width;
-                BLU32 _h = _Height;
-                BLU32 _d = _Depth;
-                for(BLU32 _face = 0; _face < _faces; ++_face)
-                {
-                    for (BLU32 _level = 0; _level < _Mipmap; ++_level)
-                    {
-                        GLsizei _imagesz = _TextureSize(_Format, _w, _h, _d);
-                        switch(_target)
-                        {
-                            case GL_TEXTURE_2D:
-                            {
-                                if(_Format > BL_TF_UNKNOWN)
-                                {
-                                    if (_Immutable)
-                                    {
-                                        GL_CHECK_INTERNAL(glTexSubImage2D(_target, _level, 0, 0, _w, _h, _fmt, _type, _Data + _aidx * _Mipmap + _level));
-                                    }
-                                    else
-                                    {
-                                        GL_CHECK_INTERNAL(glTexImage2D(_target, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
-                                    }
-                                }
-                                else
-                                {
-                                    if (_Immutable)
-                                    {
-                                        GL_CHECK_INTERNAL(glCompressedTexSubImage2D(_target, _level, 0, 0, _w, _h, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
-                                    }
-                                    else
-                                    {
-                                        GL_CHECK_INTERNAL(glCompressedTexImage2D(_target, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
-                                    }
-                                }
-                            }
-                            break;
-                            case GL_TEXTURE_2D_ARRAY:
-                            {
-                                if(_Format > BL_TF_UNKNOWN)
-                                {
-                                    if (0 == _aidx && !_Immutable)
-                                    {
-                                        GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _Layer, 0, _fmt, _type, 0));
-                                    }
-                                    GL_CHECK_INTERNAL(glTexSubImage3D(_target, _level, 0, 0, _aidx, _w, _h, 1, _fmt, _type, _Data + _aidx * _Mipmap + _level));
-                                }
-                                else
-                                {
-                                    if (0 == _aidx && !_Immutable)
-                                    {
-                                        GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _Layer, 0, _imagesz*_Layer, 0));
-                                    }
-                                    GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _level, 0, 0, _aidx, _w, _h, 1, _ifmt , _imagesz, _Data + _aidx * _Mipmap + _level));
-                                }
-                            }
-                            break;
-                            case GL_TEXTURE_CUBE_MAP:
-                            {
-                                if(_Format > BL_TF_UNKNOWN)
-                                {
-                                    if (_Immutable)
-                                    {
-                                        GL_CHECK_INTERNAL(glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0 , 0, _w, _h, _fmt, _type, _Data + _aidx * _Mipmap + _level));
-                                    }
-                                    else
-                                    {
-                                        GL_CHECK_INTERNAL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
-                                    }
-                                }
-                                else
-                                {
-                                    if (_Immutable)
-                                    {
-                                        GL_CHECK_INTERNAL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _w, _h, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
-                                    }
-                                    else
-                                    {
-                                        GL_CHECK_INTERNAL(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
-                                    }
-                                }
-                            }
-                            break;
-                            case GL_TEXTURE_CUBE_MAP_ARRAY:
-                            {
-                                if(_Format > BL_TF_UNKNOWN)
-                                {
-                                    if (0 == _aidx)
-                                    {
-                                        GL_CHECK_INTERNAL(glTexImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, _Layer, 0, _fmt, _type, 0));
-                                    }
-                                    GL_CHECK_INTERNAL(glTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _aidx, _w, _h, 1, _fmt, _type, _Data + _aidx * _Mipmap + _level));
-                                }
-                                else
-                                {
-                                    if (0 == _aidx)
-                                    {
-                                        GL_CHECK_INTERNAL(glCompressedTexImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, _Layer, 0, _imagesz * _Layer, 0));
-                                    }
-                                    GL_CHECK_INTERNAL(glCompressedTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _aidx, _w, _h, 1, _ifmt, _imagesz, _Data + _aidx * _Layer + _level));
-                                }
-                            }
-                            break;
-                            case GL_TEXTURE_3D:
-                            {
-                                if(_Format > BL_TF_UNKNOWN)
-                                {
-                                    if (_Immutable)
-                                    {
-                                        GL_CHECK_INTERNAL(glTexSubImage3D(_target, _level, 0, 0, 0, _w, _h, _d, _fmt, _type, _Data + _level));
-                                    }
-                                    else
-                                    {
-                                        GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _fmt, _type, _Data + _level));
-                                    }
-                                }
-                                else
-                                {
-                                    if (_Immutable)
-                                    {
-                                        GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _level, 0, 0, 0, _w, _h, _d, _ifmt, _imagesz, _Data + _level));
-                                    }
-                                    else
-                                    {
-                                        GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _imagesz, _Data + _level));
-                                    }
-                                }
-                            }
-                            break;
-                            default:assert(0);break;
-                        }
-                        _w = MAX_INTERNAL(1U, _w / 2);
-                        _h = MAX_INTERNAL(1U, _h / 2);
-                        _d = MAX_INTERNAL(1U, _d / 2);
-                    }
-                }
-            }
-        }
+		BLU32 _faces = (_target == GL_TEXTURE_CUBE_MAP) || (_target == GL_TEXTURE_CUBE_MAP_ARRAY) ? 6 : 1;
+		for (BLU32 _aidx = 0; _aidx < _Layer; ++_aidx)
+		{
+			BLU32 _w = _Width;
+			BLU32 _h = _Height;
+			BLU32 _d = _Depth;
+			for (BLU32 _face = 0; _face < _faces; ++_face)
+			{
+				for (BLU32 _level = 0; _level < _Mipmap; ++_level)
+				{
+					GLsizei _imagesz = _TextureSize(_Format, _w, _h, _d);
+					switch (_target)
+					{
+					case GL_TEXTURE_2D:
+					{
+						if (_Format > BL_TF_UNKNOWN)
+						{
+							if (_Immutable)
+							{
+								GL_CHECK_INTERNAL(glTexSubImage2D(_target, _level, 0, 0, _w, _h, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+							}
+							else
+							{
+								GL_CHECK_INTERNAL(glTexImage2D(_target, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+							}
+						}
+						else
+						{
+							if (_Immutable)
+							{
+								GL_CHECK_INTERNAL(glCompressedTexSubImage2D(_target, _level, 0, 0, _w, _h, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
+							}
+							else
+							{
+								GL_CHECK_INTERNAL(glCompressedTexImage2D(_target, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
+							}
+						}
+					}
+					break;
+					case GL_TEXTURE_2D_ARRAY:
+					{
+						if (_Format > BL_TF_UNKNOWN)
+						{
+							if (0 == _aidx && !_Immutable)
+							{
+								GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _Layer, 0, _fmt, _type, 0));
+							}
+							GL_CHECK_INTERNAL(glTexSubImage3D(_target, _level, 0, 0, _aidx, _w, _h, 1, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+						}
+						else
+						{
+							if (0 == _aidx && !_Immutable)
+							{
+								GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _Layer, 0, _imagesz*_Layer, 0));
+							}
+							GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _level, 0, 0, _aidx, _w, _h, 1, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
+						}
+					}
+					break;
+					case GL_TEXTURE_CUBE_MAP:
+					{
+						if (_Format > BL_TF_UNKNOWN)
+						{
+							if (_Immutable)
+							{
+								GL_CHECK_INTERNAL(glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _w, _h, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+							}
+							else
+							{
+								GL_CHECK_INTERNAL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+							}
+						}
+						else
+						{
+							if (_Immutable)
+							{
+								GL_CHECK_INTERNAL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _w, _h, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
+							}
+							else
+							{
+								GL_CHECK_INTERNAL(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
+							}
+						}
+					}
+					break;
+					case GL_TEXTURE_CUBE_MAP_ARRAY:
+					{
+						if (_Format > BL_TF_UNKNOWN)
+						{
+							if (0 == _aidx)
+							{
+								GL_CHECK_INTERNAL(glTexImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, _Layer, 0, _fmt, _type, 0));
+							}
+							GL_CHECK_INTERNAL(glTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _aidx, _w, _h, 1, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+						}
+						else
+						{
+							if (0 == _aidx)
+							{
+								GL_CHECK_INTERNAL(glCompressedTexImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, _Layer, 0, _imagesz * _Layer, 0));
+							}
+							GL_CHECK_INTERNAL(glCompressedTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _aidx, _w, _h, 1, _ifmt, _imagesz, _Data + _aidx * _Layer + _level));
+						}
+					}
+					break;
+					case GL_TEXTURE_3D:
+					{
+						if (_Format > BL_TF_UNKNOWN)
+						{
+							if (_Immutable)
+							{
+								GL_CHECK_INTERNAL(glTexSubImage3D(_target, _level, 0, 0, 0, _w, _h, _d, _fmt, _type, _Data + _level));
+							}
+							else
+							{
+								GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _fmt, _type, _Data + _level));
+							}
+						}
+						else
+						{
+							if (_Immutable)
+							{
+								GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _level, 0, 0, 0, _w, _h, _d, _ifmt, _imagesz, _Data + _level));
+							}
+							else
+							{
+								GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _imagesz, _Data + _level));
+							}
+						}
+					}
+					break;
+					default:assert(0); break;
+					}
+					_w = MAX_INTERNAL(1U, _w / 2);
+					_h = MAX_INTERNAL(1U, _h / 2);
+					_d = MAX_INTERNAL(1U, _d / 2);
+				}
+			}
+		}
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
@@ -3660,6 +3657,85 @@ blTextureFilter(IN BLGuid _Tex, IN BLEnum _MinFilter, IN BLEnum _MagFilter, IN B
     }
 #endif
 }
+BLVoid 
+blTextureSwizzle(IN BLGuid _Tex, IN BLEnum _ChannelR, IN BLEnum _ChannelG, IN BLEnum _ChannelB, IN BLEnum _ChannelA)
+{
+	_BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
+	if (!_tex)
+		return;
+#if defined(BL_GL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+	{
+		GLenum _target;
+		GLint _swizzle[4];
+		switch (_ChannelR)
+		{
+		case BL_TS_ZERO: _swizzle[0] = GL_ZERO; break;
+		case BL_TS_ONE: _swizzle[0] = GL_ONE; break;
+		case BL_TS_RED: _swizzle[0] = GL_RED; break;
+		case BL_TS_GREEN: _swizzle[0] = GL_GREEN; break;
+		case BL_TS_BLUE: _swizzle[0] = GL_BLUE; break;
+		case BL_TS_ALPHA: _swizzle[0] = GL_ALPHA; break;
+		default: _swizzle[0] = GL_ZERO; break;
+		}
+		switch (_ChannelG)
+		{
+		case BL_TS_ZERO: _swizzle[1] = GL_ZERO; break;
+		case BL_TS_ONE: _swizzle[1] = GL_ONE; break;
+		case BL_TS_RED: _swizzle[1] = GL_RED; break;
+		case BL_TS_GREEN: _swizzle[1] = GL_GREEN; break;
+		case BL_TS_BLUE: _swizzle[1] = GL_BLUE; break;
+		case BL_TS_ALPHA: _swizzle[1] = GL_ALPHA; break;
+		default: _swizzle[1] = GL_ZERO; break;
+		}
+		switch (_ChannelB)
+		{
+		case BL_TS_ZERO: _swizzle[2] = GL_ZERO; break;
+		case BL_TS_ONE: _swizzle[2] = GL_ONE; break;
+		case BL_TS_RED: _swizzle[2] = GL_RED; break;
+		case BL_TS_GREEN: _swizzle[2] = GL_GREEN; break;
+		case BL_TS_BLUE: _swizzle[2] = GL_BLUE; break;
+		case BL_TS_ALPHA: _swizzle[2] = GL_ALPHA; break;
+		default: _swizzle[2] = GL_ZERO; break;
+		}
+		switch (_ChannelA)
+		{
+		case BL_TS_ZERO: _swizzle[3] = GL_ZERO; break;
+		case BL_TS_ONE: _swizzle[3] = GL_ONE; break;
+		case BL_TS_RED: _swizzle[3] = GL_RED; break;
+		case BL_TS_GREEN: _swizzle[3] = GL_GREEN; break;
+		case BL_TS_BLUE: _swizzle[3] = GL_BLUE; break;
+		case BL_TS_ALPHA: _swizzle[3] = GL_ALPHA; break;
+		default: _swizzle[3] = GL_ZERO; break;
+		}
+		switch (_tex->eTarget)
+		{
+		case BL_TT_1D: _target = GL_TEXTURE_2D;	break;
+		case BL_TT_2D: _target = GL_TEXTURE_2D;	break;
+		case BL_TT_3D: _target = GL_TEXTURE_3D;	break;
+		case BL_TT_CUBE: _target = GL_TEXTURE_CUBE_MAP; break;
+		case BL_TT_ARRAY1D: _target = GL_TEXTURE_2D_ARRAY; break;
+		case BL_TT_ARRAY2D: _target = GL_TEXTURE_2D_ARRAY; break;
+		case BL_TT_ARRAYCUBE: _target = GL_TEXTURE_CUBE_MAP_ARRAY; break;		
+		default: _target = GL_TEXTURE_2D; break;
+		}
+		GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+		GL_CHECK_INTERNAL(glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, _swizzle));
+	}
+#elif defined(BL_MTL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+	{
+	}
+#elif defined(BL_VK_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+	{
+	}
+#elif defined(BL_DX_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+	{
+	}
+#endif
+}
 BLVoid
 blTextureUpdate(IN BLGuid _Tex, IN BLU32 _Layer, IN BLU32 _Level, IN BLEnum _Face, IN BLU32 _XOffset, IN BLU32 _YOffset, IN BLU32 _ZOffset, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, IN BLVoid* _Data)
 {
@@ -3725,7 +3801,6 @@ blTextureUpdate(IN BLGuid _Tex, IN BLU32 _Layer, IN BLU32 _Level, IN BLEnum _Fac
                 {
                     GL_CHECK_INTERNAL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _Face, _Level, _XOffset, _YOffset, _Width, _Height, _ifmt, _TextureSize(_tex->eFormat, _Width, _Height, 1), _Data));
                 }
-
                 break;
             case BL_TT_ARRAY1D:
                 _target = GL_TEXTURE_2D_ARRAY;

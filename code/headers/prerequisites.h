@@ -687,6 +687,14 @@ typedef unsigned long long BLGuid;
 #define BL_TW_CLAMP         1
 #define BL_TW_MIRROR        2
 
+/* _TEXTURE_SWIZZLE*/
+#define BL_TS_RED			0
+#define BL_TS_GREEN			1
+#define BL_TS_BLUE			2
+#define BL_TS_ALPHA			3
+#define BL_TS_ZERO			4
+#define BL_TS_ONE			5
+
 /* _PRIMITIVE_TOPOLOGY */
 #define BL_PT_POINTS        0
 #define BL_PT_LINES         1

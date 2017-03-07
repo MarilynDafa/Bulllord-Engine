@@ -168,6 +168,13 @@ BL_API BLVoid blTextureFilter(
     IN BLEnum _WrapT,
     IN BLBool _Anisotropy);
 
+BL_API BLVoid blTextureSwizzle(
+	IN BLGuid _Tex,
+	IN BLEnum _ChannelR,
+	IN BLEnum _ChannelG,
+	IN BLEnum _ChannelB,
+	IN BLEnum _ChannelA);
+
 BL_API BLVoid blTextureUpdate(
 	IN BLGuid _Tex,
     IN BLU32 _Layer,

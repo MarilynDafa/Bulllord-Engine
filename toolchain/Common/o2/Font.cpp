@@ -145,7 +145,7 @@ namespace o2d{
 			outy_ = 0.f;
 			return;
 		}
-		u16 flag = LOWU16(text_[0]);
+		u16 flag = flag6;
 		bool outline = LOWU16(flag) & 0x000F;
 		bool bold = LOWU16(flag) & 0x00F0;
 		bool shadow = LOWU16(flag) & 0x0F00;
