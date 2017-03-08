@@ -168,7 +168,7 @@ char *ezxml_decode(char *s, char **ent, char t)
     }
     
     for (s = r; ; ) {
-        while (*s && *s != '&' && (*s != '%' || t != '%') && !isspace(*s)) s++;
+        while (*s && *s != '&' && (*s != '%' || t != '%') && !isspace((unsigned char)*s)) s++;
 
         if (! *s) break;
         else if (t != 'c' && ! strncmp(s, "&#", 2)) { // character reference
@@ -203,7 +203,7 @@ char *ezxml_decode(char *s, char **ent, char t)
             }
             else s++; // not a known entity
         }
-        else if ((t == ' ' || t == '*') && isspace(*s)) *(s++) = ' ';
+        else if ((t == ' ' || t == '*') && isspace((unsigned char)*s)) *(s++) = ' ';
         else s++; // no decoding needed
     }
 
@@ -497,7 +497,7 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
                 return ezxml_err(root, d, "markup outside of root element");
 
             s += strcspn(s, EZXML_WS "/>");
-            while (isspace(*s)) *(s++) = '\0'; // null terminate tag name
+            while (isspace((unsigned char)*s)) *(s++) = '\0'; // null terminate tag name
   
             if (*s && *s != '/' && *s != '>') // find tag in default attr list
                 for (i = 0; (a = root->attr[i]) && strcmp(a[0], d); i++);
@@ -513,7 +513,7 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
                 attr[l] = s; // set attribute name
 
                 s += strcspn(s, EZXML_WS "=/>");
-                if (*s == '=' || isspace(*s)) { 
+                if (*s == '=' || isspace((unsigned char)*s)) {
                     *(s++) = '\0'; // null terminate tag attribute name
                     q = *(s += strspn(s, EZXML_WS "="));
                     if (q == '"' || q == '\'') { // attribute value
@@ -532,7 +532,7 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
                             attr[l + 3][l / 2] = EZXML_TXTM; // value malloced
                     }
                 }
-                while (isspace(*s)) s++;
+                while (isspace((unsigned char)*s)) s++;
             }
 
             if (*s == '/') { // self closing tag
@@ -559,7 +559,7 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
             if (! (q = *s) && e != '>') return ezxml_err(root, d, "missing >");
             *s = '\0'; // temporarily null terminate tag name
             if (ezxml_close_tag(root, d, s)) return &root->xml;
-            if (isspace(*s = q)) s += strspn(s, EZXML_WS);
+            if (isspace((unsigned char)*s = q)) s += strspn(s, EZXML_WS);
         }
         else if (! strncmp(s, "!--", 3)) { // xml comment
             if (! (s = strstr(s + 3, "--")) || (*(s += 2) != '>' && *s) ||

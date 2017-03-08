@@ -27,12 +27,7 @@ extern "C" {
 #endif
 BL_API BLVoid blUIWorkspace(
 	IN BLAnsi* _Dictionary,
-	IN BLAnsi* _Archive,
-	IN BLBool _UseDesignRes);
-
-BL_API BLVoid blUIResolutionQuery(
-	OUT BLU32* _Width,
-	OUT BLU32* _Height);
+	IN BLAnsi* _Archive);
 
 BL_API BLVoid blUIFile(
 	IN BLAnsi* _Filename);

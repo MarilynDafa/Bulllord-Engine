@@ -751,12 +751,13 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 {
     if (!_Node->bShow || !_Node->bValid)
         return;
-	BLU32 _w, _h;
-	blUIResolutionQuery(&_w, &_h);
+	BLU32 _w, _h, _aw, _ah;
+	BLF32 _rx, _ry;
+	blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 	if (_Node->sScissor.sLT.fX < 0.f)
-		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _w, _h);
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah);
 	else
-		blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_Node->sScissor.sLT.fX, (BLU32)_Node->sScissor.sLT.fY, (BLU32)_Node->sScissor.sRB.fX, (BLU32)_Node->sScissor.sRB.fY);   
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_Node->sScissor.sLT.fX, (BLU32)_Node->sScissor.sLT.fY, (BLU32)(_Node->sScissor.sRB.fX - _Node->sScissor.sLT.fX), (BLU32)(_Node->sScissor.sRB.fY - _Node->sScissor.sLT.fY));
 	if (_Node->nFrameNum > 1)
 	{
 		_Node->nTimePassed += _Delta;
@@ -1008,18 +1009,20 @@ _SpriteInit()
 	_PrSpriteMem->nSpriteStrokeTech = blGenTechnique("2DStroke.bsl", NULL, FALSE, FALSE);
     _PrSpriteMem->nSpriteGlowTech = blGenTechnique("2DGlow.bsl", NULL, FALSE, FALSE);
     blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
-	BLU32 _w, _h;
-	blUIResolutionQuery(&_w, &_h);
+	BLU32 _w, _h, _aw, _ah;
+	BLF32 _rx, _ry;
+	blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 	_PrSpriteMem->sViewport.sLT.fX = _PrSpriteMem->sViewport.sLT.fY = 0.f;
-	_PrSpriteMem->sViewport.sRB.fX = (BLF32)_w;
-	_PrSpriteMem->sViewport.sRB.fY = (BLF32)_h;
+	_PrSpriteMem->sViewport.sRB.fX = (BLF32)_aw;
+	_PrSpriteMem->sViewport.sRB.fY = (BLF32)_ah;
 }
 BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 {
-    BLU32 _w, _h;
-	blUIResolutionQuery(&_w, &_h);
-    BLF32 _screensz[] = { 2.f / (BLF32)_w, 2.f / (BLF32)_h };
+	BLF32 _rx, _ry;
+	BLU32 _w, _h, _aw, _ah;
+	blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+    BLF32 _screensz[] = { 2.f / (BLF32)_aw, 2.f / (BLF32)_ah };
     blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
     blTechUniform(_PrSpriteMem->nSpriteInstTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 	blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
@@ -1063,7 +1066,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 		{
 			BLU32 _totalnum = (BLU32)((_scalevp.sRB.fX - _scalevp.sLT.fX) * (_scalevp.sRB.fY - _scalevp.sLT.fY) / (_first->sSize.fX * _first->sSize.fY)) * 2;
 			BLGuid _layertex;
-			blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _w, _h);
+			blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah);
 			BLU8* _geomem = (BLU8*)alloca(_totalnum * 48 * sizeof(BLF32));
 			for (BLS32 _idx = 0; _idx < 8; ++_idx)
 			{

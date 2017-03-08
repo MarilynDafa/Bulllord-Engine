@@ -119,11 +119,15 @@ BL_API BLBool blSystemTimer(
 	IN BLS32 _PositiveID,
 	IN BLF32 _Elapse);
     
-BL_API BLVoid blWindowSize(
+BL_API BLVoid blGetWindowSize(
 	OUT BLU32* _Width, 
-	OUT BLU32* _Height);
+	OUT BLU32* _Height,
+	OUT BLU32* _ActualWidth,
+	OUT BLU32* _ActualHeight,
+	OUT BLF32* _RatioX,
+	OUT BLF32* _RatioY);
 
-BL_API BLVoid blWindowResize(
+BL_API BLVoid blWindowSize(
 	IN BLU32 _Width, 
 	IN BLU32 _Height, 
 	IN BLBool _Fullscreen);
@@ -132,6 +136,9 @@ BL_API BLVoid blSystemRun(
 	IN BLAnsi* _Appname, 
 	IN BLU32 _Width,
 	IN BLU32 _Height,
+	IN BLU32 _DesignWidth,
+	IN BLU32 _DesignHeight,
+	IN BLBool _UseDesignRes,
 	IN BLBool _Fullscreen,
 	IN BLBool _Profiler,
 	IN BLEnum _Quality,

@@ -109,6 +109,9 @@ typedef struct _BoostParam {
 	BLUtf8 pAppName[128];
 	BLU32 nScreenWidth;
 	BLU32 nScreenHeight;
+	BLU32 nDesignWidth;
+	BLU32 nDesignHeight;
+	BLBool bUseDesignRes;
 	BLBool bFullscreen;
 	BLBool bProfiler;
 	BLEnum eQuality;
@@ -4217,14 +4220,40 @@ blSystemTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
 	_PrSystemMem->aTimers[_idx].nLastTime = blSystemTicks();
 	return TRUE;
 }
-BLVoid
-blWindowSize(OUT BLU32* _Width, OUT BLU32* _Height)
+BLVoid 
+blGetWindowSize(OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _ActualWidth, OUT BLU32* _ActualHeight, OUT BLF32* _RatioX, OUT BLF32* _RatioY)
 {
 	*_Width = _PrSystemMem->sBoostParam.nScreenWidth;
 	*_Height = _PrSystemMem->sBoostParam.nScreenHeight;
+	if (_PrSystemMem->sBoostParam.bUseDesignRes)
+	{
+		BLF32 _dwidth = (BLF32)_PrSystemMem->sBoostParam.nDesignWidth;
+		BLF32 _dheight = (BLF32)_PrSystemMem->sBoostParam.nDesignHeight;
+		BLF32 _ratioorg = (BLF32)(*_Width) / (BLF32)(*_Height);
+		BLF32 _ratiodeg = (BLF32)(_dwidth) / (BLF32)(_dheight);
+		if (_ratiodeg >= _ratioorg)
+		{
+			*_ActualHeight = (BLU32)_dheight;
+			*_ActualWidth = (BLU32)(_ratioorg * _dheight);
+		}
+		else
+		{
+			*_ActualHeight = (BLU32)(_dwidth / _ratioorg);
+			*_ActualWidth = (BLU32)_dwidth;
+		}
+		*_RatioX = (BLF32)(*_Width) / (BLF32)(*_ActualWidth);
+		*_RatioY = (BLF32)(*_Height) / (BLF32)(*_ActualHeight);
+	}
+	else
+	{
+		*_ActualWidth = *_Width;
+		*_ActualHeight = *_Height;
+		*_RatioX = 1.f;
+		*_RatioY = 1.f;
+	}
 }
 BLVoid
-blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
+blWindowSize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
 {
 #if defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_UWP)
     if (_Fullscreen)
@@ -4233,8 +4262,8 @@ blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
         _ExitFullscreen(_Width, _Height);
 #endif
 }
-BLVoid
-blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))
+BLVoid 
+blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _DesignWidth, IN BLU32 _DesignHeight, IN BLBool _UseDesignRes, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))
 {
 #if defined(BL_PLATFORM_UWP)
 	_PrSystemMem = new _BLSystemMember;
@@ -4291,6 +4320,9 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _F
 #endif
 	_PrSystemMem->sBoostParam.nScreenWidth = _Width;
 	_PrSystemMem->sBoostParam.nScreenHeight = _Height;
+	_PrSystemMem->sBoostParam.nDesignWidth = _DesignWidth;
+	_PrSystemMem->sBoostParam.nDesignHeight = _DesignHeight;
+	_PrSystemMem->sBoostParam.bUseDesignRes = _UseDesignRes;
 	_PrSystemMem->sBoostParam.bFullscreen = _Fullscreen;
 	_PrSystemMem->sBoostParam.bProfiler = _Profiler;
     _PrSystemMem->sBoostParam.eQuality = _GbRenderQuality = _Quality;
