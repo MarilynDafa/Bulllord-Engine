@@ -320,6 +320,7 @@ typedef struct _Widget {
 			BLU32 nColor;
 			BLF32* pXPath;
 			BLF32* pYPath;
+			BLU32 nPathNum;
 		}sPrimitive;
 	} uExtension;
 }_BLWidget;
@@ -333,6 +334,7 @@ typedef struct _UIMember {
 	BLAnsi aArchive[260];
 	FT_Library sFtLibrary;
 	BLGuid nUITech;
+	BLGuid nBlankTex;
 	BLU32 nFboWidth;
 	BLU32 nFboHeight;
 	BLU32 nCaretColor;
@@ -2466,7 +2468,7 @@ _DrawButton(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		_flag |= 0x0F00;
 	if (_Node->uExtension.sButton.bItalics)
 		_flag |= 0xF000;
-	_WriteText(_Node->uExtension.sButton.pText, _Node->uExtension.sButton.aFontSource, _Node->uExtension.sButton.nFontHeight, _Node->uExtension.sButton.eTxtAlignmentH, _Node->uExtension.sButton.eTxtAlignmentV, FALSE, &_area, &_area, _Node->uExtension.sButton.nTxtColor, _flag, FALSE);
+	_WriteText(_Node->uExtension.sButton.pText, _Node->uExtension.sButton.aFontSource, _Node->uExtension.sButton.nFontHeight, _Node->uExtension.sButton.eTxtAlignmentH, _Node->uExtension.sButton.eTxtAlignmentV, FALSE, &_area, &_area, (_Node->uExtension.sButton.nState == 0) ? _PrUIMem->nTextDisableColor : _Node->uExtension.sButton.nTxtColor, _flag, FALSE);
 }
 static BLVoid
 _DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
@@ -2495,6 +2497,215 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 static BLVoid
 _DrawPrimitive(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
+	if (!_Node->bValid || !_Node->bVisible)
+		return;
+	if (_Node->uExtension.sPrimitive.nPathNum < 2)
+		return;
+	BLRect _scissorrect;
+	_WidgetScissorRect(_Node, &_scissorrect);
+	blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nBlankTex, 0);
+	//blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+	BLF32* _vb;
+	BLU32* _ib;
+	BLU32 _idxcount;
+	BLU32 _vtxcount;
+	BLU32 _coltrans = _Node->uExtension.sPrimitive.nColor & 0x00FFFFFF;
+	BLF32 _rgba[4];
+	blDeColor4F(_Node->uExtension.sPrimitive.nColor, _rgba);
+	BLF32 _rgbat[4];
+	blDeColor4F(_coltrans, _rgbat);
+	if (!_Node->uExtension.sPrimitive.bFill)
+	{
+		BLU32 _fillcount = 0;
+		BLU32 _count = _Node->uExtension.sPrimitive.nPathNum;
+		if (!_Node->uExtension.sPrimitive.bClosed)
+			_count = _Node->uExtension.sPrimitive.nPathNum - 1;
+		_idxcount = _count * 12;
+		_vtxcount = _Node->uExtension.sPrimitive.nPathNum * 3;
+		_vb = (BLF32*)alloca(_vtxcount * 8 * sizeof(BLF32));
+		_ib = (BLU32*)alloca(_idxcount * sizeof(BLU32));
+		BLVec2* _tempnormals = (BLVec2*)alloca(_Node->uExtension.sPrimitive.nPathNum * 3 * sizeof(BLVec2));
+		BLVec2* _temppoints = _tempnormals + _Node->uExtension.sPrimitive.nPathNum;
+		for (BLU32 _idx1 = 0; _idx1 < _count; ++_idx1)
+		{
+			BLU32 _idx2 = (_idx1 + 1) == _Node->uExtension.sPrimitive.nPathNum ? 0 : _idx1 + 1;
+			BLVec2 _diff;
+			_diff.fX = _Node->uExtension.sPrimitive.pXPath[_idx2] - _Node->uExtension.sPrimitive.pXPath[_idx1];
+			_diff.fY = _Node->uExtension.sPrimitive.pYPath[_idx2] - _Node->uExtension.sPrimitive.pYPath[_idx1];
+			BLF32 _invlen;
+			BLF32 _d = _diff.fX * _diff.fX + _diff.fY * _diff.fY;
+			if (_d > 0.0f)
+				_invlen = 1.0f / sqrtf(_d);
+			else
+				_invlen = 1.f;
+			_diff.fX *= _invlen;
+			_diff.fY *= _invlen;
+			_tempnormals[_idx1].fX = _diff.fY;
+			_tempnormals[_idx1].fY = -_diff.fX;
+		}
+		if (!_Node->uExtension.sPrimitive.bClosed)
+		{
+			_tempnormals[_Node->uExtension.sPrimitive.nPathNum - 1].fX = _tempnormals[_Node->uExtension.sPrimitive.nPathNum - 2].fX;
+			_tempnormals[_Node->uExtension.sPrimitive.nPathNum - 1].fY = _tempnormals[_Node->uExtension.sPrimitive.nPathNum - 2].fY;
+			_temppoints[0].fX = _Node->uExtension.sPrimitive.pXPath[0] + _tempnormals[0].fX;
+			_temppoints[0].fY = _Node->uExtension.sPrimitive.pYPath[0] + _tempnormals[0].fY;
+			_temppoints[1].fX = _Node->uExtension.sPrimitive.pXPath[0] - _tempnormals[0].fX;
+			_temppoints[1].fY = _Node->uExtension.sPrimitive.pYPath[0] - _tempnormals[0].fY;
+			_temppoints[(_Node->uExtension.sPrimitive.nPathNum - 1) * 2 + 0].fX = _Node->uExtension.sPrimitive.pXPath[_Node->uExtension.sPrimitive.nPathNum - 1] + _tempnormals[_Node->uExtension.sPrimitive.nPathNum - 1].fX;
+			_temppoints[(_Node->uExtension.sPrimitive.nPathNum - 1) * 2 + 0].fY = _Node->uExtension.sPrimitive.pYPath[_Node->uExtension.sPrimitive.nPathNum - 1] + _tempnormals[_Node->uExtension.sPrimitive.nPathNum - 1].fY;
+			_temppoints[(_Node->uExtension.sPrimitive.nPathNum - 1) * 2 + 1].fX = _Node->uExtension.sPrimitive.pXPath[_Node->uExtension.sPrimitive.nPathNum - 1] - _tempnormals[_Node->uExtension.sPrimitive.nPathNum - 1].fX;
+			_temppoints[(_Node->uExtension.sPrimitive.nPathNum - 1) * 2 + 1].fY = _Node->uExtension.sPrimitive.pYPath[_Node->uExtension.sPrimitive.nPathNum - 1] - _tempnormals[_Node->uExtension.sPrimitive.nPathNum - 1].fY;
+		}
+		BLU32 _idx1 = 0;
+		for (BLU32 _i1 = 0; _i1 < _count; ++_i1)
+		{
+			BLU32 _i2 = (_i1 + 1) == _Node->uExtension.sPrimitive.nPathNum ? 0 : _i1 + 1;
+			BLU32 _idx2 = (_i1 + 1) == _Node->uExtension.sPrimitive.nPathNum ? 0 : _idx1 + 3;
+			BLVec2 _dm;
+			_dm.fX = (_tempnormals[_i1].fX + _tempnormals[_i2].fX) * 0.5f;
+			_dm.fY = (_tempnormals[_i1].fY + _tempnormals[_i2].fY) * 0.5f;
+			BLF32 _dmr2 = _dm.fX * _dm.fX + _dm.fY * _dm.fY;
+			if (_dmr2 > 0.000001f)
+			{
+				BLF32 _scale = 1.0f / _dmr2;
+				if (_scale > 100.0f)
+					_scale = 100.0f;
+				_dm.fX *= _scale;
+				_dm.fY *= _scale;
+			}
+			_temppoints[_i2 * 2 + 0].fX = _Node->uExtension.sPrimitive.pXPath[_i2] + _dm.fX;
+			_temppoints[_i2 * 2 + 0].fY = _Node->uExtension.sPrimitive.pYPath[_i2] + _dm.fY;
+			_temppoints[_i2 * 2 + 1].fX = _Node->uExtension.sPrimitive.pXPath[_i2] - _dm.fX;
+			_temppoints[_i2 * 2 + 1].fY = _Node->uExtension.sPrimitive.pYPath[_i2] - _dm.fY;
+			_ib[_fillcount++] = _idx2 + 0;
+			_ib[_fillcount++] = _idx1 + 0;
+			_ib[_fillcount++] = _idx1 + 2;
+			_ib[_fillcount++] = _idx1 + 2;
+			_ib[_fillcount++] = _idx2 + 2;
+			_ib[_fillcount++] = _idx2 + 0;
+			_ib[_fillcount++] = _idx2 + 1;
+			_ib[_fillcount++] = _idx1 + 1;
+			_ib[_fillcount++] = _idx1 + 0;
+			_ib[_fillcount++] = _idx1 + 0;
+			_ib[_fillcount++] = _idx2 + 0;
+			_ib[_fillcount++] = _idx2 + 1;
+			_idx1 = _idx2;
+		}
+		_fillcount = 0;
+		for (BLU32 _idx = 0; _idx < _Node->uExtension.sPrimitive.nPathNum; ++_idx)
+		{
+			_vb[_fillcount++] = _Node->uExtension.sPrimitive.pXPath[_idx] + _X;
+			_vb[_fillcount++] = _Node->uExtension.sPrimitive.pYPath[_idx] + _Y;
+			_vb[_fillcount++] = _rgba[0];
+			_vb[_fillcount++] = _rgba[1];
+			_vb[_fillcount++] = _rgba[2];
+			_vb[_fillcount++] = _rgba[3];
+			_vb[_fillcount++] = 0.5f;
+			_vb[_fillcount++] = 0.5f;
+			_vb[_fillcount++] = _temppoints[_idx * 2 + 1].fX + _X;
+			_vb[_fillcount++] = _temppoints[_idx * 2 + 1].fY + _Y;
+			_vb[_fillcount++] = _rgbat[0];
+			_vb[_fillcount++] = _rgbat[1];
+			_vb[_fillcount++] = _rgbat[2];
+			_vb[_fillcount++] = _rgbat[3];
+			_vb[_fillcount++] = 0.5f;
+			_vb[_fillcount++] = 0.5f;
+			_vb[_fillcount++] = _temppoints[_idx * 2].fX + _X;
+			_vb[_fillcount++] = _temppoints[_idx * 2].fY + _Y;
+			_vb[_fillcount++] = _rgbat[0];
+			_vb[_fillcount++] = _rgbat[1];
+			_vb[_fillcount++] = _rgbat[2];
+			_vb[_fillcount++] = _rgbat[3];
+			_vb[_fillcount++] = 0.5f;
+			_vb[_fillcount++] = 0.5f;
+		}
+	}
+	else
+	{
+		BLU32 _fillcount = 0;
+		_idxcount = (_Node->uExtension.sPrimitive.nPathNum - 2) * 3 + _Node->uExtension.sPrimitive.nPathNum * 6;
+		_vtxcount = (_Node->uExtension.sPrimitive.nPathNum * 2);
+		_vb = (BLF32*)alloca(_vtxcount * 8 * sizeof(BLF32));
+		_ib = (BLU32*)alloca(_idxcount * sizeof(BLU32));
+		BLU32 _vtxinneridx = 0;
+		BLU32 _vtxouteridx = 1;
+		for (BLU32 _idx = 2; _idx < _Node->uExtension.sPrimitive.nPathNum; ++_idx)
+		{
+			_ib[_fillcount++] = ((_vtxinneridx));
+			_ib[_fillcount++] = ((_vtxinneridx + ((_idx - 1) << 1)));
+			_ib[_fillcount++] = ((_vtxinneridx + (_idx << 1)));
+		}
+		BLVec2* _tempnormals = (BLVec2*)alloca(_Node->uExtension.sPrimitive.nPathNum * sizeof(BLVec2));
+		for (BLU32 _idx0 = _Node->uExtension.sPrimitive.nPathNum - 1, _idx1 = 0; _idx1 < _Node->uExtension.sPrimitive.nPathNum; _idx0 = _idx1++)
+		{
+			BLVec2 _p0;
+			_p0.fX = _Node->uExtension.sPrimitive.pXPath[_idx0];
+			_p0.fY = _Node->uExtension.sPrimitive.pYPath[_idx0];
+			BLVec2 _p1;
+			_p1.fX = _Node->uExtension.sPrimitive.pXPath[_idx1];
+			_p1.fY = _Node->uExtension.sPrimitive.pYPath[_idx1];
+			BLVec2 _diff;
+			_diff.fX = _p1.fX - _p0.fX;
+			_diff.fY = _p1.fY - _p0.fY;
+			BLF32 _invlen;
+			BLF32 _d = _diff.fX * _diff.fX + _diff.fY * _diff.fY;
+			if (_d > 0.0f)
+				_invlen = 1.0f / sqrtf(_d);
+			else
+				_invlen = 1.f;
+			_diff.fX *= _invlen;
+			_diff.fY *= _invlen;
+			_tempnormals[_idx0].fX = _diff.fY;
+			_tempnormals[_idx0].fY = -_diff.fX;
+		}
+		BLU32 _fillcount2 = 0;
+		for (BLU32 _idx0 = _Node->uExtension.sPrimitive.nPathNum - 1, _idx1 = 0; _idx1 < _Node->uExtension.sPrimitive.nPathNum; _idx0 = _idx1++)
+		{
+			BLVec2 _n0 = _tempnormals[_idx0];
+			BLVec2 _n1 = _tempnormals[_idx1];
+			BLVec2 _dm;
+			_dm.fX = (_n0.fX + _n1.fX) * 0.5f;
+			_dm.fY = (_n0.fY + _n1.fY) * 0.5f;
+			BLF32 _dmr2 = _dm.fX * _dm.fX + _dm.fY * _dm.fY;
+			if (_dmr2 > 0.000001f)
+			{
+				BLF32 _scale = 1.0f / _dmr2;
+				if (_scale > 100.0f) 
+					_scale = 100.0f;
+				_dm.fX *= _scale;
+				_dm.fY *= _scale;
+			}
+			_dm.fX *= 0.5f;
+			_dm.fY *= 0.5f;
+			_vb[_fillcount2++] = _Node->uExtension.sPrimitive.pXPath[_idx1] - _dm.fX + _X;
+			_vb[_fillcount2++] = _Node->uExtension.sPrimitive.pYPath[_idx1] - _dm.fY + _Y;
+			_vb[_fillcount2++] = _rgba[0];
+			_vb[_fillcount2++] = _rgba[1];
+			_vb[_fillcount2++] = _rgba[2];
+			_vb[_fillcount2++] = _rgba[3];
+			_vb[_fillcount2++] = 0.5f;
+			_vb[_fillcount2++] = 0.5f;
+			_vb[_fillcount2++] = _Node->uExtension.sPrimitive.pXPath[_idx1] + _dm.fX + _X;
+			_vb[_fillcount2++] = _Node->uExtension.sPrimitive.pYPath[_idx1] + _dm.fY + _Y;
+			_vb[_fillcount2++] = _rgbat[0];
+			_vb[_fillcount2++] = _rgbat[1];
+			_vb[_fillcount2++] = _rgbat[2];
+			_vb[_fillcount2++] = _rgbat[3];
+			_vb[_fillcount2++] = 0.5f;
+			_vb[_fillcount2++] = 0.5f;
+			_ib[_fillcount++] = (_vtxinneridx + (_idx1 << 1));
+			_ib[_fillcount++] = (_vtxinneridx + (_idx0 << 1));
+			_ib[_fillcount++] = (_vtxouteridx + (_idx0 << 1));
+			_ib[_fillcount++] = (_vtxouteridx + (_idx0 << 1));
+			_ib[_fillcount++] = (_vtxouteridx + (_idx1 << 1));
+			_ib[_fillcount++] = (_vtxinneridx + (_idx1 << 1));
+		}
+	}
+	BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _vb, _vtxcount * 8 * sizeof(BLF32), _ib, _idxcount * sizeof(BLU32), BL_IF_32);
+	blDraw(_PrUIMem->nUITech, _geo, 1);
+	blDeleteGeometryBuffer(_geo);
 }
 static BLVoid
 _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
@@ -2830,6 +3041,8 @@ _UIInit()
 	_PrUIMem->pFocusWidget = NULL;
     _PrUIMem->pFonts = blGenArray(TRUE);
 	_PrUIMem->nUITech = blGenTechnique("2D.bsl", NULL, FALSE, FALSE);
+	BLU32 _blankdata[] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
+	_PrUIMem->nBlankTex = blGenTexture(blHashUtf8((const BLUtf8*)"#@blanktex#@"), BL_TT_2D, BL_TF_RGBA8, FALSE, TRUE, FALSE, 1, 1, 4, 4, 1, (BLU8*)_blankdata);
 	BLU32 _width, _height;
 	BLF32 _rx, _ry;
     blGetWindowSize(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
@@ -2940,6 +3153,7 @@ _UIDestroy()
 {
 	blUnsubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
 	blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
+	blDeleteTexture(_PrUIMem->nBlankTex);
 	blDeleteTechnique(_PrUIMem->nUITech);
 	blDeleteUI(_PrUIMem->pRoot->nID);
 	{
@@ -3560,6 +3774,17 @@ blUIFile(IN BLAnsi* _Filename)
                 _tmp = strtok(NULL, ",");
                 _idx++;
             }
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _QueryWidget(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_PRIMITIVE);
+			blUIReferencePoint(_widguid, _ha, _va);
+			blUISizePolicy(_widguid, _policyvar);
+			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
+			blUIScissor(_widguid, _clipedvar, _absvar);
+			blUITooltip(_widguid, (const BLUtf8*)_tooltip);
+			blUIPenetration(_widguid, _penetrationvar);
+			blUIPrimitiveClosed(_widguid, _closedvar);
+			blUIPrimitiveColor(_widguid, _colorvar);
+			blUIPrimitiveFill(_widguid, _fillvar);
+			blUIPrimitivePath(_widguid, _xpath, _ypath, _pathnum);
         }
 		_element = _element->ordered;
     } while (_element);
@@ -3784,6 +4009,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sPrimitive.nColor = 0x88888888;
 			_widget->uExtension.sPrimitive.pXPath = NULL;
 			_widget->uExtension.sPrimitive.pYPath = NULL;
+			_widget->uExtension.sPrimitive.nPathNum = 0;
 		}
 		break;
 	}
@@ -4210,6 +4436,8 @@ blUIButtonText(IN BLGuid _ID, IN BLUtf8* _Text,	IN BLU32 _TxtColor,	IN BLEnum _T
 	if (_widget->eType != BL_UT_BUTTON)
 		return;
 	BLU32 _strlen = blUtf8Length(_Text) + 1;
+	if (_widget->uExtension.sButton.pText)
+		free(_widget->uExtension.sButton.pText);
 	_widget->uExtension.sButton.pText = (BLUtf8*)malloc(_strlen);
 	memset(_widget->uExtension.sButton.pText, 0, _strlen);
 	strcpy((BLAnsi*)_widget->uExtension.sButton.pText, (const BLAnsi*)_Text);
@@ -5158,5 +5386,6 @@ blUIPrimitivePath(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _P
 	_widget->uExtension.sPrimitive.pYPath = (BLF32*)malloc(_PathNum * sizeof(BLF32));
 	memcpy(_widget->uExtension.sPrimitive.pXPath, _XPath, _PathNum * sizeof(BLF32));
 	memcpy(_widget->uExtension.sPrimitive.pYPath, _YPath, _PathNum * sizeof(BLF32));
+	_widget->uExtension.sPrimitive.nPathNum = _PathNum;
 	_PrUIMem->bDirty = TRUE;
 }
