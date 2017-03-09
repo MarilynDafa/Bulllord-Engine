@@ -283,9 +283,9 @@ BL_API BLVoid blUICheckCommonMap(
 	IN BLF32 _Width,
 	IN BLF32 _Height);
 
-BL_API BLVoid blUICheckPressMap(
+BL_API BLVoid blUICheckCheckedMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _PressedMap,
+	IN BLAnsi* _CheckedMap,
 	IN BLF32 _CenterX,
 	IN BLF32 _CenterY,
 	IN BLF32 _Width,
