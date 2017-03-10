@@ -16,8 +16,11 @@ namespace o2d{
 		c_rect m_thumb_rect;
 		c_float2 m_thumb_size;
 		c_rect m_bg_rect[UC_NUM];
+		c_rect m_dimg_rect[UC_NUM];
 		c_rect m_bg_zoom_region;
+		c_rect m_dimg_zoom_region;
 		c_string m_bg_img;
+		c_string m_dis_img;
 		c_string m_thumb_img;
 		c_string m_thumb_disable_img;
 		c_string m_stencil_img;
@@ -56,6 +59,8 @@ namespace o2d{
 		void set_position(s32 pos_);
 		void set_bg_image(const c_string& name_);
 		void set_bg_fragment(const c_float2& anc_, const c_float2& dim_);
+		void set_disable_image(const c_string& name_);
+		void set_dis_fragment(const c_float2& anc_, const c_float2& dim_);
 		void set_thumb_image(const c_string& img_);
 		void set_thumb_disable_image(const c_string& img_);
 		void set_thumb_size(const c_float2& sz_);

@@ -1263,9 +1263,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 					blTechSampler(_PrSpriteMem->nSpriteTech, "Texture0", _layertex, 0);
 					BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 					BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-					BLAnsi _buf[32] = { 0 };
-					sprintf(_buf, "@#tilelayer_%d#@", _idx);
-					BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)_buf), BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _geomem, _tilenum * 48 * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
+					BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _geomem, _tilenum * 48 * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
 					blDraw(_PrSpriteMem->nSpriteTech, _geo, 1);
 					blDeleteGeometryBuffer(_geo);
 				}

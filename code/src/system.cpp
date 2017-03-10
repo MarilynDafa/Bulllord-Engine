@@ -328,7 +328,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 			else
 				SetCursor(LoadCursorA(NULL, IDC_ARROW));
 		}
-        blInvokeEvent(BL_ET_MOUSE, _Lparam, BL_ME_MOVE, NULL);
+		blInvokeEvent(BL_ET_MOUSE, _Lparam, BL_ME_MOVE, NULL);
 		TRACKMOUSEEVENT _tme;
 		_tme.cbSize = sizeof(_tme);
 		_tme.dwFlags = TME_LEAVE;
@@ -3089,13 +3089,13 @@ BLVoid
 _SystemInit()
 {
 	_PrSystemMem->nSysTime = blSystemTicks();
+	_UtilsInit();
     _ShowWindow();
 #ifdef BL_PLATFORM_ANDROID
 	_StreamIOInit(_PrSystemMem->pActivity->assetManager);
 #else
 	_StreamIOInit(NULL);
 #endif
-    _UtilsInit();
     _AudioInit();
     _NetworkInit();
     _UIInit();
@@ -3161,9 +3161,9 @@ _SystemDestroy()
 	_UIDestroy();
     _NetworkDestroy();
     _AudioDestroy();
-    _UtilsDestroy();
 	_StreamIODestroy();
     _CloseWindow();
+	_UtilsDestroy();
     if (_PrSystemMem->pEvents)
         free(_PrSystemMem->pEvents);
 #if defined(BL_PLATFORM_UWP)

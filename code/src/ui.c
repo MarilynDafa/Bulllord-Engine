@@ -250,20 +250,26 @@ typedef struct _Widget {
 		struct _Slider {
 			BLAnsi aPixmap[128];
 			BLAnsi aCommonMap[128];
+			BLAnsi aDisableMap[128];
 			BLAnsi aSliderCommonMap[128];
 			BLAnsi aSliderDisableMap[128];
 			BLAnsi aStencilMap[128];
 			BLRect sCommonTex9;
 			BLRect sCommonTex;
+			BLRect sDisableTex9;
+			BLRect sDisableTex;
 			BLRect sSliderCommonTex;
 			BLRect sSliderDisableTex;
 			BLRect sStencilTex;
 			BLBool bHorizontal;
 			BLBool bSliderDragged;
+			BLBool bTrayClick;
+			BLBool bDragging;
 			BLS32 nMinValue;
 			BLS32 nMaxValue;
 			BLS32 nStep;
-			BLU32 nSliderPosition;
+			BLS32 nSliderPosition;
+			BLS32 nDesiredPos;
 			BLVec2 sSliderSize;
 			BLBool bFlipX;
 			BLBool bFlipY;
@@ -1062,6 +1068,17 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 				_src->uExtension.sSlider.sCommonTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
 				_src->uExtension.sSlider.sCommonTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
 			}
+			if (!strcmp(_tag, _src->uExtension.sSlider.aDisableMap))
+			{
+				_src->uExtension.sSlider.sDisableTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sSlider.sDisableTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sSlider.sDisableTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sSlider.sDisableTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sSlider.sDisableTex9.sLT.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sSlider.sDisableTex9.sLT.fY += (BLF32)(_lty + _rby) * 0.5f;
+				_src->uExtension.sSlider.sDisableTex9.sRB.fX += (BLF32)(_ltx + _rbx) * 0.5f;
+				_src->uExtension.sSlider.sDisableTex9.sRB.fY += (BLF32)(_lty + _rby) * 0.5f;
+			}
 			if (!strcmp(_tag, _src->uExtension.sSlider.aSliderCommonMap))
 			{
 				_src->uExtension.sSlider.sSliderCommonTex.sLT.fX = (BLF32)_ltx;
@@ -1303,10 +1320,13 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 		}
 		break;
 	case BL_UT_SLIDER:
-		_src->uExtension.sSlider.eTexFormat = _format;
-		_src->uExtension.sSlider.pTexData = _texdata;
-		_src->uExtension.sSlider.nTexWidth = _width;
-		_src->uExtension.sSlider.nTexHeight = _height;
+		{
+			_src->uExtension.sSlider.eTexFormat = _format;
+			_src->uExtension.sSlider.pTexData = _texdata;
+			_src->uExtension.sSlider.nTexWidth = _width;
+			_src->uExtension.sSlider.nTexHeight = _height;
+			_loadfont = FALSE;
+		}
 		break;
 	case BL_UT_TEXT:
 		_src->uExtension.sText.eTexFormat = _format;
@@ -1546,6 +1566,75 @@ _FrontWidget(_BLWidget* _Node)
 			_PrUIMem->bDirty = TRUE;
 			return;
 		}
+	}
+}
+static BLVoid
+_WidgetAbsArea(_BLWidget* _Node, BLRect* _Area)
+{
+	if (!_Node->pParent)
+		return;
+	else
+	{
+		_BLWidget* _tmp = _Node;
+		BLF32 _x = _Node->sPosition.fX;
+		BLF32 _y = _Node->sPosition.fY;
+		BLF32 _pw;
+		BLF32 _ph;
+		while (_tmp != _PrUIMem->pRoot)
+		{
+			_pw = _tmp->pParent->sDimension.fX > 0.f ? _tmp->pParent->sDimension.fX : _PrUIMem->nFboWidth;
+			_ph = _tmp->pParent->sDimension.fY > 0.f ? _tmp->pParent->sDimension.fY : _PrUIMem->nFboHeight;
+			if (_tmp->eReferenceH == BL_UA_LEFT && _tmp->eReferenceV == BL_UA_TOP)
+			{
+				_x = 0.0f * _pw + _x;
+				_y = 0.0f * _ph + _y;
+			}
+			else if (_tmp->eReferenceH == BL_UA_LEFT && _tmp->eReferenceV == BL_UA_VCENTER)
+			{
+				_x = 0.0f * _pw + _x;
+				_y = 0.5f * _ph + _y;
+			}
+			else if (_tmp->eReferenceH == BL_UA_LEFT && _tmp->eReferenceV == BL_UA_BOTTOM)
+			{
+				_x = 0.0f * _pw + _x;
+				_y = 1.0f * _ph + _y;
+			}
+			else if (_tmp->eReferenceH == BL_UA_HCENTER && _tmp->eReferenceV == BL_UA_TOP)
+			{
+				_x = 0.5f * _pw + _x;
+				_y = 0.0f * _ph + _y;
+			}
+			else if (_tmp->eReferenceH == BL_UA_HCENTER && _tmp->eReferenceV == BL_UA_VCENTER)
+			{
+				_x = 0.5f * _pw + _x;
+				_y = 0.5f * _ph + _y;
+			}
+			else if (_tmp->eReferenceH == BL_UA_HCENTER && _tmp->eReferenceV == BL_UA_BOTTOM)
+			{
+				_x = 0.5f * _pw + _x;
+				_y = 1.0f * _ph + _y;
+			}
+			else if (_tmp->eReferenceH == BL_UA_RIGHT && _tmp->eReferenceV == BL_UA_TOP)
+			{
+				_x = 1.0f * _pw + _x;
+				_y = 0.0f * _ph + _y;
+			}
+			else if (_tmp->eReferenceH == BL_UA_RIGHT && _tmp->eReferenceV == BL_UA_VCENTER)
+			{
+				_x = 1.0f * _pw + _x;
+				_y = 0.5f * _ph + _y;
+			}
+			else
+			{
+				_x = 1.0f * _pw + _x;
+				_y = 1.0f * _ph + _y;
+			}
+			_tmp = _tmp->pParent;
+		}
+		_Area->sLT.fX = _x - _Node->sDimension.fX * 0.5f;
+		_Area->sLT.fY = _y - _Node->sDimension.fY * 0.5f;
+		_Area->sRB.fX = _x + _Node->sDimension.fX * 0.5f;
+		_Area->sRB.fY = _y + _Node->sDimension.fY * 0.5f;
 	}
 }
 static BLVoid
@@ -1873,7 +1962,7 @@ _WriteText(const BLUtf8* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum _
 			};
 			_pt.fX += _gi->nAdv;
 			blTechSampler(_PrUIMem->nUITech, "Texture0", _gi->nTexture, 0);
-			BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#fontglyph#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+			BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
 			blDraw(_PrUIMem->nUITech, _geo, 1);
 			blDeleteGeometryBuffer(_geo);
 		}
@@ -1964,7 +2053,7 @@ _WriteText(const BLUtf8* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum _
 				};
 				_pt.fX += _gi->nAdv;
 				blTechSampler(_PrUIMem->nUITech, "Texture0", _gi->nTexture, 0);
-				BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#fontglyph#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+				BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
 				blDraw(_PrUIMem->nUITech, _geo, 1);
 				blDeleteGeometryBuffer(_geo);
 			}
@@ -2140,7 +2229,7 @@ _DrawButton(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
 		blDraw(_PrUIMem->nUITech, _geo, 1);
 		blDeleteGeometryBuffer(_geo);
 	}
@@ -2476,7 +2565,7 @@ _DrawButton(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
 		blDraw(_PrUIMem->nUITech, _geo, 1);
 		blDeleteGeometryBuffer(_geo);
 	}
@@ -2638,7 +2727,7 @@ _DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sCheck.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sCheck.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
 		blDraw(_PrUIMem->nUITech, _geo, 1);
 		blDeleteGeometryBuffer(_geo);
 	}
@@ -2974,7 +3063,7 @@ _DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sCheck.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sCheck.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
 		blDraw(_PrUIMem->nUITech, _geo, 1);
 		blDeleteGeometryBuffer(_geo);
 	}
@@ -2993,11 +3082,537 @@ _DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	if (_Node->uExtension.sCheck.bItalics)
 		_flag |= 0xF000;
 	_WriteText(_Node->uExtension.sCheck.pText, _Node->uExtension.sCheck.aFontSource, _Node->uExtension.sCheck.nFontHeight, _Node->uExtension.sCheck.eTxtAlignmentH, _Node->uExtension.sCheck.eTxtAlignmentV, FALSE, &_area, &_area, (_Node->uExtension.sCheck.nState == 0) ? _PrUIMem->nTextDisableColor : _Node->uExtension.sCheck.nTxtColor, _flag, FALSE);
-
 }
 static BLVoid
 _DrawSlider(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
+	if (!_Node->bValid || !_Node->bVisible)
+		return;
+	BLRect _scissorrect;
+	_WidgetScissorRect(_Node, &_scissorrect);
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sSlider.nPixmapTex, 0);
+	BLF32 _gray = 1.f;
+	BLF32 _offsetx = 0.f, _offsety = 0.f;
+	BLF32 _stencil = 1.f;
+	BLRect _texcoord, _texcoord9;
+	BLRect _texcoords, _texcoords9;
+	BLBool _flipx = _Node->uExtension.sSlider.bFlipX;
+	BLBool _flipy = _Node->uExtension.sSlider.bFlipY;
+	if (_Node->uExtension.sSlider.nState)
+	{
+		_texcoord = _Node->uExtension.sSlider.sCommonTex;
+		_texcoord9 = _Node->uExtension.sSlider.sCommonTex9;
+	}
+	else
+	{
+		if (_Node->uExtension.sSlider.aDisableMap[0] == 0 || !strcmp(_Node->uExtension.sSlider.aDisableMap, "Nil"))
+		{
+			_texcoord = _Node->uExtension.sSlider.sCommonTex;
+			_texcoord9 = _Node->uExtension.sSlider.sCommonTex9;
+			_gray = -1.f;
+		}
+		else
+		{
+			_texcoord = _Node->uExtension.sSlider.sDisableTex;
+			_texcoord9 = _Node->uExtension.sSlider.sDisableTex9;
+			_gray = 1.f;
+		}
+	}
+	if (_Node->uExtension.sSlider.aStencilMap[0] && strcmp(_Node->uExtension.sSlider.aStencilMap, "Nil"))
+	{
+		_stencil = -1.f;
+		_texcoords.sLT.fX = _Node->uExtension.sSlider.sStencilTex.sLT.fX / _Node->uExtension.sSlider.nTexWidth + 0.001f;
+		_texcoords.sLT.fY = _Node->uExtension.sSlider.sStencilTex.sLT.fY / _Node->uExtension.sSlider.nTexHeight + 0.001f;
+		_texcoords.sRB.fX = _Node->uExtension.sSlider.sStencilTex.sRB.fX / _Node->uExtension.sSlider.nTexWidth - 0.001f;
+		_texcoords.sRB.fY = _Node->uExtension.sSlider.sStencilTex.sRB.fY / _Node->uExtension.sSlider.nTexHeight - 0.001f;
+		BLF32 _oriw = _Node->uExtension.sSlider.sCommonTex.sRB.fX - _Node->uExtension.sSlider.sCommonTex.sLT.fX;
+		BLF32 _orih = _Node->uExtension.sSlider.sCommonTex.sRB.fY - _Node->uExtension.sSlider.sCommonTex.sLT.fY;
+		BLF32 _dstw = _Node->uExtension.sSlider.sStencilTex.sRB.fX - _Node->uExtension.sSlider.sStencilTex.sLT.fX;
+		BLF32 _dsth = _Node->uExtension.sSlider.sStencilTex.sRB.fX - _Node->uExtension.sSlider.sStencilTex.sLT.fX;
+		BLF32 _ratioax = (_Node->uExtension.sSlider.sCommonTex9.sLT.fX - _Node->uExtension.sSlider.sCommonTex.sLT.fX) / _oriw;
+		BLF32 _ratioay = (_Node->uExtension.sSlider.sCommonTex9.sLT.fY - _Node->uExtension.sSlider.sCommonTex.sLT.fY) / _orih;
+		BLF32 _rationx = (_Node->uExtension.sSlider.sCommonTex.sRB.fX - _Node->uExtension.sSlider.sCommonTex9.sRB.fX) / _oriw;
+		BLF32 _rationy = (_Node->uExtension.sSlider.sCommonTex.sRB.fY - _Node->uExtension.sSlider.sCommonTex9.sRB.fY) / _orih;
+		_texcoords9.sLT.fX = (_Node->uExtension.sSlider.sStencilTex.sLT.fX + _ratioax * _dstw) / _Node->uExtension.sSlider.nTexWidth;
+		_texcoords9.sLT.fY = (_Node->uExtension.sSlider.sStencilTex.sLT.fY + _ratioay * _dsth) / _Node->uExtension.sSlider.nTexHeight;
+		_texcoords9.sRB.fX = (_Node->uExtension.sSlider.sStencilTex.sRB.fX - _rationx * _dstw) / _Node->uExtension.sSlider.nTexWidth;
+		_texcoords9.sRB.fY = (_Node->uExtension.sSlider.sStencilTex.sRB.fY - _rationy * _dsth) / _Node->uExtension.sSlider.nTexHeight;
+	}
+	else
+	{
+		_texcoords.sLT.fX = 1.f;
+		_texcoords.sLT.fY = 1.f;
+		_texcoords.sRB.fX = 1.f;
+		_texcoords.sRB.fY = 1.f;
+		_texcoords9.sLT.fX = 1.f;
+		_texcoords9.sLT.fY = 1.f;
+		_texcoords9.sRB.fX = 1.f;
+		_texcoords9.sRB.fY = 1.f;
+	}
+	if (_RectApproximate(&_texcoord, &_texcoord9))
+	{
+		if (_flipx)
+		{
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
+			_tmp = _texcoords.sLT.fX;
+			_texcoords.sLT.fX = _texcoords.sRB.fX;
+			_texcoords.sRB.fX = _tmp;
+		}
+		if (_flipy)
+		{
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
+			_tmp = _texcoords.sLT.fY;
+			_texcoords.sLT.fY = _texcoords.sRB.fY;
+			_texcoords.sRB.fY = _tmp;
+		}
+		BLF32 _vbo[] = {
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight
+		};
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
+	else
+	{
+		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
+		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
+		BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
+		BLF32 _marginny = _texcoord.sRB.fY - _texcoord9.sRB.fY;
+		if (_flipx)
+		{
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
+			_tmp = _texcoords.sLT.fX;
+			_texcoords.sLT.fX = _texcoords.sRB.fX;
+			_texcoords.sRB.fX = _tmp;
+			_tmp = _texcoord9.sLT.fX;
+			_texcoord9.sLT.fX = _texcoord9.sRB.fX;
+			_texcoord9.sRB.fX = _tmp;
+			_tmp = _texcoords9.sLT.fX;
+			_texcoords9.sLT.fX = _texcoords9.sRB.fX;
+			_texcoords9.sRB.fX = _tmp;
+			_tmp = _marginax;
+			_marginax = _marginnx;
+			_marginnx = _tmp;
+		}
+		if (_flipy)
+		{
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
+			_tmp = _texcoords.sLT.fY;
+			_texcoords.sLT.fY = _texcoords.sRB.fY;
+			_texcoords.sRB.fY = _tmp;
+			_tmp = _texcoord9.sLT.fY;
+			_texcoord9.sLT.fY = _texcoord9.sRB.fY;
+			_texcoord9.sRB.fY = _tmp;
+			_tmp = _texcoords9.sLT.fY;
+			_texcoords9.sLT.fY = _texcoords9.sRB.fY;
+			_texcoords9.sRB.fY = _tmp;
+			_tmp = _marginay;
+			_marginay = _marginny;
+			_marginny = _tmp;
+		}
+		BLF32 _vob[] = {
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight
+		};
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
+	if (_Node->uExtension.sSlider.nState)
+	{
+		_texcoord = _Node->uExtension.sSlider.sSliderCommonTex;
+		_gray = 1.f;
+	}
+	else
+	{
+		if (_Node->uExtension.sSlider.aSliderDisableMap[0] == 0 || !strcmp(_Node->uExtension.sSlider.aSliderDisableMap, "Nil"))
+		{
+			_texcoord = _Node->uExtension.sSlider.sSliderCommonTex;
+			_gray = -1.f;
+		}
+		else
+		{
+			_texcoord = _Node->uExtension.sSlider.sSliderDisableTex;
+			_gray = 1.f;
+		}
+	}
+	BLF32 _perc = (BLF32)_Node->uExtension.sSlider.nSliderPosition / (BLF32)(_Node->uExtension.sSlider.nMaxValue - _Node->uExtension.sSlider.nMinValue);
+	BLF32 _sx, _sy;
+	if (_Node->uExtension.sSlider.bHorizontal)
+	{
+		_sx = _X - _Width * 0.5f + _Node->uExtension.sSlider.sSliderSize.fX * 0.5f + (_Width - _Node->uExtension.sSlider.sSliderSize.fX) * _perc;
+		_sy = _Y;
+	}
+	else
+	{
+		_sx = _X;
+		_sy = _Y + _Height * 0.5f - _Node->uExtension.sSlider.sSliderSize.fY * 0.5f - (_Height - _Node->uExtension.sSlider.sSliderSize.fY) * _perc;
+	}
+	BLF32 _vbo[] = {
+		PIXEL_ALIGNED_INTERNAL(_sx - _Node->uExtension.sSlider.sSliderSize.fX * 0.5f),
+		PIXEL_ALIGNED_INTERNAL(_sy - _Node->uExtension.sSlider.sSliderSize.fY * 0.5f),
+		1.f,
+		1.f,
+		1.f,
+		1.f * _gray,
+		_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+		_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+		PIXEL_ALIGNED_INTERNAL(_sx + _Node->uExtension.sSlider.sSliderSize.fX * 0.5f),
+		PIXEL_ALIGNED_INTERNAL(_sy - _Node->uExtension.sSlider.sSliderSize.fY * 0.5f),
+		1.f,
+		1.f,
+		1.f,
+		1.f * _gray,
+		_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+		_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+		PIXEL_ALIGNED_INTERNAL(_sx - _Node->uExtension.sSlider.sSliderSize.fX * 0.5f),
+		PIXEL_ALIGNED_INTERNAL(_sy + _Node->uExtension.sSlider.sSliderSize.fY * 0.5f),
+		1.f,
+		1.f,
+		1.f,
+		1.f * _gray,
+		_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
+		_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+		PIXEL_ALIGNED_INTERNAL(_sx + _Node->uExtension.sSlider.sSliderSize.fX * 0.5f),
+		PIXEL_ALIGNED_INTERNAL(_sy + _Node->uExtension.sSlider.sSliderSize.fY *0.5f),
+		1.f,
+		1.f,
+		1.f,
+		1.f * _gray,
+		_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
+		_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight
+	};
+	BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+	blDraw(_PrUIMem->nUITech, _geo, 1);
+	blDeleteGeometryBuffer(_geo);
 }
 static BLVoid
 _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
@@ -3108,7 +3723,7 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
 		blDraw(_PrUIMem->nUITech, _geo, 1);
 		blDeleteGeometryBuffer(_geo);
 	}
@@ -3444,7 +4059,7 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
 		blDraw(_PrUIMem->nUITech, _geo, 1);
 		blDeleteGeometryBuffer(_geo);
 	}
@@ -3489,7 +4104,7 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
 		_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight
 	};
-	BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+	BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
 	blDraw(_PrUIMem->nUITech, _geo, 1);
 	blDeleteGeometryBuffer(_geo);
 	BLRect _area;
@@ -3507,7 +4122,6 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	if (_Node->uExtension.sProgress.bItalics)
 		_flag |= 0xF000;
 	_WriteText(_Node->uExtension.sProgress.pText, _Node->uExtension.sProgress.aFontSource, _Node->uExtension.sProgress.nFontHeight, BL_UA_HCENTER, BL_UA_VCENTER, FALSE, &_area, &_area, _Node->uExtension.sProgress.nTxtColor, _flag, FALSE);
-
 }
 static BLVoid
 _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
@@ -3726,7 +4340,7 @@ _DrawPrimitive(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height
 			_ib[_fillcount++] = (_vtxinneridx + (_idx1 << 1));
 		}
 	}
-	BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _vb, _vtxcount * 8 * sizeof(BLF32), _ib, _idxcount * sizeof(BLU32), BL_IF_32);
+	BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _vb, _vtxcount * 8 * sizeof(BLF32), _ib, _idxcount * sizeof(BLU32), BL_IF_32);
 	blDraw(_PrUIMem->nUITech, _geo, 1);
 	blDeleteGeometryBuffer(_geo);
 }
@@ -3856,8 +4470,10 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 		BLU32 _oriw, _orih, _aw, _ah;
 		BLF32 _rx, _ry;
 		blGetWindowSize(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
-		BLF32 _x = (BLF32)LOWU16(_UParam) / _rx;
+		BLF32 _x = (BLF32)LOWU16(_UParam) / _rx;		
 		BLF32 _y = (BLF32)HIGU16(_UParam) / _ry;
+		_x = (_x > 10 * _oriw) ? 0.f : _x;
+		_y = (_y > 10 * _orih) ? 0.f : _y;
 		_PrUIMem->pHoveredWidget = _LocateWidget(_PrUIMem->pRoot, _x, _y, 0.f, 0.f);
 		if (_PrUIMem->pHoveredWidget != _lasthovered)
 		{
@@ -3891,6 +4507,69 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				_wid = _wid->pParent;
 			switch (_wid->eType)
 			{
+			case BL_UT_SLIDER:
+				{
+					if (_wid->uExtension.sSlider.nState && _wid->uExtension.sSlider.bDragging)
+					{
+						BLVec2 _pos;
+						_pos.fX = _x;
+						_pos.fY = _y;
+						BLF32 _w, _p;
+						BLRect _area;
+						BLRect _sarea;
+						_WidgetAbsArea(_wid, &_area);
+						_WidgetScissorRect(_wid, &_sarea);
+						BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+						if (_wid->uExtension.sSlider.bHorizontal)
+						{
+							_w = _area.sRB.fX - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX;
+							_p = _x - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+						}
+						else
+						{
+							_w = _area.sRB.fY - _area.sLT.fY - _wid->uExtension.sSlider.sSliderSize.fY;
+							_p = -_y + _area.sRB.fY - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+						}
+						BLS32 _newp = (BLS32)(_p / _w * (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue)) + _wid->uExtension.sSlider.nMinValue;
+						BLS32 _oldp = _wid->uExtension.sSlider.nSliderPosition;
+						if (!_wid->uExtension.sSlider.bSliderDragged)
+						{
+							if (blRectContains(&_drawarea, &_pos))
+							{
+								BLRect _thumb;
+								BLF32 _perc = (BLF32)_wid->uExtension.sSlider.nSliderPosition / (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue);
+								if (_wid->uExtension.sSlider.bHorizontal)
+								{
+									_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - (_area.sRB.fX - _area.sLT.fX) * 0.5f + ((_area.sRB.fX - _area.sLT.fX) - _wid->uExtension.sSlider.sSliderSize.fX) * _perc;
+									_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+									_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+									_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
+								}
+								else
+								{
+									_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+									_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f + (_area.sRB.fY - _area.sLT.fY) * 0.5f - ((_area.sRB.fY - _area.sLT.fY) - _wid->uExtension.sSlider.sSliderSize.fY) * _perc - _wid->uExtension.sSlider.sSliderSize.fY;
+									_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+									_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
+								}
+								_wid->uExtension.sSlider.bSliderDragged = blRectContains(&_thumb, &_pos);
+								_wid->uExtension.sSlider.bTrayClick = !_wid->uExtension.sSlider.bSliderDragged;
+							}
+							if (_wid->uExtension.sSlider.bSliderDragged)
+								blUISliderSliderPos(_wid->nID, _newp);
+							else
+							{
+								_wid->uExtension.sSlider.bTrayClick = FALSE;
+								break;
+							}
+							_wid->uExtension.sSlider.nDesiredPos = _newp;
+						}
+						else
+							blUISliderSliderPos(_wid->nID, _newp);
+						_PrUIMem->bDirty = TRUE;
+					}
+				}
+				break;
 			default:break;
 			}
 		}
@@ -3901,18 +4580,83 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				_wid = _wid->pParent;
 			switch (_wid->eType)
 			{
+			case BL_UT_SLIDER:
+				{
+					if (_wid->uExtension.sSlider.nState && _wid->uExtension.sSlider.bDragging)
+					{
+						BLVec2 _pos;
+						_pos.fX = _x;
+						_pos.fY = _y;
+						BLF32 _w, _p;
+						BLRect _area;
+						BLRect _sarea;
+						_WidgetAbsArea(_wid, &_area);
+						_WidgetScissorRect(_wid, &_sarea);
+						BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+						if (_wid->uExtension.sSlider.bHorizontal)
+						{
+							_w = _area.sRB.fX - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX;
+							_p = _x - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+						}
+						else
+						{
+							_w = _area.sRB.fY - _area.sLT.fY - _wid->uExtension.sSlider.sSliderSize.fY;
+							_p = -_y + _area.sRB.fY - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+						}
+						BLS32 _newp = (BLS32)(_p / _w * (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue)) + _wid->uExtension.sSlider.nMinValue;
+						BLS32 _oldp = _wid->uExtension.sSlider.nSliderPosition;
+						if (!_wid->uExtension.sSlider.bSliderDragged)
+						{
+							if (blRectContains(&_drawarea, &_pos))
+							{
+								BLRect _thumb;
+								BLF32 _perc = (BLF32)_wid->uExtension.sSlider.nSliderPosition / (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue);
+								if (_wid->uExtension.sSlider.bHorizontal)
+								{
+									_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - (_area.sRB.fX - _area.sLT.fX) * 0.5f + ((_area.sRB.fX - _area.sLT.fX) - _wid->uExtension.sSlider.sSliderSize.fX) * _perc;
+									_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+									_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+									_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
+								}
+								else
+								{
+									_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+									_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f + (_area.sRB.fY - _area.sLT.fY) * 0.5f - ((_area.sRB.fY - _area.sLT.fY) - _wid->uExtension.sSlider.sSliderSize.fY) * _perc - _wid->uExtension.sSlider.sSliderSize.fY;
+									_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+									_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
+								}
+								_wid->uExtension.sSlider.bSliderDragged = blRectContains(&_thumb, &_pos);
+								_wid->uExtension.sSlider.bTrayClick = !_wid->uExtension.sSlider.bSliderDragged;
+							}
+							if (_wid->uExtension.sSlider.bSliderDragged)
+								blUISliderSliderPos(_wid->nID, _newp);
+							else
+							{
+								_wid->uExtension.sSlider.bTrayClick = FALSE;
+								break;
+							}
+							_wid->uExtension.sSlider.nDesiredPos = _newp;
+						}
+						else
+							blUISliderSliderPos(_wid->nID, _newp);
+						_PrUIMem->bDirty = TRUE;
+					}
+				}
+				break;
 			default:break;
 			}
 		}
 	}
 	else if (_Type == BL_ME_LDOWN || _Type == BL_ME_RDOWN)
 	{
-		_BLWidget* _lasthovered = _PrUIMem->pHoveredWidget;
 		BLU32 _oriw, _orih, _aw, _ah;
 		BLF32 _rx, _ry;
 		blGetWindowSize(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
 		BLF32 _x = (BLF32)LOWU16(_UParam) / _rx;
 		BLF32 _y = (BLF32)HIGU16(_UParam) / _ry;
+		_x = (_x > 10 * _oriw) ? 0.f : _x;
+		_y = (_y > 10 * _orih) ? 0.f : _y;
+		_BLWidget* _lasthovered = _PrUIMem->pHoveredWidget;
 		_PrUIMem->pHoveredWidget = _LocateWidget(_PrUIMem->pRoot, _x, _y, 0.f, 0.f);
 		if (_PrUIMem->pHoveredWidget != _lasthovered)
 		{
@@ -3947,11 +4691,15 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					_PrUIMem->pHoveredWidget = NULL;
 				if (_PrUIMem->pFocusWidget)
 				{
+					if (_PrUIMem->pFocusWidget->eType == BL_UT_SLIDER)
+						_PrUIMem->pFocusWidget->uExtension.sSlider.bDragging = FALSE;
 					//lost focs;_PrUIMem->pFocusWidget
+					//Panel
 				}
 				if (_PrUIMem->pHoveredWidget)
 				{
 					//gain focus;_PrUIMem->pHoveredWidget
+					//Panel
 				}
 				_PrUIMem->pFocusWidget = _PrUIMem->pHoveredWidget;
 			}
@@ -3971,6 +4719,53 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
+			case BL_UT_SLIDER:
+				if (_wid->uExtension.sSlider.nState)
+				{
+					BLVec2 _pos;
+					_pos.fX = _x;
+					_pos.fY = _y;
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					if (blRectContains(&_drawarea, &_pos))
+					{
+						_wid->uExtension.sSlider.bDragging = TRUE;
+						BLRect _thumb;
+						BLF32 _perc = (BLF32)_wid->uExtension.sSlider.nSliderPosition / (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue);
+						if (_wid->uExtension.sSlider.bHorizontal)
+						{
+							_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - (_area.sRB.fX - _area.sLT.fX) * 0.5f + ((_area.sRB.fX - _area.sLT.fX) - _wid->uExtension.sSlider.sSliderSize.fX) * _perc;
+							_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+							_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+							_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
+						}
+						else
+						{
+							_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+							_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f + (_area.sRB.fY - _area.sLT.fY) * 0.5f - ((_area.sRB.fY - _area.sLT.fY) - _wid->uExtension.sSlider.sSliderSize.fY) * _perc - _wid->uExtension.sSlider.sSliderSize.fY;
+							_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+							_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
+						}
+						_wid->uExtension.sSlider.bSliderDragged = blRectContains(&_thumb, &_pos);
+						_wid->uExtension.sSlider.bTrayClick = !_wid->uExtension.sSlider.bSliderDragged;
+						BLF32 _w, _p;
+						if (_wid->uExtension.sSlider.bHorizontal)
+						{
+							_w = _area.sRB.fX - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX;
+							_p = _x - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+						}
+						else
+						{
+							_w = _area.sRB.fY - _area.sLT.fY - _wid->uExtension.sSlider.sSliderSize.fY;
+							_p = - _y + _area.sRB.fY - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+						}
+						_wid->uExtension.sSlider.nDesiredPos = (BLS32)(_p / _w * (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue)) + _wid->uExtension.sSlider.nMinValue;
+					}
+				}
+				break;
 			default:break;
 			}
 		}
@@ -3988,12 +4783,67 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
+			case BL_UT_SLIDER:
+				break;
+				if (_wid->uExtension.sSlider.nState)
+				{
+					BLVec2 _pos;
+					_pos.fX = _x;
+					_pos.fY = _y;
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					if (blRectContains(&_drawarea, &_pos))
+					{
+						_wid->uExtension.sSlider.bDragging = TRUE;
+						BLRect _thumb;
+						BLF32 _perc = (BLF32)_wid->uExtension.sSlider.nSliderPosition / (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue);
+						if (_wid->uExtension.sSlider.bHorizontal)
+						{
+							_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - (_area.sRB.fX - _area.sLT.fX) * 0.5f + ((_area.sRB.fX - _area.sLT.fX) - _wid->uExtension.sSlider.sSliderSize.fX) * _perc;
+							_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+							_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+							_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
+						}
+						else
+						{
+							_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+							_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f + (_area.sRB.fY - _area.sLT.fY) * 0.5f - ((_area.sRB.fY - _area.sLT.fY) - _wid->uExtension.sSlider.sSliderSize.fY) * _perc - _wid->uExtension.sSlider.sSliderSize.fY;
+							_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+							_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
+						}
+						_wid->uExtension.sSlider.bSliderDragged = blRectContains(&_thumb, &_pos);
+						_wid->uExtension.sSlider.bTrayClick = !_wid->uExtension.sSlider.bSliderDragged;
+						BLF32 _w, _p;
+						if (_wid->uExtension.sSlider.bHorizontal)
+						{
+							_w = _area.sRB.fX - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX;
+							_p = _x - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+						}
+						else
+						{
+							_w = _area.sRB.fY - _area.sLT.fY - _wid->uExtension.sSlider.sSliderSize.fY;
+							_p = -_y + _area.sRB.fY - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+						}
+						_wid->uExtension.sSlider.nDesiredPos = (BLS32)(_p / _w * (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue)) + _wid->uExtension.sSlider.nMinValue;
+					}
+				}
+				break;
 			default:break;
 			}
 		}
 	}
 	else if (_Type == BL_ME_LUP || _Type == BL_ME_RUP)
 	{
+		BLU32 _oriw, _orih, _aw, _ah;
+		BLF32 _rx, _ry;
+		blGetWindowSize(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
+		BLF32 _x = (BLF32)LOWU16(_UParam) / _rx;
+		BLF32 _y = (BLF32)HIGU16(_UParam) / _ry;
+		_x = (_x > 10 * _oriw) ? 0.f : _x;
+		_y = (_y > 10 * _orih) ? 0.f : _y;
 		_BLWidget* _lastfocus = _PrUIMem->pFocusWidget;
 		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
 		{
@@ -4015,6 +4865,21 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					_wid->uExtension.sCheck.nState = 3 - _wid->uExtension.sCheck.nState;
 					_PrUIMem->bDirty = TRUE;
 				}
+			case BL_UT_SLIDER:
+				if (_wid->uExtension.sSlider.nState)
+				{
+					if (_wid->uExtension.sSlider.bTrayClick)
+					{
+						if (_wid->uExtension.sSlider.nDesiredPos >= _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep)
+							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep);
+						else if (_wid->uExtension.sSlider.nDesiredPos <= _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep)
+							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep);
+						else if (_wid->uExtension.sSlider.nDesiredPos >= _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep && _wid->uExtension.sSlider.nDesiredPos <= _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep)
+							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nDesiredPos);
+					}
+					_wid->uExtension.sSlider.bDragging = FALSE;
+					_PrUIMem->bDirty = TRUE;
+				}
 				break;
 			default:break;
 			}
@@ -4037,6 +4902,22 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				if (_wid->uExtension.sCheck.nState)
 				{
 					_wid->uExtension.sCheck.nState = 3 - _wid->uExtension.sCheck.nState;
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
+			case BL_UT_SLIDER:
+				if (_wid->uExtension.sSlider.nState)
+				{
+					if (_wid->uExtension.sSlider.bTrayClick)
+					{
+						if (_wid->uExtension.sSlider.nDesiredPos >= _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep)
+							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep);
+						else if (_wid->uExtension.sSlider.nDesiredPos <= _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep)
+							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep);
+						else if (_wid->uExtension.sSlider.nDesiredPos >= _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep && _wid->uExtension.sSlider.nDesiredPos <= _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep)
+							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nDesiredPos);
+					}
+					_wid->uExtension.sSlider.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -4278,6 +5159,11 @@ blUIFile(IN BLAnsi* _Filename)
 #endif
     strcat(_path, _Filename);
     BLGuid _layout = blGenStream(_path, _PrUIMem->aArchive[0] ? _PrUIMem->aArchive : NULL);
+	if (_layout == INVALID_GUID)
+	{
+		blDebugOutput("load ui layout failed>%s", _Filename);
+		return;
+	}
     ezxml_t _doc = ezxml_parse_str(blStreamData(_layout), blStreamLength(_layout));
     ezxml_t _element = ezxml_child(_doc, "Element");
     BLU32 _idx = 0;
@@ -4745,10 +5631,10 @@ blUIFile(IN BLAnsi* _Filename)
             _slidersizevar[0] = (BLU32)strtoul(_tmp, NULL, 10);
             _slidersizevar[1] = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
             const BLAnsi* _range = ezxml_attr(_element, "Range");
-            BLF32 _rangevar[2];
+            BLU32 _rangevar[2];
             _tmp = strtok((BLAnsi*)_range, ",");
-            _rangevar[0] = (BLF32)strtod(_tmp, NULL);
-            _rangevar[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
+            _rangevar[0] = (BLU32)strtoul(_tmp, NULL, 10);
+            _rangevar[1] = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
             const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
             const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
             const BLAnsi* _commontex = ezxml_attr(_element, "CommonTexcoord");
@@ -4761,9 +5647,40 @@ blUIFile(IN BLAnsi* _Filename)
                 _tmp = strtok(NULL, ",");
                 _idx++;
             }
+			const BLAnsi* _disablemap = ezxml_attr(_element, "DisableMap");
+			const BLAnsi* _disabletexcoord = ezxml_attr(_element, "DisableTexcoord");
+			BLF32 _disabletexcoordvar[4];
+			_idx = 0;
+			_tmp = strtok((BLAnsi*)_disabletexcoord, ",");
+			while (_tmp)
+			{
+				_disabletexcoordvar[_idx] = (BLF32)strtod(_tmp, NULL);
+				_tmp = strtok(NULL, ",");
+				_idx++;
+			}
             const BLAnsi* _slidercommonmap = ezxml_attr(_element, "SliderCommonMap");
             const BLAnsi* _slidersisablemap = ezxml_attr(_element, "SliderDisableMap");
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _QueryWidget(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_SLIDER);
+			blUIReferencePoint(_widguid, _ha, _va);
+			blUISizePolicy(_widguid, _policyvar);
+			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
+			blUIScissor(_widguid, _clipedvar, _absvar);
+			blUITooltip(_widguid, (const BLUtf8*)_tooltip);
+			blUIPenetration(_widguid, _penetrationvar);
+			blUISliderFlip(_widguid, _flipxvar, _flipyvar);
+			blUISliderPixmap(_widguid, _pixmap);
+			blUISliderStencilMap(_widguid, _stencilmap);
+			blUISliderCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUISliderDisableMap(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
+			blUISliderSliderCommonMap(_widguid, _slidercommonmap);
+			blUISliderSliderDisableMap(_widguid, _slidersisablemap);
+			blUISliderHorizontal(_widguid, _orientationvar);
+			blUISliderSliderStep(_widguid, _sliderstepvar);
+			blUISliderSliderPos(_widguid, _sliderpositionvar);
+			blUISliderSliderSize(_widguid, _slidersizevar[0], _slidersizevar[1]);
+			blUISliderSliderRange(_widguid, _rangevar[0], _rangevar[1]);
+			blUISliderEnable(_widguid, _enablevar);
         }
         else if (!strcmp(_type, "Table"))
         {
@@ -4964,6 +5881,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 		{
 			memset(_widget->uExtension.sSlider.aPixmap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sSlider.aCommonMap, 0, sizeof(BLAnsi) * 128);
+			memset(_widget->uExtension.sSlider.aDisableMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sSlider.aSliderCommonMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sSlider.aSliderDisableMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sSlider.aStencilMap, 0, sizeof(BLAnsi) * 128);
@@ -4978,6 +5896,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sSlider.bFlipX = FALSE;
 			_widget->uExtension.sSlider.bFlipY = FALSE;
             _widget->uExtension.sSlider.nState = 1;
+			_widget->uExtension.sSlider.bDragging = FALSE;
             _widget->uExtension.sSlider.nPixmapTex = INVALID_GUID;
 		}
 		break;
@@ -6201,6 +7120,9 @@ blUISliderPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sSlider.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sSlider.aPixmap, _Pixmap);
+	BLAnsi _texfile[260] = { 0 };
+	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
+	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -6225,6 +7147,34 @@ blUISliderCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN 
 		return;
 	memset(_widget->uExtension.sSlider.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sSlider.aCommonMap, _CommonMap);
+	_widget->uExtension.sSlider.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sSlider.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sSlider.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sSlider.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sSlider.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sSlider.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sSlider.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sSlider.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUISliderDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_SLIDER)
+		return;
+	memset(_widget->uExtension.sSlider.aDisableMap, 0, sizeof(BLAnsi) * 128);
+	strcpy(_widget->uExtension.sSlider.aDisableMap, _DisableMap);
+	_widget->uExtension.sSlider.sDisableTex.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sSlider.sDisableTex.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sSlider.sDisableTex.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sSlider.sDisableTex.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sSlider.sDisableTex9.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sSlider.sDisableTex9.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sSlider.sDisableTex9.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sSlider.sDisableTex9.sRB.fY = _CenterY + _Height * 0.5f;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -6263,25 +7213,25 @@ blUISliderHorizontal(IN BLGuid _ID, IN BLBool _Horizontal)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUISliderSliderStep(IN BLGuid _ID, IN BLBool _Step)
+blUISliderSliderStep(IN BLGuid _ID, IN BLU32 _Step)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_SLIDER)
 		return;
-	_widget->uExtension.sSlider.nStep = _Step;
+	_widget->uExtension.sSlider.nStep = MIN_INTERNAL(_Step, (BLU32)(_widget->uExtension.sSlider.nMaxValue - _widget->uExtension.sSlider.nMinValue));
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUISliderSliderPos(IN BLGuid _ID, IN BLU32 _Pos)
+blUISliderSliderPos(IN BLGuid _ID, IN BLS32 _Pos)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_SLIDER)
 		return;
-	_widget->uExtension.sSlider.nSliderPosition = _Pos;
+	_widget->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_Pos, (BLF32)_widget->uExtension.sSlider.nMinValue, (BLF32)_widget->uExtension.sSlider.nMaxValue);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -6306,6 +7256,7 @@ blUISliderSliderRange(IN BLGuid _ID, IN BLU32 _MinValue, IN BLU32 _MaxValue)
 		return;
 	_widget->uExtension.sSlider.nMinValue = _MinValue;
 	_widget->uExtension.sSlider.nMaxValue = _MaxValue;
+	_widget->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_widget->uExtension.sSlider.nSliderPosition, (BLF32)_widget->uExtension.sSlider.nMinValue, (BLF32)_widget->uExtension.sSlider.nMaxValue);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -6330,6 +7281,16 @@ blUISliderEnable(IN BLGuid _ID, IN BLBool _Enable)
 		return;
 	_widget->uExtension.sSlider.nState = _Enable ? 1 : 0;
 	_PrUIMem->bDirty = TRUE;
+}
+BLU32
+blUIGetSliderPos(IN BLGuid _ID)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return 0;
+	if (_widget->eType != BL_UT_SLIDER)
+		return 0;
+	return _widget->uExtension.sSlider.nSliderPosition;
 }
 BLVoid
 blUITablePixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)

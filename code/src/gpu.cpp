@@ -4013,21 +4013,26 @@ blDeleteGeometryBuffer(IN BLGuid _GBO)
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
 	if (!_geo)
 		return;
-    blMutexLock(_PrGpuMem->pBufferCache->pMutex);
-    _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pBufferCache, URIPART_INTERNAL(_geo->nID));
-    if (_res)
-    {
-        _res->nRefCount--;
-        if (_res->nRefCount <= 0)
-        {
-            _discard = TRUE;
-			free(_res);
-            blDictErase(_PrGpuMem->pBufferCache, URIPART_INTERNAL(_geo->nID));
-        }
-    }
-    else
-        _discard = TRUE;
-    blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
+	if (URIPART_INTERNAL(_geo->nID) == 0xFFFFFFFF)
+		_discard = TRUE;
+	else
+	{
+		blMutexLock(_PrGpuMem->pBufferCache->pMutex);
+		_BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pBufferCache, URIPART_INTERNAL(_geo->nID));
+		if (_res)
+		{
+			_res->nRefCount--;
+			if (_res->nRefCount <= 0)
+			{
+				_discard = TRUE;
+				free(_res);
+				blDictErase(_PrGpuMem->pBufferCache, URIPART_INTERNAL(_geo->nID));
+			}
+		}
+		else
+			_discard = TRUE;
+		blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
+	}
     if (!_discard)
         return;
 #if defined(BL_GL_BACKEND)
@@ -4070,6 +4075,7 @@ blDeleteGeometryBuffer(IN BLGuid _GBO)
     }
 #endif
 	free(_geo);
+	blDeleteGuid(_GBO);
 }
 BLGuid
 blGainGeometryBuffer(IN BLU32 _Hash)

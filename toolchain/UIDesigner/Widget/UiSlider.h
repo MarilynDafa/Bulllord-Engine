@@ -19,6 +19,7 @@ class UiSlider : public UiWidget
 	Q_PROPERTY(SkinFile Pixmap READ getSkinFile WRITE setSkinFile)
 	Q_PROPERTY(SkinImageEx CommonMap READ getBackImg WRITE setBackImg)
 	Q_PROPERTY(SkinImage StencilMap READ getStencil WRITE setStencil)
+	Q_PROPERTY(SkinImageEx DisableMap READ getDisableImage WRITE setDisableImage)
 	Q_PROPERTY(SkinImage SliderCommonMap READ getThumbImg WRITE setThumbImg)
 	Q_PROPERTY(SkinImage SliderDisableMap READ getThumbDisableImg WRITE setThumbDisableImg)
 public:
@@ -28,6 +29,8 @@ public:
 	void setHorizontal(ROrientation horizontal);
 	SkinImageEx getBackImg() const;
 	void setBackImg(const SkinImageEx &image);
+	SkinImageEx getDisableImage() const;
+	void setDisableImage(const SkinImageEx &image);
 	SkinImage getThumbImg() const;
 	void setThumbImg(const SkinImage &image);
 	SkinImage getThumbDisableImg() const;
@@ -58,6 +61,7 @@ protected Q_SLOTS:
 
 private:
 	SkinImageEx _backImage;
+	SkinImageEx _disableImage;
 	SkinImage _thumbImage;
 	SkinImage _thumbDisableImage;
 	SkinImage _stencilImg;

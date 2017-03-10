@@ -83,6 +83,45 @@ namespace o2d{
 		}
 	}
 	//--------------------------------------------------------
+	void c_slider::set_disable_image(const c_string& name_)
+	{
+		if (m_dis_img != name_)
+		{
+			m_dis_img = name_;
+			c_ui_manager::get_singleton_ptr()->set_dirty(true);
+		}
+	}
+	//--------------------------------------------------------
+	void c_slider::set_dis_fragment(const c_float2& anc_, const c_float2& dim_)
+	{
+		c_skin* sk = c_ui_manager::get_singleton_ptr()->get_skin(m_skinid);
+		f32 w = sk->get_skin_tex()->get_width();
+		f32 h = sk->get_skin_tex()->get_height();
+		if (sk)
+		{
+			const c_rect& tc = sk->get_texcoord(m_dis_img);
+			c_float2 midpt = (tc.lt_pt() + tc.rb_pt())*0.5f + anc_;
+			c_float2 lt = c_float2(midpt.x() - dim_.x()*0.5f, midpt.y() - dim_.y()*0.5f);
+			c_float2 rt = c_float2(midpt.x() + dim_.x()*0.5f, midpt.y() - dim_.y()*0.5f);
+			c_float2 lb = c_float2(midpt.x() - dim_.x()*0.5f, midpt.y() + dim_.y()*0.5f);
+			c_float2 rb = c_float2(midpt.x() + dim_.x()*0.5f, midpt.y() + dim_.y()*0.5f);
+			m_dimg_rect[UC_LT] = c_rect(tc.lt_pt().x() / w, tc.lt_pt().y() / h, lt.x() / w, lt.y() / h);
+			m_dimg_rect[UC_T] = c_rect(lt.x() / w, tc.lt_pt().y() / h, rt.x() / w, lt.y() / h);
+			m_dimg_rect[UC_RT] = c_rect(rt.x() / w, tc.lt_pt().y() / h, tc.rb_pt().x() / w, lt.y() / h);
+			m_dimg_rect[UC_L] = c_rect(tc.lt_pt().x() / w, lt.y() / h, lt.x() / w, lb.y() / h);
+			m_dimg_rect[UC_MID] = c_rect(lt.x() / w, lt.y() / h, rb.x() / w, rb.y() / h);
+			m_dimg_rect[UC_R] = c_rect(rt.x() / w, rt.y() / h, tc.rb_pt().x() / w, rb.y() / h);
+			m_dimg_rect[UC_LB] = c_rect(tc.lt_pt().x() / w, lb.y() / h, lb.x() / w, tc.rb_pt().y() / h);
+			m_dimg_rect[UC_B] = c_rect(lb.x() / w, lb.y() / h, rb.x() / w, tc.rb_pt().y() / h);
+			m_dimg_rect[UC_RB] = c_rect(rb.x() / w, rb.y() / h, tc.rb_pt().x() / w, tc.rb_pt().y() / h);
+			m_dimg_zoom_region.lt_pt() = m_absolute_rect.lt_pt() + lt - tc.lt_pt();
+			m_dimg_zoom_region.rb_pt() = m_absolute_rect.rb_pt() - tc.rb_pt() + rb;
+		}
+		else
+			LOG(LL_ERROR, "can not set skin fragment, because skin is not found");
+		c_ui_manager::get_singleton_ptr()->set_dirty(true);
+	}
+	//--------------------------------------------------------
 	void c_slider::set_stencil_image(const c_string& img_)
 	{
 		if (img_.get_length() == 0)
@@ -264,63 +303,127 @@ namespace o2d{
 		}
 		else
 		{
-			if (equal(m_absolute_rect.lt_pt(), m_bg_zoom_region.lt_pt()) && equal(m_bg_zoom_region.rb_pt(), m_absolute_rect.rb_pt()))
+			if (m_enable)
 			{
-				c_rect rc;
-				rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
-				rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
-				rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
-				rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
-				c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_MID], rc, m_clipping_rect, m_flipx, m_flipy);
+				if (equal(m_absolute_rect.lt_pt(), m_bg_zoom_region.lt_pt()) && equal(m_bg_zoom_region.rb_pt(), m_absolute_rect.rb_pt()))
+				{
+					c_rect rc;
+					rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
+					rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
+					rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
+					rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_MID], rc, m_clipping_rect, m_flipx, m_flipy);
+				}
+				else
+				{
+					c_rect rc;
+					rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
+					rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
+					rc.rb_pt().x() = m_bg_zoom_region.lt_pt().x();
+					rc.rb_pt().y() = m_bg_zoom_region.lt_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_LT], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_bg_zoom_region.lt_pt().x();
+					rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
+					rc.rb_pt().x() = m_bg_zoom_region.rb_pt().x();
+					rc.rb_pt().y() = m_bg_zoom_region.lt_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_T], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_bg_zoom_region.rb_pt().x();
+					rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
+					rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
+					rc.rb_pt().y() = m_bg_zoom_region.lt_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_RT], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
+					rc.lt_pt().y() = m_bg_zoom_region.lt_pt().y();
+					rc.rb_pt().x() = m_bg_zoom_region.lt_pt().x();
+					rc.rb_pt().y() = m_bg_zoom_region.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_L], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_bg_zoom_region.lt_pt().x();
+					rc.lt_pt().y() = m_bg_zoom_region.lt_pt().y();
+					rc.rb_pt().x() = m_bg_zoom_region.rb_pt().x();
+					rc.rb_pt().y() = m_bg_zoom_region.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_MID], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_bg_zoom_region.rb_pt().x();
+					rc.lt_pt().y() = m_bg_zoom_region.lt_pt().y();
+					rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
+					rc.rb_pt().y() = m_bg_zoom_region.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_R], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
+					rc.lt_pt().y() = m_bg_zoom_region.rb_pt().y();
+					rc.rb_pt().x() = m_bg_zoom_region.lt_pt().x();
+					rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_LB], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_bg_zoom_region.lt_pt().x();
+					rc.lt_pt().y() = m_bg_zoom_region.rb_pt().y();
+					rc.rb_pt().x() = m_bg_zoom_region.rb_pt().x();
+					rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_B], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_bg_zoom_region.rb_pt().x();
+					rc.lt_pt().y() = m_bg_zoom_region.rb_pt().y();
+					rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
+					rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_RB], rc, m_clipping_rect, m_flipx, m_flipy);
+				}
 			}
 			else
 			{
-				c_rect rc;
-				rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
-				rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
-				rc.rb_pt().x() = m_bg_zoom_region.lt_pt().x();
-				rc.rb_pt().y() = m_bg_zoom_region.lt_pt().y();
-				c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_LT], rc, m_clipping_rect, m_flipx, m_flipy);
-				rc.lt_pt().x() = m_bg_zoom_region.lt_pt().x();
-				rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
-				rc.rb_pt().x() = m_bg_zoom_region.rb_pt().x();
-				rc.rb_pt().y() = m_bg_zoom_region.lt_pt().y();
-				c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_T], rc, m_clipping_rect, m_flipx, m_flipy);
-				rc.lt_pt().x() = m_bg_zoom_region.rb_pt().x();
-				rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
-				rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
-				rc.rb_pt().y() = m_bg_zoom_region.lt_pt().y();
-				c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_RT], rc, m_clipping_rect, m_flipx, m_flipy);
-				rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
-				rc.lt_pt().y() = m_bg_zoom_region.lt_pt().y();
-				rc.rb_pt().x() = m_bg_zoom_region.lt_pt().x();
-				rc.rb_pt().y() = m_bg_zoom_region.rb_pt().y();
-				c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_L], rc, m_clipping_rect, m_flipx, m_flipy);
-				rc.lt_pt().x() = m_bg_zoom_region.lt_pt().x();
-				rc.lt_pt().y() = m_bg_zoom_region.lt_pt().y();
-				rc.rb_pt().x() = m_bg_zoom_region.rb_pt().x();
-				rc.rb_pt().y() = m_bg_zoom_region.rb_pt().y();
-				c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_MID], rc, m_clipping_rect, m_flipx, m_flipy);
-				rc.lt_pt().x() = m_bg_zoom_region.rb_pt().x();
-				rc.lt_pt().y() = m_bg_zoom_region.lt_pt().y();
-				rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
-				rc.rb_pt().y() = m_bg_zoom_region.rb_pt().y();
-				c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_R], rc, m_clipping_rect, m_flipx, m_flipy);
-				rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
-				rc.lt_pt().y() = m_bg_zoom_region.rb_pt().y();
-				rc.rb_pt().x() = m_bg_zoom_region.lt_pt().x();
-				rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
-				c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_LB], rc, m_clipping_rect, m_flipx, m_flipy);
-				rc.lt_pt().x() = m_bg_zoom_region.lt_pt().x();
-				rc.lt_pt().y() = m_bg_zoom_region.rb_pt().y();
-				rc.rb_pt().x() = m_bg_zoom_region.rb_pt().x();
-				rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
-				c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_B], rc, m_clipping_rect, m_flipx, m_flipy);
-				rc.lt_pt().x() = m_bg_zoom_region.rb_pt().x();
-				rc.lt_pt().y() = m_bg_zoom_region.rb_pt().y();
-				rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
-				rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
-				c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_bg_img, m_bg_rect[UC_RB], rc, m_clipping_rect, m_flipx, m_flipy);
+				if (equal(m_absolute_rect.lt_pt(), m_dimg_zoom_region.lt_pt()) && equal(m_dimg_zoom_region.rb_pt(), m_absolute_rect.rb_pt()))
+				{
+					c_rect rc;
+					rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
+					rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
+					rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
+					rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_dis_img, m_dimg_rect[UC_MID], rc, m_clipping_rect, m_flipx, m_flipy);
+				}
+				else
+				{
+					c_rect rc;
+					rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
+					rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
+					rc.rb_pt().x() = m_dimg_zoom_region.lt_pt().x();
+					rc.rb_pt().y() = m_dimg_zoom_region.lt_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_dis_img, m_dimg_rect[UC_LT], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_dimg_zoom_region.lt_pt().x();
+					rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
+					rc.rb_pt().x() = m_dimg_zoom_region.rb_pt().x();
+					rc.rb_pt().y() = m_dimg_zoom_region.lt_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_dis_img, m_dimg_rect[UC_T], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_dimg_zoom_region.rb_pt().x();
+					rc.lt_pt().y() = m_absolute_rect.lt_pt().y();
+					rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
+					rc.rb_pt().y() = m_dimg_zoom_region.lt_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_dis_img, m_dimg_rect[UC_RT], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
+					rc.lt_pt().y() = m_dimg_zoom_region.lt_pt().y();
+					rc.rb_pt().x() = m_dimg_zoom_region.lt_pt().x();
+					rc.rb_pt().y() = m_dimg_zoom_region.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_dis_img, m_dimg_rect[UC_L], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_dimg_zoom_region.lt_pt().x();
+					rc.lt_pt().y() = m_dimg_zoom_region.lt_pt().y();
+					rc.rb_pt().x() = m_dimg_zoom_region.rb_pt().x();
+					rc.rb_pt().y() = m_dimg_zoom_region.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_dis_img, m_dimg_rect[UC_MID], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_dimg_zoom_region.rb_pt().x();
+					rc.lt_pt().y() = m_dimg_zoom_region.lt_pt().y();
+					rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
+					rc.rb_pt().y() = m_dimg_zoom_region.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_dis_img, m_dimg_rect[UC_R], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_absolute_rect.lt_pt().x();
+					rc.lt_pt().y() = m_dimg_zoom_region.rb_pt().y();
+					rc.rb_pt().x() = m_dimg_zoom_region.lt_pt().x();
+					rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_dis_img, m_dimg_rect[UC_LB], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_dimg_zoom_region.lt_pt().x();
+					rc.lt_pt().y() = m_dimg_zoom_region.rb_pt().y();
+					rc.rb_pt().x() = m_dimg_zoom_region.rb_pt().x();
+					rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_dis_img, m_dimg_rect[UC_B], rc, m_clipping_rect, m_flipx, m_flipy);
+					rc.lt_pt().x() = m_dimg_zoom_region.rb_pt().x();
+					rc.lt_pt().y() = m_dimg_zoom_region.rb_pt().y();
+					rc.rb_pt().x() = m_absolute_rect.rb_pt().x();
+					rc.rb_pt().y() = m_absolute_rect.rb_pt().y();
+					c_ui_manager::get_singleton_ptr()->cache_batch(m_skinid, m_dis_img, m_dimg_rect[UC_RB], rc, m_clipping_rect, m_flipx, m_flipy);
+				}
 			}
 		}
 		c_rect r;
@@ -335,7 +438,7 @@ namespace o2d{
 		}
 		else
 		{
-			m_thumb_rect.lt_pt().y() = m_absolute_rect.lt_pt().y() + m_draw_pos;
+			m_thumb_rect.lt_pt().y() = m_absolute_rect.rb_pt().y() - m_thumb_size .y() - m_draw_pos;
 			m_thumb_rect.rb_pt().y() = m_thumb_rect.lt_pt().y() + m_thumb_size.y();
 			r = m_thumb_rect;
 			r.lt_pt().x() += (m_absolute_rect.width() - m_thumb_size.x())/2.f;

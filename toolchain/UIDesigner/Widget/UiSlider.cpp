@@ -35,6 +35,11 @@ QDomElement UiSlider::serialize( QDomDocument &doc, const QDomElement &extElemen
 	QSize sz = getBackImg().getSkinSet().getCenterSize().toSize();
 	QString region = QString("%1,%2,%3,%4").arg(pt.x()).arg(pt.y()).arg(sz.width()).arg(sz.height());
 	extEle.setAttribute("CommonTexcoord", region);
+	extEle.setAttribute("DisableMap", getDisableImage().getSkinName());
+	pt = getDisableImage().getSkinSet().getCenterPt().toPoint();
+	sz = getDisableImage().getSkinSet().getCenterSize().toSize();
+	region = QString("%1,%2,%3,%4").arg(pt.x()).arg(pt.y()).arg(sz.width()).arg(sz.height());
+	extEle.setAttribute("DisableTexcoord", region);
 	extEle.setAttribute("StencilMap", getStencil().getSkinName());
 	extEle.setAttribute("SliderCommonMap", getThumbImg().getSkinName());
 	extEle.setAttribute("SliderDisableMap", getThumbDisableImg().getSkinName());
@@ -77,6 +82,10 @@ void UiSlider::readExt( QXmlStreamReader &reader )
 
 	QString bImg = atts.value(QLatin1String("CommonMap")).toString();
 	QStringList bReg = atts.value(QLatin1String("CommonTexcoord")).toString().split(",");
+
+	QString dImg = atts.value(QLatin1String("DisableMap")).toString();
+	QStringList dRegion = atts.value(QLatin1String("DisableTexcoord")).toString().split(",");
+
 	QString thumbimage = atts.value(QLatin1String("SliderCommonMap")).toString();
 	QString thumbdimage = atts.value(QLatin1String("SliderDisableMap")).toString();
 	QStringList thumbsz = atts.value(QLatin1String("SliderSize")).toString().split(",");
@@ -97,6 +106,7 @@ void UiSlider::readExt( QXmlStreamReader &reader )
 	setBackImg(createSkinImage(bImg, bReg));
 	setThumbImg(createSkinImage(thumbimage));
 	setThumbDisableImg(createSkinImage(thumbdimage));
+	setDisableImage(createSkinImage(dImg, dRegion));
 
 	if(thumbsz.size() == 2)
 	{
@@ -196,7 +206,18 @@ void UiSlider::setBackImg( const SkinImageEx &image )
 	((c_slider*)_widget)->set_bg_fragment(c_float2(skinSet.getCenterPt().x() , skinSet.getCenterPt().y()) , 
 		c_float2(skinSet.getCenterSize().width() , skinSet.getCenterSize().height()));
 }
-
+SkinImageEx UiSlider::getDisableImage() const
+{
+	return _disableImage;
+}
+void UiSlider::setDisableImage(const SkinImageEx &image)
+{
+	SkinSet skinSet = image.getSkinSet();
+	_disableImage.setData(image);
+	((c_slider*)_widget)->set_disable_image(fromQString(_disableImage.getSkinName()));
+	((c_slider*)_widget)->set_dis_fragment(c_float2(skinSet.getCenterPt().x(), skinSet.getCenterPt().y()),
+		c_float2(skinSet.getCenterSize().width(), skinSet.getCenterSize().height()));
+}
 SkinImage UiSlider::getThumbImg() const
 {
 	assert(((c_slider*)_widget)->get_thumb_image() == fromQString(_thumbImage.getSkinName()));

@@ -196,6 +196,7 @@ _UtilsStep(BLU32 _Delta)
 BLVoid
 _UtilsDestroy()
 {
+	assert(_PrUtilsMem->sMemCache.nUsed == 0);
 	blDeleteMutex(_PrUtilsMem->pMutex);
 	free(_PrUtilsMem->sMemCache.pDense);
 	free(_PrUtilsMem->sMemCache.pSparse);

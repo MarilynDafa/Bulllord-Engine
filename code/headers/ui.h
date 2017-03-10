@@ -463,6 +463,14 @@ BL_API BLVoid blUISliderCommonMap(
 	IN BLF32 _Width,
 	IN BLF32 _Height);
 
+BL_API BLVoid blUISliderDisableMap(
+	IN BLGuid _ID,
+	IN BLAnsi* _DisableMap,
+	IN BLF32 _CenterX,
+	IN BLF32 _CenterY,
+	IN BLF32 _Width,
+	IN BLF32 _Height);
+
 BL_API BLVoid blUISliderSliderCommonMap(
 	IN BLGuid _ID,
 	IN BLAnsi* _SliderCommonMap);
@@ -477,11 +485,11 @@ BL_API BLVoid blUISliderHorizontal(
 
 BL_API BLVoid blUISliderSliderStep(
 	IN BLGuid _ID,
-	IN BLBool _Step);
+	IN BLU32 _Step);
 
 BL_API BLVoid blUISliderSliderPos(
 	IN BLGuid _ID,
-	IN BLU32 _Pos);
+	IN BLS32 _Pos);
 
 BL_API BLVoid blUISliderSliderSize(
 	IN BLGuid _ID,
@@ -501,6 +509,9 @@ BL_API BLVoid blUISliderFlip(
 BL_API BLVoid blUISliderEnable(
 	IN BLGuid _ID,
 	IN BLBool _Enable);
+
+BL_API BLU32 blUIGetSliderPos(
+	IN BLGuid _ID);
 
 BL_API BLVoid blUITablePixmap(
 	IN BLGuid _ID,
