@@ -229,7 +229,9 @@ typedef struct _Widget {
 			BLRect sCommonTex;
 			BLRect sFillTex;
 			BLRect sStencilTex;
-			BLU32 nFontHash;
+			BLU32 nBorderX;
+			BLU32 nBorderY;
+			BLAnsi aFontSource[32];
 			BLU32 nFontHeight;
 			BLBool bOutline;
 			BLBool bBold;
@@ -1283,20 +1285,22 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 		}
 		break;
 	case BL_UT_CHECK:
-		_src->uExtension.sCheck.eTexFormat = _format;
-		_src->uExtension.sCheck.pTexData = _texdata;
-		_src->uExtension.sCheck.nTexWidth = _width;
-		_src->uExtension.sCheck.nTexHeight = _height;
-		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
 		{
-			if (_iter->nHashName == blHashUtf8((const BLUtf8*)(_src->uExtension.sCheck.aFontSource)))
+			_src->uExtension.sCheck.eTexFormat = _format;
+			_src->uExtension.sCheck.pTexData = _texdata;
+			_src->uExtension.sCheck.nTexWidth = _width;
+			_src->uExtension.sCheck.nTexHeight = _height;
+			FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
 			{
-				_loadfont = FALSE;
-				break;
+				if (_iter->nHashName == blHashUtf8((const BLUtf8*)(_src->uExtension.sCheck.aFontSource)))
+				{
+					_loadfont = FALSE;
+					break;
+				}
 			}
+			sprintf(_texfilettf, "%s/font/%s.ttf", _PrUIMem->aDir, _src->uExtension.sCheck.aFontSource);
+			sprintf(_texfilettc, "%s/font/%s.ttc", _PrUIMem->aDir, _src->uExtension.sCheck.aFontSource);
 		}
-		sprintf(_texfilettf, "%s/font/%s.ttf", _PrUIMem->aDir, _src->uExtension.sCheck.aFontSource);
-		sprintf(_texfilettc, "%s/font/%s.ttc", _PrUIMem->aDir, _src->uExtension.sCheck.aFontSource);
 		break;
 	case BL_UT_SLIDER:
 		_src->uExtension.sSlider.eTexFormat = _format;
@@ -1311,10 +1315,22 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 		_src->uExtension.sText.nTexHeight = _height;
 		break;
 	case BL_UT_PROGRESS:
-		_src->uExtension.sProgress.eTexFormat = _format;
-		_src->uExtension.sProgress.pTexData = _texdata;
-		_src->uExtension.sProgress.nTexWidth = _width;
-		_src->uExtension.sProgress.nTexHeight = _height;
+		{
+			_src->uExtension.sProgress.eTexFormat = _format;
+			_src->uExtension.sProgress.pTexData = _texdata;
+			_src->uExtension.sProgress.nTexWidth = _width;
+			_src->uExtension.sProgress.nTexHeight = _height;
+			FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
+			{
+				if (_iter->nHashName == blHashUtf8((const BLUtf8*)(_src->uExtension.sProgress.aFontSource)))
+				{
+					_loadfont = FALSE;
+					break;
+				}
+			}
+			sprintf(_texfilettf, "%s/font/%s.ttf", _PrUIMem->aDir, _src->uExtension.sProgress.aFontSource);
+			sprintf(_texfilettc, "%s/font/%s.ttc", _PrUIMem->aDir, _src->uExtension.sProgress.aFontSource);
+		}
 		break;
 	case BL_UT_DIAL:
 		_src->uExtension.sDial.eTexFormat = _format;
@@ -2990,6 +3006,508 @@ _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 static BLVoid
 _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
+	if (!_Node->bValid || !_Node->bVisible)
+		return;
+	BLRect _scissorrect;
+	_WidgetScissorRect(_Node, &_scissorrect);
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sProgress.nPixmapTex, 0);
+	BLF32 _gray = 1.f;
+	BLF32 _offsetx = 0.f, _offsety = 0.f;
+	BLF32 _stencil = 1.f;
+	BLRect _texcoord, _texcoord9;
+	BLRect _texcoords, _texcoords9;
+	BLBool _flipx = _Node->uExtension.sProgress.bFlipX;
+	BLBool _flipy = _Node->uExtension.sProgress.bFlipY;
+	_texcoord = _Node->uExtension.sProgress.sCommonTex;
+	_texcoord9 = _Node->uExtension.sProgress.sCommonTex9;
+	if (_Node->uExtension.sProgress.aStencilMap[0] && strcmp(_Node->uExtension.sProgress.aStencilMap, "Nil"))
+	{
+		_stencil = -1.f;
+		_texcoords.sLT.fX = _Node->uExtension.sProgress.sStencilTex.sLT.fX / _Node->uExtension.sProgress.nTexWidth + 0.001f;
+		_texcoords.sLT.fY = _Node->uExtension.sProgress.sStencilTex.sLT.fY / _Node->uExtension.sProgress.nTexHeight + 0.001f;
+		_texcoords.sRB.fX = _Node->uExtension.sProgress.sStencilTex.sRB.fX / _Node->uExtension.sProgress.nTexWidth - 0.001f;
+		_texcoords.sRB.fY = _Node->uExtension.sProgress.sStencilTex.sRB.fY / _Node->uExtension.sProgress.nTexHeight - 0.001f;
+		BLF32 _oriw = _Node->uExtension.sProgress.sCommonTex.sRB.fX - _Node->uExtension.sProgress.sCommonTex.sLT.fX;
+		BLF32 _orih = _Node->uExtension.sProgress.sCommonTex.sRB.fY - _Node->uExtension.sProgress.sCommonTex.sLT.fY;
+		BLF32 _dstw = _Node->uExtension.sProgress.sStencilTex.sRB.fX - _Node->uExtension.sProgress.sStencilTex.sLT.fX;
+		BLF32 _dsth = _Node->uExtension.sProgress.sStencilTex.sRB.fX - _Node->uExtension.sProgress.sStencilTex.sLT.fX;
+		BLF32 _ratioax = (_Node->uExtension.sProgress.sCommonTex9.sLT.fX - _Node->uExtension.sProgress.sCommonTex.sLT.fX) / _oriw;
+		BLF32 _ratioay = (_Node->uExtension.sProgress.sCommonTex9.sLT.fY - _Node->uExtension.sProgress.sCommonTex.sLT.fY) / _orih;
+		BLF32 _rationx = (_Node->uExtension.sProgress.sCommonTex.sRB.fX - _Node->uExtension.sProgress.sCommonTex9.sRB.fX) / _oriw;
+		BLF32 _rationy = (_Node->uExtension.sProgress.sCommonTex.sRB.fY - _Node->uExtension.sProgress.sCommonTex9.sRB.fY) / _orih;
+		_texcoords9.sLT.fX = (_Node->uExtension.sProgress.sStencilTex.sLT.fX + _ratioax * _dstw) / _Node->uExtension.sProgress.nTexWidth;
+		_texcoords9.sLT.fY = (_Node->uExtension.sProgress.sStencilTex.sLT.fY + _ratioay * _dsth) / _Node->uExtension.sProgress.nTexHeight;
+		_texcoords9.sRB.fX = (_Node->uExtension.sProgress.sStencilTex.sRB.fX - _rationx * _dstw) / _Node->uExtension.sProgress.nTexWidth;
+		_texcoords9.sRB.fY = (_Node->uExtension.sProgress.sStencilTex.sRB.fY - _rationy * _dsth) / _Node->uExtension.sProgress.nTexHeight;
+	}
+	else
+	{
+		_texcoords.sLT.fX = 1.f;
+		_texcoords.sLT.fY = 1.f;
+		_texcoords.sRB.fX = 1.f;
+		_texcoords.sRB.fY = 1.f;
+		_texcoords9.sLT.fX = 1.f;
+		_texcoords9.sLT.fY = 1.f;
+		_texcoords9.sRB.fX = 1.f;
+		_texcoords9.sRB.fY = 1.f;
+	}
+	if (_RectApproximate(&_texcoord, &_texcoord9))
+	{
+		if (_flipx)
+		{
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
+			_tmp = _texcoords.sLT.fX;
+			_texcoords.sLT.fX = _texcoords.sRB.fX;
+			_texcoords.sRB.fX = _tmp;
+		}
+		if (_flipy)
+		{
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
+			_tmp = _texcoords.sLT.fY;
+			_texcoords.sLT.fY = _texcoords.sRB.fY;
+			_texcoords.sRB.fY = _tmp;
+		}
+		BLF32 _vbo[] = {
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight
+		};
+		BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
+	else
+	{
+		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
+		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
+		BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
+		BLF32 _marginny = _texcoord.sRB.fY - _texcoord9.sRB.fY;
+		if (_flipx)
+		{
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
+			_tmp = _texcoords.sLT.fX;
+			_texcoords.sLT.fX = _texcoords.sRB.fX;
+			_texcoords.sRB.fX = _tmp;
+			_tmp = _texcoord9.sLT.fX;
+			_texcoord9.sLT.fX = _texcoord9.sRB.fX;
+			_texcoord9.sRB.fX = _tmp;
+			_tmp = _texcoords9.sLT.fX;
+			_texcoords9.sLT.fX = _texcoords9.sRB.fX;
+			_texcoords9.sRB.fX = _tmp;
+			_tmp = _marginax;
+			_marginax = _marginnx;
+			_marginnx = _tmp;
+		}
+		if (_flipy)
+		{
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
+			_tmp = _texcoords.sLT.fY;
+			_texcoords.sLT.fY = _texcoords.sRB.fY;
+			_texcoords.sRB.fY = _tmp;
+			_tmp = _texcoord9.sLT.fY;
+			_texcoord9.sLT.fY = _texcoord9.sRB.fY;
+			_texcoord9.sRB.fY = _tmp;
+			_tmp = _texcoords9.sLT.fY;
+			_texcoords9.sLT.fY = _texcoords9.sRB.fY;
+			_texcoords9.sRB.fY = _tmp;
+			_tmp = _marginay;
+			_marginay = _marginny;
+			_marginny = _tmp;
+		}
+		BLF32 _vob[] = {
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight
+		};
+		BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
+	_offsetx = (BLF32)_Node->uExtension.sProgress.nBorderX;
+	_offsety = (BLF32)_Node->uExtension.sProgress.nBorderY;
+	BLF32 _perc = (BLF32)_Node->uExtension.sProgress.nPercent / 100.f;
+	_texcoord = _Node->uExtension.sProgress.sFillTex;
+	BLF32 _fillw;
+	_fillw = _texcoord.sRB.fX - _texcoord.sLT.fX;
+	_texcoord.sRB.fX = _texcoord.sLT.fX + _fillw * _perc;
+	BLF32 _vbo[] = {
+		PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+		PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+		_texcoords.sLT.fX,
+		_texcoords.sLT.fY,
+		1.f * _stencil,
+		1.f * _gray,
+		_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+		_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+		PIXEL_ALIGNED_INTERNAL(_X + _Width * (_perc - 0.5f) - _offsetx),
+		PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+		_texcoords.sRB.fX,
+		_texcoords.sLT.fY,
+		1.f * _stencil,
+		1.f * _gray,
+		_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+		_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+		PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+		PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+		_texcoords.sLT.fX,
+		_texcoords.sRB.fY,
+		1.f * _stencil,
+		1.f * _gray,
+		_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
+		_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+		PIXEL_ALIGNED_INTERNAL(_X + _Width * (_perc - 0.5f) - _offsetx),
+		PIXEL_ALIGNED_INTERNAL(_Y + _Height *0.5f - _offsety),
+		_texcoords.sRB.fX,
+		_texcoords.sRB.fY,
+		1.f * _stencil,
+		1.f * _gray,
+		_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
+		_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight
+	};
+	BLGuid _geo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"@#widgetgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+	blDraw(_PrUIMem->nUITech, _geo, 1);
+	blDeleteGeometryBuffer(_geo);
+	BLRect _area;
+	_area.sLT.fX = _X - 0.5f * _Width;
+	_area.sLT.fY = _Y - 0.5f * _Height;
+	_area.sRB.fX = _X + 0.5f * _Width;
+	_area.sRB.fY = _Y + 0.5f * _Height;
+	BLU16 _flag = 0;
+	if (_Node->uExtension.sProgress.bOutline)
+		_flag |= 0x000F;
+	if (_Node->uExtension.sProgress.bBold)
+		_flag |= 0x00F0;
+	if (_Node->uExtension.sProgress.bShadow)
+		_flag |= 0x0F00;
+	if (_Node->uExtension.sProgress.bItalics)
+		_flag |= 0xF000;
+	_WriteText(_Node->uExtension.sProgress.pText, _Node->uExtension.sProgress.aFontSource, _Node->uExtension.sProgress.nFontHeight, BL_UA_HCENTER, BL_UA_VCENTER, FALSE, &_area, &_area, _Node->uExtension.sProgress.nTxtColor, _flag, FALSE);
+
 }
 static BLVoid
 _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
@@ -4157,10 +4675,10 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _percent = ezxml_attr(_element, "Percent");
             BLU32 _percentvar = (BLU32)strtoul(_percent, NULL, 10);
             const BLAnsi* _border = ezxml_attr(_element, "Border");
-            BLF32 _bordevarr[2];
+            BLU32 _bordevarr[2];
             _tmp = strtok((BLAnsi*)_border, ",");
-            _bordevarr[0] = (BLF32)strtod(_tmp, NULL);
-            _bordevarr[1] = (BLF32)strtod(strtok(NULL, ","), NULL);
+            _bordevarr[0] = (BLU32)strtoul(_tmp, NULL, 10);
+            _bordevarr[1] = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
             const BLAnsi* _text = ezxml_attr(_element, "Text");
             const BLAnsi* _fontsrc = ezxml_attr(_element, "FontSrc");
             const BLAnsi* _fontsize = ezxml_attr(_element, "FontSize");
@@ -4189,6 +4707,22 @@ blUIFile(IN BLAnsi* _Filename)
             }
             const BLAnsi* _fillmap = ezxml_attr(_element, "FillMap");
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _QueryWidget(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_PROGRESS);
+			blUIReferencePoint(_widguid, _ha, _va);
+			blUISizePolicy(_widguid, _policyvar);
+			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
+			blUIScissor(_widguid, _clipedvar, _absvar);
+			blUITooltip(_widguid, (const BLUtf8*)_tooltip);
+			blUIPenetration(_widguid, _penetrationvar);
+			blUIProgressFont(_widguid, _fontsrc, _fontsizevar, _fontoutlinevar, _fontboldvar, _fontshadowvar, _fontitalicsvar);
+			blUIProgressFlip(_widguid, _flipxvar, _flipyvar);
+			blUIProgressText(_widguid, (const BLUtf8*)_text, _textcolorvar);
+			blUIProgressPixmap(_widguid, _pixmap);
+			blUIProgressStencilMap(_widguid, _stencilmap);
+			blUIProgressCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUIProgressFillMap(_widguid, _fillmap);
+			blUIProgressPercent(_widguid, _percentvar);
+			blUIProgressBorder(_widguid, _bordevarr[0], _bordevarr[1]);
         }
         else if (!strcmp(_type, "Slider"))
         {
@@ -4492,7 +5026,8 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sProgress.aCommonMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sProgress.aStencilMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sProgress.aFillMap, 0, sizeof(BLAnsi) * 128);
-			_widget->uExtension.sProgress.nFontHash = 0xFFFFFFFF;
+			_widget->uExtension.sProgress.nBorderX = 0;
+			_widget->uExtension.sProgress.nBorderY = 0;
 			_widget->uExtension.sProgress.nFontHeight = 0;
 			_widget->uExtension.sProgress.bOutline = FALSE;
 			_widget->uExtension.sProgress.bBold = FALSE;
@@ -5322,6 +5857,16 @@ blUICheckEnable(IN BLGuid _ID, IN BLBool _Enable)
 	_widget->uExtension.sCheck.nState = _Enable ? 1 : 0;
 	_PrUIMem->bDirty = TRUE;
 }
+BLBool 
+blUIGetCheckState(IN BLGuid _ID)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return FALSE;
+	if (_widget->eType != BL_UT_CHECK)
+		return FALSE;
+	return (_widget->uExtension.sCheck.nState == 2) ? TRUE : FALSE;
+}
 BLVoid
 blUITextPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 {
@@ -5494,6 +6039,9 @@ blUIProgressPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sProgress.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sProgress.aPixmap, _Pixmap);
+	BLAnsi _texfile[260] = { 0 };
+	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
+	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -5518,6 +6066,14 @@ blUIProgressCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, I
 		return;
 	memset(_widget->uExtension.sProgress.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sProgress.aCommonMap, _CommonMap);
+	_widget->uExtension.sProgress.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sProgress.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sProgress.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sProgress.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sProgress.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sProgress.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sProgress.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sProgress.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -5540,7 +6096,19 @@ blUIProgressPercent(IN BLGuid _ID, IN BLU32 _Percent)
 		return;
 	if (_widget->eType != BL_UT_PROGRESS)
 		return;
-	_widget->uExtension.sProgress.nPercent = (BLU32)blScalarClamp((BLF32)_Percent, 0, 100);
+	_widget->uExtension.sProgress.nPercent = (BLU32)blScalarClamp((BLF32)_Percent, 0.f, 100.f);
+	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUIProgressBorder(IN BLGuid _ID, IN BLU32 _BorderX, IN BLU32 _BorderY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PROGRESS)
+		return;
+	_widget->uExtension.sProgress.nBorderX = _BorderX;
+	_widget->uExtension.sProgress.nBorderY = _BorderY;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -5552,6 +6120,8 @@ blUIProgressText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor)
 	if (_widget->eType != BL_UT_PROGRESS)
 		return;
 	BLU32 _strlen = blUtf8Length(_Text) + 1;
+	if (_widget->uExtension.sProgress.pText)
+		free(_widget->uExtension.sProgress.pText);
 	_widget->uExtension.sProgress.pText = (BLUtf8*)malloc(_strlen);
 	memset(_widget->uExtension.sProgress.pText, 0, _strlen);
 	strcpy((BLAnsi*)_widget->uExtension.sProgress.pText, (const BLAnsi*)_Text);
@@ -5566,12 +6136,37 @@ blUIProgressFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBoo
 		return;
 	if (_widget->eType != BL_UT_PROGRESS)
 		return;
-	_widget->uExtension.sProgress.nFontHash = blHashUtf8((const BLUtf8*)_Font);
+	memset(_widget->uExtension.sProgress.aFontSource, 0, sizeof(_widget->uExtension.sProgress.aFontSource));
+	strcpy(_widget->uExtension.sProgress.aFontSource, _Font);
 	_widget->uExtension.sProgress.nFontHeight = _FontHeight;
-	_widget->uExtension.sProgress.bOutline = _Outline;
-	_widget->uExtension.sProgress.bBold = _Bold;
-	_widget->uExtension.sProgress.bShadow = _Shadow;
-	_widget->uExtension.sProgress.bItalics = _Italics;
+	if (_Outline)
+	{
+		_widget->uExtension.sProgress.bOutline = _Outline;
+		_widget->uExtension.sProgress.bBold = FALSE;
+		_widget->uExtension.sProgress.bShadow = FALSE;
+		_widget->uExtension.sProgress.bItalics = _Italics;
+	}
+	else if (_Bold)
+	{
+		_widget->uExtension.sProgress.bOutline = FALSE;
+		_widget->uExtension.sProgress.bBold = _Bold;
+		_widget->uExtension.sProgress.bShadow = FALSE;
+		_widget->uExtension.sProgress.bItalics = _Italics;
+	}
+	else if (_Shadow)
+	{
+		_widget->uExtension.sProgress.bOutline = FALSE;
+		_widget->uExtension.sProgress.bBold = FALSE;
+		_widget->uExtension.sProgress.bShadow = _Shadow;
+		_widget->uExtension.sProgress.bItalics = _Italics;
+	}
+	else
+	{
+		_widget->uExtension.sProgress.bOutline = FALSE;
+		_widget->uExtension.sProgress.bBold = FALSE;
+		_widget->uExtension.sProgress.bShadow = FALSE;
+		_widget->uExtension.sProgress.bItalics = _Italics;
+	}
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -5585,6 +6180,16 @@ blUIProgressFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_widget->uExtension.sProgress.bFlipX = _FlipX;
 	_widget->uExtension.sProgress.bFlipY = _FlipY;
 	_PrUIMem->bDirty = TRUE;
+}
+BLF32 
+blUIGetProgressPercent(IN BLGuid _ID)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return 0.f;
+	if (_widget->eType != BL_UT_PROGRESS)
+		return 0.f;
+	return (BLF32)_widget->uExtension.sProgress.nPercent / 100.f;
 }
 BLVoid
 blUISliderPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)

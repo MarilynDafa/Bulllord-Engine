@@ -324,6 +324,9 @@ BL_API BLVoid blUICheckEnable(
 	IN BLGuid _ID,
 	IN BLBool _Enable);
 
+BL_API BLBool blUIGetCheckState(
+	IN BLGuid _ID);
+
 BL_API BLVoid blUITextPixmap(
 	IN BLGuid _ID,
 	IN BLAnsi* _Pixmap);
@@ -417,6 +420,11 @@ BL_API BLVoid blUIProgressPercent(
 	IN BLGuid _ID,
 	IN BLU32 _Percent);
 
+BL_API BLVoid blUIProgressBorder(
+	IN BLGuid _ID,
+	IN BLU32 _BorderX,
+	IN BLU32 _BorderY);
+
 BL_API BLVoid blUIProgressText(
 	IN BLGuid _ID,
 	IN BLUtf8* _Text,
@@ -435,6 +443,9 @@ BL_API BLVoid blUIProgressFlip(
 	IN BLGuid _ID,
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
+
+BL_API BLF32 blUIGetProgressPercent(
+	IN BLGuid _ID);
 
 BL_API BLVoid blUISliderPixmap(
 	IN BLGuid _ID,
