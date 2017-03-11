@@ -313,9 +313,11 @@ typedef struct _Widget {
 			BLRect sCommonTex;
 			BLRect sStencilTex;
 			BLS32 nStartAngle;
+			BLF32 fAngle;
 			BLS32 nEndAngle;
 			BLBool bAngleCut;
 			BLBool bClockWise;
+			BLBool bDragging;
             BLGuid nPixmapTex;
 			BLU32 nTexWidth;
 			BLU32 nTexHeight;
@@ -4126,6 +4128,527 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 static BLVoid
 _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
+	if (!_Node->bValid || !_Node->bVisible)
+		return;
+	BLRect _scissorrect;
+	_WidgetScissorRect(_Node, &_scissorrect);
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sDial.nPixmapTex, 0);
+	BLF32 _gray = 1.f;
+	BLF32 _stencil = 1.f;
+	if (_Node->uExtension.sDial.bAngleCut)
+	{
+		BLVec2 _pts[17], _tpts[18], _tspts[18];
+		BLS32 _startx, _endx;
+		BLS32 _theta = (BLS32)(atan2f(_Width, _Height) * 180.0f / PI_INTERNAL);
+		if (_Node->uExtension.sDial.nStartAngle == 0)
+			_startx = 0;
+		else if (_Node->uExtension.sDial.nStartAngle > 0 && _Node->uExtension.sDial.nStartAngle < _theta)
+			_startx = 1;
+		else if (_Node->uExtension.sDial.nStartAngle == _theta)
+			_startx = 2;
+		else if (_Node->uExtension.sDial.nStartAngle > _theta && _Node->uExtension.sDial.nStartAngle < 90)
+			_startx = 3;
+		else if (_Node->uExtension.sDial.nStartAngle == 90)
+			_startx = 4;
+		else if (_Node->uExtension.sDial.nStartAngle > 90 && _Node->uExtension.sDial.nStartAngle < 180 - _theta)
+			_startx = 5;
+		else if (_Node->uExtension.sDial.nStartAngle == 180 - _theta)
+			_startx = 6;
+		else if (_Node->uExtension.sDial.nStartAngle > 180 - _theta && _Node->uExtension.sDial.nStartAngle < 180)
+			_startx = 7;
+		else if (_Node->uExtension.sDial.nStartAngle == 180)
+			_startx = 8;
+		else if (_Node->uExtension.sDial.nStartAngle > 180 && _Node->uExtension.sDial.nStartAngle < 180 + _theta)
+			_startx = 9;
+		else if (_Node->uExtension.sDial.nStartAngle == 180 + _theta)
+			_startx = 10;
+		else if (_Node->uExtension.sDial.nStartAngle > 180 + _theta && _Node->uExtension.sDial.nStartAngle < 270)
+			_startx = 11;
+		else if (_Node->uExtension.sDial.nStartAngle == 270)
+			_startx = 12;
+		else if (_Node->uExtension.sDial.nStartAngle > 270 && _Node->uExtension.sDial.nStartAngle < 360 - _theta)
+			_startx = 13;
+		else if (_Node->uExtension.sDial.nStartAngle == 360 - _theta)
+			_startx = 14;
+		else if (_Node->uExtension.sDial.nStartAngle > 360 - _theta && _Node->uExtension.sDial.nStartAngle < 360)
+			_startx = 15;
+		else
+			_startx = 0;
+		if (_Node->uExtension.sDial.nEndAngle == 0)
+			_endx = 0;
+		else if (_Node->uExtension.sDial.nEndAngle > 0 && _Node->uExtension.sDial.nEndAngle < _theta)
+			_endx = 1;
+		else if (_Node->uExtension.sDial.nEndAngle == _theta)
+			_endx = 2;
+		else if (_Node->uExtension.sDial.nEndAngle > _theta && _Node->uExtension.sDial.nEndAngle < 90)
+			_endx = 3;
+		else if (_Node->uExtension.sDial.nEndAngle == 90)
+			_endx = 4;
+		else if (_Node->uExtension.sDial.nEndAngle > 90 && _Node->uExtension.sDial.nEndAngle < 180 - _theta)
+			_endx = 5;
+		else if (_Node->uExtension.sDial.nEndAngle == 180 - _theta)
+			_endx = 6;
+		else if (_Node->uExtension.sDial.nEndAngle > 180 - _theta && _Node->uExtension.sDial.nEndAngle < 180)
+			_endx = 7;
+		else if (_Node->uExtension.sDial.nEndAngle == 180)
+			_endx = 8;
+		else if (_Node->uExtension.sDial.nEndAngle > 180 && _Node->uExtension.sDial.nEndAngle < 180 + _theta)
+			_endx = 9;
+		else if (_Node->uExtension.sDial.nEndAngle == 180 + _theta)
+			_endx = 10;
+		else if (_Node->uExtension.sDial.nEndAngle > 180 + _theta && _Node->uExtension.sDial.nEndAngle < 270)
+			_endx = 11;
+		else if (_Node->uExtension.sDial.nEndAngle == 270)
+			_endx = 12;
+		else if (_Node->uExtension.sDial.nEndAngle > 270 && _Node->uExtension.sDial.nEndAngle < 360 - _theta)
+			_endx = 13;
+		else if (_Node->uExtension.sDial.nEndAngle == 360 - _theta)
+			_endx = 14;
+		else if (_Node->uExtension.sDial.nEndAngle > 360 - _theta && _Node->uExtension.sDial.nEndAngle < 360)
+			_endx = 15;
+		else
+			_endx = 0;
+		BLS32 _vbidx[16];
+		memset(_vbidx, -1, sizeof(_vbidx));
+		if (_Node->uExtension.sDial.bClockWise)
+		{
+			_vbidx[0] = _startx; _endx = (_endx > _startx) ? _endx : _endx + 16;
+		}
+		else
+		{
+			_vbidx[0] = _endx; _startx = (_startx > _endx) ? _startx : _startx + 16;
+		}
+		BLU32 _idx = 1;
+		for (; _idx < 16; ++_idx)
+		{
+			if (_Node->uExtension.sDial.bClockWise)
+			{
+				if (_startx % 2 == 1)
+					_vbidx[_idx] = _startx - 1 + _idx * 2;
+				else 
+					_vbidx[_idx] = _startx + _idx * 2;
+				if (_vbidx[_idx] >= _endx)
+				{
+					_vbidx[_idx] = _endx;
+					if (_vbidx[_idx] >= 16)
+						_vbidx[_idx] -= 16;
+					break;
+				}
+				else if (_vbidx[_idx] >= 16)
+					_vbidx[_idx] -= 16;
+			}
+			else
+			{
+				if (_endx % 2 == 1)
+					_vbidx[_idx] = _endx - 1 + _idx * 2;
+				else
+					_vbidx[_idx] = _endx + _idx * 2;
+				if (_vbidx[_idx] >= _startx)
+				{
+					_vbidx[_idx] = _startx;
+					if (_vbidx[_idx] >= 16)
+						_vbidx[_idx] -= 16;
+					break;
+				}
+				else if (_vbidx[_idx] >= 16)
+					_vbidx[_idx] -= 16;
+			}
+		}
+		_startx = (_startx > 16) ? _startx - 16 : _startx;
+		_endx = (_endx > 16) ? _endx - 16 : _endx;
+		_pts[0].fX = _X;
+		_pts[0].fY = _Y - _Height * 0.5f;
+		_pts[2].fX = _X + _Width * 0.5f;
+		_pts[2].fY = _Y - _Height * 0.5f;
+		_pts[4].fX = _X + _Width * 0.5f;
+		_pts[4].fY = _Y;
+		_pts[6].fX = _X + _Width * 0.5f;
+		_pts[6].fY = _Y + _Height * 0.5f;
+		_pts[8].fX = _X;
+		_pts[8].fY = _Y + _Height * 0.5f;
+		_pts[10].fX = _X - _Width * 0.5f;
+		_pts[10].fY = _Y + _Height * 0.5f;
+		_pts[12].fX = _X - _Width * 0.5f;
+		_pts[12].fY = _Y;
+		_pts[14].fX = _X - _Width * 0.5f;
+		_pts[14].fY = _Y - _Height * 0.5f;
+		_tpts[0].fX = (_Node->uExtension.sDial.sCommonTex.sLT.fX + _Node->uExtension.sDial.sCommonTex.sRB.fX) * 0.5f / _Node->uExtension.sDial.nTexWidth;
+		_tpts[0].fY = (_Node->uExtension.sDial.sCommonTex.sLT.fY) / _Node->uExtension.sDial.nTexHeight;
+		_tpts[2].fX = (_Node->uExtension.sDial.sCommonTex.sRB.fX) / _Node->uExtension.sDial.nTexWidth;
+		_tpts[2].fY = (_Node->uExtension.sDial.sCommonTex.sLT.fY) / _Node->uExtension.sDial.nTexHeight;
+		_tpts[4].fX = (_Node->uExtension.sDial.sCommonTex.sRB.fX) / _Node->uExtension.sDial.nTexWidth;
+		_tpts[4].fY = (_Node->uExtension.sDial.sCommonTex.sLT.fY + _Node->uExtension.sDial.sCommonTex.sRB.fY) * 0.5f / _Node->uExtension.sDial.nTexHeight;
+		_tpts[6].fX = (_Node->uExtension.sDial.sCommonTex.sRB.fX) / _Node->uExtension.sDial.nTexWidth;
+		_tpts[6].fY = (_Node->uExtension.sDial.sCommonTex.sRB.fY) / _Node->uExtension.sDial.nTexHeight;
+		_tpts[8].fX = (_Node->uExtension.sDial.sCommonTex.sLT.fX + _Node->uExtension.sDial.sCommonTex.sRB.fX) * 0.5f / _Node->uExtension.sDial.nTexWidth;
+		_tpts[8].fY = (_Node->uExtension.sDial.sCommonTex.sRB.fY) / _Node->uExtension.sDial.nTexHeight;
+		_tpts[10].fX = (_Node->uExtension.sDial.sCommonTex.sLT.fX) / _Node->uExtension.sDial.nTexWidth;
+		_tpts[10].fY = (_Node->uExtension.sDial.sCommonTex.sRB.fY) / _Node->uExtension.sDial.nTexHeight;
+		_tpts[12].fX = (_Node->uExtension.sDial.sCommonTex.sLT.fX) / _Node->uExtension.sDial.nTexWidth;
+		_tpts[12].fY = (_Node->uExtension.sDial.sCommonTex.sLT.fY + _Node->uExtension.sDial.sCommonTex.sRB.fY) * 0.5f / _Node->uExtension.sDial.nTexHeight;
+		_tpts[14].fX = (_Node->uExtension.sDial.sCommonTex.sLT.fX) / _Node->uExtension.sDial.nTexWidth;
+		_tpts[14].fY = (_Node->uExtension.sDial.sCommonTex.sLT.fY) / _Node->uExtension.sDial.nTexHeight;
+		_tpts[17].fX = (_Node->uExtension.sDial.sCommonTex.sLT.fX + _Node->uExtension.sDial.sCommonTex.sRB.fX) * 0.5f / _Node->uExtension.sDial.nTexWidth;
+		_tpts[17].fY = (_Node->uExtension.sDial.sCommonTex.sLT.fY + _Node->uExtension.sDial.sCommonTex.sRB.fY) * 0.5f / _Node->uExtension.sDial.nTexHeight;
+		if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+		{
+			_stencil = -1.f;
+			_tspts[0].fX = (_Node->uExtension.sDial.sStencilTex.sLT.fX + _Node->uExtension.sDial.sStencilTex.sRB.fX) * 0.5f / _Node->uExtension.sDial.nTexWidth;
+			_tspts[0].fY = (_Node->uExtension.sDial.sStencilTex.sLT.fY) / _Node->uExtension.sDial.nTexHeight;
+			_tspts[2].fX = (_Node->uExtension.sDial.sStencilTex.sRB.fX) / _Node->uExtension.sDial.nTexWidth;
+			_tspts[2].fY = (_Node->uExtension.sDial.sStencilTex.sLT.fY) / _Node->uExtension.sDial.nTexHeight;
+			_tspts[4].fX = (_Node->uExtension.sDial.sStencilTex.sRB.fX) / _Node->uExtension.sDial.nTexWidth;
+			_tspts[4].fY = (_Node->uExtension.sDial.sStencilTex.sLT.fY + _Node->uExtension.sDial.sStencilTex.sRB.fY) * 0.5f / _Node->uExtension.sDial.nTexHeight;
+			_tspts[6].fX = (_Node->uExtension.sDial.sStencilTex.sRB.fX) / _Node->uExtension.sDial.nTexWidth;
+			_tspts[6].fY = (_Node->uExtension.sDial.sStencilTex.sRB.fY) / _Node->uExtension.sDial.nTexHeight;
+			_tspts[8].fX = (_Node->uExtension.sDial.sStencilTex.sLT.fX + _Node->uExtension.sDial.sStencilTex.sRB.fX) * 0.5f / _Node->uExtension.sDial.nTexWidth;
+			_tspts[8].fY = (_Node->uExtension.sDial.sStencilTex.sRB.fY) / _Node->uExtension.sDial.nTexHeight;
+			_tspts[10].fX = (_Node->uExtension.sDial.sStencilTex.sLT.fX) / _Node->uExtension.sDial.nTexWidth;
+			_tspts[10].fY = (_Node->uExtension.sDial.sStencilTex.sRB.fY) / _Node->uExtension.sDial.nTexHeight;
+			_tspts[12].fX = (_Node->uExtension.sDial.sStencilTex.sLT.fX) / _Node->uExtension.sDial.nTexWidth;
+			_tspts[12].fY = (_Node->uExtension.sDial.sStencilTex.sLT.fY + _Node->uExtension.sDial.sStencilTex.sRB.fY) * 0.5f / _Node->uExtension.sDial.nTexHeight;
+			_tspts[14].fX = (_Node->uExtension.sDial.sStencilTex.sLT.fX) / _Node->uExtension.sDial.nTexWidth;
+			_tspts[14].fY = (_Node->uExtension.sDial.sStencilTex.sLT.fY) / _Node->uExtension.sDial.nTexHeight;
+			_tspts[17].fX = (_Node->uExtension.sDial.sStencilTex.sLT.fX + _Node->uExtension.sDial.sStencilTex.sRB.fX) * 0.5f / _Node->uExtension.sDial.nTexWidth;
+			_tspts[17].fY = (_Node->uExtension.sDial.sStencilTex.sLT.fY + _Node->uExtension.sDial.sStencilTex.sRB.fY) * 0.5f / _Node->uExtension.sDial.nTexHeight;
+		}
+		else
+		{
+			for (BLU32 _idx = 0; _idx < 18; ++_idx)
+			{
+				_tspts[_idx].fX = 1.f;
+				_tspts[_idx].fY = 1.f;
+			}
+		}
+		BLU32 _startback = ((_startx == _endx) ? (!_Node->uExtension.sDial.bClockWise ? 16 : _startx) : _startx);
+		BLU32 _endback = ((_startx == _endx) ? (!_Node->uExtension.sDial.bClockWise ? _endx : 16) : _endx);
+		BLF32 _tx = (_Node->uExtension.sDial.sCommonTex.sLT.fX + _Node->uExtension.sDial.sCommonTex.sRB.fX) * 0.5f;
+		BLF32 _ty = (_Node->uExtension.sDial.sCommonTex.sLT.fY + _Node->uExtension.sDial.sCommonTex.sRB.fY) * 0.5f;
+		BLF32 _tw = (_Node->uExtension.sDial.sCommonTex.sRB.fX - _Node->uExtension.sDial.sCommonTex.sLT.fX);
+		BLF32 _th = (_Node->uExtension.sDial.sCommonTex.sRB.fY - _Node->uExtension.sDial.sCommonTex.sLT.fY);
+		BLF32 _stx = (_Node->uExtension.sDial.sStencilTex.sLT.fX + _Node->uExtension.sDial.sStencilTex.sRB.fX) * 0.5f;
+		BLF32 _sty = (_Node->uExtension.sDial.sStencilTex.sLT.fY + _Node->uExtension.sDial.sStencilTex.sRB.fY) * 0.5f;
+		BLF32 _stw = (_Node->uExtension.sDial.sStencilTex.sRB.fX - _Node->uExtension.sDial.sStencilTex.sLT.fX);
+		BLF32 _sth = (_Node->uExtension.sDial.sStencilTex.sRB.fY - _Node->uExtension.sDial.sStencilTex.sLT.fY);
+		if (_startx == 1)
+		{
+			BLF32 _theta = _Node->uExtension.sDial.nStartAngle * PI_INTERNAL / 180.0f;
+			_pts[_startback].fX = _X + tanf(_theta) * _Height * 0.5f;
+			_pts[_startback].fY = _Y - _Height * 0.5f;
+			_tpts[_startback].fX = (_tx + tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_startback].fY = (_ty - _th * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_startback].fX = (_stx + tanf(_theta) * _sth * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_startback].fY = (_sty - _sth * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_startx == 3)
+		{
+			BLF32 _theta = (90.f -_Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
+			_pts[_startback].fX = _X + _Width * 0.5f;
+			_pts[_startback].fY = _Y - tanf(_theta) * _Width * 0.5f;
+			_tpts[_startback].fX = (_tx + _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_startback].fY = (_ty - tanf(_theta) * _tw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_startback].fX = (_stx + _stw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_startback].fY = (_sty - tanf(_theta) * _stw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_startx == 5)
+		{
+			BLF32 _theta = (_Node->uExtension.sDial.nStartAngle - 90.f) * PI_INTERNAL / 180.0f;
+			_pts[_startback].fX = _X + _Width * 0.5f;
+			_pts[_startback].fY = _Y + tanf(_theta) * _Width * 0.5f;
+			_tpts[_startback].fX = (_tx + _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_startback].fY = (_ty + tanf(_theta) * _tw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_startback].fX = (_stx + _stw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_startback].fY = (_sty - tanf(_theta) * _stw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_startx == 7)
+		{
+			BLF32 _theta = (180.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
+			_pts[_startback].fX = _X + tanf(_theta) * _Height * 0.5f;
+			_pts[_startback].fY = _Y + _Height * 0.5f;
+			_tpts[_startback].fX = (_tx + tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_startback].fY = (_ty + _th * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_startback].fX = (_stx + tanf(_theta) * _sth * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_startback].fY = (_sty + _sth * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_startx == 9)
+		{
+			BLF32 _theta = (_Node->uExtension.sDial.nStartAngle - 180.f) * PI_INTERNAL / 180.0f;
+			_pts[_startback].fX = _X - tanf(_theta) * _Height * 0.5f;
+			_pts[_startback].fY = _Y + _Height * 0.5f;
+			_tpts[_startback].fX = (_tx - tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_startback].fY = (_ty + _th * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_startback].fX = (_stx - tanf(_theta) * _sth * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_startback].fY = (_sty + _sth * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_startx == 11)
+		{
+			BLF32 _theta = (270.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
+			_pts[_startback].fX = _X - _Width * 0.5f;
+			_pts[_startback].fY = _Y + tanf(_theta) * _Width * 0.5f;
+			_tpts[_startback].fX = (_tx - _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_startback].fY = (_ty + tanf(_theta) * _tw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_startback].fX = (_stx - _stw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_startback].fY = (_sty + tanf(_theta) * _stw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_startx == 13)
+		{
+			BLF32 _theta = (_Node->uExtension.sDial.nStartAngle - 270.f) * PI_INTERNAL / 180.0f;
+			_pts[_startback].fX = _X - _Width * 0.5f;
+			_pts[_startback].fY = _Y - tanf(_theta) * _Width * 0.5f;
+			_tpts[_startback].fX = (_tx - _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_startback].fY = (_ty - tanf(_theta) * _tw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_startback].fX = (_stx - _stw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_startback].fY = (_sty - tanf(_theta) * _stw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_startx == 15)
+		{
+			BLF32 _theta = (360.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
+			_pts[_startback].fX = _X - tanf(_theta) * _Height * 0.5f;
+			_pts[_startback].fY = _Y - _Height * 0.5f;
+			_tpts[_startback].fX = (_tx - tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_startback].fY = (_ty - _th * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_startback].fX = (_stx - tanf(_theta) * _sth * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_startback].fY = (_sty - _sth * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		if (_endx == 1)
+		{
+			BLF32 _theta = _Node->uExtension.sDial.nEndAngle * PI_INTERNAL / 180.0f;
+			_pts[_endback].fX = _X + tanf(_theta) * _Height * 0.5f;
+			_pts[_endback].fY = _Y - _Height * 0.5f;
+			_tpts[_endback].fX = (_tx + tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_endback].fY = (_ty - _th * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_endback].fX = (_stx + tanf(_theta) * _sth * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_endback].fY = (_sty - _sth * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_endx == 3)
+		{
+			BLF32 _theta = (90.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
+			_pts[_endback].fX = _X + _Width * 0.5f;
+			_pts[_endback].fY = _Y - tanf(_theta) * _Width * 0.5f;
+			_tpts[_endback].fX = (_tx + _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_endback].fY = (_ty - tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_endback].fX = (_stx + _stw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_endback].fY = (_sty - tanf(_theta) * _sth * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_endx == 5)
+		{
+			BLF32 _theta = (_Node->uExtension.sDial.nEndAngle - 90.f) * PI_INTERNAL / 180.0f;
+			_pts[_endback].fX = _X + _Width * 0.5f;
+			_pts[_endback].fY = _Y + tanf(_theta) * _Width * 0.5f;
+			_tpts[_endback].fX = (_tx + _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_endback].fY = (_ty + tanf(_theta) * _tw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_endback].fX = (_stx + _stw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_endback].fY = (_sty + tanf(_theta) * _stw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_endx == 7)
+		{
+			BLF32 _theta = (180.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
+			_pts[_endback].fX = _X + tanf(_theta) * _Height * 0.5f;
+			_pts[_endback].fY = _Y + _Height * 0.5f;
+			_tpts[_endback].fX = (_tx + tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_endback].fY = (_ty + _th * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_endback].fX = (_stx + tanf(_theta) * _sth * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_endback].fY = (_sty + _sth * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_endx == 9)
+		{
+			BLF32 _theta = (_Node->uExtension.sDial.nEndAngle - 180.f) * PI_INTERNAL / 180.0f;
+			_pts[_endback].fX = _X - tanf(_theta) * _Height * 0.5f;
+			_pts[_endback].fY = _Y + _Height * 0.5f;
+			_tpts[_endback].fX = (_tx - tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_endback].fY = (_ty + _th * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_endback].fX = (_stx - tanf(_theta) * _sth * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_endback].fY = (_sty + _sth * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_endx == 11)
+		{
+			BLF32 _theta = (270.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
+			_pts[_endback].fX = _X - _Width * 0.5f;
+			_pts[_endback].fY = _Y + tanf(_theta) * _Width * 0.5f;
+			_tpts[_endback].fX = (_tx - _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_endback].fY = (_ty + tanf(_theta) * _tw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_endback].fX = (_stx - _stw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_endback].fY = (_sty + tanf(_theta) * _stw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_endx == 13)
+		{
+			BLF32 _theta = (_Node->uExtension.sDial.nEndAngle - 270.f) * PI_INTERNAL / 180.0f;
+			_pts[_endback].fX = _X - _Width * 0.5f;
+			_pts[_endback].fY = _Y - tanf(_theta) * _Width * 0.5f;
+			_tpts[_endback].fX = (_tx - _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_endback].fY = (_ty - tanf(_theta) * _tw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_endback].fX = (_stx - _stw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_endback].fY = (_sty - tanf(_theta) * _stw * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		else if (_endx == 15)
+		{
+			BLF32 _theta = (360.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
+			_pts[_endback].fX = _X - tanf(_theta) * _Height * 0.5f;
+			_pts[_endback].fY = _Y - _Height * 0.5f;
+			_tpts[_endback].fX = (_tx - tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+			_tpts[_endback].fY = (_ty - _th * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+			{
+				_tspts[_endback].fX = (_stx - tanf(_theta) * _sth * 0.5f) / _Node->uExtension.sDial.nTexWidth;
+				_tspts[_endback].fY = (_sty - _sth * 0.5f) / _Node->uExtension.sDial.nTexHeight;
+			}
+		}
+		BLF32* _vbo = (BLF32*)alloca(16 * 8 * sizeof(BLF32));
+		BLU32 _vbcount = 0;
+		_vbo[0] = _X;
+		_vbo[1] = _Y;
+		_vbo[2] = _tspts[17].fX;
+		_vbo[3] = _tspts[17].fY;
+		_vbo[4] = 1.f * _stencil;
+		_vbo[5] = 1.f * _gray;
+		_vbo[6] = _tpts[17].fX;
+		_vbo[7] = _tpts[17].fY;
+		do {
+			if (_vbidx[_vbcount] == -1)
+				break;
+			if (_startx == _endx && _vbidx[_vbcount + 1] == -1)
+			{
+				_vbo[(1 + _vbcount) * 8 + 0] = _pts[16].fX;
+				_vbo[(1 + _vbcount) * 8 + 1] = _pts[16].fY;
+				_vbo[(1 + _vbcount) * 8 + 2] = _tspts[16].fX;
+				_vbo[(1 + _vbcount) * 8 + 3] = _tspts[16].fY;
+				_vbo[(1 + _vbcount) * 8 + 4] = 1.f * _stencil;
+				_vbo[(1 + _vbcount) * 8 + 5] = 1.f * _gray;
+				_vbo[(1 + _vbcount) * 8 + 6] = _tpts[16].fX;
+				_vbo[(1 + _vbcount) * 8 + 7] = _tpts[16].fY;
+			}
+			else
+			{
+				_vbo[(1 + _vbcount) * 8 + 0] = _pts[_vbidx[_vbcount]].fX;
+				_vbo[(1 + _vbcount) * 8 + 1] = _pts[_vbidx[_vbcount]].fY;
+				_vbo[(1 + _vbcount) * 8 + 2] = _tspts[_vbidx[_vbcount]].fX;
+				_vbo[(1 + _vbcount) * 8 + 3] = _tspts[_vbidx[_vbcount]].fY;
+				_vbo[(1 + _vbcount) * 8 + 4] = 1.f * _stencil;
+				_vbo[(1 + _vbcount) * 8 + 5] = 1.f * _gray;
+				_vbo[(1 + _vbcount) * 8 + 6] = _tpts[_vbidx[_vbcount]].fX;
+				_vbo[(1 + _vbcount) * 8 + 7] = _tpts[_vbidx[_vbcount]].fY;
+			}
+			++_vbcount;
+		} while (1);
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLEFAN, TRUE, _semantic, _decls, 3, _vbo, (1 + _vbcount) * 8 * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
+	else
+	{
+		BLRect _texcoord;
+		BLRect _texcoords;
+		_texcoord = _Node->uExtension.sDial.sCommonTex;
+		if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
+		{
+			_stencil = -1.f;
+			_texcoords.sLT.fX = _Node->uExtension.sDial.sStencilTex.sLT.fX / _Node->uExtension.sDial.nTexWidth + 0.001f;
+			_texcoords.sLT.fY = _Node->uExtension.sDial.sStencilTex.sLT.fY / _Node->uExtension.sDial.nTexHeight + 0.001f;
+			_texcoords.sRB.fX = _Node->uExtension.sDial.sStencilTex.sRB.fX / _Node->uExtension.sDial.nTexWidth - 0.001f;
+			_texcoords.sRB.fY = _Node->uExtension.sDial.sStencilTex.sRB.fY / _Node->uExtension.sDial.nTexHeight - 0.001f;
+		}
+		else
+		{
+			_texcoords.sLT.fX = 1.f;
+			_texcoords.sLT.fY = 1.f;
+			_texcoords.sRB.fX = 1.f;
+			_texcoords.sRB.fY = 1.f;
+		}
+		BLF32 _rad = _Node->uExtension.sDial.bClockWise ? _Node->uExtension.sDial.fAngle * PI_INTERNAL / 180.0f : -_Node->uExtension.sDial.fAngle * PI_INTERNAL / 180.0f;
+		BLF32 _ltx = ((_X - _Width * 0.5f) - _X) * cosf(_rad) - ((_Y - _Height * 0.5f) - _Y) * sinf(_rad) + _X;
+		BLF32 _lty = ((_X - _Width * 0.5f) - _X) * sinf(_rad) + ((_Y - _Height * 0.5f) - _Y) * cosf(_rad) + _Y;
+		BLF32 _rtx = ((_X + _Width * 0.5f) - _X) * cosf(_rad) - ((_Y - _Height * 0.5f) - _Y) * sinf(_rad) + _X;
+		BLF32 _rty = ((_X + _Width * 0.5f) - _X) * sinf(_rad) + ((_Y - _Height * 0.5f) - _Y) * cosf(_rad) + _Y;
+		BLF32 _lbx = ((_X - _Width * 0.5f) - _X) * cosf(_rad) - ((_Y + _Height * 0.5f) - _Y) * sinf(_rad) + _X;
+		BLF32 _lby = ((_X - _Width * 0.5f) - _X) * sinf(_rad) + ((_Y + _Height * 0.5f) - _Y) * cosf(_rad) + _Y;
+		BLF32 _rbx = ((_X + _Width * 0.5f) - _X) * cosf(_rad) - ((_Y + _Height * 0.5f) - _Y) * sinf(_rad) + _X;
+		BLF32 _rby = ((_X + _Width * 0.5f) - _X) * sinf(_rad) + ((_Y + _Height * 0.5f) - _Y) * cosf(_rad) + _Y;
+		BLF32 _vbo[] = {
+			PIXEL_ALIGNED_INTERNAL(_ltx),
+			PIXEL_ALIGNED_INTERNAL(_lty),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sDial.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sDial.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_rtx),
+			PIXEL_ALIGNED_INTERNAL(_rty),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sDial.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sDial.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_lbx),
+			PIXEL_ALIGNED_INTERNAL(_lby),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sDial.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sDial.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_rbx),
+			PIXEL_ALIGNED_INTERNAL(_rby),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sDial.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sDial.nTexHeight
+		};
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
 }
 static BLVoid
 _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
@@ -4766,6 +5289,25 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					}
 				}
 				break;
+			case BL_UT_DIAL:
+				{
+					if (!_wid->uExtension.sDial.bAngleCut)
+					{
+						BLVec2 _pos;
+						_pos.fX = _x;
+						_pos.fY = _y;
+						BLRect _area;
+						BLRect _sarea;
+						_WidgetAbsArea(_wid, &_area);
+						_WidgetScissorRect(_wid, &_sarea);
+						BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+						if (blRectContains(&_drawarea, &_pos))
+						{
+							_wid->uExtension.sDial.bDragging = TRUE;
+						}
+					}
+				}
+				break;
 			default:break;
 			}
 		}
@@ -4831,6 +5373,25 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					}
 				}
 				break;
+			case BL_UT_DIAL:
+				{
+					if (!_wid->uExtension.sDial.bAngleCut)
+					{
+						BLVec2 _pos;
+						_pos.fX = _x;
+						_pos.fY = _y;
+						BLRect _area;
+						BLRect _sarea;
+						_WidgetAbsArea(_wid, &_area);
+						_WidgetScissorRect(_wid, &_sarea);
+						BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+						if (blRectContains(&_drawarea, &_pos))
+						{
+							_wid->uExtension.sDial.bDragging = TRUE;
+						}
+					}
+				}
+				break;
 			default:break;
 			}
 		}
@@ -4879,6 +5440,13 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					}
 					_wid->uExtension.sSlider.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
+				}
+				break;
+			case BL_UT_DIAL:
+				{
+					if (!_wid->uExtension.sDial.bAngleCut)
+					{
+					}
 				}
 				break;
 			default:break;
@@ -5732,6 +6300,19 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
             const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _QueryWidget(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_DIAL);
+			blUIReferencePoint(_widguid, _ha, _va);
+			blUISizePolicy(_widguid, _policyvar);
+			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
+			blUIScissor(_widguid, _clipedvar, _absvar);
+			blUITooltip(_widguid, (const BLUtf8*)_tooltip);
+			blUIPenetration(_widguid, _penetrationvar);
+			blUIDialPixmap(_widguid, _pixmap);
+			blUIDialStencilMap(_widguid, _stencilmap);
+			blUIDialCommonMap(_widguid, _commonmap);
+			blUIDialClockwise(_widguid, _clockwisevar);
+			blUIDialAngleCut(_widguid, _anglecutvar);
+			blUIDialAngleRange(_widguid, _startanglevar, _endanglevar);
         }
         else if (!strcmp(_type, "Primitive"))
         {
@@ -7430,6 +8011,9 @@ blUIDialPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sDial.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sDial.aPixmap, _Pixmap);
+	BLAnsi _texfile[260] = { 0 };
+	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
+	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -7457,7 +8041,18 @@ blUIDialCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIDialAngle(IN BLGuid _ID, IN BLS32 _StartAngle, IN BLS32 _EndAngle)
+blUIDialAngle(IN BLGuid _ID, IN BLF32 _Angle)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_DIAL)
+		return;
+	_widget->uExtension.sDial.fAngle = (BLS32)_Angle % 360 + (_Angle - (BLS32)_Angle);
+	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUIDialAngleRange(IN BLGuid _ID, IN BLS32 _StartAngle, IN BLS32 _EndAngle)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -7489,6 +8084,16 @@ blUIDialClockwise(IN BLGuid _ID, IN BLBool _Clockwise)
 		return;
 	_widget->uExtension.sDial.bClockWise = _Clockwise;
 	_PrUIMem->bDirty = TRUE;
+}
+BLF32 
+blUIGetDialAngle(IN BLGuid _ID)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return 0.f;
+	if (_widget->eType != BL_UT_DIAL)
+		return 0.f;
+	return _widget->uExtension.sDial.fAngle;
 }
 BLVoid
 blUIPrimitiveFill(IN BLGuid _ID, IN BLBool _Fill)

@@ -583,6 +583,10 @@ BL_API BLVoid blUIDialCommonMap(
 
 BL_API BLVoid blUIDialAngle(
 	IN BLGuid _ID,
+	IN BLF32 _Angle);
+
+BL_API BLVoid blUIDialAngleRange(
+	IN BLGuid _ID,
 	IN BLS32 _StartAngle,
 	IN BLS32 _EndAngle);
 
@@ -593,6 +597,9 @@ BL_API BLVoid blUIDialAngleCut(
 BL_API BLVoid blUIDialClockwise(
 	IN BLGuid _ID,
 	IN BLBool _Clockwise);
+
+BL_API BLF32 blUIGetDialAngle(
+	IN BLGuid _ID);
 
 BL_API BLVoid blUIPrimitiveFill(
 	IN BLGuid _ID,
