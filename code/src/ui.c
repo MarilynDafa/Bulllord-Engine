@@ -4541,7 +4541,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 				_tspts[_endback].fY = (_sty - _sth * 0.5f) / _Node->uExtension.sDial.nTexHeight;
 			}
 		}
-		BLF32* _vbo = (BLF32*)alloca(16 * 8 * sizeof(BLF32));
+		BLF32* _vbo = (BLF32*)alloca(20 * 8 * sizeof(BLF32));
 		BLU32 _vbcount = 0;
 		_vbo[0] = _X;
 		_vbo[1] = _Y;
@@ -4556,8 +4556,8 @@ _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 				break;
 			if (_startx == _endx && _vbidx[_vbcount + 1] == -1)
 			{
-				_vbo[(1 + _vbcount) * 8 + 0] = _pts[16].fX;
-				_vbo[(1 + _vbcount) * 8 + 1] = _pts[16].fY;
+				_vbo[(1 + _vbcount) * 8 + 0] = PIXEL_ALIGNED_INTERNAL(_pts[16].fX);
+				_vbo[(1 + _vbcount) * 8 + 1] = PIXEL_ALIGNED_INTERNAL(_pts[16].fY);
 				_vbo[(1 + _vbcount) * 8 + 2] = _tspts[16].fX;
 				_vbo[(1 + _vbcount) * 8 + 3] = _tspts[16].fY;
 				_vbo[(1 + _vbcount) * 8 + 4] = 1.f * _stencil;
@@ -4567,8 +4567,8 @@ _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			}
 			else
 			{
-				_vbo[(1 + _vbcount) * 8 + 0] = _pts[_vbidx[_vbcount]].fX;
-				_vbo[(1 + _vbcount) * 8 + 1] = _pts[_vbidx[_vbcount]].fY;
+				_vbo[(1 + _vbcount) * 8 + 0] = PIXEL_ALIGNED_INTERNAL(_pts[_vbidx[_vbcount]].fX);
+				_vbo[(1 + _vbcount) * 8 + 1] = PIXEL_ALIGNED_INTERNAL(_pts[_vbidx[_vbcount]].fY);
 				_vbo[(1 + _vbcount) * 8 + 2] = _tspts[_vbidx[_vbcount]].fX;
 				_vbo[(1 + _vbcount) * 8 + 3] = _tspts[_vbidx[_vbcount]].fY;
 				_vbo[(1 + _vbcount) * 8 + 4] = 1.f * _stencil;
@@ -5031,66 +5031,106 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 			switch (_wid->eType)
 			{
 			case BL_UT_SLIDER:
+				if (_wid->uExtension.sSlider.nState && _wid->uExtension.sSlider.bDragging)
 				{
-					if (_wid->uExtension.sSlider.nState && _wid->uExtension.sSlider.bDragging)
+					BLVec2 _pos;
+					_pos.fX = _x;
+					_pos.fY = _y;
+					BLF32 _w, _p;
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					if (_wid->uExtension.sSlider.bHorizontal)
 					{
-						BLVec2 _pos;
-						_pos.fX = _x;
-						_pos.fY = _y;
-						BLF32 _w, _p;
-						BLRect _area;
-						BLRect _sarea;
-						_WidgetAbsArea(_wid, &_area);
-						_WidgetScissorRect(_wid, &_sarea);
-						BLRect _drawarea = blRectIntersects(&_area, &_sarea);
-						if (_wid->uExtension.sSlider.bHorizontal)
+						_w = _area.sRB.fX - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX;
+						_p = _x - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+					}
+					else
+					{
+						_w = _area.sRB.fY - _area.sLT.fY - _wid->uExtension.sSlider.sSliderSize.fY;
+						_p = -_y + _area.sRB.fY - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+					}
+					BLS32 _newp = (BLS32)(_p / _w * (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue)) + _wid->uExtension.sSlider.nMinValue;
+					BLS32 _oldp = _wid->uExtension.sSlider.nSliderPosition;
+					if (!_wid->uExtension.sSlider.bSliderDragged)
+					{
+						if (blRectContains(&_drawarea, &_pos))
 						{
-							_w = _area.sRB.fX - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX;
-							_p = _x - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
-						}
-						else
-						{
-							_w = _area.sRB.fY - _area.sLT.fY - _wid->uExtension.sSlider.sSliderSize.fY;
-							_p = -_y + _area.sRB.fY - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
-						}
-						BLS32 _newp = (BLS32)(_p / _w * (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue)) + _wid->uExtension.sSlider.nMinValue;
-						BLS32 _oldp = _wid->uExtension.sSlider.nSliderPosition;
-						if (!_wid->uExtension.sSlider.bSliderDragged)
-						{
-							if (blRectContains(&_drawarea, &_pos))
+							BLRect _thumb;
+							BLF32 _perc = (BLF32)_wid->uExtension.sSlider.nSliderPosition / (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue);
+							if (_wid->uExtension.sSlider.bHorizontal)
 							{
-								BLRect _thumb;
-								BLF32 _perc = (BLF32)_wid->uExtension.sSlider.nSliderPosition / (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue);
-								if (_wid->uExtension.sSlider.bHorizontal)
-								{
-									_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - (_area.sRB.fX - _area.sLT.fX) * 0.5f + ((_area.sRB.fX - _area.sLT.fX) - _wid->uExtension.sSlider.sSliderSize.fX) * _perc;
-									_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
-									_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
-									_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
-								}
-								else
-								{
-									_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
-									_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f + (_area.sRB.fY - _area.sLT.fY) * 0.5f - ((_area.sRB.fY - _area.sLT.fY) - _wid->uExtension.sSlider.sSliderSize.fY) * _perc - _wid->uExtension.sSlider.sSliderSize.fY;
-									_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
-									_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
-								}
-								_wid->uExtension.sSlider.bSliderDragged = blRectContains(&_thumb, &_pos);
-								_wid->uExtension.sSlider.bTrayClick = !_wid->uExtension.sSlider.bSliderDragged;
+								_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - (_area.sRB.fX - _area.sLT.fX) * 0.5f + ((_area.sRB.fX - _area.sLT.fX) - _wid->uExtension.sSlider.sSliderSize.fX) * _perc;
+								_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+								_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+								_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
 							}
-							if (_wid->uExtension.sSlider.bSliderDragged)
-								blUISliderSliderPos(_wid->nID, _newp);
 							else
 							{
-								_wid->uExtension.sSlider.bTrayClick = FALSE;
-								break;
+								_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+								_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f + (_area.sRB.fY - _area.sLT.fY) * 0.5f - ((_area.sRB.fY - _area.sLT.fY) - _wid->uExtension.sSlider.sSliderSize.fY) * _perc - _wid->uExtension.sSlider.sSliderSize.fY;
+								_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+								_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
 							}
-							_wid->uExtension.sSlider.nDesiredPos = _newp;
+							_wid->uExtension.sSlider.bSliderDragged = blRectContains(&_thumb, &_pos);
+							_wid->uExtension.sSlider.bTrayClick = !_wid->uExtension.sSlider.bSliderDragged;
 						}
-						else
+						if (_wid->uExtension.sSlider.bSliderDragged)
 							blUISliderSliderPos(_wid->nID, _newp);
-						_PrUIMem->bDirty = TRUE;
+						else
+						{
+							_wid->uExtension.sSlider.bTrayClick = FALSE;
+							break;
+						}
+						_wid->uExtension.sSlider.nDesiredPos = _newp;
 					}
+					else
+						blUISliderSliderPos(_wid->nID, _newp);
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
+			case BL_UT_DIAL:
+				if (!_wid->uExtension.sDial.bAngleCut && _wid->uExtension.sDial.bDragging)
+				{
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					BLF32 _stheta = _wid->uExtension.sDial.nStartAngle * PI_INTERNAL / 180.0f, _etheta = _wid->uExtension.sDial.nEndAngle * PI_INTERNAL / 180.0f;
+					BLVec2 _vs, _ve, _vp;
+					_vs.fX = sinf(_stheta);
+					_vs.fY = -cosf(_stheta);
+					_ve.fX = sinf(_etheta);
+					_ve.fY = -cosf(_etheta);
+					_vp.fX = _x - (_drawarea.sLT.fX + _drawarea.sRB.fX) * 0.5f;
+					_vp.fY = _y - (_drawarea.sLT.fY + _drawarea.sRB.fY) * 0.5f;
+					BLF32 _anglerange = atan2f(_vs.fX * _ve.fY - _ve.fX * _vs.fY, _vs.fX * _ve.fX + _vs.fY * _ve.fY) * (180.f / PI_INTERNAL);
+					_anglerange = (blVec2CrossProduct(&_vs, &_ve) > 0.f) ? _anglerange : _anglerange + 360;
+					_anglerange = _wid->uExtension.sDial.bClockWise ? _anglerange : 360 - _anglerange;
+					BLF32 _anglecross = atan2f(_vs.fX * _vp.fY - _vp.fX * _vs.fY, _vs.fX * _vp.fX + _vs.fY * _vp.fY) * (180.f / PI_INTERNAL);
+					_anglecross = (blVec2CrossProduct(&_vs, &_vp) > 0.f) ? _anglecross : _anglecross + 360;
+					_anglecross = _wid->uExtension.sDial.bClockWise ? _anglecross : 360 - _anglecross;
+					if (_wid->uExtension.sDial.bClockWise)
+					{
+						if (_anglecross > 360 - (360 - _anglerange) * 0.5f)
+							_anglecross = 0.f;
+						else if ((_anglecross < 360 - (360 - _anglerange) * 0.5f) && _anglecross > _anglerange)
+							_anglecross = _anglerange;
+						_anglecross = _anglecross + _wid->uExtension.sDial.nStartAngle;
+					}
+					else
+					{
+						if (_anglecross > _anglerange + (360 - _anglerange) * 0.5f)
+							_anglecross = 0.f;
+						else if ((_anglecross < _anglerange + (360 - _anglerange) * 0.5f) && _anglecross > _anglerange)
+							_anglecross = _anglerange;
+						_anglecross = 360 - _wid->uExtension.sDial.nStartAngle + _anglecross;
+					}
+					blUIDialAngle(_wid->nID, _anglecross);					
+					_PrUIMem->bDirty = TRUE;
 				}
 				break;
 			default:break;
@@ -5104,66 +5144,106 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 			switch (_wid->eType)
 			{
 			case BL_UT_SLIDER:
+				if (_wid->uExtension.sSlider.nState && _wid->uExtension.sSlider.bDragging)
 				{
-					if (_wid->uExtension.sSlider.nState && _wid->uExtension.sSlider.bDragging)
+					BLVec2 _pos;
+					_pos.fX = _x;
+					_pos.fY = _y;
+					BLF32 _w, _p;
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					if (_wid->uExtension.sSlider.bHorizontal)
 					{
-						BLVec2 _pos;
-						_pos.fX = _x;
-						_pos.fY = _y;
-						BLF32 _w, _p;
-						BLRect _area;
-						BLRect _sarea;
-						_WidgetAbsArea(_wid, &_area);
-						_WidgetScissorRect(_wid, &_sarea);
-						BLRect _drawarea = blRectIntersects(&_area, &_sarea);
-						if (_wid->uExtension.sSlider.bHorizontal)
+						_w = _area.sRB.fX - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX;
+						_p = _x - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+					}
+					else
+					{
+						_w = _area.sRB.fY - _area.sLT.fY - _wid->uExtension.sSlider.sSliderSize.fY;
+						_p = -_y + _area.sRB.fY - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+					}
+					BLS32 _newp = (BLS32)(_p / _w * (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue)) + _wid->uExtension.sSlider.nMinValue;
+					BLS32 _oldp = _wid->uExtension.sSlider.nSliderPosition;
+					if (!_wid->uExtension.sSlider.bSliderDragged)
+					{
+						if (blRectContains(&_drawarea, &_pos))
 						{
-							_w = _area.sRB.fX - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX;
-							_p = _x - _area.sLT.fX - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
-						}
-						else
-						{
-							_w = _area.sRB.fY - _area.sLT.fY - _wid->uExtension.sSlider.sSliderSize.fY;
-							_p = -_y + _area.sRB.fY - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
-						}
-						BLS32 _newp = (BLS32)(_p / _w * (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue)) + _wid->uExtension.sSlider.nMinValue;
-						BLS32 _oldp = _wid->uExtension.sSlider.nSliderPosition;
-						if (!_wid->uExtension.sSlider.bSliderDragged)
-						{
-							if (blRectContains(&_drawarea, &_pos))
+							BLRect _thumb;
+							BLF32 _perc = (BLF32)_wid->uExtension.sSlider.nSliderPosition / (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue);
+							if (_wid->uExtension.sSlider.bHorizontal)
 							{
-								BLRect _thumb;
-								BLF32 _perc = (BLF32)_wid->uExtension.sSlider.nSliderPosition / (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue);
-								if (_wid->uExtension.sSlider.bHorizontal)
-								{
-									_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - (_area.sRB.fX - _area.sLT.fX) * 0.5f + ((_area.sRB.fX - _area.sLT.fX) - _wid->uExtension.sSlider.sSliderSize.fX) * _perc;
-									_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
-									_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
-									_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
-								}
-								else
-								{
-									_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
-									_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f + (_area.sRB.fY - _area.sLT.fY) * 0.5f - ((_area.sRB.fY - _area.sLT.fY) - _wid->uExtension.sSlider.sSliderSize.fY) * _perc - _wid->uExtension.sSlider.sSliderSize.fY;
-									_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
-									_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
-								}
-								_wid->uExtension.sSlider.bSliderDragged = blRectContains(&_thumb, &_pos);
-								_wid->uExtension.sSlider.bTrayClick = !_wid->uExtension.sSlider.bSliderDragged;
+								_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - (_area.sRB.fX - _area.sLT.fX) * 0.5f + ((_area.sRB.fX - _area.sLT.fX) - _wid->uExtension.sSlider.sSliderSize.fX) * _perc;
+								_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fY * 0.5f;
+								_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+								_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
 							}
-							if (_wid->uExtension.sSlider.bSliderDragged)
-								blUISliderSliderPos(_wid->nID, _newp);
 							else
 							{
-								_wid->uExtension.sSlider.bTrayClick = FALSE;
-								break;
+								_thumb.sLT.fX = (_area.sLT.fX + _area.sRB.fX) * 0.5f - _wid->uExtension.sSlider.sSliderSize.fX * 0.5f;
+								_thumb.sLT.fY = (_area.sLT.fY + _area.sRB.fY) * 0.5f + (_area.sRB.fY - _area.sLT.fY) * 0.5f - ((_area.sRB.fY - _area.sLT.fY) - _wid->uExtension.sSlider.sSliderSize.fY) * _perc - _wid->uExtension.sSlider.sSliderSize.fY;
+								_thumb.sRB.fX = _thumb.sLT.fX + _wid->uExtension.sSlider.sSliderSize.fX;
+								_thumb.sRB.fY = _thumb.sLT.fY + _wid->uExtension.sSlider.sSliderSize.fY;
 							}
-							_wid->uExtension.sSlider.nDesiredPos = _newp;
+							_wid->uExtension.sSlider.bSliderDragged = blRectContains(&_thumb, &_pos);
+							_wid->uExtension.sSlider.bTrayClick = !_wid->uExtension.sSlider.bSliderDragged;
 						}
-						else
+						if (_wid->uExtension.sSlider.bSliderDragged)
 							blUISliderSliderPos(_wid->nID, _newp);
-						_PrUIMem->bDirty = TRUE;
+						else
+						{
+							_wid->uExtension.sSlider.bTrayClick = FALSE;
+							break;
+						}
+						_wid->uExtension.sSlider.nDesiredPos = _newp;
 					}
+					else
+						blUISliderSliderPos(_wid->nID, _newp);
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
+			case BL_UT_DIAL:
+				if (!_wid->uExtension.sDial.bAngleCut && _wid->uExtension.sDial.bDragging)
+				{
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					BLF32 _stheta = _wid->uExtension.sDial.nStartAngle * PI_INTERNAL / 180.0f, _etheta = _wid->uExtension.sDial.nEndAngle * PI_INTERNAL / 180.0f;
+					BLVec2 _vs, _ve, _vp;
+					_vs.fX = sinf(_stheta);
+					_vs.fY = -cosf(_stheta);
+					_ve.fX = sinf(_etheta);
+					_ve.fY = -cosf(_etheta);
+					_vp.fX = _x - (_drawarea.sLT.fX + _drawarea.sRB.fX) * 0.5f;
+					_vp.fY = _y - (_drawarea.sLT.fY + _drawarea.sRB.fY) * 0.5f;
+					BLF32 _anglerange = atan2f(_vs.fX * _ve.fY - _ve.fX * _vs.fY, _vs.fX * _ve.fX + _vs.fY * _ve.fY) * (180.f / PI_INTERNAL);
+					_anglerange = (blVec2CrossProduct(&_vs, &_ve) > 0.f) ? _anglerange : _anglerange + 360;
+					_anglerange = _wid->uExtension.sDial.bClockWise ? _anglerange : 360 - _anglerange;
+					BLF32 _anglecross = atan2f(_vs.fX * _vp.fY - _vp.fX * _vs.fY, _vs.fX * _vp.fX + _vs.fY * _vp.fY) * (180.f / PI_INTERNAL);
+					_anglecross = (blVec2CrossProduct(&_vs, &_vp) > 0.f) ? _anglecross : _anglecross + 360;
+					_anglecross = _wid->uExtension.sDial.bClockWise ? _anglecross : 360 - _anglecross;
+					if (_wid->uExtension.sDial.bClockWise)
+					{
+						if (_anglecross > 360 - (360 - _anglerange) * 0.5f)
+							_anglecross = 0.f;
+						else if ((_anglecross < 360 - (360 - _anglerange) * 0.5f) && _anglecross > _anglerange)
+							_anglecross = _anglerange;
+						_anglecross = _anglecross + _wid->uExtension.sDial.nStartAngle;
+					}
+					else
+					{
+						if (_anglecross > _anglerange + (360 - _anglerange) * 0.5f)
+							_anglecross = 0.f;
+						else if ((_anglecross < _anglerange + (360 - _anglerange) * 0.5f) && _anglecross > _anglerange)
+							_anglecross = _anglerange;
+						_anglecross = 360 - _wid->uExtension.sDial.nStartAngle + _anglecross;
+					}
+					blUIDialAngle(_wid->nID, _anglecross);
+					_PrUIMem->bDirty = TRUE;
 				}
 				break;
 			default:break;
@@ -5216,6 +5296,8 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				{
 					if (_PrUIMem->pFocusWidget->eType == BL_UT_SLIDER)
 						_PrUIMem->pFocusWidget->uExtension.sSlider.bDragging = FALSE;
+					else if (_PrUIMem->pFocusWidget->eType == BL_UT_DIAL)
+						_PrUIMem->pFocusWidget->uExtension.sDial.bDragging = FALSE;
 					//lost focs;_PrUIMem->pFocusWidget
 					//Panel
 				}
@@ -5290,21 +5372,19 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				}
 				break;
 			case BL_UT_DIAL:
+				if (!_wid->uExtension.sDial.bAngleCut)
 				{
-					if (!_wid->uExtension.sDial.bAngleCut)
+					BLVec2 _pos;
+					_pos.fX = _x;
+					_pos.fY = _y;
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					if (blRectContains(&_drawarea, &_pos))
 					{
-						BLVec2 _pos;
-						_pos.fX = _x;
-						_pos.fY = _y;
-						BLRect _area;
-						BLRect _sarea;
-						_WidgetAbsArea(_wid, &_area);
-						_WidgetScissorRect(_wid, &_sarea);
-						BLRect _drawarea = blRectIntersects(&_area, &_sarea);
-						if (blRectContains(&_drawarea, &_pos))
-						{
-							_wid->uExtension.sDial.bDragging = TRUE;
-						}
+						_wid->uExtension.sDial.bDragging = TRUE;
 					}
 				}
 				break;
@@ -5374,21 +5454,19 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				}
 				break;
 			case BL_UT_DIAL:
+				if (!_wid->uExtension.sDial.bAngleCut)
 				{
-					if (!_wid->uExtension.sDial.bAngleCut)
+					BLVec2 _pos;
+					_pos.fX = _x;
+					_pos.fY = _y;
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					if (blRectContains(&_drawarea, &_pos))
 					{
-						BLVec2 _pos;
-						_pos.fX = _x;
-						_pos.fY = _y;
-						BLRect _area;
-						BLRect _sarea;
-						_WidgetAbsArea(_wid, &_area);
-						_WidgetScissorRect(_wid, &_sarea);
-						BLRect _drawarea = blRectIntersects(&_area, &_sarea);
-						if (blRectContains(&_drawarea, &_pos))
-						{
-							_wid->uExtension.sDial.bDragging = TRUE;
-						}
+						_wid->uExtension.sDial.bDragging = TRUE;
 					}
 				}
 				break;
@@ -5443,10 +5521,10 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				}
 				break;
 			case BL_UT_DIAL:
+				if (!_wid->uExtension.sDial.bAngleCut && _wid->uExtension.sDial.bDragging)
 				{
-					if (!_wid->uExtension.sDial.bAngleCut)
-					{
-					}
+					_wid->uExtension.sDial.bDragging = FALSE;
+					_PrUIMem->bDirty = TRUE;
 				}
 				break;
 			default:break;
@@ -5486,6 +5564,13 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nDesiredPos);
 					}
 					_wid->uExtension.sSlider.bDragging = FALSE;
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
+			case BL_UT_DIAL:
+				if (!_wid->uExtension.sDial.bAngleCut && _wid->uExtension.sDial.bDragging)
+				{
+					_wid->uExtension.sDial.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -6547,6 +6632,8 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sDial.aStencilMap, 0, sizeof(BLAnsi) * 128);
 			_widget->uExtension.sDial.nStartAngle = 0;
 			_widget->uExtension.sDial.nEndAngle = 270;
+			_widget->uExtension.sDial.fAngle = 0.f;
+			_widget->uExtension.sDial.bDragging = FALSE;
 			_widget->uExtension.sDial.bAngleCut = FALSE;
             _widget->uExtension.sDial.bClockWise = FALSE;
             _widget->uExtension.sDial.nPixmapTex = INVALID_GUID;
