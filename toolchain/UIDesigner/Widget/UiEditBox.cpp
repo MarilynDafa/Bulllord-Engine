@@ -8,7 +8,7 @@
 UiEditBox::UiEditBox( UiWidget *parent /*= 0*/ )
 	: UiWidget(parent)
 {
-
+	_txtColor = 0xFFFFFFFF;
 }
 
 void UiEditBox::getDefaultSize( int &width, int &height ) const
@@ -52,6 +52,7 @@ QDomElement UiEditBox::serialize( QDomDocument &doc, const QDomElement &extEleme
 	extEle.setAttribute("MaxLength", getMaxC());
 	extEle.setAttribute("Placeholder", getText());
 	extEle.setAttribute("TextColor",fromQColor(getTextColor()).rgba());
+	extEle.setAttribute("PlaceholderColor", fromQColor(getPlaceholderColor()).rgba());
 	TextAlign align = getTextAlignment();
 	QString vAlign, hAlign;
 	if (align.horizontal == H_Left) hAlign = "Left";
@@ -117,6 +118,7 @@ void UiEditBox::readExt( QXmlStreamReader &reader )
 	unsigned int maxc = atts.value("MaxLength").toUInt();
 	QString placeholder = atts.value("Placeholder").toString();
 	unsigned int txtcolor = atts.value("TextColor").toUInt();
+	unsigned int phcolor = atts.value("PlaceholderColor").toUInt();
 	HTextAlignment  hAlign;
 	QString ha = atts.value(QLatin1String("AlignmentH")).toString();
 	VTextAlignment  vAlign;
@@ -169,6 +171,7 @@ void UiEditBox::readExt( QXmlStreamReader &reader )
 	setMultiLine(multiline);
 	setMaxC(maxc);
 	setTextColor(fromCColor(c_color(txtcolor)));
+	setPlaceholderColor(fromCColor(c_color(phcolor)));
 	setTextAlignment(TextAlign(HTextAlignment(hAlign), VTextAlignment(vAlign)));
 	
 	QSize msz;
@@ -352,11 +355,22 @@ void UiEditBox::setTextAlignment( const TextAlign &align )
 
 QColor UiEditBox::getTextColor() const
 {
-	c_color color(((c_editbox*)_widget)->get_text_clr());
+	c_color color(_txtColor);
 	return QColor((int)(color.r()*255.0), (int)(color.g()*255.0), (int)(color.b()*255.0), (int)(color.a()*255.0));
 }
 
 void UiEditBox::setTextColor( const QColor &color )
+{
+	c_color clr((u32)color.red(), (u32)color.green(), (u32)color.blue(), (u32)color.alpha());
+	_txtColor = clr.rgba();
+}
+
+QColor UiEditBox::getPlaceholderColor() const
+{
+	c_color color(((c_editbox*)_widget)->get_text_clr());
+	return QColor((int)(color.r()*255.0), (int)(color.g()*255.0), (int)(color.b()*255.0), (int)(color.a()*255.0));
+}
+void UiEditBox::setPlaceholderColor(const QColor &color)
 {
 	c_color clr((u32)color.red(), (u32)color.green(), (u32)color.blue(), (u32)color.alpha());
 	((c_editbox*)_widget)->set_text_color(clr);

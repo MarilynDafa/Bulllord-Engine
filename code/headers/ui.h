@@ -372,11 +372,9 @@ BL_API BLVoid blUITextPlaceholder(
 	IN BLGuid _ID,
 	IN BLUtf8* _Placeholder,
 	IN BLU32 _TxtColor,
+	IN BLU32 _PlaceholderColor,
 	IN BLEnum _TxtAlignmentH,
 	IN BLEnum _TxtAlignmentV);
-
-BL_API const BLUtf8* blUIGetTextText(
-	IN BLGuid _ID);
 
 BL_API BLVoid blUITextFont(
 	IN BLGuid _ID,
@@ -395,6 +393,9 @@ BL_API BLVoid blUITextFlip(
 BL_API BLVoid blUITextEnable(
 	IN BLGuid _ID,
 	IN BLBool _Enable);
+
+BL_API const BLUtf8* blUIGetTextText(
+	IN BLGuid _ID);
 
 BL_API BLVoid blUIProgressPixmap(
 	IN BLGuid _ID,

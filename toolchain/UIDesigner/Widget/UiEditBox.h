@@ -18,6 +18,7 @@ class UiEditBox : public UiWidget
 	Q_PROPERTY(FontType Font READ getFont WRITE setFont)
 	Q_PROPERTY(QString Placeholder READ getText WRITE setText)
 	Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
+	Q_PROPERTY(QColor PlaceholderColor READ getPlaceholderColor WRITE setPlaceholderColor)
 	Q_PROPERTY(TextAlign Alignment READ getTextAlignment WRITE setTextAlignment)
 	Q_PROPERTY(QSize Padding READ getMargin WRITE setMargin)
 	Q_PROPERTY(NumericSet Numeric READ getNumeric WRITE setNumeric)
@@ -31,6 +32,8 @@ public:
 	void setTextAlignment(const TextAlign &align);
 	QColor getTextColor() const;
 	void setTextColor(const QColor &color);
+	QColor getPlaceholderColor() const;
+	void setPlaceholderColor(const QColor &color);
 	bool getEnable() const;
 	void setEnable(bool enable);
 	bool getAutoScroll() const;
@@ -66,6 +69,7 @@ protected Q_SLOTS:
 private:
 	SkinImageEx _skinImage;
 	SkinImage _stencilImg;
+	unsigned int _txtColor;
 };
 
 #endif //UIEDITBOX_H

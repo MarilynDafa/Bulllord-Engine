@@ -3298,30 +3298,31 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
             default:break;
         }
         GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+		GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
         if (_Immutable)
         {
             switch (_Target)
             {
             case BL_TT_1D:
-                GL_CHECK_INTERNAL(glTexStorage2D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height));
+                GL_CHECK_INTERNAL(glTexStorage2D(_target, _Mipmap, !_Srgb ? _ifmt : _sfmt, _Width, _Height));
                 break;
             case BL_TT_2D:
-                GL_CHECK_INTERNAL(glTexStorage2D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height));
+                GL_CHECK_INTERNAL(glTexStorage2D(_target, _Mipmap, !_Srgb ? _ifmt : _sfmt, _Width, _Height));
                 break;
             case BL_TT_3D:
-                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height, _Depth));
+                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, !_Srgb ? _ifmt : _sfmt, _Width, _Height, _Depth));
                 break;
             case BL_TT_CUBE:
-                GL_CHECK_INTERNAL(glTexStorage2D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height));
+                GL_CHECK_INTERNAL(glTexStorage2D(_target, _Mipmap, !_Srgb ? _ifmt : _sfmt, _Width, _Height));
                 break;
             case BL_TT_ARRAY1D:
-                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height, _Layer));
+                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, !_Srgb ? _ifmt : _sfmt, _Width, _Height, _Layer));
                 break;
             case BL_TT_ARRAY2D:
-                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height, _Layer));
+                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, !_Srgb ? _ifmt : _sfmt, _Width, _Height, _Layer));
                 break;
             case BL_TT_ARRAYCUBE:
-                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, _Srgb ? _ifmt : _sfmt, _Width, _Height, _Layer));
+                GL_CHECK_INTERNAL(glTexStorage3D(_target, _Mipmap, !_Srgb ? _ifmt : _sfmt, _Width, _Height, _Layer));
                 break;
             default:break;
             }
@@ -3359,7 +3360,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
 							}
 							else
 							{
-								GL_CHECK_INTERNAL(glTexImage2D(_target, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+								GL_CHECK_INTERNAL(glTexImage2D(_target, _level, !_Srgb ? _ifmt : _sfmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
 							}
 						}
 						else
@@ -3370,7 +3371,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
 							}
 							else
 							{
-								GL_CHECK_INTERNAL(glCompressedTexImage2D(_target, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
+								GL_CHECK_INTERNAL(glCompressedTexImage2D(_target, _level, !_Srgb ? _ifmt : _sfmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
 							}
 						}
 					}
@@ -3381,7 +3382,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
 						{
 							if (0 == _aidx && !_Immutable)
 							{
-								GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _Layer, 0, _fmt, _type, 0));
+								GL_CHECK_INTERNAL(glTexImage3D(_target, _level, !_Srgb ? _ifmt : _sfmt, _w, _h, _Layer, 0, _fmt, _type, 0));
 							}
 							GL_CHECK_INTERNAL(glTexSubImage3D(_target, _level, 0, 0, _aidx, _w, _h, 1, _fmt, _type, _Data + _aidx * _Mipmap + _level));
 						}
@@ -3389,7 +3390,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
 						{
 							if (0 == _aidx && !_Immutable)
 							{
-								GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _Layer, 0, _imagesz*_Layer, 0));
+								GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, !_Srgb ? _ifmt : _sfmt, _w, _h, _Layer, 0, _imagesz*_Layer, 0));
 							}
 							GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _level, 0, 0, _aidx, _w, _h, 1, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
 						}
@@ -3405,18 +3406,18 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
 							}
 							else
 							{
-								GL_CHECK_INTERNAL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
+								GL_CHECK_INTERNAL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, !_Srgb ? _ifmt : _sfmt, _w, _h, 0, _fmt, _type, _Data + _aidx * _Mipmap + _level));
 							}
 						}
 						else
 						{
 							if (_Immutable)
 							{
-								GL_CHECK_INTERNAL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _w, _h, _ifmt, _imagesz, _Data + _aidx * _Mipmap + _level));
+								GL_CHECK_INTERNAL(glCompressedTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _w, _h, !_Srgb ? _ifmt : _sfmt, _imagesz, _Data + _aidx * _Mipmap + _level));
 							}
 							else
 							{
-								GL_CHECK_INTERNAL(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
+								GL_CHECK_INTERNAL(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, !_Srgb ? _ifmt : _sfmt, _w, _h, 0, _imagesz, _Data + _aidx * _Mipmap + _level));
 							}
 						}
 					}
@@ -3427,7 +3428,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
 						{
 							if (0 == _aidx)
 							{
-								GL_CHECK_INTERNAL(glTexImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, _Layer, 0, _fmt, _type, 0));
+								GL_CHECK_INTERNAL(glTexImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, !_Srgb ? _ifmt : _sfmt, _w, _h, _Layer, 0, _fmt, _type, 0));
 							}
 							GL_CHECK_INTERNAL(glTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _aidx, _w, _h, 1, _fmt, _type, _Data + _aidx * _Mipmap + _level));
 						}
@@ -3435,9 +3436,9 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
 						{
 							if (0 == _aidx)
 							{
-								GL_CHECK_INTERNAL(glCompressedTexImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, _ifmt, _w, _h, _Layer, 0, _imagesz * _Layer, 0));
+								GL_CHECK_INTERNAL(glCompressedTexImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, !_Srgb ? _ifmt : _sfmt, _w, _h, _Layer, 0, _imagesz * _Layer, 0));
 							}
-							GL_CHECK_INTERNAL(glCompressedTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _aidx, _w, _h, 1, _ifmt, _imagesz, _Data + _aidx * _Layer + _level));
+							GL_CHECK_INTERNAL(glCompressedTexSubImage3D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + _face, _level, 0, 0, _aidx, _w, _h, 1, !_Srgb ? _ifmt : _sfmt, _imagesz, _Data + _aidx * _Layer + _level));
 						}
 					}
 					break;
@@ -3451,18 +3452,18 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
 							}
 							else
 							{
-								GL_CHECK_INTERNAL(glTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _fmt, _type, _Data + _level));
+								GL_CHECK_INTERNAL(glTexImage3D(_target, _level, !_Srgb ? _ifmt : _sfmt, _w, _h, _d, 0, _fmt, _type, _Data + _level));
 							}
 						}
 						else
 						{
 							if (_Immutable)
 							{
-								GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _level, 0, 0, 0, _w, _h, _d, _ifmt, _imagesz, _Data + _level));
+								GL_CHECK_INTERNAL(glCompressedTexSubImage3D(_target, _level, 0, 0, 0, _w, _h, _d, !_Srgb ? _ifmt : _sfmt, _imagesz, _Data + _level));
 							}
 							else
 							{
-								GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, _ifmt, _w, _h, _d, 0, _imagesz, _Data + _level));
+								GL_CHECK_INTERNAL(glCompressedTexImage3D(_target, _level, !_Srgb ? _ifmt : _sfmt, _w, _h, _d, 0, _imagesz, _Data + _level));
 							}
 						}
 					}
@@ -3475,6 +3476,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
 				}
 			}
 		}
+		GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)

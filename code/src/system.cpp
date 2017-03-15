@@ -3997,6 +3997,27 @@ blVideoOperation(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _Play)
 BLVoid
 blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
 {
+	BLF32 _x = _Xpos, _y = _Ypos;
+	if (_PrSystemMem->sBoostParam.bUseDesignRes)
+	{
+		BLF32 _dwidth = (BLF32)_PrSystemMem->sBoostParam.nDesignWidth;
+		BLF32 _dheight = (BLF32)_PrSystemMem->sBoostParam.nDesignHeight;
+		BLF32 _ratioorg = (BLF32)(_PrSystemMem->sBoostParam.nScreenWidth) / (BLF32)(_PrSystemMem->sBoostParam.nScreenHeight);
+		BLF32 _ratiodeg = (BLF32)(_dwidth) / (BLF32)(_dheight);
+		BLU32 _actualw, _actualh;
+		if (_ratiodeg >= _ratioorg)
+		{
+			_actualh = (BLU32)_dheight;
+			_actualw = (BLU32)(_ratioorg * _dheight);
+		}
+		else
+		{
+			_actualh = (BLU32)(_dwidth / _ratioorg);
+			_actualw = (BLU32)_dwidth;
+		}
+		_x *= (BLF32)(_PrSystemMem->sBoostParam.nScreenWidth) / (BLF32)(_actualw);
+		_y *= (BLF32)(_PrSystemMem->sBoostParam.nScreenHeight) / (BLF32)(_actualh);
+	}
 #if defined(BL_PLATFORM_WIN32)
 	if (_PrSystemMem->nIMC)
 	{
@@ -4004,13 +4025,13 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
 		ImmAssociateContext(_PrSystemMem->nHwnd, _PrSystemMem->nIMC);
 		ImmGetCompositionWindow(_PrSystemMem->nIMC, &_com);
 		_com.dwStyle = CFS_POINT;
-		_com.ptCurrentPos.x = (LONG)_Xpos;
-		_com.ptCurrentPos.y = (LONG)_Ypos;
+		_com.ptCurrentPos.x = (LONG)_x;
+		_com.ptCurrentPos.y = (LONG)_y;
 		ImmSetCompositionWindow(_PrSystemMem->nIMC, &_com);
 	}
 #elif defined(BL_PLATFORM_UWP)
-	_PrSystemMem->sIMEpos.X = _Xpos;
-	_PrSystemMem->sIMEpos.Y = _Ypos;
+	_PrSystemMem->sIMEpos.X = _x;
+	_PrSystemMem->sIMEpos.Y = _y;
 	_PrSystemMem->pCTEcxt->NotifyFocusEnter();
 	_PrSystemMem->pCTEcxt->NotifyLayoutChanged();
 #elif defined(BL_PLATFORM_LINUX)
@@ -4022,8 +4043,8 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
         {
             XVaNestedList _attr;
             XPoint _spot;
-            _spot.x = _Xpos;
-            _spot.y = _Ypos;
+            _spot.x = _x;
+            _spot.y = _y;
             _attr = XVaCreateNestedList(0, XNSpotLocation, &_spot, NULL);
             XSetICValues(_PrSystemMem->pIC, XNPreeditAttributes, _attr, NULL);
             XFree(_attr);
@@ -4036,8 +4057,8 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
     if (!_PrSystemMem->pTICcxt)
     {
         _PrSystemMem->pTICcxt = [[OSXTextInput alloc] initWithFrame: NSMakeRect(0, 0, 0, 0)];
-        _PrSystemMem->sIMEpos.x = _Xpos;
-        _PrSystemMem->sIMEpos.y = _Ypos;
+        _PrSystemMem->sIMEpos.x = _x;
+        _PrSystemMem->sIMEpos.y = _y;
     }
     if (![[_PrSystemMem->pTICcxt superview] isEqual: [_PrSystemMem->pWindow contentView]])
     {

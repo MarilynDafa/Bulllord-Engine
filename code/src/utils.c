@@ -448,6 +448,8 @@ blHashUtf16(IN BLUtf16* _Str)
 BLU32
 blUtf8Length(IN BLUtf8* _Str)
 {
+	if (!_Str)
+		return 0;
 	const BLUtf8* _tmp = _Str;
 	BLU32 _cnt = 0;
 	while (*_tmp++)
@@ -457,6 +459,8 @@ blUtf8Length(IN BLUtf8* _Str)
 BLU32
 blUtf16Length(IN BLUtf16* _Str)
 {
+	if (!_Str)
+		return 0;
 	const BLUtf16* _tmp = _Str;
 	BLU32 _cnt = 0;
 	while (*_tmp++)
@@ -466,6 +470,8 @@ blUtf16Length(IN BLUtf16* _Str)
 BLBool
 blUtf8Equal(IN BLUtf8* _Str1, IN BLUtf8* _Str2)
 {
+	if (!_Str1 || !_Str2)
+		return FALSE;
 	BLUtf8* _src = (BLUtf8*)_Str1;
 	BLUtf8* _dst = (BLUtf8*)_Str2;
 	BLS32 _ret = 0;
@@ -480,6 +486,8 @@ blUtf8Equal(IN BLUtf8* _Str1, IN BLUtf8* _Str2)
 BLBool
 blUtf16Equal(IN BLUtf16* _Str1, IN BLUtf16* _Str2)
 {
+	if (!_Str1 || !_Str2)
+		return FALSE;
 	BLUtf16* _src = (BLUtf16*)_Str1;
 	BLUtf16* _dst = (BLUtf16*)_Str2;
 	BLS32 _ret = 0;
@@ -494,6 +502,8 @@ blUtf16Equal(IN BLUtf16* _Str1, IN BLUtf16* _Str2)
 BLVoid
 blSwitchLowerUtf8(INOUT BLUtf8* _Str)
 {
+	if (!_Str)
+		return;
 	const BLUtf8* _tmp = _Str;
 	BLU32 _cnt = 0;
 	BLU32 _i = 0;
@@ -505,6 +515,8 @@ blSwitchLowerUtf8(INOUT BLUtf8* _Str)
 BLVoid
 blSwitchLowerUtf16(INOUT BLUtf16* _Str)
 {
+	if (!_Str)
+		return;
 	const BLUtf16* _tmp = _Str;
 	BLU32 _cnt = 0;
 	BLU32 _i = 0;
@@ -516,6 +528,8 @@ blSwitchLowerUtf16(INOUT BLUtf16* _Str)
 BLVoid
 blSwitchUpperUtf8(INOUT BLUtf8* _Str)
 {
+	if (!_Str)
+		return;
 	const BLUtf8* _tmp = _Str;
 	BLU32 _cnt = 0;
 	BLU32 _i = 0;
@@ -527,6 +541,8 @@ blSwitchUpperUtf8(INOUT BLUtf8* _Str)
 BLVoid
 blSwitchUpperUtf16(INOUT BLUtf16* _Str)
 {
+	if (!_Str)
+		return;
 	const BLUtf16* _tmp = _Str;
 	BLU32 _cnt = 0;
 	BLU32 _i = 0;
@@ -538,11 +554,15 @@ blSwitchUpperUtf16(INOUT BLUtf16* _Str)
 BLS32
 blUtf8ToInteger(IN BLUtf8* _Str)
 {
+	if (!_Str)
+		return 0;
 	return (BLS32)strtol((BLAnsi*)_Str, NULL, 0);
 }
 BLS32
 blUtf16ToInteger(IN BLUtf16* _Str)
 {
+	if (!_Str)
+		return 0;
 	BLUtf8 _buf[32] = {0};
 	BLUtf8* _dest = _buf;
 	const BLUtf16* _tmp = _Str;
@@ -597,11 +617,15 @@ blUtf16ToInteger(IN BLUtf16* _Str)
 BLU32 
 blUtf8ToUInteger(IN BLUtf8* _Str)
 {
+	if (!_Str)
+		return 0;
 	return (BLU32)strtoul((BLAnsi*)_Str, NULL, 0);
 }
 BLU32
 blUtf16ToUInteger(IN BLUtf16* _Str)
 {
+	if (!_Str)
+		return 0;
 	BLUtf8 _buf[32] = { 0 };
 	BLUtf8* _dest = _buf;
 	const BLUtf16* _tmp = _Str;
@@ -656,11 +680,15 @@ blUtf16ToUInteger(IN BLUtf16* _Str)
 BLF32
 blUtf8ToFloat(IN BLUtf8* _Str)
 {
+	if (!_Str)
+		return 0.f;
 	return (BLF32)strtod((BLAnsi*)_Str, NULL);
 }
 BLF32
 blUtf16ToFloat(IN BLUtf16* _Str)
 {
+	if (!_Str)
+		return 0.f;
 	BLUtf8 _buf[32] = { 0 };
 	BLUtf8* _dest = _buf;
 	const BLUtf16* _tmp = _Str;
@@ -807,9 +835,11 @@ blFloatToUtf16(IN BLF32 _Var)
 const BLUtf16*
 blGenUtf16Str(IN BLUtf8* _Str)
 {
+	if (!_Str)
+		return NULL;
 	BLUtf8 _tcp;
 	BLU32 _strlen, _destcapacity, _idx;
-	const BLUtf16* _ret = NULL;
+	BLUtf16* _ret = NULL;
 	const BLUtf8* _tmp = _Str;
 	const BLUtf8* _buf = _Str;
 	BLUtf16* _temp;
@@ -831,7 +861,6 @@ blGenUtf16Str(IN BLUtf8* _Str)
 		else
 		{   _cnt -= 2;	_buf += 3;	}
 	}
-	++_encsze;
 	_ret = _temp = (BLUtf16*)malloc((1 + _encsze) * sizeof(BLUtf16));
 	_destcapacity = _encsze;
 	for(_idx = 0; ((_idx < _strlen) && (_destcapacity > 0));)
@@ -858,24 +887,29 @@ blGenUtf16Str(IN BLUtf8* _Str)
 		*_temp++ = _cp;
 		--_destcapacity;
 	}
-	*_temp = 0;
+	_ret[_encsze] = 0;
 	return _ret;
 }
 BLVoid
 blDeleteUtf16Str(INOUT BLUtf16* _Str)
 {
+	if (!_Str)
+		return;
 	free(_Str);
 	_Str = NULL;
 }
 const BLUtf8*
 blGenUtf8Str(IN BLUtf16* _Str)
 {
+	if (!_Str)
+		return NULL;
 	BLUtf8* _ret, *_rettmp;
 	const BLUtf16* _tmp = _Str;
 	BLU32 _idx, _destcapacity, _cnt = 0, _tmpcnt = 0, _buffsize = 0;
 	while (*_tmp++)
 		_cnt++;
 	_tmpcnt = _cnt;
+	_tmp = _Str;
 	while(_tmpcnt--)
 	{
 		if(*_tmp < 0x80)
@@ -886,7 +920,7 @@ blGenUtf8Str(IN BLUtf16* _Str)
 			_buffsize += 3;
 		_tmp++;
 	}
-	_ret = (BLUtf8*)malloc(_buffsize*sizeof(BLUtf8));
+	_ret = (BLUtf8*)malloc((1 + _buffsize)*sizeof(BLUtf8));
 	_rettmp = (BLUtf8*)_ret;
 	_destcapacity = _buffsize;
 	for(_idx = 0; _idx < _cnt; ++_idx)
@@ -920,18 +954,22 @@ blGenUtf8Str(IN BLUtf16* _Str)
 			_destcapacity -= 3;
 		}
 	}
-	*_rettmp = 0;
+	_ret[_buffsize] = 0;
 	return _ret;
 }
 BLVoid
 blDeleteUtf8Str(INOUT BLUtf8* _Str)
 {
+	if (!_Str)
+		return;
 	free(_Str);
 	_Str = NULL;
 }
 const BLUtf8*
 blGetExtNameUtf8(IN BLUtf8* _Filename)
 {
+	if (!_Filename)
+		return NULL;
 	const BLUtf8* _tmp = _Filename;
 	BLU32 _len = 0;
 	BLS32 _i;
@@ -957,6 +995,8 @@ blGetExtNameUtf8(IN BLUtf8* _Filename)
 const BLUtf16*
 blGetExtNameUtf16(IN BLUtf16* _Filename)
 {
+	if (!_Filename)
+		return NULL;
 	BLS32 _i;
 	const BLUtf16* _tmp = _Filename;
 	BLU32 _len = 0;
