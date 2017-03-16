@@ -346,7 +346,6 @@ BL_API BLVoid blUITextCommonMap(
 BL_API BLVoid blUITextTypography(
 	IN BLGuid _ID,
 	IN BLBool _Autoscroll,
-	IN BLBool _Wordwrap,
 	IN BLBool _Multiline);
 
 BL_API BLVoid blUITextPassword(

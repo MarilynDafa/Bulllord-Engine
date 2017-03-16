@@ -198,7 +198,6 @@ typedef struct _Widget {
 			BLS32 nMaxValue;
 			BLBool bSelecting;
 			BLBool bAutoscroll;
-			BLBool bWordwrap;
 			BLBool bMultiline;
 			BLBool bPassword;
 			BLBool bNumeric;
@@ -1141,7 +1140,7 @@ _MeasureTextDim(const BLUtf16* _Text, _BLFont* _Font, BLU32 _FontHeight, BLF32* 
 		if (_start != 0)
 			*_Height += _linespace;
 		_end = blUtf16Length(_Text);
-		for (BLU32 _idx = 0; _idx < _end; ++_idx)
+		for (BLU32 _idx = _start; _idx < _end; ++_idx)
 		{
 			if (_Text[_idx] == L'\n')
 			{
@@ -1219,6 +1218,7 @@ _BreakText(_BLFont* _Font, BLU32 _FontHeight, BLUtf16* _Text, BLU32 _Width, BLU1
 			_ret = (BLUtf16*)realloc(_ret, (_newlen + 1) * sizeof(BLUtf16));
 			memmove(_ret + _idx + 1, _ret + _idx, (_newlen - 1 - _idx));
 			_ret[_idx] = L'\n';
+			_ret[_newlen] = 0;
 		}
 		else
 			_lineleftw -= _adv;
@@ -1229,7 +1229,7 @@ _BreakText(_BLFont* _Font, BLU32 _FontHeight, BLUtf16* _Text, BLU32 _Width, BLU1
 static BLS32
 _TextLine(_BLWidget* _Node, BLS32 _Pos)
 {
-	if (!_Node->uExtension.sText.bWordwrap && !_Node->uExtension.sText.bMultiline)
+	if ( !_Node->uExtension.sText.bMultiline)
 		return 0;
 	BLS32 _idx = 0;
 	while (_idx < (BLS32)_Node->uExtension.sText.nSplitSize)
@@ -1248,8 +1248,8 @@ _TextRect(_BLWidget* _Node, _BLFont* _Font, BLS32 _Line, BLRect* _Rect, BLU16 _F
 	if (!_Font)
 		return;
 	BLVec2 _d;
-	BLU32 _linecount = (_Node->uExtension.sText.bWordwrap || _Node->uExtension.sText.bMultiline) ? _Node->uExtension.sText.nSplitSize : 1;
-	if (_Node->uExtension.sText.bWordwrap || _Node->uExtension.sText.bMultiline)
+	BLU32 _linecount = _Node->uExtension.sText.bMultiline ? _Node->uExtension.sText.nSplitSize : 1;
+	if (_Node->uExtension.sText.bMultiline)
 	{
 		_MeasureTextDim(_Node->uExtension.sText.pSplitText[_Line], _Font, _Node->uExtension.sText.nFontHeight, &_d.fX, &_d.fY, _Flag);
 		_d.fY = (_d.fY) ? _d.fY : _Node->uExtension.sText.nFontHeight;
@@ -1317,7 +1317,7 @@ _TextRect(_BLWidget* _Node, _BLFont* _Font, BLS32 _Line, BLRect* _Rect, BLU16 _F
 static void 
 _TextSplit(_BLWidget* _Node, _BLFont* _Font, BLU16 _Flag)
 {
-	if (!_Node->uExtension.sText.bWordwrap && !_Node->uExtension.sText.bMultiline)
+	if (!_Node->uExtension.sText.bMultiline)
 		return;
 	if (_Node->uExtension.sText.nSplitSize >= 2048)
 		return;
@@ -1362,36 +1362,18 @@ _TextSplit(_BLWidget* _Node, _BLFont* _Font, BLU16 _Flag)
 			BLF32 _whitelen = 0.f, _wordlen = 0.f, _tmp = 0.f;
 			_MeasureTextDim(_whitespace, _Font, _Node->uExtension.sText.nFontHeight, &_whitelen, &_tmp, _Flag);
 			_MeasureTextDim(_word, _Font, _Node->uExtension.sText.nFontHeight, &_wordlen, &_tmp, _Flag);
-			if (_Node->uExtension.sText.bWordwrap && _length + _wordlen + _whitelen > _elwidth && blUtf16Length(_line) > 0)
-			{
-				_length = (BLS32)_wordlen;
-				_Node->uExtension.sText.pSplitText[_Node->uExtension.sText.nSplitSize] = _line;
-				_Node->uExtension.sText.aSplitPositions[_Node->uExtension.sText.nSplitSize] = _lastlinestart;
-				_Node->uExtension.sText.nSplitSize++;
-				_lastlinestart = _idx - (BLS32)blUtf16Length(_word);
-				BLU32 _s16len = blUtf16Length(_word);
-				if (_line)
-					free(_line);
-				_line = (BLUtf16*)malloc((_s16len + 1) * sizeof(BLU16));
-				for (BLU32 _jdx = 0; _jdx < _s16len; ++_jdx)
-					_line[_jdx] = _word[_jdx];
-				_line[_s16len] = 0;
-			}
-			else
-			{
-				BLU32 _wslen = blUtf16Length(_whitespace);
-				BLU32 _wdlen = blUtf16Length(_word);
-				BLU32 _llen = blUtf16Length(_line);
-				_line = (BLUtf16*)realloc(_line, (_llen + _wslen + _wdlen + 1) * sizeof(BLUtf16));
-				BLU32 _jdx = 0;
-				for (; _jdx < _wslen; ++_jdx)
-					_line[_llen + _jdx] = _whitespace[_jdx];
-				_jdx = 0;
-				for (; _jdx < _wdlen; ++_jdx)
-					_line[_llen + _wslen + _jdx] = _word[_jdx];
-				_line[_llen + _wslen + _wdlen] = 0;
-				_length += (BLS32)_whitelen + (BLS32)_wordlen;
-			}
+			BLU32 _wslen = blUtf16Length(_whitespace);
+			BLU32 _wdlen = blUtf16Length(_word);
+			BLU32 _llen = blUtf16Length(_line);
+			_line = (BLUtf16*)realloc(_line, (_llen + _wslen + _wdlen + 1) * sizeof(BLUtf16));
+			BLU32 _jdx = 0;
+			for (; _jdx < _wslen; ++_jdx)
+				_line[_llen + _jdx] = _whitespace[_jdx];
+			_jdx = 0;
+			for (; _jdx < _wdlen; ++_jdx)
+				_line[_llen + _wslen + _jdx] = _word[_jdx];
+			_line[_llen + _wslen + _wdlen] = 0;
+			_length += (BLS32)_whitelen + (BLS32)_wordlen;
 			_wordidx = 0;
 			_whiteidx = 0;
 			memset(_word, 0, 128 * sizeof(BLUtf16));
@@ -1451,7 +1433,7 @@ _TextSplit(_BLWidget* _Node, _BLFont* _Font, BLU16 _Flag)
 static BLS32 
 _CaretPos(_BLWidget* _Node, BLVec2* _Pos)
 {
-	BLU32 _linecount = (_Node->uExtension.sText.bWordwrap || _Node->uExtension.sText.bMultiline) ? _Node->uExtension.sText.nSplitSize : 1;
+	BLU32 _linecount = _Node->uExtension.sText.bMultiline ? _Node->uExtension.sText.nSplitSize : 1;
 	BLUtf16* _curline = NULL;
 	BLS32 _startpos = 0;
 	BLF32 _x, _y;
@@ -1495,8 +1477,8 @@ _CaretPos(_BLWidget* _Node, BLVec2* _Pos)
 			_y = _Node->uExtension.sText.sCurRect.sRB.fY;
 		if (_y >= _Node->uExtension.sText.sCurRect.sLT.fY && _y <= _Node->uExtension.sText.sCurRect.sRB.fY)
 		{
-			_curline = (_Node->uExtension.sText.bWordwrap || _Node->uExtension.sText.bMultiline) ? _Node->uExtension.sText.pSplitText[_idx] : _text16;
-			_startpos = (_Node->uExtension.sText.bWordwrap || _Node->uExtension.sText.bMultiline) ? _Node->uExtension.sText.aSplitPositions[_idx] : 0;
+			_curline = _Node->uExtension.sText.bMultiline ? _Node->uExtension.sText.pSplitText[_idx] : _text16;
+			_startpos = _Node->uExtension.sText.bMultiline ? _Node->uExtension.sText.aSplitPositions[_idx] : 0;
 			break;
 		}
 	}
@@ -1566,8 +1548,8 @@ _TextScroll(_BLWidget* _Node)
 	_TextRect(_Node, _ft, _curline, &_framerect, _flag);
 	BLU32 _caretwidth = 1;
 	const BLUtf16* _s16 = blGenUtf16Str(_Node->uExtension.sText.pText);
-	BLUtf16* _curtxt = (_Node->uExtension.sText.bMultiline || _Node->uExtension.sText.bWordwrap) ? _Node->uExtension.sText.pSplitText[_curline] : _s16;
-	BLS32 _cpos = (_Node->uExtension.sText.bMultiline || _Node->uExtension.sText.bWordwrap) ? _Node->uExtension.sText.nCaretPos - _Node->uExtension.sText.aSplitPositions[_curline] : _Node->uExtension.sText.nCaretPos;
+	BLUtf16* _curtxt = _Node->uExtension.sText.bMultiline ? _Node->uExtension.sText.pSplitText[_curline] : _s16;
+	BLS32 _cpos = _Node->uExtension.sText.bMultiline ? _Node->uExtension.sText.nCaretPos - _Node->uExtension.sText.aSplitPositions[_curline] : _Node->uExtension.sText.nCaretPos;
 	BLF32 _cbegin, _cend, _txtw, _tmp;
 	BLUtf16* _cursubstr = (BLUtf16*)alloca((1 + _cpos) * sizeof(BLUtf16));
 	memset(_cursubstr, 0, (1 + _cpos) * sizeof(BLUtf16));
@@ -1591,7 +1573,7 @@ _TextScroll(_BLWidget* _Node)
 		_Node->uExtension.sText.nScrollPosH += (BLS32)((_Node->uExtension.sText.sCurRect.sLT.fX + _cend) - _framerect.sRB.fX);
 		_TextRect(_Node, _ft, _curline, &_framerect, _flag);
 	}
-	if (_Node->uExtension.sText.bMultiline || _Node->uExtension.sText.bWordwrap)
+	if (_Node->uExtension.sText.bMultiline)
 	{
 		BLF32 _lineheight;
 		_MeasureTextDim(L"A", _ft, _Node->uExtension.sText.nFontHeight, &_tmp, &_lineheight, _flag);
@@ -2344,13 +2326,13 @@ _UnloadUI(BLVoid* _Src)
 	return TRUE;
 }
 static BLVoid
-_WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum _AlignmentH, BLEnum _AlignmentV, BLBool _Wrap, BLRect* _Area, BLRect* _ClipArea, BLU32 _Color, BLU16 _Flag, BLBool _Pwd)
+_WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum _AlignmentH, BLEnum _AlignmentV, BLBool _Single, BLRect* _Area, BLRect* _ClipArea, BLU32 _Color, BLU16 _Flag, BLBool _Pwd)
 {
 	BLU32 _txtlen = blUtf16Length(_Text);
 	if (!_txtlen)
 		return;
 	_BLFont* _ft = NULL;
-	BLUtf16* _str = (BLUtf16*)malloc((_txtlen + 1) * sizeof(BLUtf16));
+	BLUtf16* _str = (BLUtf16*)alloca((_txtlen + 1) * sizeof(BLUtf16));
 	memset(_str, 0, (_txtlen + 1) * sizeof(BLUtf16));
 	if (_Pwd)
 	{
@@ -2386,8 +2368,6 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 		blDictInsert(_ft->pGlyphAtlas, _FontHeight, _gatlas);
 	}
 	FT_Set_Char_Size(_ft->sFtFace, _FontHeight * 64, 0, 72 * 64, 72);
-	if (_Wrap)
-		_str = _BreakText(_ft, _FontHeight, _str, (BLU32)(_Area->sRB.fX - _Area->sLT.fX), _Flag);
 	BLF32 _w, _h;
 	_MeasureTextDim(_str, _ft, _FontHeight, &_w, &_h, _Flag);
 	BLVec2 _pt;
@@ -2401,7 +2381,7 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 		_pt.fY = _Area->sLT.fY;
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-	if (!_Wrap)
+	if (!_Single)
 	{
 		if (_AlignmentH == BL_UA_HCENTER)
 			_pt.fX = (_Area->sLT.fX + _Area->sRB.fX) * 0.5f - _w * 0.5f;
@@ -2478,7 +2458,7 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 			_le = _txtlen;
 			for (BLU32 _idx = _ls; _idx < _txtlen; ++_idx)
 			{
-				if (_line[_idx] == L'\n' && _idx != _txtlen - 1)
+				if (_str[_idx] == L'\n')
 				{
 					_le = _idx;
 					break;
@@ -2562,7 +2542,6 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 			_pt.fY += _FontHeight;
 		}
 	}
-	free(_str);
 }
 static BLVoid
 _DrawPanel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
@@ -4601,7 +4580,7 @@ _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	_framerect.sLT.fY = _Y - _Height * 0.5f + _Node->uExtension.sText.nPaddingY;
 	_framerect.sRB.fX = _X + _Width * 0.5f - _Node->uExtension.sText.nPaddingX;
 	_framerect.sRB.fY = _Y + _Height * 0.5f - _Node->uExtension.sText.nPaddingY;
-	if (!blUtf16Length(_text))
+	if (!blUtf16Length(_text) && _PrUIMem->pFocusWidget != _Node)
 	{
 		_text = blGenUtf16Str(_Node->uExtension.sText.pPlaceholder);
 		_WriteText(_text, _Node->uExtension.sText.aFontSource, _Node->uExtension.sText.nFontHeight, _Node->uExtension.sText.eTxtAlignmentH, _Node->uExtension.sText.eTxtAlignmentV, TRUE, &_framerect, &_area, _Node->uExtension.sText.nPlaceholderColor, _flag, FALSE);
@@ -4612,7 +4591,7 @@ _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	BLUtf16* _curline = (BLUtf16*)_text;
 	BLUtf16* _s1;
 	BLUtf16* _s2;
-	BLBool _ml = (!_Node->uExtension.sText.bPassword && (_Node->uExtension.sText.bWordwrap || _Node->uExtension.sText.bMultiline));
+	BLBool _ml = (!_Node->uExtension.sText.bPassword && _Node->uExtension.sText.bMultiline);
 	BLS32 _realmbgn = _Node->uExtension.sText.nSelectBegin < _Node->uExtension.sText.nSelectEnd ? _Node->uExtension.sText.nSelectBegin : _Node->uExtension.sText.nSelectEnd;
 	BLS32 _realmend = _Node->uExtension.sText.nSelectBegin < _Node->uExtension.sText.nSelectEnd ? _Node->uExtension.sText.nSelectEnd : _Node->uExtension.sText.nSelectBegin;
 	BLS32 _hlinestart = _ml ? _TextLine(_Node, _realmbgn) : 0;
@@ -7123,7 +7102,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					case BL_KC_UP:
 						if (!LOWU16(_UParam))
 						{
-							if (_wid->uExtension.sText.bMultiline || (_wid->uExtension.sText.bWordwrap && _wid->uExtension.sText.nSplitSize > 1))
+							if (_wid->uExtension.sText.bMultiline)
 							{
 								BLS32 _lineno = _TextLine(_wid, _wid->uExtension.sText.nCaretPos);
 								BLS32 _mb = (_wid->uExtension.sText.nSelectBegin == _wid->uExtension.sText.nSelectEnd) ? _wid->uExtension.sText.nCaretPos : (_wid->uExtension.sText.nSelectBegin < _wid->uExtension.sText.nSelectEnd ? _wid->uExtension.sText.nSelectBegin : _wid->uExtension.sText.nSelectEnd);
@@ -7144,7 +7123,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					case BL_KC_DOWN:
 						if (!LOWU16(_UParam))
 						{
-							if (_wid->uExtension.sText.bMultiline || (_wid->uExtension.sText.bWordwrap && _wid->uExtension.sText.nSplitSize > 1))
+							if (_wid->uExtension.sText.bMultiline)
 							{
 								BLS32 _lineno = _TextLine(_wid, _wid->uExtension.sText.nCaretPos);
 								BLS32 _mb = (_wid->uExtension.sText.nSelectBegin == _wid->uExtension.sText.nSelectEnd) ? _wid->uExtension.sText.nCaretPos : (_wid->uExtension.sText.nSelectBegin < _wid->uExtension.sText.nSelectEnd ? _wid->uExtension.sText.nSelectBegin : _wid->uExtension.sText.nSelectEnd);
@@ -7166,7 +7145,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 						if (!LOWU16(_UParam))
 						{
 							BLS32 _p = 0;
-							if (_wid->uExtension.sText.bMultiline || _wid->uExtension.sText.bWordwrap)
+							if (_wid->uExtension.sText.bMultiline)
 							{
 								_p = _TextLine(_wid, _wid->uExtension.sText.nCaretPos);
 								_p = _wid->uExtension.sText.aSplitPositions[_p];
@@ -7181,7 +7160,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 						{
 							const BLUtf16* _s16 = blGenUtf16Str(_wid->uExtension.sText.pText);
 							BLS32 _p = blUtf16Length(_s16);
-							if (_wid->uExtension.sText.bMultiline || _wid->uExtension.sText.bWordwrap)
+							if (_wid->uExtension.sText.bMultiline)
 							{
 								_p = _TextLine(_wid, _wid->uExtension.sText.nCaretPos);
 								_p = _wid->uExtension.sText.aSplitPositions[_p] + (BLS32)blUtf16Length(_wid->uExtension.sText.pSplitText[_p]);
@@ -7893,8 +7872,6 @@ blUIFile(IN BLAnsi* _Filename)
             BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
             const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
             BLBool _flipyvar = strcmp(_flipy, "true") ? FALSE : TRUE;
-            const BLAnsi* _wordwrap = ezxml_attr(_element, "Wordwrap");
-            BLBool _wordwrapvar = strcmp(_wordwrap, "true") ? FALSE : TRUE;
             const BLAnsi* _numeric = ezxml_attr(_element, "Numeric");
             BLBool _numericvar = strcmp(_numeric, "true") ? FALSE : TRUE;
             const BLAnsi* _password = ezxml_attr(_element, "Password");
@@ -7972,7 +7949,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUITextPixmap(_widguid, _pixmap);
 			blUITextStencilMap(_widguid, _stencilmap);
 			blUITextCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
-			blUITextTypography(_widguid, _autoscrollvar, _wordwrapvar, _multilinevar);
+			blUITextTypography(_widguid, _autoscrollvar, _multilinevar);
 			blUITextPassword(_widguid, _passwordvar);
 			blUITextNumeric(_widguid, _numericvar, _numericrangevar[0], _numericrangevar[1]);
 			blUITextPadding(_widguid, _paddingvar[0], _paddingvar[1]);
@@ -8353,7 +8330,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sText.nMaxValue = 999999;
 			_widget->uExtension.sText.bSelecting = FALSE;
 			_widget->uExtension.sText.bAutoscroll = TRUE;
-			_widget->uExtension.sText.bWordwrap = FALSE;
 			_widget->uExtension.sText.bMultiline = FALSE;
 			_widget->uExtension.sText.bPassword = FALSE;
 			_widget->uExtension.sText.bNumeric = FALSE;
@@ -9277,7 +9253,7 @@ blUITextCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BL
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUITextTypography(IN BLGuid _ID, IN BLBool _Autoscroll, IN BLBool _Wordwrap, IN BLBool _Multiline)
+blUITextTypography(IN BLGuid _ID, IN BLBool _Autoscroll, IN BLBool _Multiline)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -9285,7 +9261,6 @@ blUITextTypography(IN BLGuid _ID, IN BLBool _Autoscroll, IN BLBool _Wordwrap, IN
 	if (_widget->eType != BL_UT_TEXT)
 		return;
 	_widget->uExtension.sText.bAutoscroll = _Autoscroll;
-	_widget->uExtension.sText.bWordwrap = _Wordwrap;
 	_widget->uExtension.sText.bMultiline = _Multiline;
 	_BLFont* _ft = NULL;
 	{

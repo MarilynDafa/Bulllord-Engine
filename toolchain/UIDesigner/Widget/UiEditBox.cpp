@@ -38,7 +38,7 @@ QDomElement UiEditBox::serialize( QDomDocument &doc, const QDomElement &extEleme
 	extEle.setAttribute("CommonTexcoord", region);
 	extEle.setAttribute("StencilMap", getStencil().getSkinName());
 	extEle.setAttribute("Enable", boolToString(getEnable()));
-	extEle.setAttribute("Wordwrap", boolToString(getWordWrap()));
+	//extEle.setAttribute("Wordwrap", boolToString(getWordWrap()));
 	extEle.setAttribute("Numeric", boolToString(getNumeric().getEnable()));
 	extEle.setAttribute("Password", boolToString(getPassword()));
 	extEle.setAttribute("Autoscroll", boolToString(getAutoScroll()));
@@ -108,7 +108,7 @@ void UiEditBox::readExt( QXmlStreamReader &reader )
 	QStringRef stenciltag = atts.value(QLatin1String("StencilMap"));
 	setStencil(createSkinImage(stenciltag.toString()));
 	bool enable = StringToBool(atts.value("Enable").toString());
-	bool wordwrap = StringToBool(atts.value("Wordwrap").toString());
+	//bool wordwrap = StringToBool(atts.value("Wordwrap").toString());
 	bool numeric = StringToBool(atts.value("Numeric").toString());
 	bool password = StringToBool(atts.value("Password").toString());
 	bool autoscroll = StringToBool(atts.value("Autoscroll").toString());
@@ -165,7 +165,7 @@ void UiEditBox::readExt( QXmlStreamReader &reader )
 
 	setBackImg(createSkinImage(bImg, bReg));
 	setEnable(enable);
-	setWordWrap(wordwrap);
+	//setWordWrap(wordwrap);
 	setPassword(password);
 	setAutoScroll(autoscroll);
 	setMultiLine(multiline);

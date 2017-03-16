@@ -512,8 +512,6 @@ namespace o2d{
 					u32 fmt = m_h_align|m_v_align;
 					u32 clr = m_enable?m_txt_color:c_ui_manager::get_singleton_ptr()->get_uu_color(UUC_TXT_DISABLE_CLR).rgba();
 					c_color xxx = clr;
-					if (!m_password_box)
-						xxx.a() *= 0.5;
 					c_ui_manager::get_singleton_ptr()->cache_batch(m_fntid , m_fnt_height , fmt  , true , curline , m_cur_rect , localcliprect , xxx.rgba(), m_password_box, m_password_box ? 0x00F0 : m_txt_flag);
 					if(focus && m_select_begin != m_select_end && i >= hlinestart && i < hlinestart + hlinecount)
 					{

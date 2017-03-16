@@ -9,7 +9,6 @@ class UiEditBox : public UiWidget
 	Q_CLASSINFO("uiClassName", "Text");
 	Q_PROPERTY(bool Enable READ getEnable WRITE setEnable)
 	Q_PROPERTY(bool AutoScroll READ getAutoScroll WRITE setAutoScroll)
-	Q_PROPERTY(bool WordWrap READ getWordWrap WRITE setWordWrap)
 	Q_PROPERTY(bool MultiLine READ getMultiLine WRITE setMultiLine)
 	Q_PROPERTY(bool Password READ getPassword WRITE setPassword)
 	Q_PROPERTY(bool FlipX READ getFlipX WRITE setFlipX)
