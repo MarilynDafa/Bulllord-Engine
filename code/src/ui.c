@@ -295,16 +295,27 @@ typedef struct _Widget {
 			BLRect sOddItemTex;
 			BLRect sEvenItemTex;
 			BLRect sStencilTex;
-			BLU32 nFontHash;
+			BLAnsi aFontSource[32];
 			BLU32 nFontHeight;
 			BLBool bOutline;
 			BLBool bBold;
 			BLBool bShadow;
 			BLBool bItalics;
-			BLU32 nTxtColor;
 			BLBool bFlipX;
             BLBool bFlipY;
             BLGuid nPixmapTex;
+			BLS32 aColumnWidth[32];
+			BLU32 nColumnNum;
+			BLUtf8** pCellText;
+			BLUtf16** pCellBroken;
+			BLU32* pCellColor;
+			BLU32 nCellNum;
+			BLS32 nScroll;
+			BLU32 nRowHeight;
+			BLU32 nTotalHeight;
+			BLU32 nTotalWidth;
+			BLS32 nActiveColumn;
+			BLBool bSelecting;
 			BLU32 nTexWidth;
 			BLU32 nTexHeight;
 			BLEnum eTexFormat;
@@ -835,7 +846,15 @@ _QueryGlyph(_BLFont* _Font, BLU32 _Char, BLU32 _FontHeight)
 {
 	_BLGlyphAtlas* _glyphatlas = blDictElement(_Font->pGlyphAtlas, _FontHeight);
 	if (!_glyphatlas)
-		return NULL;
+	{
+		_glyphatlas = (_BLGlyphAtlas*)malloc(sizeof(_BLGlyphAtlas));
+		memset(_glyphatlas, 0, sizeof(_BLGlyphAtlas));
+		_glyphatlas->pTextures = blGenArray(FALSE);
+		_glyphatlas->pGlyphs = blGenDict(FALSE);
+		_glyphatlas->nCurTexture = INVALID_GUID;
+		blDictInsert(_Font->pGlyphAtlas, _FontHeight, _glyphatlas);
+		FT_Set_Char_Size(_Font->sFtFace, _FontHeight * 64, 0, 72 * 64, 72);
+	}
 	_BLGlyph* _glyph = blDictElement(_glyphatlas->pGlyphs, _Char);
 	if (!_glyph)
 	{
@@ -1625,6 +1644,96 @@ _TextScroll(_BLWidget* _Node)
 	}
 	blDeleteUtf16Str((BLUtf16*)_s16);
 }
+static void
+_TableSplit(_BLWidget* _Node, _BLFont* _Font, BLU32 _Flag, const BLUtf8* _Text, BLUtf16** _BrokenText, BLU32 _Width)
+{
+	if (!_Text)
+		return;
+	BLUtf16* _line = NULL;
+	BLUtf16* _linedots = NULL;
+	BLUtf16 _c[2];
+	_c[1] = L'\0';
+	BLU32 _maxlen = _Width - 4;
+	BLF32 _txtw, _txth;
+	_MeasureTextDim(L"...", _Font, _Node->uExtension.sTable.nFontHeight, &_txtw, &_txth, _Flag);
+	BLU32 _dontsmaxlLen = (BLU32)(_Width - _txtw);
+	BLU32 _pos = 0;
+	BLU32 _idx;
+	const BLUtf16* _txt = blGenUtf16Str(_Text);
+	BLU32 _size = blUtf16Length(_txt);
+	BLUtf16* _tmp = alloca(1024 * sizeof(BLUtf16));
+	for (_idx = 0; _idx < _size; ++_idx)
+	{
+		_c[0] = _txt[_idx];
+		if (_c[0] == L'\n')
+			break;
+		_MeasureTextDim(_c, _Font, _Node->uExtension.sTable.nFontHeight, &_txtw, &_txth, _Flag);
+		_pos += (BLU32)_txtw;
+		if (_pos > _maxlen)
+			break;
+		BLU32 _tmplen = blUtf16Length(_line);
+		if (_line)
+		{
+			for (BLU32 _jdx = 0; _jdx < _tmplen; ++_jdx)
+				_tmp[_jdx] = _line[_jdx];			
+		}
+		_tmp[_tmplen] = _c[0];
+		_tmp[_tmplen + 1] = 0;
+		_MeasureTextDim(_tmp, _Font, _Node->uExtension.sTable.nFontHeight, &_txtw, &_txth, _Flag);
+		if (_txtw > _dontsmaxlLen)
+		{
+			BLU32 _linelen = blUtf16Length(_line);
+			_linedots = (BLUtf16*)alloca((1 + _linelen) * sizeof(BLUtf16));
+			for (BLU32 _jdx = 0; _jdx < _linelen; ++_jdx)
+				_linedots[_jdx] = _line[_jdx];
+			_linedots[_linelen] = 0;
+		}
+		_line = (BLUtf16*)realloc(_line, (_tmplen + 2) * sizeof(BLUtf16));
+		_line[_tmplen] = _c[0];
+		_line[_tmplen + 1] = 0;
+	}
+	if (_idx < _size)
+	{
+		if (*_BrokenText)
+			free(*_BrokenText);
+		BLU32 _linelen = blUtf16Length(_linedots);
+		BLUtf16* _btmp = (BLUtf16*)malloc((_linelen + 4) * sizeof(BLUtf16));
+		for (BLU32 _jdx = 0; _jdx < _linelen; ++_jdx)
+			_btmp[_jdx] = _linedots[_jdx];
+		_btmp[_linelen + 0] = L'.';
+		_btmp[_linelen + 1] = L'.';
+		_btmp[_linelen + 2] = L'.';
+		_btmp[_linelen + 3] = 0;
+		*_BrokenText = _btmp;
+	}
+	else
+	{
+		if (*_BrokenText)
+			free(*_BrokenText);
+		BLU32 _linelen = blUtf16Length(_line);
+		BLUtf16* _btmp = (BLUtf16*)malloc((_linelen + 1) * sizeof(BLUtf16));
+		for (BLU32 _jdx = 0; _jdx < _linelen; ++_jdx)
+			_btmp[_jdx] = _line[_jdx];
+		_btmp[_linelen] = 0;
+		*_BrokenText = _btmp;
+	}
+	blDeleteUtf16Str((BLUtf16*)_txt);
+}
+static void
+_TableMake(_BLWidget* _Node)
+{
+	_Node->uExtension.sTable.nTotalHeight = 0;
+	_Node->uExtension.sTable.nTotalWidth = 0;	
+	if (_Node->uExtension.sTable.nColumnNum)
+		_Node->uExtension.sTable.nTotalHeight = _Node->uExtension.sTable.nRowHeight * (BLU32)roundf((BLF32)_Node->uExtension.sTable.nCellNum / (BLF32)_Node->uExtension.sTable.nColumnNum);
+	else
+		_Node->uExtension.sTable.nTotalHeight = 0;
+	for (BLU32 _idx = 0; _idx < _Node->uExtension.sTable.nColumnNum; ++_idx)
+		_Node->uExtension.sTable.nTotalWidth += _Node->uExtension.sTable.aColumnWidth[_idx];
+	BLU32 _cheight = (BLU32)(_Node->sDimension.fY - _Node->uExtension.sTable.nRowHeight - 2);
+	if (_Node->uExtension.sTable.nTotalHeight > _cheight)
+		_Node->uExtension.sTable.nScroll = (BLS32)blScalarClamp((BLF32)_Node->uExtension.sTable.nScroll, 0.f, (BLF32)_Node->uExtension.sTable.nTotalHeight - _cheight);
+}
 static BLBool
 _UISetup(BLVoid* _Src)
 {
@@ -2243,6 +2352,16 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 		_src->uExtension.sTable.pTexData = _texdata;
 		_src->uExtension.sTable.nTexWidth = _width;
 		_src->uExtension.sTable.nTexHeight = _height;
+		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
+		{
+			if (_iter->nHashName == blHashUtf8((const BLUtf8*)(_src->uExtension.sTable.aFontSource)))
+			{
+				_loadfont = FALSE;
+				break;
+			}
+		}
+		sprintf(_texfilettf, "%s/font/%s.ttf", _PrUIMem->aDir, _src->uExtension.sTable.aFontSource);
+		sprintf(_texfilettc, "%s/font/%s.ttc", _PrUIMem->aDir, _src->uExtension.sTable.aFontSource);
 		break;
 	default: break;
 	}	
@@ -2306,6 +2425,23 @@ _UnloadUI(BLVoid* _Src)
 			free(_widget->uExtension.sText.pSplitText[_idx]);
 	}
 	break;
+	case BL_UT_TABLE:
+	{
+		for (BLU32 _idx = 0; _idx < _widget->uExtension.sTable.nCellNum; ++_idx)
+		{
+			if (_widget->uExtension.sTable.pCellText[_idx])
+				free(_widget->uExtension.sTable.pCellText[_idx]);
+			if (_widget->uExtension.sTable.pCellBroken[_idx])
+				free(_widget->uExtension.sTable.pCellBroken[_idx]);
+		}
+		if (_widget->uExtension.sTable.pCellColor)
+			free(_widget->uExtension.sTable.pCellColor);
+		if (_widget->uExtension.sTable.pCellText)
+			free(_widget->uExtension.sTable.pCellText);
+		if (_widget->uExtension.sTable.pCellBroken)
+			free(_widget->uExtension.sTable.pCellBroken);
+	}
+	break;
 	case BL_UT_PROGRESS:
 	{
 		if (_widget->uExtension.sProgress.pText)
@@ -2326,7 +2462,7 @@ _UnloadUI(BLVoid* _Src)
 	return TRUE;
 }
 static BLVoid
-_WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum _AlignmentH, BLEnum _AlignmentV, BLBool _Single, BLRect* _Area, BLRect* _ClipArea, BLU32 _Color, BLU16 _Flag, BLBool _Pwd)
+_WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum _AlignmentH, BLEnum _AlignmentV, BLBool _Multiline, BLRect* _Area, BLRect* _ClipArea, BLU32 _Color, BLU16 _Flag, BLBool _Pwd)
 {
 	BLU32 _txtlen = blUtf16Length(_Text);
 	if (!_txtlen)
@@ -2381,7 +2517,7 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 		_pt.fY = _Area->sLT.fY;
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-	if (!_Single)
+	if (!_Multiline)
 	{
 		if (_AlignmentH == BL_UA_HCENTER)
 			_pt.fX = (_Area->sLT.fX + _Area->sRB.fX) * 0.5f - _w * 0.5f;
@@ -5744,6 +5880,588 @@ _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 static BLVoid
 _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
+	if (!_Node->bValid || !_Node->bVisible)
+		return;
+	_TableMake(_Node);
+	BLRect _scissorrect;
+	_WidgetScissorRect(_Node, &_scissorrect);
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sTable.nPixmapTex, 0);
+	BLF32 _gray = 1.f;
+	BLF32 _offsetx = 0.f, _offsety = 0.f;
+	BLF32 _stencil = 1.f;
+	BLRect _texcoord, _texcoord9;
+	BLRect _texcoords, _texcoords9;
+	BLBool _flipx = _Node->uExtension.sTable.bFlipX;
+	BLBool _flipy = _Node->uExtension.sTable.bFlipY;
+	_texcoord = _Node->uExtension.sTable.sCommonTex;
+	_texcoord9 = _Node->uExtension.sTable.sCommonTex9;
+	if (_Node->uExtension.sTable.aStencilMap[0] && strcmp(_Node->uExtension.sTable.aStencilMap, "Nil"))
+	{
+		_stencil = -1.f;
+		_texcoords.sLT.fX = _Node->uExtension.sTable.sStencilTex.sLT.fX / _Node->uExtension.sTable.nTexWidth + 0.001f;
+		_texcoords.sLT.fY = _Node->uExtension.sTable.sStencilTex.sLT.fY / _Node->uExtension.sTable.nTexHeight + 0.001f;
+		_texcoords.sRB.fX = _Node->uExtension.sTable.sStencilTex.sRB.fX / _Node->uExtension.sTable.nTexWidth - 0.001f;
+		_texcoords.sRB.fY = _Node->uExtension.sTable.sStencilTex.sRB.fY / _Node->uExtension.sTable.nTexHeight - 0.001f;
+		BLF32 _oriw = _Node->uExtension.sTable.sCommonTex.sRB.fX - _Node->uExtension.sTable.sCommonTex.sLT.fX;
+		BLF32 _orih = _Node->uExtension.sTable.sCommonTex.sRB.fY - _Node->uExtension.sTable.sCommonTex.sLT.fY;
+		BLF32 _dstw = _Node->uExtension.sTable.sStencilTex.sRB.fX - _Node->uExtension.sTable.sStencilTex.sLT.fX;
+		BLF32 _dsth = _Node->uExtension.sTable.sStencilTex.sRB.fX - _Node->uExtension.sTable.sStencilTex.sLT.fX;
+		BLF32 _ratioax = (_Node->uExtension.sTable.sCommonTex9.sLT.fX - _Node->uExtension.sTable.sCommonTex.sLT.fX) / _oriw;
+		BLF32 _ratioay = (_Node->uExtension.sTable.sCommonTex9.sLT.fY - _Node->uExtension.sTable.sCommonTex.sLT.fY) / _orih;
+		BLF32 _rationx = (_Node->uExtension.sTable.sCommonTex.sRB.fX - _Node->uExtension.sTable.sCommonTex9.sRB.fX) / _oriw;
+		BLF32 _rationy = (_Node->uExtension.sTable.sCommonTex.sRB.fY - _Node->uExtension.sTable.sCommonTex9.sRB.fY) / _orih;
+		_texcoords9.sLT.fX = (_Node->uExtension.sTable.sStencilTex.sLT.fX + _ratioax * _dstw) / _Node->uExtension.sTable.nTexWidth;
+		_texcoords9.sLT.fY = (_Node->uExtension.sTable.sStencilTex.sLT.fY + _ratioay * _dsth) / _Node->uExtension.sTable.nTexHeight;
+		_texcoords9.sRB.fX = (_Node->uExtension.sTable.sStencilTex.sRB.fX - _rationx * _dstw) / _Node->uExtension.sTable.nTexWidth;
+		_texcoords9.sRB.fY = (_Node->uExtension.sTable.sStencilTex.sRB.fY - _rationy * _dsth) / _Node->uExtension.sTable.nTexHeight;
+	}
+	else
+	{
+		_texcoords.sLT.fX = 1.f;
+		_texcoords.sLT.fY = 1.f;
+		_texcoords.sRB.fX = 1.f;
+		_texcoords.sRB.fY = 1.f;
+		_texcoords9.sLT.fX = 1.f;
+		_texcoords9.sLT.fY = 1.f;
+		_texcoords9.sRB.fX = 1.f;
+		_texcoords9.sRB.fY = 1.f;
+	}
+	if (_RectApproximate(&_texcoord, &_texcoord9))
+	{
+		if (_flipx)
+		{
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
+			_tmp = _texcoords.sLT.fX;
+			_texcoords.sLT.fX = _texcoords.sRB.fX;
+			_texcoords.sRB.fX = _tmp;
+		}
+		if (_flipy)
+		{
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
+			_tmp = _texcoords.sLT.fY;
+			_texcoords.sLT.fY = _texcoords.sRB.fY;
+			_texcoords.sRB.fY = _tmp;
+		}
+		BLF32 _vbo[] = {
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight
+		};
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
+	else
+	{
+		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
+		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
+		BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
+		BLF32 _marginny = _texcoord.sRB.fY - _texcoord9.sRB.fY;
+		if (_flipx)
+		{
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
+			_tmp = _texcoords.sLT.fX;
+			_texcoords.sLT.fX = _texcoords.sRB.fX;
+			_texcoords.sRB.fX = _tmp;
+			_tmp = _texcoord9.sLT.fX;
+			_texcoord9.sLT.fX = _texcoord9.sRB.fX;
+			_texcoord9.sRB.fX = _tmp;
+			_tmp = _texcoords9.sLT.fX;
+			_texcoords9.sLT.fX = _texcoords9.sRB.fX;
+			_texcoords9.sRB.fX = _tmp;
+			_tmp = _marginax;
+			_marginax = _marginnx;
+			_marginnx = _tmp;
+		}
+		if (_flipy)
+		{
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
+			_tmp = _texcoords.sLT.fY;
+			_texcoords.sLT.fY = _texcoords.sRB.fY;
+			_texcoords.sRB.fY = _tmp;
+			_tmp = _texcoord9.sLT.fY;
+			_texcoord9.sLT.fY = _texcoord9.sRB.fY;
+			_texcoord9.sRB.fY = _tmp;
+			_tmp = _texcoords9.sLT.fY;
+			_texcoords9.sLT.fY = _texcoords9.sRB.fY;
+			_texcoords9.sRB.fY = _tmp;
+			_tmp = _marginay;
+			_marginay = _marginny;
+			_marginny = _tmp;
+		}
+		BLF32 _vob[] = {
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight
+		};
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
+	BLRect _scrolledclient = { 0 };
+	_scrolledclient.sLT.fX = _X - _Width * 0.5f;
+	_scrolledclient.sLT.fY = _Y - _Height * 0.5f + 1;
+	_scrolledclient.sRB.fY = _Y - _Height * 0.5f + 1 + _Node->uExtension.sTable.nTotalHeight;
+	_scrolledclient.sRB.fX = _X - _Width * 0.5f + _Node->uExtension.sTable.nTotalWidth;
+	_scrolledclient.sLT.fY -= _Node->uExtension.sTable.nScroll;
+	_scrolledclient.sRB.fY -= _Node->uExtension.sTable.nScroll;
+	BLRect _rowr;
+	_rowr.sLT.fX = _scrolledclient.sLT.fX;
+	_rowr.sLT.fY = _scrolledclient.sLT.fY;
+	_rowr.sRB.fX = _scrolledclient.sRB.fX;
+	_rowr.sRB.fY = _scrolledclient.sRB.fY;
+	_rowr.sRB.fY = _rowr.sLT.fY + _Node->uExtension.sTable.nRowHeight; 
+	BLU32 _rownum = (BLU32)roundf((BLF32)_Node->uExtension.sTable.nCellNum / _Node->uExtension.sTable.nColumnNum);
+	BLS32 _pos;
+	_BLFont* _ft = NULL;
+	{
+		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
+		{
+			if (_iter->nHashName == blHashUtf8((const BLUtf8*)_Node->uExtension.sTable.aFontSource))
+			{
+				_ft = _iter;
+				break;
+			}
+		}
+	}
+	if (!_ft)
+		return;
+	BLU16 _flag = 0;
+	if (_Node->uExtension.sText.bOutline)
+		_flag |= 0x000F;
+	if (_Node->uExtension.sText.bBold)
+		_flag |= 0x00F0;
+	if (_Node->uExtension.sText.bShadow)
+		_flag |= 0x0F00;
+	if (_Node->uExtension.sText.bItalics)
+		_flag |= 0xF000;
+	for (BLU32 _idx = 0; ; ++_idx)
+	{
+		if (_rowr.sRB.fY >= _Y - _Height * 0.5f && _rowr.sLT.fY <= _Y + _Height * 0.5f)
+		{
+			BLBool _odd = TRUE;
+			BLRect _rc;
+			if (_idx % 2 == 1)
+			{
+				_rc.sLT.fX = _rowr.sLT.fX;
+				_rc.sLT.fY = _rowr.sLT.fY;
+				_rc.sRB.fX = _rowr.sRB.fX;
+				_rc.sRB.fY = _rowr.sRB.fY;
+				_rc.sRB.fX = _rc.sLT.fX + _Width;
+			}
+			if (_idx % 2 == 0)
+			{
+				_rc.sLT.fX = _rowr.sLT.fX;
+				_rc.sLT.fY = _rowr.sLT.fY;
+				_rc.sRB.fX = _rowr.sRB.fX;
+				_rc.sRB.fY = _rowr.sRB.fY;
+				_rc.sRB.fX = _rc.sLT.fX + _Width;
+				_odd = FALSE;
+			}
+			_texcoord = _odd ? _Node->uExtension.sTable.sOddItemTex : _Node->uExtension.sTable.sEvenItemTex;
+			if (_flipx)
+			{
+				BLF32 _tmp = _texcoord.sLT.fX;
+				_texcoord.sLT.fX = _texcoord.sRB.fX;
+				_texcoord.sRB.fX = _tmp;
+			}
+			if (_flipy)
+			{
+				BLF32 _tmp = _texcoord.sLT.fY;
+				_texcoord.sLT.fY = _texcoord.sRB.fY;
+				_texcoord.sRB.fY = _tmp;
+			}
+			BLF32 _vbo[] = {
+				PIXEL_ALIGNED_INTERNAL(_rc.sLT.fX + _offsetx),
+				PIXEL_ALIGNED_INTERNAL(_rc.sLT.fY + _offsety),
+				1.f,
+				1.f,
+				1.f * _stencil,
+				1.f * _gray,
+				_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+				_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+				PIXEL_ALIGNED_INTERNAL(_rc.sRB.fX - _offsetx),
+				PIXEL_ALIGNED_INTERNAL(_rc.sLT.fY + _offsety),
+				1.f,
+				1.f,
+				1.f * _stencil,
+				1.f * _gray,
+				_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+				_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+				PIXEL_ALIGNED_INTERNAL(_rc.sLT.fX + _offsetx),
+				PIXEL_ALIGNED_INTERNAL(_rc.sRB.fY - _offsety),
+				1.f,
+				1.f,
+				1.f * _stencil,
+				1.f * _gray,
+				_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
+				_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+				PIXEL_ALIGNED_INTERNAL(_rc.sRB.fX + _offsetx),
+				PIXEL_ALIGNED_INTERNAL(_rc.sRB.fY - _offsety),
+				1.f,
+				1.f,
+				1.f * _stencil,
+				1.f * _gray,
+				_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
+				_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight
+			};
+			blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sTable.nPixmapTex, 0);
+			BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+			blDraw(_PrUIMem->nUITech, _geo, 1);
+			blDeleteGeometryBuffer(_geo);
+			BLRect _textr;
+			_textr.sLT.fX = _rowr.sLT.fX;
+			_textr.sLT.fY = _rowr.sLT.fY;
+			_textr.sRB.fX = _rowr.sRB.fX;
+			_textr.sRB.fY = _rowr.sRB.fY;
+			_pos = (BLS32)_rowr.sLT.fX;
+			if (_idx < _Node->uExtension.sTable.nCellNum / _Node->uExtension.sTable.nColumnNum) 
+			{
+				for (BLU32 _jdx = 0; _jdx < _Node->uExtension.sTable.nColumnNum; ++_jdx)
+				{
+					_textr.sLT.fX = (BLF32)_pos;
+					_textr.sRB.fX = (BLF32)_pos + _Node->uExtension.sTable.aColumnWidth[_jdx];
+					BLU32 _cellidx = _jdx + _idx * _Node->uExtension.sTable.nColumnNum;
+					if (_cellidx < _Node->uExtension.sTable.nCellNum)
+					{
+						if (!_Node->uExtension.sTable.pCellBroken[_cellidx])
+							_TableSplit(_Node, _ft, _flag, _Node->uExtension.sTable.pCellText[_cellidx], &_Node->uExtension.sTable.pCellBroken[_cellidx], _Node->uExtension.sTable.aColumnWidth[_jdx]);
+						_WriteText(_Node->uExtension.sTable.pCellBroken[_cellidx], _Node->uExtension.sTable.aFontSource, _Node->uExtension.sTable.nFontHeight, BL_UA_HCENTER, BL_UA_VCENTER, FALSE, &_textr, &_scissorrect, _Node->uExtension.sTable.pCellColor[_cellidx], _flag, FALSE);
+					}
+					_pos += _Node->uExtension.sTable.aColumnWidth[_jdx];
+				}
+			}
+		}
+		else
+			break;
+		_rowr.sLT.fY += _Node->uExtension.sTable.nRowHeight;
+		_rowr.sRB.fY += _Node->uExtension.sTable.nRowHeight;
+	}
 }
 static BLVoid
 _DrawPrimitive(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
@@ -6800,6 +7518,110 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				}
 				break;
 			default:break;
+			}
+		}
+	}
+	else
+	{
+		BLBool _up = (BLBool)HIGU16(_UParam);
+		BLS32 _val = LOWU16(_UParam);
+		_BLWidget* _lastfocus = _PrUIMem->pFocusWidget;
+		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible)
+		{
+			_BLWidget* _wid = _PrUIMem->pFocusWidget;
+			while (_wid->bPenetration)
+				_wid = _wid->pParent;
+			if (_wid->eType == BL_UT_TEXT)
+			{
+				BLS32 _newmarkbegin = _wid->uExtension.sText.nSelectBegin;
+				BLS32 _newmarkend = _wid->uExtension.sText.nSelectEnd;
+				if (_up)
+				{
+					if (_wid->uExtension.sText.bMultiline)
+					{
+						BLS32 _lineno = _TextLine(_wid, _wid->uExtension.sText.nCaretPos);
+						if (_lineno > 0)
+						{
+							BLS32 _cp = _wid->uExtension.sText.nCaretPos - _wid->uExtension.sText.aSplitPositions[_lineno];
+							if (((BLU32)_lineno >= _wid->uExtension.sText.nSplitSize) && (BLS32)blUtf16Length(_wid->uExtension.sText.pSplitText[_lineno + 1]) < _cp)
+								_wid->uExtension.sText.nCaretPos = _wid->uExtension.sText.aSplitPositions[_lineno - 1] + MAX_INTERNAL((BLU32)1, blUtf16Length(_wid->uExtension.sText.pSplitText[_lineno + 1])) - 1;
+							else
+								_wid->uExtension.sText.nCaretPos = _wid->uExtension.sText.aSplitPositions[_lineno - 1] + _cp;
+						}
+						_newmarkbegin = 0;
+						_newmarkend = 0;
+					}
+				}
+				else
+				{
+					if (_wid->uExtension.sText.bMultiline)
+					{
+						BLS32 _lineno = _TextLine(_wid, _wid->uExtension.sText.nCaretPos);
+						if (_lineno < (BLS32)_wid->uExtension.sText.nSplitSize - 1)
+						{
+							BLS32 _cp = _wid->uExtension.sText.nCaretPos - _wid->uExtension.sText.aSplitPositions[_lineno];
+							if (((BLU32)_lineno >= _wid->uExtension.sText.nSplitSize) && (BLS32)blUtf16Length(_wid->uExtension.sText.pSplitText[_lineno + 1]) < _cp)
+								_wid->uExtension.sText.nCaretPos = _wid->uExtension.sText.aSplitPositions[_lineno + 1] + MAX_INTERNAL((BLU32)1, blUtf16Length(_wid->uExtension.sText.pSplitText[_lineno + 1])) - 1;
+							else
+								_wid->uExtension.sText.nCaretPos = _wid->uExtension.sText.aSplitPositions[_lineno + 1] + _cp;
+						}
+						_newmarkbegin = 0;
+						_newmarkend = 0;
+					}
+				}
+				_wid->uExtension.sText.nSelectBegin = _newmarkbegin;
+				_wid->uExtension.sText.nSelectEnd = _newmarkend;
+				_TextScroll(_wid);
+				_PrUIMem->bDirty = TRUE;
+			}
+		}
+		if (!_lastfocus && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible)
+		{
+			_BLWidget* _wid = _PrUIMem->pHoveredWidget;
+			while (_wid->bPenetration)
+				_wid = _wid->pParent;
+			if (_wid->eType == BL_UT_TEXT)
+			{
+				BLS32 _newmarkbegin = _wid->uExtension.sText.nSelectBegin;
+				BLS32 _newmarkend = _wid->uExtension.sText.nSelectEnd;
+				if (_up)
+				{
+					if (_wid->uExtension.sText.bMultiline)
+					{
+						BLS32 _lineno = _TextLine(_wid, _wid->uExtension.sText.nCaretPos);
+						if (_lineno > 0)
+						{
+							BLS32 _cp = _wid->uExtension.sText.nCaretPos - _wid->uExtension.sText.aSplitPositions[_lineno];
+							if (((BLU32)_lineno >= _wid->uExtension.sText.nSplitSize) && (BLS32)blUtf16Length(_wid->uExtension.sText.pSplitText[_lineno + 1]) < _cp)
+								_wid->uExtension.sText.nCaretPos = _wid->uExtension.sText.aSplitPositions[_lineno - 1] + MAX_INTERNAL((BLU32)1, blUtf16Length(_wid->uExtension.sText.pSplitText[_lineno + 1])) - 1;
+							else
+								_wid->uExtension.sText.nCaretPos = _wid->uExtension.sText.aSplitPositions[_lineno - 1] + _cp;
+						}
+						_newmarkbegin = 0;
+						_newmarkend = 0;
+					}
+				}
+				else
+				{
+					if (_wid->uExtension.sText.bMultiline)
+					{
+						BLS32 _lineno = _TextLine(_wid, _wid->uExtension.sText.nCaretPos);
+						if (_lineno < (BLS32)_wid->uExtension.sText.nSplitSize - 1)
+						{
+							BLS32 _cp = _wid->uExtension.sText.nCaretPos - _wid->uExtension.sText.aSplitPositions[_lineno];
+							if (((BLU32)_lineno >= _wid->uExtension.sText.nSplitSize) && (BLS32)blUtf16Length(_wid->uExtension.sText.pSplitText[_lineno + 1]) < _cp)
+								_wid->uExtension.sText.nCaretPos = _wid->uExtension.sText.aSplitPositions[_lineno + 1] + MAX_INTERNAL((BLU32)1, blUtf16Length(_wid->uExtension.sText.pSplitText[_lineno + 1])) - 1;
+							else
+								_wid->uExtension.sText.nCaretPos = _wid->uExtension.sText.aSplitPositions[_lineno + 1] + _cp;
+						}
+						_newmarkbegin = 0;
+						_newmarkend = 0;
+					}
+				}
+				_wid->uExtension.sText.nSelectBegin = _newmarkbegin;
+				_wid->uExtension.sText.nSelectEnd = _newmarkend;
+				_TextScroll(_wid);
+				_PrUIMem->bDirty = TRUE;
 			}
 		}
 	}
@@ -8122,6 +8944,23 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _odditemmap = ezxml_attr(_element, "OddItemMap");
             const BLAnsi* _evenitemmap = ezxml_attr(_element, "EvenItemMap");
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
+			const BLAnsi* _rowheight = ezxml_attr(_element, "RowHeight");
+			BLU32 _rowheightvar = (BLU32)strtoul(_rowheight, NULL, 10);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _QueryWidget(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_TABLE);
+			blUIReferencePoint(_widguid, _ha, _va);
+			blUISizePolicy(_widguid, _policyvar);
+			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
+			blUIScissor(_widguid, _clipedvar, _absvar);
+			blUITooltip(_widguid, (const BLUtf8*)_tooltip);
+			blUIPenetration(_widguid, _penetrationvar);
+			blUITablePixmap(_widguid, _pixmap);
+			blUITableStencilMap(_widguid, _stencilmap);
+			blUITableCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUITableOddItemMap(_widguid, _odditemmap);
+			blUITableEvenItemMap(_widguid, _evenitemmap);
+			blUITableFont(_widguid, _fontsrc, _fontsizevar, _fontoutlinevar, _fontboldvar, _fontshadowvar, _fontitalicsvar);
+			blUITableFlip(_widguid, _flipxvar, _flipyvar);
+			blUITableRowHeight(_widguid, _rowheightvar);
         }
         else if (!strcmp(_type, "Dial"))
         {
@@ -8397,15 +9236,24 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sTable.aStencilMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sTable.aOddItemMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sTable.aEvenItemMap, 0, sizeof(BLAnsi) * 128);
-			_widget->uExtension.sTable.nFontHash = 0xFFFFFFFF;
 			_widget->uExtension.sTable.nFontHeight = 0;
 			_widget->uExtension.sTable.bOutline = FALSE;
 			_widget->uExtension.sTable.bBold = FALSE;
 			_widget->uExtension.sTable.bShadow = FALSE;
 			_widget->uExtension.sTable.bItalics = FALSE;
-			_widget->uExtension.sTable.nTxtColor = 0xFFFFFFFF;
 			_widget->uExtension.sTable.bFlipX = FALSE;
             _widget->uExtension.sTable.bFlipY = FALSE;
+			_widget->uExtension.sTable.pCellText = NULL;
+			_widget->uExtension.sTable.pCellBroken = NULL;
+			_widget->uExtension.sTable.pCellColor = NULL;
+			_widget->uExtension.sTable.nColumnNum = 0;
+			_widget->uExtension.sTable.nCellNum = 0;
+			_widget->uExtension.sTable.nScroll = 0;
+			_widget->uExtension.sTable.nRowHeight = 14;
+			_widget->uExtension.sTable.nTotalHeight = 0;
+			_widget->uExtension.sTable.nTotalWidth = 0;
+			_widget->uExtension.sTable.nActiveColumn = -1;
+			_widget->uExtension.sTable.bSelecting = FALSE;
             _widget->uExtension.sTable.nPixmapTex = INVALID_GUID;
 		}
 		break;
@@ -9792,6 +10640,9 @@ blUITablePixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sTable.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sTable.aPixmap, _Pixmap);
+	BLAnsi _texfile[260] = { 0 };
+	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
+	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -9816,6 +10667,14 @@ blUITableCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN B
 		return;
 	memset(_widget->uExtension.sTable.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sTable.aCommonMap, _CommonMap);
+	_widget->uExtension.sTable.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sTable.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sTable.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sTable.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sTable.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sTable.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sTable.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sTable.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -9839,37 +10698,154 @@ blUITableEvenItemMap(IN BLGuid _ID, IN BLAnsi* _EvenItemMap)
 	if (_widget->eType != BL_UT_TABLE)
 		return;
 	memset(_widget->uExtension.sTable.aEvenItemMap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sTable.aEvenItemMap, _EvenItemMap);
+	strcpy(_widget->uExtension.sTable.aEvenItemMap, _EvenItemMap); 
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid
-blUITableAddRow(IN BLGuid _ID)
+BLVoid 
+blUITableMaking(IN BLGuid _ID, IN BLU32 _Column, IN BLU32 _Row)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_TABLE)
 		return;
+	if (!_Column || !_Row)
+		return;
+	for (BLU32 _idx = 0; _idx < _widget->uExtension.sTable.nCellNum; ++_idx)
+	{
+		if (_widget->uExtension.sTable.pCellText[_idx])
+			free(_widget->uExtension.sTable.pCellText[_idx]);
+		if (_widget->uExtension.sTable.pCellBroken[_idx])
+			free(_widget->uExtension.sTable.pCellBroken[_idx]);
+	}
+	_widget->uExtension.sTable.nColumnNum = _Column;
+	_widget->uExtension.sTable.nCellNum = _Column * _Row;
+	_widget->uExtension.sTable.pCellText = (BLUtf8**)realloc(_widget->uExtension.sTable.pCellText, _widget->uExtension.sTable.nCellNum * sizeof(BLUtf8*));
+	_widget->uExtension.sTable.pCellBroken = (BLUtf16**)realloc(_widget->uExtension.sTable.pCellBroken, _widget->uExtension.sTable.nCellNum * sizeof(BLUtf16*));
+	_widget->uExtension.sTable.pCellColor = (BLU32*)realloc(_widget->uExtension.sTable.pCellColor, _widget->uExtension.sTable.nCellNum * sizeof(BLU32));
+	for (BLU32 _idx = 0; _idx < _widget->uExtension.sTable.nCellNum; ++_idx)
+	{
+		_widget->uExtension.sTable.pCellText[_idx] = NULL;
+		_widget->uExtension.sTable.pCellBroken[_idx] = NULL;
+		_widget->uExtension.sTable.pCellColor[_idx] = 0xFFFFFFFF;
+	}
+	for (BLU32 _idx = 0; _idx < _widget->uExtension.sTable.nColumnNum; ++_idx)
+		_widget->uExtension.sTable.aColumnWidth[_idx] = (BLS32)(_widget->sDimension.fX / _Column);
+	_TableMake(_widget);
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid
-blUITableAddColumn(IN BLGuid _ID)
+BLVoid 
+blUITableRowHeight(IN BLGuid _ID, IN BLU32 _RowHeight)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_TABLE)
 		return;
+	_widget->uExtension.sTable.nRowHeight = _RowHeight;
+	_TableMake(_widget);
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid
-blUITableText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLU32 _Row, IN BLU32 _Column)
+BLVoid 
+blUITableColumnWidth(IN BLGuid _ID, IN BLU32 _Column, IN BLU32 _Width)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_TABLE)
 		return;
+	if (_Column >= _widget->uExtension.sTable.nColumnNum)
+		return;
+	if (_widget->uExtension.sTable.nColumnNum == 1)
+		return;
+	if (_Column == _widget->uExtension.sTable.nColumnNum - 1)
+	{
+		BLS32 _total = _widget->uExtension.sTable.aColumnWidth[_Column] + _widget->uExtension.sTable.aColumnWidth[_Column - 1];
+		_widget->uExtension.sTable.aColumnWidth[_Column] = _Width;
+		_widget->uExtension.sTable.aColumnWidth[_Column - 1] = _total - _Width;
+	}
+	else
+	{
+		BLS32 _total = _widget->uExtension.sTable.aColumnWidth[_Column] + _widget->uExtension.sTable.aColumnWidth[_Column + 1];
+		_widget->uExtension.sTable.aColumnWidth[_Column] = _Width;
+		_widget->uExtension.sTable.aColumnWidth[_Column + 1] = _total - _Width;
+	}
+	BLU32 _rownum = (BLU32)roundf((BLF32)_widget->uExtension.sTable.nCellNum / _widget->uExtension.sTable.nColumnNum);
+	_BLFont* _ft = NULL;
+	{
+		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
+		{
+			if (_iter->nHashName == blHashUtf8((const BLUtf8*)_widget->uExtension.sTable.aFontSource))
+			{
+				_ft = _iter;
+				break;
+			}
+		}
+	}
+	if (!_ft)
+		return;
+	BLU16 _flag = 0;
+	if (_widget->uExtension.sText.bOutline)
+		_flag |= 0x000F;
+	if (_widget->uExtension.sText.bBold)
+		_flag |= 0x00F0;
+	if (_widget->uExtension.sText.bShadow)
+		_flag |= 0x0F00;
+	if (_widget->uExtension.sText.bItalics)
+		_flag |= 0xF000;
+	for (BLU32 _idx = 0; _idx < _rownum; ++_idx)
+	{
+		BLU32 _cellidx = _Column + _idx * _widget->uExtension.sTable.nColumnNum;
+		if (_cellidx < _widget->uExtension.sTable.nCellNum)
+			_TableSplit(_widget, _ft, _flag, _widget->uExtension.sTable.pCellText[_cellidx], &_widget->uExtension.sTable.pCellBroken[_cellidx], _Width);
+	}
+	_TableMake(_widget);
+	_PrUIMem->bDirty = TRUE;
+}
+BLVoid
+blUITableCell(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLU32 _Row, IN BLU32 _Column)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TABLE)
+		return;
+	if (_Column >= 32)
+		return;
+	_BLFont* _ft = NULL;
+	{
+		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
+		{
+			if (_iter->nHashName == blHashUtf8((const BLUtf8*)_widget->uExtension.sTable.aFontSource))
+			{
+				_ft = _iter;
+				break;
+			}
+		}
+	}
+	BLU16 _flag = 0;
+	if (_widget->uExtension.sText.bOutline)
+		_flag |= 0x000F;
+	if (_widget->uExtension.sText.bBold)
+		_flag |= 0x00F0;
+	if (_widget->uExtension.sText.bShadow)
+		_flag |= 0x0F00;
+	if (_widget->uExtension.sText.bItalics)
+		_flag |= 0xF000;
+	BLU32 _cellidx = _Column + _Row * _widget->uExtension.sTable.nColumnNum;
+	if (_cellidx < _widget->uExtension.sTable.nCellNum)
+	{
+		if (_widget->uExtension.sTable.pCellText[_cellidx])
+			free(_widget->uExtension.sTable.pCellText[_cellidx]);
+		BLU32 _txtlen = blUtf8Length(_Text);
+		_widget->uExtension.sTable.pCellText[_cellidx] = (BLUtf8*)malloc((_txtlen + 1) * sizeof(BLUtf8*));
+		strcpy((BLAnsi*)_widget->uExtension.sTable.pCellText[_cellidx], (const BLAnsi*)_Text);
+		_widget->uExtension.sTable.pCellText[_cellidx][_txtlen] = 0;
+		_widget->uExtension.sTable.pCellBroken[_cellidx] = NULL;
+		_widget->uExtension.sTable.pCellColor[_cellidx] = _TxtColor;
+		if (_ft)
+			_TableSplit(_widget, _ft, _flag, _widget->uExtension.sTable.pCellText[_cellidx], &_widget->uExtension.sTable.pCellBroken[_cellidx], _widget->uExtension.sTable.aColumnWidth[_Column]);
+	}
 	_PrUIMem->bDirty = TRUE;
 }
 const BLUtf8* 
@@ -9880,6 +10856,9 @@ blUIGetTableText(IN BLGuid _ID, IN BLU32 _Row, IN BLU32 _Column)
 		return NULL;
 	if (_widget->eType != BL_UT_TABLE)
 		return NULL;
+	BLU32 _cellidx = _Column + _Row * _widget->uExtension.sTable.nColumnNum;
+	if (_cellidx < _widget->uExtension.sTable.nCellNum)
+		return _widget->uExtension.sTable.pCellText[_cellidx];
     return NULL;
 }
 BLVoid
@@ -9890,12 +10869,37 @@ blUITableFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _
 		return;
 	if (_widget->eType != BL_UT_TABLE)
 		return;
-	_widget->uExtension.sTable.nFontHash = blHashUtf8((const BLUtf8*)_Font);
+	memset(_widget->uExtension.sTable.aFontSource, 0, sizeof(_widget->uExtension.sTable.aFontSource));
+	strcpy(_widget->uExtension.sTable.aFontSource, _Font);
 	_widget->uExtension.sTable.nFontHeight = _FontHeight;
-	_widget->uExtension.sTable.bOutline = _Outline;
-	_widget->uExtension.sTable.bBold = _Bold;
-	_widget->uExtension.sTable.bShadow = _Shadow;
-	_widget->uExtension.sTable.bItalics = _Italics;
+	if (_Outline)
+	{
+		_widget->uExtension.sTable.bOutline = _Outline;
+		_widget->uExtension.sTable.bBold = FALSE;
+		_widget->uExtension.sTable.bShadow = FALSE;
+		_widget->uExtension.sTable.bItalics = _Italics;
+	}
+	else if (_Bold)
+	{
+		_widget->uExtension.sTable.bOutline = FALSE;
+		_widget->uExtension.sTable.bBold = _Bold;
+		_widget->uExtension.sTable.bShadow = FALSE;
+		_widget->uExtension.sTable.bItalics = _Italics;
+	}
+	else if (_Shadow)
+	{
+		_widget->uExtension.sTable.bOutline = FALSE;
+		_widget->uExtension.sTable.bBold = FALSE;
+		_widget->uExtension.sTable.bShadow = _Shadow;
+		_widget->uExtension.sTable.bItalics = _Italics;
+	}
+	else
+	{
+		_widget->uExtension.sTable.bOutline = FALSE;
+		_widget->uExtension.sTable.bBold = FALSE;
+		_widget->uExtension.sTable.bShadow = FALSE;
+		_widget->uExtension.sTable.bItalics = _Italics;
+	}
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid

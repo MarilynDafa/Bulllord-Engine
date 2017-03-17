@@ -106,6 +106,13 @@ namespace o2d{
 		c_ui_manager::get_singleton_ptr()->set_dirty(true);
 	}
 	//--------------------------------------------------------
+	void c_tablebox::set_row_height(u32 h)
+	{
+		m_row_height = h;
+		_refresh_controls();
+		c_ui_manager::get_singleton_ptr()->set_dirty(true);
+	}
+	//--------------------------------------------------------
 	const c_string& c_tablebox::get_cell_text(u32 rindex_, u32 cindex_) const
 	{
 		if(rindex_ < m_rows.size() && cindex_ < m_columns.size())
@@ -570,7 +577,7 @@ namespace o2d{
 	void c_tablebox::_recalculate_heights()
 	{
 		m_total_height = 0;
-		m_row_height = m_fnt_height + (m_cell_height_padding * 2);
+		//m_row_height = m_fnt_height + (m_cell_height_padding * 2);
 		m_total_height = m_row_height * m_rows.size();
 		_check_scroll();
 	}

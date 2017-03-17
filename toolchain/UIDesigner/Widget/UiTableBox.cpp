@@ -381,6 +381,7 @@ QDomElement UiTableBox::serialize( QDomDocument &doc, const QDomElement &extElem
 	QSize sz = getBackImg().getSkinSet().getCenterSize().toSize();
 	QString region = QString("%1,%2,%3,%4").arg(pt.x()).arg(pt.y()).arg(sz.width()).arg(sz.height());
 	extEle.setAttribute("CommonTexcoord", region);
+	extEle.setAttribute("RowHeight", getRowHeight());
 	extEle.setAttribute("StencilMap", getStencil().getSkinName());
 	extEle.setAttribute("TextColor",fromQColor(getTextColor()).rgba());
 	extEle.setAttribute("OddItemMap", getOdd().getSkinName());
@@ -447,6 +448,7 @@ void UiTableBox::readExt( QXmlStreamReader &reader )
 	bool shadow = StringToBool(atts.value(QLatin1String("FontShadow")).toString());
 	bool FlipX = StringToBool(atts.value(QLatin1String("FlipX")).toString());
 	bool FlipY = StringToBool(atts.value(QLatin1String("FlipY")).toString());
+	int rh = atts.value(QLatin1String("RowHeight")).toString().toInt();
 	setFlipX(FlipX);
 	setFlipY(FlipY);
 
@@ -462,7 +464,7 @@ void UiTableBox::readExt( QXmlStreamReader &reader )
 	ft.setFontBold(bold);
 	ft.setFontItalics(intly);
 	setFont(ft);
-
+	setRowHeight(rh);
 	setBackImg(createSkinImage(bImg, bReg));
 	setTextColor(fromCColor(c_color(txtClr)));
 	setOdd(createSkinImage(odd.toString()));
@@ -612,4 +614,12 @@ void UiTableBox::setEven(const SkinImage &stencilImg)
 {
 	_EvenImg.setData(stencilImg);
 	((c_tablebox*)_widget)->set_even_image(fromQString(stencilImg.getSkinName()));
+}
+int UiTableBox::getRowHeight()
+{
+	return ((c_tablebox*)_widget)->get_row_height();
+}
+void UiTableBox::setRowHeight(int h)
+{
+	((c_tablebox*)_widget)->set_row_height(h);
 }

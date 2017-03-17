@@ -537,13 +537,21 @@ BL_API BLVoid blUITableEvenItemMap(
 	IN BLGuid _ID,
 	IN BLAnsi* _EvenItemMap);
 
-BL_API BLVoid blUITableAddRow(
-	IN BLGuid _ID);
+BL_API BLVoid blUITableMaking(
+	IN BLGuid _ID,
+	IN BLU32 _Column,
+	IN BLU32 _Row);
 
-BL_API BLVoid blUITableAddColumn(
-	IN BLGuid _ID);
+BL_API BLVoid blUITableRowHeight(
+	IN BLGuid _ID,
+	IN BLU32 _RowHeight);
 
-BL_API BLVoid blUITableText(
+BL_API BLVoid blUITableColumnWidth(
+	IN BLGuid _ID,
+	IN BLU32 _Column,
+	IN BLU32 _Width);
+
+BL_API BLVoid blUITableCell(
 	IN BLGuid _ID,
 	IN BLUtf8* _Text,
 	IN BLU32 _TxtColor,

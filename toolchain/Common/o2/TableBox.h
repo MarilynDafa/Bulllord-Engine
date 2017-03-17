@@ -63,6 +63,7 @@ namespace o2d{
 		inline bool is_col_separator() const {return m_col_separator;}
 		inline u32 get_text_clr() const { return m_txt_color;}
 		inline const c_string& get_bg_image() const {return m_bg_img;}
+		inline u32 get_row_height() const { return m_row_height; }
 	public:
 		void set_bg_image(const c_string& img_);
 		void set_bg_fragment(const c_float2& anc_, const c_float2& dim_);
@@ -70,6 +71,7 @@ namespace o2d{
 		void set_separator(bool row_, bool col_);
 		void set_cell_text(u32 rindex_, u32 cindex_, const c_string& text_);
 		void set_cell_data(u32 rindex_, u32 cindex_, void* data_);
+		void set_row_height(u32 h);
 		const c_string& get_cell_text(u32 rindex_, u32 cindex_ ) const;
 		void* get_cell_data(u32 rindex_, u32 cindex_ ) const;
 		void add_column(const c_string& caption_, s32 cindex_);

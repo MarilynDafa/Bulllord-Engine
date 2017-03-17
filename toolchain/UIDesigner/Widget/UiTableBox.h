@@ -45,6 +45,7 @@ class UiTableBox : public UiWidget
 	Q_PROPERTY(bool ColSeparator READ getColSeparator WRITE setColSeparator DESIGNABLE false)
 	Q_PROPERTY(bool FlipX READ getFlipX WRITE setFlipX)
 	Q_PROPERTY(bool FlipY READ getFlipY WRITE setFlipY)
+	Q_PROPERTY(int RowHeight READ getRowHeight WRITE setRowHeight)
 	Q_PROPERTY(FontType Font READ getFont WRITE setFont)
 	Q_PROPERTY(QColor TextColor READ getTextColor WRITE setTextColor)
 	Q_PROPERTY(SkinFile Pixmap READ getSkinFile WRITE setSkinFile)
@@ -70,6 +71,8 @@ public:
 	void setOdd(const SkinImage &stencilImg);
 	SkinImage getEven();
 	void setEven(const SkinImage &stencilImg);
+	int getRowHeight();
+	void setRowHeight(int h);
 public:
 	Q_INVOKABLE UiTableBox(UiWidget *parent = 0);
 	virtual bool acceptChildern() const { return true; }
