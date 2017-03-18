@@ -68,7 +68,7 @@ extern "C" {
     extern BLVoid _SpriteInit();
     extern BLVoid _SpriteStep(BLU32, BLBool);
     extern BLVoid _SpriteDestroy();
-	extern BLVoid _UIInit();
+	extern BLVoid _UIInit(BLBool);
 	extern BLVoid _UIStep(BLU32, BLBool);
 	extern BLVoid _UIDestroy();
 	extern BLBool _UseCustomCursor();
@@ -3101,7 +3101,7 @@ _SystemInit()
 #endif
     _AudioInit();
     _NetworkInit();
-    _UIInit();
+    _UIInit(_PrSystemMem->sBoostParam.bProfiler);
     _SpriteInit();
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
 	_GbSystemRunning = TRUE;

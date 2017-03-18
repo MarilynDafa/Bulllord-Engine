@@ -25,6 +25,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+//for BMFont only support xml + none-compression tga format 
 BL_API BLVoid blUIWorkspace(
 	IN BLAnsi* _Dictionary,
 	IN BLAnsi* _Archive);
@@ -114,13 +115,6 @@ BL_API BLVoid blUIVisible(
 BL_API BLVoid blUIGetVisible(
 	IN BLGuid _ID,
 	OUT BLBool* _Visible);
-
-BL_API BLVoid blUITooltip(
-	IN BLGuid _ID,
-	IN BLUtf8* _Tooltip);
-
-BL_API const BLUtf8* blUIGetTooltip(
-	IN BLGuid _ID);
 
 BL_API BLVoid blUIPenetration(
 	IN BLGuid _ID,

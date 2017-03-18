@@ -50,6 +50,9 @@ BLVoid* blDictElement(
 	IN BLDictionary* _Dct,
 	IN BLU32 _Key);
 
+BLVoid* blDictRootElement(
+	IN BLDictionary* _Dct);
+
 BLVoid blDictInsert(
 	INOUT BLDictionary* _Dct,
 	IN BLU32 _Key, 

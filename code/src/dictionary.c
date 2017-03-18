@@ -215,6 +215,11 @@ blDictElement(IN BLDictionary* _Dct, IN BLU32 _Key)
 	else
 		return NULL;
 }
+BLVoid* 
+blDictRootElement(IN BLDictionary* _Dct)
+{
+	return _Dct->pRoot->pValue;
+}
 BLVoid
 blDictInsert(INOUT BLDictionary* _Dct, IN BLU32 _Key, IN BLVoid* _Data)
 {

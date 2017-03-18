@@ -613,7 +613,7 @@ QDomElement UiWidget::serialize( QDomDocument &doc, const QDomElement &extElemen
 	QSize maxsz = getMaxinumSize();
 	baseEle.setAttribute("MinSize", QString("%1,%2").arg(minsz.width()).arg(minsz.height()));
 	baseEle.setAttribute("MaxSize", QString("%1,%2").arg(maxsz.width()).arg(maxsz.height()));
-	baseEle.setAttribute("Tooltip", getToolTip());
+	//baseEle.setAttribute("Tooltip", getToolTip());
 	baseEle.setAttribute("AbsScissor", boolToString(getAbs()));
 	baseEle.setAttribute("Cliped", boolToString(getCliped()));
 	baseEle.setAttribute("Penetration", boolToString(getPenetrate()));
@@ -696,14 +696,14 @@ void UiWidget::read( QXmlStreamReader &reader, UiWidget *parent /*= NULL*/ )
 				bool abs = StringToBool(atts.value(QLatin1String("AbsScissor")).toString());
 				QStringList minsz = atts.value(QLatin1String("MinSize")).toString().split(",");
 				QStringList maxsz = atts.value(QLatin1String("MaxSize")).toString().split(",");
-				QString tooltip = atts.value(QLatin1String("Tooltip")).toString();
+				//QString tooltip = atts.value(QLatin1String("Tooltip")).toString();
 
 				//setVisible(visible);
 				setPenetrate(penetrate);
 				//setTransfer(transmit);
 				setCliped(clip);
 				setAbs(abs);
-				setToolTip(tooltip);
+				//setToolTip(tooltip);
 				
 				if(minsz.size() == 2)
 				{

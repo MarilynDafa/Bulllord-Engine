@@ -75,7 +75,7 @@ class UiWidget : public QObject
 	Q_PROPERTY(PtAlign ReferencePt  READ getReferencePt WRITE setReferencePt)
 	Q_PROPERTY(QSize MinSize READ getMininumSize WRITE setMininumSize)
 	Q_PROPERTY(QSize MaxSize READ getMaxinumSize WRITE setMaxinumSize)
-	Q_PROPERTY(QString Tooltip READ getToolTip WRITE setToolTip)
+	//Q_PROPERTY(QString Tooltip READ getToolTip WRITE setToolTip)
 	Q_PROPERTY(bool AbsScissor READ getAbs WRITE setAbs)
 	Q_PROPERTY(bool Cliped READ getCliped WRITE setCliped)
 	Q_PROPERTY(QRect absoluteRegion READ getAbsoluteRegion WRITE setAbsoluteRegion DESIGNABLE false)

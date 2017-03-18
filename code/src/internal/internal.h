@@ -89,6 +89,9 @@ extern "C" {
 #define SPACTION_SCALE_INTERNAL			2
 #define SPACTION_ALPHA_INTERNAL			3
 #define SPACTION_DEAD_INTERNAL			4
+/* Default Font*/
+extern const BLAnsi* DEFAULTFONT_INTERNAL;
+extern const BLAnsi* DEFAULTFONTIMG_INTERNAL;
 /* Platform Scancode*/
 #if defined(BL_PLATFORM_WIN32)
     static const BLEnum SCANCODE_INTERNAL[] =
