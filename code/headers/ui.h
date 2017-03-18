@@ -551,6 +551,7 @@ BL_API BLVoid blUITableColumnWidth(
 	IN BLU32 _Column,
 	IN BLU32 _Width);
 
+//#image:picture.bmg:archive#
 BL_API BLVoid blUITableCell(
 	IN BLGuid _ID,
 	IN BLUtf8* _Text,

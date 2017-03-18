@@ -357,7 +357,7 @@ typedef struct _UIMember {
 	_BLWidget* pHoveredWidget;
 	_BLWidget* pFocusWidget;
 	BLArray* pFonts;
-	BLGuid nGlyphGeo;
+	BLGuid nQuadGeo;
 	BLAnsi aDir[260];
 	BLAnsi aArchive[260];
 	FT_Library sFtLibrary;
@@ -2584,8 +2584,8 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 			};
 			_pt.fX += _gi->nAdv;
 			blTechSampler(_PrUIMem->nUITech, "Texture0", _gi->nTexture, 0);
-			blGeometryBufferUpdate(_PrUIMem->nGlyphGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-			blDraw(_PrUIMem->nUITech, _PrUIMem->nGlyphGeo, 1);
+			blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+			blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 		}
 	}
 	else
@@ -2674,8 +2674,8 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 				};
 				_pt.fX += _gi->nAdv;
 				blTechSampler(_PrUIMem->nUITech, "Texture0", _gi->nTexture, 0);
-				blGeometryBufferUpdate(_PrUIMem->nGlyphGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-				blDraw(_PrUIMem->nUITech, _PrUIMem->nGlyphGeo, 1);
+				blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+				blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 			}
 			_ls = _le + 1;
 			_pt.fY += _FontHeight;
@@ -2698,8 +2698,6 @@ _DrawButton(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
-	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sButton.nPixmapTex, 0);
 	BLF32 _gray = 1.f;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -2796,6 +2794,8 @@ _DrawButton(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	}
 	if (_RectApproximate(&_texcoord, &_texcoord9))
 	{
+		BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+		BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 		if (_flipx)
 		{
 			BLF32 _tmp = _texcoord.sLT.fX;
@@ -2848,12 +2848,13 @@ _DrawButton(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sButton.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sButton.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-		blDraw(_PrUIMem->nUITech, _geo, 1);
-		blDeleteGeometryBuffer(_geo);
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 	}
 	else
 	{
+		BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+		BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
 		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
 		BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
@@ -3215,8 +3216,6 @@ _DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
-	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sCheck.nPixmapTex, 0);
 	BLF32 _gray = 1.f;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -3349,12 +3348,13 @@ _DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sCheck.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sCheck.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-		blDraw(_PrUIMem->nUITech, _geo, 1);
-		blDeleteGeometryBuffer(_geo);
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 	}
 	else
 	{
+		BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+		BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
 		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
 		BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
@@ -3716,8 +3716,6 @@ _DrawSlider(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
-	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sSlider.nPixmapTex, 0);
 	BLF32 _gray = 1.f;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -3831,12 +3829,13 @@ _DrawSlider(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-		blDraw(_PrUIMem->nUITech, _geo, 1);
-		blDeleteGeometryBuffer(_geo);
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 	}
 	else
 	{
+		BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+		BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
 		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
 		BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
@@ -4235,9 +4234,8 @@ _DrawSlider(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
 		_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight
 	};
-	BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-	blDraw(_PrUIMem->nUITech, _geo, 1);
-	blDeleteGeometryBuffer(_geo);
+	blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+	blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 }
 static BLVoid
 _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
@@ -4247,8 +4245,6 @@ _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
-	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	BLF32 _gray = 1.f;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
 	BLF32 _stencil = 1.f;
@@ -4344,12 +4340,13 @@ _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sText.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sText.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-		blDraw(_PrUIMem->nUITech, _geo, 1);
-		blDeleteGeometryBuffer(_geo);
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 	}
 	else
 	{
+		BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+		BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 		blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sText.nPixmapTex, 0);
 		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
 		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
@@ -4840,9 +4837,8 @@ _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 				1.f,
 				1.f
 			};
-			BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-			blDraw(_PrUIMem->nUITech, _geo, 1);
-			blDeleteGeometryBuffer(_geo);
+			blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+			blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 		}
 	}
 	blDeleteUtf16Str((BLUtf16*)_text);
@@ -4855,8 +4851,6 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
-	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sProgress.nPixmapTex, 0);
 	BLF32 _gray = 1.f;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -4952,12 +4946,13 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-		blDraw(_PrUIMem->nUITech, _geo, 1);
-		blDeleteGeometryBuffer(_geo);
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 	}
 	else
 	{
+		BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+		BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
 		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
 		BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
@@ -5333,9 +5328,8 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
 		_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight
 	};
-	BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-	blDraw(_PrUIMem->nUITech, _geo, 1);
-	blDeleteGeometryBuffer(_geo);
+	blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+	blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 	BLRect _area;
 	_area.sLT.fX = _X - 0.5f * _Width;
 	_area.sLT.fY = _Y - 0.5f * _Height;
@@ -5363,8 +5357,6 @@ _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
-	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sDial.nPixmapTex, 0);
 	BLF32 _gray = 1.f;
 	BLF32 _stencil = 1.f;
@@ -5808,6 +5800,8 @@ _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			}
 			++_vbcount;
 		} while (1);
+		BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+		BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLEFAN, TRUE, _semantic, _decls, 3, _vbo, (1 + _vbcount) * 8 * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
 		blDraw(_PrUIMem->nUITech, _geo, 1);
 		blDeleteGeometryBuffer(_geo);
@@ -5875,9 +5869,8 @@ _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sDial.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sDial.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-		blDraw(_PrUIMem->nUITech, _geo, 1);
-		blDeleteGeometryBuffer(_geo);
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 	}
 }
 static BLVoid
@@ -5889,8 +5882,6 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
-	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sTable.nPixmapTex, 0);
 	BLF32 _gray = 1.f;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -5986,12 +5977,13 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
 			_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight
 		};
-		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-		blDraw(_PrUIMem->nUITech, _geo, 1);
-		blDeleteGeometryBuffer(_geo);
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 	}
 	else
 	{
+		BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+		BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
 		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
 		BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
@@ -6440,9 +6432,8 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 				_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight
 			};
 			blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sTable.nPixmapTex, 0);
-			BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-			blDraw(_PrUIMem->nUITech, _geo, 1);
-			blDeleteGeometryBuffer(_geo);
+			blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+			blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 			BLRect _textr;
 			_textr.sLT.fX = _rowr.sLT.fX;
 			_textr.sLT.fY = _rowr.sLT.fY;
@@ -6458,8 +6449,159 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 					BLU32 _cellidx = _jdx + _idx * _Node->uExtension.sTable.nColumnNum;
 					if (_cellidx < _Node->uExtension.sTable.nCellNum)
 					{
-						if (_Node->uExtension.sTable.pCellText[_cellidx] && !strncmp(_Node->uExtension.sTable.pCellText[_cellidx], "#image#", 7))
+						if (_Node->uExtension.sTable.pCellText[_cellidx] && !strncmp(_Node->uExtension.sTable.pCellText[_cellidx], "#image", 6))
 						{
+							BLU32 _richlen = strlen((const BLAnsi*)_Node->uExtension.sTable.pCellText[_cellidx]);
+							BLAnsi _dir[260] = { 0 };
+							BLAnsi _archive[260] = { 0 };
+							BLBool _parsearchive = FALSE;
+							for (BLU32 _kdx = 0; _kdx < _richlen - 7; ++_kdx)
+							{
+								if (_Node->uExtension.sTable.pCellText[_cellidx][_kdx + 7] == ':')
+									_parsearchive = TRUE;
+								else if (_Node->uExtension.sTable.pCellText[_cellidx][_kdx + 7] == '#')
+									break;
+								if (_parsearchive)
+								{
+									strcpy(_archive, (const BLAnsi*)(_Node->uExtension.sTable.pCellText[_cellidx]) + _kdx + 8);
+									break;
+								}
+								else
+									_dir[_kdx] = _Node->uExtension.sTable.pCellText[_cellidx][_kdx + 7];
+							}
+							BLGuid _stream;							
+							if (_archive[0])
+							{
+								_archive[strlen(_archive) - 1] = 0;
+								_stream = blGenStream(_dir, _archive);
+							}
+							else
+							{
+								BLAnsi _tmpname[260];
+								strcpy(_tmpname, _dir);
+								BLAnsi _path[260] = { 0 };
+								strcpy(_path, blWorkingDir(TRUE));
+								strcat(_path, _tmpname);
+								_stream = blGenStream(_path, NULL);
+								if (INVALID_GUID == _stream)
+								{
+									memset(_path, 0, sizeof(_path));
+									strcpy(_path, blUserFolderDir());
+									_stream = blGenStream(_path, NULL);
+								}
+								if (INVALID_GUID == _stream)
+									continue;
+							}
+							BLU8 _identifier[12];
+							blStreamRead(_stream, sizeof(_identifier), _identifier);
+							if (_identifier[0] != 0xDD || _identifier[1] != 0xDD || _identifier[2] != 0xDD ||
+								_identifier[3] != 0xEE || _identifier[4] != 0xEE || _identifier[5] != 0xEE ||
+								_identifier[6] != 0xAA || _identifier[7] != 0xAA || _identifier[8] != 0xAA ||
+								_identifier[9] != 0xDD || _identifier[10] != 0xDD || _identifier[11] != 0xDD)
+							{
+								blDeleteStream(_stream);
+								continue;
+							}
+							BLU32 _width, _height, _depth;
+							blStreamRead(_stream, sizeof(BLU32), &_width);
+							blStreamRead(_stream, sizeof(BLU32), &_height);
+							blStreamRead(_stream, sizeof(BLU32), &_depth);
+							BLU32 _array, _faces, _mipmap;
+							blStreamRead(_stream, sizeof(BLU32), &_array);
+							blStreamRead(_stream, sizeof(BLU32), &_faces);
+							blStreamRead(_stream, sizeof(BLU32), &_mipmap);
+							BLU32 _fourcc, _channels, _offset;
+							blStreamRead(_stream, sizeof(BLU32), &_fourcc);
+							blStreamRead(_stream, sizeof(BLU32), &_channels);
+							blStreamRead(_stream, sizeof(BLU32), &_offset);
+							BLEnum _type = BL_TT_2D;
+							blStreamSeek(_stream, _offset);
+							BLU32 _imagesz;
+							BLEnum _format;
+							switch (_fourcc)
+							{
+							case FOURCC_INTERNAL('B', 'M', 'G', 'T'): blStreamRead(_stream, sizeof(BLU32), &_imagesz); _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8; break;
+							case FOURCC_INTERNAL('S', '3', 'T', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_BC1; break;
+							case FOURCC_INTERNAL('S', '3', 'T', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_BC1A1; break;
+							case FOURCC_INTERNAL('S', '3', 'T', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_BC3; break;
+							case FOURCC_INTERNAL('A', 'S', 'T', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
+							case FOURCC_INTERNAL('A', 'S', 'T', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
+							case FOURCC_INTERNAL('A', 'S', 'T', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
+							case FOURCC_INTERNAL('E', 'T', 'C', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_ETC2; break;
+							case FOURCC_INTERNAL('E', 'T', 'C', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_ETC2A1; break;
+							case FOURCC_INTERNAL('E', 'T', 'C', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ETC2A; break;
+							default:assert(0); break;
+							}
+							BLU8* _texdata;
+							if (_fourcc == FOURCC_INTERNAL('B', 'M', 'G', 'T'))
+							{
+								BLU8* _data = (BLU8*)malloc(_imagesz);
+								blStreamRead(_stream, _imagesz, _data);
+								BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
+								blRLEDecode(_data, _width * _height * _channels, _data2);
+								free(_data);
+								_texdata = _data2;
+							}
+							else
+							{
+								BLU8* _data = (BLU8*)malloc(_imagesz);
+								blStreamRead(_stream, _imagesz, _data);
+								_texdata = _data;
+							}
+							blDeleteStream(_stream);
+							BLGuid _tex = blGenTexture(blHashUtf8((const BLUtf8*)_dir), _type, _format, FALSE, TRUE, FALSE, 1, 1, _width, _height, _depth, _texdata);
+							free(_texdata);
+							BLF32 _imgratio = (BLF32)_width / _height;
+							BLF32 _imgw, _imgh;
+							BLF32 _minedge = (_textr.sRB.fX - _textr.sLT.fX >= _Node->uExtension.sTable.nRowHeight) ? _Node->uExtension.sTable.nRowHeight : _textr.sRB.fX - _textr.sLT.fX;
+							if (_minedge == _Node->uExtension.sTable.nRowHeight)
+							{
+								_imgw = _minedge * _imgratio;
+								_imgh = _minedge;
+							}
+							else
+							{
+								_imgw = _minedge;
+								_imgh = _minedge / _imgratio;
+							}
+							BLF32 _vbo[] = {
+								PIXEL_ALIGNED_INTERNAL((_textr.sLT.fX + _textr.sRB.fX) * 0.5f - _imgw * 0.5f),
+								PIXEL_ALIGNED_INTERNAL((_textr.sLT.fY + _textr.sRB.fY) * 0.5f - _imgh * 0.5f),
+								1.f,
+								1.f,
+								1.f,
+								1.f,
+								0.f,
+								0.f,
+								PIXEL_ALIGNED_INTERNAL((_textr.sLT.fX + _textr.sRB.fX) * 0.5f + _imgw * 0.5f),
+								PIXEL_ALIGNED_INTERNAL((_textr.sLT.fY + _textr.sRB.fY) * 0.5f - _imgh * 0.5f),
+								1.f,
+								1.f,
+								1.f,
+								1.f,
+								1.f,
+								0.f,
+								PIXEL_ALIGNED_INTERNAL((_textr.sLT.fX + _textr.sRB.fX) * 0.5f - _imgw * 0.5f),
+								PIXEL_ALIGNED_INTERNAL((_textr.sLT.fY + _textr.sRB.fY) * 0.5f + _imgh * 0.5f),
+								1.f,
+								1.f,
+								1.f,
+								1.f,
+								0.f,
+								1.f,
+								PIXEL_ALIGNED_INTERNAL((_textr.sLT.fX + _textr.sRB.fX) * 0.5f + _imgw * 0.5f),
+								PIXEL_ALIGNED_INTERNAL((_textr.sLT.fY + _textr.sRB.fY) * 0.5f + _imgh * 0.5f),
+								1.f,
+								1.f,
+								1.f,
+								1.f,
+								1.f,
+								1.f
+							};
+							blTechSampler(_PrUIMem->nUITech, "Texture0", _tex, 0);
+							blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+							blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
+							blDeleteTexture(_tex);
 						}
 						else
 						{
@@ -8299,9 +8441,9 @@ _UIInit()
 	_PrUIMem->nUITech = blGenTechnique("2D.bsl", NULL, FALSE, FALSE);
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-	_PrUIMem->nGlyphGeo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"#@glyphgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, NULL, sizeof(float) * 32, NULL, 0, BL_IF_INVALID);
+	_PrUIMem->nQuadGeo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"#@quadgeo@#"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, NULL, sizeof(BLF32) * 32, NULL, 0, BL_IF_INVALID);
 	BLU32 _blankdata[] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
-	_PrUIMem->nBlankTex = blGenTexture(blHashUtf8((const BLUtf8*)"#@blanktex#@"), BL_TT_2D, BL_TF_RGBA8, FALSE, TRUE, FALSE, 1, 1, 2, 2, 1, (BLU8*)_blankdata);
+	_PrUIMem->nBlankTex = blGenTexture(blHashUtf8((const BLUtf8*)"#@blanktex@#"), BL_TT_2D, BL_TF_RGBA8, FALSE, TRUE, FALSE, 1, 1, 2, 2, 1, (BLU8*)_blankdata);
 	BLU32 _width, _height;
 	BLF32 _rx, _ry;
     blGetWindowSize(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
@@ -8412,7 +8554,7 @@ _UIDestroy()
 {
 	blUnsubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
 	blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
-	blDeleteGeometryBuffer(_PrUIMem->nGlyphGeo);
+	blDeleteGeometryBuffer(_PrUIMem->nQuadGeo);
 	blDeleteTexture(_PrUIMem->nBlankTex);
 	blDeleteTechnique(_PrUIMem->nUITech);
 	blDeleteUI(_PrUIMem->pRoot->nID);
