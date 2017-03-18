@@ -314,8 +314,10 @@ typedef struct _Widget {
 			BLU32 nRowHeight;
 			BLU32 nTotalHeight;
 			BLU32 nTotalWidth;
-			BLS32 nActiveColumn;
+			BLU32 nSelectedCell;
 			BLBool bSelecting;
+			BLBool bDragging;
+			BLF32 fDraggingPos;
 			BLU32 nTexWidth;
 			BLU32 nTexHeight;
 			BLEnum eTexFormat;
@@ -355,6 +357,7 @@ typedef struct _UIMember {
 	_BLWidget* pHoveredWidget;
 	_BLWidget* pFocusWidget;
 	BLArray* pFonts;
+	BLGuid nGlyphGeo;
 	BLAnsi aDir[260];
 	BLAnsi aArchive[260];
 	FT_Library sFtLibrary;
@@ -1415,6 +1418,8 @@ _TextSplit(_BLWidget* _Node, _BLFont* _Font, BLU16 _Flag)
 				for (; _jdx < _wdlen; ++_jdx)
 					_line[_llen + _wslen + _jdx] = _word[_jdx];
 				_line[_llen + _wslen + _wdlen] = 0;
+				if (_Node->uExtension.sText.pSplitText[_Node->uExtension.sText.nSplitSize])
+					free(_Node->uExtension.sText.pSplitText[_Node->uExtension.sText.nSplitSize]);
 				_Node->uExtension.sText.pSplitText[_Node->uExtension.sText.nSplitSize] = _line;
 				_Node->uExtension.sText.aSplitPositions[_Node->uExtension.sText.nSplitSize] = _lastlinestart;
 				_Node->uExtension.sText.nSplitSize++;
@@ -1444,6 +1449,8 @@ _TextSplit(_BLWidget* _Node, _BLFont* _Font, BLU16 _Flag)
 	for (; _jdx < _wdlen; ++_jdx)
 		_line[_llen + _wslen + _jdx] = _word[_jdx];
 	_line[_llen + _wslen + _wdlen] = 0;
+	if (_Node->uExtension.sText.pSplitText[_Node->uExtension.sText.nSplitSize])
+		free(_Node->uExtension.sText.pSplitText[_Node->uExtension.sText.nSplitSize]);
 	_Node->uExtension.sText.pSplitText[_Node->uExtension.sText.nSplitSize] = _line;
 	_Node->uExtension.sText.aSplitPositions[_Node->uExtension.sText.nSplitSize] = _lastlinestart;
 	_Node->uExtension.sText.nSplitSize++;
@@ -1717,6 +1724,7 @@ _TableSplit(_BLWidget* _Node, _BLFont* _Font, BLU32 _Flag, const BLUtf8* _Text, 
 		_btmp[_linelen] = 0;
 		*_BrokenText = _btmp;
 	}
+	free(_line);
 	blDeleteUtf16Str((BLUtf16*)_txt);
 }
 static void
@@ -1730,9 +1738,8 @@ _TableMake(_BLWidget* _Node)
 		_Node->uExtension.sTable.nTotalHeight = 0;
 	for (BLU32 _idx = 0; _idx < _Node->uExtension.sTable.nColumnNum; ++_idx)
 		_Node->uExtension.sTable.nTotalWidth += _Node->uExtension.sTable.aColumnWidth[_idx];
-	BLU32 _cheight = (BLU32)(_Node->sDimension.fY - _Node->uExtension.sTable.nRowHeight - 2);
-	if (_Node->uExtension.sTable.nTotalHeight > _cheight)
-		_Node->uExtension.sTable.nScroll = (BLS32)blScalarClamp((BLF32)_Node->uExtension.sTable.nScroll, 0.f, (BLF32)_Node->uExtension.sTable.nTotalHeight - _cheight);
+	if ((BLS32)_Node->uExtension.sTable.nTotalHeight >(BLS32)_Node->sDimension.fY)
+		_Node->uExtension.sTable.nScroll = (BLS32)blScalarClamp((BLF32)_Node->uExtension.sTable.nScroll, 0.f, (BLF32)_Node->uExtension.sTable.nTotalHeight - _Node->sDimension.fY);
 }
 static BLBool
 _UISetup(BLVoid* _Src)
@@ -2515,8 +2522,6 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 		_pt.fY = _Area->sRB.fY - _h;
 	else
 		_pt.fY = _Area->sLT.fY;
-	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	if (!_Multiline)
 	{
 		if (_AlignmentH == BL_UA_HCENTER)
@@ -2579,9 +2584,8 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 			};
 			_pt.fX += _gi->nAdv;
 			blTechSampler(_PrUIMem->nUITech, "Texture0", _gi->nTexture, 0);
-			BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-			blDraw(_PrUIMem->nUITech, _geo, 1);
-			blDeleteGeometryBuffer(_geo);
+			blGeometryBufferUpdate(_PrUIMem->nGlyphGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+			blDraw(_PrUIMem->nUITech, _PrUIMem->nGlyphGeo, 1);
 		}
 	}
 	else
@@ -2670,9 +2674,8 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 				};
 				_pt.fX += _gi->nAdv;
 				blTechSampler(_PrUIMem->nUITech, "Texture0", _gi->nTexture, 0);
-				BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-				blDraw(_PrUIMem->nUITech, _geo, 1);
-				blDeleteGeometryBuffer(_geo);
+				blGeometryBufferUpdate(_PrUIMem->nGlyphGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+				blDraw(_PrUIMem->nUITech, _PrUIMem->nGlyphGeo, 1);
 			}
 			_ls = _le + 1;
 			_pt.fY += _FontHeight;
@@ -6330,12 +6333,17 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	_scrolledclient.sRB.fX = _X - _Width * 0.5f + _Node->uExtension.sTable.nTotalWidth;
 	_scrolledclient.sLT.fY -= _Node->uExtension.sTable.nScroll;
 	_scrolledclient.sRB.fY -= _Node->uExtension.sTable.nScroll;
-	BLRect _rowr;
+	BLRect _rowr = { 0 };
 	_rowr.sLT.fX = _scrolledclient.sLT.fX;
 	_rowr.sLT.fY = _scrolledclient.sLT.fY;
 	_rowr.sRB.fX = _scrolledclient.sRB.fX;
 	_rowr.sRB.fY = _scrolledclient.sRB.fY;
-	_rowr.sRB.fY = _rowr.sLT.fY + _Node->uExtension.sTable.nRowHeight; 
+	_rowr.sRB.fY = _rowr.sLT.fY + _Node->uExtension.sTable.nRowHeight;
+	BLRect _clientc = { 0 };
+	_clientc.sLT.fX = _X - _Width * 0.5f;
+	_clientc.sLT.fY = _Y - _Height * 0.5f;
+	_clientc.sRB.fX = _X + _Width * 0.5f;
+	_clientc.sRB.fY = _Y + _Height * 0.5f;
 	BLU32 _rownum = (BLU32)roundf((BLF32)_Node->uExtension.sTable.nCellNum / _Node->uExtension.sTable.nColumnNum);
 	BLS32 _pos;
 	_BLFont* _ft = NULL;
@@ -6359,10 +6367,11 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	if (_Node->uExtension.sText.bShadow)
 		_flag |= 0x0F00;
 	if (_Node->uExtension.sText.bItalics)
-		_flag |= 0xF000;
-	for (BLU32 _idx = 0; ; ++_idx)
+		_flag |= 0xF000; 
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_clientc.sLT.fX, (BLU32)_clientc.sLT.fY, (BLU32)(_clientc.sRB.fX - _clientc.sLT.fX), (BLU32)(_clientc.sRB.fY - _clientc.sLT.fY));
+	for (BLU32 _idx = 0; _idx < _rownum; ++_idx)
 	{
-		if (_rowr.sRB.fY >= _Y - _Height * 0.5f && _rowr.sLT.fY <= _Y + _Height * 0.5f)
+		if (_rowr.sRB.fY >= _clientc.sLT.fY - 10 && _rowr.sLT.fY <= _clientc.sRB.fY + 10)
 		{
 			BLBool _odd = TRUE;
 			BLRect _rc;
@@ -6440,7 +6449,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_textr.sRB.fX = _rowr.sRB.fX;
 			_textr.sRB.fY = _rowr.sRB.fY;
 			_pos = (BLS32)_rowr.sLT.fX;
-			if (_idx < _Node->uExtension.sTable.nCellNum / _Node->uExtension.sTable.nColumnNum) 
+			if (_idx < _Node->uExtension.sTable.nCellNum / _Node->uExtension.sTable.nColumnNum)
 			{
 				for (BLU32 _jdx = 0; _jdx < _Node->uExtension.sTable.nColumnNum; ++_jdx)
 				{
@@ -6449,16 +6458,20 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 					BLU32 _cellidx = _jdx + _idx * _Node->uExtension.sTable.nColumnNum;
 					if (_cellidx < _Node->uExtension.sTable.nCellNum)
 					{
-						if (!_Node->uExtension.sTable.pCellBroken[_cellidx])
-							_TableSplit(_Node, _ft, _flag, _Node->uExtension.sTable.pCellText[_cellidx], &_Node->uExtension.sTable.pCellBroken[_cellidx], _Node->uExtension.sTable.aColumnWidth[_jdx]);
-						_WriteText(_Node->uExtension.sTable.pCellBroken[_cellidx], _Node->uExtension.sTable.aFontSource, _Node->uExtension.sTable.nFontHeight, BL_UA_HCENTER, BL_UA_VCENTER, FALSE, &_textr, &_scissorrect, _Node->uExtension.sTable.pCellColor[_cellidx], _flag, FALSE);
+						if (_Node->uExtension.sTable.pCellText[_cellidx] && !strncmp(_Node->uExtension.sTable.pCellText[_cellidx], "#image#", 7))
+						{
+						}
+						else
+						{
+							if (!_Node->uExtension.sTable.pCellBroken[_cellidx])
+								_TableSplit(_Node, _ft, _flag, _Node->uExtension.sTable.pCellText[_cellidx], &_Node->uExtension.sTable.pCellBroken[_cellidx], _Node->uExtension.sTable.aColumnWidth[_jdx]);
+							_WriteText(_Node->uExtension.sTable.pCellBroken[_cellidx], _Node->uExtension.sTable.aFontSource, _Node->uExtension.sTable.nFontHeight, BL_UA_HCENTER, BL_UA_VCENTER, FALSE, &_textr, &_clientc, _Node->uExtension.sTable.pCellColor[_cellidx], _flag, FALSE);
+						}
 					}
 					_pos += _Node->uExtension.sTable.aColumnWidth[_jdx];
 				}
 			}
 		}
-		else
-			break;
 		_rowr.sLT.fY += _Node->uExtension.sTable.nRowHeight;
 		_rowr.sRB.fY += _Node->uExtension.sTable.nRowHeight;
 	}
@@ -6942,6 +6955,18 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
+			case BL_UT_TABLE:
+				if (_wid->uExtension.sTable.bSelecting || _wid->uExtension.sTable.bDragging)
+				{
+					_wid->uExtension.sTable.bDragging = TRUE;
+					_wid->uExtension.sTable.bSelecting = FALSE;
+					_wid->uExtension.sTable.nScroll = _wid->uExtension.sTable.nScroll - (BLS32)(_y - _wid->uExtension.sTable.fDraggingPos);
+					_wid->uExtension.sTable.fDraggingPos = _y;
+					if ((BLS32)_wid->uExtension.sTable.nTotalHeight >(BLS32)_wid->sDimension.fY)
+						_wid->uExtension.sTable.nScroll = (BLS32)blScalarClamp((BLF32)_wid->uExtension.sTable.nScroll, 0.f, (BLF32)_wid->uExtension.sTable.nTotalHeight - _wid->sDimension.fY);
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
 			case BL_UT_TEXT:
 				if (_wid->uExtension.sText.bSelecting && _wid->uExtension.sText.nState)
 				{
@@ -7067,6 +7092,18 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
+			case BL_UT_TABLE:
+				if (_wid->uExtension.sTable.bSelecting || _wid->uExtension.sTable.bDragging)
+				{
+					_wid->uExtension.sTable.bDragging = TRUE;
+					_wid->uExtension.sTable.bSelecting = FALSE;
+					_wid->uExtension.sTable.nScroll = _wid->uExtension.sTable.nScroll - (BLS32)(_y - _wid->uExtension.sTable.fDraggingPos);
+					_wid->uExtension.sTable.fDraggingPos = _y;
+					if ((BLS32)_wid->uExtension.sTable.nTotalHeight >(BLS32)_wid->sDimension.fY)
+						_wid->uExtension.sTable.nScroll = (BLS32)blScalarClamp((BLF32)_wid->uExtension.sTable.nScroll, 0.f, (BLF32)_wid->uExtension.sTable.nTotalHeight - _wid->sDimension.fY);
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
 			case BL_UT_TEXT:
 				if (_wid->uExtension.sText.bSelecting && _wid->uExtension.sText.nState)
 				{
@@ -7133,6 +7170,8 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 						_PrUIMem->pFocusWidget->uExtension.sDial.bDragging = FALSE;
 					else if (_PrUIMem->pFocusWidget->eType == BL_UT_TEXT)
 						blDetachIME();
+					else if (_PrUIMem->pFocusWidget->eType == BL_UT_TABLE)
+						_PrUIMem->pFocusWidget->uExtension.sTable.bDragging = FALSE;
 					//lost focs;_PrUIMem->pFocusWidget
 					//Panel
 				}
@@ -7222,6 +7261,24 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					if (blRectContains(&_drawarea, &_pos))
 					{
 						_wid->uExtension.sDial.bDragging = TRUE;
+					}
+				}
+				break;
+			case BL_UT_TABLE:
+				{
+					BLVec2 _pos;
+					_pos.fX = _x;
+					_pos.fY = _y;
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					if (blRectContains(&_drawarea, &_pos))
+					{
+						_wid->uExtension.sTable.bDragging = FALSE;
+						_wid->uExtension.sTable.bSelecting = TRUE;
+						_wid->uExtension.sTable.fDraggingPos = _y;
 					}
 				}
 				break;
@@ -7343,6 +7400,24 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					}
 				}
 				break;
+			case BL_UT_TABLE:
+				{
+					BLVec2 _pos;
+					_pos.fX = _x;
+					_pos.fY = _y;
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					if (blRectContains(&_drawarea, &_pos))
+					{
+						_wid->uExtension.sTable.bDragging = FALSE;
+						_wid->uExtension.sTable.bSelecting = TRUE;
+						_wid->uExtension.sTable.fDraggingPos = _y;
+					}
+				}
+				break;
 			case BL_UT_TEXT:
 				if (_wid->uExtension.sText.nState == 1)
 				{
@@ -7436,6 +7511,51 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
+			case BL_UT_TABLE:
+				if (_wid->uExtension.sTable.bDragging)
+				{
+					_wid->uExtension.sTable.bDragging = FALSE;
+					_wid->uExtension.sTable.bSelecting = FALSE;
+					_PrUIMem->bDirty = TRUE;
+				}
+				else if (_wid->uExtension.sTable.bSelecting)
+				{
+					_wid->uExtension.sTable.bDragging = FALSE;
+					_wid->uExtension.sTable.bSelecting = FALSE;
+					BLU32 _oldsel = _wid->uExtension.sTable.nSelectedCell;
+					BLS32 _selrow, _selcol = 0;
+					BLRect _area;
+					BLRect _sarea;
+					_WidgetAbsArea(_wid, &_area);
+					_WidgetScissorRect(_wid, &_sarea);
+					BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+					BLU32 _rownum = (BLU32)roundf((BLF32)_wid->uExtension.sTable.nCellNum / _wid->uExtension.sTable.nColumnNum);
+					if (_y < _drawarea.sLT.fY)
+						break;
+					if (_wid->uExtension.sTable.nRowHeight)
+						_selrow = (BLS32)((_y - _drawarea.sLT.fY) + _wid->uExtension.sTable.nScroll) / _wid->uExtension.sTable.nRowHeight;
+					if (_selrow >= (BLS32)_rownum)
+						_selrow = _rownum - 1;
+					else if (_selrow < 0)
+						_selrow = 0;
+					BLF32 _edge = _drawarea.sLT.fX;
+					for (BLU32 _idx = 0; _idx < _wid->uExtension.sTable.nColumnNum; ++_idx)
+					{
+						if (_x > _edge && _x < _edge + _wid->uExtension.sTable.aColumnWidth[_idx])
+						{
+							_selcol = _idx;
+							break;
+						}
+						else
+							_edge += _wid->uExtension.sTable.aColumnWidth[_idx];
+					}
+					_wid->uExtension.sTable.nSelectedCell = _selrow * _wid->uExtension.sTable.nColumnNum + _selcol;
+					if (_wid->uExtension.sTable.nSelectedCell != _oldsel)
+					{
+					}
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
 			case BL_UT_TEXT:
 				if (_wid->uExtension.sText.nState == 1)
 				{
@@ -7497,6 +7617,13 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				if (!_wid->uExtension.sDial.bAngleCut && _wid->uExtension.sDial.bDragging)
 				{
 					_wid->uExtension.sDial.bDragging = FALSE;
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
+			case BL_UT_TABLE:
+				if (_wid->uExtension.sTable.bDragging)
+				{
+					_wid->uExtension.sTable.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -7574,6 +7701,13 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				_TextScroll(_wid);
 				_PrUIMem->bDirty = TRUE;
 			}
+			else if (_wid->eType == BL_UT_TABLE)
+			{
+				_wid->uExtension.sTable.nScroll = _wid->uExtension.sTable.nScroll + 10 * _val * (_up ? 1 : -1);
+				if ((BLS32)_wid->uExtension.sTable.nTotalHeight >(BLS32)_wid->sDimension.fY)
+					_wid->uExtension.sTable.nScroll = (BLS32)blScalarClamp((BLF32)_wid->uExtension.sTable.nScroll, 0.f, (BLF32)_wid->uExtension.sTable.nTotalHeight - _wid->sDimension.fY);
+				_PrUIMem->bDirty = TRUE;
+			}
 		}
 		if (!_lastfocus && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible)
 		{
@@ -7621,6 +7755,13 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				_wid->uExtension.sText.nSelectBegin = _newmarkbegin;
 				_wid->uExtension.sText.nSelectEnd = _newmarkend;
 				_TextScroll(_wid);
+				_PrUIMem->bDirty = TRUE;
+			}
+			else if (_wid->eType == BL_UT_TABLE)
+			{
+				_wid->uExtension.sTable.nScroll = _wid->uExtension.sTable.nScroll + 10 * _val * (_up ? 1 : -1);
+				if ((BLS32)_wid->uExtension.sTable.nTotalHeight >(BLS32)_wid->sDimension.fY)
+					_wid->uExtension.sTable.nScroll = (BLS32)blScalarClamp((BLF32)_wid->uExtension.sTable.nScroll, 0.f, (BLF32)_wid->uExtension.sTable.nTotalHeight - _wid->sDimension.fY);
 				_PrUIMem->bDirty = TRUE;
 			}
 		}
@@ -8135,7 +8276,6 @@ BLVoid
 _UIInit()
 {
     _PrUIMem = (_BLUIMember*)malloc(sizeof(_BLUIMember));
-    _PrUIMem->pFonts = blGenArray(FALSE);
     memset(_PrUIMem->aDir, 0, sizeof(_PrUIMem->aDir));
     memset(_PrUIMem->aArchive, 0, sizeof(_PrUIMem->aArchive));
     FT_Init_FreeType(&_PrUIMem->sFtLibrary);
@@ -8157,6 +8297,9 @@ _UIInit()
 	_PrUIMem->pFocusWidget = NULL;
     _PrUIMem->pFonts = blGenArray(TRUE);
 	_PrUIMem->nUITech = blGenTechnique("2D.bsl", NULL, FALSE, FALSE);
+	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+	_PrUIMem->nGlyphGeo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"#@glyphgeo#@"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, NULL, sizeof(float) * 32, NULL, 0, BL_IF_INVALID);
 	BLU32 _blankdata[] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
 	_PrUIMem->nBlankTex = blGenTexture(blHashUtf8((const BLUtf8*)"#@blanktex#@"), BL_TT_2D, BL_TF_RGBA8, FALSE, TRUE, FALSE, 1, 1, 2, 2, 1, (BLU8*)_blankdata);
 	BLU32 _width, _height;
@@ -8269,6 +8412,7 @@ _UIDestroy()
 {
 	blUnsubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
 	blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
+	blDeleteGeometryBuffer(_PrUIMem->nGlyphGeo);
 	blDeleteTexture(_PrUIMem->nBlankTex);
 	blDeleteTechnique(_PrUIMem->nUITech);
 	blDeleteUI(_PrUIMem->pRoot->nID);
@@ -8290,8 +8434,10 @@ _UIDestroy()
 						free(_iter4);
 					}
 					blDeleteDict(_iter2->pGlyphs);
+					free(_iter2);
 				}
 			}
+			blDeleteDict(_iter->pGlyphAtlas);
 			blDeleteStream(_iter->nFontStream);
 			free(_iter);
 		}
@@ -9164,6 +9310,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sText.aPixmap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sText.aCommonMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sText.aStencilMap, 0, sizeof(BLAnsi) * 128);
+			memset(_widget->uExtension.sText.pSplitText, 0, sizeof(BLUtf16*) * 2048);
 			_widget->uExtension.sText.nMaxLength = 999999;
 			_widget->uExtension.sText.nMinValue = 0;
 			_widget->uExtension.sText.nMaxValue = 999999;
@@ -9252,8 +9399,9 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sTable.nRowHeight = 14;
 			_widget->uExtension.sTable.nTotalHeight = 0;
 			_widget->uExtension.sTable.nTotalWidth = 0;
-			_widget->uExtension.sTable.nActiveColumn = -1;
+			_widget->uExtension.sTable.nSelectedCell = -1;
 			_widget->uExtension.sTable.bSelecting = FALSE;
+			_widget->uExtension.sTable.bDragging = FALSE;
             _widget->uExtension.sTable.nPixmapTex = INVALID_GUID;
 		}
 		break;
@@ -10702,7 +10850,7 @@ blUITableEvenItemMap(IN BLGuid _ID, IN BLAnsi* _EvenItemMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid 
-blUITableMaking(IN BLGuid _ID, IN BLU32 _Column, IN BLU32 _Row)
+blUITableMaking(IN BLGuid _ID, IN BLU32 _Row, IN BLU32 _Column)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)

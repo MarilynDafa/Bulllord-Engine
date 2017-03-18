@@ -26,6 +26,9 @@
 #include "internal/internal.h"
 #include "internal/dictionary.h"
 #if defined BL_PLATFORM_WIN32
+#	if defined(VLD_FORCE_ENABLE)
+#	pragma comment(lib, "vld.lib")
+#	endif
 #	pragma comment(lib, "ws2_32.lib")
 #	pragma comment(lib, "opengl32.lib")
 #	pragma comment(lib, "imm32.lib")

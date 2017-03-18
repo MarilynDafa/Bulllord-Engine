@@ -1309,6 +1309,7 @@ _SpriteDestroy()
 	blDeleteTechnique(_PrSpriteMem->nSpriteStrokeTech);
 	blDeleteTechnique(_PrSpriteMem->nSpriteGlowTech);
     free(_PrSpriteMem);
+	_PrSpriteMem = NULL;
 }
 BLGuid
 blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLAnsi* _Tag, IN BLF32 _Width, IN BLF32 _Height, IN BLF32 _Zv, IN BLU32 _FPS, IN BLBool _AsTile)

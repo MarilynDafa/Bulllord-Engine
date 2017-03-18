@@ -539,8 +539,8 @@ BL_API BLVoid blUITableEvenItemMap(
 
 BL_API BLVoid blUITableMaking(
 	IN BLGuid _ID,
-	IN BLU32 _Column,
-	IN BLU32 _Row);
+	IN BLU32 _Row,
+	IN BLU32 _Column);
 
 BL_API BLVoid blUITableRowHeight(
 	IN BLGuid _ID,

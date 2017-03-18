@@ -45,6 +45,9 @@
 #	include <time.h>
 #	include <io.h>
 #	include <assert.h>
+#	if defined(VLD_FORCE_ENABLE)
+#		include <vld.h>  
+#	endif
 #   define BL_GL_BACKEND
 #   define BL_VK_BACKEND
 #elif defined(BL_PLATFORM_OSX)
@@ -192,10 +195,14 @@ typedef unsigned long long BLGuid;
 #	undef BL_API
 #endif
 #if defined(_MSC_VER)
-#	ifdef BL_EXPORT
-#		define BL_API __declspec(dllexport)
+#	if defined(VLD_FORCE_ENABLE)
+#		define BL_API extern
 #	else
-#		define BL_API __declspec(dllimport)
+#		ifdef BL_EXPORT
+#			define BL_API __declspec(dllexport)
+#		else
+#			define BL_API __declspec(dllimport)
+#		endif
 #	endif
 #else
 #	ifdef PLUGIN_EXPORT
