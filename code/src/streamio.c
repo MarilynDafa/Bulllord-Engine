@@ -125,7 +125,7 @@ _FetchResource(const BLAnsi* _Filename, const BLAnsi* _Archive, BLVoid** _Res, B
 	{
 		blMutexLock(_PrStreamIOMem->pLoadingQueue->pMutex);
 		{
-			FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
+			FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
 			{
 				if (_iter->nGuid == _ID)
 				{
@@ -137,7 +137,7 @@ _FetchResource(const BLAnsi* _Filename, const BLAnsi* _Archive, BLVoid** _Res, B
 		blMutexUnlock(_PrStreamIOMem->pLoadingQueue->pMutex);
 		blMutexLock(_PrStreamIOMem->pSetupQueue->pMutex);
 		{
-			FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
+			FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
 			{
 				if (_iter->nGuid == _ID)
 				{
@@ -177,7 +177,7 @@ _DiscardResource(BLGuid _ID, BLBool(*_Unload)(BLVoid*), BLBool(*_Release)(BLVoid
 {
 	blMutexLock(_PrStreamIOMem->pLoadingQueue->pMutex);
 	{
-		FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
+		FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
 		{
 			if (_iter->nGuid == _ID)
 			{
@@ -191,7 +191,7 @@ _DiscardResource(BLGuid _ID, BLBool(*_Unload)(BLVoid*), BLBool(*_Release)(BLVoid
 	blMutexUnlock(_PrStreamIOMem->pLoadingQueue->pMutex);
 	blMutexLock(_PrStreamIOMem->pSetupQueue->pMutex);
 	{
-		FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
+		FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
 		{
 			if (_iter->nGuid == _ID)
 			{
@@ -280,9 +280,9 @@ BLVoid
 _StreamIODestroy()
 {
 	{
-		FOREACH_ARRAY (_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
+		FOREACH_ARRAY(_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
 		{
-			FOREACH_DICT (_BLBpkFileEntry*, _iter2, _iter->pFiles)
+			FOREACH_DICT(_BLBpkFileEntry*, _iter2, _iter->pFiles)
 			{
 				if (_iter2->pPatch)
 					free(_iter2->pPatch);
@@ -296,13 +296,13 @@ _StreamIODestroy()
 	}
 	blDeleteThread(_PrStreamIOMem->pLoadThread);
 	{
-		FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
+		FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
 		{
 			free(_iter);
 		}
 	}
 	{
-		FOREACH_LIST (_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
+		FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pSetupQueue)
 		{
 			free(_iter);
 		}
@@ -402,7 +402,7 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 		BLAnsi _tmpname[260];
 		_BLStream* _ret = NULL;
 		_BLBpkFileEntry* _file = NULL;
-		FOREACH_ARRAY (_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
+		FOREACH_ARRAY(_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
 		{
 			if (!strcmp(_iter->pArchive, _Archive))
 				break;
@@ -952,7 +952,7 @@ blPatchArchive(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 	if (!_PrStreamIOMem->pArchives->nSize)
 		return FALSE;
     {
-		FOREACH_ARRAY (_BLBpkArchive*, _biter, _PrStreamIOMem->pArchives)
+		FOREACH_ARRAY(_BLBpkArchive*, _biter, _PrStreamIOMem->pArchives)
 		{
 			if (!strcmp(_Archive, _biter->pArchive))
 			{
@@ -1173,7 +1173,7 @@ blPatchArchive(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 BLU32
 blQueryArchiveVer(IN BLAnsi* _Archive)
 {
-    FOREACH_ARRAY (_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
+    FOREACH_ARRAY(_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
     {
         if(!strcmp(_Archive , _iter->pArchive))
             return _iter->nVersion;

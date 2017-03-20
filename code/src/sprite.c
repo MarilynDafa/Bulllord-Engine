@@ -576,7 +576,7 @@ _UnloadSprite(BLVoid* _Src)
         free(_node->pEmitParam);
     }
 	{
-		FOREACH_DICT (_BLSpriteSheet*, _iter, _node->pTagSheet)
+		FOREACH_DICT(_BLSpriteSheet*, _iter, _node->pTagSheet)
 		{
 			free(_iter);
 		}
@@ -1294,7 +1294,7 @@ _SpriteDestroy()
     blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 	{		
-		FOREACH_ARRAY (_BLTileInfo*, _tileiter, _PrSpriteMem->pTileArray[_idx])
+		FOREACH_ARRAY(_BLTileInfo*, _tileiter, _PrSpriteMem->pTileArray[_idx])
 		{
 			blDeleteTexture(_tileiter->nTex);
 			blDeleteGuid(_tileiter->nID);

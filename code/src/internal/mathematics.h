@@ -103,6 +103,10 @@ BLF32 blScalarClamp(
 	IN BLF32 _Min, 
 	IN BLF32 _Max);
 
+BLBool blRectApproximate(
+	IN BLRect* _R1,
+	IN BLRect* _R2);
+
 BLRect blRectIntersects(
 	IN BLRect* _R1,
 	IN BLRect* _R2);
@@ -118,6 +122,10 @@ BLRect blRectClip(
 BLVoid blRectExtend(
 	INOUT BLRect* _Tar, 
 	IN BLVec2* _Pt);
+
+BLBool blVec2Approximate(
+	IN BLVec2* _V1,
+	IN BLVec2* _V2);
 
 BLF32 blVec2Length(
 	IN BLVec2* _V);
@@ -136,9 +144,9 @@ BLF32 blVec2CrossProduct(
 	IN BLVec2* _V1,
 	IN BLVec2* _V2);
 
-BLBool blVec2Approximate(
-	IN BLVec2* _V1,
-	IN BLVec2* _V2);
+BLBool blVec3Approximate(
+	IN BLVec3* _V1,
+	IN BLVec3* _V2);
 
 BLF32 blVec3Length(
 	IN BLVec3* _V);
@@ -157,9 +165,9 @@ BLVec3 blVec3CrossProduct(
 	IN BLVec3* _V1,
 	IN BLVec3* _V2);
 
-BLBool blVec3Approximate(
-	IN BLVec3* _V1,
-	IN BLVec3* _V2);
+BLBool blQuatApproximate(
+	IN BLQuaternion* _Q1,
+	IN BLQuaternion* _Q2);
 
 BLQuaternion blQuatFromAxNRad(
 	IN BLVec3* _Axis, 
@@ -207,6 +215,10 @@ BLVec3 blQuatTransform(
 	IN BLQuaternion* _Q,
 	IN BLVec3* _Vec);
 
+BLBool blMatApproximate(
+	IN BLMatrix* _M1,
+	IN BLMatrix* _M2);
+
 BLMatrix blMatFromTransform(
 	IN BLVec3* _Trans,
 	IN BLVec3* _Scale,
@@ -242,6 +254,10 @@ BLVoid blMatLookatL(
 	IN BLVec3* _Focus,
 	IN BLVec3* _Up);
 
+BLBool blPlaneApproximate(
+	IN BLPlane* _P1,
+	IN BLPlane* _P2);
+
 BLPlane blPlaneFrom3P(
 	IN BLVec3* _P1,
 	IN BLVec3* _P2,
@@ -250,6 +266,10 @@ BLPlane blPlaneFrom3P(
 BLPlane blPlaneFromPN(
 	IN BLVec3* _Pt,
 	IN BLVec3* _Nor);
+
+BLBool blBoxApproximate(
+	IN BLBox* _B1,
+	IN BLBox* _B2);
 
 BLVoid blBoxMerge(
 	INOUT BLBox* _Box, 

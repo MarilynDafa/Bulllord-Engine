@@ -870,7 +870,7 @@ _AudioThreadFunc(BLVoid* _Userdata)
 #endif
 			blMutexUnlock(_PrAudioMem->pMusicMutex);
 			blMutexLock(_PrAudioMem->pSounds->pMutex);
-			FOREACH_LIST (_BLAudioSource*, _iter, _PrAudioMem->pSounds)
+			FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
 			{
 #if defined(BL_USE_AL_API)
 				if (_ALUpdate(_iter))
@@ -1055,7 +1055,7 @@ BLVoid
 _AudioStep(BLU32 _Delta)
 {
 	blMutexLock(_PrAudioMem->pSounds->pMutex);
-	FOREACH_LIST (_BLAudioSource*, _iter, _PrAudioMem->pSounds)
+	FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
 	{
 		if (_iter->bLoop && !_iter->bCompressed)
 		{
@@ -1165,7 +1165,7 @@ blUseEnvironmentVolume(IN BLF32 _Vol)
 {
 	_PrAudioMem->pAudioDev.fEnvVolume = _Vol;
     blMutexLock(_PrAudioMem->pSounds->pMutex);
-    FOREACH_LIST (_BLAudioSource*, _iter, _PrAudioMem->pSounds)
+    FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
     {
 		if (_iter->bLoop)
 		{
@@ -1187,7 +1187,7 @@ blUseSystemVolume(IN BLF32 _Vol)
 {
 	_PrAudioMem->pAudioDev.fSystemVolume = _Vol;
     blMutexLock(_PrAudioMem->pSounds->pMutex);
-    FOREACH_LIST (_BLAudioSource*, _iter, _PrAudioMem->pSounds)
+    FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
     {
 		if (!_iter->bLoop)
         {
@@ -1235,7 +1235,7 @@ blSetListenerDir(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 BLVoid
 blSetEmitterPos(IN BLGuid _ID, IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
-	FOREACH_LIST (_BLAudioSource*, _iter, _PrAudioMem->pSounds)
+	FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
 	{
 		if (_iter->nID == _ID)
 		{
@@ -1284,7 +1284,7 @@ blDeleteAudio(IN BLGuid _ID)
 	else if(_ID == ASSOCIATED_GUID)
 	{
 		blMutexLock(_PrAudioMem->pSounds->pMutex);
-		FOREACH_LIST (_BLAudioSource*, _iter, _PrAudioMem->pSounds)
+		FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
 		{
 #if defined(BL_USE_AL_API)
 			_DiscardResource(_iter->nID, _UnloadAudio, _ALSoundRelease);
@@ -1317,7 +1317,7 @@ blDeleteAudio(IN BLGuid _ID)
             return;
 		}
 		blMutexLock(_PrAudioMem->pSounds->pMutex);
-		FOREACH_LIST (_BLAudioSource*, _iter, _PrAudioMem->pSounds)
+		FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
 		{
 			if (_iter->nID == _ID)
 			{

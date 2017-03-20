@@ -166,34 +166,34 @@ _NetworkDestroy()
 		_PrNetworkMem->pDownMain = NULL;
 	}
 	{
-		FOREACH_LIST (_BLNetMsg*, _citer, _PrNetworkMem->pCriList)
+		FOREACH_LIST(_BLNetMsg*, _citer, _PrNetworkMem->pCriList)
 		{
 			free(_citer->pBuf);
 			free(_citer);
 		}
 	}
 	{
-		FOREACH_LIST (_BLNetMsg*, _niter, _PrNetworkMem->pNorList)
+		FOREACH_LIST(_BLNetMsg*, _niter, _PrNetworkMem->pNorList)
 		{
 			free(_niter->pBuf);
 			free(_niter);
 		}
 	}
 	{
-		FOREACH_LIST (_BLNetMsg*, _riter, _PrNetworkMem->pRevList)
+		FOREACH_LIST(_BLNetMsg*, _riter, _PrNetworkMem->pRevList)
 		{
 			free(_riter->pBuf);
 			free(_riter);
 		}
 	}
 	{
-		FOREACH_ARRAY (BLAnsi*, _riter, _PrNetworkMem->pDownList)
+		FOREACH_ARRAY(BLAnsi*, _riter, _PrNetworkMem->pDownList)
 		{
 			free(_riter);
 		}
 	}
 	{
-		FOREACH_ARRAY (BLAnsi*, _riter, _PrNetworkMem->pLocalList)
+		FOREACH_ARRAY(BLAnsi*, _riter, _PrNetworkMem->pLocalList)
 		{
 			free(_riter);
 		}
@@ -215,7 +215,7 @@ _NetworkDestroy()
 		_PrNetworkMem->sTcpSocket = INVALID_SOCKET_INTERNAL;
 #endif
 	}
-	FOREACH_LIST (_BLHttpJob*, _iter, _PrNetworkMem->pHttpJobArray)
+	FOREACH_LIST(_BLHttpJob*, _iter, _PrNetworkMem->pHttpJobArray)
 	{
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 		shutdown(_iter->sSocket, SD_SEND);
@@ -258,7 +258,7 @@ _NetworkStep(BLU32 _Delta)
 		}
 		blMutexLock(_PrNetworkMem->pRevList->pMutex);
 		{
-			FOREACH_LIST (_BLNetMsg*, _iter, _PrNetworkMem->pRevList)
+			FOREACH_LIST(_BLNetMsg*, _iter, _PrNetworkMem->pRevList)
 			{
 				BLVoid* _buf = malloc(_iter->nLength);
 				memcpy(_buf, _iter->pBuf, _iter->nLength);
@@ -271,7 +271,7 @@ _NetworkStep(BLU32 _Delta)
 	}
 	blMutexLock(_PrNetworkMem->pRevList->pMutex);
 	{
-		FOREACH_LIST (_BLNetMsg*, _iter, _PrNetworkMem->pRevList)
+		FOREACH_LIST(_BLNetMsg*, _iter, _PrNetworkMem->pRevList)
 		{
 			BLVoid* _buf = malloc(_iter->nLength);
 			memcpy(_buf, _iter->pBuf, _iter->nLength);
@@ -283,7 +283,7 @@ _NetworkStep(BLU32 _Delta)
 	blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
 	blMutexLock(_PrNetworkMem->pHttpJobArray->pMutex);
 	{
-		FOREACH_LIST (_BLHttpJob*, _iter, _PrNetworkMem->pHttpJobArray)
+		FOREACH_LIST(_BLHttpJob*, _iter, _PrNetworkMem->pHttpJobArray)
 		{
 			if (_iter->bOver)
 			{
@@ -1602,21 +1602,21 @@ blDisconnectNetwork()
 	memset(_PrNetworkMem->aHost, 0, sizeof(_PrNetworkMem->aHost));
 	_PrNetworkMem->nPort = -1;
 	{
-		FOREACH_LIST (_BLNetMsg*, _citer, _PrNetworkMem->pCriList)
+		FOREACH_LIST(_BLNetMsg*, _citer, _PrNetworkMem->pCriList)
 		{
 			free(_citer->pBuf);
 			free(_citer);
 		}
 	}
 	{
-		FOREACH_LIST (_BLNetMsg*, _niter, _PrNetworkMem->pNorList)
+		FOREACH_LIST(_BLNetMsg*, _niter, _PrNetworkMem->pNorList)
 		{
 			free(_niter->pBuf);
 			free(_niter);
 		}
 	}
 	{
-		FOREACH_LIST (_BLNetMsg*, _riter, _PrNetworkMem->pRevList)
+		FOREACH_LIST(_BLNetMsg*, _riter, _PrNetworkMem->pRevList)
 		{
 			free(_riter->pBuf);
 			free(_riter);
@@ -1663,7 +1663,7 @@ blSendNetMsg(IN BLU32 _MsgID, IN BLVoid* _Msgbuf, IN BLU32 _Msgsz, IN BLBool _Cr
 		{
 			blMutexLock(_PrNetworkMem->pCriList->pMutex);
 			{
-				FOREACH_LIST (_BLNetMsg*, _citer, _PrNetworkMem->pCriList)
+				FOREACH_LIST(_BLNetMsg*, _citer, _PrNetworkMem->pCriList)
 				{
 					if (_citer->nID == _msg->nID)
 					{
@@ -1709,7 +1709,7 @@ blSendNetMsg(IN BLU32 _MsgID, IN BLVoid* _Msgbuf, IN BLU32 _Msgsz, IN BLBool _Cr
 		{
 			blMutexLock(_PrNetworkMem->pNorList->pMutex);
 			{
-				FOREACH_LIST (_BLNetMsg*, _niter, _PrNetworkMem->pNorList)
+				FOREACH_LIST(_BLNetMsg*, _niter, _PrNetworkMem->pNorList)
 				{
 					if (_niter->nID == _msg->nID)
 					{
@@ -2117,7 +2117,7 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
         _localpath[_idx] = '/';
 	mkdir(_localpath, 0755);
 #endif
-	FOREACH_ARRAY (BLAnsi*, _iter, _PrNetworkMem->pDownList)
+	FOREACH_ARRAY(BLAnsi*, _iter, _PrNetworkMem->pDownList)
 	{
 		if (strcmp(_iter, _Host) == 0)
 		{

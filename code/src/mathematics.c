@@ -54,6 +54,19 @@ blScalarClamp(IN BLF32 _Val, IN BLF32 _Min, IN BLF32 _Max)
 	else
 		return _Val;
 }
+BLBool 
+blRectApproximate(IN BLRect* _R1, IN BLRect* _R2)
+{
+	if (fabs(_R1->sLT.fX - _R2->sLT.fX) > 0.000001f)
+		return FALSE;
+	if (fabs(_R1->sLT.fY - _R2->sLT.fY) > 0.000001f)
+		return FALSE;
+	if (fabs(_R1->sRB.fX - _R2->sRB.fX) > 0.000001f)
+		return FALSE;
+	if (fabs(_R1->sRB.fY - _R2->sRB.fY) > 0.000001f)
+		return FALSE;
+	return TRUE;
+}
 BLRect
 blRectIntersects(IN BLRect* _R1, IN BLRect* _R2)
 {
@@ -101,6 +114,15 @@ blRectExtend(INOUT BLRect* _Tar, IN BLVec2* _Pt)
 	if (_Tar->sRB.fY < _Pt->fY)
 		_Tar->sRB.fY = _Pt->fY;
 }
+BLBool 
+blVec2Approximate(IN BLVec2* _V1, IN BLVec2* _V2)
+{
+	if (fabs(_V1->fX - _V2->fX) > 0.000001f)
+		return FALSE;
+	if (fabs(_V1->fY - _V2->fY) > 0.000001f)
+		return FALSE;
+	return TRUE;
+}
 BLF32
 blVec2Length(IN BLVec2* _V)
 {
@@ -132,9 +154,15 @@ blVec2CrossProduct(IN BLVec2* _V1, IN BLVec2* _V2)
 	return _V1->fX * _V2->fY - _V1->fY * _V2->fX;
 }
 BLBool
-blVec2Approximate(IN BLVec2* _V1, IN BLVec2* _V2)
+blVec3Approximate(IN BLVec3* _V1, IN BLVec3* _V2)
 {
-	return ((_V1->fX - _V2->fX) * (_V1->fX - _V2->fX) + (_V1->fY - _V2->fY) * (_V1->fY - _V2->fY))<0.000001f;
+	if (fabs(_V1->fX - _V2->fX) > 0.000001f)
+		return FALSE;
+	if (fabs(_V1->fY - _V2->fY) > 0.000001f)
+		return FALSE;
+	if (fabs(_V1->fZ - _V2->fZ) > 0.000001f)
+		return FALSE;
+	return TRUE;
 }
 BLF32
 blVec3Length(IN BLVec3* _V)
@@ -172,15 +200,18 @@ blVec3CrossProduct(IN BLVec3* _V1, IN BLVec3* _V2)
 	_ret.fZ = _V1->fX * _V2->fY - _V1->fY * _V2->fX;
 	return _ret;
 }
-BLBool
-blVec3Approximate(IN BLVec3* _V1, IN BLVec3* _V2)
+BLBool 
+blQuatApproximate(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2)
 {
-	BLF32 _x, _y, _z, _sqlen;
-	_x = _V1->fX - _V2->fX;
-	_y = _V1->fY - _V2->fY;
-	_z = _V1->fZ - _V2->fZ;
-	_sqlen = (_x * _x) + (_y * _y) + (_z * _z);
-	return _sqlen < (0.000001f * 0.000001f);
+	if (fabs(_Q1->fX - _Q2->fX) > 0.000001f)
+		return FALSE;
+	if (fabs(_Q1->fY - _Q2->fY) > 0.000001f)
+		return FALSE;
+	if (fabs(_Q1->fZ - _Q2->fZ) > 0.000001f)
+		return FALSE;
+	if (fabs(_Q1->fW - _Q2->fW) > 0.000001f)
+		return FALSE;
+	return TRUE;
 }
 BLQuaternion
 blQuatFromAxNRad(IN BLVec3* _Axis, IN BLF32 _Rad)
@@ -486,6 +517,14 @@ blQuatTransform(IN BLQuaternion* _Q, IN BLVec3* _Vec)
 	_ret.fZ = _Vec->fZ + _uv.fZ + _uuv.fZ;
 	return _ret;
 }
+BLBool 
+blMatApproximate(IN BLMatrix* _M1, IN BLMatrix* _M2)
+{
+	for (BLU32 _idx = 0; _idx < 16; ++_idx)
+		if (fabs(_M1->fEle[_idx] - _M1->fEle[_idx]) > 0.000001f)
+			return FALSE;
+	return TRUE;
+}
 BLMatrix
 blMatFromTransform(IN BLVec3* _Trans, IN BLVec3* _Scale, IN BLQuaternion* _Rotate)
 {
@@ -734,6 +773,19 @@ blMatLookatL(OUT BLMatrix* _Mat, IN BLVec3* _Eye, IN BLVec3* _Focus, IN BLVec3* 
 	_Mat->fData[3][2] = -_zaxis.fX * _Eye->fX + -_zaxis.fY * _Eye->fY + -_zaxis.fZ * _Eye->fZ;
 	_Mat->fData[3][3] = 1.f;
 }
+BLBool 
+blPlaneApproximate(IN BLPlane* _P1, IN BLPlane* _P2)
+{
+	if (fabs(_P1->sNormal.fX - _P2->sNormal.fX) > 0.000001f)
+		return FALSE;
+	if (fabs(_P1->sNormal.fY - _P2->sNormal.fY) > 0.000001f)
+		return FALSE;
+	if (fabs(_P1->sNormal.fZ - _P2->sNormal.fZ) > 0.000001f)
+		return FALSE;
+	if (fabs(_P1->fDistance - _P2->fDistance) > 0.000001f)
+		return FALSE;
+	return TRUE;
+}
 BLPlane
 blPlaneFrom3P(IN BLVec3* _P1, IN BLVec3* _P2, IN BLVec3* _P3)
 {
@@ -767,6 +819,23 @@ blPlaneFromPN(IN BLVec3* _Pt, IN BLVec3* _Nor)
 	_ret.sNormal = *_Nor;
 	_ret.fDistance = -_ret.sNormal.fX * _Pt->fX + -_ret.sNormal.fY * _Pt->fY + -_ret.sNormal.fZ * _Pt->fZ;
 	return _ret;
+}
+BLBool 
+blBoxApproximate(IN BLBox* _B1, IN BLBox* _B2)
+{
+	if (fabs(_B1->sMinPt.fX - _B2->sMinPt.fX) > 0.000001f)
+		return FALSE;
+	if (fabs(_B1->sMinPt.fY - _B2->sMinPt.fY) > 0.000001f)
+		return FALSE;
+	if (fabs(_B1->sMinPt.fZ - _B2->sMinPt.fZ) > 0.000001f)
+		return FALSE;
+	if (fabs(_B1->sMaxPt.fX - _B2->sMaxPt.fX) > 0.000001f)
+		return FALSE;
+	if (fabs(_B1->sMaxPt.fY - _B2->sMaxPt.fY) > 0.000001f)
+		return FALSE;
+	if (fabs(_B1->sMaxPt.fZ - _B2->sMaxPt.fZ) > 0.000001f)
+		return FALSE;
+	return TRUE;
 }
 BLVoid
 blBoxMerge(INOUT BLBox* _Box, IN BLVec3* _Pt)

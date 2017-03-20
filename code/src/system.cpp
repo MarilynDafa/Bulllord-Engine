@@ -3111,6 +3111,26 @@ _SystemInit()
 BLVoid
 _SystemStep()
 {
+	BLU32 _aw, _ah;
+	if (_PrSystemMem->sBoostParam.bUseDesignRes)
+	{
+		if ((BLF32)(_PrSystemMem->sBoostParam.nDesignWidth) / (BLF32)(_PrSystemMem->sBoostParam.nDesignHeight) > (BLF32)_PrSystemMem->sBoostParam.nScreenWidth / (BLF32)_PrSystemMem->sBoostParam.nScreenHeight)
+		{
+			_ah = (BLU32)_PrSystemMem->sBoostParam.nDesignHeight;
+			_aw = (BLU32)((BLF32)_PrSystemMem->sBoostParam.nScreenWidth / (BLF32)_PrSystemMem->sBoostParam.nScreenHeight * _PrSystemMem->sBoostParam.nDesignHeight);
+		}
+		else
+		{
+			_ah = (BLU32)(_PrSystemMem->sBoostParam.nDesignWidth * (BLF32)_PrSystemMem->sBoostParam.nScreenHeight / (BLF32)_PrSystemMem->sBoostParam.nScreenWidth);
+			_aw = (BLU32)_PrSystemMem->sBoostParam.nDesignWidth;
+		}
+	}
+	else
+	{
+		_aw = _PrSystemMem->sBoostParam.nScreenWidth;
+		_ah = _PrSystemMem->sBoostParam.nScreenHeight;
+	}
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah);
 	blFrameBufferClear(INVALID_GUID, TRUE, TRUE, TRUE);
     BLU32 _now = blSystemTicks();
     BLU32 _delta = _now - _PrSystemMem->nSysTime;
@@ -3724,7 +3744,7 @@ blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 			memcpy(_Value, _str, strlen((const BLAnsi*)_str));
 		else
 		{
-			FOREACH_DICT (BLUtf8*, _iter, _tmpdic)
+			FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
 			{
 				free(_iter);
 			}
@@ -3760,7 +3780,7 @@ blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 #else
 		_fp = CreateFileA(_path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
-		FOREACH_DICT (BLUtf8*, _iter, _tmpdic)
+		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
 		{
 			WriteFile(_fp, &_iterator_iter->nKey, sizeof(BLU32), NULL, NULL);
 			_sz = strlen((const BLAnsi*)_iter);
@@ -3772,7 +3792,7 @@ blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 		CloseHandle(_fp);
 #else
 		_fp = fopen(_path, "wb");
-		FOREACH_DICT (BLUtf8*, _iter, _tmpdic)
+		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
 		{
 			fwrite(&_iterator_iter.nKey, sizeof(BLU32), 1, _fp);
 			_sz = (BLU32)strlen((const BLAnsi*)_iter);
@@ -3784,7 +3804,7 @@ blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 		fclose(_fp);
 #endif
 	}
-	FOREACH_DICT (BLUtf8*, _iter, _tmpdic)
+	FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
 	{
 		free(_iter);
 	}

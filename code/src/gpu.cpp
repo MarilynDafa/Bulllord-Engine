@@ -1659,21 +1659,21 @@ _GpuAnitIntervention(HWND _Hwnd)
 		wglDeleteContext(_PrGpuMem->sGLRC);
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2249,7 +2249,7 @@ _GpuAnitIntervention()
 		}
 	}
 	{
-		FOREACH_DICT (_BLTextureBufferDX*, _iter, _PrGpuMem->pTextureDict)
+		FOREACH_DICT(_BLTextureBufferDX*, _iter, _PrGpuMem->pTextureDict)
 		{
 			if (NULL != _iter->pPtr)
 				blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _iter->pPtr);
@@ -2303,7 +2303,7 @@ _GpuAnitIntervention()
 	_PrGpuMem->pAdapter->Release();
 	_PrGpuMem->pDxgiFactory->Release();
 	{
-		FOREACH_DICT (struct _BLUniformBuffer::_UniformInfo*, _iter, _PrGpuMem->sUniformBuffer.pUniforms)
+		FOREACH_DICT(struct _BLUniformBuffer::_UniformInfo*, _iter, _PrGpuMem->sUniformBuffer.pUniforms)
 		{
 			free(_iter);
 		}
@@ -2313,21 +2313,21 @@ _GpuAnitIntervention()
 	for (_idx = 0; _idx < 256; ++_idx)
 		blDeleteArray(_PrGpuMem->sCmdQueue.pRelease[_idx]);
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2426,21 +2426,21 @@ BLVoid
 _GpuAnitIntervention()
 {
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2557,21 +2557,21 @@ _GpuAnitIntervention()
 		eglTerminate(_PrGpuMem->pEglDisplay);
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2715,21 +2715,21 @@ _GpuAnitIntervention()
         [_PrGpuMem->pGLC release];
     }
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2766,21 +2766,21 @@ BLVoid
 _GpuAnitIntervention()
 {
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
 			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
 			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
 		{
 			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
 			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
 		}
 	}
 	{
-		FOREACH_DICT (_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
 		{
 			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
 			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
@@ -2982,6 +2982,7 @@ blDeleteFrameBuffer(IN BLGuid _FBO)
 BLVoid
 blFrameBufferClear(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN BLBool _StencilBit)
 {
+	_PipelineStateRefreshGL();
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
