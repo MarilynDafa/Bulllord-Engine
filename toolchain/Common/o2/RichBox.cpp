@@ -497,6 +497,7 @@ namespace o2d{
 		r.rb_pt()+=c_float2(0.f , m_scrollpos);
 		_relative_position(r);
 		m_clipping_rect = cliptmp;
+		c_widget::_redraw();
 	}
 	//--------------------------------------------------------
 	void c_richbox::_parse(const c_string& text_)

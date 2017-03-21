@@ -158,5 +158,6 @@ namespace o2d{
 			else
 				m_last_record+=dt_;
 		}
+		c_widget::_redraw();
 	}
 }

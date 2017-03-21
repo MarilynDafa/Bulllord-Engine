@@ -262,6 +262,7 @@ namespace o2d{
 			}
 		}
 		c_ui_manager::get_singleton_ptr()->cache_batch(m_fntid , m_fnt_height ,m_v_align|m_h_align , true, m_text , m_absolute_rect, m_clipping_rect, m_txt_color);
+		c_widget::_redraw();
 	}
 	//--------------------------------------------------------
 	void c_dragdrop_slot::_update(c_technique* uit_, u32 dt_)
