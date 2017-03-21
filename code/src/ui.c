@@ -114,11 +114,21 @@ typedef struct _Widget {
 			BLAnsi aStencilMap[128];
 			BLRect sCommonTex9;
 			BLRect sCommonTex;
-			BLRect sStenciTex;
+			BLRect sStencilTex;
 			BLBool bDragable;
+			BLBool bDragging;
+			BLVec2 sDraggingPos;
 			BLBool bBasePlate;
 			BLBool bModal;
 			BLBool bScrollable;
+			BLBool bScrolling;
+			BLS32 nScroll;
+			BLS32 nScrollMin;
+			BLS32 nScrollMax;
+			BLS32 nTolerance;
+			BLS32 nLastRecord;
+			BLF32 fPanDelta;
+			BLBool bElastic;
 			BLBool bFlipX;
             BLBool bFlipY;
             BLGuid nPixmapTex;
@@ -410,6 +420,7 @@ typedef struct _UIMember {
 	_BLWidget* pBasePlate;
 	_BLWidget* pHoveredWidget;
 	_BLWidget* pFocusWidget;
+	_BLWidget* pModalWidget;
 	BLArray* pFonts;
 	BLGuid nQuadGeo;
 	BLAnsi aDir[260];
@@ -644,16 +655,16 @@ _WidgetScissorRect(_BLWidget* _Node, BLRect* _Rect)
 		}
 		else
 		{
-			_BLWidget* _tmp = _Node;
-			BLF32 _x = _Node->pParent->sPosition.fX;
-			BLF32 _y = _Node->pParent->sPosition.fY;
+			_BLWidget* _tmp = _Node->pParent;
+			BLF32 _x = _tmp->sPosition.fX;
+			BLF32 _y = _tmp->sPosition.fY;
 			BLF32 _pw;
 			BLF32 _ph;
 			while (_tmp != _PrUIMem->pRoot)
 			{
 				_tmp = _tmp->pParent;
-				_pw = _tmp->pParent->sDimension.fX > 0.f ? _tmp->pParent->sDimension.fX : _PrUIMem->nFboWidth;
-				_ph = _tmp->pParent->sDimension.fY > 0.f ? _tmp->pParent->sDimension.fY : _PrUIMem->nFboHeight;
+				_pw = (_tmp && _tmp->sDimension.fX > 0.f) ? _tmp->sDimension.fX : _PrUIMem->nFboWidth;
+				_ph = (_tmp && _tmp->sDimension.fY > 0.f) ? _tmp->sDimension.fY : _PrUIMem->nFboHeight;
 				if (_tmp->eReferenceH == BL_UA_LEFT && _tmp->eReferenceV == BL_UA_TOP)
 				{
 					_x = 0.0f * _pw + _x;
@@ -700,31 +711,31 @@ _WidgetScissorRect(_BLWidget* _Node, BLRect* _Rect)
 					_y = 1.0f * _ph + _y;
 				}
 			}
-			BLF32 _w, _h;
-			if (_tmp->pParent->ePolicy == BL_UP_FIXED)
+			BLF32 _w = _Node->pParent->sDimension.fX;
+			BLF32 _h = _Node->pParent->sDimension.fY;
+			_tmp = _Node->pParent;
+			while (_tmp->ePolicy != BL_UP_FIXED)
 			{
-				_w = _pw;
-				_h = _ph;
+				if (_tmp->ePolicy == BL_UP_HMatch)
+				{
+					_w = (_tmp->pParent && _tmp->pParent->sDimension.fX > 0.f) ? _tmp->pParent->sDimension.fX : _PrUIMem->nFboWidth;
+					_h = _w / _tmp->fRatio;
+				}
+				else if (_tmp->ePolicy == BL_UP_VMatch)
+				{
+					_h = (_tmp->pParent && _tmp->pParent->sDimension.fY > 0.f) ? _tmp->pParent->sDimension.fY : _PrUIMem->nFboHeight;
+					_w = _h * _tmp->pParent->fRatio;
+				}
+				else
+				{
+					_w = (_tmp->pParent && _tmp->pParent->sDimension.fX > 0.f) ? _tmp->pParent->sDimension.fX : _PrUIMem->nFboWidth;
+					_h = (_tmp->pParent && _tmp->pParent->sDimension.fY > 0.f) ? _tmp->pParent->sDimension.fY : _PrUIMem->nFboHeight;
+				}
 			}
-			else if (_tmp->pParent->ePolicy == BL_UP_HMatch)
-			{
-				_w = _pw;
-				_h = _pw / _tmp->pParent->fRatio;
-			}
-			else if (_tmp->pParent->ePolicy == BL_UP_VMatch)
-			{
-				_w = _ph * _tmp->pParent->fRatio;
-				_h = _ph;
-			}
-			else
-			{
-				_w = _pw;
-				_h = _ph;
-			}
-			_Rect->sLT.fX = _x - _pw * 0.5f;
-			_Rect->sLT.fY = _y - _ph * 0.5f;
-			_Rect->sRB.fX = _x + _pw * 0.5f;
-			_Rect->sRB.fY = _y + _ph * 0.5f;
+			_Rect->sLT.fX = _x - _w * 0.5f;
+			_Rect->sLT.fY = _y - _h * 0.5f;
+			_Rect->sRB.fX = _x + _w * 0.5f;
+			_Rect->sRB.fY = _y + _h * 0.5f;
 		}
 	}
 	else
@@ -801,19 +812,19 @@ _WidgetScissorRect(_BLWidget* _Node, BLRect* _Rect)
 				}
 			}
 			BLF32 _w, _h;
-			if (_tmp->pParent->ePolicy == BL_UP_FIXED)
+			if (_Node->pParent->ePolicy == BL_UP_FIXED)
 			{
 				_w = _pw;
 				_h = _ph;
 			}
-			else if (_tmp->pParent->ePolicy == BL_UP_HMatch)
+			else if (_Node->pParent->ePolicy == BL_UP_HMatch)
 			{
 				_w = _pw;
-				_h = _pw / _tmp->pParent->fRatio;
+				_h = _pw / _Node->pParent->fRatio;
 			}
-			else if (_tmp->pParent->ePolicy == BL_UP_VMatch)
+			else if (_Node->pParent->ePolicy == BL_UP_VMatch)
 			{
-				_w = _ph * _tmp->pParent->fRatio;
+				_w = _ph * _Node->pParent->fRatio;
 				_h = _ph;
 			}
 			else
@@ -832,7 +843,7 @@ static _BLFont*
 _FontFace(const BLAnsi* _Filename, const BLAnsi* _Archive)
 {
 	BLGuid _font;
-	if (_Archive[0])
+	if (_Archive && _Archive[0])
 		_font = blGenStream(_Filename, _Archive);
 	else
 	{
@@ -2766,10 +2777,10 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 			}
 			if (!strcmp(_tag, _src->uExtension.sPanel.aStencilMap))
 			{
-				_src->uExtension.sPanel.sStenciTex.sLT.fX = (BLF32)_ltx;
-				_src->uExtension.sPanel.sStenciTex.sLT.fY = (BLF32)_lty;
-				_src->uExtension.sPanel.sStenciTex.sRB.fX = (BLF32)_rbx;
-				_src->uExtension.sPanel.sStenciTex.sRB.fY = (BLF32)_rby;
+				_src->uExtension.sPanel.sStencilTex.sLT.fX = (BLF32)_ltx;
+				_src->uExtension.sPanel.sStencilTex.sLT.fY = (BLF32)_lty;
+				_src->uExtension.sPanel.sStencilTex.sRB.fX = (BLF32)_rbx;
+				_src->uExtension.sPanel.sStencilTex.sRB.fY = (BLF32)_rby;
 			}
 			break;
 		case BL_UT_LABEL:
@@ -3580,6 +3591,454 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 static BLVoid
 _DrawPanel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
+	if (!_Node->bValid || !_Node->bVisible)
+		return;
+	BLRect _scissorrect;
+	_WidgetScissorRect(_Node, &_scissorrect);
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sPanel.nPixmapTex, 0);
+	BLF32 _gray = 1.f;
+	BLF32 _offsetx = 0.f, _offsety = 0.f;
+	BLF32 _stencil = 1.f;
+	BLRect _texcoord, _texcoord9;
+	BLRect _texcoords, _texcoords9;
+	BLBool _flipx = _Node->uExtension.sPanel.bFlipX;
+	BLBool _flipy = _Node->uExtension.sPanel.bFlipY;
+	_texcoord = _Node->uExtension.sPanel.sCommonTex;
+	_texcoord9 = _Node->uExtension.sPanel.sCommonTex9;
+	if (_Node->uExtension.sPanel.aStencilMap[0] && strcmp(_Node->uExtension.sPanel.aStencilMap, "Nil"))
+	{
+		_stencil = -1.f;
+		_texcoords.sLT.fX = _Node->uExtension.sPanel.sStencilTex.sLT.fX / _Node->uExtension.sPanel.nTexWidth + 0.001f;
+		_texcoords.sLT.fY = _Node->uExtension.sPanel.sStencilTex.sLT.fY / _Node->uExtension.sPanel.nTexHeight + 0.001f;
+		_texcoords.sRB.fX = _Node->uExtension.sPanel.sStencilTex.sRB.fX / _Node->uExtension.sPanel.nTexWidth - 0.001f;
+		_texcoords.sRB.fY = _Node->uExtension.sPanel.sStencilTex.sRB.fY / _Node->uExtension.sPanel.nTexHeight - 0.001f;
+		BLF32 _oriw = _Node->uExtension.sPanel.sCommonTex.sRB.fX - _Node->uExtension.sPanel.sCommonTex.sLT.fX;
+		BLF32 _orih = _Node->uExtension.sPanel.sCommonTex.sRB.fY - _Node->uExtension.sPanel.sCommonTex.sLT.fY;
+		BLF32 _dstw = _Node->uExtension.sPanel.sStencilTex.sRB.fX - _Node->uExtension.sPanel.sStencilTex.sLT.fX;
+		BLF32 _dsth = _Node->uExtension.sPanel.sStencilTex.sRB.fX - _Node->uExtension.sPanel.sStencilTex.sLT.fX;
+		BLF32 _ratioax = (_Node->uExtension.sPanel.sCommonTex9.sLT.fX - _Node->uExtension.sPanel.sCommonTex.sLT.fX) / _oriw;
+		BLF32 _ratioay = (_Node->uExtension.sPanel.sCommonTex9.sLT.fY - _Node->uExtension.sPanel.sCommonTex.sLT.fY) / _orih;
+		BLF32 _rationx = (_Node->uExtension.sPanel.sCommonTex.sRB.fX - _Node->uExtension.sPanel.sCommonTex9.sRB.fX) / _oriw;
+		BLF32 _rationy = (_Node->uExtension.sPanel.sCommonTex.sRB.fY - _Node->uExtension.sPanel.sCommonTex9.sRB.fY) / _orih;
+		_texcoords9.sLT.fX = (_Node->uExtension.sPanel.sStencilTex.sLT.fX + _ratioax * _dstw) / _Node->uExtension.sPanel.nTexWidth;
+		_texcoords9.sLT.fY = (_Node->uExtension.sPanel.sStencilTex.sLT.fY + _ratioay * _dsth) / _Node->uExtension.sPanel.nTexHeight;
+		_texcoords9.sRB.fX = (_Node->uExtension.sPanel.sStencilTex.sRB.fX - _rationx * _dstw) / _Node->uExtension.sPanel.nTexWidth;
+		_texcoords9.sRB.fY = (_Node->uExtension.sPanel.sStencilTex.sRB.fY - _rationy * _dsth) / _Node->uExtension.sPanel.nTexHeight;
+	}
+	else
+	{
+		_texcoords.sLT.fX = 1.f;
+		_texcoords.sLT.fY = 1.f;
+		_texcoords.sRB.fX = 1.f;
+		_texcoords.sRB.fY = 1.f;
+		_texcoords9.sLT.fX = 1.f;
+		_texcoords9.sLT.fY = 1.f;
+		_texcoords9.sRB.fX = 1.f;
+		_texcoords9.sRB.fY = 1.f;
+	}
+	if (blRectApproximate(&_texcoord, &_texcoord9))
+	{
+		if (_flipx)
+		{
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
+			_tmp = _texcoords.sLT.fX;
+			_texcoords.sLT.fX = _texcoords.sRB.fX;
+			_texcoords.sRB.fX = _tmp;
+		}
+		if (_flipy)
+		{
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
+			_tmp = _texcoords.sLT.fY;
+			_texcoords.sLT.fY = _texcoords.sRB.fY;
+			_texcoords.sRB.fY = _tmp;
+		}
+		BLF32 _vbo[] = {
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sPanel.nTexHeight
+		};
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
+	}
+	else
+	{
+		BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+		BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+		BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
+		BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
+		BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
+		BLF32 _marginny = _texcoord.sRB.fY - _texcoord9.sRB.fY;
+		if (_flipx)
+		{
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
+			_tmp = _texcoords.sLT.fX;
+			_texcoords.sLT.fX = _texcoords.sRB.fX;
+			_texcoords.sRB.fX = _tmp;
+			_tmp = _texcoord9.sLT.fX;
+			_texcoord9.sLT.fX = _texcoord9.sRB.fX;
+			_texcoord9.sRB.fX = _tmp;
+			_tmp = _texcoords9.sLT.fX;
+			_texcoords9.sLT.fX = _texcoords9.sRB.fX;
+			_texcoords9.sRB.fX = _tmp;
+			_tmp = _marginax;
+			_marginax = _marginnx;
+			_marginnx = _tmp;
+		}
+		if (_flipy)
+		{
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
+			_tmp = _texcoords.sLT.fY;
+			_texcoords.sLT.fY = _texcoords.sRB.fY;
+			_texcoords.sRB.fY = _tmp;
+			_tmp = _texcoord9.sLT.fY;
+			_texcoord9.sLT.fY = _texcoord9.sRB.fY;
+			_texcoord9.sRB.fY = _tmp;
+			_tmp = _texcoords9.sLT.fY;
+			_texcoords9.sLT.fY = _texcoords9.sRB.fY;
+			_texcoords9.sRB.fY = _tmp;
+			_tmp = _marginay;
+			_marginay = _marginny;
+			_marginny = _tmp;
+		}
+		BLF32 _vob[] = {
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _marginay + _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sLT.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sLT.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _marginax + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sLT.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sLT.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _marginny - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords9.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord9.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _marginnx - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords9.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord9.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sPanel.nTexHeight,
+			PIXEL_ALIGNED_INTERNAL(_X + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
+			_texcoords.sRB.fX,
+			_texcoords.sRB.fY,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX / _Node->uExtension.sPanel.nTexWidth,
+			_texcoord.sRB.fY / _Node->uExtension.sPanel.nTexHeight
+		};
+		BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
+		blDraw(_PrUIMem->nUITech, _geo, 1);
+		blDeleteGeometryBuffer(_geo);
+	}
+	if (_Node->uExtension.sPanel.nScroll <= _Node->uExtension.sPanel.nScrollMax && _Node->uExtension.sPanel.nScroll >= _Node->uExtension.sPanel.nScrollMin)
+		_Node->uExtension.sPanel.bElastic = FALSE;
+	else
+		_Node->uExtension.sPanel.bElastic = TRUE;
+	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
+		_iter->sPosition.fY += _Node->uExtension.sPanel.fPanDelta;
+	_Node->uExtension.sPanel.fPanDelta = 0.f;
 }
 static BLVoid
 _DrawLabel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
@@ -8569,14 +9028,27 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 {
 	if (_Type == BL_ME_MOVE)
 	{
-		_BLWidget* _lasthovered = _PrUIMem->pHoveredWidget;
 		BLU32 _oriw, _orih, _aw, _ah;
 		BLF32 _rx, _ry;
 		blGetWindowSize(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
-		BLF32 _cx = (BLF32)LOWU16(_UParam) / _rx;		
+		BLF32 _cx = (BLF32)LOWU16(_UParam) / _rx;
 		BLF32 _cy = (BLF32)HIGU16(_UParam) / _ry;
 		_cx = (_cx > 10 * _oriw) ? 0.f : _cx;
 		_cy = (_cy > 10 * _orih) ? 0.f : _cy;
+		if (_PrUIMem->pModalWidget)
+		{
+			BLVec2 _pos;
+			_pos.fX = _cx;
+			_pos.fY = _cy;
+			BLRect _area;
+			BLRect _sarea;
+			_WidgetAbsArea(_PrUIMem->pModalWidget, &_area);
+			_WidgetScissorRect(_PrUIMem->pModalWidget, &_sarea);
+			BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+			if (!blRectContains(&_drawarea, &_pos))
+				return;
+		}
+		_BLWidget* _lasthovered = _PrUIMem->pHoveredWidget;
 		_PrUIMem->pHoveredWidget = _WidgetLocate(_PrUIMem->pRoot, _cx, _cy, 0.f, 0.f);
 		if (_PrUIMem->pHoveredWidget != _lasthovered)
 		{
@@ -8610,6 +9082,30 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				_wid = _wid->pParent;
 			switch (_wid->eType)
 			{
+			case BL_UT_PANEL:
+				if (_wid->uExtension.sPanel.bDragging)
+				{
+					BLRect _area;
+					_WidgetAbsArea(_wid, &_area);
+					BLF32 _deltax = _cx - _wid->uExtension.sPanel.sDraggingPos.fX;
+					BLF32 _deltay = _cy - _wid->uExtension.sPanel.sDraggingPos.fY;
+					_wid->sPosition.fX += _deltax;
+					_wid->sPosition.fY += _deltay;
+					_wid->uExtension.sPanel.sDraggingPos.fX += _deltax;
+					_wid->uExtension.sPanel.sDraggingPos.fY += _deltay;
+					_wid->uExtension.sPanel.bDragging = 2;
+					_PrUIMem->bDirty = TRUE;
+				}
+				if (_wid->uExtension.sPanel.bScrolling)
+				{
+					BLF32 _newspos = blScalarClamp((BLF32)_wid->uExtension.sPanel.nScroll + _cy - _wid->uExtension.sPanel.nLastRecord, (BLF32)_wid->uExtension.sPanel.nScrollMin - _wid->uExtension.sPanel.nTolerance, (BLF32)_wid->uExtension.sPanel.nScrollMax + _wid->uExtension.sPanel.nTolerance);
+					_wid->uExtension.sPanel.fPanDelta = (BLF32)(_newspos - _wid->uExtension.sPanel.nScroll);
+					_wid->uExtension.sPanel.nScroll = (BLS32)_newspos;
+					_wid->uExtension.sPanel.nLastRecord = (BLS32)_cy;
+					_wid->uExtension.sPanel.bScrolling = 2;
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
 			case BL_UT_SLIDER:
 				if (_wid->uExtension.sSlider.nState && _wid->uExtension.sSlider.bDragging)
 				{
@@ -8738,7 +9234,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				}
 				break;
 			case BL_UT_LABEL:
-				if (_wid->uExtension.sLabel.bDragging == 1 || _wid->uExtension.sLabel.bDragging == 2)
+				if (_wid->uExtension.sLabel.bDragging)
 				{
 					_wid->uExtension.sLabel.bDragging = 2;
 					_wid->uExtension.sLabel.nScroll = _wid->uExtension.sLabel.nScroll - (BLS32)(_cy - _wid->uExtension.sLabel.fDraggingPos);
@@ -8757,6 +9253,31 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				_wid = _wid->pParent;
 			switch (_wid->eType)
 			{
+			case BL_UT_PANEL:
+				if (_wid->uExtension.sPanel.bDragging)
+				{
+					BLRect _area;
+					_WidgetAbsArea(_wid, &_area);
+					BLF32 _deltax = _cx - _wid->uExtension.sPanel.sDraggingPos.fX;
+					BLF32 _deltay = _cy - _wid->uExtension.sPanel.sDraggingPos.fY;
+					_wid->sPosition.fX += _deltax;
+					_wid->sPosition.fY += _deltay;
+					_wid->uExtension.sPanel.sDraggingPos.fX += _deltax;
+					_wid->uExtension.sPanel.sDraggingPos.fY += _deltay;
+					_wid->uExtension.sPanel.bDragging = 2;
+					_PrUIMem->bDirty = TRUE;
+				}
+				if (_wid->uExtension.sPanel.bScrolling)
+				{
+					BLF32 _newspos = blScalarClamp((BLF32)_wid->uExtension.sPanel.nScroll + _cy - _wid->uExtension.sPanel.nLastRecord, (BLF32)_wid->uExtension.sPanel.nScrollMin - _wid->uExtension.sPanel.nTolerance, (BLF32)_wid->uExtension.sPanel.nScrollMax + _wid->uExtension.sPanel.nTolerance);
+					_wid->uExtension.sPanel.fPanDelta = (BLF32)(_newspos - _wid->uExtension.sPanel.nScroll);
+					_wid->uExtension.sPanel.nScroll = (BLS32)_newspos;
+					_wid->uExtension.sPanel.nLastRecord = (BLS32)_cy;
+					_wid->uExtension.sPanel.bScrolling = 2;
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
+				break;
 			case BL_UT_SLIDER:
 				if (_wid->uExtension.sSlider.nState && _wid->uExtension.sSlider.bDragging)
 				{
@@ -8885,7 +9406,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				}
 				break;
 			case BL_UT_LABEL:
-				if (_wid->uExtension.sLabel.bDragging == 1 || _wid->uExtension.sLabel.bDragging == 2)
+				if (_wid->uExtension.sLabel.bDragging)
 				{
 					_wid->uExtension.sLabel.bDragging = 2;
 					_wid->uExtension.sLabel.nScroll = _wid->uExtension.sLabel.nScroll - (BLS32)(_cy - _wid->uExtension.sLabel.fDraggingPos);
@@ -8907,6 +9428,19 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 		BLF32 _cy = (BLF32)HIGU16(_UParam) / _ry;
 		_cx = (_cx > 10 * _oriw) ? 0.f : _cx;
 		_cy = (_cy > 10 * _orih) ? 0.f : _cy;
+		if (_PrUIMem->pModalWidget)
+		{
+			BLVec2 _pos;
+			_pos.fX = _cx;
+			_pos.fY = _cy;
+			BLRect _area;
+			BLRect _sarea;
+			_WidgetAbsArea(_PrUIMem->pModalWidget, &_area);
+			_WidgetScissorRect(_PrUIMem->pModalWidget, &_sarea);
+			BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+			if (!blRectContains(&_drawarea, &_pos))
+				return;
+		}
 		_BLWidget* _lasthovered = _PrUIMem->pHoveredWidget;
 		_PrUIMem->pHoveredWidget = _WidgetLocate(_PrUIMem->pRoot, _cx, _cy, 0.f, 0.f);
 		if (_PrUIMem->pHoveredWidget != _lasthovered)
@@ -8935,36 +9469,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 			}
 		}
 		if ((_PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget != _PrUIMem->pFocusWidget) || !_PrUIMem->pFocusWidget)
-		{
-			if (_PrUIMem->pFocusWidget != _PrUIMem->pHoveredWidget)
-			{
-				if (_PrUIMem->pHoveredWidget == _PrUIMem->pRoot)
-					_PrUIMem->pHoveredWidget = NULL;
-				if (_PrUIMem->pFocusWidget)
-				{
-					if (_PrUIMem->pFocusWidget->eType == BL_UT_SLIDER)
-						_PrUIMem->pFocusWidget->uExtension.sSlider.bDragging = FALSE;
-					else if (_PrUIMem->pFocusWidget->eType == BL_UT_DIAL)
-						_PrUIMem->pFocusWidget->uExtension.sDial.bDragging = FALSE;
-					else if (_PrUIMem->pFocusWidget->eType == BL_UT_TEXT)
-						blDetachIME();
-					else if (_PrUIMem->pFocusWidget->eType == BL_UT_TABLE)
-						_PrUIMem->pFocusWidget->uExtension.sTable.bDragging = FALSE;
-					else if (_PrUIMem->pFocusWidget->eType == BL_UT_LABEL)
-						_PrUIMem->pFocusWidget->uExtension.sLabel.bDragging = FALSE;
-					//lost focs;_PrUIMem->pFocusWidget
-					//Panel
-				}
-				if (_PrUIMem->pHoveredWidget)
-				{
-					if (_PrUIMem->pHoveredWidget->eType == BL_UT_TEXT)
-						blAttachIME(_cx, _cy + _PrUIMem->pHoveredWidget->sDimension.fY * 0.5f);
-					//gain focus;_PrUIMem->pHoveredWidget
-					//Panel
-				}
-				_PrUIMem->pFocusWidget = _PrUIMem->pHoveredWidget;
-			}
-		}
+			blUIFocus(_PrUIMem->pHoveredWidget->nID, _cx, _cy);
 		_BLWidget* _lastfocus = _PrUIMem->pFocusWidget;
 		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
 		{
@@ -8973,6 +9478,27 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				_wid = _wid->pParent;
 			switch (_wid->eType)
 			{
+			case BL_UT_PANEL:
+				if (_wid->uExtension.sPanel.bDragable)
+				{
+					_wid->uExtension.sPanel.bDragging = 1;
+					_wid->uExtension.sPanel.sDraggingPos.fX = _cx;
+					_wid->uExtension.sPanel.sDraggingPos.fY = _cy;
+				}
+				else if (_wid->uExtension.sPanel.bScrollable)
+				{
+					_wid->uExtension.sPanel.nLastRecord = (BLS32)_cy;
+					_wid->uExtension.sPanel.bScrolling = 1;
+					BLF32 _upc = 99999.f, _downc = -99999.f;
+					FOREACH_ARRAY(_BLWidget*, _iter, _wid->pChildren)
+					{
+						_upc = MIN_INTERNAL(_iter->sPosition.fY - _iter->sDimension.fY * 0.5f, _upc);
+						_downc = MAX_INTERNAL(_iter->sPosition.fY + _iter->sDimension.fY * 0.5f, _downc);
+					}
+					_wid->uExtension.sPanel.nScrollMin = -(BLS32)(_downc - _wid->sDimension.fY * 0.5f);
+					_wid->uExtension.sPanel.nScrollMax = -(BLS32)(_upc + _wid->sDimension.fY * 0.5f);
+				}
+				break;
 			case BL_UT_BUTTON:
 				if (_wid->uExtension.sButton.nState)
 				{
@@ -9082,6 +9608,27 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				_wid = _wid->pParent;
 			switch (_wid->eType)
 			{
+			case BL_UT_PANEL:
+				if (_wid->uExtension.sPanel.bDragable)
+				{
+					_wid->uExtension.sPanel.bDragging = 1;
+					_wid->uExtension.sPanel.sDraggingPos.fX = _cx;
+					_wid->uExtension.sPanel.sDraggingPos.fY = _cy;
+				}
+				else if (_wid->uExtension.sPanel.bScrollable)
+				{
+					_wid->uExtension.sPanel.nLastRecord = (BLS32)_cy;
+					_wid->uExtension.sPanel.bScrolling = 1;
+					BLF32 _upc = 99999.f, _downc = -99999.f;
+					FOREACH_ARRAY(_BLWidget*, _iter, _wid->pChildren)
+					{
+						_upc = MIN_INTERNAL(_iter->sPosition.fY - _iter->sDimension.fY * 0.5f, _upc);
+						_downc = MAX_INTERNAL(_iter->sPosition.fY + _iter->sDimension.fY * 0.5f, _downc);
+					}
+					_wid->uExtension.sPanel.nScrollMin = -(BLS32)(_downc - _wid->sDimension.fY * 0.5f);
+					_wid->uExtension.sPanel.nScrollMax = -(BLS32)(_upc + _wid->sDimension.fY * 0.5f);
+				}
+				break;
 			case BL_UT_BUTTON:
 				if (_wid->uExtension.sButton.nState)
 				{
@@ -9195,6 +9742,19 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 		BLF32 _cy = (BLF32)HIGU16(_UParam) / _ry;
 		_cx = (_cx > 10 * _oriw) ? 0.f : _cx;
 		_cy = (_cy > 10 * _orih) ? 0.f : _cy;
+		if (_PrUIMem->pModalWidget)
+		{
+			BLVec2 _pos;
+			_pos.fX = _cx;
+			_pos.fY = _cy;
+			BLRect _area;
+			BLRect _sarea;
+			_WidgetAbsArea(_PrUIMem->pModalWidget, &_area);
+			_WidgetScissorRect(_PrUIMem->pModalWidget, &_sarea);
+			BLRect _drawarea = blRectIntersects(&_area, &_sarea);
+			if (!blRectContains(&_drawarea, &_pos))
+				return;
+		}
 		_BLWidget* _lastfocus = _PrUIMem->pFocusWidget;
 		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
 		{
@@ -9203,6 +9763,15 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				_wid = _wid->pParent;
 			switch (_wid->eType)
 			{
+			case BL_UT_PANEL:
+				if (_wid->uExtension.sPanel.bScrollable)
+				{
+					_wid->uExtension.sPanel.nScroll = 0;
+					_wid->uExtension.sPanel.bDragging = 0;
+					_wid->uExtension.sPanel.bScrolling = FALSE;
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
 			case BL_UT_BUTTON:
 				if (_wid->uExtension.sButton.nState)
 				{
@@ -9432,6 +10001,15 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				_wid = _wid->pParent;
 			switch (_wid->eType)
 			{
+			case BL_UT_PANEL:
+				if (_wid->uExtension.sPanel.bScrollable)
+				{
+					_wid->uExtension.sPanel.nScroll = 0;
+					_wid->uExtension.sPanel.bDragging = 0;
+					_wid->uExtension.sPanel.bScrolling = FALSE;
+					_PrUIMem->bDirty = TRUE;
+				}
+				break;
 			case BL_UT_BUTTON:
 				if (_wid->uExtension.sButton.nState)
 				{
@@ -10261,6 +10839,7 @@ _UIInit(BLBool _Profiler)
     memset(_PrUIMem->aArchive, 0, sizeof(_PrUIMem->aArchive));
     FT_Init_FreeType(&_PrUIMem->sFtLibrary);
 	_PrUIMem->pBasePlate = NULL;
+	_PrUIMem->pModalWidget = NULL;
     _PrUIMem->pRoot = (_BLWidget*)malloc(sizeof(_BLWidget));
     memset(_PrUIMem->pRoot, 0, sizeof(_BLWidget));
     _PrUIMem->pRoot->sDimension.fX = -1.f;
@@ -10376,8 +10955,8 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 		_y = _node->sPosition.fY;
 		do
 		{
-			BLF32 _pw = _node->pParent->sDimension.fX > 0.f ? _node->pParent->sDimension.fX : _PrUIMem->nFboWidth;
-			BLF32 _ph = _node->pParent->sDimension.fY > 0.f ? _node->pParent->sDimension.fY : _PrUIMem->nFboHeight;
+			BLF32 _pw = _node->pParent ? (_node->pParent->sDimension.fX > 0.f ? _node->pParent->sDimension.fX : _PrUIMem->nFboWidth) : _PrUIMem->nFboWidth;
+			BLF32 _ph = _node->pParent ? (_node->pParent->sDimension.fY > 0.f ? _node->pParent->sDimension.fY : _PrUIMem->nFboHeight) : _PrUIMem->nFboHeight;
 			BLF32 _px = _node->pParent ? _node->pParent->sPosition.fX : 0.f;
 			BLF32 _py = _node->pParent ? _node->pParent->sPosition.fY : 0.f;
 			if (_node->eReferenceH == BL_UA_LEFT && _node->eReferenceV == BL_UA_TOP)
@@ -10694,7 +11273,20 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-            blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_PANEL);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_PANEL);
+			blUIReferencePoint(_widguid, _ha, _va);
+			blUISizePolicy(_widguid, _policyvar);
+			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
+			blUIScissor(_widguid, _clipedvar, _absvar);
+			blUIPenetration(_widguid, _penetrationvar);
+			blUIPanelFlip(_widguid, _flipxvar, _flipyvar);
+			blUIPanelPixmap(_widguid, _pixmap);
+			blUIPanelStencilMap(_widguid, _stencilmap);
+			blUIPanelCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUIPanelDragable(_widguid, _dragablevar);
+			blUIPanelBasePlate(_widguid, _baseplatevar);
+			blUIPanelModal(_widguid, _modalvar);
+			blUIPanelScrollable(_widguid, _scrollablevar);
         }
         else if (!strcmp(_type, "Button"))
         {
@@ -11304,9 +11896,18 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sPanel.bDragable = FALSE;
 			_widget->uExtension.sPanel.bBasePlate = FALSE;
 			_widget->uExtension.sPanel.bModal = FALSE;
-			_widget->uExtension.sPanel.bScrollable = TRUE;
+			_widget->uExtension.sPanel.bScrollable = FALSE;
 			_widget->uExtension.sPanel.bFlipX = FALSE;
 			_widget->uExtension.sPanel.bFlipY = FALSE;
+			_widget->uExtension.sPanel.bDragging = FALSE;
+			_widget->uExtension.sPanel.bScrolling = FALSE;
+			_widget->uExtension.sPanel.fPanDelta = 0.f;
+			_widget->uExtension.sPanel.nScroll = 0;
+			_widget->uExtension.sPanel.nScrollMin = 0;
+			_widget->uExtension.sPanel.nScrollMax = 0;
+			_widget->uExtension.sPanel.nTolerance = 0;
+			_widget->uExtension.sPanel.nLastRecord = 0;
+			_widget->uExtension.sPanel.bElastic = FALSE;
             _widget->uExtension.sPanel.nPixmapTex = INVALID_GUID;
 		}
 		break;
@@ -11556,6 +12157,58 @@ blUIQuery(IN BLAnsi* _WidgetName)
 	return _WidgetQuery(_PrUIMem->pRoot, blHashUtf8((const BLUtf8*)_WidgetName), TRUE)->nID;
 }
 BLVoid 
+blUIFocus(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y)
+{
+	_BLWidget* _widget = blGuidAsPointer(_ID);
+	if (_PrUIMem->pFocusWidget == _widget)
+		return;
+	if (_PrUIMem->pFocusWidget)
+	{
+		if (_PrUIMem->pFocusWidget->eType == BL_UT_PANEL && _PrUIMem->pFocusWidget->uExtension.sPanel.bModal)
+			return;
+		else if (_PrUIMem->pFocusWidget->eType == BL_UT_PANEL && _PrUIMem->pFocusWidget->uExtension.sPanel.bScrollable)
+		{
+			_PrUIMem->pFocusWidget->uExtension.sPanel.nScroll = 0;
+			_PrUIMem->pFocusWidget->uExtension.sPanel.bDragging = 0;
+			_PrUIMem->pFocusWidget->uExtension.sPanel.bScrolling = FALSE;
+		}
+		if (_PrUIMem->pFocusWidget->eType == BL_UT_SLIDER)
+			_PrUIMem->pFocusWidget->uExtension.sSlider.bDragging = FALSE;
+		else if (_PrUIMem->pFocusWidget->eType == BL_UT_DIAL)
+			_PrUIMem->pFocusWidget->uExtension.sDial.bDragging = FALSE;
+		else if (_PrUIMem->pFocusWidget->eType == BL_UT_TEXT)
+			blDetachIME();
+		else if (_PrUIMem->pFocusWidget->eType == BL_UT_TABLE)
+			_PrUIMem->pFocusWidget->uExtension.sTable.bDragging = FALSE;
+		else if (_PrUIMem->pFocusWidget->eType == BL_UT_LABEL)
+			_PrUIMem->pFocusWidget->uExtension.sLabel.bDragging = FALSE;
+	}
+	if (_widget)
+	{
+		if (_PrUIMem->pHoveredWidget->eType == BL_UT_TEXT)
+			blAttachIME(_X, _Y + _PrUIMem->pHoveredWidget->sDimension.fY * 0.5f);
+	}
+	_PrUIMem->pFocusWidget = _widget;
+}
+BLVoid 
+blUIPosition(IN BLGuid _ID, IN BLS32 _XPos, IN BLS32 _YPos)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	_widget->sPosition.fX = (BLF32)_XPos;
+	_widget->sPosition.fY = (BLF32)_YPos;
+}
+BLVoid 
+blUIGetPosition(IN BLGuid _ID, OUT BLS32* _XPos, OUT BLS32* _YPos)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	*_XPos = (BLS32)_widget->sPosition.fX;
+	*_YPos = (BLS32)_widget->sPosition.fY;
+}
+BLVoid 
 blUISize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -11725,6 +12378,9 @@ blUIPanelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sPanel.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sPanel.aPixmap, _Pixmap);
+	BLAnsi _texfile[260] = { 0 };
+	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
+	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -11749,6 +12405,14 @@ blUIPanelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN B
 		return;
 	memset(_widget->uExtension.sPanel.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sPanel.aCommonMap, _CommonMap);
+	_widget->uExtension.sPanel.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sPanel.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sPanel.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sPanel.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sPanel.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
+	_widget->uExtension.sPanel.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
+	_widget->uExtension.sPanel.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
+	_widget->uExtension.sPanel.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -11760,6 +12424,12 @@ blUIPanelDragable(IN BLGuid _ID, IN BLBool _Dragable)
 	if (_widget->eType != BL_UT_PANEL)
 		return;
 	_widget->uExtension.sPanel.bDragable = _Dragable;
+	if (_Dragable)
+	{
+		_widget->uExtension.sPanel.bScrollable = FALSE;
+		_widget->uExtension.sPanel.bBasePlate = FALSE;
+		_widget->uExtension.sPanel.bModal = FALSE;
+	}
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -11771,7 +12441,12 @@ blUIPanelBasePlate(IN BLGuid _ID, IN BLBool _BasePlate)
 	if (_widget->eType != BL_UT_PANEL)
 		return;
 	_widget->uExtension.sPanel.bBasePlate = _BasePlate;
-	_PrUIMem->pBasePlate = _widget;
+	if (_BasePlate)
+	{
+		_widget->uExtension.sPanel.bScrollable = FALSE;
+		_widget->uExtension.sPanel.bDragable = FALSE;
+		_widget->uExtension.sPanel.bModal = FALSE;
+	}
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -11783,6 +12458,17 @@ blUIPanelModal(IN BLGuid _ID, IN BLBool _Modal)
 	if (_widget->eType != BL_UT_PANEL)
 		return;
 	_widget->uExtension.sPanel.bModal = _Modal;
+	if (_Modal)
+	{
+		_widget->uExtension.sPanel.bScrollable = FALSE;
+		_widget->uExtension.sPanel.bDragable = FALSE;
+		_widget->uExtension.sPanel.bBasePlate = FALSE;
+		_WidgetFront(_widget);
+		_PrUIMem->pModalWidget = _widget;
+		blUIFocus(INVALID_GUID, 0, 0);
+	}
+	else
+		_PrUIMem->pModalWidget = NULL;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -11794,6 +12480,12 @@ blUIPanelScrollable(IN BLGuid _ID, IN BLBool _Scrollable)
 	if (_widget->eType != BL_UT_PANEL)
 		return;
 	_widget->uExtension.sPanel.bScrollable = _Scrollable;
+	if (_Scrollable)
+	{
+		_widget->uExtension.sPanel.bModal = FALSE;
+		_widget->uExtension.sPanel.bDragable = FALSE;
+		_widget->uExtension.sPanel.bBasePlate = FALSE;
+	}
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid

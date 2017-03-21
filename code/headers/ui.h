@@ -48,6 +48,21 @@ BL_API BLVoid blDeleteUI(
 BL_API BLGuid blUIQuery(
 	IN BLAnsi* _WidgetName);
 
+BL_API BLVoid blUIFocus(
+	IN BLGuid _ID,
+	IN BLF32 _X,
+	IN BLF32 _Y);
+
+BL_API BLVoid blUIPosition(
+	IN BLGuid _ID,
+	IN BLS32 _XPos,
+	IN BLS32 _YPos);
+
+BL_API BLVoid blUIGetPosition(
+	IN BLGuid _ID,
+	OUT BLS32* _XPos,
+	OUT BLS32* _YPos);
+
 BL_API BLVoid blUISize(
 	IN BLGuid _ID,
 	IN BLU32 _Width,

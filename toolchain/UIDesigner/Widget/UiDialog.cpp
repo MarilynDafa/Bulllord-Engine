@@ -165,6 +165,24 @@ bool UiDialog::getDragable() const
 void UiDialog::setDragable(bool tran)
 {
 	_dragable = tran;
+	if (tran)
+	{
+		QtVariantProperty* perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("Modal"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("Modal", false);
+		}
+		perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("Scrollable"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("Scrollable", false);
+		}
+		perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("BasePlate"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("BasePlate", false);
+		}
+	}
 }
 
 bool UiDialog::getModal() const
@@ -174,6 +192,24 @@ bool UiDialog::getModal() const
 void UiDialog::setModal(bool tran)
 {
 	_Modal = tran;
+	if (tran)
+	{
+		QtVariantProperty* perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("Dragable"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("Dragable", false);
+		}
+		perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("Scrollable"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("Scrollable", false);
+		}
+		perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("BasePlate"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("BasePlate", false);
+		}
+	}
 }
 bool UiDialog::getScrollable() const
 {
@@ -182,6 +218,24 @@ bool UiDialog::getScrollable() const
 void UiDialog::setScrollable(bool tran)
 {
 	_Scrollable = tran;
+	if (tran)
+	{
+		QtVariantProperty* perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("Dragable"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("Dragable", false);
+		}
+		perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("Modal"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("Modal", false);
+		}
+		perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("BasePlate"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("BasePlate", false);
+		}
+	}
 }
 
 
@@ -192,4 +246,22 @@ bool UiDialog::getBasePlate() const
 void UiDialog::setBasePlate(bool flag)
 {
 	_BasePlate = flag;
+	if (flag)
+	{
+		QtVariantProperty* perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("Dragable"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("Dragable", false);
+		}
+		perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("Modal"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("Modal", false);
+		}
+		perty = dynamic_cast<QtVariantProperty*>(PropertyEditerDockWidget::getInstance()->findProperty("Scrollable"));
+		if (perty)
+		{
+			PropertyEditerDockWidget::getInstance()->setPropertyXX("Scrollable", false);
+		}
+	}
 }
