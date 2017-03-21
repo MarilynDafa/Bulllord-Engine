@@ -473,23 +473,6 @@ _WidgetLocate(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 	return _target;
 }
 static BLVoid
-_WidgetFront(_BLWidget* _Node)
-{
-	if (!_Node->pParent)
-		return;
-	BLU32 _idx = 0;
-	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pParent->pChildren)
-	{
-		if (_Node == _iter)
-		{
-			blArrayErase(_Node->pParent->pChildren, _idx);
-			blArrayPushBack(_Node->pParent->pChildren, _Node);
-			_PrUIMem->bDirty = TRUE;
-			return;
-		}
-	}
-}
-static BLVoid
 _WidgetScissorRect(_BLWidget* _Node, BLRect* _Rect)
 {
 	if (!_Node->pParent || _Node->pParent == _PrUIMem->pRoot)
@@ -4985,11 +4968,11 @@ _DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		}
 		break;
 	case 1:
-	{
-		_texcoord = _Node->uExtension.sCheck.sCommonTex;
-		_texcoord9 = _Node->uExtension.sCheck.sCommonTex9;
-	}
-	break;
+		{
+			_texcoord = _Node->uExtension.sCheck.sCommonTex;
+			_texcoord9 = _Node->uExtension.sCheck.sCommonTex9;
+		}
+		break;
 	case 2:
 		if (_Node->uExtension.sCheck.aCheckedMap[0] == 0 || !strcmp(_Node->uExtension.sCheck.aCheckedMap, "Nil"))
 		{
@@ -8701,7 +8684,7 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 	}
 }
 static const BLVoid
-_MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
+_MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
 {
 	if (_Type == BL_ME_MOVE)
 	{
@@ -8825,7 +8808,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 							_wid->uExtension.sSlider.bTrayClick = !_wid->uExtension.sSlider.bSliderDragged;
 						}
 						if (_wid->uExtension.sSlider.bSliderDragged)
-							blUISliderSliderPos(_wid->nID, _newp);
+							_wid->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_newp, (BLF32)_wid->uExtension.sSlider.nMinValue, (BLF32)_wid->uExtension.sSlider.nMaxValue);
 						else
 						{
 							_wid->uExtension.sSlider.bTrayClick = FALSE;
@@ -8834,7 +8817,9 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 						_wid->uExtension.sSlider.nDesiredPos = _newp;
 					}
 					else
-						blUISliderSliderPos(_wid->nID, _newp);
+						_wid->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_newp, (BLF32)_wid->uExtension.sSlider.nMinValue, (BLF32)_wid->uExtension.sSlider.nMaxValue);
+					if (_newp != _oldp)
+						blInvokeEvent(BL_ET_UI, _wid->uExtension.sSlider.nSliderPosition, _wid->eType, NULL, _wid->nID);
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -8874,7 +8859,11 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 							_anglecross = _anglerange;
 						_anglecross = 360 - _wid->uExtension.sDial.nStartAngle + _anglecross;
 					}
-					blUIDialAngle(_wid->nID, _anglecross);					
+					if (!blScalarApproximate(_wid->uExtension.sDial.fAngle, (BLS32)_anglecross % 360 + (_anglecross - (BLS32)_anglecross)))
+					{
+						_wid->uExtension.sDial.fAngle = (BLS32)_anglecross % 360 + (_anglecross - (BLS32)_anglecross);
+						blInvokeEvent(BL_ET_UI, (BLS32)_wid->uExtension.sDial.fAngle, _wid->eType, NULL, _wid->nID);
+					}
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -8991,7 +8980,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 							_wid->uExtension.sSlider.bTrayClick = !_wid->uExtension.sSlider.bSliderDragged;
 						}
 						if (_wid->uExtension.sSlider.bSliderDragged)
-							blUISliderSliderPos(_wid->nID, _newp);
+							_wid->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_newp, (BLF32)_wid->uExtension.sSlider.nMinValue, (BLF32)_wid->uExtension.sSlider.nMaxValue);
 						else
 						{
 							_wid->uExtension.sSlider.bTrayClick = FALSE;
@@ -9000,7 +8989,9 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 						_wid->uExtension.sSlider.nDesiredPos = _newp;
 					}
 					else
-						blUISliderSliderPos(_wid->nID, _newp);
+						_wid->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_newp, (BLF32)_wid->uExtension.sSlider.nMinValue, (BLF32)_wid->uExtension.sSlider.nMaxValue);
+					if (_newp != _oldp)
+						blInvokeEvent(BL_ET_UI, _wid->uExtension.sSlider.nSliderPosition, _wid->eType, NULL, _wid->nID);
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -9040,7 +9031,11 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 							_anglecross = _anglerange;
 						_anglecross = 360 - _wid->uExtension.sDial.nStartAngle + _anglecross;
 					}
-					blUIDialAngle(_wid->nID, _anglecross);
+					if (!blScalarApproximate(_wid->uExtension.sDial.fAngle, (BLS32)_anglecross % 360 + (_anglecross - (BLS32)_anglecross)))
+					{
+						_wid->uExtension.sDial.fAngle = (BLS32)_anglecross % 360 + (_anglecross - (BLS32)_anglecross);
+						blInvokeEvent(BL_ET_UI, (BLS32)_wid->uExtension.sDial.fAngle, _wid->eType, NULL, _wid->nID);
+					}
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -9436,6 +9431,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				if (_wid->uExtension.sButton.nState)
 				{
 					_wid->uExtension.sButton.nState = 1;
+					blInvokeEvent(BL_ET_UI, 0, _wid->eType, NULL, _wid->nID);
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -9443,6 +9439,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				if (_wid->uExtension.sCheck.nState)
 				{
 					_wid->uExtension.sCheck.nState = 3 - _wid->uExtension.sCheck.nState;
+					blInvokeEvent(BL_ET_UI, _wid->uExtension.sCheck.nState - 1, _wid->eType, NULL, _wid->nID);
 					_PrUIMem->bDirty = TRUE;
 				}
 			case BL_UT_SLIDER:
@@ -9451,11 +9448,12 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					if (_wid->uExtension.sSlider.bTrayClick)
 					{
 						if (_wid->uExtension.sSlider.nDesiredPos >= _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep)
-							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep);
+							_wid->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep, (BLF32)_wid->uExtension.sSlider.nMinValue, (BLF32)_wid->uExtension.sSlider.nMaxValue);
 						else if (_wid->uExtension.sSlider.nDesiredPos <= _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep)
-							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep);
+							_wid->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep, (BLF32)_wid->uExtension.sSlider.nMinValue, (BLF32)_wid->uExtension.sSlider.nMaxValue);
 						else if (_wid->uExtension.sSlider.nDesiredPos >= _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep && _wid->uExtension.sSlider.nDesiredPos <= _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep)
-							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nDesiredPos);
+							_wid->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_wid->uExtension.sSlider.nDesiredPos, (BLF32)_wid->uExtension.sSlider.nMinValue, (BLF32)_wid->uExtension.sSlider.nMaxValue);
+						blInvokeEvent(BL_ET_UI, _wid->uExtension.sSlider.nSliderPosition, _wid->eType, NULL, _wid->nID);
 					}
 					_wid->uExtension.sSlider.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
@@ -9600,13 +9598,11 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 									{
 									case 3:
 										if ((_iter2->nTexture != INVALID_GUID) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-										{
-										}
+											blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
 									break;
 									case 4:
 										if ((_iter2->pText) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-										{
-										}
+											blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
 										break;
 									default:
 										break;
@@ -9633,13 +9629,11 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 							{
 							case 3:
 								if ((_iter3->pElement->nTexture != INVALID_GUID) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-								{
-								}
+									blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
 								break;
 							case 4:
 								if ((_iter3->pElement->pText) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-								{
-								}
+									blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
 								break;
 							default: break;
 							}
@@ -9675,6 +9669,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				if (_wid->uExtension.sButton.nState)
 				{
 					_wid->uExtension.sButton.nState = 1;
+					blInvokeEvent(BL_ET_UI, 0, _wid->eType, NULL, _wid->nID);
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -9682,6 +9677,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 				if (_wid->uExtension.sCheck.nState)
 				{
 					_wid->uExtension.sCheck.nState = 3 - _wid->uExtension.sCheck.nState;
+					blInvokeEvent(BL_ET_UI, _wid->uExtension.sCheck.nState - 1, _wid->eType, NULL, _wid->nID);
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -9691,11 +9687,12 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 					if (_wid->uExtension.sSlider.bTrayClick)
 					{
 						if (_wid->uExtension.sSlider.nDesiredPos >= _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep)
-							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep);
+							_wid->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep, (BLF32)_wid->uExtension.sSlider.nMinValue, (BLF32)_wid->uExtension.sSlider.nMaxValue);
 						else if (_wid->uExtension.sSlider.nDesiredPos <= _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep)
-							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep);
+							_wid->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep, (BLF32)_wid->uExtension.sSlider.nMinValue, (BLF32)_wid->uExtension.sSlider.nMaxValue);
 						else if (_wid->uExtension.sSlider.nDesiredPos >= _wid->uExtension.sSlider.nSliderPosition - _wid->uExtension.sSlider.nStep && _wid->uExtension.sSlider.nDesiredPos <= _wid->uExtension.sSlider.nSliderPosition + _wid->uExtension.sSlider.nStep)
-							blUISliderSliderPos(_wid->nID, _wid->uExtension.sSlider.nDesiredPos);
+							_wid->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_wid->uExtension.sSlider.nDesiredPos, (BLF32)_wid->uExtension.sSlider.nMinValue, (BLF32)_wid->uExtension.sSlider.nMaxValue);
+						blInvokeEvent(BL_ET_UI, _wid->uExtension.sSlider.nSliderPosition, _wid->eType, NULL, _wid->nID);
 					}
 					_wid->uExtension.sSlider.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
@@ -9804,13 +9801,11 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 									{
 									case 3:
 										if ((_iter2->nTexture != INVALID_GUID) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-										{
-										}
+											blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
 										break;
 									case 4:
 										if ((_iter2->pText) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-										{
-										}
+											blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
 										break;
 									default: break;
 									}
@@ -9836,13 +9831,11 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 							{
 							case 3:
 								if ((_iter3->pElement->nTexture != INVALID_GUID) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-								{
-								}
+									blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
 								break;
 							case 4:
 								if ((_iter3->pElement->pText) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-								{
-								}
+									blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
 								break;
 							default: break;
 							}
@@ -9986,7 +9979,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 	}
 }
 static const BLVoid
-_KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
+_KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
 {
 	if (_Type == BL_ET_KEY)
 	{
@@ -10133,6 +10126,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 								_wid->uExtension.sText.nCaretPos--;
 							}
 						}
+						blInvokeEvent(BL_ET_UI, _ch, _wid->eType, NULL, _wid->nID);
 					}
 					blDeleteUtf16Str((BLUtf16*)_s16);
 				}
@@ -10147,8 +10141,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 						if (!LOWU16(_UParam))
 						{
 							if (!_wid->uExtension.sText.bMultiline)
-							{
-							}
+								blInvokeEvent(BL_ET_UI, BL_KC_RETURN, _wid->eType, _wid->uExtension.sText.pText, _wid->nID);
 						}
 						break;
 					case BL_KC_DELETE:
@@ -10201,6 +10194,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 							_newbegin = 0;
 							_newend = 0;
 							_textchanged = TRUE;
+							blInvokeEvent(BL_ET_UI, BL_KC_DELETE, _wid->eType, NULL, _wid->nID);
 						}
 						break;
 					case BL_KC_BACKSPACE:
@@ -10251,11 +10245,14 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 								--_wid->uExtension.sText.nCaretPos;
 								blDeleteUtf16Str(_s16);
 							}
-							if (_wid->uExtension.sText.nCaretPos < 0)
-								_wid->uExtension.sText.nCaretPos = 0;
 							_newbegin = 0;
 							_newend = 0;
-							_textchanged = TRUE;
+							if (_wid->uExtension.sText.nCaretPos < 0)
+								_wid->uExtension.sText.nCaretPos = 0;
+							else
+								_textchanged = TRUE;
+							if (_textchanged)
+								blInvokeEvent(BL_ET_UI, BL_KC_BACKSPACE, _wid->eType, NULL, _wid->nID);
 						}
 						break;
 					case BL_KC_LEFT:
@@ -10413,6 +10410,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 								_newbegin = 0;
 								_newend = 0;
 								_textchanged = TRUE;
+								blInvokeEvent(BL_ET_UI, BL_KC_CUT, _wid->eType, NULL, _wid->nID);
 								blDeleteUtf16Str((BLUtf16*)_s16);
 							}
 						}
@@ -10475,6 +10473,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
 							_newbegin = 0;
 							_newend = 0;
 							_textchanged = TRUE;
+							blInvokeEvent(BL_ET_UI, BL_KC_PASTE, _wid->eType, NULL, _wid->nID);
 						}
 						break;
 					default: break;
@@ -11810,44 +11809,15 @@ blDeleteUI(IN BLGuid _ID)
     blDeleteGuid(_ID);
     _PrUIMem->bDirty = TRUE;
 }
-BLGuid 
-blUIQuery(IN BLAnsi* _WidgetName)
+BLEnum 
+blUIGetType(IN BLGuid _ID)
 {
-	return _WidgetQuery(_PrUIMem->pRoot, blHashUtf8((const BLUtf8*)_WidgetName), TRUE)->nID;
-}
-BLVoid 
-blUIFocus(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y)
-{
+	if (_ID == INVALID_GUID)
+		return BL_UT_INVALID;
 	_BLWidget* _widget = blGuidAsPointer(_ID);
-	if (_PrUIMem->pFocusWidget == _widget)
-		return;
-	if (_PrUIMem->pFocusWidget)
-	{
-		if (_PrUIMem->pFocusWidget->eType == BL_UT_PANEL && _PrUIMem->pFocusWidget->uExtension.sPanel.bModal)
-			return;
-		else if (_PrUIMem->pFocusWidget->eType == BL_UT_PANEL && _PrUIMem->pFocusWidget->uExtension.sPanel.bScrollable)
-		{
-			_PrUIMem->pFocusWidget->uExtension.sPanel.nScroll = 0;
-			_PrUIMem->pFocusWidget->uExtension.sPanel.bDragging = 0;
-			_PrUIMem->pFocusWidget->uExtension.sPanel.bScrolling = FALSE;
-		}
-		if (_PrUIMem->pFocusWidget->eType == BL_UT_SLIDER)
-			_PrUIMem->pFocusWidget->uExtension.sSlider.bDragging = FALSE;
-		else if (_PrUIMem->pFocusWidget->eType == BL_UT_DIAL)
-			_PrUIMem->pFocusWidget->uExtension.sDial.bDragging = FALSE;
-		else if (_PrUIMem->pFocusWidget->eType == BL_UT_TEXT)
-			blDetachIME();
-		else if (_PrUIMem->pFocusWidget->eType == BL_UT_TABLE)
-			_PrUIMem->pFocusWidget->uExtension.sTable.bDragging = FALSE;
-		else if (_PrUIMem->pFocusWidget->eType == BL_UT_LABEL)
-			_PrUIMem->pFocusWidget->uExtension.sLabel.bDragging = FALSE;
-	}
-	if (_widget)
-	{
-		if (_PrUIMem->pHoveredWidget->eType == BL_UT_TEXT)
-			blAttachIME(_X, _Y + _PrUIMem->pHoveredWidget->sDimension.fY * 0.5f);
-	}
-	_PrUIMem->pFocusWidget = _widget;
+	if (!_widget)
+		return BL_UT_INVALID;
+	return _widget->eType;
 }
 BLVoid 
 blUIPosition(IN BLGuid _ID, IN BLS32 _XPos, IN BLS32 _YPos)
@@ -11864,8 +11834,8 @@ blUIGetPosition(IN BLGuid _ID, OUT BLS32* _XPos, OUT BLS32* _YPos)
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
 		return;
-	*_XPos = (BLS32)_widget->sPosition.fX;
-	*_YPos = (BLS32)_widget->sPosition.fY;
+	*_XPos = (BLS32)((_widget->sAbsRegion.sLT.fX + _widget->sAbsRegion.sRB.fX) * 0.5f);
+	*_YPos = (BLS32)((_widget->sAbsRegion.sLT.fY + _widget->sAbsRegion.sRB.fY) * 0.5f);
 }
 BLVoid 
 blUISize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
@@ -12027,6 +11997,70 @@ blUIGetPenetration(IN BLGuid _ID, OUT BLBool* _Penetration)
 		return;
 	*_Penetration = _widget->bPenetration;
 }
+BLGuid
+blUIQuery(IN BLAnsi* _WidgetName)
+{
+	return _WidgetQuery(_PrUIMem->pRoot, blHashUtf8((const BLUtf8*)_WidgetName), TRUE)->nID;
+}
+BLGuid
+blUILocate(IN BLS32 _XPos, IN BLS32 _YPos)
+{
+	return _WidgetLocate(_PrUIMem->pRoot, (BLF32)_XPos, (BLF32)_YPos)->nID;
+}
+BLVoid
+blUIStick(IN BLGuid _ID)
+{
+	_BLWidget* _widget = blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (!_widget->pParent)
+		return;
+	BLU32 _idx = 0;
+	FOREACH_ARRAY(_BLWidget*, _iter, _widget->pParent->pChildren)
+	{
+		if (_widget == _iter)
+		{
+			blArrayErase(_widget->pParent->pChildren, _idx);
+			blArrayPushBack(_widget->pParent->pChildren, _widget);
+			_PrUIMem->bDirty = TRUE;
+			return;
+		}
+	}
+}
+BLVoid
+blUIFocus(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y)
+{
+	_BLWidget* _widget = blGuidAsPointer(_ID);
+	if (_PrUIMem->pFocusWidget == _widget)
+		return;
+	if (_PrUIMem->pFocusWidget)
+	{
+		if (_PrUIMem->pFocusWidget->eType == BL_UT_PANEL && _PrUIMem->pFocusWidget->uExtension.sPanel.bModal)
+			return;
+		else if (_PrUIMem->pFocusWidget->eType == BL_UT_PANEL && _PrUIMem->pFocusWidget->uExtension.sPanel.bScrollable)
+		{
+			_PrUIMem->pFocusWidget->uExtension.sPanel.nScroll = 0;
+			_PrUIMem->pFocusWidget->uExtension.sPanel.bDragging = 0;
+			_PrUIMem->pFocusWidget->uExtension.sPanel.bScrolling = FALSE;
+		}
+		if (_PrUIMem->pFocusWidget->eType == BL_UT_SLIDER)
+			_PrUIMem->pFocusWidget->uExtension.sSlider.bDragging = FALSE;
+		else if (_PrUIMem->pFocusWidget->eType == BL_UT_DIAL)
+			_PrUIMem->pFocusWidget->uExtension.sDial.bDragging = FALSE;
+		else if (_PrUIMem->pFocusWidget->eType == BL_UT_TEXT)
+			blDetachIME();
+		else if (_PrUIMem->pFocusWidget->eType == BL_UT_TABLE)
+			_PrUIMem->pFocusWidget->uExtension.sTable.bDragging = FALSE;
+		else if (_PrUIMem->pFocusWidget->eType == BL_UT_LABEL)
+			_PrUIMem->pFocusWidget->uExtension.sLabel.bDragging = FALSE;
+	}
+	if (_widget)
+	{
+		if (_PrUIMem->pHoveredWidget->eType == BL_UT_TEXT)
+			blAttachIME(_X, _Y + _PrUIMem->pHoveredWidget->sDimension.fY * 0.5f);
+	}
+	_PrUIMem->pFocusWidget = _widget;
+}
 BLVoid
 blUIPanelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 {
@@ -12122,7 +12156,7 @@ blUIPanelModal(IN BLGuid _ID, IN BLBool _Modal)
 		_widget->uExtension.sPanel.bScrollable = FALSE;
 		_widget->uExtension.sPanel.bDragable = FALSE;
 		_widget->uExtension.sPanel.bBasePlate = FALSE;
-		_WidgetFront(_widget);
+		blUIStick(_widget->nID);
 		_PrUIMem->pModalWidget = _widget;
 		blUIFocus(INVALID_GUID, 0, 0);
 	}

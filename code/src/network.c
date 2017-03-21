@@ -246,7 +246,7 @@ _NetworkStep(BLU32 _Delta)
 		{
 			blDeleteThread(_PrNetworkMem->pConnThread);
 			_PrNetworkMem->pConnThread = NULL;
-			blInvokeEvent(BL_ET_SYSTEM, BL_SE_CONNECTED, 0, NULL);
+			blInvokeEvent(BL_ET_SYSTEM, BL_SE_CONNECTED, 0, NULL, INVALID_GUID);
 		}
 		if (!_PrNetworkMem->bConnected)
 		{
@@ -254,7 +254,7 @@ _NetworkStep(BLU32 _Delta)
 			_PrNetworkMem->pSendThread = NULL;
 			blDeleteThread(_PrNetworkMem->pRecvThread);
 			_PrNetworkMem->pRecvThread = NULL;
-			blInvokeEvent(BL_ET_SYSTEM, BL_SE_DISCONNECTED, 0, NULL);
+			blInvokeEvent(BL_ET_SYSTEM, BL_SE_DISCONNECTED, 0, NULL, INVALID_GUID);
 		}
 		blMutexLock(_PrNetworkMem->pRevList->pMutex);
 		{
@@ -262,7 +262,7 @@ _NetworkStep(BLU32 _Delta)
 			{
 				BLVoid* _buf = malloc(_iter->nLength);
 				memcpy(_buf, _iter->pBuf, _iter->nLength);
-				blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf);
+				blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
 				free(_iter);
 			}
 		}
@@ -275,7 +275,7 @@ _NetworkStep(BLU32 _Delta)
 		{
 			BLVoid* _buf = malloc(_iter->nLength);
 			memcpy(_buf, _iter->pBuf, _iter->nLength);
-			blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf);
+			blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
 			free(_iter);
 		}
 	}

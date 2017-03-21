@@ -26,6 +26,14 @@
 extern "C" {
 #endif
 //for BMFont only support xml + none-compression tga format 
+//ui event
+//			_Type		_Uparam		_Sparam			_Pparam		 _ID
+//slider	BL_ET_UI	sliderpos	BL_UT_SLIDER	NULL		id		value changed
+//button	BL_ET_UI	0			BL_UT_BUTTON	NULL		id		button click
+//check		BL_ET_UI	1 or 0		BL_UT_CHECK		NULL		id		1 checked, 0 unchecked
+//label		BL_ET_UI	linkid		BL_UT_LABEL		NULL		id		label click linkid
+//text		BL_ET_UI	keycode		BL_UT_TEXT		NULL		id		text changed
+//dial		BL_ET_UI	angle		BL_UT_DIAL		NULL		id		dial value changed
 BL_API BLVoid blUIWorkspace(
 	IN BLAnsi* _Dictionary,
 	IN BLAnsi* _Archive);
@@ -45,13 +53,8 @@ BL_API BLGuid blGenUI(
 BL_API BLVoid blDeleteUI(
 	IN BLGuid _ID);
 
-BL_API BLGuid blUIQuery(
-	IN BLAnsi* _WidgetName);
-
-BL_API BLVoid blUIFocus(
-	IN BLGuid _ID,
-	IN BLF32 _X,
-	IN BLF32 _Y);
+BL_API BLEnum blUIGetType(
+	IN BLGuid _ID);
 
 BL_API BLVoid blUIPosition(
 	IN BLGuid _ID,
@@ -138,6 +141,21 @@ BL_API BLVoid blUIPenetration(
 BL_API BLVoid blUIGetPenetration(
 	IN BLGuid _ID,
 	OUT BLBool* _Penetration);
+
+BL_API BLGuid blUIQuery(
+	IN BLAnsi* _WidgetName);
+
+BL_API BLGuid blUILocate(
+	IN BLS32 _XPos,
+	IN BLS32 _YPos);
+
+BL_API BLVoid blUIStick(
+	IN BLGuid _ID);
+
+BL_API BLVoid blUIFocus(
+	IN BLGuid _ID,
+	IN BLF32 _X,
+	IN BLF32 _Y);
 
 BL_API BLVoid blUIPanelPixmap(
 	IN BLGuid _ID,

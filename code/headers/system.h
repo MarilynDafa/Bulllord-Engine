@@ -92,17 +92,18 @@ BL_API BLVoid blDetachIME();
 
 BL_API BLVoid blSubscribeEvent(
 	IN BLEnum _Type, 
-	IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*));
+	IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid));
 
 BL_API BLVoid blUnsubscribeEvent(
 	IN BLEnum _Type,
-	IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*));
+	IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid));
 
 BL_API BLVoid blInvokeEvent(
 	IN BLEnum _Type, 
 	IN BLU32 _Uparam, 
 	IN BLS32 _Sparam, 
-	IN BLVoid* _Pparam);
+	IN BLVoid* _Pparam,
+	IN BLGuid _ID);
 
 BL_API BLVoid blSystemDateTime(
 	OUT BLS32* _Year,

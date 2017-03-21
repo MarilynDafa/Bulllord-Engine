@@ -184,7 +184,7 @@ _UseCustomCursor()
 		return FALSE;
 }
 static const BLVoid
-_MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam)
+_MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
 {
 	if (_Type == BL_ME_MOVE)
 	{
@@ -662,6 +662,7 @@ _SpriteUpdate(BLU32 _Delta)
 				break;
 				case SPACTION_DEAD_INTERNAL:
 				{
+					blInvokeEvent(BL_ET_SPRITE, 0, 0, NULL, _node->nID);
 					blDeleteSprite(_node->nID);
 					_delete = TRUE;
 				}
@@ -710,6 +711,7 @@ _SpriteUpdate(BLU32 _Delta)
 							_tmp = _tmpnext;
 						}
 						_node->pAction = _node->pCurAction = NULL;
+						blInvokeEvent(BL_ET_SPRITE, 0, 0, NULL, _node->nID);
 					}
 					else
 						_node->pCurAction = _node->pCurAction->pNext;

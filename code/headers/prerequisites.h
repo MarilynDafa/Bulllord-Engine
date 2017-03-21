@@ -283,8 +283,21 @@ typedef unsigned long long BLGuid;
 #define HIGU16(val) ((BLU16)((((BLU32)(val)) >> 16) & 0xFFFF))     ///<Get High 16bit part from a 32bit unsigned int
 #define MAKEU32(high, low) ((BLU32)(((BLU16)(((BLU32)(low)) & 0xFFFF)) | ((BLU32)((BLU16)(((BLU32)(high)) & 0xFFFF))) << 16))       ///<Combine two short into a 32bit unsigned int
 
-/* _UI_TYPE */
-#define BL_UT_COUNT 0
+ /* _EVENT_TYPE */
+#define BL_ET_NET		0
+#define BL_ET_MOUSE		1
+#define BL_ET_KEY		2
+#define BL_ET_SYSTEM	3
+#define BL_ET_UI		4
+#define BL_ET_SPRITE	5
+#define BL_ET_COUNT		6
+
+ /* _SYSTEM_EVENT */
+#define BL_SE_CONNECTED		0
+#define BL_SE_DISCONNECTED	1
+#define BL_SE_VIDEOOVER		2
+#define BL_SE_TIMER			3
+#define BL_SE_RESOLUTION    4
 
 /* _MOUSE_EVENT */
 #define BL_ME_LDOWN		0
@@ -543,21 +556,6 @@ typedef unsigned long long BLGuid;
 #define BL_METAL_API			2 //New OSX & IOS
 #define BL_VULKAN_API			3 //Android Win32
 
-/* _SYSTEM_EVENT */
-#define BL_SE_CONNECTED		0
-#define BL_SE_DISCONNECTED	1
-#define BL_SE_VIDEOOVER		2
-#define BL_SE_TIMER			3
-#define BL_SE_RESOLUTION    4
-
-/* _EVENT_TYPE */
-#define BL_ET_NET		0
-#define BL_ET_UI		1
-#define BL_ET_MOUSE		2
-#define BL_ET_KEY		3
-#define BL_ET_SYSTEM	4
-#define BL_ET_COUNT		5
-
 /* _NETWORK_TYPE */
 #define BL_NT_HTTP		0
 #define BL_NT_TCP		1
@@ -776,6 +774,7 @@ typedef unsigned long long BLGuid;
 #define BL_UT_DIAL			0x0007
 #define BL_UT_TABLE			0x0008
 #define BL_UT_PRIMITIVE		0x0009
+#define BL_UT_INVALID		0xFFFF
 
 /* _UI_POLICY */
 #define BL_UP_FIXED			0x0000
