@@ -21,7 +21,6 @@
 #ifndef __sprite_h_
 #define __sprite_h_
 #include "prerequisites.h"
-#include "streamio.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -179,16 +178,16 @@ BL_API BLBool blSpriteActionEnd(
 	IN BLGuid _ID,
     IN BLBool _Delete);
 
-BL_API BLBool blSpriteActionPlay(
-	IN BLGuid _ID);
-
-BL_API BLBool blSpriteActionStop(
-	IN BLGuid _ID);
-
 BL_API BLBool blSpriteParallelBegin(
 	IN BLGuid _ID);
 
 BL_API BLBool blSpriteParallelEnd(
+	IN BLGuid _ID);
+
+BL_API BLBool blSpriteActionPlay(
+	IN BLGuid _ID);
+
+BL_API BLBool blSpriteActionStop(
 	IN BLGuid _ID);
 
 BL_API BLBool blSpriteActionMove(

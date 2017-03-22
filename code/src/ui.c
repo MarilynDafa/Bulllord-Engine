@@ -281,6 +281,8 @@ typedef struct _Widget {
 			BLF32 fPaddingY;
 			BLBool bFlipX;
 			BLBool bFlipY;
+			BLU32 nLastRecord;
+			BLBool bShowCaret;
             BLU32 nState;
             BLGuid nPixmapTex;
 			BLU32 nTexWidth;
@@ -434,6 +436,7 @@ typedef struct _UIMember {
 	BLU32 nCaretColor;
 	BLU32 nSelectRangeColor;
 	BLU32 nTextDisableColor;
+	BLU32 nTimeInterval;
 	BLBool bProfiler;
 	BLBool bDirty;
 }_BLUIMember;
@@ -468,7 +471,7 @@ _WidgetLocate(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 				return _target;
 		}
 	}
-	if (_XPos >= _target->sAbsRegion.sLT.fX && _XPos <= _target->sAbsRegion.sRB.fX && _YPos >= _target->sAbsRegion.sLT.fY && _target->sAbsRegion.sRB.fX)
+	if (_XPos >= _Node->sAbsRegion.sLT.fX && _XPos <= _Node->sAbsRegion.sRB.fX && _YPos >= _Node->sAbsRegion.sLT.fY && _Node->sAbsRegion.sRB.fX)
 		_target = _Node;
 	return _target;
 }
@@ -3684,10 +3687,6 @@ _DrawPanel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		blDraw(_PrUIMem->nUITech, _geo, 1);
 		blDeleteGeometryBuffer(_geo);
 	}
-	if (_Node->uExtension.sPanel.nScroll <= _Node->uExtension.sPanel.nScrollMax && _Node->uExtension.sPanel.nScroll >= _Node->uExtension.sPanel.nScrollMin)
-		_Node->uExtension.sPanel.bElastic = FALSE;
-	else
-		_Node->uExtension.sPanel.bElastic = TRUE;
 	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
 		_iter->sPosition.fY += _Node->uExtension.sPanel.fPanDelta;
 	_Node->uExtension.sPanel.fPanDelta = 0.f;
@@ -6568,6 +6567,83 @@ _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 		}
 	}
+	_curline = (BLUtf16*)_text;
+	if (_Node->uExtension.sText.bShowCaret)
+	{
+		BLRect _cv;
+		BLS32 _cursorline = 0;
+		BLS32 _startpos = 0;
+		BLF32 _charcursorpos;
+		BLRect _localcliprect = _framerect;
+		if (_Node->uExtension.sText.bMultiline)
+		{
+			_cursorline = _TextLine(_Node, _Node->uExtension.sText.nCaretPos);
+			_curline = _Node->uExtension.sText.pSplitText[_cursorline];
+			_startpos = _Node->uExtension.sText.aSplitPositions[_cursorline];
+		}
+		BLF32 _outy;
+		if (_Node->uExtension.sText.bPassword)
+		{
+			BLUtf16* _starph = (BLUtf16*)alloca((_Node->uExtension.sText.nCaretPos - _startpos + 1) * sizeof(BLUtf16));
+			for (BLS32 _jdx = 0; _jdx < _Node->uExtension.sText.nCaretPos - _startpos; ++_jdx)
+				_starph[_jdx] = L'*';
+			_starph[_Node->uExtension.sText.nCaretPos - _startpos] = 0;
+			_FontMeasure(_starph, _ft, _Node->uExtension.sText.nFontHeight, &_charcursorpos, &_outy, _flag);
+		}
+		else
+		{
+			BLU16* _s1 = (BLUtf16*)alloca((_Node->uExtension.sText.nCaretPos - _startpos + 1) * sizeof(BLUtf16));
+			for (BLS32 _jdx = 0; _jdx < _Node->uExtension.sText.nCaretPos - _startpos; ++_jdx)
+				_s1[_jdx] = _curline[_jdx];
+			_s1[_Node->uExtension.sText.nCaretPos - _startpos] = 0;
+			_FontMeasure((const BLUtf16*)_s1, _ft, _Node->uExtension.sText.nFontHeight, &_charcursorpos, &_outy, _flag);
+		}
+		_TextRect(_Node, _ft, _cursorline, &_framerect, _flag);
+		_Node->uExtension.sText.sCurRect.sLT.fX += _charcursorpos;
+		_cv = _Node->uExtension.sText.sCurRect;
+		_cv = blRectIntersects(&_cv, &_localcliprect);
+		_cv.sRB.fX = _cv.sLT.fX + 1;
+		_cv.sRB.fY = _cv.sLT.fY + _Node->uExtension.sText.nFontHeight;
+		BLF32 _caretcolor[4];
+		blDeColor4F(_PrUIMem->nCaretColor, _caretcolor);
+		blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nBlankTex, 0);
+		BLF32 _vbo[] = {
+			PIXEL_ALIGNED_INTERNAL(_cv.sLT.fX),
+			PIXEL_ALIGNED_INTERNAL(_cv.sLT.fY),
+			_caretcolor[0],
+			_caretcolor[1],
+			_caretcolor[2],
+			_caretcolor[3],
+			0.f,
+			0.f,
+			PIXEL_ALIGNED_INTERNAL(_cv.sRB.fX),
+			PIXEL_ALIGNED_INTERNAL(_cv.sLT.fY),
+			_caretcolor[0],
+			_caretcolor[1],
+			_caretcolor[2],
+			_caretcolor[3],
+			1.f,
+			0.f,
+			PIXEL_ALIGNED_INTERNAL(_cv.sLT.fX),
+			PIXEL_ALIGNED_INTERNAL(_cv.sRB.fY),
+			_caretcolor[0],
+			_caretcolor[1],
+			_caretcolor[2],
+			_caretcolor[3],
+			0.f,
+			1.f,
+			PIXEL_ALIGNED_INTERNAL(_cv.sRB.fX),
+			PIXEL_ALIGNED_INTERNAL(_cv.sRB.fY),
+			_caretcolor[0],
+			_caretcolor[1],
+			_caretcolor[2],
+			_caretcolor[3],
+			1.f,
+			1.f
+		};
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
+	}
 	blDeleteUtf16Str((BLUtf16*)_text);
 }
 static BLVoid
@@ -8759,6 +8835,10 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					_wid->uExtension.sPanel.nScroll = (BLS32)_newspos;
 					_wid->uExtension.sPanel.nLastRecord = (BLS32)_cy;
 					_wid->uExtension.sPanel.bScrolling = 2;
+					if (_wid->uExtension.sPanel.nScroll > _wid->uExtension.sPanel.nScrollMax || _wid->uExtension.sPanel.nScroll < _wid->uExtension.sPanel.nScrollMin)
+						_wid->uExtension.sPanel.bElastic = TRUE;
+					else
+						_wid->uExtension.sPanel.bElastic = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -8930,6 +9010,10 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					_wid->uExtension.sPanel.nScroll = (BLS32)_newspos;
 					_wid->uExtension.sPanel.nLastRecord = (BLS32)_cy;
 					_wid->uExtension.sPanel.bScrolling = 2;
+					if (_wid->uExtension.sPanel.nScroll > _wid->uExtension.sPanel.nScrollMax || _wid->uExtension.sPanel.nScroll < _wid->uExtension.sPanel.nScrollMin)
+						_wid->uExtension.sPanel.bElastic = TRUE;
+					else
+						_wid->uExtension.sPanel.bElastic = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
 				break;
@@ -9125,7 +9209,12 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 			}
 		}
 		if ((_PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget != _PrUIMem->pFocusWidget) || !_PrUIMem->pFocusWidget)
-			blUIFocus(_PrUIMem->pHoveredWidget->nID, _cx, _cy);
+		{
+			if (_PrUIMem->pHoveredWidget)
+				blUIFocus(_PrUIMem->pHoveredWidget->nID, _cx, _cy);
+			else
+				_PrUIMem->pFocusWidget = NULL;
+		}			
 		_BLWidget* _lastfocus = _PrUIMem->pFocusWidget;
 		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
 		{
@@ -9421,7 +9510,6 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 				}
 				else if (_wid->uExtension.sPanel.bScrollable)
 				{
-					_wid->uExtension.sPanel.nScroll = 0;
 					_wid->uExtension.sPanel.bDragging = 0;
 					_wid->uExtension.sPanel.bScrolling = FALSE;
 					_PrUIMem->bDirty = TRUE;
@@ -9659,7 +9747,6 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 				}
 				else if (_wid->uExtension.sPanel.bScrollable)
 				{
-					_wid->uExtension.sPanel.nScroll = 0;
 					_wid->uExtension.sPanel.bDragging = 0;
 					_wid->uExtension.sPanel.bScrolling = FALSE;
 					_PrUIMem->bDirty = TRUE;
@@ -10489,6 +10576,14 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam,
 		}
 	}
 }
+static const BLVoid 
+_SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
+{
+	if (_UParam == BL_SE_RESOLUTION)
+	{
+		_PrUIMem->bDirty = TRUE;
+	}
+}
 BLVoid
 _UIInit(BLBool _Profiler)
 {
@@ -10496,6 +10591,7 @@ _UIInit(BLBool _Profiler)
     memset(_PrUIMem->aDir, 0, sizeof(_PrUIMem->aDir));
     memset(_PrUIMem->aArchive, 0, sizeof(_PrUIMem->aArchive));
     FT_Init_FreeType(&_PrUIMem->sFtLibrary);
+	_PrUIMem->nTimeInterval = 0;
 	_PrUIMem->pBasePlate = NULL;
 	_PrUIMem->pModalWidget = NULL;
     _PrUIMem->pRoot = (_BLWidget*)malloc(sizeof(_BLWidget));
@@ -10526,6 +10622,7 @@ _UIInit(BLBool _Profiler)
     blGetWindowSize(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
 	blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	blSubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
+	blSubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
 	BLU32 _tmplen;
 	const Bytef* _tmp = blGenBase64Decoder(DEFAULTFONT_INTERNAL, &_tmplen);
 	uLongf _destlen = 11189;
@@ -10599,10 +10696,67 @@ _UIInit(BLBool _Profiler)
 	blArrayPushBack(_PrUIMem->pFonts, _ret);
 }
 BLVoid
+_UIUpdate(_BLWidget* _Node, BLU32 _Interval)
+{
+	if (_Node != _PrUIMem->pRoot)
+	{
+		if (_Node->eType == BL_UT_PANEL && _Node->uExtension.sPanel.bScrollable && _Node->uExtension.sPanel.bElastic && !_Node->uExtension.sPanel.bScrolling)
+		{
+			if (_Node->uExtension.sPanel.nScroll <= _Node->uExtension.sPanel.nScrollMax && _Node->uExtension.sPanel.nScroll >= _Node->uExtension.sPanel.nScrollMin)
+			{
+				_Node->uExtension.sPanel.nScroll = 0;
+				_Node->uExtension.sPanel.bScrolling = FALSE;
+				_Node->uExtension.sPanel.bElastic = FALSE;
+			}
+			else if (_Node->uExtension.sPanel.nScroll >= _Node->uExtension.sPanel.nScrollMin)
+			{
+				BLF32 _newspos = MAX_INTERNAL(_Node->uExtension.sPanel.nScrollMin, _Node->uExtension.sPanel.nScroll - 0.8f * _Interval);
+				_Node->uExtension.sPanel.fPanDelta = _newspos - _Node->uExtension.sPanel.nScroll;
+				_Node->uExtension.sPanel.nScroll = (BLS32)_newspos;
+			}
+			else if (_Node->uExtension.sPanel.nScroll <= _Node->uExtension.sPanel.nScrollMax)
+			{
+				BLF32 _newspos = MIN_INTERNAL(_Node->uExtension.sPanel.nScrollMax, _Node->uExtension.sPanel.nScroll + 0.8f * _Interval);
+				_Node->uExtension.sPanel.fPanDelta = _newspos - _Node->uExtension.sPanel.nScroll;
+				_Node->uExtension.sPanel.nScroll = (BLS32)_newspos;
+			}
+			else
+			{
+				_Node->uExtension.sPanel.nScroll = 0;
+				_Node->uExtension.sPanel.bScrolling = FALSE;
+				_Node->uExtension.sPanel.bElastic = FALSE;
+			}
+			_PrUIMem->bDirty = TRUE;
+		}
+		else if (_Node->eType == BL_UT_TEXT && _Node->uExtension.sText.nState && _PrUIMem->pFocusWidget == _Node)
+		{
+			if (_Node->uExtension.sText.nLastRecord <= 1200)
+				_Node->uExtension.sText.nLastRecord += _Interval;
+			else
+			{
+				_Node->uExtension.sText.nLastRecord = 0;
+				_Node->uExtension.sText.bShowCaret = !_Node->uExtension.sText.bShowCaret;
+				_PrUIMem->bDirty = TRUE;
+			}
+		}
+	}
+	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
+	{
+		_UIUpdate(_iter, _Interval);
+	}
+}
+BLVoid
 _UIStep(BLU32 _Delta, BLBool _Baseplate)
 {
 	BLF32 _screensz[2] = { 2.f / (BLF32)_PrUIMem->nFboWidth, 2.f / (BLF32)_PrUIMem->nFboHeight };
-	blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
+	blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));	
+	if (_PrUIMem->nTimeInterval > 10)
+	{
+		_UIUpdate(_PrUIMem->pRoot, _PrUIMem->nTimeInterval);
+		_PrUIMem->nTimeInterval = 0;
+	}
+	else
+		_PrUIMem->nTimeInterval += _Delta;
 	if (_Baseplate)
 	{
 		BLF32 _x, _y, _w, _h;
@@ -10730,6 +10884,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 BLVoid
 _UIDestroy()
 {
+	blUnsubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
 	blUnsubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
 	blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	blDeleteGeometryBuffer(_PrUIMem->nQuadGeo);
@@ -11255,7 +11410,8 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIPenetration(_widguid, _penetrationvar);
 			blUITextFont(_widguid, _fontsrc, _fontsizevar, _fontoutlinevar, _fontboldvar, _fontshadowvar, _fontitalicsvar);
 			blUITextFlip(_widguid, _flipxvar, _flipyvar);
-			blUITextPlaceholder(_widguid, (const BLUtf8*)_placeholder, _textcolorvar, _phcolorvar, _txtha, _txtva);
+			blUITextPlaceholder(_widguid, (const BLUtf8*)_placeholder, _phcolorvar);
+			blUITextText(_widguid, NULL, _textcolorvar, _txtha, _txtva);
 			blUITextPixmap(_widguid, _pixmap);
 			blUITextStencilMap(_widguid, _stencilmap);
 			blUITextCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
@@ -11563,7 +11719,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sPanel.nScroll = 0;
 			_widget->uExtension.sPanel.nScrollMin = 0;
 			_widget->uExtension.sPanel.nScrollMax = 0;
-			_widget->uExtension.sPanel.nTolerance = 0;
+			_widget->uExtension.sPanel.nTolerance = (BLS32)(_widget->sDimension.fY * 0.33f);
 			_widget->uExtension.sPanel.nLastRecord = 0;
 			_widget->uExtension.sPanel.bElastic = FALSE;
             _widget->uExtension.sPanel.nPixmapTex = INVALID_GUID;
@@ -11704,6 +11860,8 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sText.bFlipX = FALSE;
 			_widget->uExtension.sText.bFlipY = FALSE;
             _widget->uExtension.sText.nState = 1;
+			_widget->uExtension.sText.bShowCaret = FALSE;
+			_widget->uExtension.sText.nLastRecord = 0;
             _widget->uExtension.sText.nPixmapTex = INVALID_GUID;
 		}
 		break;
@@ -12048,7 +12206,11 @@ blUIFocus(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y)
 		else if (_PrUIMem->pFocusWidget->eType == BL_UT_DIAL)
 			_PrUIMem->pFocusWidget->uExtension.sDial.bDragging = FALSE;
 		else if (_PrUIMem->pFocusWidget->eType == BL_UT_TEXT)
+		{
+			_PrUIMem->pFocusWidget->uExtension.sText.nLastRecord = 0;
+			_PrUIMem->pFocusWidget->uExtension.sText.bShowCaret = FALSE;
 			blDetachIME();
+		}
 		else if (_PrUIMem->pFocusWidget->eType == BL_UT_TABLE)
 			_PrUIMem->pFocusWidget->uExtension.sTable.bDragging = FALSE;
 		else if (_PrUIMem->pFocusWidget->eType == BL_UT_LABEL)
@@ -12056,8 +12218,11 @@ blUIFocus(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y)
 	}
 	if (_widget)
 	{
-		if (_PrUIMem->pHoveredWidget->eType == BL_UT_TEXT)
-			blAttachIME(_X, _Y + _PrUIMem->pHoveredWidget->sDimension.fY * 0.5f);
+		if (_widget->eType == BL_UT_TEXT && _widget->uExtension.sText.nState)
+		{
+			_widget->uExtension.sText.bShowCaret = TRUE;
+			blAttachIME(_X, _Y + _widget->sDimension.fY * 0.5f);
+		}
 	}
 	_PrUIMem->pFocusWidget = _widget;
 }
@@ -12687,6 +12852,16 @@ blUICheckEnable(IN BLGuid _ID, IN BLBool _Enable)
 	_widget->uExtension.sCheck.nState = _Enable ? 1 : 0;
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUICheckState(IN BLGuid _ID, IN BLBool _Checked)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_CHECK)
+		return;
+	_widget->uExtension.sCheck.nState = (_Checked ? 2 : 1);
+}
 BLBool 
 blUIGetCheckState(IN BLGuid _ID)
 {
@@ -12837,7 +13012,7 @@ blUITextMaxLength(IN BLGuid _ID, IN BLU32 _MaxLength)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUITextPlaceholder(IN BLGuid _ID, IN BLUtf8*	_Placeholder, IN BLU32 _TxtColor, IN BLU32 _PlaceholderColor, IN BLEnum _TxtAlignmentH, IN BLEnum _TxtAlignmentV)
+blUITextPlaceholder(IN BLGuid _ID, IN BLUtf8* _Placeholder, IN BLU32 _PlaceholderColor)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -12850,8 +13025,27 @@ blUITextPlaceholder(IN BLGuid _ID, IN BLUtf8*	_Placeholder, IN BLU32 _TxtColor, 
 	_widget->uExtension.sText.pPlaceholder = (BLUtf8*)malloc(_strlen);
 	memset(_widget->uExtension.sText.pPlaceholder, 0, _strlen);
 	strcpy((BLAnsi*)_widget->uExtension.sText.pPlaceholder, (const BLAnsi*)_Placeholder);
-	_widget->uExtension.sText.nTxtColor = _TxtColor;
 	_widget->uExtension.sText.nPlaceholderColor = _PlaceholderColor;
+	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUITextText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _TxtAlignmentH, IN BLEnum _TxtAlignmentV)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TEXT)
+		return;
+	if (_widget->uExtension.sText.pText)
+		free(_widget->uExtension.sText.pText);
+	if (_Text)
+	{
+		BLU32 _strlen = blUtf8Length(_Text) + 1;
+		_widget->uExtension.sText.pText = (BLUtf8*)malloc(_strlen);
+		memset(_widget->uExtension.sText.pText, 0, _strlen);
+		strcpy((BLAnsi*)_widget->uExtension.sText.pText, (const BLAnsi*)_Text);
+	}
+	_widget->uExtension.sText.nTxtColor = _TxtColor;
 	_widget->uExtension.sText.eTxtAlignmentH = _TxtAlignmentH;
 	_widget->uExtension.sText.eTxtAlignmentV = _TxtAlignmentV;
 	_PrUIMem->bDirty = TRUE;
@@ -13703,4 +13897,59 @@ blUIPrimitivePath(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _P
 	memcpy(_widget->uExtension.sPrimitive.pYPath, _YPath, _PathNum * sizeof(BLF32));
 	_widget->uExtension.sPrimitive.nPathNum = _PathNum;
 	_PrUIMem->bDirty = TRUE;
+}
+BLBool 
+blUIActionBegin(IN BLGuid _ID)
+{
+	return TRUE;
+}
+BLBool 
+blUIActionEnd(IN BLGuid _ID, IN BLBool _Delete)
+{
+	return TRUE;
+}
+BLBool 
+blUIParallelBegin(IN BLGuid _ID)
+{
+	return TRUE;
+}
+BLBool 
+blUIParallelEnd(IN BLGuid _ID)
+{
+	return TRUE;
+}
+BLBool 
+blUIActionPlay(IN BLGuid _ID)
+{
+	return TRUE;
+}
+BLBool 
+blUIActionStop(IN BLGuid _ID)
+{
+	return TRUE;
+}
+BLBool 
+blUIActionUV(IN BLGuid _ID, IN BLAnsi* _Tag, IN BLU32 _FPS)
+{
+	return TRUE;
+}
+BLBool 
+blUIActionMove(IN BLGuid _ID, IN BLF32 _XVec, IN BLF32 _YVec, IN BLF32 _Time, IN BLBool _Loop)
+{
+	return TRUE;
+}
+BLBool 
+blUIActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
+{
+	return TRUE;
+}
+BLBool 
+blUIActionRotate(IN BLGuid _ID, IN BLF32 _Angle, IN BLBool _ClockWise, IN BLF32 _Time, IN BLBool _Loop)
+{
+	return TRUE;
+}
+BLBool 
+blUIActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
+{
+	return TRUE;
 }

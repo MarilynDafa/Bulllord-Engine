@@ -42,6 +42,14 @@ extern "C" {
 		_Uparam ..
 		_Sparam ..
 		_Pparam ..
+//ui event
+//			_Type		_Uparam		_Sparam			_Pparam		 _ID
+//slider	BL_ET_UI	sliderpos	BL_UT_SLIDER	NULL		id		value changed
+//button	BL_ET_UI	0			BL_UT_BUTTON	NULL		id		button click
+//check		BL_ET_UI	1 or 0		BL_UT_CHECK		NULL		id		1 checked, 0 unchecked
+//label		BL_ET_UI	linkid		BL_UT_LABEL		NULL		id		label click linkid
+//text		BL_ET_UI	keycode		BL_UT_TEXT		NULL		id		text changed
+//dial		BL_ET_UI	angle		BL_UT_DIAL		NULL		id		dial value changed
 */
     
 BL_API BLEnum blPlatformIdentity();

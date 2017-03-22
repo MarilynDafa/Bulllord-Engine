@@ -23,6 +23,7 @@
 #include "../headers/system.h"
 #include "../headers/utils.h"
 #include "../headers/ui.h"
+#include "../headers/streamio.h"
 #include "internal/dictionary.h"
 #include "internal/array.h"
 #include "internal/internal.h"
@@ -1932,6 +1933,31 @@ blSpriteActionEnd(IN BLGuid _ID, IN BLBool _Delete)
 	_PrSpriteMem->bParallelEdit = FALSE;
     return TRUE;
 }
+BLBool
+blSpriteParallelBegin(IN BLGuid _ID)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	if (_PrSpriteMem->bParallelEdit)
+		return FALSE;
+	_PrSpriteMem->bParallelEdit = TRUE;
+	return TRUE;
+}
+BLBool
+blSpriteParallelEnd(IN BLGuid _ID)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	if (!_PrSpriteMem->bParallelEdit)
+		return FALSE;
+	_PrSpriteMem->bParallelEdit = FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	_BLSpriteAction* _lastact = _node->pAction;
+	while (_lastact->pNext)
+		_lastact = _lastact->pNext;
+	_lastact->bParallel = FALSE;
+	return TRUE;
+}
 BLBool 
 blSpriteActionPlay(IN BLGuid _ID)
 {
@@ -1957,31 +1983,6 @@ blSpriteActionStop(IN BLGuid _ID)
 		return FALSE;
 	_node->pCurAction = NULL;
 	return TRUE;
-}
-BLBool
-blSpriteParallelBegin(IN BLGuid _ID)
-{
-    if (_ID == INVALID_GUID)
-        return FALSE;
-	if (_PrSpriteMem->bParallelEdit)
-		return FALSE;
-	_PrSpriteMem->bParallelEdit = TRUE;
-    return TRUE;
-}
-BLBool
-blSpriteParallelEnd(IN BLGuid _ID)
-{
-    if (_ID == INVALID_GUID)
-        return FALSE;
-	if (!_PrSpriteMem->bParallelEdit)
-		return FALSE;
-    _PrSpriteMem->bParallelEdit = FALSE;
-    _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
-    _BLSpriteAction* _lastact = _node->pAction;
-    while (_lastact->pNext)
-        _lastact = _lastact->pNext;
-    _lastact->bParallel = FALSE;
-    return TRUE;
 }
 BLBool
 blSpriteActionMove(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _PathNum, IN BLF32 _Acceleration, IN BLF32 _Time, IN BLBool _Loop)

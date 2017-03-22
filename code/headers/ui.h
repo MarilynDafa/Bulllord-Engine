@@ -21,19 +21,10 @@
 #ifndef __ui_h_
 #define __ui_h_
 #include "prerequisites.h"
-#include "streamio.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 //for BMFont only support xml + none-compression tga format 
-//ui event
-//			_Type		_Uparam		_Sparam			_Pparam		 _ID
-//slider	BL_ET_UI	sliderpos	BL_UT_SLIDER	NULL		id		value changed
-//button	BL_ET_UI	0			BL_UT_BUTTON	NULL		id		button click
-//check		BL_ET_UI	1 or 0		BL_UT_CHECK		NULL		id		1 checked, 0 unchecked
-//label		BL_ET_UI	linkid		BL_UT_LABEL		NULL		id		label click linkid
-//text		BL_ET_UI	keycode		BL_UT_TEXT		NULL		id		text changed
-//dial		BL_ET_UI	angle		BL_UT_DIAL		NULL		id		dial value changed
 BL_API BLVoid blUIWorkspace(
 	IN BLAnsi* _Dictionary,
 	IN BLAnsi* _Archive);
@@ -359,6 +350,10 @@ BL_API BLVoid blUICheckEnable(
 	IN BLGuid _ID,
 	IN BLBool _Enable);
 
+BL_API BLVoid blUICheckState(
+	IN BLGuid _ID,
+	IN BLBool _Checked);
+
 BL_API BLBool blUIGetCheckState(
 	IN BLGuid _ID);
 
@@ -405,8 +400,12 @@ BL_API BLVoid blUITextMaxLength(
 BL_API BLVoid blUITextPlaceholder(
 	IN BLGuid _ID,
 	IN BLUtf8* _Placeholder,
+	IN BLU32 _PlaceholderColor);
+
+BL_API BLVoid blUITextText(
+	IN BLGuid _ID,
+	IN BLUtf8* _Text,
 	IN BLU32 _TxtColor,
-	IN BLU32 _PlaceholderColor,
 	IN BLEnum _TxtAlignmentH,
 	IN BLEnum _TxtAlignmentV);
 
@@ -662,6 +661,59 @@ BL_API BLVoid blUIPrimitivePath(
 	IN BLF32* _XPath,
 	IN BLF32* _YPath,
 	IN BLU32 _PathNum);
+
+BL_API BLBool blUIActionBegin(
+	IN BLGuid _ID);
+
+BL_API BLBool blUIActionEnd(
+	IN BLGuid _ID,
+	IN BLBool _Delete);
+
+BL_API BLBool blUIParallelBegin(
+	IN BLGuid _ID);
+
+BL_API BLBool blUIParallelEnd(
+	IN BLGuid _ID);
+
+BL_API BLBool blUIActionPlay(
+	IN BLGuid _ID);
+
+BL_API BLBool blUIActionStop(
+	IN BLGuid _ID);
+
+BL_API BLBool blUIActionUV(
+	IN BLGuid _ID,
+	IN BLAnsi* _Tag,
+	IN BLU32 _FPS);
+
+BL_API BLBool blUIActionMove(
+	IN BLGuid _ID,
+	IN BLF32 _XVec,
+	IN BLF32 _YVec,
+	IN BLF32 _Time,
+	IN BLBool _Loop);
+
+BL_API BLBool blUIActionScale(
+	IN BLGuid _ID,
+	IN BLF32 _XScale,
+	IN BLF32 _YScale,
+	IN BLBool _Reverse,
+	IN BLF32 _Time,
+	IN BLBool _Loop);
+
+BL_API BLBool blUIActionRotate(
+	IN BLGuid _ID,
+	IN BLF32 _Angle,
+	IN BLBool _ClockWise,
+	IN BLF32 _Time,
+	IN BLBool _Loop);
+
+BL_API BLBool blUIActionAlpha(
+	IN BLGuid _ID,
+	IN BLF32 _Alpha,
+	IN BLBool _Reverse,
+	IN BLF32 _Time,
+	IN BLBool _Loop);
 #ifdef __cplusplus
 }
 #endif
