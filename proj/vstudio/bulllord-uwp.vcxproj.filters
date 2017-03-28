@@ -369,9 +369,6 @@
     <ClCompile Include="..\..\code\src\ui.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\src\system.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\code\externals\fastlz\fastlz.c">
       <Filter>externals\fastlz</Filter>
     </ClCompile>
@@ -381,14 +378,19 @@
     <ClCompile Include="..\..\code\src\internal.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\src\audio.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\src\gpu.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\code\externals\xml\ezxml.c">
       <Filter>externals\xml</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\code\src\audio.xc">
+      <Filter>src</Filter>
+    </None>
+    <None Include="..\..\code\src\gpu.xc">
+      <Filter>src</Filter>
+    </None>
+    <None Include="..\..\code\src\system.xc">
+      <Filter>src</Filter>
+    </None>
   </ItemGroup>
 </Project>
