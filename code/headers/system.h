@@ -50,6 +50,7 @@ extern "C" {
 //label		BL_ET_UI	linkid		BL_UT_LABEL		NULL		id		label click linkid
 //text		BL_ET_UI	keycode		BL_UT_TEXT		NULL		id		text changed
 //dial		BL_ET_UI	angle		BL_UT_DIAL		NULL		id		dial value changed
+//ui		BL_ET_UI	0xFFFFFFFF	type			NULL		id		ui action end
 */
     
 BL_API BLEnum blPlatformIdentity();

@@ -55,9 +55,6 @@ typedef struct _SpriteAction{
 			BLF32 fYScale;
             BLBool bReverse;
 		}sScale;
-		struct _ZValue {
-			BLF32 fZv;
-		}sZValue;
 		struct _Alpha {
 			BLF32 fInitAlpha;
 			BLF32 fAlpha;
@@ -637,8 +634,8 @@ _SpriteUpdate(BLU32 _Delta)
                         }
                         else
                         {
-                            _node->fScaleX = (_action->fTotalTime - 2 * _action->fCurTime) / _action->fTotalTime * (_action->uAction.sScale.fXInitScale) + _action->uAction.sScale.fXScale;
-                            _node->fScaleY = (_action->fTotalTime - 2 * _action->fCurTime) / _action->fTotalTime * (_action->uAction.sScale.fYInitScale) + _action->uAction.sScale.fYScale;
+                            _node->fScaleX = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fXInitScale) + _action->uAction.sScale.fXScale;
+							_node->fScaleY = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fYInitScale) + _action->uAction.sScale.fYScale;
                         }
                     }
                     else
@@ -675,7 +672,7 @@ _SpriteUpdate(BLU32 _Delta)
                     break;
 				_action = _action->pNeighbor;
 			} while (_action);
-			if (_node->pCurAction->fCurTime >= _node->pCurAction->fTotalTime && !_delete)
+			if (!_delete && _node->pCurAction->fCurTime >= _node->pCurAction->fTotalTime)
 			{
 				if (!_node->pCurAction->bLoop)
 				{
@@ -718,31 +715,7 @@ _SpriteUpdate(BLU32 _Delta)
 						_node->pCurAction = _node->pCurAction->pNext;
 				}
 				else
-				{
 					_node->pCurAction->fCurTime = 0.f;
-					switch (_node->pCurAction->eActionType)
-					{
-					case SPACTION_MOVE_INTERNAL:
-						{
-							_node->sPos.fX = _node->pCurAction->uAction.sMove.pXPath[0];
-							_node->sPos.fY = _node->pCurAction->uAction.sMove.pYPath[0];
-						}
-						break;
-					case SPACTION_SCALE_INTERNAL:
-						{
-							_node->fScaleX = _node->pCurAction->uAction.sScale.fXInitScale;
-							_node->fScaleY = _node->pCurAction->uAction.sScale.fYInitScale;
-						}
-						break;
-					case SPACTION_ALPHA_INTERNAL:
-						{
-							_node->fAlpha = _node->pCurAction->uAction.sAlpha.fInitAlpha;
-						}
-						break;
-					default:
-						break;
-					}
-				}
 			}
 		}
 		if (!_delete)

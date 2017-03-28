@@ -681,10 +681,22 @@ BL_API BLBool blUIActionPlay(
 BL_API BLBool blUIActionStop(
 	IN BLGuid _ID);
 
+//panel commonmap
+//label	commonmap
+//button commonmap
+//check commonmap
+//slider slidermap
+//text commonmap
+//progress fillmap
+//dial none-anglecut
+//table commonmap
+//none-trim samesize
 BL_API BLBool blUIActionUV(
 	IN BLGuid _ID,
 	IN BLAnsi* _Tag,
-	IN BLU32 _FPS);
+	IN BLU32 _FPS,
+	IN BLF32 _Time, 
+	IN BLBool _Loop);
 
 BL_API BLBool blUIActionMove(
 	IN BLGuid _ID,
@@ -692,7 +704,7 @@ BL_API BLBool blUIActionMove(
 	IN BLF32 _YVec,
 	IN BLF32 _Time,
 	IN BLBool _Loop);
-
+//all controls except primitive
 BL_API BLBool blUIActionScale(
 	IN BLGuid _ID,
 	IN BLF32 _XScale,
@@ -700,7 +712,7 @@ BL_API BLBool blUIActionScale(
 	IN BLBool _Reverse,
 	IN BLF32 _Time,
 	IN BLBool _Loop);
-
+//only dial control
 BL_API BLBool blUIActionRotate(
 	IN BLGuid _ID,
 	IN BLF32 _Angle,
