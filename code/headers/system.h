@@ -51,6 +51,10 @@ extern "C" {
 //text		BL_ET_UI	keycode		BL_UT_TEXT		NULL		id		text changed
 //dial		BL_ET_UI	angle		BL_UT_DIAL		NULL		id		dial value changed
 //ui		BL_ET_UI	0xFFFFFFFF	type			NULL		id		ui action end
+//sprite event
+//			_Type			_Uparam									_Sparam													_Pparam		_ID
+//			BL_ET_SPRITE	LOWU16(_Uparam)->X HIGU16(_Uparam)->Y	BL_ME_LDOWN or BL_ME_RDOWN or BL_ME_LUP or BL_ME_RUP	NULL		id	sprite click
+//			BL_ET_SPRITE	0xFFFFFFFF								0														NULL		id	sprite action end
 */
     
 BL_API BLEnum blPlatformIdentity();

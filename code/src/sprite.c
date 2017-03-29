@@ -1,4 +1,4 @@
-/*
+﻿/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
  
@@ -134,6 +134,10 @@ typedef struct _SpriteNode{
     BLVec2 sSize;
     BLVec2 sPos;
     BLVec2 sPivot;
+	BLVec2 sAbsLT;
+	BLVec2 sAbsRT;
+	BLVec2 sAbsLB;
+	BLVec2 sAbsRB;
     BLRect sScissor;
     BLU32 nFPS;
     BLF32 fScaleX;
@@ -191,6 +195,46 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
             _PrSpriteMem->pCursor->sPos.fX = LOWU16(_UParam);
             _PrSpriteMem->pCursor->sPos.fY = HIGU16(_UParam);
         }
+	}
+	else if (_Type == BL_ME_LDOWN || _Type == BL_ME_RDOWN)
+	{
+		BLF32 _x = LOWU16(_UParam);
+		BLF32 _y = HIGU16(_UParam);
+		BLGuid _id = INVALID_GUID;
+		for (BLU32 _idx = 0; _idx < _PrSpriteMem->nNodeNum; ++_idx)
+		{
+			_BLSpriteNode* _node = _PrSpriteMem->pNodeList[_idx];
+			BLS32 _a = (_node->sAbsLT.fX - _node->sAbsLB.fX) * (_y - _node->sAbsLB.fY) - (_node->sAbsLT.fY - _node->sAbsLB.fY) * (_x - _node->sAbsLB.fX);
+			BLS32 _b = (_node->sAbsRT.fX - _node->sAbsLT.fX) * (_y - _node->sAbsLT.fY) - (_node->sAbsRT.fY - _node->sAbsLT.fY) * (_x - _node->sAbsLT.fX);
+			BLS32 _c = (_node->sAbsRB.fX - _node->sAbsRT.fX) * (_y - _node->sAbsRT.fY) - (_node->sAbsRB.fY - _node->sAbsRT.fY) * (_x - _node->sAbsRT.fX);
+			BLS32 _d = (_node->sAbsLB.fX - _node->sAbsRB.fX) * (_y - _node->sAbsRB.fY) - (_node->sAbsLB.fY - _node->sAbsRB.fY) * (_x - _node->sAbsRB.fX);
+			if ((_a > 0 && _b > 0 && _c > 0 && _d > 0) || (_a < 0 && _b < 0 && _c < 0 && _d < 0)) 
+			{
+				_id = _node->nID;
+				break;
+			}
+		}
+		blInvokeEvent(BL_ET_SPRITE, _UParam, _Type, NULL, _id);
+	}
+	else if (_Type == BL_ME_LUP || _Type == BL_ME_RUP)
+	{
+		BLF32 _x = LOWU16(_UParam);
+		BLF32 _y = HIGU16(_UParam);
+		BLGuid _id = INVALID_GUID;
+		for (BLU32 _idx = 0; _idx < _PrSpriteMem->nNodeNum; ++_idx)
+		{
+			_BLSpriteNode* _node = _PrSpriteMem->pNodeList[_idx];
+			BLS32 _a = (_node->sAbsLT.fX - _node->sAbsLB.fX) * (_y - _node->sAbsLB.fY) - (_node->sAbsLT.fY - _node->sAbsLB.fY) * (_x - _node->sAbsLB.fX);
+			BLS32 _b = (_node->sAbsRT.fX - _node->sAbsLT.fX) * (_y - _node->sAbsLT.fY) - (_node->sAbsRT.fY - _node->sAbsLT.fY) * (_x - _node->sAbsLT.fX);
+			BLS32 _c = (_node->sAbsRB.fX - _node->sAbsRT.fX) * (_y - _node->sAbsRT.fY) - (_node->sAbsRB.fY - _node->sAbsRT.fY) * (_x - _node->sAbsRT.fX);
+			BLS32 _d = (_node->sAbsLB.fX - _node->sAbsRB.fX) * (_y - _node->sAbsRB.fY) - (_node->sAbsLB.fY - _node->sAbsRB.fY) * (_x - _node->sAbsRB.fX);
+			if ((_a > 0 && _b > 0 && _c > 0 && _d > 0) || (_a < 0 && _b < 0 && _c < 0 && _d < 0))
+			{
+				_id = _node->nID;
+				break;
+			}
+		}
+		blInvokeEvent(BL_ET_SPRITE, _UParam, _Type, NULL, _id);
 	}
 	return FALSE;
 }
@@ -661,7 +705,7 @@ _SpriteUpdate(BLU32 _Delta)
 				break;
 				case SPACTION_DEAD_INTERNAL:
 				{
-					blInvokeEvent(BL_ET_SPRITE, 0, 0, NULL, _node->nID);
+					blInvokeEvent(BL_ET_SPRITE, 0xFFFFFFFF, 0, NULL, _node->nID);
 					blDeleteSprite(_node->nID);
 					_delete = TRUE;
 				}
@@ -710,7 +754,7 @@ _SpriteUpdate(BLU32 _Delta)
 							_tmp = _tmpnext;
 						}
 						_node->pAction = _node->pCurAction = NULL;
-						blInvokeEvent(BL_ET_SPRITE, 0, 0, NULL, _node->nID);
+						blInvokeEvent(BL_ET_SPRITE, 0xFFFFFFFF, 0, NULL, _node->nID);
 					}
 					else
 						_node->pCurAction = _node->pCurAction->pNext;
@@ -787,6 +831,14 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
     BLF32 _lby = (_minx * _Mat[1]) + (_maxy * _Mat[3]) + _Mat[5];
     BLF32 _rbx = (_maxx * _Mat[0]) + (_maxy * _Mat[2]) + _Mat[4];
     BLF32 _rby = (_maxx * _Mat[1]) + (_maxy * _Mat[3]) + _Mat[5];
+	_Node->sAbsLB.fX = _ltx;
+	_Node->sAbsLB.fY = _lty;
+	_Node->sAbsRT.fX = _rtx;
+	_Node->sAbsRT.fY = _rty;
+	_Node->sAbsLB.fX = _lbx;
+	_Node->sAbsLB.fY = _lby;
+	_Node->sAbsRB.fX = _rbx;
+	_Node->sAbsRB.fY = _rby;
     if (_Node->pEmitParam)
     {
         BLU32 _gen = (BLU32)(_Node->pEmitParam->fGenPerMSec * _Delta);

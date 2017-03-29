@@ -10829,6 +10829,7 @@ _UIInit(BLBool _Profiler)
     _PrUIMem->pRoot->sDimension.fY = -1.f;
 	_PrUIMem->pRoot->sPosition.fX = 0.f;
 	_PrUIMem->pRoot->sPosition.fY = 0.f;	
+	_PrUIMem->pRoot->bPenetration = TRUE;
 	_PrUIMem->pRoot->pParent = NULL;
 	_PrUIMem->pRoot->eReferenceH = BL_UA_HCENTER;
 	_PrUIMem->pRoot->eReferenceV = BL_UA_VCENTER;
