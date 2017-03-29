@@ -25,13 +25,13 @@
 extern "C" {
 #endif
 
-BL_API BLVoid blUseMusicVolume(
+BL_API BLVoid blMusicVolume(
 	IN BLF32 _Vol);
     
-BL_API BLVoid blUseEnvironmentVolume(
+BL_API BLVoid blEnvironmentVolume(
 	IN BLF32 _Vol);
     
-BL_API BLVoid blUseSystemVolume(
+BL_API BLVoid blSystemVolume(
 	IN BLF32 _Vol);
 
 BL_API BLVoid blQueryAudioVolume(
@@ -39,22 +39,22 @@ BL_API BLVoid blQueryAudioVolume(
 	OUT BLF32* _System,
 	OUT BLF32* _Env);
 
-BL_API BLVoid blSetListenerPos(
+BL_API BLVoid blListenerPos(
 	IN BLF32 _Xpos,
 	IN BLF32 _Ypos,
 	IN BLF32 _Zpos);
     
-BL_API BLVoid blSetListenerUp(
+BL_API BLVoid blListenerUp(
 	IN BLF32 _Xpos,
 	IN BLF32 _Ypos,
 	IN BLF32 _Zpos);
     
-BL_API BLVoid blSetListenerDir(
+BL_API BLVoid blListenerDir(
 	IN BLF32 _Xpos,
 	IN BLF32 _Ypos,
 	IN BLF32 _Zpos);
 
-BL_API BLVoid blSetEmitterPos(
+BL_API BLVoid blEmitterPos(
 	IN BLGuid _ID,
 	IN BLF32 _Xpos,
 	IN BLF32 _Ypos,

@@ -173,7 +173,7 @@ typedef struct _Plugins {
 }_BLPlugin;
 typedef struct _SystemMember {
 	_BLBoostParam sBoostParam;
-	const BLVoid(*pSubscriber[BL_ET_COUNT][128])(BLEnum, BLU32, BLS32, BLVoid*, BLGuid);
+	const BLBool(*pSubscriber[BL_ET_COUNT][128])(BLEnum, BLU32, BLS32, BLVoid*, BLGuid);
 	const BLVoid(*pBeginFunc)(BLVoid);
 	const BLVoid(*pStepFunc)(BLU32);
 	const BLVoid(*pEndFunc)(BLVoid);
@@ -3013,8 +3013,11 @@ _PollEvent()
 #ifdef BL_PLATFORM_ANDROID
 	pthread_mutex_lock(&_PrSystemMem->sMutex);
 #endif
+	BLEnum _blockindex = BL_ET_COUNT;
     for (BLU32 _idx = 0; _idx < _PrSystemMem->nEventIdx; ++_idx)
     {
+		if (_PrSystemMem->pEvents[_idx].eType > _blockindex)
+			continue;
         switch (_PrSystemMem->pEvents[_idx].eType)
         {
             case BL_ET_NET:
@@ -3024,7 +3027,8 @@ _PollEvent()
 					BLU32 _fidx = 0;
 					while (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx])
 					{
-						_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_NET, _PrSystemMem->pEvents[_idx].uEvent.sNet.nID, _PrSystemMem->pEvents[_idx].uEvent.sNet.nLength, _PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf, INVALID_GUID);
+						 if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_NET, _PrSystemMem->pEvents[_idx].uEvent.sNet.nID, _PrSystemMem->pEvents[_idx].uEvent.sNet.nLength, _PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf, INVALID_GUID))
+							_blockindex = _PrSystemMem->pEvents[_idx].eType;
 						++_fidx;
 					}
 				}
@@ -3032,8 +3036,17 @@ _PollEvent()
                     free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf);
             } break;
             case BL_ET_UI:
-            {
-
+            {			
+				if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][0])
+				{
+					BLU32 _fidx = 0;
+					while (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx])
+					{
+						if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_UI, _PrSystemMem->pEvents[_idx].uEvent.sUI.nUParam, _PrSystemMem->pEvents[_idx].uEvent.sUI.nSParam, _PrSystemMem->pEvents[_idx].uEvent.sUI.pPParam, _PrSystemMem->pEvents[_idx].uEvent.sUI.nID))
+							_blockindex = _PrSystemMem->pEvents[_idx].eType;
+						_fidx++;
+					}
+				}
             } break;
             case BL_ET_MOUSE:
 			{
@@ -3044,7 +3057,8 @@ _PollEvent()
 						BLU32 _fidx = 0;
 						while (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx])
 						{
-							_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ME_WHEEL, _PrSystemMem->pEvents[_idx].uEvent.sMouse.nWheel, _PrSystemMem->pEvents[_idx].uEvent.sMouse.eEvent, NULL, INVALID_GUID);
+							if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ME_WHEEL, _PrSystemMem->pEvents[_idx].uEvent.sMouse.nWheel, _PrSystemMem->pEvents[_idx].uEvent.sMouse.eEvent, NULL, INVALID_GUID))
+								_blockindex = _PrSystemMem->pEvents[_idx].eType;
 							_fidx++;
 						}
 					}
@@ -3053,7 +3067,8 @@ _PollEvent()
 						BLU32 _fidx = 0;
 						while (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx])
 						{
-							_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](_PrSystemMem->pEvents[_idx].uEvent.sMouse.eEvent, MAKEU32(_PrSystemMem->pEvents[_idx].uEvent.sMouse.nY, _PrSystemMem->pEvents[_idx].uEvent.sMouse.nX), _PrSystemMem->pEvents[_idx].uEvent.sMouse.eEvent, NULL, INVALID_GUID);
+							if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](_PrSystemMem->pEvents[_idx].uEvent.sMouse.eEvent, MAKEU32(_PrSystemMem->pEvents[_idx].uEvent.sMouse.nY, _PrSystemMem->pEvents[_idx].uEvent.sMouse.nX), _PrSystemMem->pEvents[_idx].uEvent.sMouse.eEvent, NULL, INVALID_GUID))
+								_blockindex = _PrSystemMem->pEvents[_idx].eType;
 							_fidx++;
 						}
 					}
@@ -3066,7 +3081,8 @@ _PollEvent()
 					BLU32 _fidx = 0;
 					while (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx])
 					{
-						_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_KEY, MAKEU32(_PrSystemMem->pEvents[_idx].uEvent.sKey.eCode, _PrSystemMem->pEvents[_idx].uEvent.sKey.bPressed), 0, _PrSystemMem->pEvents[_idx].uEvent.sKey.pString, INVALID_GUID);
+						if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_KEY, MAKEU32(_PrSystemMem->pEvents[_idx].uEvent.sKey.eCode, _PrSystemMem->pEvents[_idx].uEvent.sKey.bPressed), 0, _PrSystemMem->pEvents[_idx].uEvent.sKey.pString, INVALID_GUID))
+							_blockindex = _PrSystemMem->pEvents[_idx].eType;
 						_fidx++;
 					}
 				}
@@ -3080,7 +3096,8 @@ _PollEvent()
 					BLU32 _fidx = 0;
 					while (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx])
 					{
-						_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_SYSTEM, _PrSystemMem->pEvents[_idx].uEvent.sUser.nUParam, _PrSystemMem->pEvents[_idx].uEvent.sUser.nSParam, _PrSystemMem->pEvents[_idx].uEvent.sUser.pPParam, INVALID_GUID);
+						if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_SYSTEM, _PrSystemMem->pEvents[_idx].uEvent.sUser.nUParam, _PrSystemMem->pEvents[_idx].uEvent.sUser.nSParam, _PrSystemMem->pEvents[_idx].uEvent.sUser.pPParam, INVALID_GUID))
+							_blockindex = _PrSystemMem->pEvents[_idx].eType;
 						_fidx++;
 					}
 				}
@@ -3092,7 +3109,8 @@ _PollEvent()
 					BLU32 _fidx = 0;
 					while (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx])
 					{
-						_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_SPRITE, 0, 0, NULL, _PrSystemMem->pEvents[_idx].uEvent.sSprite.nID);
+						if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_SPRITE, 0, 0, NULL, _PrSystemMem->pEvents[_idx].uEvent.sSprite.nID))
+							_blockindex = _PrSystemMem->pEvents[_idx].eType;
 						_fidx++;
 					}
 				}
@@ -3119,9 +3137,9 @@ _SystemInit()
 	_StreamIOInit(NULL);
 #endif
     _AudioInit();
-    _NetworkInit();
     _UIInit(_PrSystemMem->sBoostParam.bProfiler);
     _SpriteInit();
+    _NetworkInit();
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
 	_GbSystemRunning = TRUE;
 	_PrSystemMem->pBeginFunc();
@@ -3199,9 +3217,9 @@ _SystemDestroy()
 		_GbVideoPlaying = FALSE;
 	}
 	_PrSystemMem->pEndFunc();
+    _NetworkDestroy();
     _SpriteDestroy();
 	_UIDestroy();
-    _NetworkDestroy();
     _AudioDestroy();
 	_StreamIODestroy();
     _CloseWindow();
@@ -4168,7 +4186,7 @@ blDetachIME()
 #endif
 }
 BLVoid
-blSubscribeEvent(IN BLEnum _Type, IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid))
+blSubscribeEvent(IN BLEnum _Type, IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid))
 {
 	BLU32 _idx = 0;
 	while (_PrSystemMem->pSubscriber[_Type][_idx])
@@ -4176,7 +4194,7 @@ blSubscribeEvent(IN BLEnum _Type, IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, 
 	_PrSystemMem->pSubscriber[_Type][_idx] = _Subscriber;
 }
 BLVoid
-blUnsubscribeEvent(IN BLEnum _Type, IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid))
+blUnsubscribeEvent(IN BLEnum _Type, IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid))
 {
 	BLU32 _idx = 0, _num = 0;
 	while (_PrSystemMem->pSubscriber[_Type][_num])

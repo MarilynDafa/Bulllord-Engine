@@ -148,6 +148,10 @@ BL_API BLVoid blUIFocus(
 	IN BLF32 _X,
 	IN BLF32 _Y);
 
+BL_API BLGuid blUIGetFocus();
+
+BL_API BLGuid blUIGetHoverd();
+
 BL_API BLVoid blUIPanelPixmap(
 	IN BLGuid _ID,
 	IN BLAnsi* _Pixmap);

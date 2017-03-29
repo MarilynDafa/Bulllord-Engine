@@ -265,6 +265,8 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx)
 		_buf.Flags = XAUDIO2_END_OF_STREAM;
 	_Src->pSource->SubmitSourceBuffer(&_buf);
 #endif
+	if (!_ret)
+		blInvokeEvent(BL_ET_SYSTEM, BL_SE_AUDIOOVER, 0, NULL, _Src->nID);
     return _ret;
 }
 static BLBool
@@ -877,7 +879,7 @@ _AudioThreadFunc(BLVoid* _Userdata)
 #elif defined(BL_USE_SL_API)
 				if (_SLUpdate(_iter))
 #elif defined(BL_USE_COREAUDIO_API)
-				if (!_CAUpdate(_iter))
+				if (_CAUpdate(_iter))
 #endif
 				{
 					blListErase(_PrAudioMem->pSounds, _iterator_iter); 
@@ -912,7 +914,7 @@ _ALInit()
     assert(_PrAudioMem->pAudioDev.pALDevice);
 	_PrAudioMem->pAudioDev.pALContext = alcCreateContext(_PrAudioMem->pAudioDev.pALDevice, 0);
     assert(_PrAudioMem->pAudioDev.pALContext);
-    if(!alcMakeContextCurrent(_PrAudioMem->pAudioDev.pALContext))
+    if (!alcMakeContextCurrent(_PrAudioMem->pAudioDev.pALContext))
     {
         assert(0);
         alcDestroyContext(_PrAudioMem->pAudioDev.pALContext);
@@ -1143,7 +1145,7 @@ _AudioDestroy()
 	free(_PrAudioMem);
 }
 BLVoid
-blUseMusicVolume(IN BLF32 _Vol)
+blMusicVolume(IN BLF32 _Vol)
 {
     if (!_PrAudioMem->pBackMusic)
         return;
@@ -1161,7 +1163,7 @@ blUseMusicVolume(IN BLF32 _Vol)
     blMutexUnlock(_PrAudioMem->pMusicMutex);
 }
 BLVoid
-blUseEnvironmentVolume(IN BLF32 _Vol)
+blEnvironmentVolume(IN BLF32 _Vol)
 {
 	_PrAudioMem->pAudioDev.fEnvVolume = _Vol;
     blMutexLock(_PrAudioMem->pSounds->pMutex);
@@ -1183,7 +1185,7 @@ blUseEnvironmentVolume(IN BLF32 _Vol)
     blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 }
 BLVoid
-blUseSystemVolume(IN BLF32 _Vol)
+blSystemVolume(IN BLF32 _Vol)
 {
 	_PrAudioMem->pAudioDev.fSystemVolume = _Vol;
     blMutexLock(_PrAudioMem->pSounds->pMutex);
@@ -1212,28 +1214,28 @@ blQueryAudioVolume(OUT BLF32* _Music, OUT BLF32* _System, OUT BLF32* _Env)
 	*_Env = _PrAudioMem->pAudioDev.fEnvVolume;
 }
 BLVoid
-blSetListenerPos(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
+blListenerPos(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
 	_PrAudioMem->sListenerPos.fX = _Xpos;
 	_PrAudioMem->sListenerPos.fY = _Ypos;
 	_PrAudioMem->sListenerPos.fZ = _Zpos;
 }
 BLVoid
-blSetListenerUp(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
+blListenerUp(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
 	_PrAudioMem->sListenerUp.fX = _Xpos;
 	_PrAudioMem->sListenerUp.fY = _Ypos;
 	_PrAudioMem->sListenerUp.fZ = _Zpos;
 }
 BLVoid
-blSetListenerDir(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
+blListenerDir(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
 	_PrAudioMem->sListenerDir.fX = _Xpos;
 	_PrAudioMem->sListenerDir.fY = _Ypos;
 	_PrAudioMem->sListenerDir.fZ = _Zpos;
 }
 BLVoid
-blSetEmitterPos(IN BLGuid _ID, IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
+blEmitterPos(IN BLGuid _ID, IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
 	FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
 	{

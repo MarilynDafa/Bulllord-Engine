@@ -284,17 +284,16 @@ typedef unsigned long long BLGuid;
 #define MAKEU32(high, low) ((BLU32)(((BLU16)(((BLU32)(low)) & 0xFFFF)) | ((BLU32)((BLU16)(((BLU32)(high)) & 0xFFFF))) << 16))       ///<Combine two short into a 32bit unsigned int
 
  /* _EVENT_TYPE */
-#define BL_ET_NET		0
-#define BL_ET_MOUSE		1
-#define BL_ET_KEY		2
-#define BL_ET_SYSTEM	3
+#define BL_ET_SYSTEM	0
+#define BL_ET_NET		1
+#define BL_ET_MOUSE		2
+#define BL_ET_KEY		3
 #define BL_ET_UI		4
 #define BL_ET_SPRITE	5
 #define BL_ET_COUNT		6
 
  /* _SYSTEM_EVENT */
-#define BL_SE_CONNECTED		0
-#define BL_SE_DISCONNECTED	1
+#define BL_SE_AUDIOOVER		1
 #define BL_SE_VIDEOOVER		2
 #define BL_SE_TIMER			3
 #define BL_SE_RESOLUTION    4

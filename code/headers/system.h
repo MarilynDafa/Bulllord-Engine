@@ -101,11 +101,11 @@ BL_API BLVoid blDetachIME();
 
 BL_API BLVoid blSubscribeEvent(
 	IN BLEnum _Type, 
-	IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid));
+	IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid));
 
 BL_API BLVoid blUnsubscribeEvent(
 	IN BLEnum _Type,
-	IN BLVoid(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid));
+	IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid));
 
 BL_API BLVoid blInvokeEvent(
 	IN BLEnum _Type, 

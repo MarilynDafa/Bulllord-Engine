@@ -8964,7 +8964,7 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 		_DrawWidget(_iter, _x, _y);
 	}
 }
-static const BLVoid
+static const BLBool
 _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
 {
 	if (_Type == BL_ME_MOVE)
@@ -8985,7 +8985,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 			_WidgetScissorRect(_PrUIMem->pModalWidget, &_sarea);
 			BLRect _drawarea = blRectIntersects(&_PrUIMem->pModalWidget->sAbsRegion, &_sarea);
 			if (!blRectContains(&_drawarea, &_pos))
-				return;
+				return FALSE;
 		}
 		_BLWidget* _lasthovered = _PrUIMem->pHoveredWidget;
 		_PrUIMem->pHoveredWidget = _WidgetLocate(_PrUIMem->pRoot, _cx, _cy);
@@ -9017,8 +9017,10 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
 		{
 			_BLWidget* _wid = _PrUIMem->pFocusWidget;
-			while (_wid->bPenetration)
+			while (_wid && _wid->bPenetration)
 				_wid = _wid->pParent;
+			if (!_wid)
+				return FALSE;
 			switch (_wid->eType)
 			{
 			case BL_UT_PANEL:
@@ -9192,8 +9194,10 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 		if (!_PrUIMem->pFocusWidget && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible && _PrUIMem->pHoveredWidget->bInteractive)
 		{
 			_BLWidget* _wid = _PrUIMem->pHoveredWidget;
-			while (_wid->bPenetration)
+			while (_wid && _wid->bPenetration)
 				_wid = _wid->pParent;
+			if (!_wid)
+				return FALSE;
 			switch (_wid->eType)
 			{
 			case BL_UT_PANEL:
@@ -9365,6 +9369,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 			default:break;
 			}
 		}
+		return FALSE;
 	}
 	else if (_Type == BL_ME_LDOWN || _Type == BL_ME_RDOWN)
 	{
@@ -9384,7 +9389,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 			_WidgetScissorRect(_PrUIMem->pModalWidget, &_sarea);
 			BLRect _drawarea = blRectIntersects(&_PrUIMem->pModalWidget->sAbsRegion, &_sarea);
 			if (!blRectContains(&_drawarea, &_pos))
-				return;
+				return TRUE;
 		}
 		_BLWidget* _lasthovered = _PrUIMem->pHoveredWidget;
 		_PrUIMem->pHoveredWidget = _WidgetLocate(_PrUIMem->pRoot, _cx, _cy);
@@ -9424,8 +9429,10 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
 		{
 			_BLWidget* _wid = _PrUIMem->pFocusWidget;
-			while (_wid->bPenetration)
+			while (_wid && _wid->bPenetration)
 				_wid = _wid->pParent;
+			if (!_wid)
+				return FALSE;
 			switch (_wid->eType)
 			{
 			case BL_UT_PANEL:
@@ -9552,8 +9559,10 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 		if (!_lastfocus && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible && _PrUIMem->pHoveredWidget->bInteractive)
 		{
 			_BLWidget* _wid = _PrUIMem->pHoveredWidget;
-			while (_wid->bPenetration)
+			while (_wid && _wid->bPenetration)
 				_wid = _wid->pParent;
+			if (!_wid)
+				return FALSE;
 			switch (_wid->eType)
 			{
 			case BL_UT_PANEL:
@@ -9678,6 +9687,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 			default:break;
 			}
 		}
+		return TRUE;
 	}
 	else if (_Type == BL_ME_LUP || _Type == BL_ME_RUP)
 	{
@@ -9697,14 +9707,16 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 			_WidgetScissorRect(_PrUIMem->pModalWidget, &_sarea);
 			BLRect _drawarea = blRectIntersects(&_PrUIMem->pModalWidget->sAbsRegion, &_sarea);
 			if (!blRectContains(&_drawarea, &_pos))
-				return;
+				return TRUE;
 		}
 		_BLWidget* _lastfocus = _PrUIMem->pFocusWidget;
 		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
 		{
 			_BLWidget* _wid = _PrUIMem->pFocusWidget;
-			while (_wid->bPenetration)
+			while (_wid && _wid->bPenetration)
 				_wid = _wid->pParent;
+			if (!_wid)
+				return FALSE;
 			switch (_wid->eType)
 			{
 			case BL_UT_PANEL:
@@ -9940,8 +9952,10 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 		if (!_lastfocus && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible && _PrUIMem->pHoveredWidget->bInteractive)
 		{
 			_BLWidget* _wid = _PrUIMem->pHoveredWidget;
-			while (_wid->bPenetration)
+			while (_wid && _wid->bPenetration)
 				_wid = _wid->pParent;
+			if (!_wid)
+				return FALSE;
 			switch (_wid->eType)
 			{
 			case BL_UT_PANEL:
@@ -10138,17 +10152,20 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 			default:break;
 			}
 		}
+		return TRUE;
 	}
 	else
 	{
 		BLBool _up = (BLBool)HIGU16(_UParam);
 		BLS32 _val = LOWU16(_UParam);
 		_BLWidget* _lastfocus = _PrUIMem->pFocusWidget;
-		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible)
+		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
 		{
 			_BLWidget* _wid = _PrUIMem->pFocusWidget;
-			while (_wid->bPenetration)
+			while (_wid && _wid->bPenetration)
 				_wid = _wid->pParent;
+			if (!_wid)
+				return FALSE;
 			if (_wid->eType == BL_UT_TEXT)
 			{
 				BLS32 _newmarkbegin = _wid->uExtension.sText.nSelectBegin;
@@ -10206,11 +10223,13 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 				_PrUIMem->bDirty = TRUE;
 			}
 		}
-		if (!_lastfocus && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible)
+		if (!_lastfocus && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible && _PrUIMem->pHoveredWidget->bInteractive)
 		{
 			_BLWidget* _wid = _PrUIMem->pHoveredWidget;
-			while (_wid->bPenetration)
+			while (_wid && _wid->bPenetration)
 				_wid = _wid->pParent;
+			if (!_wid)
+				return FALSE;
 			if (_wid->eType == BL_UT_TEXT)
 			{
 				BLS32 _newmarkbegin = _wid->uExtension.sText.nSelectBegin;
@@ -10268,18 +10287,22 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 				_PrUIMem->bDirty = TRUE;
 			}
 		}
+		return TRUE;
 	}
+	return FALSE;
 }
-static const BLVoid
+static const BLBool
 _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
 {
 	if (_Type == BL_ET_KEY)
 	{
-		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible)
+		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
 		{
 			_BLWidget* _wid = _PrUIMem->pFocusWidget;
-			while (_wid->bPenetration)
+			while (_wid && _wid->bPenetration)
 				_wid = _wid->pParent;
+			if (!_wid)
+				return FALSE;
 			if (BL_UT_TEXT == _wid->eType && _wid->uExtension.sText.nState)
 			{
 				_BLFont* _ft = NULL;
@@ -10293,8 +10316,6 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam,
 						}
 					}
 				}
-				if (!_ft)
-					return;
 				BLU16 _flag = 0;
 				if (_wid->uExtension.sText.bOutline)
 					_flag |= 0x000F;
@@ -10778,16 +10799,19 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam,
 				}
 			}
 			_PrUIMem->bDirty = TRUE;
+			return TRUE;
 		}
 	}
+	return FALSE;
 }
-static const BLVoid 
+static const BLBool
 _SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
 {
 	if (_UParam == BL_SE_RESOLUTION)
 	{
 		_PrUIMem->bDirty = TRUE;
 	}
+	return FALSE;
 }
 BLVoid
 _UIInit(BLBool _Profiler)
@@ -12567,6 +12591,16 @@ blUIFocus(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y)
 		}
 	}
 	_PrUIMem->pFocusWidget = _widget;
+}
+BLGuid 
+blUIGetFocus()
+{
+	return _PrUIMem->pFocusWidget;
+}
+BLGuid 
+blUIGetHoverd()
+{
+	return _PrUIMem->pHoveredWidget;
 }
 BLVoid
 blUIPanelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)

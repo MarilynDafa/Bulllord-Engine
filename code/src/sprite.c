@@ -181,7 +181,7 @@ _UseCustomCursor()
 	else
 		return FALSE;
 }
-static const BLVoid
+static const BLBool
 _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
 {
 	if (_Type == BL_ME_MOVE)
@@ -192,6 +192,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
             _PrSpriteMem->pCursor->sPos.fY = HIGU16(_UParam);
         }
 	}
+	return FALSE;
 }
 static BLVoid
 _AddToNodeList(_BLSpriteNode* _Node)
