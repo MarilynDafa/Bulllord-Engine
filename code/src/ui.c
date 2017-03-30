@@ -489,6 +489,8 @@ typedef struct _UIMember {
 	BLAnsi aDir[260];
 	BLAnsi aArchive[260];
 	FT_Library sFtLibrary;
+	BLGuid nFBO;
+	BLGuid nFBOTex;
 	BLGuid nUITech;
 	BLGuid nBlankTex;
 	BLU32 nFboWidth;
@@ -532,7 +534,7 @@ _WidgetLocate(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 				return _target;
 		}
 	}
-	if (_XPos >= _Node->sAbsRegion.sLT.fX && _XPos <= _Node->sAbsRegion.sRB.fX && _YPos >= _Node->sAbsRegion.sLT.fY && _Node->sAbsRegion.sRB.fX)
+	if (_XPos >= _Node->sAbsRegion.sLT.fX && _XPos <= _Node->sAbsRegion.sRB.fX && _YPos >= _Node->sAbsRegion.sLT.fY && _YPos <= _Node->sAbsRegion.sRB.fY)
 		_target = _Node;
 	return _target;
 }
@@ -3016,6 +3018,7 @@ _UnloadUI(BLVoid* _Src)
 			_tmp = _tmpnext;
 		}
 	}
+	if (_widget->pTagSheet)
 	{
 		FOREACH_DICT(_BLWidgetSheet*, _iter, _widget->pTagSheet)
 		{
@@ -8840,7 +8843,7 @@ _DrawPrimitive(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height
 	blDeleteGeometryBuffer(_geo);
 }
 static BLVoid
-_DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
+_DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLBool _BasePlate)
 {
 	BLF32 _x, _y, _w, _h;
 	if (_Node->pParent)
@@ -8915,7 +8918,10 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 		switch (_Node->eType)
 		{
 		case BL_UT_PANEL:
-			_DrawPanel(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+			if (_Node->uExtension.sPanel.bBasePlate && _BasePlate)
+				_DrawPanel(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+			else if (!_Node->uExtension.sPanel.bBasePlate && !_BasePlate)
+				_DrawPanel(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
 			break;
 		case BL_UT_LABEL:
 			_DrawLabel(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
@@ -8959,9 +8965,12 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 		_Node->sAbsRegion.sRB.fX = (BLF32)_PrUIMem->nFboWidth;
 		_Node->sAbsRegion.sRB.fY = (BLF32)_PrUIMem->nFboHeight;
 	}
-	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
+	if (!_BasePlate)
 	{
-		_DrawWidget(_iter, _x, _y);
+		FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
+		{
+			_DrawWidget(_iter, _x, _y, _BasePlate);
+		}
 	}
 }
 static const BLBool
@@ -9455,14 +9464,14 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					_wid->uExtension.sPanel.nScrollMin = -(BLS32)(_downc - _wid->sDimension.fY * 0.5f);
 					_wid->uExtension.sPanel.nScrollMax = -(BLS32)(_upc + _wid->sDimension.fY * 0.5f);
 				}
-				break;
+				return TRUE;
 			case BL_UT_BUTTON:
 				if (_wid->uExtension.sButton.nState)
 				{
 					_wid->uExtension.sButton.nState = 3;
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_SLIDER:
 				if (_wid->uExtension.sSlider.nState)
 				{
@@ -9507,13 +9516,13 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 						_wid->uExtension.sSlider.nDesiredPos = (BLS32)(_p / _w * (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue)) + _wid->uExtension.sSlider.nMinValue;
 					}
 				}
-				break;
+				return TRUE;
 			case BL_UT_DIAL:
 				if (!_wid->uExtension.sDial.bAngleCut)
 				{
 					_wid->uExtension.sDial.bDragging = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_TABLE:
 				{
 					_wid->uExtension.sTable.bDragging = FALSE;
@@ -9548,12 +9557,13 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 						_PrUIMem->bDirty = TRUE;
 					}
 				}
-				break;
+				return TRUE;
 			case BL_UT_LABEL:
 				_wid->uExtension.sLabel.bDragging = 1;
 				_wid->uExtension.sLabel.fDraggingPos = _cy;
-				break;
-			default:break;
+				return TRUE;
+			default:
+				return FALSE;
 			}
 		}
 		if (!_lastfocus && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible && _PrUIMem->pHoveredWidget->bInteractive)
@@ -9585,16 +9595,15 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					_wid->uExtension.sPanel.nScrollMin = -(BLS32)(_downc - _wid->sDimension.fY * 0.5f);
 					_wid->uExtension.sPanel.nScrollMax = -(BLS32)(_upc + _wid->sDimension.fY * 0.5f);
 				}
-				break;
+				return TRUE;
 			case BL_UT_BUTTON:
 				if (_wid->uExtension.sButton.nState)
 				{
 					_wid->uExtension.sButton.nState = 3;
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_SLIDER:
-				break;
 				if (_wid->uExtension.sSlider.nState)
 				{
 					BLVec2 _pos;
@@ -9638,20 +9647,20 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 						_wid->uExtension.sSlider.nDesiredPos = (BLS32)(_p / _w * (BLF32)(_wid->uExtension.sSlider.nMaxValue - _wid->uExtension.sSlider.nMinValue)) + _wid->uExtension.sSlider.nMinValue;
 					}
 				}
-				break;
+				return TRUE;
 			case BL_UT_DIAL:
 				if (!_wid->uExtension.sDial.bAngleCut)
 				{
 					_wid->uExtension.sDial.bDragging = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_TABLE:
 				{
 					_wid->uExtension.sTable.bDragging = FALSE;
 					_wid->uExtension.sTable.bSelecting = TRUE;
 					_wid->uExtension.sTable.fDraggingPos = _cy;
 				}
-				break;
+				return TRUE;
 			case BL_UT_TEXT:
 				if (_wid->uExtension.sText.nState == 1)
 				{
@@ -9679,15 +9688,15 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 						_PrUIMem->bDirty = TRUE;
 					}
 				}
-				break;
+				return TRUE;
 			case BL_UT_LABEL:
 				_wid->uExtension.sLabel.bDragging = 1;
 				_wid->uExtension.sLabel.fDraggingPos = _cy;
-				break;
-			default:break;
+				return TRUE;
+			default:
+				return FALSE;
 			}
 		}
-		return TRUE;
 	}
 	else if (_Type == BL_ME_LUP || _Type == BL_ME_RUP)
 	{
@@ -9731,7 +9740,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					_wid->uExtension.sPanel.bScrolling = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_BUTTON:
 				if (_wid->uExtension.sButton.nState)
 				{
@@ -9739,7 +9748,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					blInvokeEvent(BL_ET_UI, 0, _wid->eType, NULL, _wid->nID);
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_CHECK:
 				if (_wid->uExtension.sCheck.nState)
 				{
@@ -9747,6 +9756,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					blInvokeEvent(BL_ET_UI, _wid->uExtension.sCheck.nState - 1, _wid->eType, NULL, _wid->nID);
 					_PrUIMem->bDirty = TRUE;
 				}
+				return TRUE;
 			case BL_UT_SLIDER:
 				if (_wid->uExtension.sSlider.nState)
 				{
@@ -9763,14 +9773,14 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					_wid->uExtension.sSlider.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_DIAL:
 				if (!_wid->uExtension.sDial.bAngleCut && _wid->uExtension.sDial.bDragging)
 				{
 					_wid->uExtension.sDial.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_TABLE:
 				if (_wid->uExtension.sTable.bDragging)
 				{
@@ -9813,7 +9823,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					}
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_TEXT:
 				if (_wid->uExtension.sText.nState == 1)
 				{
@@ -9830,7 +9840,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 						_PrUIMem->bDirty = TRUE;
 					}
 				}
-				break;
+				return TRUE;
 			case BL_UT_LABEL:
 				if (_wid->uExtension.sLabel.bDragging == 2)
 					_wid->uExtension.sLabel.bDragging = 0;
@@ -9945,8 +9955,9 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 						}
 					}
 				}
-				break;
-			default:break;
+				return TRUE;
+			default:
+				return FALSE;
 			}
 		}
 		if (!_lastfocus && _PrUIMem->pHoveredWidget && _PrUIMem->pHoveredWidget->bVisible && _PrUIMem->pHoveredWidget->bInteractive)
@@ -9970,7 +9981,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					_wid->uExtension.sPanel.bScrolling = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_BUTTON:
 				if (_wid->uExtension.sButton.nState)
 				{
@@ -9978,7 +9989,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					blInvokeEvent(BL_ET_UI, 0, _wid->eType, NULL, _wid->nID);
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_CHECK:
 				if (_wid->uExtension.sCheck.nState)
 				{
@@ -9986,7 +9997,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					blInvokeEvent(BL_ET_UI, _wid->uExtension.sCheck.nState - 1, _wid->eType, NULL, _wid->nID);
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_SLIDER:
 				if (_wid->uExtension.sSlider.nState)
 				{
@@ -10003,21 +10014,21 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					_wid->uExtension.sSlider.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_DIAL:
 				if (!_wid->uExtension.sDial.bAngleCut && _wid->uExtension.sDial.bDragging)
 				{
 					_wid->uExtension.sDial.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_TABLE:
 				if (_wid->uExtension.sTable.bDragging)
 				{
 					_wid->uExtension.sTable.bDragging = FALSE;
 					_PrUIMem->bDirty = TRUE;
 				}
-				break;
+				return TRUE;
 			case BL_UT_TEXT:
 				if (_wid->uExtension.sText.nState == 1)
 				{
@@ -10034,7 +10045,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 						_PrUIMem->bDirty = TRUE;
 					}
 				}
-				break;
+				return TRUE;
 			case BL_UT_LABEL:
 				if (_wid->uExtension.sLabel.bDragging == 2)
 					_wid->uExtension.sLabel.bDragging = 0;
@@ -10148,11 +10159,11 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 						}
 					}
 				}
-				break;
-			default:break;
+				return TRUE;
+			default:
+				return FALSE;
 			}
 		}
-		return TRUE;
 	}
 	else
 	{
@@ -10287,7 +10298,6 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 				_PrUIMem->bDirty = TRUE;
 			}
 		}
-		return TRUE;
 	}
 	return FALSE;
 }
@@ -10797,9 +10807,9 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam,
 						_TextSplit(_wid, _ft, _flag);
 					_TextScroll(_wid);
 				}
+				return TRUE;
 			}
 			_PrUIMem->bDirty = TRUE;
-			return TRUE;
 		}
 	}
 	return FALSE;
@@ -10841,15 +10851,18 @@ _UIInit(BLBool _Profiler)
 	_PrUIMem->pFocusWidget = NULL;
     _PrUIMem->pFonts = blGenArray(TRUE);
 	_PrUIMem->nUITech = blGenTechnique("2D.bsl", NULL, FALSE, FALSE);
+	_PrUIMem->nFBO = blGenFrameBuffer();
 	_PrUIMem->bProfiler = _Profiler;
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-	_PrUIMem->nQuadGeo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"#@quadgeo@#"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, NULL, sizeof(BLF32) * 32, NULL, 0, BL_IF_INVALID);
+	_PrUIMem->nQuadGeo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"#@quadgeoui@#"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, NULL, sizeof(BLF32) * 32, NULL, 0, BL_IF_INVALID);
 	BLU32 _blankdata[] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
 	_PrUIMem->nBlankTex = blGenTexture(blHashUtf8((const BLUtf8*)"#@blanktex@#"), BL_TT_2D, BL_TF_RGBA8, FALSE, TRUE, FALSE, 1, 1, 2, 2, 1, (BLU8*)_blankdata);
 	BLU32 _width, _height;
 	BLF32 _rx, _ry;
     blGetWindowSize(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
+	_PrUIMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrUIMem->nFboWidth, _PrUIMem->nFboHeight, 1, NULL);
+	blFrameBufferAttach(_PrUIMem->nFBO, _PrUIMem->nFBOTex, 0, BL_CTF_IGNORE);
 	blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	blSubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
 	blSubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
@@ -11198,15 +11211,54 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 			_w = _pw;
 			_h = _ph;
 		}
+		_DrawWidget(_PrUIMem->pBasePlate, _x, _y, TRUE);
 	}
 	else
 	{
-		//if (_PrUIMem->bDirty)
+		if (_PrUIMem->bDirty)
 		{
-			_DrawWidget(_PrUIMem->pRoot, 0.f, 0.f);
+			blFrameBufferClear(_PrUIMem->nFBO, TRUE, FALSE, FALSE);
+			_DrawWidget(_PrUIMem->pRoot, 0.f, 0.f, FALSE);
+			blFrameBufferResolve(_PrUIMem->nFBO);
 			_PrUIMem->bDirty = FALSE;
 		}
-		///draw quad
+		BLF32 _vbo[] = {
+			PIXEL_ALIGNED_INTERNAL(0.f),
+			PIXEL_ALIGNED_INTERNAL(0.f),
+			1.f,
+			1.f,
+			1.f,
+			1.f,
+			0.f,
+			1.f,
+			PIXEL_ALIGNED_INTERNAL(_PrUIMem->nFboWidth),
+			PIXEL_ALIGNED_INTERNAL(0.f),
+			1.f,
+			1.f,
+			1.f,
+			1.f,
+			1.f,
+			1.f,
+			PIXEL_ALIGNED_INTERNAL(0.f),
+			PIXEL_ALIGNED_INTERNAL(_PrUIMem->nFboHeight),
+			1.f,
+			1.f,
+			1.f,
+			1.f,
+			0.f,
+			0.f,
+			PIXEL_ALIGNED_INTERNAL(_PrUIMem->nFboWidth),
+			PIXEL_ALIGNED_INTERNAL(_PrUIMem->nFboHeight),
+			1.f,
+			1.f,
+			1.f,
+			1.f,
+			1.f,
+			0.f
+		};	
+		blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nFBOTex, 0);
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 		static BLAnsi _fps[32] = { 0 };
 		if (_PrUIMem->bProfiler == 7)
 		{
@@ -11246,6 +11298,9 @@ _UIDestroy()
 	blUnsubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
 	blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	blDeleteGeometryBuffer(_PrUIMem->nQuadGeo);
+	blFrameBufferDetach(_PrUIMem->nFBO, 0, FALSE);
+	blDeleteTexture(_PrUIMem->nFBOTex);
+	blDeleteFrameBuffer(_PrUIMem->nFBO);
 	blDeleteTexture(_PrUIMem->nBlankTex);
 	blDeleteTechnique(_PrUIMem->nUITech);
 	blDeleteUI(_PrUIMem->pRoot->nID);
@@ -12596,12 +12651,12 @@ blUIFocus(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y)
 BLGuid 
 blUIGetFocus()
 {
-	return _PrUIMem->pFocusWidget;
+	return _PrUIMem->pFocusWidget->nID;
 }
 BLGuid 
 blUIGetHoverd()
 {
-	return _PrUIMem->pHoveredWidget;
+	return _PrUIMem->pHoveredWidget->nID;
 }
 BLVoid
 blUIPanelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
@@ -12681,7 +12736,10 @@ blUIPanelBasePlate(IN BLGuid _ID, IN BLBool _BasePlate)
 		_widget->uExtension.sPanel.bScrollable = FALSE;
 		_widget->uExtension.sPanel.bDragable = FALSE;
 		_widget->uExtension.sPanel.bModal = FALSE;
+		_PrUIMem->pBasePlate = _widget;
 	}
+	else
+		_PrUIMem->pBasePlate = NULL;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid

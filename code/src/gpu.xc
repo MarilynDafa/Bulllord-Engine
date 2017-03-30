@@ -141,7 +141,7 @@ typedef struct _FrameBuffer {
         BLU32 nFace;
     } aAttachments[8];
     _BLTextureBuffer* pDSAttachment;
-    BLU32 nAttachmentNum;
+    BLU32 nAttachmentIndex;
     BLU32 nWidth;
     BLU32 nHeight;
     union {
@@ -2796,9 +2796,6 @@ _GpuAnitIntervention()
 BLVoid 
 blVSync(IN BLBool _On)
 {
-	_BLFrameBuffer* _fbo = (_BLFrameBuffer*)malloc(sizeof(_BLFrameBuffer));
-	memset(_fbo, 0, sizeof(_BLFrameBuffer));
-	_fbo->nAttachmentNum = 0;
 #if defined(BL_GL_BACKEND)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
 	{
@@ -2929,7 +2926,7 @@ blGenFrameBuffer()
 {
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)malloc(sizeof(_BLFrameBuffer));
     memset(_fbo, 0, sizeof(_BLFrameBuffer));
-    _fbo->nAttachmentNum = 0;
+    _fbo->nAttachmentIndex = 0;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -2989,7 +2986,7 @@ blFrameBufferClear(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN 
     {
         if (_fbo)
         {
-            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+			GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
         }
         else
         {
@@ -3020,31 +3017,6 @@ blFrameBufferClear(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN 
 #endif
 }
 BLVoid
-blFrameBufferBind(IN BLGuid _FBO)
-{
-    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
-    if (!_fbo)
-        return;
-#if defined(BL_GL_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
-    {
-        GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
-    }
-#elif defined(BL_MTL_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
-    {
-    }
-#elif defined(BL_VK_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
-    {
-    }
-#elif defined(BL_DX_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
-    {
-    }
-#endif
-}
-BLVoid
 blFrameBufferResolve(IN BLGuid _FBO)
 {
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
@@ -3059,73 +3031,44 @@ blFrameBufferResolve(IN BLGuid _FBO)
             GL_CHECK_INTERNAL(glReadBuffer(GL_COLOR_ATTACHMENT0));
             GL_CHECK_INTERNAL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo->uData.sGL.nResolveHandle));
             GL_CHECK_INTERNAL(glBlitFramebuffer(0, 0, _fbo->nWidth, _fbo->nHeight, 0, 0, _fbo->nWidth, _fbo->nHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
-            GL_CHECK_INTERNAL(glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
-            GL_CHECK_INTERNAL(glReadBuffer(GL_NONE) );
+			GLenum _buffers[10];
+			BLU32 _idx = 0;
+			for (BLU32 _jdx = 0; _jdx < _fbo->nAttachmentIndex; ++_jdx)
+				_buffers[_idx++] = GL_COLOR_ATTACHMENT0 + _jdx;
+			if (_fbo->pDSAttachment)
+			{
+				if (_fbo->pDSAttachment->eTarget == BL_TF_D24S8)
+					_buffers[_idx++] = GL_DEPTH_STENCIL_ATTACHMENT;
+				else
+					_buffers[_idx++] = GL_DEPTH_ATTACHMENT;
+			}
+			GL_CHECK_INTERNAL(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, _idx, _buffers));
+			GL_CHECK_INTERNAL(glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+			GL_CHECK_INTERNAL(glReadBuffer(GL_NONE));
             GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
         }
-        if (_fbo->nAttachmentNum)
+        for (BLU32 _idx = 0; _idx < _fbo->nAttachmentIndex; ++_idx)
         {
-            for (BLU32 _idx = 0; _idx < _fbo->nAttachmentNum; ++_idx)
+            _BLTextureBuffer* _tex = _fbo->aAttachments[_idx].pAttachments;
+            if (_tex->nNumMips > 1)
             {
-                _BLTextureBuffer* _tex = _fbo->aAttachments[_idx].pAttachments;
-                if (_tex->nNumMips > 1)
+                GLenum _target = GL_TEXTURE_2D;
+                switch (_tex->eTarget)
                 {
-                    GLenum _target = GL_TEXTURE_2D;
-                    switch (_tex->eTarget)
-                    {
-                        case BL_TT_1D: _target = GL_TEXTURE_2D; break;
-                        case BL_TT_2D: _target = GL_TEXTURE_2D; break;
-                        case BL_TT_3D: _target = GL_TEXTURE_3D; break;
-                        case BL_TT_CUBE: _target = GL_TEXTURE_CUBE_MAP; break;
-                        case BL_TT_ARRAY1D: _target = GL_TEXTURE_2D_ARRAY; break;
-                        case BL_TT_ARRAY2D: _target = GL_TEXTURE_2D_ARRAY; break;
-                        case BL_TT_ARRAYCUBE: _target = GL_TEXTURE_CUBE_MAP_ARRAY; break;
-                        default:break;
-                    }
-                    GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
-                    GL_CHECK_INTERNAL(glGenerateMipmap(_target));
-                    GL_CHECK_INTERNAL(glBindTexture(_target, 0));
+                    case BL_TT_1D: _target = GL_TEXTURE_2D; break;
+                    case BL_TT_2D: _target = GL_TEXTURE_2D; break;
+                    case BL_TT_3D: _target = GL_TEXTURE_3D; break;
+                    case BL_TT_CUBE: _target = GL_TEXTURE_CUBE_MAP; break;
+                    case BL_TT_ARRAY1D: _target = GL_TEXTURE_2D_ARRAY; break;
+                    case BL_TT_ARRAY2D: _target = GL_TEXTURE_2D_ARRAY; break;
+                    case BL_TT_ARRAYCUBE: _target = GL_TEXTURE_CUBE_MAP_ARRAY; break;
+                    default:break;
                 }
+                GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
+                GL_CHECK_INTERNAL(glGenerateMipmap(_target));
+                GL_CHECK_INTERNAL(glBindTexture(_target, 0));
             }
         }
-    }
-#elif defined(BL_MTL_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
-    {
-    }
-#elif defined(BL_VK_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
-    {
-    }
-#elif defined(BL_DX_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
-    {
-    }
-#endif
-}
-BLVoid
-blFrameBufferDiscard(IN BLGuid _FBO, IN BLBool _DiscardColor, IN BLBool _DiscardDepth, IN BLBool _DiscardStencil)
-{
-    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
-    if (!_fbo)
-        return;
-#if defined(BL_GL_BACKEND)
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
-    {
-        GLenum _buffers[10];
-        BLU32 _idx = 0;
-        if (_DiscardColor)
-        {
-            for (BLU32 _jdx = 0; _jdx < _fbo->nAttachmentNum; ++_jdx)
-                _buffers[_idx++] = GL_COLOR_ATTACHMENT0 + _jdx;
-        }
-        if (_DiscardDepth && _DiscardStencil)
-            _buffers[_idx++] = GL_DEPTH_STENCIL_ATTACHMENT;
-        else if (_DiscardDepth && !_DiscardStencil)
-            _buffers[_idx++] = GL_DEPTH_ATTACHMENT;
-        else if (!_DiscardDepth && _DiscardStencil)
-            _buffers[_idx++] = GL_STENCIL_ATTACHMENT;
-        GL_CHECK_INTERNAL(glInvalidateFramebuffer(GL_FRAMEBUFFER, _idx, _buffers));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
@@ -3161,7 +3104,7 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
         GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
-        if (0 == _fbo->nAttachmentNum)
+        if (0 == _fbo->nAttachmentIndex)
         {
             _fbo->nWidth  = MAX_INTERNAL(_width  >> _Level, 1);
             _fbo->nHeight = MAX_INTERNAL(_height >> _Level, 1);
@@ -3169,11 +3112,11 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
         GLenum _attachment;
         if (_format < BL_TF_DS_UNKNOWN)
         {
-            _attachment = GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentNum;
-            _fbo->aAttachments[_fbo->nAttachmentNum].pAttachments = _tex;
-            _fbo->aAttachments[_fbo->nAttachmentNum].nFace = _CFace;
-            _fbo->aAttachments[_fbo->nAttachmentNum].nMip = _Level;
-            _fbo->nAttachmentNum++;
+            _attachment = GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentIndex;
+            _fbo->aAttachments[_fbo->nAttachmentIndex].pAttachments = _tex;
+            _fbo->aAttachments[_fbo->nAttachmentIndex].nFace = _CFace;
+            _fbo->aAttachments[_fbo->nAttachmentIndex].nMip = _Level;
+            _fbo->nAttachmentIndex++;
         }
         else if (_format == BL_TF_D24S8)
         {
@@ -3199,9 +3142,9 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
         }
         if (_tex->uData.sGL.nRTHandle && _tex->uData.sGL.nHandle)
         {
-            GL_CHECK_INTERNAL(glGenFramebuffers(1, &_tex->uData.sGL.nRTHandle));
-            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _tex->uData.sGL.nRTHandle));
-            for (BLU32 _idx = 0; _idx < _fbo->nAttachmentNum; ++_idx)
+            GL_CHECK_INTERNAL(glGenFramebuffers(1, &_fbo->uData.sGL.nResolveHandle));
+            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nResolveHandle));
+            for (BLU32 _idx = 0; _idx < _fbo->nAttachmentIndex; ++_idx)
             {
                 _tex = _fbo->aAttachments[_idx].pAttachments;
                 _attachment = GL_COLOR_ATTACHMENT0 + _idx;
@@ -3227,7 +3170,7 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
     {
     }
 #endif
-    return _fbo->nAttachmentNum;
+    return _fbo->nAttachmentIndex;
 }
 BLVoid
 blFrameBufferDetach(IN BLGuid _FBO, IN BLU32 _Index, IN BLBool _DepthStencil)

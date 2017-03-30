@@ -108,7 +108,7 @@ BL_API BLVoid blBlendState(
     
 BL_API BLGuid blGenFrameBuffer();
 
-BL_API BLVoid blDeleteFramebuffer(
+BL_API BLVoid blDeleteFrameBuffer(
 	IN BLGuid _FBO);
     
 BL_API BLVoid blFrameBufferClear(
@@ -116,18 +116,9 @@ BL_API BLVoid blFrameBufferClear(
     IN BLBool _ColorBit,
     IN BLBool _DepthBit,
     IN BLBool _StencilBit);
-
-BL_API BLVoid blFrameBufferBind(
-    IN BLGuid _FBO);
     
 BL_API BLVoid blFrameBufferResolve(
     IN BLGuid _FBO);
-    
-BL_API BLVoid blFrameBufferDiscard(
-    IN BLGuid _FBO,
-    IN BLBool _DiscardColor,
-    IN BLBool _DiscardDepth,
-    IN BLBool _DiscardStencil);
     
 BL_API BLU32 blFrameBufferAttach(
     IN BLGuid _FBO,
