@@ -264,7 +264,7 @@
     <ClCompile Include="..\..\code\src\array.c" />
     <ClCompile Include="..\..\code\src\audio.xc" />
     <ClCompile Include="..\..\code\src\dictionary.c" />
-    <ClCompile Include="..\..\code\src\gpu.xc" />
+    <ClCompile Include="..\..\code\src\gpu.cpp" />
     <ClCompile Include="..\..\code\src\internal.c" />
     <ClCompile Include="..\..\code\src\list.c" />
     <ClCompile Include="..\..\code\src\mathematics.c" />
@@ -276,7 +276,7 @@
     <ClCompile Include="..\..\code\src\utils.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\code\src\system.xc">
+    <ClCompile Include="..\..\code\src\system.cpp">
       <FileType>Document</FileType>
     </ClCompile>
   </ItemGroup>

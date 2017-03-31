@@ -236,7 +236,7 @@ typedef struct _Technique{
 			} sDX;
 #endif
 		} uData;
-    } aSamplerVars[16];
+    } aSamplerVars[8];
     union {
 #if defined(BL_GL_BACKEND)
         struct _GL {
@@ -587,14 +587,24 @@ _PipelineStateRefreshGL()
         {
             GL_CHECK_INTERNAL(glDisable(GL_POLYGON_OFFSET_FILL));
         }
-		BLF32 _rx, _ry;
-		BLU32 _w, _h, _aw, _ah;
-		blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
-		BLS32 _scissorx = (BLS32)(_PrGpuMem->sPipelineState.nScissorX * _rx);
-		BLS32 _scissory = (BLS32)((_ah - _PrGpuMem->sPipelineState.nScissorH - _PrGpuMem->sPipelineState.nScissorY) * _ry);
-		BLS32 _scissorw = (BLS32)(_PrGpuMem->sPipelineState.nScissorW * _rx);
-		BLS32 _scissorh = (BLS32)(_PrGpuMem->sPipelineState.nScissorH * _ry);
-        GL_CHECK_INTERNAL(glScissor(_scissorx, _scissory, _scissorw, _scissorh));
+		if (!_PrGpuMem->sPipelineState.nScissorW && !_PrGpuMem->sPipelineState.nScissorH)
+		{
+			BLF32 _rx, _ry;
+			BLU32 _w, _h, _aw, _ah;
+			blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+			GL_CHECK_INTERNAL(glScissor(0, 0, _w, _h));
+		}
+		else
+		{
+			BLF32 _rx, _ry;
+			BLU32 _w, _h, _aw, _ah;
+			blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+			BLS32 _scissorx = (BLS32)(_PrGpuMem->sPipelineState.nScissorX);
+			BLS32 _scissory = (BLS32)(_ah - _PrGpuMem->sPipelineState.nScissorH - _PrGpuMem->sPipelineState.nScissorY);
+			BLS32 _scissorw = (BLS32)(_PrGpuMem->sPipelineState.nScissorW);
+			BLS32 _scissorh = (BLS32)(_PrGpuMem->sPipelineState.nScissorH);
+			GL_CHECK_INTERNAL(glScissor(_scissorx, _scissory, _scissorw, _scissorh));
+		}
         _PrGpuMem->sPipelineState.bRasterStateDirty = FALSE;
     }
     if (_PrGpuMem->sPipelineState.bDSStateDirty)
@@ -2976,6 +2986,45 @@ blDeleteFrameBuffer(IN BLGuid _FBO)
     free(_fbo);
     blDeleteGuid(_FBO);
 }
+BLVoid 
+blBindFrameBuffer(IN BLGuid _FBO)
+{
+	_BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
+	BLU32 _w, _h, _aw, _ah;
+	BLF32 _rx, _ry;
+	blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+#if defined(BL_GL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+	{
+		if (_fbo)
+		{
+			GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+			_BLTextureBuffer* _tex = _fbo->aAttachments[0].pAttachments;
+			if (_tex)
+			{
+				GL_CHECK_INTERNAL(glViewport(0, 0, _tex->nWidth, _tex->nHeight));
+			}			
+		}
+		else
+		{
+			GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+			GL_CHECK_INTERNAL(glViewport(0, 0, _w, _h));
+		}
+	}
+#elif defined(BL_MTL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+	{
+	}
+#elif defined(BL_VK_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+	{
+	}
+#elif defined(BL_DX_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+	{
+	}
+#endif
+}
 BLVoid
 blFrameBufferClear(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN BLBool _StencilBit)
 {
@@ -2984,14 +3033,6 @@ blFrameBufferClear(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN 
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
-        if (_fbo)
-        {
-			GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
-        }
-        else
-        {
-            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-        }
         BLU32 _clearbuf = 0;
         if (_ColorBit)
             _clearbuf |= GL_COLOR_BUFFER_BIT;
@@ -3173,7 +3214,7 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
     return _fbo->nAttachmentIndex;
 }
 BLVoid
-blFrameBufferDetach(IN BLGuid _FBO, IN BLU32 _Index, IN BLBool _DepthStencil)
+blFrameBufferDetach(IN BLGuid _FBO, IN BLBool _DepthStencil)
 {
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
     if (!_fbo)
@@ -3181,35 +3222,37 @@ blFrameBufferDetach(IN BLGuid _FBO, IN BLU32 _Index, IN BLBool _DepthStencil)
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
-        if (_fbo->pDSAttachment && _DepthStencil)
-        {
-            GLenum _attachment;
-            if (_fbo->pDSAttachment->eTarget == BL_TF_D24S8)
-                _attachment = GL_DEPTH_STENCIL_ATTACHMENT;
-            else
-                _attachment = GL_DEPTH_ATTACHMENT;
-            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
-            GL_CHECK_INTERNAL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, _attachment, GL_RENDERBUFFER, 0));
-            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nResolveHandle));
-            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, _attachment, GL_TEXTURE_2D, 0, 0));
-            _fbo->pDSAttachment = NULL;
-        }
+		if (_fbo->pDSAttachment && _DepthStencil)
+		{
+			GLenum _attachment;
+			if (_fbo->pDSAttachment->eTarget == BL_TF_D24S8)
+				_attachment = GL_DEPTH_STENCIL_ATTACHMENT;
+			else
+				_attachment = GL_DEPTH_ATTACHMENT;
+			GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
+			GL_CHECK_INTERNAL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, _attachment, GL_RENDERBUFFER, 0));
+			GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nResolveHandle));
+			GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, _attachment, GL_TEXTURE_2D, 0, 0));
+			_fbo->pDSAttachment = NULL;
+		}
+		else
+			_fbo->nAttachmentIndex--;
         GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
-        _BLTextureBuffer* _tex = _fbo->aAttachments[_Index].pAttachments;
+        _BLTextureBuffer* _tex = _fbo->aAttachments[_fbo->nAttachmentIndex].pAttachments;
         if (_fbo->uData.sGL.nResolveHandle)
         {
-            GL_CHECK_INTERNAL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _Index, GL_RENDERBUFFER, 0));
+            GL_CHECK_INTERNAL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentIndex, GL_RENDERBUFFER, 0));
         }
         else
         {
-            GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_Index].nFace : GL_TEXTURE_2D;
-            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _Index, _target, 0, _fbo->aAttachments[_Index].nMip));
+            GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_fbo->nAttachmentIndex].nFace : GL_TEXTURE_2D;
+            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentIndex, _target, 0, _fbo->aAttachments[_fbo->nAttachmentIndex].nMip));
         }
         if (_fbo->uData.sGL.nResolveHandle)
         {
             GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nResolveHandle));
-            GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_Index].nFace : GL_TEXTURE_2D;
-            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _Index, _target, 0, _fbo->aAttachments[_Index].nMip));
+            GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_fbo->nAttachmentIndex].nFace : GL_TEXTURE_2D;
+            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentIndex, _target, 0, _fbo->aAttachments[_fbo->nAttachmentIndex].nMip));
         }
     }
 #elif defined(BL_MTL_BACKEND)
@@ -4226,11 +4269,14 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
     {
         memset(_tech->aUniformVars[_idx].aName, 0, 128 * sizeof(BLAnsi));
         _tech->aUniformVars[_idx].pVar = NULL;
-        memset(_tech->aSamplerVars[_idx].aName, 0, 128 * sizeof(BLAnsi));
-        _tech->aSamplerVars[_idx].pTex = NULL;
 		_tech->aUniformVars[_idx].uData.sGL.nHandle = 0xFFFFFFFF;
-		_tech->aSamplerVars[_idx].uData.sGL.nHandle = 0xFFFFFFFF;
     }
+	for (BLU32 _idx = 0; _idx < 8; ++_idx)
+	{
+		memset(_tech->aSamplerVars[_idx].aName, 0, 128 * sizeof(BLAnsi));
+		_tech->aSamplerVars[_idx].pTex = NULL;
+		_tech->aSamplerVars[_idx].uData.sGL.nHandle = 0xFFFFFFFF;
+	}
     BLU32 _hash = blHashUtf8((const BLUtf8*)_Filename);
     BLGuid _stream = INVALID_GUID;
     BLAnsi _path[260] = { 0 };
@@ -4573,7 +4619,7 @@ blTechSampler(IN BLGuid _Tech, IN BLAnsi* _Name, IN BLGuid _Tex, IN BLU32 _Unit)
     if (!_tech || !_tex)
         return;
     BLU32 _idx = 0;
-    for (_idx = 0; _idx < 16; ++_idx)
+    for (_idx = 0; _idx < 8; ++_idx)
     {
         if (_tech->aSamplerVars[_idx].aName[0] == 0)
         {
@@ -4632,8 +4678,10 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 				default:assert(0); break;
 				}
 			}
+			else
+				break;
 		}
-		for (BLU32 _idx = 0; _idx < 16; ++_idx)
+		for (BLU32 _idx = 0; _idx < 8; ++_idx)
 		{
 			if (_tech->aSamplerVars[_idx].aName[0])
 			{
@@ -4656,6 +4704,8 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 				GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
 				GL_CHECK_INTERNAL(glUniform1i(_tech->aSamplerVars[_idx].uData.sGL.nHandle, _tech->aSamplerVars[_idx].nUnit));
 			}
+			else
+				break;
 		}
 		GLenum _prim;
 		switch (_geo->eVBTopology)

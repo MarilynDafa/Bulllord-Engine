@@ -110,6 +110,9 @@ BL_API BLGuid blGenFrameBuffer();
 
 BL_API BLVoid blDeleteFrameBuffer(
 	IN BLGuid _FBO);
+
+BL_API BLVoid blBindFrameBuffer(
+	IN BLGuid _FBO);
     
 BL_API BLVoid blFrameBufferClear(
     IN BLGuid _FBO,
@@ -128,7 +131,6 @@ BL_API BLU32 blFrameBufferAttach(
 
 BL_API BLVoid blFrameBufferDetach(
     IN BLGuid _FBO,
-    IN BLU32 _Index,
     IN BLBool _DepthStencil);
 
 BL_API BLGuid blGenTexture(

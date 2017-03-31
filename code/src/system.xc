@@ -299,11 +299,12 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 			_GbSystemRunning = 1;
 		RECT _rc;
 		GetClientRect(_PrSystemMem->nHwnd, &_rc);
-		_PrSystemMem->sBoostParam.nScreenWidth = _rc.right - _rc.right;
+		_PrSystemMem->sBoostParam.nScreenWidth = _rc.right - _rc.left;
 		_PrSystemMem->sBoostParam.nScreenHeight = _rc.bottom - _rc.top;
 		GetWindowRect(_PrSystemMem->nHwnd, &_rc);
 		InvalidateRect(_PrSystemMem->nHwnd, &_rc, FALSE);
 		UpdateWindow(_PrSystemMem->nHwnd);
+		blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
 	}
 	break;
 	case WM_GETMINMAXINFO:
@@ -852,6 +853,7 @@ protected:
 	{
 		_PrSystemMem->sBoostParam.nScreenWidth = ((BLS32)(0.5f + (((BLF32)(_Sender->Bounds.Width) * (BLF32)Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi) / 96.f)));
 		_PrSystemMem->sBoostParam.nScreenHeight = ((BLS32)(0.5f + (((BLF32)(_Sender->Bounds.Height) * (BLF32)Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi) / 96.f)));
+		blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
 	}
 	BLVoid OnVisibilityChanged(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::VisibilityChangedEventArgs^ _Args)
 	{
@@ -1277,6 +1279,7 @@ _WndProc(XEvent* _Event)
     {
         _PrSystemMem->sBoostParam.nScreenWidth = _Event->xconfigure.width;
         _PrSystemMem->sBoostParam.nScreenHeight = _Event->xconfigure.height;
+		blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
     }
     break;
     case ClientMessage:
@@ -2154,6 +2157,7 @@ ANativeActivity_onCreate(ANativeActivity* _Activity, BLVoid* _State, size_t _Sta
     NSTrackingAreaOptions _options = NSTrackingMouseEnteredAndExited|NSTrackingActiveAlways|NSTrackingAssumeInside;
     _area = [[NSTrackingArea alloc] initWithRect:_view.bounds options:_options owner:_view userInfo:nil];
     [_view addTrackingArea:_area];
+	blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
 }
 - (BLVoid)close
 {
@@ -3173,7 +3177,7 @@ _SystemStep()
 		_aw = _PrSystemMem->sBoostParam.nScreenWidth;
 		_ah = _PrSystemMem->sBoostParam.nScreenHeight;
 	}
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah);
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0);
 	blFrameBufferClear(INVALID_GUID, TRUE, TRUE, TRUE);
     BLU32 _now = blSystemTicks();
     BLU32 _delta = _now - _PrSystemMem->nSysTime;

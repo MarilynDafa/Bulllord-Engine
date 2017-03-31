@@ -10819,6 +10819,13 @@ _SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, B
 {
 	if (_UParam == BL_SE_RESOLUTION)
 	{
+		blFrameBufferDetach(_PrUIMem->nFBO, FALSE);
+		blDeleteTexture(_PrUIMem->nFBOTex);
+		BLU32 _width, _height;
+		BLF32 _rx, _ry;
+		blGetWindowSize(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
+		_PrUIMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrUIMem->nFboWidth, _PrUIMem->nFboHeight, 1, NULL);
+		blFrameBufferAttach(_PrUIMem->nFBO, _PrUIMem->nFBOTex, 0, BL_CTF_IGNORE);
 		_PrUIMem->bDirty = TRUE;
 	}
 	return FALSE;
@@ -11119,8 +11126,12 @@ _UIUpdate(_BLWidget* _Node, BLU32 _Interval)
 BLVoid
 _UIStep(BLU32 _Delta, BLBool _Baseplate)
 {
-	BLF32 _screensz[2] = { 2.f / (BLF32)_PrUIMem->nFboWidth, 2.f / (BLF32)_PrUIMem->nFboHeight };
-	blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));	
+	BLU32 _width, _height;
+	BLF32 _rx, _ry;
+	blGetWindowSize(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
+	BLU8 _blendfactor[4] = { 0 };
+	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS);
+	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor);
 	if (_PrUIMem->nTimeInterval > 10)
 	{
 		_UIUpdate(_PrUIMem->pRoot, _PrUIMem->nTimeInterval);
@@ -11217,11 +11228,18 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 	{
 		if (_PrUIMem->bDirty)
 		{
+			blBindFrameBuffer(_PrUIMem->nFBO);
+			BLF32 _screensz[2] = { 2.f / (BLF32)_PrUIMem->nFboWidth, 2.f / (BLF32)_PrUIMem->nFboHeight };
+			blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 			blFrameBufferClear(_PrUIMem->nFBO, TRUE, FALSE, FALSE);
 			_DrawWidget(_PrUIMem->pRoot, 0.f, 0.f, FALSE);
 			blFrameBufferResolve(_PrUIMem->nFBO);
 			_PrUIMem->bDirty = FALSE;
 		}
+		blBindFrameBuffer(INVALID_GUID);
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0);
+		BLF32 _screensz[2] = { 2.f / (BLF32)_width, 2.f / (BLF32)_height };
+		blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 		BLF32 _vbo[] = {
 			PIXEL_ALIGNED_INTERNAL(0.f),
 			PIXEL_ALIGNED_INTERNAL(0.f),
@@ -11231,7 +11249,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 			1.f,
 			0.f,
 			1.f,
-			PIXEL_ALIGNED_INTERNAL(_PrUIMem->nFboWidth),
+			PIXEL_ALIGNED_INTERNAL(_width),
 			PIXEL_ALIGNED_INTERNAL(0.f),
 			1.f,
 			1.f,
@@ -11240,15 +11258,15 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 			1.f,
 			1.f,
 			PIXEL_ALIGNED_INTERNAL(0.f),
-			PIXEL_ALIGNED_INTERNAL(_PrUIMem->nFboHeight),
+			PIXEL_ALIGNED_INTERNAL(_height),
 			1.f,
 			1.f,
 			1.f,
 			1.f,
 			0.f,
 			0.f,
-			PIXEL_ALIGNED_INTERNAL(_PrUIMem->nFboWidth),
-			PIXEL_ALIGNED_INTERNAL(_PrUIMem->nFboHeight),
+			PIXEL_ALIGNED_INTERNAL(_width),
+			PIXEL_ALIGNED_INTERNAL(_height),
 			1.f,
 			1.f,
 			1.f,
@@ -11269,8 +11287,9 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 			_area.sLT.fX = _area.sLT.fY = 10;
 			_area.sRB.fX = 120;
 			_area.sRB.fY = 40;
+			BLRect _carea = { 0 };
 			BLU32 _color = (1000 / (_Delta ? _Delta : 1) <= 30) ? 0xFF0000FF : 0xFFFFFFFF;
-			_WriteText(_labelfps, "default", 24, BL_UA_LEFT, BL_UA_TOP, FALSE, &_area, &_area, _color, 1.f, 0, FALSE);
+			_WriteText(_labelfps, "default", 24, BL_UA_LEFT, BL_UA_TOP, FALSE, &_area, &_carea, _color, 1.f, 0, FALSE);
 			blDeleteUtf16Str((BLUtf16*)_labelfps);
 			_PrUIMem->bProfiler = 1;
 		}
@@ -11283,8 +11302,9 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 				_area.sLT.fX = _area.sLT.fY = 10;
 				_area.sRB.fX = 120;
 				_area.sRB.fY = 40;
+				BLRect _carea = { 0 };
 				BLU32 _color = (1000 / (_Delta ? _Delta : 1) <= 30) ? 0xFF0000FF : 0xFFFFFFFF;
-				_WriteText(_labelfps, "default", 24, BL_UA_LEFT, BL_UA_TOP, FALSE, &_area, &_area, _color, 1.f, 0, FALSE);
+				_WriteText(_labelfps, "default", 24, BL_UA_LEFT, BL_UA_TOP, FALSE, &_area, &_carea, _color, 1.f, 0, FALSE);
 				blDeleteUtf16Str((BLUtf16*)_labelfps);
 			}
 			_PrUIMem->bProfiler++;
@@ -11298,7 +11318,7 @@ _UIDestroy()
 	blUnsubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
 	blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	blDeleteGeometryBuffer(_PrUIMem->nQuadGeo);
-	blFrameBufferDetach(_PrUIMem->nFBO, 0, FALSE);
+	blFrameBufferDetach(_PrUIMem->nFBO, FALSE);
 	blDeleteTexture(_PrUIMem->nFBOTex);
 	blDeleteFrameBuffer(_PrUIMem->nFBO);
 	blDeleteTexture(_PrUIMem->nBlankTex);
