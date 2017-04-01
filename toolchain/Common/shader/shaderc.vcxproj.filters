@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="shaderc\libshaderc\include\shaderc\shaderc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc\include\shaderc\shaderc.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc\src\shaderc_private.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\compiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\counting_includer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\file_finder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\format.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\io.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\resources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\shader_stage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\spirv_tools_wrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\string_piece.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\universal_unistd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderc\libshaderc_util\include\libshaderc_util\version_profile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIRV-Cross\GLSL.std.450.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIRV-Cross\spirv.hpp">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIRV-Cross\spirv_cfg.hpp">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIRV-Cross\spirv_common.hpp">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIRV-Cross\spirv_cpp.hpp">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIRV-Cross\spirv_cross.hpp">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIRV-Cross\spirv_glsl.hpp">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIRV-Cross\spirv_hlsl.hpp">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPIRV-Cross\spirv_msl.hpp">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="shaderc\libshaderc\src\shaderc.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderc\libshaderc_util\src\compiler.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderc\libshaderc_util\src\file_finder.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderc\libshaderc_util\src\io.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderc\libshaderc_util\src\message.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderc\libshaderc_util\src\resources.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderc\libshaderc_util\src\shader_stage.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderc\libshaderc_util\src\spirv_tools_wrapper.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shaderc\libshaderc_util\src\version_profile.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIRV-Cross\spirv_cfg.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIRV-Cross\spirv_cpp.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIRV-Cross\spirv_cross.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIRV-Cross\spirv_glsl.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIRV-Cross\spirv_hlsl.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPIRV-Cross\spirv_msl.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

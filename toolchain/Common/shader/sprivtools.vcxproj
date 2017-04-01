@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FA5EEB00-7F2A-4C4B-A564-0A74B4008D5C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>sprivtools</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>.</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;SPIRV_WINDOWS;SPIRV_COLOR_TERMINAL;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>SPIRV-Tools;SPIRV-Tools\include;SPIRV-Tools\source;SPIRV-Tools\external\SPIRV-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;SPIRV_WINDOWS;SPIRV_COLOR_TERMINAL;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>SPIRV-Tools;SPIRV-Tools\include;SPIRV-Tools\source;SPIRV-Tools\external\SPIRV-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;SPIRV_WINDOWS;SPIRV_COLOR_TERMINAL;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>SPIRV-Tools;SPIRV-Tools\include;SPIRV-Tools\source;SPIRV-Tools\external\SPIRV-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;SPIRV_WINDOWS;SPIRV_COLOR_TERMINAL;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>SPIRV-Tools;SPIRV-Tools\include;SPIRV-Tools\source;SPIRV-Tools\external\SPIRV-Headers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SPIRV-Tools\source\assembly_grammar.h" />
+    <ClInclude Include="SPIRV-Tools\source\binary.h" />
+    <ClInclude Include="SPIRV-Tools\source\diagnostic.h" />
+    <ClInclude Include="SPIRV-Tools\source\enum_set.h" />
+    <ClInclude Include="SPIRV-Tools\source\enum_string_mapping.h" />
+    <ClInclude Include="SPIRV-Tools\source\extensions.h" />
+    <ClInclude Include="SPIRV-Tools\source\ext_inst.h" />
+    <ClInclude Include="SPIRV-Tools\source\instruction.h" />
+    <ClInclude Include="SPIRV-Tools\source\macro.h" />
+    <ClInclude Include="SPIRV-Tools\source\message.h" />
+    <ClInclude Include="SPIRV-Tools\source\name_mapper.h" />
+    <ClInclude Include="SPIRV-Tools\source\opcode.h" />
+    <ClInclude Include="SPIRV-Tools\source\operand.h" />
+    <ClInclude Include="SPIRV-Tools\source\parsed_operand.h" />
+    <ClInclude Include="SPIRV-Tools\source\print.h" />
+    <ClInclude Include="SPIRV-Tools\source\spirv_constant.h" />
+    <ClInclude Include="SPIRV-Tools\source\spirv_definition.h" />
+    <ClInclude Include="SPIRV-Tools\source\spirv_endian.h" />
+    <ClInclude Include="SPIRV-Tools\source\spirv_target_env.h" />
+    <ClInclude Include="SPIRV-Tools\source\spirv_validator_options.h" />
+    <ClInclude Include="SPIRV-Tools\source\table.h" />
+    <ClInclude Include="SPIRV-Tools\source\text.h" />
+    <ClInclude Include="SPIRV-Tools\source\text_handler.h" />
+    <ClInclude Include="SPIRV-Tools\source\util\bitutils.h" />
+    <ClInclude Include="SPIRV-Tools\source\util\hex_float.h" />
+    <ClInclude Include="SPIRV-Tools\source\util\parse_number.h" />
+    <ClInclude Include="SPIRV-Tools\source\util\string_utils.h" />
+    <ClInclude Include="SPIRV-Tools\source\validate.h" />
+    <ClInclude Include="SPIRV-Tools\source\val\basic_block.h" />
+    <ClInclude Include="SPIRV-Tools\source\val\construct.h" />
+    <ClInclude Include="SPIRV-Tools\source\val\decoration.h" />
+    <ClInclude Include="SPIRV-Tools\source\val\function.h" />
+    <ClInclude Include="SPIRV-Tools\source\val\instruction.h" />
+    <ClInclude Include="SPIRV-Tools\source\val\validation_state.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SPIRV-Tools\source\assembly_grammar.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\binary.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\diagnostic.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\disassemble.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\enum_string_mapping.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\extensions.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\ext_inst.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\libspirv.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\message.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\name_mapper.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\opcode.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\operand.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\parsed_operand.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\print.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\software_version.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\spirv_endian.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\spirv_target_env.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\spirv_validator_options.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\table.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\text.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\text_handler.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\util\parse_number.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\util\string_utils.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\validate.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\validate_capability.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\validate_cfg.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\validate_datarules.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\validate_decorations.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\validate_id.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\validate_instruction.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\validate_layout.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\validate_type_unique.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\val\basic_block.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\val\construct.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\val\function.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\val\instruction.cpp" />
+    <ClCompile Include="SPIRV-Tools\source\val\validation_state.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

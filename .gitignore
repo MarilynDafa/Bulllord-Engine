@@ -16,3 +16,7 @@
 *.res
 *.cache
 *.moc
+*.txt
+*.json
+*.lua
+*.xml

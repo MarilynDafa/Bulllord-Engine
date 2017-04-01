@@ -88,21 +88,21 @@ static unsigned int hash(const char*  _Str)
 	std::string extname = getEXName(_Str);
 	unsigned int _tag = 0;
 	if (extname == "bmg")
-		_tag = TEX_TAG_INTERNAL;
+	_tag = TEX_TAG_INTERNAL;
 	else if (extname == "mp3")
-		_tag = AUDIO_TAG_INTERNAL;
+	_tag = AUDIO_TAG_INTERNAL;
 	else if (extname == "wav")
-		_tag = AUDIO_TAG_INTERNAL;
+	_tag = AUDIO_TAG_INTERNAL;
 	else if (extname == "bfx")
-		_tag = UNC_TAG_INTERNAL;
+	_tag = UNC_TAG_INTERNAL;
 	else if (extname == "bui")
-		_tag = UNC_TAG_INTERNAL;
+	_tag = UNC_TAG_INTERNAL;
 	else if (extname == "bmd")
-		_tag = MODEL_TAG_INTERNAL;
+	_tag = MODEL_TAG_INTERNAL;
 	else if (extname == "bsk")
-		_tag = MODEL_TAG_INTERNAL;
+	_tag = MODEL_TAG_INTERNAL;
 	else
-		_tag = -1;*/
+	_tag = -1;*/
 
 	return _h;
 }
@@ -179,7 +179,7 @@ static unsigned char* queryFileData(const char* name, size_t& sz2_, size_t& osz)
 	sz2_ = sz2;
 	osz = sz;
 
-	
+
 	free(buf);
 	return buf2;
 }
@@ -310,7 +310,7 @@ bool Console::_exec_command(const std::vector<std::string>& args_)
 		{
 			_pack(args_[3], args_[4], files);
 		}
-	}	
+	}
 	else if (args_[1] == "patch")
 	{
 		addList.clear();
@@ -424,7 +424,7 @@ bool Console::_exec_command(const std::vector<std::string>& args_)
 		//std::string xx = args_[2].substr(0, args_[2].size() - 4);
 		//patch(args_[2].c_str(), (std::string("patch") + std::string(tmpbuf) + ".pat").c_str(), (xx + std::string(tmpbuf2) + ".bpk").c_str());
 
-	
+
 	}
 	else if (args_[1] == "query")
 	{
@@ -494,7 +494,7 @@ void Console::_pack(const std::string& filename, const std::string& version, con
 		std::string info("load file:");
 		info.append(files[i]);
 		print_info(info);
-		s_bpk_file_entry entry;		
+		s_bpk_file_entry entry;
 		entry.hashname = hash(files[i].c_str());
 		if (!check(entry.hashname, files[i]))
 		{
@@ -587,12 +587,12 @@ int Console::_queryBPK(const std::string& filename)
 	print_info("fourcc: 'B' 'P' 'K' '2'");
 	tmp = "version:";
 	char buf[256];
-	memset(buf,0, 256 * sizeof(char));
+	memset(buf, 0, 256 * sizeof(char));
 	sprintf(buf, "%.2f", (float)header.version / 100.0);
 	tmp.append(buf);
 	print_info(tmp);
 	tmp = "file num:";
-	memset(buf,0, 256 * sizeof(char));
+	memset(buf, 0, 256 * sizeof(char));
 	sprintf(buf, "%d", header.file_num);
 	tmp.append(buf);
 	print_info(tmp);
@@ -836,13 +836,13 @@ void Console::_queryPatch(const std::string& filename)
 
 	char buf[256];
 
-	memset(buf, 0,256 * sizeof(char));
+	memset(buf, 0, 256 * sizeof(char));
 	sprintf(buf, "%.2f", (float)header.src_version / 100.0);
 	std::string tmp = "src package version: ";
 	tmp.append(buf);
 	print_info(tmp);
 
-	memset(buf, 0,256 * sizeof(char));
+	memset(buf, 0, 256 * sizeof(char));
 	sprintf(buf, "%.2f", (float)header.dest_version / 100.0);
 	tmp = "dest package version: ";
 	tmp.append(buf);
@@ -866,7 +866,7 @@ void Console::_queryPatch(const std::string& filename)
 	//!有修改列表
 	if (header.modlist_num)
 	{
-		memset(buf,0, 256 * sizeof(char));
+		memset(buf, 0, 256 * sizeof(char));
 		strcpy(buf, QString::number(header.modlist_num).toStdString().c_str());
 		tmp = "this patch modify ";
 		tmp.append(buf);
@@ -881,7 +881,7 @@ void Console::_queryPatch(const std::string& filename)
 	//!有删除列表
 	if (header.dellist_num)
 	{
-		memset(buf,0, 256 * sizeof(char));
+		memset(buf, 0, 256 * sizeof(char));
 		strcpy(buf, QString::number(header.dellist_num).toStdString().c_str());
 		tmp = "this patch delete ";
 		tmp.append(buf);
@@ -930,4 +930,3 @@ void Console::writeListFile(const std::string& name)
 	}
 	sout.close();
 }
-

@@ -1,0 +1,1 @@
+"v2016.7-dev", "SPIRV-Tools v2016.7-dev a808df692d5545e602f04ea9abb595e52ee22253"
