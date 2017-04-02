@@ -86,7 +86,7 @@ bool IrLoader::AddInstruction(const spv_parsed_instruction_t* inst) {
     block_ = nullptr;
   } else {
     if (function_ == nullptr) {  // Outside function definition
-      SPIRV_ASSERT(consumer_, block_ == nullptr);
+//      SPIRV_ASSERT(consumer_, block_ == nullptr);
       if (opcode == SpvOpCapability) {
         module_->AddCapability(std::move(spv_inst));
       } else if (opcode == SpvOpExtension) {
@@ -109,8 +109,8 @@ bool IrLoader::AddInstruction(const spv_parsed_instruction_t* inst) {
                  opcode == SpvOpUndef) {
         module_->AddGlobalValue(std::move(spv_inst));
       } else {
-        SPIRV_UNIMPLEMENTED(consumer_,
-                            "unhandled inst type outside function defintion");
+ //       SPIRV_UNIMPLEMENTED(consumer_,
+//                            "unhandled inst type outside function defintion");
       }
     } else {
       if (block_ == nullptr) {  // Inside function but outside blocks

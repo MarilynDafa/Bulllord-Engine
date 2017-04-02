@@ -116,13 +116,13 @@ bool DefUseManager::ReplaceAllUsesWith(uint32_t before, uint32_t after) {
       if (it->inst->type_id() != 0 && it->operand_index == 0) {
         it->inst->SetResultType(after);
       } else if (it->inst->type_id() == 0) {
-        SPIRV_ASSERT(consumer_, false,
-                     "Result type id considered as use while the instruction "
-                     "doesn't have a result type id.");
+   //     SPIRV_ASSERT(consumer_, false,
+   //                  "Result type id considered as use while the instruction "
+   //                  "doesn't have a result type id.");
         (void)consumer_;  // Makes the compiler happy for release build.
       } else {
-        SPIRV_ASSERT(consumer_, false,
-                     "Trying setting the immutable result id.");
+     //   SPIRV_ASSERT(consumer_, false,
+     //                "Trying setting the immutable result id.");
       }
     } else {
       // Update an in-operand.

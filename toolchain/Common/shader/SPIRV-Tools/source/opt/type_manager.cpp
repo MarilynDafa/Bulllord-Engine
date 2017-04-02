@@ -162,17 +162,17 @@ Type* TypeManager::RecordIfTypeDefinition(
       type = new NamedBarrier();
       break;
     default:
-      SPIRV_UNIMPLEMENTED(consumer_, "unhandled type");
+//      SPIRV_UNIMPLEMENTED(consumer_, "unhandled type");
       break;
   }
 
   uint32_t id = inst.result_id();
   if (id == 0) {
-    SPIRV_ASSERT(consumer_, inst.opcode() == SpvOpTypeForwardPointer,
-                 "instruction without result id found");
+ //   SPIRV_ASSERT(consumer_, inst.opcode() == SpvOpTypeForwardPointer,
+//                 "instruction without result id found");
   } else {
-    SPIRV_ASSERT(consumer_, type != nullptr,
-                 "type should not be nullptr at this point");
+  //  SPIRV_ASSERT(consumer_, type != nullptr,
+  //               "type should not be nullptr at this point");
     id_to_type_[id].reset(type);
     type_to_id_[type] = id;
   }
@@ -206,16 +206,16 @@ void TypeManager::AttachIfTypeDecoration(const ir::Instruction& inst) {
       if (Struct* st = target_type->AsStruct()) {
         st->AddMemeberDecoration(index, std::move(data));
       } else {
-        SPIRV_UNIMPLEMENTED(consumer_, "OpMemberDecorate non-struct type");
+   //     SPIRV_UNIMPLEMENTED(consumer_, "OpMemberDecorate non-struct type");
       }
     } break;
     case SpvOpDecorationGroup:
     case SpvOpGroupDecorate:
     case SpvOpGroupMemberDecorate:
-      SPIRV_UNIMPLEMENTED(consumer_, "unhandled decoration");
+//      SPIRV_UNIMPLEMENTED(consumer_, "unhandled decoration");
       break;
     default:
-      SPIRV_UNREACHABLE(consumer_);
+ //     SPIRV_UNREACHABLE(consumer_);
       break;
   }
 }

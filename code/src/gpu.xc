@@ -103,6 +103,25 @@ typedef struct _PipelineState{
 #endif
     } uData;
 }_BLPipelineState;
+typedef struct _UniformBuffer {
+	union {
+#if defined(BL_GL_BACKEND)
+		struct _GL {
+			GLuint nHandle;
+		} sGL;
+#elif defined(BL_VK_BACKEND)
+		struct _VK {
+		} sVK;
+#elif defined(BL_MTL_BACKEND)
+		struct _MTL {
+		} sMTL;
+#elif defined(BL_DX_BACKEND)
+		struct _DX {
+		} sDX;
+#endif
+	} uData;
+	BLU32 nSize;
+} _BLUniformBuffer;
 typedef struct _TextureBuffer {
     BLEnum eTarget;
     BLEnum eFormat;
@@ -201,7 +220,8 @@ typedef struct _Technique{
 		union {
 #if defined(BL_GL_BACKEND)
 			struct _GL {
-				GLuint nHandle;
+				GLuint nIndices;
+				GLint nOffset;
 			} sGL;
 #elif defined(BL_VK_BACKEND)
 			struct _VK {
@@ -360,6 +380,7 @@ typedef struct _GpuMember {
     BLDictionary* pTextureCache;
     BLDictionary* pBufferCache;
 	BLDictionary* pTechCache;
+	_BLUniformBuffer* pUBO;
 #if defined(BL_PLATFORM_WIN32)
 	HGLRC sGLRC;
 	HDC sGLHDC;
@@ -1295,6 +1316,54 @@ _FillTextureFormatGL(BLEnum _BLFmt, GLenum* _IFmt, GLenum* _Fmt, GLenum* _Type, 
             break;
     }
 }
+static void
+_AllocUBO(_BLUniformBuffer* _UBO)
+{
+#if defined(BL_GL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+	{
+		GL_CHECK_INTERNAL(glGenBuffers(1, &_UBO->uData.sGL.nHandle));
+		GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, _UBO->uData.sGL.nHandle));
+		GL_CHECK_INTERNAL(glBufferData(GL_UNIFORM_BUFFER, _UBO->nSize, NULL, GL_DYNAMIC_DRAW));
+		GL_CHECK_INTERNAL(glBindBufferBase(GL_UNIFORM_BUFFER, 0, _UBO->uData.sGL.nHandle));
+	}
+#elif defined(BL_MTL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+	{
+	}
+#elif defined(BL_VK_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+	{
+	}
+#elif defined(BL_DX_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+	{
+	}
+#endif
+}
+static void
+_FreeUBO(_BLUniformBuffer* _UBO)
+{
+#if defined(BL_GL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+	{
+		GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, 0));
+		GL_CHECK_INTERNAL(glDeleteBuffers(1, &_UBO->uData.sGL.nHandle));
+	}
+#elif defined(BL_MTL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+	{
+	}
+#elif defined(BL_VK_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+	{
+	}
+#elif defined(BL_DX_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+	{
+	}
+#endif
+}
 #elif defined(BL_DX_BACKEND)
 static ID3D12GraphicsCommandList*
 _AllocCmdList()
@@ -1552,6 +1621,8 @@ _GpuIntervention(HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
 	_PrGpuMem->pBufferCache = blGenDict(TRUE);
 	_PrGpuMem->pTechCache = blGenDict(TRUE);
+	_PrGpuMem->pUBO = (_BLUniformBuffer*)malloc(sizeof(_BLUniformBuffer));	
+	_PrGpuMem->pUBO->nSize = 0;
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
 		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	BLBool _vkinited = FALSE;
@@ -1660,6 +1731,7 @@ _GpuSwapBuffer()
 BLVoid
 _GpuAnitIntervention(HWND _Hwnd)
 {
+	_FreeUBO(_PrGpuMem->pUBO);
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
 	{
 	}
@@ -1692,6 +1764,7 @@ _GpuAnitIntervention(HWND _Hwnd)
 	blDeleteDict(_PrGpuMem->pTechCache);
 	blDeleteDict(_PrGpuMem->pTextureCache);
 	blDeleteDict(_PrGpuMem->pBufferCache);
+	free(_PrGpuMem->pUBO);
 	free(_PrGpuMem);
 }
 #elif defined(BL_PLATFORM_UWP)
@@ -2363,12 +2436,22 @@ _GpuIntervention(Display* _Display, Window _Window, GLXFBConfig _Config, BLVoid*
 	_PrGpuMem->bVsync = _Vsync;
 	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
 	_PrGpuMem->nBackBufferIdx = 0;
-    _PrGpuMem->sHardwareCaps.nFuncSupported = 0;
-    for (BLU32 _idx = 0 ; _idx < BL_TF_COUNT ; ++_idx)
-        _PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
+	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
+	_PrGpuMem->pTextureCache = blGenDict(TRUE);
+	_PrGpuMem->pBufferCache = blGenDict(TRUE);
+	_PrGpuMem->pTechCache = blGenDict(TRUE);
 	_PrGpuMem->bCtxError = FALSE;
+	_PrGpuMem->pUBO = (_BLUniformBuffer*)malloc(sizeof(_BLUniformBuffer));
+	_PrGpuMem->pUBO->nSize = 0;
+	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
+		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	BLBool _vkinited = FALSE;
-    BLBool _gpuok = FALSE;
+	BLBool _gpuok = FALSE;
     if (_vkinited)
     {
         _PrGpuMem->sHardwareCaps.eApiType = BL_VULKAN_API;
@@ -2435,6 +2518,15 @@ _GpuSwapBuffer()
 BLVoid
 _GpuAnitIntervention()
 {
+	_FreeUBO(_PrGpuMem->pUBO);
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+	{
+	}
+	else
+	{
+		wglMakeCurrent(_PrGpuMem->sGLHDC, 0);
+		wglDeleteContext(_PrGpuMem->sGLRC);
+	}
 	{
 		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
@@ -2459,6 +2551,8 @@ _GpuAnitIntervention()
 	blDeleteDict(_PrGpuMem->pTechCache);
 	blDeleteDict(_PrGpuMem->pTextureCache);
 	blDeleteDict(_PrGpuMem->pBufferCache);
+	free(_PrGpuMem->pUBO);
+	free(_PrGpuMem);
 }
 #elif defined(BL_PLATFORM_ANDROID)
 BLVoid
@@ -2469,10 +2563,19 @@ _GpuIntervention(ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync
 	_PrGpuMem->bVsync = _Vsync;
 	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
 	_PrGpuMem->nBackBufferIdx = 0;
-    _PrGpuMem->sHardwareCaps.nFuncSupported = 0;
-    for (BLU32 _idx = 0 ; _idx < BL_TF_COUNT ; ++_idx)
-        _PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
-	_PrGpuMem->pEglConfig = _PrGpuMem->pEglContext = _PrGpuMem->pEglDisplay = _PrGpuMem->pEglSurface = 0;
+	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
+	_PrGpuMem->pTextureCache = blGenDict(TRUE);
+	_PrGpuMem->pBufferCache = blGenDict(TRUE);
+	_PrGpuMem->pTechCache = blGenDict(TRUE);
+	_PrGpuMem->pUBO = (_BLUniformBuffer*)malloc(sizeof(_BLUniformBuffer));
+	_PrGpuMem->pUBO->nSize = 0;
+	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
+		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	BLBool _vkinited = FALSE;
 	BLBool _gpuok = FALSE;
 	if (_vkinited)
@@ -2556,15 +2659,14 @@ _GpuSwapBuffer()
 BLVoid
 _GpuAnitIntervention()
 {
+	_FreeUBO(_PrGpuMem->pUBO);
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
 	{
 	}
 	else
 	{
-		eglMakeCurrent(_PrGpuMem->pEglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-		eglDestroySurface(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglSurface);
-		eglDestroyContext(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglContext);
-		eglTerminate(_PrGpuMem->pEglDisplay);
+		wglMakeCurrent(_PrGpuMem->sGLHDC, 0);
+		wglDeleteContext(_PrGpuMem->sGLRC);
 	}
 	{
 		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
@@ -2590,30 +2692,34 @@ _GpuAnitIntervention()
 	blDeleteDict(_PrGpuMem->pTechCache);
 	blDeleteDict(_PrGpuMem->pTextureCache);
 	blDeleteDict(_PrGpuMem->pBufferCache);
+	free(_PrGpuMem->pUBO);
 	free(_PrGpuMem);
 }
 #elif defined(BL_PLATFORM_OSX)
 BLVoid
 _GpuIntervention(NSView* _View, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
-    _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
-    _PrGpuMem->fPresentElapsed = 0.f;
-    _PrGpuMem->bVsync = _Vsync;
-    _PrGpuMem->nCurFramebufferHandle = 0xFFFF;
-    _PrGpuMem->nBackBufferIdx = 0;
-    _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
-    _PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
-    _PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-    _PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
-    _PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
-    _PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
-    _PrGpuMem->pTextureCache = blGenDict(TRUE);
-    _PrGpuMem->pBufferCache = blGenDict(TRUE);
-    _PrGpuMem->pTechCache = blGenDict(TRUE);
-    for (BLU32 _idx = 0 ; _idx < BL_TF_COUNT ; ++_idx)
-        _PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
-    _PrGpuMem->pGLC = nil;
-    BLBool _vkinited = FALSE;
+	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
+	_PrGpuMem->fPresentElapsed = 0.f;
+	_PrGpuMem->bVsync = _Vsync;
+	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
+	_PrGpuMem->nBackBufferIdx = 0;
+	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
+	_PrGpuMem->pTextureCache = blGenDict(TRUE);
+	_PrGpuMem->pBufferCache = blGenDict(TRUE);
+	_PrGpuMem->pTechCache = blGenDict(TRUE);
+	_PrGpuMem->pGLC = nil;
+	_PrGpuMem->pUBO = (_BLUniformBuffer*)malloc(sizeof(_BLUniformBuffer));
+	_PrGpuMem->pUBO->nSize = 0;
+	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
+		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
+	BLBool _vkinited = FALSE;
+	BLBool _gpuok = FALSE;
     if (_vkinited)
     {
         _PrGpuMem->sHardwareCaps.eApiType = BL_VULKAN_API;
@@ -2718,63 +2824,15 @@ _GpuSwapBuffer()
 BLVoid
 _GpuAnitIntervention()
 {
-    if (BL_GL_API == _PrGpuMem->sHardwareCaps.eApiType)
-    {
-        [NSOpenGLContext clearCurrentContext];
-        [_PrGpuMem->pGLC update];
-        [_PrGpuMem->pGLC release];
-    }
+	_FreeUBO(_PrGpuMem->pUBO);
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
-		{
-			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
-			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
-		}
 	}
+	else
 	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
-		{
-			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
-			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
-		}
+		wglMakeCurrent(_PrGpuMem->sGLHDC, 0);
+		wglDeleteContext(_PrGpuMem->sGLRC);
 	}
-	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
-		{
-			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
-			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
-		}
-	}
-	blDeleteDict(_PrGpuMem->pTechCache);
-    blDeleteDict(_PrGpuMem->pTextureCache);
-    blDeleteDict(_PrGpuMem->pBufferCache);
-    free(_PrGpuMem);
-}
-#elif defined(BL_PLATFORM_IOS)
-BLVoid
-_GpuIntervention(BLBool _Vsync)
-{
-    _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
-    _PrGpuMem->fPresentElapsed = 0.f;
-    _PrGpuMem->bVsync = _Vsync;
-    _PrGpuMem->nCurFramebufferHandle = 0xFFFF;
-    _PrGpuMem->nBackBufferIdx = 0;
-    _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
-    _PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
-    _PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-    _PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
-    _PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
-    _PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
-    _PrGpuMem->pTextureCache = blGenDict(TRUE);
-    _PrGpuMem->pBufferCache = blGenDict(TRUE);
-}
-BLVoid
-_GpuSwapBuffer()
-{
-}
-BLVoid
-_GpuAnitIntervention()
-{
 	{
 		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
@@ -2799,6 +2857,77 @@ _GpuAnitIntervention()
 	blDeleteDict(_PrGpuMem->pTechCache);
 	blDeleteDict(_PrGpuMem->pTextureCache);
 	blDeleteDict(_PrGpuMem->pBufferCache);
+	free(_PrGpuMem->pUBO);
+	free(_PrGpuMem);
+}
+#elif defined(BL_PLATFORM_IOS)
+BLVoid
+_GpuIntervention(BLBool _Vsync)
+{
+	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
+	_PrGpuMem->fPresentElapsed = 0.f;
+	_PrGpuMem->bVsync = _Vsync;
+	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
+	_PrGpuMem->nBackBufferIdx = 0;
+	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
+	_PrGpuMem->pTextureCache = blGenDict(TRUE);
+	_PrGpuMem->pBufferCache = blGenDict(TRUE);
+	_PrGpuMem->pTechCache = blGenDict(TRUE);
+	_PrGpuMem->pGLC = nil;
+	_PrGpuMem->pUBO = (_BLUniformBuffer*)malloc(sizeof(_BLUniformBuffer));
+	_PrGpuMem->pUBO->nSize = 0;
+	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
+		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
+	BLBool _vkinited = FALSE;
+	BLBool _gpuok = FALSE;
+}
+BLVoid
+_GpuSwapBuffer()
+{
+}
+BLVoid
+_GpuAnitIntervention()
+{
+	_FreeUBO(_PrGpuMem->pUBO);
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+	{
+	}
+	else
+	{
+		wglMakeCurrent(_PrGpuMem->sGLHDC, 0);
+		wglDeleteContext(_PrGpuMem->sGLRC);
+	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		{
+			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
+			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
+		}
+	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		{
+			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
+			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
+		}
+	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		{
+			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
+			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
+		}
+	}
+	blDeleteDict(_PrGpuMem->pTechCache);
+	blDeleteDict(_PrGpuMem->pTextureCache);
+	blDeleteDict(_PrGpuMem->pBufferCache);
+	free(_PrGpuMem->pUBO);
+	free(_PrGpuMem);
 }
 #else
 #   "error what's the fucking platform"
@@ -4269,7 +4398,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
     {
         memset(_tech->aUniformVars[_idx].aName, 0, 128 * sizeof(BLAnsi));
         _tech->aUniformVars[_idx].pVar = NULL;
-		_tech->aUniformVars[_idx].uData.sGL.nHandle = 0xFFFFFFFF;
+		_tech->aUniformVars[_idx].uData.sGL.nIndices = 0xFFFFFFFF;
     }
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 	{
@@ -4647,40 +4776,58 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 #if defined(BL_GL_BACKEND)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
 	{
-		GL_CHECK_INTERNAL(glUseProgram(_tech->uData.sGL.nHandle));
+		if (!_PrGpuMem->pUBO->nSize)
+		{
+			GLuint _uboidx = glGetUniformBlockIndex(_tech->uData.sGL.nHandle, "UBO");
+			GLint _size;
+			GL_CHECK_INTERNAL(glGetActiveUniformBlockiv(_tech->uData.sGL.nHandle, _uboidx, GL_UNIFORM_BLOCK_DATA_SIZE, &_size));
+			_PrGpuMem->pUBO->nSize = (BLU32)_size;
+			_AllocUBO(_PrGpuMem->pUBO);
+			GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, _PrGpuMem->pUBO->uData.sGL.nHandle));
+		}
+		else
+		{
+			GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, _PrGpuMem->pUBO->uData.sGL.nHandle));
+		}		
 		for (BLU32 _idx = 0; _idx < 16; ++_idx)
 		{
 			if (_tech->aUniformVars[_idx].aName[0])
 			{
-				if (_tech->aUniformVars[_idx].uData.sGL.nHandle == 0xFFFFFFFF)
-					_tech->aUniformVars[_idx].uData.sGL.nHandle = glGetUniformLocation(_tech->uData.sGL.nHandle, _tech->aUniformVars[_idx].aName);
 				void* _data = _tech->aUniformVars[_idx].pVar;
 				BLU32 _count = _tech->aUniformVars[_idx].nCount;
+				if (_tech->aUniformVars[_idx].uData.sGL.nIndices == 0xFFFFFFFF)
+				{
+					const GLchar* _name = _tech->aUniformVars[_idx].aName;
+					GL_CHECK_INTERNAL(glGetUniformIndices(_tech->uData.sGL.nHandle, 1, &_name, &_tech->aUniformVars[_idx].uData.sGL.nIndices));
+					GL_CHECK_INTERNAL(glGetActiveUniformsiv(_tech->uData.sGL.nHandle, _count, &_tech->aUniformVars[_idx].uData.sGL.nIndices, GL_UNIFORM_OFFSET, &_tech->aUniformVars[_idx].uData.sGL.nOffset));
+					GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, _PrGpuMem->pUBO->uData.sGL.nHandle));
+				}								
 				switch (_tech->aUniformVars[_idx].eType)
 				{
-				case BL_UB_S32X1: GL_CHECK_INTERNAL(glUniform1iv(_tech->aUniformVars[_idx].uData.sGL.nHandle, _count, (GLint*)_data)); break;
-				case BL_UB_S32X2: GL_CHECK_INTERNAL(glUniform2iv(_tech->aUniformVars[_idx].uData.sGL.nHandle, _count, (GLint*)_data)); break;
-				case BL_UB_S32X3: GL_CHECK_INTERNAL(glUniform3iv(_tech->aUniformVars[_idx].uData.sGL.nHandle, _count, (GLint*)_data)); break;
-				case BL_UB_S32X4: GL_CHECK_INTERNAL(glUniform4iv(_tech->aUniformVars[_idx].uData.sGL.nHandle, _count, (GLint*)_data)); break;
-				case BL_UB_F32X1: GL_CHECK_INTERNAL(glUniform1fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, _count, (GLfloat*)_data)); break;
-				case BL_UB_F32X2: GL_CHECK_INTERNAL(glUniform2fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, _count, (GLfloat*)_data)); break;
-				case BL_UB_F32X3: GL_CHECK_INTERNAL(glUniform3fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, _count, (GLfloat*)_data)); break;
-				case BL_UB_F32X4: GL_CHECK_INTERNAL(glUniform4fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, _count, (GLfloat*)_data)); break;
-				case BL_UB_MAT2: GL_CHECK_INTERNAL(glUniformMatrix2fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, 1, GL_FALSE, (GLfloat*)_data)); break;
-				case BL_UB_MAT3: GL_CHECK_INTERNAL(glUniformMatrix3fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, 1, GL_FALSE, (GLfloat*)_data)); break;
-				case BL_UB_MAT4: GL_CHECK_INTERNAL(glUniformMatrix4fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, 1, GL_FALSE, (GLfloat*)_data)); break;
-				case BL_UB_MAT2X3: GL_CHECK_INTERNAL(glUniformMatrix2x3fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, 1, GL_FALSE, (GLfloat*)_data)); break;
-				case BL_UB_MAT3X2: GL_CHECK_INTERNAL(glUniformMatrix3x2fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, 1, GL_FALSE, (GLfloat*)_data)); break;
-				case BL_UB_MAT2X4: GL_CHECK_INTERNAL(glUniformMatrix2x4fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, 1, GL_FALSE, (GLfloat*)_data)); break;
-				case BL_UB_MAT4X2: GL_CHECK_INTERNAL(glUniformMatrix4x2fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, 1, GL_FALSE, (GLfloat*)_data)); break;
-				case BL_UB_MAT3X4: GL_CHECK_INTERNAL(glUniformMatrix3x4fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, 1, GL_FALSE, (GLfloat*)_data)); break;
-				case BL_UB_MAT4X3: GL_CHECK_INTERNAL(glUniformMatrix4x3fv(_tech->aUniformVars[_idx].uData.sGL.nHandle, 1, GL_FALSE, (GLfloat*)_data)); break;
+				case BL_UB_S32X1: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 1 * sizeof(BLS32), (GLint*)_data)); break;
+				case BL_UB_S32X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 2 * sizeof(BLS32), (GLint*)_data)); break;
+				case BL_UB_S32X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 3 * sizeof(BLS32), (GLint*)_data)); break;
+				case BL_UB_S32X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 4 * sizeof(BLS32), (GLint*)_data)); break;
+				case BL_UB_F32X1: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 1 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_F32X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 2 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_F32X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 3 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_F32X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 5 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_MAT2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 4 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_MAT3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 9 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_MAT4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 16 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_MAT2X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 6 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_MAT3X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 6 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_MAT2X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 8 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_MAT4X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 8 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_MAT3X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 12 * sizeof(BLF32), (GLfloat*)_data)); break;
+				case BL_UB_MAT4X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 12* sizeof(BLF32), (GLfloat*)_data)); break;
 				default:assert(0); break;
 				}
 			}
 			else
 				break;
 		}
+		GL_CHECK_INTERNAL(glUseProgram(_tech->uData.sGL.nHandle));
 		for (BLU32 _idx = 0; _idx < 8; ++_idx)
 		{
 			if (_tech->aSamplerVars[_idx].aName[0])

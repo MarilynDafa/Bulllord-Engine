@@ -74,7 +74,7 @@ Pass::Status EliminateDeadConstantPass::Process(ir::Module* module) {
           }
           // The number of uses should never be less then 0, so it can not be
           // less than 1 before it decreases.
-          SPIRV_ASSERT(consumer(), use_counts[def_inst] > 0);
+//          SPIRV_ASSERT(consumer(), use_counts[def_inst] > 0);
           --use_counts[def_inst];
           if (!use_counts[def_inst]) {
             working_list.insert(def_inst);

@@ -87,7 +87,7 @@ inline uint32_t PassManager::NumPasses() const {
 }
 
 inline Pass* PassManager::GetPass(uint32_t index) const {
-  SPIRV_ASSERT(consumer_, index < passes_.size(), "index out of bound");
+  //SPIRV_ASSERT(consumer_, index < passes_.size(), "index out of bound");
   return passes_[index].get();
 }
 

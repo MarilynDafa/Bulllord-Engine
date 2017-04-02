@@ -41,35 +41,43 @@
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\Common\shader\shaderc\libshaderc_util\include;..\Common\shader\shaderc\libshaderc\include;..\Common\shader\glslang;..\Common\shader\SPIRV-Tools\include;..\Common\shader\shaderc\glslc\src;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;..\common\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Common\shader\SPIRV-Cross;..\Common\shader\shaderc\libshaderc_util\include;..\Common\shader\shaderc\libshaderc\include;..\Common\shader\glslang;..\Common\shader\SPIRV-Tools\include;..\Common\shader\shaderc\glslc\src;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;..\common\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;..\common\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;..\common\zlib;..\common\shader;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>zlib.lib;qtmaind.lib;Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslang.lib;shaderc.lib;sprivtools.lib;sprivtoolsopt.lib;zlib.lib;qtmaind.lib;Qt5Cored.lib;Qt5Xmld.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <DebugInformationFormat />
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\Common\shader\shaderc\libshaderc_util\include;..\Common\shader\shaderc\libshaderc\include;..\Common\shader\glslang;..\Common\shader\SPIRV-Tools\include;..\Common\shader\shaderc\glslc\src;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;..\common\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Common\shader\SPIRV-Cross;..\Common\shader\shaderc\libshaderc_util\include;..\Common\shader\shaderc\libshaderc\include;..\Common\shader\glslang;..\Common\shader\SPIRV-Tools\include;..\Common\shader\shaderc\glslc\src;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;..\common\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <Optimization>Disabled</Optimization>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;..\common\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;..\common\zlib;..\common\shader;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>zlib.lib;qtmain.lib;Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;glslang.lib;shaderc.lib;sprivtools.lib;sprivtoolsopt.lib;zlib.lib;qtmain.lib;Qt5Core.lib;Qt5Xml.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\shader\shaderc\glslc\src\dependency_info.cc" />
+    <ClCompile Include="..\Common\shader\shaderc\glslc\src\file.cc" />
+    <ClCompile Include="..\Common\shader\shaderc\glslc\src\file_compiler.cc" />
+    <ClCompile Include="..\Common\shader\shaderc\glslc\src\file_includer.cc" />
+    <ClCompile Include="..\Common\shader\shaderc\glslc\src\resource_parse.cc" />
+    <ClCompile Include="..\Common\shader\shaderc\glslc\src\shader_stage.cc" />
     <ClCompile Include="Console.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
     </ClCompile>
@@ -87,6 +95,21 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB  "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I.\..\common\zlib"</Command>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="MAINICON.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\shader\shaderc\glslc\src\dependency_info.h" />
+    <ClInclude Include="..\Common\shader\shaderc\glslc\src\file.h" />
+    <ClInclude Include="..\Common\shader\shaderc\glslc\src\file_compiler.h" />
+    <ClInclude Include="..\Common\shader\shaderc\glslc\src\file_includer.h" />
+    <ClInclude Include="..\Common\shader\shaderc\glslc\src\resource_parse.h" />
+    <ClInclude Include="..\Common\shader\shaderc\glslc\src\shader_stage.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ShaderCompiler.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
