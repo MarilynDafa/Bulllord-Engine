@@ -207,7 +207,7 @@ blUniqueUri()
 {
     BLAnsi _buf[128] = { 0 };
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-    sprintf(_buf, "%s_%zu", "BulllordEngineUniqueUriCount", _PrUtilsMem->nUriCount);
+    sprintf(_buf, "%s_%I32u", "BulllordEngineUniqueUriCount", _PrUtilsMem->nUriCount);
 #elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID)
     sprintf(_buf, "%s_%zu", "BulllordEngineUniqueUriCount", _PrUtilsMem->nUriCount);
 #else

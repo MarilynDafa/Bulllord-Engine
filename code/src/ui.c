@@ -7929,7 +7929,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 					{
 						if (_Node->uExtension.sTable.pCellText[_cellidx] && !strncmp(_Node->uExtension.sTable.pCellText[_cellidx], "#image", 6))
 						{
-							BLU32 _richlen = strlen((const BLAnsi*)_Node->uExtension.sTable.pCellText[_cellidx]);
+							BLU32 _richlen = (BLU32)strlen((const BLAnsi*)_Node->uExtension.sTable.pCellText[_cellidx]);
 							BLAnsi _dir[260] = { 0 };
 							BLAnsi _archive[260] = { 0 };
 							BLBool _parsearchive = FALSE;
@@ -13099,7 +13099,7 @@ blUILableText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _Tx
 			_flag |= 0xF000;
 		BLAnsi _tmp[256] = { 0 };
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		sprintf_s(_tmp, 256, "#font:%s:%d:%d##align:%s##color:%zu:-1#", _Font, _FontHeight, _flag, _align, _TxtColor);
+		sprintf_s(_tmp, 256, "#font:%s:%d:%d##align:%s##color:%I32u:-1#", _Font, _FontHeight, _flag, _align, _TxtColor);
 #elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID)
         sprintf(_tmp, "#font:%s:%d:%d##align:%s##color:%zu:-1#", _Font, _FontHeight, _flag, _align, _TxtColor);
 #else

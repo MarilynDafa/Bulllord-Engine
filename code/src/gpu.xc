@@ -276,99 +276,6 @@ typedef struct _Technique{
 }_BLTechnique;
 #if defined(BL_GL_BACKEND)
 #elif defined(BL_DX_BACKEND)
-typedef struct _CommandQueue {
-	struct _CommandList {
-		ID3D12GraphicsCommandList* pCommandList;
-		ID3D12CommandAllocator* pCommandAllocator;
-		HANDLE pEvent;
-	};
-	struct _RingBuffer {
-		BLU32 nSize;
-		BLU32 nCurrent;
-		BLU32 nWrite;
-		BLU32 nRead;
-	};
-	_CommandList aCommandList[256];
-	BLArray* pRelease[256];
-	_RingBuffer sControl;
-	ID3D12CommandQueue* pCommandQueue;
-	ID3D12Fence* pFence;
-	BLU64 nCurrentFence;
-	BLU64 nCompletedFence;
-}_BLCommandQueueDX;
-typedef struct _GenericBuffer {
-	D3D12_SHADER_RESOURCE_VIEW_DESC  sSrvd;
-	D3D12_UNORDERED_ACCESS_VIEW_DESC sUavd;
-	D3D12_GPU_VIRTUAL_ADDRESS nGpuVA;
-	D3D12_RESOURCE_STATES eState;
-	ID3D12Resource* pPtr;
-	BLU32 nSize;
-	BLU16 nFags;
-	BLU16 nDecl;
-	BLBool bDynamic;
-}_BLGenericBufferDX;
-typedef struct _ScratchBuffer {
-	ID3D12DescriptorHeap* pHeap;
-	ID3D12Resource* pUpload;
-	D3D12_GPU_VIRTUAL_ADDRESS nGpuVA;
-	D3D12_CPU_DESCRIPTOR_HANDLE sCpuHandle;
-	D3D12_GPU_DESCRIPTOR_HANDLE sGpuHandle;
-	BLU8* pData;
-	BLU32 nIncrementSize;
-	BLU32 nPos;
-}_BLScrathBufferDX;
-typedef struct _SamplerBuffer {
-	ID3D12DescriptorHeap* pHeap;
-	D3D12_CPU_DESCRIPTOR_HANDLE sCpuHandle;
-	D3D12_GPU_DESCRIPTOR_HANDLE sGpuHandle;
-	BLU32 nIncrementSize;
-	BLU16 nDescriptorsPerBlock;
-}_BLSamplerBufferDX;
-typedef struct _BatchBuffer {
-	struct _DrawVertexIndirectCommand {
-		D3D12_GPU_VIRTUAL_ADDRESS nCbv;
-		D3D12_VERTEX_BUFFER_VIEW aVbv[2];
-		D3D12_DRAW_ARGUMENTS sDraw;
-	};
-	struct _DrawIndexedIndirectCommand {
-		D3D12_GPU_VIRTUAL_ADDRESS nCbv;
-		D3D12_VERTEX_BUFFER_VIEW aVbv[2];
-		D3D12_INDEX_BUFFER_VIEW sIbv;
-		D3D12_DRAW_INDEXED_ARGUMENTS sDrawIndexed;
-	};
-	struct _Stats {
-		BLU32 nImmediate[2];
-		BLU32 nIndirect[2];
-	};
-	ID3D12CommandSignature* aCommandSignature[2];
-	_DrawIndexedIndirectCommand aCurrent;
-	_BLGenericBufferDX aIndirect[32];
-	_Stats sStats;
-	BLVoid* aCmds[2];
-	BLU32 aNum[2];
-	BLU32 nCurrIndirect;
-	BLU32 nMaxDrawPerBatch;
-	BLU32 nMinIndirect;
-	BLU32 nFlushPerBatch;
-}_BLBatchBufferDX;
-typedef struct _ShaderBuffer {
-	struct _Buffer {
-		BLU32 nSize;
-		BLU32 nPos;
-		BLU8 aBuffer[8];
-	} *sConstBuffer;
-	struct _Handle {
-		BLU32 nLoc;
-		BLU16 nCount;
-		BLU8 nType;
-	}aPredefined[UNIFORM_COUNT_INTERNAL];
-	BLVoid* pCode;
-	BLU32 nHash;
-	BLU16 nAttrMask[SHADERATR_COUNT_INTERNAL];
-	BLU16 nUniforms;
-	BLU16 nSize;
-	BLU8 nPredefined;
-}_BLShaderBufferDX;
 #endif
 typedef struct _GpuMember {
 	_BLHardwareCaps sHardwareCaps;
@@ -385,28 +292,6 @@ typedef struct _GpuMember {
 	HGLRC sGLRC;
 	HDC sGLHDC;
 #elif defined(BL_PLATFORM_UWP)
-	IDXGIFactory4* pDxgiFactory;
-	ID3D12Device* pDevice;
-	IDXGIAdapter3* pAdapter;
-	IDXGISwapChain1* pSwapChain;
-	ID3D12DescriptorHeap* pRtvHeap;
-	ID3D12DescriptorHeap* pDsvHeap;
-	ID3D12Resource* aBackColor[3];
-	ID3D12Resource* pDepthStencil;
-	ID3D12RootSignature* pRootSignature;
-	ID3D12GraphicsCommandList* pCommandList;
-	_BLGenericBufferDX aVertexBuffers[4096];
-	_BLGenericBufferDX aIndexBuffers[4096];
-	_BLShaderBufferDX aShaderBuffers[512];
-	_BLScrathBufferDX aScratchBuffer[3];
-	_BLFrameBufferDX aFrameBuffer[128];
-	_BLSamplerBufferDX sSamplerBuffer;
-	_BLCommandQueueDX sCmdQueue;
-	_BLUniformBuffer sUniformBuffer;
-	_BLBatchBufferDX sBatchBuffer;
-	BLDictionary* pPipelineState;
-	BLDictionary* pTextureDict;
-	BLU64 aBackBufferFence[3];
 #elif defined(BL_PLATFORM_OSX)
     NSOpenGLContext* pGLC;
 #elif defined(BL_PLATFORM_IOS)
@@ -1365,244 +1250,31 @@ _FreeUBO(_BLUniformBuffer* _UBO)
 #endif
 }
 #elif defined(BL_DX_BACKEND)
-static ID3D12GraphicsCommandList*
-_AllocCmdList()
-{
-    do
-    {
-        BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nRead - _PrGpuMem->sCmdQueue.sControl.nWrite + _PrGpuMem->sCmdQueue.sControl.nSize;
-        BLU32 _dist = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nRead - (BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nRead - _PrGpuMem->sCmdQueue.sControl.nWrite) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nRead - (BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite) >> 31)) - 1;
-        BLU32 _maxsz = ((_PrGpuMem->sCmdQueue.sControl.nSize - 1) & (((BLS32)_dist) >> 31)) | (_dist & ~(((BLS32)_dist) >> 31));
-        BLU32 _sizenosign = 1 & 0x7fffffff;
-        BLU32 _test = _sizenosign - _maxsz;
-        BLU32 _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
-        BLU32 _advance = _PrGpuMem->sCmdQueue.sControl.nWrite + _size;
-        BLU32 _write = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
-        _PrGpuMem->sCmdQueue.sControl.nWrite = _write;
-        if (_size == 0)
-        {
-            _BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nRead];
-            if (WAIT_OBJECT_0 == WaitForSingleObject(_cmdlist.pEvent, INFINITE))
-            {
-                CloseHandle(_cmdlist.pEvent);
-                _cmdlist.pEvent = NULL;
-                _PrGpuMem->sCmdQueue.nCompletedFence = _PrGpuMem->sCmdQueue.pFence->GetCompletedValue();
-                _PrGpuMem->sCmdQueue.pCommandQueue->Wait(_PrGpuMem->sCmdQueue.pFence, _PrGpuMem->sCmdQueue.nCompletedFence);
-                FOREACH_ARRAY(ID3D12Resource*, _iter, _PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead])
-                {
-                    _iter->Release();
-                }
-                blClearArray(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead]);
-                BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead + _PrGpuMem->sCmdQueue.sControl.nSize;
-                _maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31));
-                _sizenosign = 1 & 0x7fffffff;
-                _test = _sizenosign - _maxsz;
-                _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
-                _advance = _PrGpuMem->sCmdQueue.sControl.nRead + _size;
-                BLU32 _read = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
-                _PrGpuMem->sCmdQueue.sControl.nRead = _read;
-            }
-        }
-        else
-            break;
-    } while (1);
-    _BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nCurrent];
-    DX_CHECK_INTERNAL(_cmdlist.pCommandAllocator->Reset());
-    DX_CHECK_INTERNAL(_cmdlist.pCommandList->Reset(_cmdlist.pCommandAllocator, NULL));
-    return _cmdlist.pCommandList;
-}
-static BLU64
-_KickCmdList()
-{
-    _BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nCurrent];
-    DX_CHECK_INTERNAL(_cmdlist.pCommandList->Close());
-    ID3D12CommandList* _dx12cmdlist[] = { _cmdlist.pCommandList };
-    _PrGpuMem->sCmdQueue.pCommandQueue->ExecuteCommandLists(sizeof(_dx12cmdlist) / sizeof(_dx12cmdlist[0]), _dx12cmdlist);
-    _cmdlist.pEvent = CreateEventExW(NULL, NULL, 0, EVENT_ALL_ACCESS);
-    BLU64 _fence = _PrGpuMem->sCmdQueue.nCurrentFence++;
-    _PrGpuMem->sCmdQueue.pCommandQueue->Signal(_PrGpuMem->sCmdQueue.pFence, _fence);
-    _PrGpuMem->sCmdQueue.pFence->SetEventOnCompletion(_fence, _cmdlist.pEvent);
-    BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nWrite - _PrGpuMem->sCmdQueue.sControl.nCurrent + _PrGpuMem->sCmdQueue.sControl.nSize;
-    BLU32 _maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite - (BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nWrite - _PrGpuMem->sCmdQueue.sControl.nCurrent) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nWrite - (BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent) >> 31));
-    BLU32 _sizenosign = 1 & 0x7fffffff;
-    BLU32 _test = _sizenosign - _maxsz;
-    BLU32 _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
-    BLU32 _advance = _PrGpuMem->sCmdQueue.sControl.nCurrent + _size;
-    BLU32 _current = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
-    _PrGpuMem->sCmdQueue.sControl.nCurrent = _current;
-    return _fence;
-}
 static BLVoid
-_UpdateBuffer(_BLGenericBufferDX* _Buf, ID3D12GraphicsCommandList* _CommandList, BLU32 _Offset, BLU32 _Size, BLVoid* _Data)
+_PipelineStateRefreshDX()
 {
-    D3D12_RESOURCE_DESC _desc;
-    _desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    _desc.Alignment = 0;
-    _desc.Width = _Size;
-    _desc.Height = 1;
-    _desc.DepthOrArraySize = 1;
-    _desc.MipLevels = 1;
-    _desc.Format = DXGI_FORMAT_UNKNOWN;
-    _desc.SampleDesc.Count = 1;
-    _desc.SampleDesc.Quality = 0;
-    _desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    _desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-    ID3D12Resource* _staging;
-    D3D12_HEAP_PROPERTIES _hp = { D3D12_HEAP_TYPE_UPLOAD, D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
-    DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_hp, D3D12_HEAP_FLAG_NONE, &_desc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_ID3D12Resource, (BLVoid**)&_staging));
-    BLU8* _data;
-    DX_CHECK_INTERNAL(_staging->Map(0, NULL, (BLVoid**)&_data));
-    memcpy(_data, _Data, _Size);
-    _staging->Unmap(0, NULL);
-    D3D12_RESOURCE_STATES _state = D3D12_RESOURCE_STATE_COPY_DEST;
-    if (_Buf->eState != D3D12_RESOURCE_STATE_COPY_DEST)
-    {
-        _state = _Buf->eState;
-        D3D12_RESOURCE_BARRIER _barrier;
-        _barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        _barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        _barrier.Transition.pResource = const_cast<ID3D12Resource*>(_Buf->pPtr);
-        _barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        _barrier.Transition.StateBefore = _Buf->eState;
-        _barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-        _PrGpuMem->pCommandList->ResourceBarrier(1, &_barrier);
-        _Buf->eState = D3D12_RESOURCE_STATE_COPY_DEST;
-    }
-    _CommandList->CopyBufferRegion(_Buf->pPtr, _Offset, _staging, 0, _Size);
-    if (_Buf->eState != _state)
-    {
-        D3D12_RESOURCE_BARRIER _barrier;
-        _barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        _barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        _barrier.Transition.pResource = (ID3D12Resource*)(_Buf->pPtr);
-        _barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        _barrier.Transition.StateBefore = _Buf->eState;
-        _barrier.Transition.StateAfter = _state;
-        _PrGpuMem->pCommandList->ResourceBarrier(1, &_barrier);
-        _Buf->eState = _state;
-    }
-    blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _staging);
-}
-static BLVoid
-_CreateBuffer(_BLGenericBufferDX* _Buf, BLU32 _Size, BLVoid* _Data, BLU16 _Flags, BLBool _Vertex, BLU32 _Stride)
-{
-    _Buf->nSize = _Size;
-    _Buf->nFags = _Flags;
-    BLBool _needuav = 0 != (_Flags & (BUFFER_COMPUTE_WRITE_INTERNAL | BUFFER_DRAW_INDIRECT_INTERNAL));
-    BLBool _drawindirect = 0 != (_Flags & BUFFER_DRAW_INDIRECT_INTERNAL);
-    _Buf->bDynamic = (NULL == _Data || _needuav);
-    DXGI_FORMAT _format;
-    BLU32 _stride;
-    BLU32 _flags = _needuav	? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
-    if (_drawindirect)
-    {
-        _format = DXGI_FORMAT_R32G32B32A32_UINT;
-        _stride = 16;
-    }
-    else
-    {
-        BLU32 _uavformat = (_Flags & BUFFER_COMPUTE_FORMAT_MASK_INTERNAL) >> BUFFER_COMPUTE_FORMAT_SHIFT_INTERNAL;
-        if (0 == _uavformat)
-        {
-            if (_Vertex)
-            {
-                _format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-                _stride = 16;
-            }
-            else
-            {
-                if (0 == (_Flags & BUFFER_INDEX32_INTERNAL))
-                {
-                    _format = DXGI_FORMAT_R16_UINT;
-                    _stride = 2;
-                }
-                else
-                {
-                    _format = DXGI_FORMAT_R32_UINT;
-                    _stride = 4;
-                }
-            }
-        }
-        else
-        {
-            BLU32 _sub = (((_Flags & BUFFER_COMPUTE_TYPE_MASK_INTERNAL) >> BUFFER_COMPUTE_TYPE_SHIFT_INTERNAL) - 1);
-            BLU32 _le = -(_sub <= (BLU32)((_Flags & BUFFER_COMPUTE_TYPE_MASK_INTERNAL) >> BUFFER_COMPUTE_TYPE_SHIFT_INTERNAL));
-            BLU32 _uavtype = _sub & _le;
-            const DXGI_FORMAT _auavformat[][3] =
-            {
-                DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,
-                DXGI_FORMAT_R8_SINT,           DXGI_FORMAT_R8_UINT,            DXGI_FORMAT_UNKNOWN,
-                DXGI_FORMAT_R8G8_SINT,         DXGI_FORMAT_R8G8_UINT,          DXGI_FORMAT_UNKNOWN,
-                DXGI_FORMAT_R8G8B8A8_SINT,     DXGI_FORMAT_R8G8B8A8_UINT,      DXGI_FORMAT_UNKNOWN,
-                DXGI_FORMAT_R16_SINT,          DXGI_FORMAT_R16_UINT,           DXGI_FORMAT_R16_FLOAT ,
-                DXGI_FORMAT_R16G16_SINT,       DXGI_FORMAT_R16G16_UINT,        DXGI_FORMAT_R16G16_FLOAT,
-                DXGI_FORMAT_R16G16B16A16_SINT, DXGI_FORMAT_R16G16B16A16_UINT,  DXGI_FORMAT_R16G16B16A16_FLOAT,
-                DXGI_FORMAT_R32_SINT,          DXGI_FORMAT_R32_UINT,           DXGI_FORMAT_R32_FLOAT,
-                DXGI_FORMAT_R32G32_SINT,       DXGI_FORMAT_R32G32_UINT,        DXGI_FORMAT_R32G32_FLOAT,
-                DXGI_FORMAT_R32G32B32A32_SINT, DXGI_FORMAT_R32G32B32A32_UINT,  DXGI_FORMAT_R32G32B32A32_FLOAT
-            };
-            const BLU32 _auavstride[] =	{ 0, 1,	2, 4, 2, 4, 8, 4, 8, 16 };
-            _format = _auavformat[_uavformat][_uavtype];
-            _stride = _auavstride[_uavformat];
-        }
-    }
-    _stride = (0 == _Stride ? _stride : _Stride);
-    _Buf->sSrvd.Format = _format;
-    _Buf->sSrvd.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-    _Buf->sSrvd.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    _Buf->sSrvd.Buffer.FirstElement = 0;
-    _Buf->sSrvd.Buffer.NumElements = _Buf->nSize / _stride;
-    _Buf->sSrvd.Buffer.StructureByteStride = 0;
-    _Buf->sSrvd.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-    _Buf->sUavd.Format = _format;
-    _Buf->sUavd.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-    _Buf->sUavd.Buffer.FirstElement = 0;
-    _Buf->sUavd.Buffer.NumElements = _Buf->nSize / _stride;
-    _Buf->sUavd.Buffer.StructureByteStride = 0;
-    _Buf->sUavd.Buffer.CounterOffsetInBytes = 0;
-    _Buf->sUavd.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-    D3D12_RESOURCE_DESC _desc;
-    _desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    _desc.Alignment = 0;
-    _desc.Width = _Size;
-    _desc.Height = 1;
-    _desc.DepthOrArraySize = 1;
-    _desc.MipLevels = 1;
-    _desc.Format = DXGI_FORMAT_UNKNOWN;
-    _desc.SampleDesc.Count = 1;
-    _desc.SampleDesc.Quality = 0;
-    _desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-    _desc.Flags = D3D12_RESOURCE_FLAGS(_flags);
-    D3D12_HEAP_PROPERTIES _hp = { D3D12_HEAP_TYPE_DEFAULT,  D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
-    DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_hp, D3D12_HEAP_FLAG_NONE, &_desc, D3D12_RESOURCE_STATE_COMMON, NULL, IID_ID3D12Resource, (BLVoid**)&_Buf->pPtr));
-    _Buf->nGpuVA = _Buf->pPtr->GetGPUVirtualAddress();
-    if (_Buf->eState != (_drawindirect ? D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT : D3D12_RESOURCE_STATE_GENERIC_READ))
-    {
-        D3D12_RESOURCE_BARRIER _barrier;
-        _barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        _barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-        _barrier.Transition.pResource = (ID3D12Resource*)(_Buf->pPtr);
-        _barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        _barrier.Transition.StateBefore = _Buf->eState;
-        _barrier.Transition.StateAfter = (_drawindirect ? D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT : D3D12_RESOURCE_STATE_GENERIC_READ);
-        _PrGpuMem->pCommandList->ResourceBarrier(1, &_barrier);
-        _Buf->eState = (_drawindirect ? D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT : D3D12_RESOURCE_STATE_GENERIC_READ);
-    }
-    if (!_Buf->bDynamic)
-        _UpdateBuffer(_Buf, _PrGpuMem->pCommandList, 0, _Size, _Data);
-}
-static BLVoid
-_DestroyBuffer(_BLGenericBufferDX* _Buf)
-{
-    if (_Buf->pPtr)
-    {
-        blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _Buf->pPtr);
-        _Buf->bDynamic = FALSE;
-    }
 }
 #elif defined(BL_VK_BACKEND)
+#elif defined(BL_MTL_BACKEND)
 #else
 #endif
+static void
+_PipelineStateRefresh()
+{
+#if defined(BL_GL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+		_PipelineStateRefreshGL();
+#elif defined(BL_MTL_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+		_PipelineStateRefreshMTL();
+#elif defined(BL_VK_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+		_PipelineStateRefreshVK();
+#elif defined(BL_DX_BACKEND)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+		_PipelineStateRefreshDX();
+#endif
+}
 #if defined(BL_PLATFORM_WIN32)
 BLVoid
 _GpuIntervention(HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
@@ -1771,655 +1443,14 @@ _GpuAnitIntervention(HWND _Hwnd)
 BLVoid
 _GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
-	BLBool _gpuok = FALSE;
-	BLU32 _idx = 0;
-	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
-	_PrGpuMem->fPresentElapsed = 0.f;
-	_PrGpuMem->bVsync = _Vsync;
-	_PrGpuMem->nBackBufferIdx = 0;
-	_PrGpuMem->sHardwareCaps.eApiType = BL_DX_API;
-	_PrGpuMem->sHardwareCaps.nFuncSupported = CAP_COMPUTE_SHADER_INTERNAL;
-	_PrGpuMem->sCmdQueue.nCurrentFence = 0;
-	_PrGpuMem->sCmdQueue.nCompletedFence = 0;
-	_PrGpuMem->sCmdQueue.sControl.nCurrent = 0;
-	_PrGpuMem->sCmdQueue.sControl.nRead = 0;
-	_PrGpuMem->sCmdQueue.sControl.nWrite = 0;
-	_PrGpuMem->sCmdQueue.sControl.nSize = 256;
-	for (_idx = 0; _idx < 256 ; ++_idx)
-		_PrGpuMem->sCmdQueue.pRelease[_idx] = blGenArray(FALSE);
-	for (_idx = 0; _idx < 128; ++_idx)
-	{
-		_PrGpuMem->aFrameBuffer[_idx].pSwapChain = NULL;
-		_PrGpuMem->aFrameBuffer[_idx].nWidth = 0;
-		_PrGpuMem->aFrameBuffer[_idx].nHeight = 0;
-		_PrGpuMem->aFrameBuffer[_idx].nDenseIdx = 0xFFFF;
-		_PrGpuMem->aFrameBuffer[_idx].nNum = 0;
-		_PrGpuMem->aFrameBuffer[_idx].nNumTh = 0;
-		for (BLU32 _k = 0; _k < 8 ; ++_k)
-			_PrGpuMem->aFrameBuffer[_idx].aTexture[_k] = 0xFFFF;
-	}
-	_PrGpuMem->sSamplerBuffer.nDescriptorsPerBlock = 1;
-	_PrGpuMem->sBatchBuffer.nCurrIndirect = 0;
-	_PrGpuMem->sBatchBuffer.nMaxDrawPerBatch = 0;
-	_PrGpuMem->sBatchBuffer.nMinIndirect = 0;
-	_PrGpuMem->sBatchBuffer.nFlushPerBatch = 0;
-	memset(_PrGpuMem->sBatchBuffer.aNum, 0, sizeof(_PrGpuMem->sBatchBuffer.aNum));
-	for (_idx = 0; _idx < 32 ; ++_idx)
-	{
-		_PrGpuMem->sBatchBuffer.aIndirect[_idx].nDecl = -1;
-		_PrGpuMem->sBatchBuffer.aIndirect[_idx].pPtr = NULL;
-		_PrGpuMem->sBatchBuffer.aIndirect[_idx].eState = D3D12_RESOURCE_STATE_COMMON;
-		_PrGpuMem->sBatchBuffer.aIndirect[_idx].nSize = 0;
-		_PrGpuMem->sBatchBuffer.aIndirect[_idx].nFags = 0;
-		_PrGpuMem->sBatchBuffer.aIndirect[_idx].bDynamic = FALSE;
-	}
-	for (_idx = 0; _idx < 512; ++_idx)
-	{
-		_PrGpuMem->aShaderBuffers[_idx].pCode = NULL;
-		_PrGpuMem->aShaderBuffers[_idx].sConstBuffer = NULL;
-		_PrGpuMem->aShaderBuffers[_idx].nHash = 0;
-		_PrGpuMem->aShaderBuffers[_idx].nUniforms = 0;
-		_PrGpuMem->aShaderBuffers[_idx].nPredefined = 0;
-	}
-	for (_idx = 0; _idx < 4096; ++_idx)
-	{
-		_PrGpuMem->aVertexBuffers[_idx].nDecl = -1;
-		_PrGpuMem->aVertexBuffers[_idx].pPtr = NULL;
-		_PrGpuMem->aVertexBuffers[_idx].eState = D3D12_RESOURCE_STATE_COMMON;
-		_PrGpuMem->aVertexBuffers[_idx].nSize = 0;
-		_PrGpuMem->aVertexBuffers[_idx].nFags = 0;
-		_PrGpuMem->aVertexBuffers[_idx].bDynamic = FALSE;
-		_PrGpuMem->aIndexBuffers[_idx].nDecl = -1;
-		_PrGpuMem->aIndexBuffers[_idx].pPtr = NULL;
-		_PrGpuMem->aIndexBuffers[_idx].eState = D3D12_RESOURCE_STATE_COMMON;
-		_PrGpuMem->aIndexBuffers[_idx].nSize = 0;
-		_PrGpuMem->aIndexBuffers[_idx].nFags = 0;
-		_PrGpuMem->aIndexBuffers[_idx].bDynamic = FALSE;
-	}
-	_PrGpuMem->pTextureDict = blGenDict(FALSE);
-	_PrGpuMem->sUniformBuffer.pUniforms = blGenDict(FALSE);
-	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
-	_PrGpuMem->pPipelineState = blGenDict(FALSE);
-	DX_CHECK_INTERNAL(CreateDXGIFactory2(0, IID_PPV_ARGS(&(_PrGpuMem->pDxgiFactory))));
-	IDXGIAdapter3* _tmpadapter;
-	for (_idx = 0; DXGI_ERROR_NOT_FOUND != _PrGpuMem->pDxgiFactory->EnumAdapters(_idx, (IDXGIAdapter**)(&_tmpadapter)); ++_idx)
-	{
-		DXGI_ADAPTER_DESC2 _desc;
-		DX_CHECK_INTERNAL(_tmpadapter->GetDesc2(&_desc));
-		if (_desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
-			continue;
-		else
-		{
-			_PrGpuMem->pAdapter = _tmpadapter;
-			_tmpadapter = NULL;
-			break;
-		}
-    }
-#if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
-#   if defined(_DEBUG)
-	ID3D12Debug* _debug;
-	DX_CHECK_INTERNAL(D3D12GetDebugInterface(IID_ID3D12Debug, (BLVoid**)&_debug));
-	_debug->EnableDebugLayer();
-#   endif
-#endif
-	D3D_FEATURE_LEVEL _featurelevel[4] =
-	{
-		D3D_FEATURE_LEVEL_12_1,
-		D3D_FEATURE_LEVEL_12_0,
-		D3D_FEATURE_LEVEL_11_1,
-		D3D_FEATURE_LEVEL_11_0
-	};
-	for (_idx = 0; _idx < 4; ++_idx)
-	{
-		if (SUCCEEDED(D3D12CreateDevice(_PrGpuMem->pAdapter, _featurelevel[_idx], IID_ID3D12Device, (BLVoid**)&_PrGpuMem->pDevice)))
-		{
-			_gpuok = TRUE;
-			break;
-		}
-	}
-	if (!_gpuok)
-	{
-		DX_CHECK_INTERNAL(_PrGpuMem->pDxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&_PrGpuMem->pAdapter)));
-		if (_PrGpuMem->pAdapter)
-			if (SUCCEEDED(D3D12CreateDevice(_PrGpuMem->pAdapter, D3D_FEATURE_LEVEL_11_0, IID_ID3D12Device, (BLVoid**)&_PrGpuMem->pDevice)))
-				_gpuok = TRUE;
-		if (!_gpuok)
-		{
-			blDebugOutput("bulllord needs directx feature level 11.0 or above");
-			return;
-		}
-	}	
-	for (_idx = 0; DXGI_ERROR_NOT_FOUND != _PrGpuMem->pDxgiFactory->EnumAdapters(_idx, (IDXGIAdapter**)(&_tmpadapter)); ++_idx)
-	{
-		DXGI_ADAPTER_DESC2 _dsec;
-		_tmpadapter->GetDesc2(&_dsec);
-		if (_dsec.AdapterLuid.LowPart == _PrGpuMem->pDevice->GetAdapterLuid().LowPart  &&  _dsec.AdapterLuid.HighPart == _PrGpuMem->pDevice->GetAdapterLuid().HighPart)
-		{
-			_PrGpuMem->pAdapter = _tmpadapter;
-			_tmpadapter = NULL;
-			break;
-		}
-	}
-	D3D12_COMMAND_QUEUE_DESC _queuedesc;
-	_queuedesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-	_queuedesc.Priority = 0;
-	_queuedesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	_queuedesc.NodeMask = 1;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandQueue(&_queuedesc, IID_ID3D12CommandQueue, (BLVoid**)&_PrGpuMem->sCmdQueue.pCommandQueue));
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_ID3D12Fence, (BLVoid**)&_PrGpuMem->sCmdQueue.pFence));
-	for (_idx = 0; _idx < 256; ++_idx)
-	{
-		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_ID3D12CommandAllocator, (BLVoid**)&_PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandAllocator));
-		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, _PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandAllocator, NULL, IID_ID3D12GraphicsCommandList, (BLVoid**)&_PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandList));
-		DX_CHECK_INTERNAL(_PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandList->Close());
-	}
-	DXGI_SWAP_CHAIN_DESC1 _scd;
-	_scd.Width = _Width;
-	_scd.Height = _Height;
-	_scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	_scd.Stereo = FALSE;
-	_scd.SampleDesc.Count = 1;
-	_scd.SampleDesc.Quality = 0;
-	_scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	_scd.BufferCount = 3;
-	_scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-	_scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-#if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
-	_scd.Scaling = DXGI_SCALING_STRETCH;
-#else
-	_scd.Scaling = DXGI_SCALING_NONE;
-#endif
-	_scd.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDxgiFactory->CreateSwapChainForCoreWindow(_PrGpuMem->sCmdQueue.pCommandQueue, (IUnknown*)(_Hwnd), &_scd, NULL, &_PrGpuMem->pSwapChain));
-#ifdef _DEBUG
-	ID3D12InfoQueue* _infoqueue;
-	if (SUCCEEDED(_PrGpuMem->pDevice->QueryInterface(IID_ID3D12InfoQueue, (BLVoid**)&_infoqueue)))
-	{
-		_infoqueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, TRUE);
-		_infoqueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, TRUE);
-		_infoqueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, TRUE);
-		D3D12_INFO_QUEUE_FILTER _infofilter;
-		memset(&_infofilter, 0, sizeof(_infofilter));
-		D3D12_MESSAGE_CATEGORY _catlist[] =	{ D3D12_MESSAGE_CATEGORY_STATE_CREATION, D3D12_MESSAGE_CATEGORY_EXECUTION, };
-		_infofilter.DenyList.NumCategories = 2;
-		_infofilter.DenyList.pCategoryList = _catlist;
-		_infoqueue->PushStorageFilter(&_infofilter);
-		_infoqueue->Release();
-	}
-#endif
-	D3D12_DESCRIPTOR_HEAP_DESC _rtvdescheap;
-	_rtvdescheap.NumDescriptors = 3 + 8*128;
-	_rtvdescheap.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-	_rtvdescheap.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	_rtvdescheap.NodeMask = 1;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_rtvdescheap, IID_ID3D12DescriptorHeap, (BLVoid**)&_PrGpuMem->pRtvHeap));
-	D3D12_DESCRIPTOR_HEAP_DESC _dsvdescheap;
-	_dsvdescheap.NumDescriptors = 1	+ 128;
-	_dsvdescheap.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-	_dsvdescheap.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	_dsvdescheap.NodeMask = 1;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_dsvdescheap, IID_ID3D12DescriptorHeap, (BLVoid**)&_PrGpuMem->pDsvHeap));
-	for (_idx = 0; _idx < 3; ++_idx)
-	{
-		BLU32 _maxdesc = (4 << 10) + 128 + ((64 << 10) - 1);
-		_PrGpuMem->aScratchBuffer[_idx].nIncrementSize = _PrGpuMem->pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		D3D12_DESCRIPTOR_HEAP_DESC _desc;
-		_desc.NumDescriptors = _maxdesc;
-		_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		_desc.NodeMask = 1;
-		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_desc, IID_ID3D12DescriptorHeap, (BLVoid**)&_PrGpuMem->aScratchBuffer[_idx].pHeap));
-		D3D12_HEAP_PROPERTIES _hp = { D3D12_HEAP_TYPE_UPLOAD, D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
-		D3D12_RESOURCE_DESC _resdesc;
-		_resdesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		_resdesc.Alignment = 0;
-		_resdesc.Width = _maxdesc * 1024;
-		_resdesc.Height = 1;
-		_resdesc.DepthOrArraySize = 1;
-		_resdesc.MipLevels = 1;
-		_resdesc.Format = DXGI_FORMAT_UNKNOWN;
-		_resdesc.SampleDesc.Count = 1;
-		_resdesc.SampleDesc.Quality = 0;
-		_resdesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		_resdesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-		DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_hp, D3D12_HEAP_FLAG_NONE, &_resdesc, D3D12_RESOURCE_STATE_GENERIC_READ, NULL, IID_ID3D12Resource, (BLVoid**)&_PrGpuMem->aScratchBuffer[_idx].pUpload));
-		_PrGpuMem->aScratchBuffer[_idx].nGpuVA = _PrGpuMem->aScratchBuffer[_idx].pUpload->GetGPUVirtualAddress();
-		_PrGpuMem->aScratchBuffer[_idx].pUpload->Map(0, NULL, (BLVoid**)&_PrGpuMem->aScratchBuffer[_idx].pData);
-		_PrGpuMem->aScratchBuffer[_idx].nPos = 0;
-		_PrGpuMem->aScratchBuffer[_idx].sCpuHandle = _PrGpuMem->aScratchBuffer[_idx].pHeap->GetCPUDescriptorHandleForHeapStart();
-		_PrGpuMem->aScratchBuffer[_idx].sGpuHandle = _PrGpuMem->aScratchBuffer[_idx].pHeap->GetGPUDescriptorHandleForHeapStart();
-	}
-	_PrGpuMem->sSamplerBuffer.nDescriptorsPerBlock = 16;
-	_PrGpuMem->sSamplerBuffer.nIncrementSize = _PrGpuMem->pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
-	D3D12_DESCRIPTOR_HEAP_DESC _samplerdesc;
-	_samplerdesc.NumDescriptors = 1024;
-	_samplerdesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
-	_samplerdesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	_samplerdesc.NodeMask = 1;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateDescriptorHeap(&_samplerdesc, IID_ID3D12DescriptorHeap, (BLVoid**)&_PrGpuMem->sSamplerBuffer.pHeap));
-	_PrGpuMem->sSamplerBuffer.sCpuHandle = _PrGpuMem->sSamplerBuffer.pHeap->GetCPUDescriptorHandleForHeapStart();
-	_PrGpuMem->sSamplerBuffer.sGpuHandle = _PrGpuMem->sSamplerBuffer.pHeap->GetGPUDescriptorHandleForHeapStart();
-	D3D12_DESCRIPTOR_RANGE _descrange[] =
-	{
-		{ D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 16, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
-		{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV,     16, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
-		{ D3D12_DESCRIPTOR_RANGE_TYPE_CBV,     1,                                0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
-		{ D3D12_DESCRIPTOR_RANGE_TYPE_UAV,     16, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
-	};
-	D3D12_ROOT_PARAMETER _rootparam[] =
-	{
-		{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,{ { 1, &_descrange[0] } }, D3D12_SHADER_VISIBILITY_ALL },
-		{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,{ { 1, &_descrange[1] } }, D3D12_SHADER_VISIBILITY_ALL },
-		{ D3D12_ROOT_PARAMETER_TYPE_CBV,{ { 0, 0 } }, D3D12_SHADER_VISIBILITY_ALL },
-		{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,{ { 1, &_descrange[3] } }, D3D12_SHADER_VISIBILITY_ALL },
-	};
-	_rootparam[2].Descriptor.RegisterSpace = 0;
-	_rootparam[2].Descriptor.ShaderRegister = 0;
-	D3D12_ROOT_SIGNATURE_DESC _signature;
-	_signature.NumParameters = 4;
-	_signature.pParameters = _rootparam;
-	_signature.NumStaticSamplers = 0;
-	_signature.pStaticSamplers = NULL;
-	_signature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	ID3DBlob* _out;
-	ID3DBlob* _error;
-	DX_CHECK_INTERNAL(D3D12SerializeRootSignature(&_signature, D3D_ROOT_SIGNATURE_VERSION_1, &_out, &_error));
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateRootSignature(0, _out->GetBufferPointer(), _out->GetBufferSize(), IID_ID3D12RootSignature, (BLVoid**)&_PrGpuMem->pRootSignature));
-	for (_idx = 0; _idx < UNIFORM_COUNT_INTERNAL; ++_idx)
-	{
-		struct _BLUniformBuffer::_UniformInfo* _ele = (struct _BLUniformBuffer::_UniformInfo*)malloc(sizeof(struct _BLUniformBuffer::_UniformInfo));
-		_ele->eType = _idx;
-		_ele->nHandle = -1;
-		blDictInsert(_PrGpuMem->sUniformBuffer.pUniforms, _idx, _ele);
-	}
-	_PrGpuMem->sHardwareCaps.nMaxTextureSize = 16384;
-	_PrGpuMem->sHardwareCaps.nMaxFBAttachments = 8;
-	DXGI_FORMAT _orifmt[] = {
-		DXGI_FORMAT_BC1_UNORM, DXGI_FORMAT_BC3_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_SINT, DXGI_FORMAT_R8_UINT, DXGI_FORMAT_R8_SNORM, DXGI_FORMAT_R16_UNORM,
-		DXGI_FORMAT_R16_SINT, DXGI_FORMAT_R16_UNORM, DXGI_FORMAT_R16_FLOAT, DXGI_FORMAT_R16_SNORM, DXGI_FORMAT_R32_SINT, DXGI_FORMAT_R32_UINT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R8G8_UNORM,
-		DXGI_FORMAT_R8G8_SINT, DXGI_FORMAT_R8G8_UINT, DXGI_FORMAT_R8G8_SNORM, DXGI_FORMAT_R16G16_UNORM, DXGI_FORMAT_R16G16_SINT, DXGI_FORMAT_R16G16_UINT, DXGI_FORMAT_R16G16_FLOAT,
-		DXGI_FORMAT_R16G16_SNORM, DXGI_FORMAT_R32G32_SINT, DXGI_FORMAT_R32G32_UINT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R9G9B9E5_SHAREDEXP, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_SINT, DXGI_FORMAT_R8G8B8A8_UINT,
-		DXGI_FORMAT_R8G8B8A8_SNORM, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R16G16B16A16_SINT, DXGI_FORMAT_R16G16B16A16_UINT, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		DXGI_FORMAT_R16G16B16A16_SNORM, DXGI_FORMAT_R32G32B32A32_SINT, DXGI_FORMAT_R32G32B32A32_UINT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R10G10B10A2_UNORM,
-		DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16_TYPELESS, DXGI_FORMAT_R24G8_TYPELESS, DXGI_FORMAT_R24G8_TYPELESS, DXGI_FORMAT_R24G8_TYPELESS,
-		DXGI_FORMAT_R32_TYPELESS, DXGI_FORMAT_R32_TYPELESS, DXGI_FORMAT_R32_TYPELESS, DXGI_FORMAT_R24G8_TYPELESS
-	};
-	DXGI_FORMAT _srvfmt[] = {
-		DXGI_FORMAT_BC1_UNORM, DXGI_FORMAT_BC3_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8_UNORM, DXGI_FORMAT_R8_SINT, DXGI_FORMAT_R8_UINT, DXGI_FORMAT_R8_SNORM, DXGI_FORMAT_R16_UNORM,
-		DXGI_FORMAT_R16_SINT, DXGI_FORMAT_R16_UNORM, DXGI_FORMAT_R16_FLOAT, DXGI_FORMAT_R16_SNORM, DXGI_FORMAT_R32_SINT, DXGI_FORMAT_R32_UINT, DXGI_FORMAT_R32_FLOAT,
-		DXGI_FORMAT_R8G8_UNORM, DXGI_FORMAT_R8G8_SINT, DXGI_FORMAT_R8G8_UINT, DXGI_FORMAT_R8G8_SNORM, DXGI_FORMAT_R16G16_UNORM, DXGI_FORMAT_R16G16_SINT, DXGI_FORMAT_R16G16_UINT,
-		DXGI_FORMAT_R16G16_FLOAT, DXGI_FORMAT_R16G16_SNORM, DXGI_FORMAT_R32G32_SINT, DXGI_FORMAT_R32G32_UINT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R9G9B9E5_SHAREDEXP, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_SINT,
-		DXGI_FORMAT_R8G8B8A8_UINT, DXGI_FORMAT_R8G8B8A8_SNORM, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R16G16B16A16_SINT, DXGI_FORMAT_R16G16B16A16_UINT, DXGI_FORMAT_R16G16B16A16_FLOAT,
-		DXGI_FORMAT_R16G16B16A16_SNORM, DXGI_FORMAT_R32G32B32A32_SINT, DXGI_FORMAT_R32G32B32A32_UINT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R10G10B10A2_UNORM, DXGI_FORMAT_R11G11B10_FLOAT,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16_UNORM, DXGI_FORMAT_R24_UNORM_X8_TYPELESS, DXGI_FORMAT_R24_UNORM_X8_TYPELESS, DXGI_FORMAT_R24_UNORM_X8_TYPELESS, DXGI_FORMAT_R32_FLOAT,
-		DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R24_UNORM_X8_TYPELESS
-	};
-	DXGI_FORMAT _dsvfmt[] = {
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_D16_UNORM, DXGI_FORMAT_D24_UNORM_S8_UINT, DXGI_FORMAT_D24_UNORM_S8_UINT, DXGI_FORMAT_D24_UNORM_S8_UINT, DXGI_FORMAT_D32_FLOAT, DXGI_FORMAT_D32_FLOAT,
-		DXGI_FORMAT_D32_FLOAT, DXGI_FORMAT_D24_UNORM_S8_UINT
-	};
-	DXGI_FORMAT _srgbfmt[] = {
-		DXGI_FORMAT_BC1_UNORM_SRGB, DXGI_FORMAT_BC3_UNORM_SRGB, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN,
-		DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN
-	};
-	for (_idx = 0; _idx < BL_TF_COUNT; ++_idx)
-	{
-		BLU16 _support = 0;
-		DXGI_FORMAT _fmt = (_idx > BL_TF_DEPTH_UNKNOWN && _idx < BL_TF_COUNT) ? _dsvfmt[_idx] : _orifmt[_idx];
-		DXGI_FORMAT _sfmt = _srgbfmt[_idx];
-		if (DXGI_FORMAT_UNKNOWN != _fmt)
-		{
-			D3D12_FEATURE_DATA_FORMAT_SUPPORT _data;
-			_data.Format = _fmt;
-			if (SUCCEEDED(_PrGpuMem->pDevice->CheckFeatureSupport(D3D12_FEATURE_FORMAT_SUPPORT, &_data, sizeof(_data))))
-			{
-				_support |= 0 != (_data.Support1 & (0 | D3D12_FORMAT_SUPPORT1_TEXTURE2D)) ? BL_TS_2D : BL_TS_NONE;
-				_support |= 0 != (_data.Support1 & (0 | D3D12_FORMAT_SUPPORT1_TEXTURE3D)) ? BL_TS_3D : BL_TS_NONE;
-				_support |= 0 != (_data.Support1 & (0 | D3D12_FORMAT_SUPPORT1_TEXTURECUBE)) ? BL_TS_CUBE : BL_TS_NONE;
-				_support |= 0 != (_data.Support1 & (0 | D3D12_FORMAT_SUPPORT1_BUFFER | D3D12_FORMAT_SUPPORT1_IA_VERTEX_BUFFER | D3D12_FORMAT_SUPPORT1_IA_INDEX_BUFFER)) ? BL_TS_VERTEX : BL_TS_NONE;
-				_support |= 0 != (_data.Support1 & (0 | D3D12_FORMAT_SUPPORT1_SHADER_LOAD)) ? BL_TS_IMAGE : BL_TS_NONE;
-				_support |= 0 != (_data.Support1 & (0 | D3D12_FORMAT_SUPPORT1_RENDER_TARGET | D3D12_FORMAT_SUPPORT1_DEPTH_STENCIL)) ? BL_TS_FRAMEBUFFER : BL_TS_NONE;
-				if (0 != (_support & BL_TS_IMAGE))
-				{
-					_support &= ~BL_TS_IMAGE;
-					_data.Format = _orifmt[_idx];
-					DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CheckFeatureSupport(D3D12_FEATURE_FORMAT_SUPPORT, &_data, sizeof(_data)));
-					_support |= 0 != (_data.Support2 & (0 | D3D12_FORMAT_SUPPORT2_UAV_TYPED_LOAD | D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE)) ? BL_TS_IMAGE : BL_TS_NONE;
-				}
-			}
-		}
-		if (DXGI_FORMAT_UNKNOWN != _sfmt)
-		{
-			D3D12_FEATURE_DATA_FORMAT_SUPPORT _data;
-			_data.Format = _sfmt;
-			if (SUCCEEDED(_PrGpuMem->pDevice->CheckFeatureSupport(D3D12_FEATURE_FORMAT_SUPPORT, &_data, sizeof(_data))))
-			{
-				_support |= 0 != (_data.Support1 & (0 | D3D12_FORMAT_SUPPORT1_TEXTURE2D)) ? BL_TS_2D_SRGB : BL_TS_NONE;
-				_support |= 0 != (_data.Support1 & (0 | D3D12_FORMAT_SUPPORT1_TEXTURE3D)) ? BL_TS_3D_SRGB : BL_TS_NONE;
-				_support |= 0 != (_data.Support1 & (0 | D3D12_FORMAT_SUPPORT1_TEXTURECUBE)) ? BL_TS_CUBE_SRGB : BL_TS_NONE;
-			}
-		}
-		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = _support;
-	}
-	memset(_PrGpuMem->aBackBufferFence, 0, sizeof(_PrGpuMem->aBackBufferFence));
-	BLU32 _rtvdesc = _PrGpuMem->pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	for (_idx = 0; _idx < _scd.BufferCount; ++_idx)
-	{
-		D3D12_CPU_DESCRIPTOR_HANDLE _handle = _PrGpuMem->pRtvHeap->GetCPUDescriptorHandleForHeapStart();
-		_handle.ptr += _idx * _rtvdesc;
-		DX_CHECK_INTERNAL(_PrGpuMem->pSwapChain->GetBuffer(_idx, IID_ID3D12Resource, (BLVoid**)&_PrGpuMem->aBackColor[_idx]));
-		_PrGpuMem->pDevice->CreateRenderTargetView(_PrGpuMem->aBackColor[_idx], NULL, _handle);
-	}
-	D3D12_RESOURCE_DESC _backdsdesc;
-	_backdsdesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	_backdsdesc.Alignment = 0;
-	_backdsdesc.Width = _Width;
-	_backdsdesc.Height = _Height;
-	_backdsdesc.DepthOrArraySize = 1;
-	_backdsdesc.MipLevels = 0;
-	_backdsdesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	_backdsdesc.SampleDesc.Count = 1;
-	_backdsdesc.SampleDesc.Quality = 0;
-	_backdsdesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	_backdsdesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-	D3D12_CLEAR_VALUE _clearclr;
-	_clearclr.Format = _backdsdesc.Format;
-	_clearclr.DepthStencil.Depth = 1.0f;
-	_clearclr.DepthStencil.Stencil = 0;
-	D3D12_HEAP_PROPERTIES _dsvhp = { D3D12_HEAP_TYPE_DEFAULT,  D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommittedResource(&_dsvhp, D3D12_HEAP_FLAG_NONE, &_backdsdesc, D3D12_RESOURCE_STATE_COMMON, &_clearclr, IID_ID3D12Resource, (BLVoid**)&_PrGpuMem->pDepthStencil));
-	D3D12_DEPTH_STENCIL_VIEW_DESC _dsvdesc;
-	memset(&_dsvdesc, 0, sizeof(_dsvdesc));
-	_dsvdesc.Format = _backdsdesc.Format;
-	_dsvdesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	_dsvdesc.Flags = D3D12_DSV_FLAGS(0);
-	_PrGpuMem->pDevice->CreateDepthStencilView(_PrGpuMem->pDepthStencil, &_dsvdesc, _PrGpuMem->pDsvHeap->GetCPUDescriptorHandleForHeapStart());
-	_PrGpuMem->pCommandList = _AllocCmdList();
-	_PrGpuMem->sBatchBuffer.nMaxDrawPerBatch = 4 << 10;
-	_PrGpuMem->sBatchBuffer.nFlushPerBatch = 4 << 10;
-	_PrGpuMem->sBatchBuffer.nMinIndirect = 64;
-	D3D12_INDIRECT_ARGUMENT_DESC _drawvertexarg[] =
-	{
-		{ D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW,{ { 2 } } },
-		{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,{ { 0 } } },
-		{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,{ { 1 } } },
-		{ D3D12_INDIRECT_ARGUMENT_TYPE_DRAW,{ { 0 } } }
-	};
-	D3D12_COMMAND_SIGNATURE_DESC _drawvertexcmdsig ={ sizeof(_BLBatchBufferDX::_DrawVertexIndirectCommand), 4,_drawvertexarg, 1};
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandSignature(&_drawvertexcmdsig, _PrGpuMem->pRootSignature, IID_ID3D12CommandSignature, (BLVoid**)&_PrGpuMem->sBatchBuffer.aCommandSignature[0]));
-	D3D12_INDIRECT_ARGUMENT_DESC _drawindexedarg[] =
-	{
-		{ D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW,{ { 2 } } },
-		{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,{ { 0 } } },
-		{ D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW,{ { 1 } } },
-		{ D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW,{ { 0 } } },
-		{ D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED,{ { 0 } } },
-	};
-	D3D12_COMMAND_SIGNATURE_DESC _drawindexedcmdsig ={ sizeof(_BLBatchBufferDX::_DrawIndexedIndirectCommand), 5, _drawindexedarg, 1};
-	DX_CHECK_INTERNAL(_PrGpuMem->pDevice->CreateCommandSignature(&_drawindexedcmdsig, _PrGpuMem->pRootSignature, IID_ID3D12CommandSignature, (BLVoid**)&_PrGpuMem->sBatchBuffer.aCommandSignature[1]));
-	_PrGpuMem->sBatchBuffer.nCmds[0] = malloc((4 << 10) * sizeof(_BLBatchBufferDX::_DrawVertexIndirectCommand));
-	_PrGpuMem->sBatchBuffer.nCmds[1] = malloc((4 << 10) * sizeof(_BLBatchBufferDX::_DrawIndexedIndirectCommand));
-	for (_idx = 0; _idx < 32; ++_idx)
-		_CreateBuffer(&_PrGpuMem->sBatchBuffer.aIndirect[_idx], (4 << 10) * sizeof(_BLBatchBufferDX::_DrawIndexedIndirectCommand), NULL, BUFFER_DRAW_INDIRECT_INTERNAL, FALSE, sizeof(_BLBatchBufferDX::_DrawIndexedIndirectCommand));
 }
 BLVoid
 _GpuSwapBuffer()
 {
-	if (_Overdrive)
-	{
-	}
-	else
-	{
-
-		if (_PrGpuMem->pSwapChain)
-		{
-			HRESULT _hr = 0;
-			BLF32 _start = blSystemSecTime();
-			for (BLU32 _idx = 0; _idx < 128; ++_idx)
-			{
-				if (_PrGpuMem->aFrameBuffer[_idx].pSwapChain)
-					_hr = _PrGpuMem->aFrameBuffer[_idx].pSwapChain->Present(_PrGpuMem->bVsync ? 1 : 0, 0);
-			}
-			if (SUCCEEDED(_hr))
-			{
-				do
-				{
-					BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead + _PrGpuMem->sCmdQueue.sControl.nSize;
-					BLU32 _maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31));
-					if (_maxsz)
-					{
-						_BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nRead];
-						if (WAIT_OBJECT_0 == WaitForSingleObject(_cmdlist.pEvent, INFINITE))
-						{
-							CloseHandle(_cmdlist.pEvent);
-							_cmdlist.pEvent = NULL;
-							_PrGpuMem->sCmdQueue.nCompletedFence = _PrGpuMem->sCmdQueue.pFence->GetCompletedValue();
-							_PrGpuMem->sCmdQueue.pCommandQueue->Wait(_PrGpuMem->sCmdQueue.pFence, _PrGpuMem->sCmdQueue.nCompletedFence);
-							FOREACH_ARRAY(ID3D12Resource*, _iter, _PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead])
-							{
-								_iter->Release();
-							}
-							blClearArray(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead]);
-							BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead + _PrGpuMem->sCmdQueue.sControl.nSize;
-							_maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31));
-							BLU32 _sizenosign = 1 & 0x7fffffff;
-							BLU32 _test = _sizenosign - _maxsz;
-							BLU32 _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
-							BLU32 _advance = _PrGpuMem->sCmdQueue.sControl.nRead + _size;
-							BLU32 _read = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
-							_PrGpuMem->sCmdQueue.sControl.nRead = _read;
-						}
-					}
-					if (_PrGpuMem->aBackBufferFence[(_PrGpuMem->nBackBufferIdx - 1) % 3U] <= _PrGpuMem->sCmdQueue.nCompletedFence)
-						return;
-				} while (1);
-				_hr = _PrGpuMem->pSwapChain->Present(_PrGpuMem->bVsync ? 1 : 0, 0);
-			}
-			_PrGpuMem->fPresentElapsed = blSystemSecTime() - _start;
-			if ((_hr == DXGI_ERROR_DEVICE_REMOVED) || (_hr == DXGI_ERROR_DEVICE_HUNG) || (_hr == DXGI_ERROR_DEVICE_RESET) || (_hr == DXGI_ERROR_DRIVER_INTERNAL_ERROR) || (_hr == DXGI_ERROR_NOT_CURRENTLY_AVAILABLE))
-				blDebugOutput("Directx Device Lost");
-		}
-	}
 }
 BLVoid
 _GpuAnitIntervention()
 {
-	BLU32 _idx = 0, _num;
-	free(_PrGpuMem->sBatchBuffer.nCmds[0]);
-	free(_PrGpuMem->sBatchBuffer.nCmds[1]);
-	_PrGpuMem->sBatchBuffer.aCommandSignature[0]->Release();
-	_PrGpuMem->sBatchBuffer.aCommandSignature[1]->Release();
-	for (_idx = 0; _idx < 32; ++_idx)
-	{
-		if (NULL != _PrGpuMem->sBatchBuffer.aIndirect[_idx].pPtr)
-		{
-			blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _PrGpuMem->sBatchBuffer.aIndirect[_idx].pPtr);
-			_PrGpuMem->sBatchBuffer.aIndirect[_idx].bDynamic = FALSE;
-		}
-	}
-	_KickCmdList();
-	do
-	{
-		BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead + _PrGpuMem->sCmdQueue.sControl.nSize;
-		BLU32 _maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31));
-		if (_maxsz)
-		{
-			_BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nRead];
-			if (WAIT_OBJECT_0 == WaitForSingleObject(_cmdlist.pEvent, INFINITE))
-			{
-				CloseHandle(_cmdlist.pEvent);
-				_cmdlist.pEvent = NULL;
-				_PrGpuMem->sCmdQueue.nCompletedFence = _PrGpuMem->sCmdQueue.pFence->GetCompletedValue();
-				_PrGpuMem->sCmdQueue.pCommandQueue->Wait(_PrGpuMem->sCmdQueue.pFence, _PrGpuMem->sCmdQueue.nCompletedFence);
-				FOREACH_ARRAY(ID3D12Resource*, _iter, _PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead])
-				{
-					_iter->Release();
-				}
-				blClearArray(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead]);
-				BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead + _PrGpuMem->sCmdQueue.sControl.nSize;
-				_maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31));
-				BLU32 _sizenosign = 1 & 0x7fffffff;
-				BLU32 _test = _sizenosign - _maxsz;
-				BLU32 _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
-				BLU32 _advance = _PrGpuMem->sCmdQueue.sControl.nRead + _size;
-				BLU32 _read = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
-				_PrGpuMem->sCmdQueue.sControl.nRead = _read;
-			}
-		}
-		else
-			break;
-	} while (1);
-	for (_idx = 0, _num = 3U; _idx < _num; ++_idx)
-		_PrGpuMem->aBackColor[_idx]->Release();
-	_PrGpuMem->pDepthStencil->Release();
-	_PrGpuMem->sSamplerBuffer.pHeap->Release();
-	for (_idx = 0; _idx < 3U; ++_idx)
-	{
-		_PrGpuMem->aScratchBuffer[_idx].pUpload->Unmap(0, NULL);
-		_PrGpuMem->aScratchBuffer[_idx].pUpload->Release();
-		_PrGpuMem->aScratchBuffer[_idx].pHeap->Release();
-	}
-	{
-		FOREACH_DICT(ID3D12PipelineState*, _iter, _PrGpuMem->pPipelineState)
-		{
-			_iter->AddRef();
-			BLU32 _ref = _iter->Release();
-			assert(_ref == 1);
-			_iter->Release();
-		}
-	}
-	blDeleteDict(_PrGpuMem->pPipelineState);
-	for (_idx = 0; _idx < 512; ++_idx)
-	{
-		if (NULL != _PrGpuMem->aShaderBuffers[_idx].sConstBuffer)
-			free(_PrGpuMem->aShaderBuffers[_idx].sConstBuffer);
-		_PrGpuMem->aShaderBuffers[_idx].nPredefined = 0;
-		if (_PrGpuMem->aShaderBuffers[_idx].pCode)
-		{
-			_PrGpuMem->aShaderBuffers[_idx].pCode = NULL;
-			_PrGpuMem->aShaderBuffers[_idx].nHash = 0;
-		}
-	}
-	for (_idx = 0; _idx < 4096; ++_idx)
-	{
-		if (NULL != _PrGpuMem->aIndexBuffers[_idx].pPtr)
-		{
-			blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _PrGpuMem->aIndexBuffers[_idx].pPtr);
-			_PrGpuMem->aIndexBuffers[_idx].bDynamic = FALSE;
-		}
-		if (NULL != _PrGpuMem->aVertexBuffers[_idx].pPtr)
-		{
-			blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _PrGpuMem->aVertexBuffers[_idx].pPtr);
-			_PrGpuMem->aVertexBuffers[_idx].bDynamic = FALSE;
-		}
-	}
-	{
-		FOREACH_DICT(_BLTextureBufferDX*, _iter, _PrGpuMem->pTextureDict)
-		{
-			if (NULL != _iter->pPtr)
-				blArrayPushBack(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nCurrent], _iter->pPtr);
-		}
-	}
-	_PrGpuMem->pRtvHeap->Release();
-	_PrGpuMem->pDsvHeap->Release();
-	_PrGpuMem->pRootSignature->Release();
-	_PrGpuMem->pSwapChain->Release();
-	do
-	{
-		BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead + _PrGpuMem->sCmdQueue.sControl.nSize;
-		BLU32 _maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31));
-		if (_maxsz)
-		{
-			_BLCommandQueueDX::_CommandList& _cmdlist = _PrGpuMem->sCmdQueue.aCommandList[_PrGpuMem->sCmdQueue.sControl.nRead];
-			if (WAIT_OBJECT_0 == WaitForSingleObject(_cmdlist.pEvent, INFINITE))
-			{
-				CloseHandle(_cmdlist.pEvent);
-				_cmdlist.pEvent = NULL;
-				_PrGpuMem->sCmdQueue.nCompletedFence = _PrGpuMem->sCmdQueue.pFence->GetCompletedValue();
-				_PrGpuMem->sCmdQueue.pCommandQueue->Wait(_PrGpuMem->sCmdQueue.pFence, _PrGpuMem->sCmdQueue.nCompletedFence);
-				{
-					FOREACH_ARRAY(ID3D12Resource*, _iter, _PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead])
-					{
-						_iter->Release();
-					}
-				}
-				blClearArray(_PrGpuMem->sCmdQueue.pRelease[_PrGpuMem->sCmdQueue.sControl.nRead]);
-				BLU32 _le = _PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead + _PrGpuMem->sCmdQueue.sControl.nSize;
-				_maxsz = ((_le) & (((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31)) | ((_PrGpuMem->sCmdQueue.sControl.nCurrent - _PrGpuMem->sCmdQueue.sControl.nRead) & ~(((BLS32)_PrGpuMem->sCmdQueue.sControl.nCurrent - (BLS32)_PrGpuMem->sCmdQueue.sControl.nRead) >> 31));
-				BLU32 _sizenosign = 1 & 0x7fffffff;
-				BLU32 _test = _sizenosign - _maxsz;
-				BLU32 _size = ((1) & (((BLS32)_test) >> 31)) | (_maxsz & ~(((BLS32)_test) >> 31));
-				BLU32 _advance = _PrGpuMem->sCmdQueue.sControl.nRead + _size;
-				BLU32 _read = _advance % _PrGpuMem->sCmdQueue.sControl.nSize;
-				_PrGpuMem->sCmdQueue.sControl.nRead = _read;
-			}
-		}
-		else
-			break;
-	} while (1);
-	_PrGpuMem->sCmdQueue.pFence->Release();
-	for (_idx = 0; _idx < 256; ++_idx)
-	{
-		_PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandAllocator->Release();
-		_PrGpuMem->sCmdQueue.aCommandList[_idx].pCommandList->Release();
-	}
-	_PrGpuMem->sCmdQueue.pCommandQueue->Release();
-	_PrGpuMem->pDevice->Release();
-	_PrGpuMem->pAdapter->Release();
-	_PrGpuMem->pDxgiFactory->Release();
-	{
-		FOREACH_DICT(struct _BLUniformBuffer::_UniformInfo*, _iter, _PrGpuMem->sUniformBuffer.pUniforms)
-		{
-			free(_iter);
-		}
-	}
-	blDeleteDict(_PrGpuMem->pTextureDict);
-	blDeleteDict(_PrGpuMem->sUniformBuffer.pUniforms);
-	for (_idx = 0; _idx < 256; ++_idx)
-		blDeleteArray(_PrGpuMem->sCmdQueue.pRelease[_idx]);
-	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
-		{
-			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
-			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
-		}
-	}
-	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
-		{
-			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
-			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
-		}
-	}
-	{
-		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
-		{
-			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
-			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
-		}
-	}
-	blDeleteDict(_PrGpuMem->pTechCache);
-	blDeleteDict(_PrGpuMem->pTextureCache);
-	blDeleteDict(_PrGpuMem->pBufferCache);
-	free(_PrGpuMem);
 }
 #elif defined(BL_PLATFORM_LINUX)
 static BLS32
@@ -3157,7 +2188,7 @@ blBindFrameBuffer(IN BLGuid _FBO)
 BLVoid
 blFrameBufferClear(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN BLBool _StencilBit)
 {
-	_PipelineStateRefreshGL();
+	_PipelineStateRefresh();
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
@@ -4398,13 +3429,47 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
     {
         memset(_tech->aUniformVars[_idx].aName, 0, 128 * sizeof(BLAnsi));
         _tech->aUniformVars[_idx].pVar = NULL;
-		_tech->aUniformVars[_idx].uData.sGL.nIndices = 0xFFFFFFFF;
+#if defined(BL_GL_BACKEND)
+		if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+		{
+			_tech->aUniformVars[_idx].uData.sGL.nIndices = 0xFFFFFFFF;
+		}
+#elif defined(BL_MTL_BACKEND)
+		if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+		{
+		}
+#elif defined(BL_VK_BACKEND)
+		if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+		{
+		}
+#elif defined(BL_DX_BACKEND)
+		if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+		{
+		}
+#endif
     }
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 	{
 		memset(_tech->aSamplerVars[_idx].aName, 0, 128 * sizeof(BLAnsi));
 		_tech->aSamplerVars[_idx].pTex = NULL;
-		_tech->aSamplerVars[_idx].uData.sGL.nHandle = 0xFFFFFFFF;
+#if defined(BL_GL_BACKEND)
+		if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+		{
+			_tech->aSamplerVars[_idx].uData.sGL.nHandle = 0xFFFFFFFF;
+		}
+#elif defined(BL_MTL_BACKEND)
+		if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+		{
+		}
+#elif defined(BL_VK_BACKEND)
+		if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+		{
+		}
+#elif defined(BL_DX_BACKEND)
+		if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+		{
+		}
+#endif
 	}
     BLU32 _hash = blHashUtf8((const BLUtf8*)_Filename);
     BLGuid _stream = INVALID_GUID;
@@ -4770,7 +3835,7 @@ blTechSampler(IN BLGuid _Tech, IN BLAnsi* _Name, IN BLGuid _Tex, IN BLU32 _Unit)
 BLVoid
 blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 {
-	_PipelineStateRefreshGL();
+	_PipelineStateRefresh();
 	_BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
 	_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
 #if defined(BL_GL_BACKEND)

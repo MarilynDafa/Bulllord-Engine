@@ -58,7 +58,11 @@ extern "C" {
 /* UI */
 #define PIXEL_ALIGNED_INTERNAL(pixel) ((BLF32)(BLS32)((pixel) + ((pixel)>0.0f?0.5f:-0.5f)))
 /* File */
-#define FILE_INVALID_INTERNAL(fp) ((fp) && (fp) != (BLVoid*)0xFFFFFFFF)
+#if defined(_WIN64) || defined(WIN64)
+#	define FILE_INVALID_INTERNAL(fp) ((fp) && (fp) != (BLVoid*)0x00000000FFFFFFFFULL)
+#else
+#	define FILE_INVALID_INTERNAL(fp) ((fp) && (fp) != (BLVoid*)0xFFFFFFFF)
+#endif
 #define FOURCC_INTERNAL(ch0, ch1, ch2, ch3) ((ch0<<0) + (ch1<<8) + (ch2<<16) + (ch3<<24))
 /* GUID */
 #define URIPART_INTERNAL(val) ((BLU32)(((BLU64)(val)) & 0xFFFFFFFF))

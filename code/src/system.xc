@@ -3338,7 +3338,7 @@ blUserFolderDir()
         auto _localfolderpath = Windows::Storage::ApplicationData::Current->LocalFolder->Path;
         Platform::String^ _path = _localfolderpath;
         const wchar_t* _wstr = _path->Data();
-        BLU32 _wsz = wcslen(_wstr);
+        BLU32 _wsz = (BLU32)wcslen(_wstr);
         BLU32 _y;
         for (_y = 0; _y < _wsz; ++_y)
 			_PrSystemMem->aUserDir[_y] = (BLAnsi)_wstr[_y];
@@ -3458,7 +3458,7 @@ blWorkingDir(IN BLBool _Content)
         Windows::ApplicationModel::Package^ _package = Windows::ApplicationModel::Package::Current;
         Platform::String^ _path = _package->InstalledLocation->Path;
         const WCHAR* _wstr = _path->Data();
-        BLU32 _wsz = wcslen(_wstr);
+        BLU32 _wsz = (BLU32)wcslen(_wstr);
         BLU32 _y;
         for (_y = 0; _y < _wsz; ++_y)
 			_PrSystemMem->aWorkDir[_y] = (BLAnsi)_wstr[_y];
@@ -3830,7 +3830,7 @@ blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
 		{
 			WriteFile(_fp, &_iterator_iter->nKey, sizeof(BLU32), NULL, NULL);
-			_sz = strlen((const BLAnsi*)_iter);
+			_sz = (BLU32)strlen((const BLAnsi*)_iter);
 			WriteFile(_fp, &_sz, sizeof(BLU32), NULL, NULL);
 			WriteFile(_fp, _iter, _sz, NULL, NULL);
 		}

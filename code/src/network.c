@@ -485,7 +485,7 @@ _HttpDownloadRequest(BLSocket _Sock, const BLAnsi* _Host, const BLAnsi* _Addr, c
 	if (_End == 0xFFFFFFFF)
 		sprintf_s(_temp, 512, "HEAD %s%s HTTP/1.1\r\nHost: %s\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)\r\n\r\n", _Addr, _Filename, _Host);
 	else
-		sprintf_s(_temp, 512, "GET %s%s HTTP/1.1\r\nHost: %s\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)\r\nConnection: close\r\nRange: bytes=%zu-%zu\r\n\r\n", _Addr, _Filename, _Host, (unsigned long)_Pos, (unsigned long)_End);
+		sprintf_s(_temp, 512, "GET %s%s HTTP/1.1\r\nHost: %s\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)\r\nConnection: close\r\nRange: bytes=%lu-%lu\r\n\r\n", _Addr, _Filename, _Host, (unsigned long)_Pos, (unsigned long)_End);
 #elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID)
 	if (_End == 0xFFFFFFFF)
 		sprintf(_temp, "HEAD %s%s HTTP/1.1\r\nHost: %s\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)\r\n\r\n", _Addr, _Filename, _Host);

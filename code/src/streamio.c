@@ -320,7 +320,7 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 	{
 		_BLStream* _ret = NULL;
         BLAnsi _trfilename[260] = { 0 };
-        BLU32 _filelen = strlen(_Filename);
+        BLU32 _filelen = (BLU32)strlen(_Filename);
         for (BLU32 _idx = 0; _idx < _filelen; ++_idx)
         {
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -408,7 +408,7 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 				break;
 		}
 		strcpy(_tmpname, _Filename);
-        BLU32 _tmplen = strlen(_tmpname);
+        BLU32 _tmplen = (BLU32)strlen(_tmpname);
 		for (_i = 0; _i < _tmplen; ++_i)
 		{
 			if (_tmpname[_i] == '\\')
@@ -423,7 +423,7 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 			BLAnsi _path[260] = { 0 };
 			strcpy(_path, blWorkingDir(TRUE));
             strcat(_path, _Filename);
-            _tmplen = strlen(_path);
+            _tmplen = (BLU32)strlen(_path);
 			for (_i = 0; _i < _tmplen; ++_i)
 			{
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -510,7 +510,6 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 #else
 			HANDLE _fp = CreateFileA(_file->pPatch ? _file->pPatch : _iter->pPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
-			assert(_fp != (HANDLE)0xFFFFFFFF);
 			LARGE_INTEGER _li;
 			_li.LowPart = _file->nOffset;
 			_li.HighPart = 0;

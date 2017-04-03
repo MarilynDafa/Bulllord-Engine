@@ -41,6 +41,13 @@
     <ClInclude Include="..\..\code\externals\mpaudec\mpaudec.h" />
     <ClInclude Include="..\..\code\externals\mpaudec\mpaudectab.h" />
     <ClInclude Include="..\..\code\externals\mpaudec\mpegaudio.h" />
+    <ClInclude Include="..\..\code\externals\ogg\include\ogg\ogg.h" />
+    <ClInclude Include="..\..\code\externals\ogg\include\ogg\os_types.h" />
+    <ClInclude Include="..\..\code\externals\opus\include\opus.h" />
+    <ClInclude Include="..\..\code\externals\opus\include\opus_custom.h" />
+    <ClInclude Include="..\..\code\externals\opus\include\opus_defines.h" />
+    <ClInclude Include="..\..\code\externals\opus\include\opus_multistream.h" />
+    <ClInclude Include="..\..\code\externals\opus\include\opus_types.h" />
     <ClInclude Include="..\..\code\externals\xml\ezxml.h" />
     <ClInclude Include="..\..\code\externals\xxtea\xxtea.h" />
     <ClInclude Include="..\..\code\externals\zlib\crc32.h" />
@@ -112,6 +119,223 @@
     <ClCompile Include="..\..\code\externals\freetype2\src\winfonts\winfnt.c" />
     <ClCompile Include="..\..\code\externals\mpaudec\bits.c" />
     <ClCompile Include="..\..\code\externals\mpaudec\mpaudec.c" />
+    <ClCompile Include="..\..\code\externals\ogg\src\bitwise.c" />
+    <ClCompile Include="..\..\code\externals\ogg\src\framing.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\arm\armcpu.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\arm\arm_celt_map.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\arm\celt_neon_intr.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\bands.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\celt.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\celt_decoder.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\celt_lpc.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\cwrs.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\entcode.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\entdec.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\entenc.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\kiss_fft.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\laplace.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\mathops.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\mdct.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\modes.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\pitch.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\quant_bands.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\rate.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\vq.c" />
+    <ClCompile Include="..\..\code\externals\opus\celt\x86\celt_lpc_sse.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\x86\pitch_sse.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\x86\pitch_sse2.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\x86\pitch_sse4_1.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\x86\vq_sse2.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\x86\x86cpu.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\x86\x86_celt_map.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\silk\A2NLSF.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\ana_filt_bank_1.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\arm\arm_silk_map.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\silk\arm\LPC_inv_pred_gain_neon_intr.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\silk\arm\NSQ_del_dec_neon_intr.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\silk\arm\NSQ_neon.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\silk\biquad_alt.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\bwexpander.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\bwexpander_32.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\check_control_input.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\CNG.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\code_signs.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\control_audio_bandwidth.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\control_codec.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\control_SNR.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\decoder_set_fs.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\decode_core.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\decode_frame.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\decode_indices.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\decode_parameters.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\decode_pitch.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\decode_pulses.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\dec_API.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\encode_indices.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\encode_pulses.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\apply_sine_window_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\autocorrelation_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\burg_modified_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\bwexpander_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\corrMatrix_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\encode_frame_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\energy_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\find_LPC_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\find_LTP_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\find_pitch_lags_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\find_pred_coefs_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\inner_product_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\k2a_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\LPC_analysis_filter_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\LPC_inv_pred_gain_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\LTP_analysis_filter_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\LTP_scale_ctrl_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\noise_shape_analysis_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\pitch_analysis_core_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\process_gains_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\regularize_correlations_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\residual_energy_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\scale_copy_vector_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\scale_vector_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\schur_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\sort_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\warped_autocorrelation_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\float\wrappers_FLP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\gain_quant.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\init_decoder.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\inner_prod_aligned.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\interpolate.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\lin2log.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\log2lin.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\LPC_analysis_filter.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\LPC_fit.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\LPC_inv_pred_gain.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\LP_variable_cutoff.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\NLSF2A.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\NLSF_decode.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\NLSF_del_dec_quant.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\NLSF_encode.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\NLSF_stabilize.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\NLSF_unpack.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\NLSF_VQ.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\NLSF_VQ_weights_laroia.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\NSQ.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\NSQ_del_dec.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\pitch_est_tables.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\PLC.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\process_NLSFs.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\quant_LTP_gains.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\resampler.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\resampler_down2.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\resampler_down2_3.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\resampler_private_AR2.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\resampler_private_down_FIR.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\resampler_private_IIR_FIR.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\resampler_private_up2_HQ.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\resampler_rom.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\shell_coder.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\sigm_Q15.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\sort.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\stereo_decode_pred.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\stereo_find_predictor.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\stereo_LR_to_MS.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\stereo_MS_to_LR.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\stereo_quant_pred.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\sum_sqr_shift.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\tables_gain.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\tables_LTP.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\tables_NLSF_CB_NB_MB.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\tables_NLSF_CB_WB.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\tables_other.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\tables_pitch_lag.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\tables_pulses_per_block.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\table_LSF_cos.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\VAD.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\VQ_WMat_EC.c" />
+    <ClCompile Include="..\..\code\externals\opus\silk\x86\NSQ_del_dec_sse.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\silk\x86\NSQ_sse.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\silk\x86\VAD_sse.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\silk\x86\VQ_WMat_EC_sse.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\silk\x86\x86_silk_map.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\src\analysis.c" />
+    <ClCompile Include="..\..\code\externals\opus\src\mlp.c" />
+    <ClCompile Include="..\..\code\externals\opus\src\mlp_data.c" />
+    <ClCompile Include="..\..\code\externals\opus\src\opus.c" />
+    <ClCompile Include="..\..\code\externals\opus\src\opus_decoder.c" />
+    <ClCompile Include="..\..\code\externals\opus\src\opus_multistream.c" />
+    <ClCompile Include="..\..\code\externals\opus\src\opus_multistream_decoder.c" />
+    <ClCompile Include="..\..\code\externals\opus\src\repacketizer.c" />
     <ClCompile Include="..\..\code\externals\sqlite3\sqlite3secure.c" />
     <ClCompile Include="..\..\code\externals\xml\ezxml.c" />
     <ClCompile Include="..\..\code\externals\xxtea\xxtea.c" />
@@ -143,9 +367,59 @@
     <ClCompile Include="..\..\code\src\utils.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\code\src\audio.xc" />
-    <None Include="..\..\code\src\gpu.xc" />
-    <None Include="..\..\code\src\system.xc" />
+    <ClCompile Include="..\..\code\src\audio.xc">
+      <FileType>Document</FileType>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\gpu.xc">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </DeploymentContent>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+      </DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+      </DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </DeploymentContent>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsWinRT>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\system.xc">
+      <FileType>Document</FileType>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsWinRT>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\code\externals\opus\celt\arm\armopts.s.in">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\..\code\externals\opus\celt\arm\celt_pitch_xcorr_arm.s">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{f6595daa-17b5-4cd5-a82b-20cdc58435a7}</ProjectGuid>
@@ -259,14 +533,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\code\externals\freetype2\include;..\..\code\externals\zlib;..\..\code\externals\jp2\include;..\..\code\externals\yaml</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>nodefaultlib:vccorlibd /nodefaultlib:msvcrtd vccorlibd.lib msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -274,14 +550,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;SQLITE_OS_WINRT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\code\externals\freetype2\include;..\..\code\externals\zlib;..\..\code\externals\jp2\include;..\..\code\externals\yaml</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;SQLITE_OS_WINRT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/nodefaultlib:vccorlib /nodefaultlib:msvcrt vccorlib.lib msvcrt.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
@@ -289,14 +567,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\code\externals\freetype2\include;..\..\code\externals\zlib;..\..\code\externals\jp2\include;..\..\code\externals\yaml</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>nodefaultlib:vccorlibd /nodefaultlib:msvcrtd vccorlibd.lib msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
@@ -304,14 +584,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\code\externals\freetype2\include;..\..\code\externals\zlib;..\..\code\externals\jp2\include;..\..\code\externals\yaml</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/nodefaultlib:vccorlib /nodefaultlib:msvcrt vccorlib.lib msvcrt.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -319,14 +601,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\code\externals\freetype2\include;..\..\code\externals\zlib;..\..\code\externals\jp2\include;..\..\code\externals\yaml</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>nodefaultlib:vccorlibd /nodefaultlib:msvcrtd vccorlibd.lib msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -334,14 +618,16 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;SQLITE_OS_WINRT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\code\externals\freetype2\include;..\..\code\externals\zlib;..\..\code\externals\jp2\include;..\..\code\externals\yaml</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;SQLITE_OS_WINRT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/nodefaultlib:vccorlib /nodefaultlib:msvcrt vccorlib.lib msvcrt.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
