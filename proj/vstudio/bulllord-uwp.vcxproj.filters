@@ -16,9 +16,6 @@
     <Filter Include="externals\gl">
       <UniqueIdentifier>{ff38eed8-f6f6-4cd0-b7ef-84f27a547d25}</UniqueIdentifier>
     </Filter>
-    <Filter Include="externals\mpaudec">
-      <UniqueIdentifier>{28437689-be7f-44a9-8440-804449ddf77f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="externals\sqlite3">
       <UniqueIdentifier>{b8fcfbfd-eeb7-4d80-a39b-36c007b62c23}</UniqueIdentifier>
     </Filter>
@@ -114,18 +111,6 @@
     </ClInclude>
     <ClInclude Include="..\..\code\externals\zlib\zutil.h">
       <Filter>externals\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\mpaudec\internal.h">
-      <Filter>externals\mpaudec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\mpaudec\mpaudec.h">
-      <Filter>externals\mpaudec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\mpaudec\mpaudectab.h">
-      <Filter>externals\mpaudec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\mpaudec\mpegaudio.h">
-      <Filter>externals\mpaudec</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\externals\gl\glcorearb.h">
       <Filter>externals\gl</Filter>
@@ -275,12 +260,6 @@
     </ClCompile>
     <ClCompile Include="..\..\code\externals\zlib\zutil.c">
       <Filter>externals\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\mpaudec\bits.c">
-      <Filter>externals\mpaudec</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\mpaudec\mpaudec.c">
-      <Filter>externals\mpaudec</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\externals\sqlite3\sqlite3secure.c">
       <Filter>externals\sqlite3</Filter>

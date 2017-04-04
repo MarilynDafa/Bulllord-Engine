@@ -340,7 +340,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 			else
 				SetCursor(LoadCursorA(NULL, IDC_ARROW));
 		}
-		blInvokeEvent(BL_ET_MOUSE, _Lparam, BL_ME_MOVE, NULL, INVALID_GUID);
+		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_MOVE, NULL, INVALID_GUID);
 		TRACKMOUSEEVENT _tme;
 		_tme.cbSize = sizeof(_tme);
 		_tme.dwFlags = TME_LEAVE;
@@ -360,25 +360,25 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 	break;
     case WM_LBUTTONDOWN:
 	{
-		blInvokeEvent(BL_ET_MOUSE, _Lparam, BL_ME_LDOWN, NULL, INVALID_GUID);
+		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_LDOWN, NULL, INVALID_GUID);
         SetCapture(_Hwnd);
 	}
 	break;
     case WM_LBUTTONUP:
 	{
-		blInvokeEvent(BL_ET_MOUSE, _Lparam, BL_ME_LUP, NULL, INVALID_GUID);
+		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_LUP, NULL, INVALID_GUID);
 		ReleaseCapture();
 	}
 	break;
     case WM_RBUTTONDOWN:
     {
-		blInvokeEvent(BL_ET_MOUSE, _Lparam, BL_ME_RDOWN, NULL, INVALID_GUID);
+		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_RDOWN, NULL, INVALID_GUID);
         SetCapture(_Hwnd);
 	}
 	break;
     case WM_RBUTTONUP:
 	{
-		blInvokeEvent(BL_ET_MOUSE, _Lparam, BL_ME_RUP, NULL, INVALID_GUID);
+		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_RUP, NULL, INVALID_GUID);
 		ReleaseCapture();
 	}
 	break;
@@ -594,7 +594,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 	case WM_IME_CHAR:
 	{
 		BLUtf8 _text[5];
-		UINT32 _codepoint = _Wparam;
+		UINT32 _codepoint = (UINT32)_Wparam;
 		if (_codepoint <= 0x7F)
 		{
 			_text[0] = (BLUtf8)_codepoint;

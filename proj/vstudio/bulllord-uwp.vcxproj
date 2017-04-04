@@ -37,10 +37,6 @@
     <ClInclude Include="..\..\code\externals\freetype2\include\ft2build.h" />
     <ClInclude Include="..\..\code\externals\gl\glcorearb.h" />
     <ClInclude Include="..\..\code\externals\gl\wglext.h" />
-    <ClInclude Include="..\..\code\externals\mpaudec\internal.h" />
-    <ClInclude Include="..\..\code\externals\mpaudec\mpaudec.h" />
-    <ClInclude Include="..\..\code\externals\mpaudec\mpaudectab.h" />
-    <ClInclude Include="..\..\code\externals\mpaudec\mpegaudio.h" />
     <ClInclude Include="..\..\code\externals\ogg\include\ogg\ogg.h" />
     <ClInclude Include="..\..\code\externals\ogg\include\ogg\os_types.h" />
     <ClInclude Include="..\..\code\externals\opus\include\opus.h" />
@@ -117,8 +113,6 @@
     <ClCompile Include="..\..\code\externals\freetype2\src\type1\type1.c" />
     <ClCompile Include="..\..\code\externals\freetype2\src\type42\type42.c" />
     <ClCompile Include="..\..\code\externals\freetype2\src\winfonts\winfnt.c" />
-    <ClCompile Include="..\..\code\externals\mpaudec\bits.c" />
-    <ClCompile Include="..\..\code\externals\mpaudec\mpaudec.c" />
     <ClCompile Include="..\..\code\externals\ogg\src\bitwise.c" />
     <ClCompile Include="..\..\code\externals\ogg\src\framing.c" />
     <ClCompile Include="..\..\code\externals\opus\celt\arm\armcpu.c">

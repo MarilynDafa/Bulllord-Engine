@@ -22,9 +22,6 @@
     <Filter Include="externals\sqlite3">
       <UniqueIdentifier>{d171f8e7-32ac-416b-830f-7a4d66023344}</UniqueIdentifier>
     </Filter>
-    <Filter Include="externals\mpaudec">
-      <UniqueIdentifier>{c4996c57-a015-49d4-9395-8f6c106d166f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="externals\freetype2\FT_MODULES">
       <UniqueIdentifier>{03a4f40c-cd94-48de-a5ee-82783f5e581a}</UniqueIdentifier>
     </Filter>
@@ -114,18 +111,6 @@
     </ClInclude>
     <ClInclude Include="..\..\code\externals\zlib\zutil.h">
       <Filter>externals\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\mpaudec\internal.h">
-      <Filter>externals\mpaudec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\mpaudec\mpaudec.h">
-      <Filter>externals\mpaudec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\mpaudec\mpaudectab.h">
-      <Filter>externals\mpaudec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\mpaudec\mpegaudio.h">
-      <Filter>externals\mpaudec</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\headers\gpu.h">
       <Filter>headers</Filter>
@@ -285,12 +270,6 @@
     <ClCompile Include="..\..\code\externals\sqlite3\sqlite3secure.c">
       <Filter>externals\sqlite3</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\externals\mpaudec\bits.c">
-      <Filter>externals\mpaudec</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\mpaudec\mpaudec.c">
-      <Filter>externals\mpaudec</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\code\externals\freetype2\src\base\ftbbox.c">
       <Filter>externals\freetype2\FT_MODULES</Filter>
     </ClCompile>
@@ -425,9 +404,6 @@
     </ClCompile>
     <ClCompile Include="..\..\code\externals\xml\ezxml.c">
       <Filter>externals\xml</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\src\audio.xc">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\src\system.xc">
       <Filter>src</Filter>
@@ -878,6 +854,9 @@
     </ClCompile>
     <ClCompile Include="..\..\code\externals\opus\silk\VQ_WMat_EC.c">
       <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\audio.xc">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
