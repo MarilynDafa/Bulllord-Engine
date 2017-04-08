@@ -26,6 +26,7 @@
 #include "internal/internal.h"
 #include "../externals/fastlz/fastlz.h"
 #include "../externals/xxtea/xxtea.h"
+#include "../externals/duktape/duktape.h"
 #pragma pack(1)
 typedef struct _NetMsg {
 	BLU32 nID;
@@ -51,6 +52,7 @@ typedef struct  _HttpSect {
 }_BLHttpSect;
 #pragma pack()
 typedef struct _NetworkMember {
+	duk_context* pDukContext;
 	BLAnsi aHost[64];
 	BLU16 nPort;
 	BLList* pCriList;
@@ -82,10 +84,11 @@ typedef struct _NetworkMember {
 static _BLNetworkMember* _PrNetworkMem = NULL;
 
 BLVoid
-_NetworkInit()
+_NetworkInit(duk_context* _DKC)
 {
 	_PrNetworkMem = (_BLNetworkMember*)malloc(sizeof(_BLNetworkMember));
 	memset(_PrNetworkMem->aHost, 0, sizeof(_PrNetworkMem->aHost));
+	_PrNetworkMem->pDukContext = _DKC;
 	_PrNetworkMem->nPort = 0;
 	_PrNetworkMem->pCriList = NULL;
 	_PrNetworkMem->pNorList = NULL;

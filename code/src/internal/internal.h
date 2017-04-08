@@ -100,6 +100,8 @@ extern "C" {
 #define UIACTION_SCALE_INTERNAL			4
 #define UIACTION_ALPHA_INTERNAL			5
 #define UIACTION_DEAD_INTERNAL			6
+/* JS Bind */
+#define JS_FUNCTION_INTERNAL(func) static BLS32 _##func##JS(duk_context* _DKC)
 /* Default Font*/
 extern const BLAnsi* DEFAULTFONT_INTERNAL;
 extern const BLAnsi* DEFAULTFONTIMG_INTERNAL;

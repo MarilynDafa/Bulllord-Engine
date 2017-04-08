@@ -55,6 +55,9 @@
     <Filter Include="externals\opus\float">
       <UniqueIdentifier>{b37aec69-97d2-421e-9ab8-38c89453a9f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="externals\duktape">
+      <UniqueIdentifier>{76992953-79db-4ef6-b29c-fe1e14bd5534}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\config.h" />
@@ -189,6 +192,12 @@
     </ClInclude>
     <ClInclude Include="..\..\code\externals\opus\include\opus_types.h">
       <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\duktape\duk_config.h">
+      <Filter>externals\duktape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\duktape\duktape.h">
+      <Filter>externals\duktape</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -834,17 +843,20 @@
     <ClCompile Include="..\..\code\externals\opus\silk\VQ_WMat_EC.c">
       <Filter>externals\opus</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\code\src\audio.xc">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\gpu.xc">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\duktape\duktape.c">
+      <Filter>externals\duktape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\system.xc">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\code\src\audio.xc">
-      <Filter>src</Filter>
-    </None>
-    <None Include="..\..\code\src\gpu.xc">
-      <Filter>src</Filter>
-    </None>
-    <None Include="..\..\code\src\system.xc">
-      <Filter>src</Filter>
-    </None>
     <None Include="..\..\code\externals\opus\celt\arm\armopts.s.in">
       <Filter>externals\opus\arm</Filter>
     </None>

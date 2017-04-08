@@ -27,6 +27,7 @@
 #include "internal/mathematics.h"
 #include "internal/internal.h"
 #include "../externals/xml/ezxml.h"
+#include "../externals/duktape/duktape.h"
 #if defined BL_PLATFORM_OSX
 #   include <AppKit/NSOpenGL.h>
 #   include <AppKit/NSApplication.h>
@@ -278,6 +279,7 @@ typedef struct _Technique{
 #elif defined(BL_DX_BACKEND)
 #endif
 typedef struct _GpuMember {
+	duk_context* pDukContext;
 	_BLHardwareCaps sHardwareCaps;
     _BLPipelineState sPipelineState;
 	BLF32 fPresentElapsed;
@@ -1277,9 +1279,10 @@ _PipelineStateRefresh()
 }
 #if defined(BL_PLATFORM_WIN32)
 BLVoid
-_GpuIntervention(HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(duk_context* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
+	_PrGpuMem->pDukContext = _DKC;
 	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
 	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
@@ -1441,7 +1444,7 @@ _GpuAnitIntervention(HWND _Hwnd)
 }
 #elif defined(BL_PLATFORM_UWP)
 BLVoid
-_GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(duk_context* _DKC, Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 }
 BLVoid
@@ -1460,9 +1463,10 @@ _CtxErrorHandler(Display*, XErrorEvent*)
     return 0;
 }
 BLVoid
-_GpuIntervention(Display* _Display, Window _Window, GLXFBConfig _Config, BLVoid* _Lib, BLBool _Vsync)
+_GpuIntervention(duk_context* _DKC, Display* _Display, Window _Window, GLXFBConfig _Config, BLVoid* _Lib, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
+	_PrGpuMem->pDukContext = _DKC;
 	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
 	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
@@ -1587,9 +1591,10 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_ANDROID)
 BLVoid
-_GpuIntervention(ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
+	_PrGpuMem->pDukContext = _DKC;
 	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
 	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
@@ -1728,9 +1733,10 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_OSX)
 BLVoid
-_GpuIntervention(NSView* _View, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(duk_context* _DKC, NSView* _View, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
+	_PrGpuMem->pDukContext = _DKC;
 	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
 	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
@@ -1893,9 +1899,10 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_IOS)
 BLVoid
-_GpuIntervention(BLBool _Vsync)
+_GpuIntervention(duk_context* _DKC, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
+	_PrGpuMem->pDukContext = _DKC;
 	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
 	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;

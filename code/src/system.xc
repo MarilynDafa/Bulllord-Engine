@@ -25,6 +25,7 @@
 #include "../headers/gpu.h"
 #include "internal/internal.h"
 #include "internal/dictionary.h"
+#include "../externals/duktape/duktape.h"
 #if defined BL_PLATFORM_WIN32
 #	if defined(VLD_FORCE_ENABLE)
 #	pragma comment(lib, "vld.lib")
@@ -56,53 +57,53 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	extern BLVoid _StreamIOInit(BLVoid*);
+	extern BLVoid _StreamIOInit(duk_context*, BLVoid*);
 	extern BLVoid _StreamIOStep(BLU32);
     extern BLVoid _StreamIODestroy();
-    extern BLVoid _NetworkInit();
+    extern BLVoid _NetworkInit(duk_context*);
     extern BLVoid _NetworkStep(BLU32);
 	extern BLVoid _NetworkDestroy();
-	extern BLVoid _UtilsInit();
+	extern BLVoid _UtilsInit(duk_context*);
 	extern BLVoid _UtilsStep(BLU32);
 	extern BLVoid _UtilsDestroy();
-    extern BLVoid _SpriteInit();
+    extern BLVoid _SpriteInit(duk_context*);
     extern BLVoid _SpriteStep(BLU32, BLBool);
     extern BLVoid _SpriteDestroy();
-	extern BLVoid _UIInit(BLBool);
+	extern BLVoid _UIInit(duk_context*, BLBool);
 	extern BLVoid _UIStep(BLU32, BLBool);
 	extern BLVoid _UIDestroy();
 	extern BLBool _UseCustomCursor();
 #ifdef __cplusplus
 }
 #endif
-extern BLVoid _AudioInit();
+extern BLVoid _AudioInit(duk_context*);
 extern BLVoid _AudioStep(BLU32);
 extern BLVoid _AudioDestroy();
 extern BLVoid _SystemInit();
 extern BLVoid _SystemStep();
 extern BLVoid _SystemDestroy();
 #if defined(BL_PLATFORM_WIN32)
-extern BLVoid _GpuIntervention(HWND, BLU32, BLU32, BLBool);
+extern BLVoid _GpuIntervention(duk_context*, HWND, BLU32, BLU32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention(HWND);
 #elif defined(BL_PLATFORM_UWP)
-extern BLVoid _GpuIntervention(Windows::UI::Core::CoreWindow^, BLU32, BLU32, BLBool);
+extern BLVoid _GpuIntervention(duk_context*, Windows::UI::Core::CoreWindow^, BLU32, BLU32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_OSX)
-extern BLVoid _GpuIntervention(NSView*, BLU32, BLU32, BLBool);
+extern BLVoid _GpuIntervention(duk_context*, NSView*, BLU32, BLU32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_IOS)
-extern BLVoid _GpuIntervention(BLBool);
+extern BLVoid _GpuIntervention(duk_context*, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_LINUX)
-extern BLVoid _GpuIntervention(Display*, Window, GLXFBConfig, BLVoid*, BLBool);
+extern BLVoid _GpuIntervention(duk_context*, Display*, Window, GLXFBConfig, BLVoid*, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_ANDROID)
-extern BLVoid _GpuIntervention(ANativeWindow*, BLU32, BLU32, BLBool);
+extern BLVoid _GpuIntervention(duk_context*, ANativeWindow*, BLU32, BLU32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #else
@@ -174,6 +175,7 @@ typedef struct _Plugins {
 #endif
 }_BLPlugin;
 typedef struct _SystemMember {
+	duk_context* pDukContext;
 	_BLBoostParam sBoostParam;
 	const BLBool(*pSubscriber[BL_ET_COUNT][128])(BLEnum, BLU32, BLS32, BLVoid*, BLGuid);
 	const BLVoid(*pBeginFunc)(BLVoid);
@@ -196,6 +198,7 @@ typedef struct _SystemMember {
 	BLBool bCtrlPressed;
 #elif defined(BL_PLATFORM_UWP)
 	Windows::UI::Text::Core::CoreTextEditContext^ pCTEcxt;
+	Windows::Devices::Sensors::Accelerometer^ pSensor;
 	Windows::Foundation::Point sIMEpos;
 	BLBool bCtrlPressed;
 #elif defined(BL_PLATFORM_LINUX)
@@ -709,7 +712,7 @@ _ShowWindow()
 	UpdateWindow(_PrSystemMem->nHwnd);
 	SetWindowLongPtrW(_PrSystemMem->nHwnd, GWLP_USERDATA, 0);
     blDeleteUtf16Str((BLUtf16*)_title);
-	_GpuIntervention(_PrSystemMem->nHwnd, _width, _height, !_PrSystemMem->sBoostParam.bProfiler);
+	_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->nHwnd, _width, _height, !_PrSystemMem->sBoostParam.bProfiler);
 	_PrSystemMem->nIMC = ImmGetContext(_PrSystemMem->nHwnd);
 	if (_PrSystemMem->nIMC)
 	{
@@ -1139,7 +1142,7 @@ _ShowWindow()
 	if (_PrSystemMem->sBoostParam.nScreenWidth > _PrSystemMem->sBoostParam.nScreenHeight)
 		_PrSystemMem->nOrientation = SCREEN_LANDSCAPE_INTERNAL;
 	else
-		_PrSystemMem->nOrientation = SCREEN_PORTRAIT_INTERNAL;
+		_PrSystemMem->nOrientation = SCREEN_PORTRAIT_INTERNAL;	
 	Windows::ApplicationModel::Core::CoreApplication::Run(_window);
 }
 BLVoid
@@ -3138,18 +3141,19 @@ _PollEvent()
 BLVoid
 _SystemInit()
 {
+	_PrSystemMem->pDukContext = duk_create_heap_default();
 	_PrSystemMem->nSysTime = blSystemTicks();
-	_UtilsInit();
+	_UtilsInit(_PrSystemMem->pDukContext);
     _ShowWindow();
 #ifdef BL_PLATFORM_ANDROID
-	_StreamIOInit(_PrSystemMem->pActivity->assetManager);
+	_StreamIOInit(_PrSystemMem->pDukContext, _PrSystemMem->pActivity->assetManager);
 #else
-	_StreamIOInit(NULL);
+	_StreamIOInit(_PrSystemMem->pDukContext, NULL);
 #endif
-    _AudioInit();
-    _UIInit(_PrSystemMem->sBoostParam.bProfiler);
-    _SpriteInit();
-    _NetworkInit();
+    _AudioInit(_PrSystemMem->pDukContext);
+    _UIInit(_PrSystemMem->pDukContext, _PrSystemMem->sBoostParam.bProfiler);
+    _SpriteInit(_PrSystemMem->pDukContext);
+    _NetworkInit(_PrSystemMem->pDukContext);
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
 	_GbSystemRunning = TRUE;
 	_PrSystemMem->pBeginFunc();
@@ -3236,6 +3240,7 @@ _SystemDestroy()
 	_UtilsDestroy();
     if (_PrSystemMem->pEvents)
         free(_PrSystemMem->pEvents);
+	duk_destroy_heap(_PrSystemMem->pDukContext);
 #if defined(BL_PLATFORM_UWP)
 	delete _PrSystemMem;
 	_PrSystemMem = NULL;
@@ -4378,6 +4383,7 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 	_PrSystemMem->pStepFunc = NULL;
 	_PrSystemMem->pEndFunc = NULL;
 	_PrSystemMem->pEvents = NULL;
+	_PrSystemMem->pDukContext = NULL;
 	memset(_PrSystemMem->aWorkDir, 0, sizeof(_PrSystemMem->aWorkDir));
 	memset(_PrSystemMem->aContentDir, 0, sizeof(_PrSystemMem->aContentDir));
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
@@ -4486,4 +4492,9 @@ blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)
 	} while (_GbSystemRunning);
 	_SystemDestroy();
 #endif
+}
+BLVoid 
+blSystemEvalFile(IN BLAnsi* _Filename)
+{
+	duk_eval_string(_PrSystemMem->pDukContext, _Filename);
 }

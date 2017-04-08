@@ -30,6 +30,7 @@
 #include "internal/internal.h"
 #include "../externals/xml/ezxml.h"
 #include "../externals/zlib/zlib.h"
+#include "../externals/duktape/duktape.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
 typedef struct _Glyph{
@@ -479,6 +480,7 @@ typedef struct _Widget {
 	} uExtension;
 }_BLWidget;
 typedef struct _UIMember {
+	duk_context* pDukContext;
 	_BLWidget* pRoot;
 	_BLWidget* pBasePlate;
 	_BLWidget* pHoveredWidget;
@@ -10831,12 +10833,13 @@ _SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, B
 	return FALSE;
 }
 BLVoid
-_UIInit(BLBool _Profiler)
+_UIInit(duk_context* _DKC, BLBool _Profiler)
 {
     _PrUIMem = (_BLUIMember*)malloc(sizeof(_BLUIMember));
     memset(_PrUIMem->aDir, 0, sizeof(_PrUIMem->aDir));
     memset(_PrUIMem->aArchive, 0, sizeof(_PrUIMem->aArchive));
     FT_Init_FreeType(&_PrUIMem->sFtLibrary);
+	_PrUIMem->pDukContext = _DKC;
 	_PrUIMem->nTimeInterval = 0;
 	_PrUIMem->pBasePlate = NULL;
 	_PrUIMem->pModalWidget = NULL;

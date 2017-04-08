@@ -26,9 +26,10 @@
 #include "internal/list.h"
 #include "internal/thread.h"
 #include "internal/internal.h"
-#include "../../externals/ogg/include/ogg/ogg.h"
-#include "../../externals/opus/include/opus.h"
-#include "../../externals/opus/include/opus_multistream.h"
+#include "../externals/ogg/include/ogg/ogg.h"
+#include "../externals/opus/include/opus.h"
+#include "../externals/opus/include/opus_multistream.h"
+#include "../externals/duktape/duktape.h"
 #if defined(BL_PLATFORM_IOS) || defined(BL_PLATFORM_OSX)
 #   define BL_USE_AL_API
 #include <OpenAL/al.h>
@@ -122,6 +123,7 @@ typedef struct _AudioSource{
 #endif
 }_BLAudioSource;
 typedef struct _AudioMember {
+	duk_context* pDukContext;
 	_BLAudioDevice pAudioDev;
 	_BLAudioSource* pBackMusic;
 	BLList* pSounds;
@@ -1059,9 +1061,10 @@ _CADestroy()
 }
 #endif
 BLVoid
-_AudioInit()
+_AudioInit(duk_context* _DKC)
 {
 	_PrAudioMem = (_BLAudioMember*)malloc(sizeof(_BLAudioMember));
+	_PrAudioMem->pDukContext = _DKC;
 	_PrAudioMem->pBackMusic = NULL;
 	_PrAudioMem->pSounds = NULL;
 	_PrAudioMem->pMusicMutex = NULL;

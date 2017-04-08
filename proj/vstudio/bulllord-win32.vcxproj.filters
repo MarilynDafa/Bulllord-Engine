@@ -58,6 +58,9 @@
     <Filter Include="externals\opus\x86">
       <UniqueIdentifier>{e8ed2f0d-b77a-4bb5-ae46-cd2736abf67a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="externals\duktape">
+      <UniqueIdentifier>{84ae7d44-21cd-4709-98c5-783cfdeb8005}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\config.h" />
@@ -195,6 +198,12 @@
     </ClInclude>
     <ClInclude Include="..\..\code\externals\opus\include\opus_types.h">
       <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\duktape\duk_config.h">
+      <Filter>externals\duktape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\duktape\duktape.h">
+      <Filter>externals\duktape</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -404,9 +413,6 @@
     </ClCompile>
     <ClCompile Include="..\..\code\externals\xml\ezxml.c">
       <Filter>externals\xml</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\src\system.xc">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\src\gpu.xc">
       <Filter>src</Filter>
@@ -856,6 +862,12 @@
       <Filter>externals\opus</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\src\audio.xc">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\duktape\duktape.c">
+      <Filter>externals\duktape</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\system.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

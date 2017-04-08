@@ -28,6 +28,7 @@
 #include "internal/array.h"
 #include "internal/internal.h"
 #include "internal/mathematics.h"
+#include "../externals/duktape/duktape.h"
 typedef struct _SpriteAction{
     struct _SpriteAction* pNext;
     struct _SpriteAction* pNeighbor;
@@ -112,6 +113,7 @@ typedef struct _TileInfo{
 	BLBool bShow;
 }_BLTileInfo;
 typedef struct _SpriteNode{
+	duk_context* pDukContext;
     struct _SpriteNode* pParent;
     struct _SpriteNode** pChildren;
 	_BLSpriteAction* pAction;
@@ -158,6 +160,7 @@ typedef struct _SpriteNode{
     BLBool bShow;
 }_BLSpriteNode;
 typedef struct _SpriteMember {
+	duk_context* pDukContext;
     BLGuid nSpriteTech;
     BLGuid nSpriteInstTech;
 	BLGuid nSpriteStrokeTech;
@@ -1044,10 +1047,32 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 		_SpriteDraw(_Delta, _chnode, _rmat);
 	}
 }
+JS_FUNCTION_INTERNAL(blGenSprite)
+{
+	BLGuid _id = blGenSprite(duk_to_string(_DKC, 0),
+		duk_is_null(_DKC, 1) ? NULL : duk_to_string(_DKC, 1),
+		duk_to_string(_DKC, 2),
+		(BLF32)duk_to_number(_DKC, 3),
+		(BLF32)duk_to_number(_DKC, 4),
+		(BLF32)duk_to_number(_DKC, 5),
+		duk_to_uint32(_DKC, 6),
+		duk_to_boolean(_DKC, 7));
+	BLAnsi _idstr[64] = { 0 };
+	sprintf(_idstr, "%llu", _id);
+	duk_push_string(_DKC, _idstr);
+	return 1;
+}
+static void
+_SpriteRegister()
+{
+	duk_push_c_function(_PrSpriteMem->pDukContext, _blGenSpriteJS, DUK_VARARGS);
+	duk_put_global_string(_PrSpriteMem->pDukContext, "blGenSprite");
+}
 BLVoid
-_SpriteInit()
+_SpriteInit(duk_context* _DKC)
 {
     _PrSpriteMem = (_BLSpriteMember*)malloc(sizeof(_BLSpriteMember));
+	_PrSpriteMem->pDukContext = _DKC;
     _PrSpriteMem->pNodeList = NULL;
 	_PrSpriteMem->nTimeInterval = 0;
     _PrSpriteMem->nNodeNum = 0;
@@ -1074,6 +1099,7 @@ _SpriteInit()
 	_PrSpriteMem->sViewport.sRB.fY = (BLF32)_ah;
 	_PrSpriteMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _aw, _ah, 1, NULL);
 	blFrameBufferAttach(_PrSpriteMem->nFBO, _PrSpriteMem->nFBOTex, 0, BL_CTF_IGNORE);
+	_SpriteRegister();
 }
 BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)

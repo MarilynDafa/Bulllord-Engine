@@ -166,6 +166,9 @@ BL_API BLVoid blSystemEmbedRun(
 	IN BLVoid(*_Step)(BLU32),
 	IN BLVoid(*_End)(BLVoid));
 
+BL_API BLVoid blSystemEvalFile(
+	IN BLAnsi* _Filename);
+
 #ifdef __cplusplus
 }
 #endif
