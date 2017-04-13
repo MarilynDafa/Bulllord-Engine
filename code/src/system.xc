@@ -181,6 +181,7 @@ typedef struct _SystemMember {
 	const BLVoid(*pBeginFunc)(BLVoid);
 	const BLVoid(*pStepFunc)(BLU32);
 	const BLVoid(*pEndFunc)(BLVoid);
+	BLVoid* aFuncPtr[BL_ET_COUNT + 3];
 	_BLEvent* pEvents;
 	_BLTimer aTimers[8];
 	_BLPlugin aPlugins[64];
@@ -258,6 +259,168 @@ BLBool _GbVideoPlaying = FALSE;
 BLEnum _GbRenderQuality = BL_RQ_ULP;
 static _BLSystemMember* _PrSystemMem = NULL;
 
+static const void
+_JSBeginFunc()
+{
+	duk_push_heapptr(_PrSystemMem->pDukContext, _PrSystemMem->aFuncPtr[BL_ET_COUNT]);
+	duk_call(_PrSystemMem->pDukContext, 0);
+}
+static duk_ret_t
+_BeginFuncBridge(duk_context* _DKC)
+{
+	DUK_REGISTER_CALLBACK(_PrSystemMem->pBeginFunc, _JSBeginFunc, _PrSystemMem->aFuncPtr[BL_ET_COUNT]);
+}
+static const void
+_JSStepFunc(BLU32 _Delta)
+{
+	duk_push_heapptr(_PrSystemMem->pDukContext, _PrSystemMem->aFuncPtr[BL_ET_COUNT + 1]);
+	duk_push_uint(_PrSystemMem->pDukContext, _Delta);
+	duk_call(_PrSystemMem->pDukContext, 1);
+}
+static duk_ret_t
+_StepFuncBridge(duk_context* _DKC)
+{
+	DUK_REGISTER_CALLBACK(_PrSystemMem->pStepFunc, _JSStepFunc, _PrSystemMem->aFuncPtr[BL_ET_COUNT + 1]);
+}
+static const void
+_JSEndFunc()
+{
+	duk_push_heapptr(_PrSystemMem->pDukContext, _PrSystemMem->aFuncPtr[BL_ET_COUNT + 2]);
+	duk_call(_PrSystemMem->pDukContext, 0);
+}
+static duk_ret_t
+_EndFuncBridge(duk_context* _DKC)
+{
+	DUK_REGISTER_CALLBACK(_PrSystemMem->pEndFunc, _JSEndFunc, _PrSystemMem->aFuncPtr[BL_ET_COUNT + 2]);
+}
+static const BLBool
+_SystemEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
+{
+	duk_push_heapptr(_PrSystemMem->pDukContext, _PrSystemMem->aFuncPtr[BL_ET_SYSTEM]);
+	duk_push_uint(_PrSystemMem->pDukContext, _Type);
+	duk_push_uint(_PrSystemMem->pDukContext, _UParam);
+	duk_push_int(_PrSystemMem->pDukContext, _SParam);
+	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
+	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
+	duk_call(_PrSystemMem->pDukContext, 5);
+}
+static duk_ret_t
+_SystemEventBridge(duk_context* _DKC)
+{
+	BLU32 _idx = 0;
+	while (_PrSystemMem->pSubscriber[BL_ET_SYSTEM][_idx])
+		_idx++;
+	DUK_REGISTER_CALLBACK(_PrSystemMem->pSubscriber[BL_ET_SYSTEM][_idx], _SystemEventFunc, _PrSystemMem->aFuncPtr[BL_ET_SYSTEM]);
+}
+static const BLBool
+_NetEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
+{
+	duk_push_heapptr(_PrSystemMem->pDukContext, _PrSystemMem->aFuncPtr[BL_ET_NET]);
+	duk_push_uint(_PrSystemMem->pDukContext, _Type);
+	duk_push_uint(_PrSystemMem->pDukContext, _UParam);
+	duk_push_int(_PrSystemMem->pDukContext, _SParam);
+	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
+	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
+	duk_call(_PrSystemMem->pDukContext, 5);
+}
+static duk_ret_t
+_NetEventBridge(duk_context* _DKC)
+{
+	BLU32 _idx = 0;
+	while (_PrSystemMem->pSubscriber[BL_ET_NET][_idx])
+		_idx++;
+	DUK_REGISTER_CALLBACK(_PrSystemMem->pSubscriber[BL_ET_NET][_idx], _NetEventFunc, _PrSystemMem->aFuncPtr[BL_ET_NET]);
+}
+static const BLBool
+_MouseEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
+{
+	duk_push_heapptr(_PrSystemMem->pDukContext, _PrSystemMem->aFuncPtr[BL_ET_MOUSE]);
+	duk_push_uint(_PrSystemMem->pDukContext, _Type);
+	duk_push_uint(_PrSystemMem->pDukContext, _UParam);
+	duk_push_int(_PrSystemMem->pDukContext, _SParam);
+	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
+	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
+	duk_call(_PrSystemMem->pDukContext, 5);
+}
+static duk_ret_t
+_MouseEventBridge(duk_context* _DKC)
+{
+	BLU32 _idx = 0;
+	while (_PrSystemMem->pSubscriber[BL_ET_MOUSE][_idx])
+		_idx++;
+	DUK_REGISTER_CALLBACK(_PrSystemMem->pSubscriber[BL_ET_MOUSE][_idx], _MouseEventFunc, _PrSystemMem->aFuncPtr[BL_ET_MOUSE]);
+}
+static const BLBool
+_KeyEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
+{
+	duk_push_heapptr(_PrSystemMem->pDukContext, _PrSystemMem->aFuncPtr[BL_ET_KEY]);
+	duk_push_uint(_PrSystemMem->pDukContext, _Type);
+	duk_push_uint(_PrSystemMem->pDukContext, _UParam);
+	duk_push_int(_PrSystemMem->pDukContext, _SParam);
+	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
+	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
+	duk_call(_PrSystemMem->pDukContext, 5);
+}
+static duk_ret_t
+_KeyEventBridge(duk_context* _DKC)
+{
+	BLU32 _idx = 0;
+	while (_PrSystemMem->pSubscriber[BL_ET_KEY][_idx])
+		_idx++;
+	DUK_REGISTER_CALLBACK(_PrSystemMem->pSubscriber[BL_ET_KEY][_idx], _KeyEventFunc, _PrSystemMem->aFuncPtr[BL_ET_KEY]);
+}
+static const BLBool
+_UIEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
+{
+	duk_push_heapptr(_PrSystemMem->pDukContext, _PrSystemMem->aFuncPtr[BL_ET_UI]);
+	duk_push_uint(_PrSystemMem->pDukContext, _Type);
+	duk_push_uint(_PrSystemMem->pDukContext, _UParam);
+	duk_push_int(_PrSystemMem->pDukContext, _SParam);
+	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
+	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
+	duk_call(_PrSystemMem->pDukContext, 5);
+}
+static duk_ret_t
+_UIEventBridge(duk_context* _DKC)
+{
+	BLU32 _idx = 0;
+	while (_PrSystemMem->pSubscriber[BL_ET_UI][_idx])
+		_idx++;
+	DUK_REGISTER_CALLBACK(_PrSystemMem->pSubscriber[BL_ET_UI][_idx], _UIEventFunc, _PrSystemMem->aFuncPtr[BL_ET_UI]);
+}
+static const BLBool
+_SpriteEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
+{
+	duk_push_heapptr(_PrSystemMem->pDukContext, _PrSystemMem->aFuncPtr[BL_ET_SPRITE]);
+	duk_push_uint(_PrSystemMem->pDukContext, _Type);
+	duk_push_uint(_PrSystemMem->pDukContext, _UParam);
+	duk_push_int(_PrSystemMem->pDukContext, _SParam);
+	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
+	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
+	duk_call(_PrSystemMem->pDukContext, 5);
+}
+static duk_ret_t
+_SpriteEventBridge(duk_context* _DKC)
+{
+	BLU32 _idx = 0;
+	while (_PrSystemMem->pSubscriber[BL_ET_SPRITE][_idx])
+		_idx++;
+	DUK_REGISTER_CALLBACK(_PrSystemMem->pSubscriber[BL_ET_SPRITE][_idx], _SpriteEventFunc, _PrSystemMem->aFuncPtr[BL_ET_SPRITE]);
+}
+static duk_ret_t
+_JSExport(duk_context* _DKC)
+{
+	JS_FUNCTION_REG("blSubscribeBeginEvent", _BeginFuncBridge);
+	JS_FUNCTION_REG("blSubscribeStepEvent", _StepFuncBridge);
+	JS_FUNCTION_REG("blSubscribeEndEvent", _EndFuncBridge);
+	JS_FUNCTION_REG("blSubscribeSystemEvent", _SystemEventBridge);
+	JS_FUNCTION_REG("blSubscribeNetEvent", _NetEventBridge);
+	JS_FUNCTION_REG("blSubscribeMouseEvent", _MouseEventBridge);
+	JS_FUNCTION_REG("blSubscribeKeyEvent", _KeyEventBridge);
+	JS_FUNCTION_REG("blSubscribeUIEvent", _UIEventBridge);
+	JS_FUNCTION_REG("blSubscribeSpriteEvent", _SpriteEventBridge);
+	return 1;
+}
 #if defined(BL_PLATFORM_WIN32)
 LRESULT CALLBACK
 _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
@@ -3141,15 +3304,64 @@ _PollEvent()
 BLVoid
 _SystemInit()
 {
-	_PrSystemMem->pDukContext = duk_create_heap_default();
-	_PrSystemMem->nSysTime = blSystemTicks();
+	_PrSystemMem->nSysTime = blTickCounts();
 	_UtilsInit(_PrSystemMem->pDukContext);
-    _ShowWindow();
 #ifdef BL_PLATFORM_ANDROID
 	_StreamIOInit(_PrSystemMem->pDukContext, _PrSystemMem->pActivity->assetManager);
 #else
 	_StreamIOInit(_PrSystemMem->pDukContext, NULL);
 #endif
+	if (_PrSystemMem->pDukContext)
+	{
+		BLAnsi _tmpname[260] = { 0 };
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+		strcpy_s(_tmpname, 260, blWorkingDir(TRUE));
+		strcat_s(_tmpname, 260, "main.js");
+#else
+		strcpy(_tmpname, blWorkingDir(TRUE));
+		strcat(_tmpname, "main.js");
+#endif
+		duk_push_c_function(_PrSystemMem->pDukContext, _JSExport, 0);
+		duk_call(_PrSystemMem->pDukContext, 0);
+		duk_put_global_string(_PrSystemMem->pDukContext, "bulllord");
+		BLGuid _stream = blGenStream(_tmpname, NULL);
+		BLAnsi* _data = (BLAnsi*)malloc(blStreamLength(_stream) + 1);
+		blStreamRead(_stream, blStreamLength(_stream), _data);
+		_data[blStreamLength(_stream)] = 0;
+		duk_peval_string(_PrSystemMem->pDukContext, _data);
+		duk_get_global_string(_PrSystemMem->pDukContext, "APPNAME");
+		strcpy((BLAnsi*)_PrSystemMem->sBoostParam.pAppName, (const BLAnsi*)duk_to_string(_PrSystemMem->pDukContext, -1));
+		duk_pop(_PrSystemMem->pDukContext);
+		duk_get_global_string(_PrSystemMem->pDukContext, "USE_DESIGN_RES");
+		_PrSystemMem->sBoostParam.bUseDesignRes = duk_to_boolean(_PrSystemMem->pDukContext, -1);
+		duk_pop(_PrSystemMem->pDukContext);
+		duk_get_global_string(_PrSystemMem->pDukContext, "DESIGN_WIDTH");
+		_PrSystemMem->sBoostParam.nDesignWidth = duk_to_int(_PrSystemMem->pDukContext, -1);
+		duk_pop(_PrSystemMem->pDukContext);
+		duk_get_global_string(_PrSystemMem->pDukContext, "DESIGN_HEIGHT");
+		_PrSystemMem->sBoostParam.nDesignHeight = duk_to_int(_PrSystemMem->pDukContext, -1);
+		duk_pop(_PrSystemMem->pDukContext);
+		duk_get_global_string(_PrSystemMem->pDukContext, "PROFILER");
+		_PrSystemMem->sBoostParam.bProfiler = duk_to_boolean(_PrSystemMem->pDukContext, -1);
+		duk_pop(_PrSystemMem->pDukContext);
+		if (_PrSystemMem->sBoostParam.nScreenWidth + _PrSystemMem->sBoostParam.nScreenHeight == 0)
+		{
+			duk_get_global_string(_PrSystemMem->pDukContext, "SCREEN_WIDTH_DEFAULT");
+			_PrSystemMem->sBoostParam.nScreenWidth = duk_to_int(_PrSystemMem->pDukContext, -1);
+			duk_pop(_PrSystemMem->pDukContext);
+			duk_get_global_string(_PrSystemMem->pDukContext, "SCREEN_HEIGHT_DEFAULT");
+			_PrSystemMem->sBoostParam.nScreenHeight = duk_to_int(_PrSystemMem->pDukContext, -1);
+			duk_pop(_PrSystemMem->pDukContext);
+			duk_get_global_string(_PrSystemMem->pDukContext, "FULLSCREEN_DEFAULT");
+			_PrSystemMem->sBoostParam.bFullscreen = duk_to_boolean(_PrSystemMem->pDukContext, -1);
+			duk_pop(_PrSystemMem->pDukContext);
+			duk_get_global_string(_PrSystemMem->pDukContext, "QUALITY_DEFAULT");
+			_PrSystemMem->sBoostParam.eQuality = duk_to_uint(_PrSystemMem->pDukContext, -1);
+			duk_pop(_PrSystemMem->pDukContext);
+		}
+		blDeleteStream(_stream);
+	}
+	_ShowWindow();
     _AudioInit(_PrSystemMem->pDukContext);
     _UIInit(_PrSystemMem->pDukContext, _PrSystemMem->sBoostParam.bProfiler);
     _SpriteInit(_PrSystemMem->pDukContext);
@@ -3183,7 +3395,7 @@ _SystemStep()
 	}
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0);
 	blFrameBufferClear(INVALID_GUID, TRUE, TRUE, TRUE);
-    BLU32 _now = blSystemTicks();
+    BLU32 _now = blTickCounts();
     BLU32 _delta = _now - _PrSystemMem->nSysTime;
     _PrSystemMem->nSysTime = _now;
 	for (BLU32 _idx = 0 ; _idx < 8; ++_idx)
@@ -3230,6 +3442,21 @@ _SystemDestroy()
 		blInvokeEvent(BL_ET_SYSTEM, BL_SE_VIDEOOVER, 0, NULL, INVALID_GUID);
 		_GbVideoPlaying = FALSE;
 	}
+	BLAnsi _tmp[256] = { 0 };
+	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenWidth);
+	blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp);
+	memset(_tmp, 0, sizeof(_tmp));
+	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenHeight);
+	blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp);
+	memset(_tmp, 0, sizeof(_tmp));
+	if (_PrSystemMem->sBoostParam.bFullscreen)
+		strcpy(_tmp, "true");
+	else
+		strcpy(_tmp, "false");
+	blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp);
+	memset(_tmp, 0, sizeof(_tmp));
+	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.eQuality);
+	blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp);
 	_PrSystemMem->pEndFunc();
     _NetworkDestroy();
     _SpriteDestroy();
@@ -3240,7 +3467,8 @@ _SystemDestroy()
 	_UtilsDestroy();
     if (_PrSystemMem->pEvents)
         free(_PrSystemMem->pEvents);
-	duk_destroy_heap(_PrSystemMem->pDukContext);
+	if (_PrSystemMem->pDukContext)
+		duk_destroy_heap(_PrSystemMem->pDukContext);
 #if defined(BL_PLATFORM_UWP)
 	delete _PrSystemMem;
 	_PrSystemMem = NULL;
@@ -3269,7 +3497,7 @@ blPlatformIdentity()
 #endif
 }
 BLU32
-blSystemTicks()
+blTickCounts()
 {
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	static LARGE_INTEGER _litime = { 0 };
@@ -3520,7 +3748,7 @@ blWorkingDir(IN BLBool _Content)
 		return _PrSystemMem->aWorkDir;
 }
 BLBool
-blSetClipboard(IN BLUtf8* _Text)
+blClipboardCopy(IN BLUtf8* _Text)
 {
 	if (!_Text)
 		return FALSE;
@@ -3600,7 +3828,7 @@ blSetClipboard(IN BLUtf8* _Text)
 #endif
 }
 const BLUtf8*
-blGetClipboard()
+blClipboardPaste()
 {
 #if defined(BL_PLATFORM_WIN32)
 	memset(_PrSystemMem->aClipboard, 0, 1024);
@@ -3673,7 +3901,7 @@ blGetClipboard()
 	return _PrSystemMem->aClipboard;
 }
 BLBool
-blEnvString(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
+blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 {
 	BLBool _set = (_Value[0] == 0) ? FALSE : TRUE;
 	BLAnsi _path[260] = { 0 };
@@ -3993,7 +4221,7 @@ blOpenPlugin(IN BLAnsi* _Basename)
 	strcat(_path, "OpenEXT");
 #endif
 	BLVoid(*_open)(BLVoid);
-	_open = (BLVoid(*)(BLVoid))blGetPluginProcAddress(_Basename, _path);
+	_open = (BLVoid(*)(BLVoid))blPluginProcAddress(_Basename, _path);
 	_open();
     return TRUE;
 }
@@ -4018,7 +4246,7 @@ blClosePlugin(IN BLAnsi* _Basename)
 	strcat(_path, "CloseEXT");
 #endif
 	BLVoid(*_close)(BLVoid);
-	_close = (BLVoid(*)(BLVoid))blGetPluginProcAddress(_Basename, _path);
+	_close = (BLVoid(*)(BLVoid))blPluginProcAddress(_Basename, _path);
 	_close();
 #if defined(BL_PLATFORM_WIN32)
     FreeLibrary(_PrSystemMem->aPlugins[_idx].pHandle);
@@ -4037,7 +4265,7 @@ blClosePlugin(IN BLAnsi* _Basename)
     return TRUE;
 }
 BLVoid*
-blGetPluginProcAddress(IN BLAnsi* _Basename, IN BLAnsi* _Function)
+blPluginProcAddress(IN BLAnsi* _Basename, IN BLAnsi* _Function)
 {
 	BLU32 _hashname = blHashUtf8((const BLUtf8*)_Basename);
 	BLU32 _idx = 0;
@@ -4209,17 +4437,6 @@ blSubscribeEvent(IN BLEnum _Type, IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, 
 	_PrSystemMem->pSubscriber[_Type][_idx] = _Subscriber;
 }
 BLVoid
-blUnsubscribeEvent(IN BLEnum _Type, IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid))
-{
-	BLU32 _idx = 0, _num = 0;
-	while (_PrSystemMem->pSubscriber[_Type][_num])
-		_num++;
-	while (_PrSystemMem->pSubscriber[_Type][_idx] != _Subscriber)
-		_idx++;
-	memmove(_PrSystemMem->pSubscriber[_Type] + _idx, _PrSystemMem->pSubscriber[_Type] + _idx + 1, (_num - _idx - 1) * sizeof(BLVoid*));
-	_PrSystemMem->pSubscriber[_Type][_num - 1] = NULL;
-}
-BLVoid
 blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _Pparam, IN BLGuid _ID)
 {
 #ifdef BL_PLATFORM_ANDROID
@@ -4291,7 +4508,7 @@ blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _P
 #endif
 }
 BLVoid
-blSystemDateTime(OUT BLS32* _Year, OUT BLS32* _Month, OUT BLS32* _Day, OUT BLS32* _Hour, OUT BLS32* _Minute, OUT BLS32* _Second, OUT BLS32* _Wday, OUT BLS32* _Yday, OUT BLS32* _Dst)
+blDateTime(OUT BLS32* _Year, OUT BLS32* _Month, OUT BLS32* _Day, OUT BLS32* _Hour, OUT BLS32* _Minute, OUT BLS32* _Second, OUT BLS32* _Wday, OUT BLS32* _Yday, OUT BLS32* _Dst)
 {
 	time_t _timer;
 	struct tm* _tblock;
@@ -4308,7 +4525,7 @@ blSystemDateTime(OUT BLS32* _Year, OUT BLS32* _Month, OUT BLS32* _Day, OUT BLS32
 	*_Dst = _tblock->tm_isdst;
 }
 BLBool
-blSystemTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
+blTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
 {
 	BLU32 _idx = 0;
 	BLBool _full = TRUE;
@@ -4324,11 +4541,11 @@ blSystemTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
 		return FALSE;
 	_PrSystemMem->aTimers[_idx].nId = _PositiveID;
 	_PrSystemMem->aTimers[_idx].fElapse = _Elapse;
-	_PrSystemMem->aTimers[_idx].nLastTime = blSystemTicks();
+	_PrSystemMem->aTimers[_idx].nLastTime = blTickCounts();
 	return TRUE;
 }
 BLVoid 
-blGetWindowSize(OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _ActualWidth, OUT BLU32* _ActualHeight, OUT BLF32* _RatioX, OUT BLF32* _RatioY)
+blWindowQuery(OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _ActualWidth, OUT BLU32* _ActualHeight, OUT BLF32* _RatioX, OUT BLF32* _RatioY)
 {
 	*_Width = _PrSystemMem->sBoostParam.nScreenWidth;
 	*_Height = _PrSystemMem->sBoostParam.nScreenHeight;
@@ -4360,13 +4577,28 @@ blGetWindowSize(OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _ActualWidth, 
 	}
 }
 BLVoid
-blWindowSize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
+blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
 {
 #if defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_UWP)
     if (_Fullscreen)
         _EnterFullscreen();
     else
         _ExitFullscreen(_Width, _Height);
+	BLAnsi _tmp[256] = { 0 };
+	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenWidth);
+	blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp);
+	memset(_tmp, 0, sizeof(_tmp));
+	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenHeight);
+	blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp);
+	memset(_tmp, 0, sizeof(_tmp));
+	if (_PrSystemMem->sBoostParam.bFullscreen)
+		strcpy(_tmp, "true");
+	else
+		strcpy(_tmp, "false");
+	blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp);
+	memset(_tmp, 0, sizeof(_tmp));
+	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.eQuality);
+	blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp);
 #endif
 }
 BLVoid 
@@ -4426,15 +4658,40 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 #else
 	strcpy((BLAnsi*)_PrSystemMem->sBoostParam.pAppName, _Appname);
 #endif
-	_PrSystemMem->sBoostParam.nScreenWidth = _Width;
-	_PrSystemMem->sBoostParam.nScreenHeight = _Height;
+	if (_Width + _Height == 0)
+	{
+		BLAnsi _tmp[256] = { 0 };
+		if (blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp))
+			_PrSystemMem->sBoostParam.nScreenWidth = strtoul(_tmp, NULL, 10);
+		else
+			_PrSystemMem->sBoostParam.nScreenWidth = 0;
+		memset(_tmp, 0, sizeof(_tmp));
+		if (blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp))
+			_PrSystemMem->sBoostParam.nScreenHeight = strtoul(_tmp, NULL, 10);
+		else
+			_PrSystemMem->sBoostParam.nScreenHeight = 0;
+		memset(_tmp, 0, sizeof(_tmp));
+		if (blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp))
+			_PrSystemMem->sBoostParam.bFullscreen = strcmp(_tmp, "true") ? FALSE : TRUE;
+		else
+			_PrSystemMem->sBoostParam.bFullscreen = FALSE;
+		memset(_tmp, 0, sizeof(_tmp));
+		if (blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp))
+			_PrSystemMem->sBoostParam.eQuality = strtoul(_tmp, NULL, 10);
+		else
+			_PrSystemMem->sBoostParam.eQuality = BL_RQ_NORMAL;
+	}
+	else
+	{
+		_PrSystemMem->sBoostParam.nScreenWidth = _Width;
+		_PrSystemMem->sBoostParam.nScreenHeight = _Height;
+		_PrSystemMem->sBoostParam.bFullscreen = _Fullscreen;
+		_PrSystemMem->sBoostParam.eQuality = _GbRenderQuality = _Quality;
+	}
 	_PrSystemMem->sBoostParam.nDesignWidth = _DesignWidth;
 	_PrSystemMem->sBoostParam.nDesignHeight = _DesignHeight;
 	_PrSystemMem->sBoostParam.bUseDesignRes = _UseDesignRes;
-	_PrSystemMem->sBoostParam.bFullscreen = _Fullscreen;
 	_PrSystemMem->sBoostParam.bProfiler = _Profiler;
-    _PrSystemMem->sBoostParam.eQuality = _GbRenderQuality = _Quality;
-	_PrSystemMem->sBoostParam.nHandle = 0;
     _PrSystemMem->pBeginFunc = _Begin;
     _PrSystemMem->pStepFunc = _Step;
     _PrSystemMem->pEndFunc = _End;
@@ -4482,7 +4739,6 @@ blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)
 #endif
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 		_PrSystemMem->aTimers[_idx].nId = -1;
-	_PrSystemMem->sBoostParam.nHandle = 0;
 	_PrSystemMem->pBeginFunc = _Begin;
 	_PrSystemMem->pStepFunc = _Step;
 	_PrSystemMem->pEndFunc = _End;
@@ -4493,8 +4749,83 @@ blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)
 	_SystemDestroy();
 #endif
 }
-BLVoid 
-blSystemEvalFile(IN BLAnsi* _Filename)
+BLVoid
+blSystemScriptRun()
 {
-	duk_eval_string(_PrSystemMem->pDukContext, _Filename);
+#if defined(BL_PLATFORM_UWP)
+	_PrSystemMem = new _BLSystemMember;
+#elif defined(BL_PLATFORM_ANDROID)
+#else
+	_PrSystemMem = (_BLSystemMember*)malloc(sizeof(_BLSystemMember));
+#endif
+	memset(_PrSystemMem->pSubscriber, 0, sizeof(_PrSystemMem->pSubscriber));
+	_PrSystemMem->pBeginFunc = NULL;
+	_PrSystemMem->pStepFunc = NULL;
+	_PrSystemMem->pEndFunc = NULL;
+	_PrSystemMem->pEvents = NULL;
+	_PrSystemMem->pDukContext = duk_create_heap_default();
+	memset(_PrSystemMem->aWorkDir, 0, sizeof(_PrSystemMem->aWorkDir));
+	memset(_PrSystemMem->aContentDir, 0, sizeof(_PrSystemMem->aContentDir));
+	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
+	_PrSystemMem->nEventsSz = 0;
+	_PrSystemMem->nEventIdx = 0;
+	_PrSystemMem->nSysTime = 0;
+	_PrSystemMem->nOrientation = SCREEN_LANDSCAPE_INTERNAL;
+	for (BLU32 _idx = 0; _idx < 64; ++_idx)
+		_PrSystemMem->aPlugins[_idx].nHash = 0;
+	BLAnsi _tmp[256] = { 0 };
+	if (blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp))
+		_PrSystemMem->sBoostParam.nScreenWidth = strtoul(_tmp, NULL, 10);
+	else
+		_PrSystemMem->sBoostParam.nScreenWidth = 0;
+	memset(_tmp, 0, sizeof(_tmp));
+	if (blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp))
+		_PrSystemMem->sBoostParam.nScreenHeight = strtoul(_tmp, NULL, 10);
+	else
+		_PrSystemMem->sBoostParam.nScreenHeight = 0;
+	memset(_tmp, 0, sizeof(_tmp));
+	if (blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp))
+		_PrSystemMem->sBoostParam.bFullscreen = strcmp(_tmp, "true") ? FALSE : TRUE;
+	else
+		_PrSystemMem->sBoostParam.bFullscreen = FALSE;
+	memset(_tmp, 0, sizeof(_tmp));
+	if (blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp))
+		_PrSystemMem->sBoostParam.eQuality = strtoul(_tmp, NULL, 10);
+	else
+		_PrSystemMem->sBoostParam.eQuality = BL_RQ_NORMAL;
+#if defined(BL_PLATFORM_WIN32)
+	_PrSystemMem->bCtrlPressed = FALSE;
+#elif defined(BL_PLATFORM_UWP)
+	_PrSystemMem->bCtrlPressed = FALSE;
+#elif defined(BL_PLATFORM_LINUX)
+	_PrSystemMem->pDisplay = NULL;
+	_PrSystemMem->pIME = NULL;
+	_PrSystemMem->pIC = NULL;
+	_PrSystemMem->pLib = NULL;
+	_PrSystemMem->bCtrlPressed = FALSE;
+#elif defined(BL_PLATFORM_ANDROID)
+	_PrSystemMem->bAvtivityFocus = FALSE;
+#elif defined(BL_PLATFORM_OSX)
+	_PrSystemMem->pPool = nil;
+	_PrSystemMem->pWindow = nil;
+	_PrSystemMem->pTICcxt = nil;
+	_PrSystemMem->pDelegate = nil;
+	_PrSystemMem->bCtrlPressed = FALSE;
+#elif defined(BL_PLATFORM_IOS)
+	_PrSystemMem->pPool = nil;
+	_PrSystemMem->pWindow = nil;
+	_PrSystemMem->pTICcxt = nil;
+	_PrSystemMem->nKeyboardHeight = 0;
+	_PrSystemMem->pCtlView = nil;
+#endif
+	for (BLU32 _idx = 0; _idx < 8; ++_idx)
+		_PrSystemMem->aTimers[_idx].nId = -1;
+	memset(_PrSystemMem->sBoostParam.pAppName, 0, sizeof(_PrSystemMem->sBoostParam.pAppName));
+	_SystemInit();
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
+	do {
+		_SystemStep();
+	} while (_GbSystemRunning);
+	_SystemDestroy();
+#endif
 }

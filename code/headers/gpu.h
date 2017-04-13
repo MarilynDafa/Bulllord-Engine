@@ -27,7 +27,7 @@ extern "C" {
 BL_API BLVoid blVSync(
 	IN BLBool _On);
 
-BL_API BLVoid blQueryHardwareCaps(
+BL_API BLVoid blHardwareCapsQuery(
 	OUT BLEnum* _Api,
 	OUT BLU32* _MaxTexSize,
 	OUT BLU32* _MaxFramebuffer,

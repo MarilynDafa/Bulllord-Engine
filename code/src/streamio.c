@@ -684,7 +684,7 @@ blStreamSeek(IN BLGuid _ID, IN BLU32 _Pos)
 		blDebugOutput("Invalid Operation blStreamSeek");
 }
 BLBool
-blExistFile(IN BLAnsi* _Filename)
+blFileExist(IN BLAnsi* _Filename)
 {
 	BLU32 _i;
 	BLAnsi _tmpname[260];
@@ -713,7 +713,7 @@ blExistFile(IN BLAnsi* _Filename)
 #endif
 }
 BLBool
-blWriteFile(IN BLAnsi* _Filename, IN BLU32 _Count, IN BLU8* _Data)
+blFileWrite(IN BLAnsi* _Filename, IN BLU32 _Count, IN BLU8* _Data)
 {
 	BLU32 _i;
 	BLAnsi _tmpname[260] = { 0 };
@@ -757,7 +757,7 @@ blWriteFile(IN BLAnsi* _Filename, IN BLU32 _Count, IN BLU8* _Data)
     return FALSE;
 }
 BLBool
-blDeleteFile(IN BLAnsi* _Filename)
+blFileDelete(IN BLAnsi* _Filename)
 {
 	BLU32 _i;
 	BLAnsi _tmpname[260];
@@ -785,7 +785,7 @@ blDeleteFile(IN BLAnsi* _Filename)
 #endif
 }
 BLBool
-blRegisterArchive(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
+blArchiveRegist(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 {
 	BLBool _inworkdir = TRUE;
 	BLU32 _i;
@@ -943,7 +943,7 @@ blRegisterArchive(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 	return TRUE;
 }
 BLBool
-blPatchArchive(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
+blArchivePatch(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 {
 	BLBool _inworkdir = FALSE;
 	BLU32 _aidx = 0 , _i;
@@ -1172,18 +1172,22 @@ blPatchArchive(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 #endif
 	return TRUE;
 }
-BLU32
-blQueryArchiveVer(IN BLAnsi* _Archive)
+BLBool
+blArchiveQuery(IN BLAnsi* _Archive, OUT BLU32* _Version)
 {
     FOREACH_ARRAY(_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
     {
-        if(!strcmp(_Archive , _iter->pArchive))
-            return _iter->nVersion;
+		if (!strcmp(_Archive, _iter->pArchive))
+		{
+			*_Version = _iter->nVersion;
+			return TRUE;
+		}
     }
-    return -1;
+	_Version = NULL;
+    return FALSE;
 }
 BLBool
-blGenSqlConnection(IN BLAnsi* _Dbname, IN BLAnsi* _Dbpwd, IN BLBool _Inmem)
+blGenSql(IN BLAnsi* _Dbname, IN BLAnsi* _Dbpwd, IN BLBool _Inmem)
 {
 	BLS32 _ret , _i;
     sqlite3* _db;
@@ -1247,7 +1251,7 @@ blGenSqlConnection(IN BLAnsi* _Dbname, IN BLAnsi* _Dbpwd, IN BLBool _Inmem)
     return TRUE;
 }
 BLVoid
-blDeleteSqlConnection()
+blDeleteSql()
 {
     sqlite3_close(_PrStreamIOMem->pSqlDB);
 }
@@ -1297,7 +1301,7 @@ blSqlValueAsInteger(IN BLAnsi* _Name)
     return sqlite3_column_int64(_PrStreamIOMem->pSqlVM, _index);
 }
 BLF64
-blSqlValueAsReal(IN BLAnsi* _Name)
+blSqlValueAsNumber(IN BLAnsi* _Name)
 {
     BLS32 _count = sqlite3_column_count(_PrStreamIOMem->pSqlVM);
     BLAnsi* _colname = NULL;

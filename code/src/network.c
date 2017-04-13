@@ -1568,7 +1568,7 @@ failed:
 #endif
 }
 BLVoid
-blConnectNetwork(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
+blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 {
 	memset(_PrNetworkMem->aHost, 0, sizeof(_PrNetworkMem->aHost));
 	strcpy(_PrNetworkMem->aHost, _Host);
@@ -1600,7 +1600,7 @@ blConnectNetwork(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 	}
 }
 BLVoid
-blDisconnectNetwork()
+blDisconnect()
 {
 	memset(_PrNetworkMem->aHost, 0, sizeof(_PrNetworkMem->aHost));
 	_PrNetworkMem->nPort = -1;
@@ -2281,7 +2281,7 @@ blBeginDownload()
 	blThreadRun(_PrNetworkMem->pDownMain);
 }
 BLVoid
-blQueryProgress(OUT BLU32* _Curtask, OUT BLU32* _Downloaded, OUT BLU32* _Total, OUT BLU32 _Finish[64])
+blProgressQuery(OUT BLU32* _Curtask, OUT BLU32* _Downloaded, OUT BLU32* _Total, OUT BLU32 _Finish[64])
 {
 	*_Curtask = _PrNetworkMem->_PrCurDownHash;
 	*_Downloaded = _PrNetworkMem->nCurDownSize;

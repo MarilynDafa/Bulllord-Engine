@@ -254,7 +254,7 @@ _SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, B
 		blDeleteTexture(_PrSpriteMem->nFBOTex);
 		BLU32 _w, _h, _aw, _ah;
 		BLF32 _rx, _ry;
-		blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+		blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 		_PrSpriteMem->sViewport.sLT.fX = _PrSpriteMem->sViewport.sLT.fY = 0.f;
 		_PrSpriteMem->sViewport.sRB.fX = (BLF32)_aw;
 		_PrSpriteMem->sViewport.sRB.fY = (BLF32)_ah;
@@ -799,7 +799,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
         return;
 	BLU32 _w, _h, _aw, _ah;
 	BLF32 _rx, _ry;
-	blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+	blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 	if (_Node->sScissor.sLT.fX < 0.f)
 		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah);
 	else
@@ -1047,27 +1047,6 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 		_SpriteDraw(_Delta, _chnode, _rmat);
 	}
 }
-JS_FUNCTION_INTERNAL(blGenSprite)
-{
-	BLGuid _id = blGenSprite(duk_to_string(_DKC, 0),
-		duk_is_null(_DKC, 1) ? NULL : duk_to_string(_DKC, 1),
-		duk_to_string(_DKC, 2),
-		(BLF32)duk_to_number(_DKC, 3),
-		(BLF32)duk_to_number(_DKC, 4),
-		(BLF32)duk_to_number(_DKC, 5),
-		duk_to_uint32(_DKC, 6),
-		duk_to_boolean(_DKC, 7));
-	BLAnsi _idstr[64] = { 0 };
-	sprintf(_idstr, "%llu", _id);
-	duk_push_string(_DKC, _idstr);
-	return 1;
-}
-static void
-_SpriteRegister()
-{
-	duk_push_c_function(_PrSpriteMem->pDukContext, _blGenSpriteJS, DUK_VARARGS);
-	duk_put_global_string(_PrSpriteMem->pDukContext, "blGenSprite");
-}
 BLVoid
 _SpriteInit(duk_context* _DKC)
 {
@@ -1093,20 +1072,19 @@ _SpriteInit(duk_context* _DKC)
 	blSubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
 	BLU32 _w, _h, _aw, _ah;
 	BLF32 _rx, _ry;
-	blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+	blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 	_PrSpriteMem->sViewport.sLT.fX = _PrSpriteMem->sViewport.sLT.fY = 0.f;
 	_PrSpriteMem->sViewport.sRB.fX = (BLF32)_aw;
 	_PrSpriteMem->sViewport.sRB.fY = (BLF32)_ah;
 	_PrSpriteMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _aw, _ah, 1, NULL);
 	blFrameBufferAttach(_PrSpriteMem->nFBO, _PrSpriteMem->nFBOTex, 0, BL_CTF_IGNORE);
-	_SpriteRegister();
 }
 BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 {
 	BLF32 _rx, _ry;
 	BLU32 _w, _h, _aw, _ah;
-	blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+	blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 	BLU8 _blendfactor[4] = { 0 };
 	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS);
 	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor);
@@ -1429,8 +1407,6 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 BLVoid
 _SpriteDestroy()
 {
-	blUnsubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
-    blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 	{		
 		FOREACH_ARRAY(_BLTileInfo*, _tileiter, _PrSpriteMem->pTileArray[_idx])

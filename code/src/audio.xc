@@ -1242,7 +1242,7 @@ blSystemVolume(IN BLF32 _Vol)
     blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 }
 BLVoid
-blQueryAudioVolume(OUT BLF32* _Music, OUT BLF32* _System, OUT BLF32* _Env)
+blVolumeQuery(OUT BLF32* _Music, OUT BLF32* _System, OUT BLF32* _Env)
 {
 	*_Music = _PrAudioMem->pAudioDev.fMusicVolume;
 	*_System = _PrAudioMem->pAudioDev.fSystemVolume;

@@ -8982,7 +8982,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 	{
 		BLU32 _oriw, _orih, _aw, _ah;
 		BLF32 _rx, _ry;
-		blGetWindowSize(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
+		blWindowQuery(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
 		BLF32 _cx = (BLF32)LOWU16(_UParam) / _rx;
 		BLF32 _cy = (BLF32)HIGU16(_UParam) / _ry;
 		_cx = (_cx > 10 * _oriw) ? 0.f : _cx;
@@ -9386,7 +9386,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 	{
 		BLU32 _oriw, _orih, _aw, _ah;
 		BLF32 _rx, _ry;
-		blGetWindowSize(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
+		blWindowQuery(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
 		BLF32 _cx = (BLF32)LOWU16(_UParam) / _rx;
 		BLF32 _cy = (BLF32)HIGU16(_UParam) / _ry;
 		_cx = (_cx > 10 * _oriw) ? 0.f : _cx;
@@ -9704,7 +9704,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 	{
 		BLU32 _oriw, _orih, _aw, _ah;
 		BLF32 _rx, _ry;
-		blGetWindowSize(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
+		blWindowQuery(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
 		BLF32 _cx = (BLF32)LOWU16(_UParam) / _rx;
 		BLF32 _cy = (BLF32)HIGU16(_UParam) / _ry;
 		_cx = (_cx > 10 * _oriw) ? 0.f : _cx;
@@ -10698,7 +10698,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam,
 									_s[_jdx] = _s16[_jdx + _realmbgn];
 								_s[_realmend - _realmbgn] = 0;
 								const BLUtf8* _clipboard = blGenUtf8Str((const BLUtf16*)_s);
-								blSetClipboard(_clipboard);
+								blClipboardCopy(_clipboard);
 								blDeleteUtf8Str((BLUtf8*)_clipboard);
 								blDeleteUtf16Str((BLUtf16*)_s16);
 							}
@@ -10719,7 +10719,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam,
 									_s[_jdx] = _s16[_jdx + _realmbgn];
 								_s[_realmend - _realmbgn] = 0;
 								const BLUtf8* _clipboard = blGenUtf8Str((const BLUtf16*)_s);
-								blSetClipboard(_clipboard);
+								blClipboardCopy(_clipboard);
 								blDeleteUtf8Str((BLUtf8*)_clipboard);
 								BLUtf16* _sn = (BLUtf16*)alloca((_s16len - _realmend + _realmbgn + 1) * sizeof(BLUtf16));
 								_jdx = 0;
@@ -10745,7 +10745,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam,
 						{
 							BLS32 _realmbgn = _wid->uExtension.sText.nSelectBegin < _wid->uExtension.sText.nSelectEnd ? _wid->uExtension.sText.nSelectBegin : _wid->uExtension.sText.nSelectEnd;
 							BLS32 _realmend = _wid->uExtension.sText.nSelectBegin < _wid->uExtension.sText.nSelectEnd ? _wid->uExtension.sText.nSelectEnd : _wid->uExtension.sText.nSelectBegin;
-							const BLUtf8* _clipboard = blGetClipboard();
+							const BLUtf8* _clipboard = blClipboardPaste();
 							if (_clipboard)
 							{
 								const BLUtf16* _clipboard16 = blGenUtf16Str(_clipboard);
@@ -10825,7 +10825,7 @@ _SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, B
 		blDeleteTexture(_PrUIMem->nFBOTex);
 		BLU32 _width, _height;
 		BLF32 _rx, _ry;
-		blGetWindowSize(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
+		blWindowQuery(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
 		_PrUIMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrUIMem->nFboWidth, _PrUIMem->nFboHeight, 1, NULL);
 		blFrameBufferAttach(_PrUIMem->nFBO, _PrUIMem->nFBOTex, 0, BL_CTF_IGNORE);
 		_PrUIMem->bDirty = TRUE;
@@ -10870,7 +10870,7 @@ _UIInit(duk_context* _DKC, BLBool _Profiler)
 	_PrUIMem->nBlankTex = blGenTexture(blHashUtf8((const BLUtf8*)"#@blanktex@#"), BL_TT_2D, BL_TF_RGBA8, FALSE, TRUE, FALSE, 1, 1, 2, 2, 1, (BLU8*)_blankdata);
 	BLU32 _width, _height;
 	BLF32 _rx, _ry;
-    blGetWindowSize(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
+    blWindowQuery(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
 	_PrUIMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrUIMem->nFboWidth, _PrUIMem->nFboHeight, 1, NULL);
 	blFrameBufferAttach(_PrUIMem->nFBO, _PrUIMem->nFBOTex, 0, BL_CTF_IGNORE);
 	blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
@@ -11131,7 +11131,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 {
 	BLU32 _width, _height;
 	BLF32 _rx, _ry;
-	blGetWindowSize(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
+	blWindowQuery(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
 	BLU8 _blendfactor[4] = { 0 };
 	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS);
 	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor);
@@ -11317,9 +11317,6 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 BLVoid
 _UIDestroy()
 {
-	blUnsubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
-	blUnsubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
-	blUnsubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	blDeleteGeometryBuffer(_PrUIMem->nQuadGeo);
 	blFrameBufferDetach(_PrUIMem->nFBO, FALSE);
 	blDeleteTexture(_PrUIMem->nFBOTex);

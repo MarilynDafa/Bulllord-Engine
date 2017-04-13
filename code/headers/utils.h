@@ -34,7 +34,13 @@ BL_API BLVoid blDeleteGuid(
 	IN BLGuid _ID);
 
 BL_API BLVoid* blGuidAsPointer(
-	BLGuid _ID);
+	IN BLGuid _ID);
+
+BL_API const BLAnsi* blGuidAsString(
+	IN BLGuid _ID);
+
+BL_API BLGuid blStringAsGuid(
+	IN BLAnsi* _String);
 
 BL_API BLVoid blDebugOutput(
 	IN BLAnsi* _Format,

@@ -42,6 +42,7 @@ typedef struct _UtilsMember {
 	BLAnsi aMd5Buf[64];
 	BLUtf8 aU8Buf[32];
 	BLUtf16 aU16Buf[32];
+	BLAnsi aGuidBuf[32];
     BLU32 nUriCount;
 }_BLUtilsMember;
 static _BLUtilsMember* _PrUtilsMem = NULL;
@@ -259,13 +260,25 @@ blDeleteGuid(IN BLGuid _ID)
 	blMutexUnlock(_PrUtilsMem->pMutex);
 }
 BLVoid*
-blGuidAsPointer(BLGuid _ID)
+blGuidAsPointer(IN BLGuid _ID)
 {
 	BLU32 _inptr = PTRPART_INTERNAL(_ID);
 	if (_inptr >= MEMCACHE_CAP_INTERNAL)
         return NULL;
 	else
 		return _PrUtilsMem->aPtrBuf[_inptr];
+}
+const BLAnsi* 
+blGuidAsString(IN BLGuid _ID)
+{
+	memset(_PrUtilsMem->aGuidBuf, 0, sizeof(_PrUtilsMem->aGuidBuf));
+	sprintf((BLAnsi*)_PrUtilsMem->aGuidBuf, "%llu", _ID);
+	return _PrUtilsMem->aGuidBuf;
+}
+BLGuid 
+blStringAsGuid(IN BLAnsi* _String)
+{
+	return strtoull(_String, NULL, 10);
 }
 BLVoid
 blDebugOutput(IN BLAnsi* _Format, ...)

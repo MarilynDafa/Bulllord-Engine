@@ -43,23 +43,23 @@
     <Filter Include="externals\xml">
       <UniqueIdentifier>{b65d4abf-d4f9-4557-bfdd-d6a41da71db5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="externals\duktape">
+      <UniqueIdentifier>{1a79ee76-1bb2-4aee-9c98-6d519d47f8d9}</UniqueIdentifier>
+    </Filter>
     <Filter Include="externals\ogg">
-      <UniqueIdentifier>{d1d1de96-7511-4e4e-acb8-e3e4f6040103}</UniqueIdentifier>
+      <UniqueIdentifier>{c0f4aa0e-2412-4151-abd7-e472bbf015c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="externals\opus">
-      <UniqueIdentifier>{a1918696-bb51-4ea9-ac78-f9472a981e92}</UniqueIdentifier>
+      <UniqueIdentifier>{edf3b3fb-e4e0-4738-9370-86fe5cc80737}</UniqueIdentifier>
     </Filter>
     <Filter Include="externals\opus\arm">
-      <UniqueIdentifier>{cf2fa4ac-3ebd-496f-a146-ea91edf059fe}</UniqueIdentifier>
+      <UniqueIdentifier>{d41d946a-7671-454a-9083-6d950ba04dc3}</UniqueIdentifier>
     </Filter>
     <Filter Include="externals\opus\float">
-      <UniqueIdentifier>{6500f451-aa7d-408d-857f-f49b463fca1b}</UniqueIdentifier>
+      <UniqueIdentifier>{4fb184b0-1bf4-4657-be1e-3b1169fdfd54}</UniqueIdentifier>
     </Filter>
     <Filter Include="externals\opus\x86">
-      <UniqueIdentifier>{e8ed2f0d-b77a-4bb5-ae46-cd2736abf67a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="externals\duktape">
-      <UniqueIdentifier>{84ae7d44-21cd-4709-98c5-783cfdeb8005}</UniqueIdentifier>
+      <UniqueIdentifier>{7c5848d7-fea5-4901-9868-c522d31697e2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +178,12 @@
     <ClInclude Include="..\..\code\externals\xml\ezxml.h">
       <Filter>externals\xml</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\externals\duktape\duk_config.h">
+      <Filter>externals\duktape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\duktape\duktape.h">
+      <Filter>externals\duktape</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\code\externals\ogg\include\ogg\ogg.h">
       <Filter>externals\ogg</Filter>
     </ClInclude>
@@ -198,12 +204,6 @@
     </ClInclude>
     <ClInclude Include="..\..\code\externals\opus\include\opus_types.h">
       <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\duktape\duk_config.h">
-      <Filter>externals\duktape</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\duktape\duktape.h">
-      <Filter>externals\duktape</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -414,14 +414,23 @@
     <ClCompile Include="..\..\code\externals\xml\ezxml.c">
       <Filter>externals\xml</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\src\gpu.xc">
-      <Filter>src</Filter>
+    <ClCompile Include="..\..\code\externals\duktape\duktape.c">
+      <Filter>externals\duktape</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\externals\ogg\src\bitwise.c">
       <Filter>externals\ogg</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\externals\ogg\src\framing.c">
       <Filter>externals\ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\arm\armcpu.c">
+      <Filter>externals\opus\arm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\arm\arm_celt_map.c">
+      <Filter>externals\opus\arm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\opus\celt\arm\celt_neon_intr.c">
+      <Filter>externals\opus\arm</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\externals\opus\silk\arm\arm_silk_map.c">
       <Filter>externals\opus\arm</Filter>
@@ -433,21 +442,6 @@
       <Filter>externals\opus\arm</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\externals\opus\silk\arm\NSQ_neon.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\opus\celt\arm\arm_celt_map.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\opus\celt\arm\armcpu.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\opus\celt\arm\celt_ne10_fft.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\opus\celt\arm\celt_ne10_mdct.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\opus\celt\arm\celt_neon_intr.c">
       <Filter>externals\opus\arm</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\externals\opus\silk\float\apply_sine_window_FLP.c">
@@ -549,10 +543,10 @@
     <ClCompile Include="..\..\code\externals\opus\celt\x86\vq_sse2.c">
       <Filter>externals\opus\x86</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\externals\opus\celt\x86\x86_celt_map.c">
+    <ClCompile Include="..\..\code\externals\opus\celt\x86\x86cpu.c">
       <Filter>externals\opus\x86</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\externals\opus\celt\x86\x86cpu.c">
+    <ClCompile Include="..\..\code\externals\opus\celt\x86\x86_celt_map.c">
       <Filter>externals\opus\x86</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\externals\opus\silk\x86\NSQ_del_dec_sse.c">
@@ -861,13 +855,13 @@
     <ClCompile Include="..\..\code\externals\opus\silk\VQ_WMat_EC.c">
       <Filter>externals\opus</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\code\src\system.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\code\src\audio.xc">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\externals\duktape\duktape.c">
-      <Filter>externals\duktape</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\src\system.cpp">
+    <ClCompile Include="..\..\code\src\gpu.xc">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

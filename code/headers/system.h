@@ -59,19 +59,26 @@ extern "C" {
     
 BL_API BLEnum blPlatformIdentity();
     
-BL_API BLU32 blSystemTicks();
+BL_API BLU32 blTickCounts();
 
 BL_API const BLAnsi* blUserFolderDir();
 
 BL_API const BLAnsi* blWorkingDir(
 	IN BLBool _Content);
 
-BL_API BLBool blSetClipboard(
+BL_API BLBool blClipboardCopy(
 	IN BLUtf8* _Text);
 
-BL_API const BLUtf8* blGetClipboard();
+BL_API const BLUtf8* blClipboardPaste();
 
-BL_API BLBool blEnvString(
+/**
+in-build vars
+SCREEN_WIDTH
+SCREEN_HEIGHT
+FULLSCREEN
+QUALITY
+*/
+BL_API BLBool blEnvVariable(
 	IN BLUtf8* _Section,
 	INOUT BLUtf8 _Value[256]);
 
@@ -84,13 +91,13 @@ BL_API BLBool blOpenPlugin(
 BL_API BLBool blClosePlugin(
 	IN BLAnsi* _Basename);
     
-BL_API BLVoid* blGetPluginProcAddress(
+BL_API BLVoid* blPluginProcAddress(
 	IN BLAnsi* _Basename,
     IN BLAnsi* _Function);
 
 /**
-	Video Format: MPEG2 PS Stream
-	Audio Format: AAC 16BIT STEREO
+	Video Format: Daala
+	Audio Format: Opus
 */
 BL_API BLBool blVideoOperation(
 	IN BLAnsi* _Filename,
@@ -107,10 +114,6 @@ BL_API BLVoid blSubscribeEvent(
 	IN BLEnum _Type, 
 	IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid));
 
-BL_API BLVoid blUnsubscribeEvent(
-	IN BLEnum _Type,
-	IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid));
-
 BL_API BLVoid blInvokeEvent(
 	IN BLEnum _Type, 
 	IN BLU32 _Uparam, 
@@ -118,7 +121,7 @@ BL_API BLVoid blInvokeEvent(
 	IN BLVoid* _Pparam,
 	IN BLGuid _ID);
 
-BL_API BLVoid blSystemDateTime(
+BL_API BLVoid blDateTime(
 	OUT BLS32* _Year,
 	OUT BLS32* _Month,
 	OUT BLS32* _Day,
@@ -129,11 +132,11 @@ BL_API BLVoid blSystemDateTime(
 	OUT BLS32* _Yday,
 	OUT BLS32* _Dst);
 
-BL_API BLBool blSystemTimer(
+BL_API BLBool blTimer(
 	IN BLS32 _PositiveID,
 	IN BLF32 _Elapse);
     
-BL_API BLVoid blGetWindowSize(
+BL_API BLVoid blWindowQuery(
 	OUT BLU32* _Width, 
 	OUT BLU32* _Height,
 	OUT BLU32* _ActualWidth,
@@ -141,7 +144,7 @@ BL_API BLVoid blGetWindowSize(
 	OUT BLF32* _RatioX,
 	OUT BLF32* _RatioY);
 
-BL_API BLVoid blWindowSize(
+BL_API BLVoid blWindowResize(
 	IN BLU32 _Width, 
 	IN BLU32 _Height, 
 	IN BLBool _Fullscreen);
@@ -166,9 +169,7 @@ BL_API BLVoid blSystemEmbedRun(
 	IN BLVoid(*_Step)(BLU32),
 	IN BLVoid(*_End)(BLVoid));
 
-BL_API BLVoid blSystemEvalFile(
-	IN BLAnsi* _Filename);
-
+BL_API BLVoid blSystemScriptRun();
 #ifdef __cplusplus
 }
 #endif

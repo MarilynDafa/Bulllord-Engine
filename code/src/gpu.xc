@@ -499,14 +499,14 @@ _PipelineStateRefreshGL()
 		{
 			BLF32 _rx, _ry;
 			BLU32 _w, _h, _aw, _ah;
-			blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+			blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 			GL_CHECK_INTERNAL(glScissor(0, 0, _w, _h));
 		}
 		else
 		{
 			BLF32 _rx, _ry;
 			BLU32 _w, _h, _aw, _ah;
-			blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+			blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 			BLS32 _scissorx = (BLS32)(_PrGpuMem->sPipelineState.nScissorX);
 			BLS32 _scissory = (BLS32)(_ah - _PrGpuMem->sPipelineState.nScissorH - _PrGpuMem->sPipelineState.nScissorY);
 			BLS32 _scissorw = (BLS32)(_PrGpuMem->sPipelineState.nScissorW);
@@ -2001,7 +2001,7 @@ blVSync(IN BLBool _On)
 #endif
 }
 BLVoid
-blQueryHardwareCaps(OUT BLEnum* _Api, OUT BLU32* _MaxTexSize, OUT BLU32* _MaxFramebuffer, OUT BLBool _TexSupport[BL_TF_COUNT])
+blHardwareCapsQuery(OUT BLEnum* _Api, OUT BLU32* _MaxTexSize, OUT BLU32* _MaxFramebuffer, OUT BLBool _TexSupport[BL_TF_COUNT])
 {
 	*_Api = _PrGpuMem->sHardwareCaps.eApiType;
 	*_MaxTexSize = _PrGpuMem->sHardwareCaps.nMaxTextureSize;
@@ -2159,7 +2159,7 @@ blBindFrameBuffer(IN BLGuid _FBO)
 	_BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
 	BLU32 _w, _h, _aw, _ah;
 	BLF32 _rx, _ry;
-	blGetWindowSize(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+	blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 #if defined(BL_GL_BACKEND)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
 	{
@@ -3642,7 +3642,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
             {
                 BLU8* _binary = (BLU8*)malloc(_len * sizeof(BLU8) + sizeof(GLenum));
                 GL_CHECK_INTERNAL(glGetProgramBinary(_tech->uData.sGL.nHandle, _len, NULL, (GLenum*)_binary, _binary + sizeof(GLenum)));
-                blWriteFile(_Filename, _len * sizeof(BLU8) + sizeof(GLenum), _binary);
+                blFileWrite(_Filename, _len * sizeof(BLU8) + sizeof(GLenum), _binary);
             }
             if (_vs)
             {

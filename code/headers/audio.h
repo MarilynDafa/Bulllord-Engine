@@ -34,7 +34,7 @@ BL_API BLVoid blEnvironmentVolume(
 BL_API BLVoid blSystemVolume(
 	IN BLF32 _Vol);
 
-BL_API BLVoid blQueryAudioVolume(
+BL_API BLVoid blVolumeQuery(
 	OUT BLF32* _Music,
 	OUT BLF32* _System,
 	OUT BLF32* _Env);

@@ -58,34 +58,35 @@ BL_API BLVoid blStreamSeek(
 	IN BLGuid _ID,
 	IN BLU32 _Pos);
 
-BL_API BLBool blExistFile(
+BL_API BLBool blFileExist(
 	IN BLAnsi* _Filename);
     
-BL_API BLBool blWriteFile(
+BL_API BLBool blFileWrite(
 	IN BLAnsi* _Filename,
 	IN BLU32 _Count,
 	IN BLU8* _Data);
 
-BL_API BLBool blDeleteFile(
+BL_API BLBool blFileDelete(
 	IN BLAnsi* _Filename);
     
-BL_API BLBool blRegisterArchive(
+BL_API BLBool blArchiveRegist(
 	IN BLAnsi* _Filename,
 	IN BLAnsi* _Archive);
     
-BL_API BLBool blPatchArchive(
+BL_API BLBool blArchivePatch(
 	IN BLAnsi* _Filename, 
 	IN BLAnsi* _Archive);
     
-BL_API BLU32 blQueryArchiveVer(
-	IN BLAnsi* _Archive);
+BL_API BLBool blArchiveQuery(
+	IN BLAnsi* _Archive,
+	OUT BLU32* _Version);
     
-BL_API BLBool blGenSqlConnection(
+BL_API BLBool blGenSql(
 	IN BLAnsi* _Dbname,
 	IN BLAnsi* _Dbpwd,
 	IN BLBool _Inmem);
     
-BL_API BLVoid blDeleteSqlConnection();
+BL_API BLVoid blDeleteSql();
     
 BL_API BLBool blSqlCmdBegin(
 	IN BLAnsi* _Cmd);
@@ -95,7 +96,7 @@ BL_API BLVoid blSqlCmdEnd();
 BL_API BLS64 blSqlValueAsInteger(
 	IN BLAnsi* _Name);
     
-BL_API BLF64 blSqlValueAsReal(
+BL_API BLF64 blSqlValueAsNumber(
 	IN BLAnsi* _Name);
     
 BL_API const BLUtf8* blSqlValueAsString(

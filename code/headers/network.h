@@ -25,12 +25,12 @@
 extern "C" {
 #endif
 
-BL_API BLVoid blConnectNetwork(
+BL_API BLVoid blConnect(
 	IN BLAnsi* _Host, 
 	IN BLU16 _Port, 
 	IN BLEnum _Type);
     
-BL_API BLVoid blDisconnectNetwork();
+BL_API BLVoid blDisconnect();
     
 BL_API BLVoid blSendNetMsg(
 	IN BLU32 _MsgID, 
@@ -57,7 +57,7 @@ BL_API BLBool blAddDownloadList(
 
 BL_API BLVoid blBeginDownload();
 
-BL_API BLVoid blQueryProgress(
+BL_API BLVoid blProgressQuery(
 	OUT BLU32* _Curtask, 
 	OUT BLU32* _Downloaded, 
 	OUT BLU32* _Total, 
