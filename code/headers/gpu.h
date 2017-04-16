@@ -46,10 +46,11 @@ BL_API BLVoid blRasterState(
     IN BLS32 _DepthBias,
     IN BLF32 _SlopeScaledDepthBias,
     IN BLBool _Scissor,
-    IN BLU32 _X,
-    IN BLU32 _Y,
+    IN BLS32 _X,
+    IN BLS32 _Y,
     IN BLU32 _W,
-    IN BLU32 _H);
+    IN BLU32 _H, 
+	IN BLBool _Force);
 
 /**
      Default Value
@@ -82,7 +83,8 @@ BL_API BLVoid blDepthStencilState(
     IN BLEnum _BackStencilFailOp,
     IN BLEnum _BackStencilDepthFailOp,
     IN BLEnum _BackStencilPassOp,
-    IN BLEnum _BackStencilCompFunc);
+    IN BLEnum _BackStencilCompFunc,
+	IN BLBool _Force);
     
 /**
      Default Value
@@ -104,7 +106,8 @@ BL_API BLVoid blBlendState(
     IN BLEnum _DestBlendAlphaFactor,
     IN BLEnum _BlendOp,
     IN BLEnum _BlendOpAlpha,
-    IN BLU8 _BlendFactor[4]);
+    IN BLU8 _BlendFactor[4],
+	IN BLBool _Force);
     
 BL_API BLGuid blGenFrameBuffer();
 
@@ -115,7 +118,6 @@ BL_API BLVoid blBindFrameBuffer(
 	IN BLGuid _FBO);
     
 BL_API BLVoid blFrameBufferClear(
-    IN BLGuid _FBO,
     IN BLBool _ColorBit,
     IN BLBool _DepthBit,
     IN BLBool _StencilBit);

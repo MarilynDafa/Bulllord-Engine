@@ -801,9 +801,9 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 	BLF32 _rx, _ry;
 	blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 	if (_Node->sScissor.sLT.fX < 0.f)
-		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah);
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah, FALSE);
 	else
-		blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_Node->sScissor.sLT.fX, (BLU32)_Node->sScissor.sLT.fY, (BLU32)(_Node->sScissor.sRB.fX - _Node->sScissor.sLT.fX), (BLU32)(_Node->sScissor.sRB.fY - _Node->sScissor.sLT.fY));
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_Node->sScissor.sLT.fX, (BLS32)_Node->sScissor.sLT.fY, (BLU32)(_Node->sScissor.sRB.fX - _Node->sScissor.sLT.fX), (BLU32)(_Node->sScissor.sRB.fY - _Node->sScissor.sLT.fY), FALSE);
 	if (_Node->nFrameNum > 1)
 	{
 		_Node->nTimePassed += _Delta;
@@ -1086,8 +1086,8 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 	BLU32 _w, _h, _aw, _ah;
 	blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 	BLU8 _blendfactor[4] = { 0 };
-	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS);
-	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor);
+	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, FALSE);
+	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
     if (_Cursor)
     {
 		BLF32 _screensz[] = { 2.f / (BLF32)_w, 2.f / (BLF32)_h };
@@ -1105,7 +1105,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 		_mat[3] = _PrSpriteMem->pCursor->fScaleY;
 		_mat[4] = (-_pivotx * _PrSpriteMem->pCursor->fScaleX) + _PrSpriteMem->pCursor->sPos.fX;
 		_mat[5] = (-_pivoty * _PrSpriteMem->pCursor->fScaleY) + _PrSpriteMem->pCursor->sPos.fY;
-		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0);
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0, FALSE);
 		_SpriteDraw(_Delta, _PrSpriteMem->pCursor, _mat);
     }
     else
@@ -1118,7 +1118,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			blTechUniform(_PrSpriteMem->nSpriteInstTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 			blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 			blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
-			blFrameBufferClear(_PrSpriteMem->nFBO, TRUE, FALSE, FALSE);
+			blFrameBufferClear(TRUE, FALSE, FALSE);
 			BLRect _scalevp = _PrSpriteMem->sViewport;
 			_scalevp.sLT.fX -= (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.25f;
 			_scalevp.sRB.fX += (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.25f;
@@ -1129,7 +1129,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			{
 				BLU32 _totalnum = (BLU32)((_scalevp.sRB.fX - _scalevp.sLT.fX) * (_scalevp.sRB.fY - _scalevp.sLT.fY) / (_first->sSize.fX * _first->sSize.fY)) * 2;
 				BLGuid _layertex;
-				blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah);
+				blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah, FALSE);
 				BLU8* _geomem = (BLU8*)alloca(_totalnum * 48 * sizeof(BLF32));
 				for (BLS32 _idx = 0; _idx < 8; ++_idx)
 				{
@@ -1362,7 +1362,6 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 				_PrSpriteMem->bShaking = FALSE;
 		}
 		blBindFrameBuffer(INVALID_GUID);
-		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0);
 		BLF32 _screensz[] = { 2.f / (BLF32)_w, 2.f / (BLF32)_h };
 		blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 		BLF32 _vbo[] = {

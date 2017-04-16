@@ -270,7 +270,7 @@ _StreamIOStep(BLU32 _Delta)
 {
 	_BLResNode* _res;
 	blMutexLock(_PrStreamIOMem->pSetupQueue->pMutex);
-	if (_PrStreamIOMem->pSetupQueue->nSize)
+	while (_PrStreamIOMem->pSetupQueue->nSize)
 	{
 		_res = (_BLResNode*)blListFrontElement(_PrStreamIOMem->pSetupQueue);
 		_res->fSetup(_res->pRes);

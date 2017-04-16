@@ -58,8 +58,8 @@ typedef struct _PipelineState{
     BLS32 nDepthBias;
     BLF32 fSlopeScaledDepthBias;
     BLBool bScissor;
-    BLU32 nScissorX;
-    BLU32 nScissorY;
+	BLS32 nScissorX;
+	BLS32 nScissorY;
     BLU32 nScissorW;
     BLU32 nScissorH;
     BLBool bDepth;
@@ -414,7 +414,7 @@ _PipelineStateDefaultGL(BLU32 _Width, BLU32 _Height)
     GL_CHECK_INTERNAL(glPolygonOffset(0.f, 0.f));
     _PrGpuMem->sPipelineState.nDepthBias = 0;
     _PrGpuMem->sPipelineState.fSlopeScaledDepthBias = 0.f;
-    GL_CHECK_INTERNAL(glEnable(GL_SCISSOR_TEST));
+    GL_CHECK_INTERNAL(glDisable(GL_SCISSOR_TEST));
 	_PrGpuMem->sPipelineState.nScissorX = 0;
 	_PrGpuMem->sPipelineState.nScissorY = 0;
 	_PrGpuMem->sPipelineState.nScissorW = _Width;
@@ -2001,7 +2001,7 @@ blVSync(IN BLBool _On)
 #endif
 }
 BLVoid
-blHardwareCapsQuery(OUT BLEnum* _Api, OUT BLU32* _MaxTexSize, OUT BLU32* _MaxFramebuffer, OUT BLBool _TexSupport[BL_TF_COUNT])
+blHardwareCapsQuery(OUT BLEnum* _Api, OUT BLU32* _MaxTexSize, OUT BLU32* _MaxFramebuffer, OUT BLBool _TexSupport[BL_TF_COUNT], IN BLBool _Force)
 {
 	*_Api = _PrGpuMem->sHardwareCaps.eApiType;
 	*_MaxTexSize = _PrGpuMem->sHardwareCaps.nMaxTextureSize;
@@ -2010,7 +2010,7 @@ blHardwareCapsQuery(OUT BLEnum* _Api, OUT BLU32* _MaxTexSize, OUT BLU32* _MaxFra
 		_TexSupport[_idx] = _PrGpuMem->sHardwareCaps.aTexFormats[_idx];
 }
 BLVoid
-blRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDepthBias, IN BLBool _Scissor, IN BLU32 _X, IN BLU32 _Y, IN BLU32 _W, IN BLU32 _H)
+blRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDepthBias, IN BLBool _Scissor, IN BLS32 _X, IN BLS32 _Y, IN BLU32 _W, IN BLU32 _H, IN BLBool _Force)
 {
     if (_PrGpuMem->sPipelineState.eCullMode != _CullMode ||
         _PrGpuMem->sPipelineState.nDepthBias != _DepthBias ||
@@ -2031,9 +2031,22 @@ blRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDep
 		_PrGpuMem->sPipelineState.nScissorH = _H;
         _PrGpuMem->sPipelineState.bRasterStateDirty = TRUE;
     }
+	else if (_Force)
+	{
+		_PrGpuMem->sPipelineState.eCullMode = _CullMode;
+		_PrGpuMem->sPipelineState.nDepthBias = _DepthBias;
+		_PrGpuMem->sPipelineState.fSlopeScaledDepthBias = _SlopeScaledDepthBias;
+		_PrGpuMem->sPipelineState.bScissor = _Scissor;
+		_PrGpuMem->sPipelineState.nScissorX = _X;
+		_PrGpuMem->sPipelineState.nScissorY = _Y;
+		_PrGpuMem->sPipelineState.nScissorW = _W;
+		_PrGpuMem->sPipelineState.nScissorH = _H;
+		_PrGpuMem->sPipelineState.bRasterStateDirty = TRUE;
+		_PipelineStateRefresh();
+	}
 }
 BLVoid
-blDepthStencilState(IN BLBool _Depth, IN BLBool _Mask, IN BLEnum _DepthCompFunc, IN BLBool _Stencil, IN BLU8 _StencilReadMask, IN BLU8 _StencilWriteMask, IN BLEnum _FrontStencilFailOp, IN BLEnum _FrontStencilDepthFailOp, IN BLEnum _FrontStencilPassOp, IN BLEnum _FrontStencilCompFunc, IN BLEnum _BackStencilFailOp, IN BLEnum _BackStencilDepthFailOp, IN BLEnum _BackStencilPassOp, IN BLEnum _BackStencilCompFunc)
+blDepthStencilState(IN BLBool _Depth, IN BLBool _Mask, IN BLEnum _DepthCompFunc, IN BLBool _Stencil, IN BLU8 _StencilReadMask, IN BLU8 _StencilWriteMask, IN BLEnum _FrontStencilFailOp, IN BLEnum _FrontStencilDepthFailOp, IN BLEnum _FrontStencilPassOp, IN BLEnum _FrontStencilCompFunc, IN BLEnum _BackStencilFailOp, IN BLEnum _BackStencilDepthFailOp, IN BLEnum _BackStencilPassOp, IN BLEnum _BackStencilCompFunc, IN BLBool _Force)
 {
     if (_PrGpuMem->sPipelineState.bDepth != _Depth ||
         _PrGpuMem->sPipelineState.bDepthMask != _Mask ||
@@ -2066,9 +2079,28 @@ blDepthStencilState(IN BLBool _Depth, IN BLBool _Mask, IN BLEnum _DepthCompFunc,
         _PrGpuMem->sPipelineState.eBackStencilCompFunc = _BackStencilCompFunc;
         _PrGpuMem->sPipelineState.bDSStateDirty = TRUE;
     }
+	else if (_Force)
+	{
+		_PrGpuMem->sPipelineState.bDepth = _Depth;
+		_PrGpuMem->sPipelineState.bDepthMask = _Mask;
+		_PrGpuMem->sPipelineState.eDepthCompFunc = _DepthCompFunc;
+		_PrGpuMem->sPipelineState.bStencil = _Stencil;
+		_PrGpuMem->sPipelineState.nStencilReadMask = _StencilReadMask;
+		_PrGpuMem->sPipelineState.nStencilWriteMask = _StencilWriteMask;
+		_PrGpuMem->sPipelineState.eFrontStencilFailOp = _FrontStencilFailOp;
+		_PrGpuMem->sPipelineState.eFrontStencilDepthFailOp = _FrontStencilDepthFailOp;
+		_PrGpuMem->sPipelineState.eFrontStencilPassOp = _FrontStencilPassOp;
+		_PrGpuMem->sPipelineState.eFrontStencilCompFunc = _FrontStencilCompFunc;
+		_PrGpuMem->sPipelineState.eBackStencilFailOp = _BackStencilFailOp;
+		_PrGpuMem->sPipelineState.eBackStencilDepthFailOp = _BackStencilDepthFailOp;
+		_PrGpuMem->sPipelineState.eBackStencilPassOp = _BackStencilPassOp;
+		_PrGpuMem->sPipelineState.eBackStencilCompFunc = _BackStencilCompFunc;
+		_PrGpuMem->sPipelineState.bDSStateDirty = TRUE;
+		_PipelineStateRefresh();	
+	}
 }
 BLVoid
-blBlendState(IN BLBool _AlphaToCoverage, IN BLBool _Blend, IN BLEnum _SrcBlendFactor, IN BLEnum _DestBlendFactor, IN BLEnum _SrcBlendAlphaFactor, IN BLEnum _DestBlendAlphaFactor, IN BLEnum _BlendOp, IN BLEnum _BlendOpAlpha, IN BLU8 _BlendFactor[4])
+blBlendState(IN BLBool _AlphaToCoverage, IN BLBool _Blend, IN BLEnum _SrcBlendFactor, IN BLEnum _DestBlendFactor, IN BLEnum _SrcBlendAlphaFactor, IN BLEnum _DestBlendAlphaFactor, IN BLEnum _BlendOp, IN BLEnum _BlendOpAlpha, IN BLU8 _BlendFactor[4], IN BLBool _Force)
 {
     if (_PrGpuMem->sPipelineState.bAlphaToCoverage != _AlphaToCoverage ||
         _PrGpuMem->sPipelineState.bBlend != _Blend ||
@@ -2097,6 +2129,23 @@ blBlendState(IN BLBool _AlphaToCoverage, IN BLBool _Blend, IN BLEnum _SrcBlendFa
         _PrGpuMem->sPipelineState.aBlendFactor[3] = _BlendFactor[3];
         _PrGpuMem->sPipelineState.bBlendStateDirty = TRUE;
     }
+	else if (_Force)
+	{
+		_PrGpuMem->sPipelineState.bAlphaToCoverage = _AlphaToCoverage;
+		_PrGpuMem->sPipelineState.bBlend = _Blend;
+		_PrGpuMem->sPipelineState.eSrcBlendFactor = _SrcBlendFactor;
+		_PrGpuMem->sPipelineState.eDestBlendFactor = _DestBlendFactor;
+		_PrGpuMem->sPipelineState.eSrcBlendAlphaFactor = _SrcBlendAlphaFactor;
+		_PrGpuMem->sPipelineState.eDestBlendAlphaFactor = _DestBlendAlphaFactor;
+		_PrGpuMem->sPipelineState.eBlendOp = _BlendOp;
+		_PrGpuMem->sPipelineState.eBlendOpAlpha = _BlendOpAlpha;
+		_PrGpuMem->sPipelineState.aBlendFactor[0] = _BlendFactor[0];
+		_PrGpuMem->sPipelineState.aBlendFactor[1] = _BlendFactor[1];
+		_PrGpuMem->sPipelineState.aBlendFactor[2] = _BlendFactor[2];
+		_PrGpuMem->sPipelineState.aBlendFactor[3] = _BlendFactor[3];
+		_PrGpuMem->sPipelineState.bBlendStateDirty = TRUE;
+		_PipelineStateRefresh();
+	}
 }
 BLGuid
 blGenFrameBuffer()
@@ -2193,10 +2242,8 @@ blBindFrameBuffer(IN BLGuid _FBO)
 #endif
 }
 BLVoid
-blFrameBufferClear(IN BLGuid _FBO, IN BLBool _ColorBit, IN BLBool _DepthBit, IN BLBool _StencilBit)
+blFrameBufferClear(IN BLBool _ColorBit, IN BLBool _DepthBit, IN BLBool _StencilBit)
 {
-	_PipelineStateRefresh();
-    _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -3842,12 +3889,13 @@ blTechSampler(IN BLGuid _Tech, IN BLAnsi* _Name, IN BLGuid _Tex, IN BLU32 _Unit)
 BLVoid
 blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 {
-	_PipelineStateRefresh();
 	_BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
 	_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
 #if defined(BL_GL_BACKEND)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
 	{
+		GL_CHECK_INTERNAL(glEnable(GL_SCISSOR_TEST));
+		_PipelineStateRefresh();
 		if (!_PrGpuMem->pUBO->nSize)
 		{
 			GLuint _uboidx = glGetUniformBlockIndex(_tech->uData.sGL.nHandle, "UBO");
@@ -3967,18 +4015,22 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 			GL_CHECK_INTERNAL(glBindVertexArray(0));
 		}
 		GL_CHECK_INTERNAL(glUseProgram(0));
+		GL_CHECK_INTERNAL(glDisable(GL_SCISSOR_TEST));
 	}
 #elif defined(BL_MTL_BACKEND)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
 	{
+		_PipelineStateRefresh();
 	}
 #elif defined(BL_VK_BACKEND)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
 	{
+		_PipelineStateRefresh();
 	}
 #elif defined(BL_DX_BACKEND)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
 	{
+		_PipelineStateRefresh();
 	}
 #endif
 }

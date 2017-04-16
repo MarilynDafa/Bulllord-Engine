@@ -303,7 +303,7 @@ blDictErase(INOUT BLDictionary* _Dct, IN BLU32 _Key)
 	--_Dct->nSize;
 }
 BLBool 
-blDictTraval(INOUT BLDictionary* _Dct, OUT BLVoid** _Node, OUT BLVoid** _Data)
+blDictTraval(INOUT BLDictionary* _Dct, OUT BLVoid** _Node, OUT BLU32* _Key, OUT BLVoid** _Data)
 {
 	if (!_Dct->nSize)
 		return FALSE;
@@ -311,6 +311,7 @@ blDictTraval(INOUT BLDictionary* _Dct, OUT BLVoid** _Node, OUT BLVoid** _Data)
 	if (*_Data == NULL)
 	{
 		_node = _MinNode(_Dct->pRoot);
+		*_Key = _node->nKey;
 		*_Data = _node->pValue;
 		_NodeInc(&_node);
 		*_Node = _node;
@@ -318,6 +319,7 @@ blDictTraval(INOUT BLDictionary* _Dct, OUT BLVoid** _Node, OUT BLVoid** _Data)
 	}
 	else if (*_Node != NULL)
 	{
+		*_Key = _node->nKey;
 		*_Data = ((struct _DictNode*)*_Node)->pValue;
 		_NodeInc(&_node);
 		*_Node = _node;

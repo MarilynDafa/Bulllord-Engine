@@ -511,7 +511,7 @@ extern BLBool _DiscardResource(BLGuid, BLBool(*)(BLVoid*), BLBool(*)(BLVoid*));
 static _BLWidget*
 _WidgetQuery(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren_)
 {
-	_BLWidget* _ret = _PrUIMem->pRoot;
+	_BLWidget* _ret = NULL;
 	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
 	{
 		if (URIPART_INTERNAL(_iter->nID) == _HashName)
@@ -529,7 +529,10 @@ _WidgetLocate(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 	_BLWidget* _target = NULL;
 	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
 	{
-		if (_iter->bVisible)
+		if (_iter->bVisible && 
+			_iter->eType != BL_UT_PRIMITIVE &&
+			_iter->eType != BL_UT_PROGRESS &&
+			!(_iter->eType == BL_UT_PANEL && _iter->uExtension.sPanel.bBasePlate))
 		{
 			_target = _WidgetLocate(_iter, _XPos, _YPos);
 			if (_target)
@@ -3158,7 +3161,7 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 			}
 		}
 	}
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_ClipArea->sLT.fX, (BLU32)_ClipArea->sLT.fY, (BLU32)(_ClipArea->sRB.fX - _ClipArea->sLT.fX), (BLU32)(_ClipArea->sRB.fY - _ClipArea->sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_ClipArea->sLT.fX, (BLS32)_ClipArea->sLT.fY, (BLU32)(_ClipArea->sRB.fX - _ClipArea->sLT.fX), (BLU32)(_ClipArea->sRB.fY - _ClipArea->sLT.fY), FALSE);
 	_BLGlyphAtlas* _gatlas = _ft->bFreetype ? blDictElement(_ft->pGlyphAtlas, _FontHeight) : blDictRootElement(_ft->pGlyphAtlas);
 	if (!_gatlas)
 	{
@@ -3352,9 +3355,10 @@ _DrawPanel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 {
 	if (!_Node->bValid || !_Node->bVisible)
 		return;
-	BLRect _scissorrect;
-	_WidgetScissorRect(_Node, &_scissorrect);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	BLRect _scissorrect = { 0 };
+	if (!_Node->uExtension.sPanel.bBasePlate)
+		_WidgetScissorRect(_Node, &_scissorrect);
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sPanel.nPixmapTex, 0);
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -3811,7 +3815,7 @@ _DrawLabel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		return;
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sLabel.nPixmapTex, 0);
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -4262,7 +4266,7 @@ _DrawLabel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	_scissorrect.sRB.fX = _X + 0.5f * _Width;
 	_scissorrect.sRB.fY = _Y + 0.5f * _Height - _Node->uExtension.sLabel.fPaddingY;
 	BLS32 _y = (BLS32)(_Y - _Height * 0.5f + _Node->uExtension.sLabel.fPaddingY - _Node->uExtension.sLabel.nScroll);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	FOREACH_ARRAY(_BLRichRowCell*, _iter, _Node->uExtension.sLabel.pRowCells)
 	{
 		if (_y <= _scissorrect.sRB.fY && _y + _iter->nHeight >= _scissorrect.sLT.fY)
@@ -4545,7 +4549,7 @@ _DrawButton(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		return;
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sButton.nPixmapTex, 0);
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -5096,7 +5100,7 @@ _DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		return;
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sCheck.nPixmapTex, 0);
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -5133,8 +5137,8 @@ _DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			}
 			else
 			{
-				_texcoord = _Node->uExtension.sButton.sCommonTex;
-				_texcoord9 = _Node->uExtension.sButton.sCommonTex9;
+				_texcoord = _Node->uExtension.sCheck.sCommonTex;
+				_texcoord9 = _Node->uExtension.sCheck.sCommonTex9;
 			}
 		}
 		break;
@@ -5607,7 +5611,7 @@ _DrawSlider(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		return;
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sSlider.nPixmapTex, 0);
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -6144,7 +6148,7 @@ _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		return;
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
 	BLF32 _stencil = 1.f;
@@ -6836,7 +6840,7 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		return;
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sProgress.nPixmapTex, 0);
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -7352,7 +7356,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 	_TableMake(_Node);
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sTable.nPixmapTex, 0);
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -7840,7 +7844,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		_flag |= 0x0F00;
 	if (_Node->uExtension.sText.bItalics)
 		_flag |= 0xF000; 
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_clientc.sLT.fX, (BLU32)_clientc.sLT.fY, (BLU32)(_clientc.sRB.fX - _clientc.sLT.fX), (BLU32)(_clientc.sRB.fY - _clientc.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_clientc.sLT.fX, (BLS32)_clientc.sLT.fY, (BLU32)(_clientc.sRB.fX - _clientc.sLT.fX), (BLU32)(_clientc.sRB.fY - _clientc.sLT.fY), FALSE);
 	for (BLU32 _idx = 0; _idx < _rownum; ++_idx)
 	{
 		if (_rowr.sRB.fY >= _clientc.sLT.fY - 10 && _rowr.sLT.fY <= _clientc.sRB.fY + 10)
@@ -8105,7 +8109,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		return;
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sDial.nPixmapTex, 0);
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _stencil = 1.f;
@@ -8641,7 +8645,7 @@ _DrawPrimitive(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height
 	BLRect _scissorrect;
 	_WidgetScissorRect(_Node, &_scissorrect);
 	blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nBlankTex, 0);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLU32)_scissorrect.sLT.fX, (BLU32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY));
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	BLF32* _vb;
@@ -8845,7 +8849,7 @@ _DrawPrimitive(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height
 	blDeleteGeometryBuffer(_geo);
 }
 static BLVoid
-_DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLBool _BasePlate)
+_DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 {
 	BLF32 _x, _y, _w, _h;
 	if (_Node->pParent)
@@ -8920,9 +8924,7 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLBool _BasePlate)
 		switch (_Node->eType)
 		{
 		case BL_UT_PANEL:
-			if (_Node->uExtension.sPanel.bBasePlate && _BasePlate)
-				_DrawPanel(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
-			else if (!_Node->uExtension.sPanel.bBasePlate && !_BasePlate)
+			if (!_Node->uExtension.sPanel.bBasePlate)
 				_DrawPanel(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
 			break;
 		case BL_UT_LABEL:
@@ -8967,12 +8969,9 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLBool _BasePlate)
 		_Node->sAbsRegion.sRB.fX = (BLF32)_PrUIMem->nFboWidth;
 		_Node->sAbsRegion.sRB.fY = (BLF32)_PrUIMem->nFboHeight;
 	}
-	if (!_BasePlate)
+	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
 	{
-		FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
-		{
-			_DrawWidget(_iter, _x, _y, _BasePlate);
-		}
+		_DrawWidget(_iter, _x, _y);
 	}
 }
 static const BLBool
@@ -11133,8 +11132,8 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 	BLF32 _rx, _ry;
 	blWindowQuery(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
 	BLU8 _blendfactor[4] = { 0 };
-	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS);
-	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor);
+	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, FALSE);
+	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
 	if (_PrUIMem->nTimeInterval > 10)
 	{
 		_UIUpdate(_PrUIMem->pRoot, _PrUIMem->nTimeInterval);
@@ -11144,80 +11143,70 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 		_PrUIMem->nTimeInterval += _Delta;
 	if (_Baseplate)
 	{
-		BLF32 _x, _y, _w, _h;
 		_BLWidget* _node = _PrUIMem->pBasePlate;
-        if (!_node)
+        if (!_node || _node->pParent != _PrUIMem->pRoot)
             return;
-		_x = _node->sPosition.fX;
-		_y = _node->sPosition.fY;
-		do
+		BLF32 _x, _y, _w, _h;
+		BLF32 _pw = (BLF32)_width;
+		BLF32 _ph = (BLF32)_height;
+		if (_node->eReferenceH == BL_UA_LEFT && _node->eReferenceV == BL_UA_TOP)
 		{
-			BLF32 _pw = _node->pParent ? (_node->pParent->sDimension.fX > 0.f ? _node->pParent->sDimension.fX : _PrUIMem->nFboWidth) : _PrUIMem->nFboWidth;
-			BLF32 _ph = _node->pParent ? (_node->pParent->sDimension.fY > 0.f ? _node->pParent->sDimension.fY : _PrUIMem->nFboHeight) : _PrUIMem->nFboHeight;
-			BLF32 _px = _node->pParent ? _node->pParent->sPosition.fX : 0.f;
-			BLF32 _py = _node->pParent ? _node->pParent->sPosition.fY : 0.f;
-			if (_node->eReferenceH == BL_UA_LEFT && _node->eReferenceV == BL_UA_TOP)
-			{
-				_x += 0.5f * _pw + _px;
-				_y += 0.5f * _ph + _py;
-			}
-			else if (_node->eReferenceH == BL_UA_LEFT && _node->eReferenceV == BL_UA_VCENTER)
-			{
-				_x += 0.5f * _pw + _px;
-				_y += 0.0f * _ph + _py;
-			}
-			else if (_node->eReferenceH == BL_UA_LEFT && _node->eReferenceV == BL_UA_BOTTOM)
-			{
-				_x += 0.5f * _pw + _px;
-				_y += -0.5f * _ph + _py;
-			}
-			else if (_node->eReferenceH == BL_UA_HCENTER && _node->eReferenceV == BL_UA_TOP)
-			{
-				_x += 0.0f * _pw + _px;
-				_y += 0.5f * _ph + _py;
-			}
-			else if (_node->eReferenceH == BL_UA_HCENTER && _node->eReferenceV == BL_UA_VCENTER)
-			{
-				_x += 0.0f * _pw + _px;
-				_y += 0.0f * _ph + _py;
-			}
-			else if (_node->eReferenceH == BL_UA_HCENTER && _node->eReferenceV == BL_UA_BOTTOM)
-			{
-				_x += 0.0f * _pw + _px;
-				_y += -0.5f * _ph + _py;
-			}
-			else if (_node->eReferenceH == BL_UA_RIGHT && _node->eReferenceV == BL_UA_TOP)
-			{
-				_x += 0.5f * _pw + _px;
-				_y += 0.5f * _ph + _py;
-			}
-			else if (_node->eReferenceH == BL_UA_RIGHT && _node->eReferenceV == BL_UA_VCENTER)
-			{
-				_x += 0.5f * _pw + _px;
-				_y += 0.0f * _ph + _py;
-			}
-			else
-			{
-				_x += 0.5f * _pw + _px;
-				_y += -0.5f * _ph + _py;
-			}
-			_node = _node->pParent;
-		} while (_node);
-		BLF32 _pw = _PrUIMem->pBasePlate->pParent->sDimension.fX > 0.f ? _PrUIMem->pBasePlate->pParent->sDimension.fX : _PrUIMem->nFboWidth;
-		BLF32 _ph = _PrUIMem->pBasePlate->pParent->sDimension.fY > 0.f ? _PrUIMem->pBasePlate->pParent->sDimension.fY : _PrUIMem->nFboHeight;
-		if (_PrUIMem->pBasePlate->ePolicy == BL_UP_FIXED)
+			_x = _node->sPosition.fX * _rx + _node->fOffsetX - 0.5f * _pw + 0.5f * _width;
+			_y = _node->sPosition.fY * _ry + _node->fOffsetY - 0.5f * _ph + 0.5f * _height;
+		}
+		else if (_node->eReferenceH == BL_UA_LEFT && _node->eReferenceV == BL_UA_VCENTER)
+		{
+			_x = _node->sPosition.fX * _rx + _node->fOffsetX - 0.5f * _pw + 0.5f * _width;
+			_y = _node->sPosition.fY * _ry + _node->fOffsetY + 0.0f * _ph + 0.5f * _height;
+		}
+		else if (_node->eReferenceH == BL_UA_LEFT && _node->eReferenceV == BL_UA_BOTTOM)
+		{
+			_x = _node->sPosition.fX * _rx + _node->fOffsetX - 0.5f * _pw + 0.5f * _width;
+			_y = _node->sPosition.fY * _ry + _node->fOffsetY + 0.5f * _ph + 0.5f * _height;
+		}
+		else if (_node->eReferenceH == BL_UA_HCENTER && _node->eReferenceV == BL_UA_TOP)
+		{
+			_x = _node->sPosition.fX * _rx + _node->fOffsetX + 0.0f * _pw + 0.5f * _width;
+			_y = _node->sPosition.fY * _ry + _node->fOffsetY - 0.5f * _ph + 0.5f * _height;
+		}
+		else if (_node->eReferenceH == BL_UA_HCENTER && _node->eReferenceV == BL_UA_VCENTER)
+		{
+			_x = _node->sPosition.fX * _rx + _node->fOffsetX + 0.0f * _pw + 0.5f * _width;
+			_y = _node->sPosition.fY * _ry + _node->fOffsetY + 0.0f * _ph + 0.5f * _height;
+		}
+		else if (_node->eReferenceH == BL_UA_HCENTER && _node->eReferenceV == BL_UA_BOTTOM)
+		{
+			_x = _node->sPosition.fX * _rx + _node->fOffsetX + 0.0f * _pw + 0.5f * _width;
+			_y = _node->sPosition.fY * _ry + _node->fOffsetY + 0.5f * _ph + 0.5f * _height;
+		}
+		else if (_node->eReferenceH == BL_UA_RIGHT && _node->eReferenceV == BL_UA_TOP)
+		{
+			_x = _node->sPosition.fX * _rx + _node->fOffsetX + 0.5f * _pw + 0.5f * _width;
+			_y = _node->sPosition.fY * _ry + _node->fOffsetY - 0.5f * _ph + 0.5f * _height;
+		}
+		else if (_node->eReferenceH == BL_UA_RIGHT && _node->eReferenceV == BL_UA_VCENTER)
+		{
+			_x = _node->sPosition.fX * _rx + _node->fOffsetX + 0.5f * _pw + 0.5f * _width;
+			_y = _node->sPosition.fY * _ry + _node->fOffsetY + 0.0f * _ph + 0.5f * _height;
+		}
+		else
+		{
+			_x = _node->sPosition.fX * _rx + _node->fOffsetX + 0.5f * _pw + 0.5f * _width;
+			_y = _node->sPosition.fY * _ry + _node->fOffsetY + 0.5f * _ph + 0.5f * _height;
+		}
+		if (_node->ePolicy == BL_UP_FIXED)
+		{
+			_w = _node->sDimension.fX * _rx;
+			_h = _node->sDimension.fY * _ry;
+		}
+		else if (_node->ePolicy == BL_UP_HMatch)
 		{
 			_w = _pw;
-			_h = _ph;
+			_h = _pw / _node->fRatio;
 		}
-		else if (_PrUIMem->pBasePlate->ePolicy == BL_UP_HMatch)
+		else if (_node->ePolicy == BL_UP_VMatch)
 		{
-			_w = _pw;
-			_h = _pw / _PrUIMem->pBasePlate->fRatio;
-		}
-		else if (_PrUIMem->pBasePlate->ePolicy == BL_UP_VMatch)
-		{
-			_w = _ph * _PrUIMem->pBasePlate->fRatio;
+			_w = _ph * _node->fRatio;
 			_h = _ph;
 		}
 		else
@@ -11225,7 +11214,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 			_w = _pw;
 			_h = _ph;
 		}
-		_DrawWidget(_PrUIMem->pBasePlate, _x, _y, TRUE);
+		_DrawPanel(_node, _x, _y, _w * _node->fScaleX, _h * _node->fScaleY);
 	}
 	else
 	{
@@ -11234,13 +11223,12 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 			blBindFrameBuffer(_PrUIMem->nFBO);
 			BLF32 _screensz[2] = { 2.f / (BLF32)_PrUIMem->nFboWidth, 2.f / (BLF32)_PrUIMem->nFboHeight };
 			blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
-			blFrameBufferClear(_PrUIMem->nFBO, TRUE, FALSE, FALSE);
-			_DrawWidget(_PrUIMem->pRoot, 0.f, 0.f, FALSE);
+			blFrameBufferClear(TRUE, FALSE, FALSE);
+			_DrawWidget(_PrUIMem->pRoot, 0.f, 0.f);
 			blFrameBufferResolve(_PrUIMem->nFBO);
 			_PrUIMem->bDirty = FALSE;
 		}
 		blBindFrameBuffer(INVALID_GUID);
-		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0);
 		BLF32 _screensz[2] = { 2.f / (BLF32)_width, 2.f / (BLF32)_height };
 		blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 		BLF32 _vbo[] = {
@@ -11519,7 +11507,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_PANEL);
+			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_PANEL);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -11618,7 +11607,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-            BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_BUTTON);
+			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
+            BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_BUTTON);
             blUIReferencePoint(_widguid, _ha, _va);
             blUISizePolicy(_widguid, _policyvar);
             blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -11661,7 +11651,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_LABEL);
+			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_LABEL);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -11746,7 +11737,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_CHECK);
+			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_CHECK);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -11835,7 +11827,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_TEXT);
+			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_TEXT);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -11897,7 +11890,8 @@ blUIFile(IN BLAnsi* _Filename)
             }
             const BLAnsi* _fillmap = ezxml_attr(_element, "FillMap");
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_PROGRESS);
+			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_PROGRESS);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -11964,7 +11958,8 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _slidercommonmap = ezxml_attr(_element, "SliderCommonMap");
             const BLAnsi* _slidersisablemap = ezxml_attr(_element, "SliderDisableMap");
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_SLIDER);
+			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_SLIDER);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12021,7 +12016,8 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
 			const BLAnsi* _rowheight = ezxml_attr(_element, "RowHeight");
 			BLU32 _rowheightvar = (BLU32)strtoul(_rowheight, NULL, 10);
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_TABLE);
+			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_TABLE);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12050,7 +12046,8 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
             const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_DIAL);
+			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_DIAL);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12090,7 +12087,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _tmp = strtok(NULL, ",");
                 _idx++;
             }
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE)->nID, BL_UT_PRIMITIVE);
+			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_PRIMITIVE);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12101,7 +12099,17 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIPrimitiveFill(_widguid, _fillvar);
 			blUIPrimitivePath(_widguid, _xpath, _ypath, _pathnum);
         }
-		_element = _element->ordered;
+		if (_element->sibling)
+			_element = _element->sibling;
+		else
+		{
+			do {
+				_element = _element->parent;
+				if (!_element)
+					break;
+			} while (!_element->next);
+			_element = _element ? _element->next : NULL;
+		}
     } while (_element);
     ezxml_free(_doc);
     blDeleteStream(_layout);

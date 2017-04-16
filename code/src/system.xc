@@ -303,6 +303,7 @@ _SystemEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
 	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
 	duk_call(_PrSystemMem->pDukContext, 5);
+	return TRUE;
 }
 static duk_ret_t
 _SystemEventBridge(duk_context* _DKC)
@@ -322,6 +323,7 @@ _NetEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGui
 	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
 	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
 	duk_call(_PrSystemMem->pDukContext, 5);
+	return TRUE;
 }
 static duk_ret_t
 _NetEventBridge(duk_context* _DKC)
@@ -341,6 +343,7 @@ _MouseEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLG
 	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
 	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
 	duk_call(_PrSystemMem->pDukContext, 5);
+	return TRUE;
 }
 static duk_ret_t
 _MouseEventBridge(duk_context* _DKC)
@@ -360,6 +363,7 @@ _KeyEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGui
 	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
 	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
 	duk_call(_PrSystemMem->pDukContext, 5);
+	return TRUE;
 }
 static duk_ret_t
 _KeyEventBridge(duk_context* _DKC)
@@ -379,6 +383,7 @@ _UIEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid
 	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
 	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
 	duk_call(_PrSystemMem->pDukContext, 5);
+	return TRUE;
 }
 static duk_ret_t
 _UIEventBridge(duk_context* _DKC)
@@ -398,6 +403,7 @@ _SpriteEventFunc(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 	duk_push_pointer(_PrSystemMem->pDukContext, _PParam);
 	duk_push_string(_PrSystemMem->pDukContext, blGuidAsString(_ID));
 	duk_call(_PrSystemMem->pDukContext, 5);
+	return TRUE;
 }
 static duk_ret_t
 _SpriteEventBridge(duk_context* _DKC)
@@ -3393,8 +3399,8 @@ _SystemStep()
 		_aw = _PrSystemMem->sBoostParam.nScreenWidth;
 		_ah = _PrSystemMem->sBoostParam.nScreenHeight;
 	}
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0);
-	blFrameBufferClear(INVALID_GUID, TRUE, TRUE, TRUE);
+	blBindFrameBuffer(INVALID_GUID);
+	blFrameBufferClear(TRUE, TRUE, TRUE);
     BLU32 _now = blTickCounts();
     BLU32 _delta = _now - _PrSystemMem->nSysTime;
     _PrSystemMem->nSysTime = _now;
@@ -3965,8 +3971,6 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 					break;
 				if (!ReadFile(_fp, &_strsz, sizeof(BLU32), NULL, NULL))
 					break;
-				if (_tmpstr)
-					free(_tmpstr);
 				_tmpstr = (BLUtf8*)malloc(_strsz + 1);
 				if (!ReadFile(_fp, _tmpstr, sizeof(BLUtf8) * _strsz, NULL, NULL))
 				{
@@ -3999,8 +4003,6 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 					break;
 				if (!fread(&_strsz, sizeof(BLU32), 1, _fp))
 					break;
-				if (_tmpstr)
-					free(_tmpstr);
 				_tmpstr = (BLUtf8*)malloc(_strsz + 1);
 				if (!fread(_tmpstr, sizeof(BLUtf8), _strsz, _fp))
 				{
@@ -4062,7 +4064,7 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 #endif
 		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
 		{
-			WriteFile(_fp, &_iterator_iter->nKey, sizeof(BLU32), NULL, NULL);
+			WriteFile(_fp, &_iteratorkey, sizeof(BLU32), NULL, NULL);
 			_sz = (BLU32)strlen((const BLAnsi*)_iter);
 			WriteFile(_fp, &_sz, sizeof(BLU32), NULL, NULL);
 			WriteFile(_fp, _iter, _sz, NULL, NULL);
@@ -4074,7 +4076,7 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 		_fp = fopen(_path, "wb");
 		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
 		{
-			fwrite(&_iterator_iter.nKey, sizeof(BLU32), 1, _fp);
+			fwrite(&_iteratorkey, sizeof(BLU32), 1, _fp);
 			_sz = (BLU32)strlen((const BLAnsi*)_iter);
 			fwrite(&_sz, sizeof(BLU32), 1, _fp);
 			fwrite(_iter, sizeof(BLUtf8), _sz, _fp);

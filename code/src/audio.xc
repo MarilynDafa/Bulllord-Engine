@@ -1172,9 +1172,12 @@ _AudioDestroy()
 		_DiscardResource(_PrAudioMem->pBackMusic->nID, _UnloadAudio, _CASoundRelease);
     _CADestroy();
 #endif
-	blDeleteGuid(_PrAudioMem->pBackMusic->nID);
-	free(_PrAudioMem->pBackMusic);
-	_PrAudioMem->pBackMusic = NULL;
+	if (_PrAudioMem->pBackMusic)
+	{
+		blDeleteGuid(_PrAudioMem->pBackMusic->nID);
+		free(_PrAudioMem->pBackMusic);
+		_PrAudioMem->pBackMusic = NULL;
+	}
 	blMutexUnlock(_PrAudioMem->pMusicMutex);
 	blDebugOutput("Audio shutdown");
 	free(_PrAudioMem);

@@ -63,18 +63,21 @@ BLVoid blDictErase(
 	IN BLU32 _Key);
 
 BLBool blDictTraval(
-	INOUT BLDictionary* _Dct, 
+	INOUT BLDictionary* _Dct,
 	OUT BLVoid** _Node,
+	OUT BLU32* _Key,
 	OUT BLVoid** _Data);
 
 #ifdef __cplusplus
 #define FOREACH_DICT(type , var , container) struct BLDictionary::_DictNode* _iterator##var;\
 	type var = NULL;\
-	while (blDictTraval(container, (BLVoid**)&_iterator##var , (BLVoid**)&var))
+	BLU32 _iterator##key = 0;\
+	while (blDictTraval(container, (BLVoid**)&_iterator##var, &_iterator##key, (BLVoid**)&var))
 #else
 #define FOREACH_DICT(type , var , container) struct _DictNode* _iterator##var;\
     type var = NULL;\
-    while (blDictTraval(container, (BLVoid**)&_iterator##var , (BLVoid**)&var))
+	BLU32 _iterator##key = 0;\
+    while (blDictTraval(container, (BLVoid**)&_iterator##var, &_iterator##key, (BLVoid**)&var))
 #endif
 
 #ifdef __cplusplus
