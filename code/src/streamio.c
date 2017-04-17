@@ -243,6 +243,7 @@ _LoadThreadFunc(BLVoid* _Userdata)
 			}
 			else
 				free(_res);
+			blYield();
 		}
 		blYield();
 	} while (_PrStreamIOMem->pLoadThread->bRunning);
@@ -319,7 +320,7 @@ _StreamIODestroy()
 BLGuid
 blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 {
-    if (!_Archive)
+    if (!_Archive && _Filename)
 	{
 		_BLStream* _ret = NULL;
         BLAnsi _trfilename[260] = { 0 };
@@ -399,7 +400,7 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 			return INVALID_GUID;
 #endif
 	}
-	else
+	else if (_Archive && _Filename)
 	{
 		BLU32 _id, _i;
 		BLAnsi _tmpname[260];
@@ -549,6 +550,16 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 			return blGenGuid(_ret, _id);
 		}
 	}
+	else
+	{
+		_BLStream* _ret = NULL;
+		_ret = (_BLStream*)malloc(sizeof(_BLStream));
+		_ret->pBuffer = NULL;
+		_ret->nLen = 0;
+		_ret->pPos = (BLU8*)_ret->pBuffer;
+		_ret->pEnd = _ret->pPos + _ret->nLen;
+		return blGenGuid(_ret, blUniqueUri());
+	}
 }
 BLBool
 blDeleteStream(IN BLGuid _ID)
@@ -647,18 +658,15 @@ blStreamWrite(IN BLGuid _ID, IN BLU32 _Count, IN BLVoid* _Buf)
 {
 	if (_ID == INVALID_GUID)
 		return 0;
-	BLU32 _cnt;
 	_BLStream* _stream = (_BLStream*)blGuidAsPointer(_ID);
 	if (_stream)
 	{
-		_cnt = _Count;
-		if (_stream->pPos + _cnt > _stream->pEnd)
-			_cnt = (BLU32)(_stream->pEnd - _stream->pPos);
-		if (_cnt == 0)
-			return 0;
-		memcpy(_stream->pPos, _Buf, _cnt);
-		_stream->pPos += _cnt;
-		return _cnt;
+		_stream->pBuffer = (BLVoid*)realloc(_stream->pBuffer, _stream->nLen + _Count);
+		_stream->pPos = _stream->pBuffer;
+		_stream->nLen += _Count;
+		memcpy(_stream->pPos, _Buf, _Count);
+		_stream->pEnd = (BLU8*)_stream->pBuffer + _stream->nLen;
+		return _Count;
 	}
 	else
 	{

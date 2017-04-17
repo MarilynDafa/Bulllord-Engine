@@ -2801,14 +2801,17 @@ blGainTexture(IN BLU32 _Hash)
 {
     blMutexLock(_PrGpuMem->pTextureCache->pMutex);
     _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _Hash);
-    blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
     if (_res)
     {
         _res->nRefCount++;
+		blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
         return ((_BLTextureBuffer*)_res->pRes)->nID;
     }
-    else
-        return INVALID_GUID;
+	else
+	{
+		blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
+		return INVALID_GUID;
+	}
 }
 BLVoid
 blTextureFilter(IN BLGuid _Tex, IN BLEnum _MinFilter, IN BLEnum _MagFilter, IN BLEnum _WrapS, IN BLEnum _WrapT, IN BLBool _Anisotropy)
