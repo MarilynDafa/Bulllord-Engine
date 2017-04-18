@@ -113,7 +113,7 @@ typedef struct _WidgetAction {
 		struct _Move {
 			BLF32 fVelocityX;
 			BLF32 fVelocityY;
-			BLF32 fTimePassed;
+			BLBool bReverse;
 		}sMove;
 		struct _Scale {
 			BLF32 fXInitScale;
@@ -11203,11 +11203,25 @@ _UIUpdate(_BLWidget* _Node, BLU32 _Interval)
 					break;
 				case UIACTION_MOVE_INTERNAL:
 					{
-						_Node->fOffsetX += (_action->fCurTime - _action->uAction.sMove.fTimePassed) * _action->uAction.sMove.fVelocityX;
-						_Node->fOffsetY += (_action->fCurTime - _action->uAction.sMove.fTimePassed) * _action->uAction.sMove.fVelocityY;
-						_action->uAction.sMove.fTimePassed = _action->fCurTime;
+						if (_action->uAction.sMove.bReverse)
+						{
+							if (2 * _action->fCurTime < _action->fTotalTime)
+							{
+								_Node->fOffsetX = _action->fCurTime * _action->uAction.sMove.fVelocityX;
+								_Node->fOffsetY = _action->fCurTime * _action->uAction.sMove.fVelocityY;
+							}
+							else
+							{
+								_Node->fOffsetX = (_action->fTotalTime - _action->fCurTime) * _action->uAction.sMove.fVelocityX;
+								_Node->fOffsetY = (_action->fTotalTime - _action->fCurTime) * _action->uAction.sMove.fVelocityY;
+							}
+						}
+						else
+						{
+							_Node->fOffsetX = _action->fCurTime * _action->uAction.sMove.fVelocityX;
+							_Node->fOffsetY = _action->fCurTime * _action->uAction.sMove.fVelocityY;
+						}
 					}
-					break;
 					break;
 				case UIACTION_ROTATE_INTERNAL:
 					{
@@ -11307,7 +11321,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
 	if (_PrUIMem->nTimeInterval > 10)
 	{
-		_UIUpdate(_PrUIMem->pRoot, _PrUIMem->nTimeInterval);
+		_UIUpdate(_PrUIMem->pRoot, _Delta);
 		_PrUIMem->nTimeInterval = 0;
 	}
 	else
@@ -11438,6 +11452,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 		};	
 		blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nFBOTex, 0);
 		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0, FALSE);
 		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 		static BLAnsi _fps[32] = { 0 };
 		if (_PrUIMem->bProfiler == 7)
@@ -14731,7 +14746,7 @@ blUIActionUV(IN BLGuid _ID, IN BLAnsi* _Tag, IN BLU32 _FPS, IN BLF32 _Time, IN B
 	return TRUE;
 }
 BLBool 
-blUIActionMove(IN BLGuid _ID, IN BLF32 _XVec, IN BLF32 _YVec, IN BLF32 _Time, IN BLBool _Loop)
+blUIActionMove(IN BLGuid _ID, IN BLF32 _XVec, IN BLF32 _YVec, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
 {
 	if (_Time <= 0.f)
 		return FALSE;
@@ -14750,9 +14765,9 @@ blUIActionMove(IN BLGuid _ID, IN BLF32 _XVec, IN BLF32 _YVec, IN BLF32 _Time, IN
 	_act->eActionType = UIACTION_MOVE_INTERNAL;
 	_act->fCurTime = 0.f;
 	_act->fTotalTime = _Time;
-	_act->uAction.sMove.fVelocityX = _XVec / _Time;
-	_act->uAction.sMove.fVelocityY = _YVec / _Time;
-	_act->uAction.sMove.fTimePassed = 0.f;
+	_act->uAction.sMove.fVelocityX = _XVec / _Time * (_Reverse ? 2 : 1);
+	_act->uAction.sMove.fVelocityY = _YVec / _Time * (_Reverse ? 2 : 1);
+	_act->uAction.sMove.bReverse = _Reverse;
 	if (!_widget->pAction)
 	{
 		_widget->pAction = _act;

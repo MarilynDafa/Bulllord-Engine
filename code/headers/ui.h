@@ -706,6 +706,7 @@ BL_API BLBool blUIActionMove(
 	IN BLGuid _ID,
 	IN BLF32 _XVec,
 	IN BLF32 _YVec,
+	IN BLBool _Reverse,
 	IN BLF32 _Time,
 	IN BLBool _Loop);
 //all controls except primitive
