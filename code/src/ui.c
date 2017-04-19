@@ -501,7 +501,6 @@ typedef struct _UIMember {
 	BLU32 nCaretColor;
 	BLU32 nSelectRangeColor;
 	BLU32 nTextDisableColor;
-	BLU32 nTimeInterval;
 	BLBool bParallelEdit;
 	BLBool bProfiler;
 	BLBool bDirty;
@@ -11009,7 +11008,6 @@ _UIInit(duk_context* _DKC, BLBool _Profiler)
     memset(_PrUIMem->aArchive, 0, sizeof(_PrUIMem->aArchive));
     FT_Init_FreeType(&_PrUIMem->sFtLibrary);
 	_PrUIMem->pDukContext = _DKC;
-	_PrUIMem->nTimeInterval = 0;
 	_PrUIMem->pBasePlate = NULL;
 	_PrUIMem->pModalWidget = NULL;
 	_PrUIMem->pPixmapsCache = blGenDict(TRUE);
@@ -11319,13 +11317,6 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 	BLU8 _blendfactor[4] = { 0 };
 	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, FALSE);
 	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
-	if (_PrUIMem->nTimeInterval > 10)
-	{
-		_UIUpdate(_PrUIMem->pRoot, _Delta);
-		_PrUIMem->nTimeInterval = 0;
-	}
-	else
-		_PrUIMem->nTimeInterval += _Delta;
 	if (_Baseplate)
 	{
 		_BLWidget* _node = _PrUIMem->pBasePlate;
@@ -11403,6 +11394,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 	}
 	else
 	{
+		_UIUpdate(_PrUIMem->pRoot, _Delta);
 		if (_PrUIMem->bDirty)
 		{
 			blBindFrameBuffer(_PrUIMem->nFBO);

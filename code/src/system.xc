@@ -3509,9 +3509,9 @@ blTickCounts()
 	static LARGE_INTEGER _litime = { 0 };
 	if (_litime.QuadPart == 0)
 		QueryPerformanceFrequency(&_litime);
-    LARGE_INTEGER _lifreq;
-    QueryPerformanceCounter(&_lifreq);
-    return (BLU32)((_lifreq.QuadPart) * 1000 / _litime.QuadPart);
+	LARGE_INTEGER _lifreq;
+	QueryPerformanceCounter(&_lifreq);
+	return (BLU32)((_lifreq.QuadPart) * 1000 / _litime.QuadPart);
 #elif defined(BL_PLATFORM_LINUX)
     struct timeval _val;
     gettimeofday(&_val, NULL);

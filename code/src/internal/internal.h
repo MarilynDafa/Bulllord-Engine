@@ -56,7 +56,7 @@ extern "C" {
 #define MIN_INTERNAL(x,y) ((x)<(y)?(x):(y))
 #define MAX_INTERNAL(x,y) ((x)>(y)?(x):(y))
 /* UI */
-#define PIXEL_ALIGNED_INTERNAL(pixel) ((BLF32)(BLS32)((pixel) + ((pixel)>0.0f?0.5f:-0.5f)))
+#define PIXEL_ALIGNED_INTERNAL(pixel) ((BLF32)(BLS32)((pixel) + ((pixel) > 0.0f ? 0.5f : -0.5f)))
 /* File */
 #if defined(_WIN64) || defined(WIN64)
 #	define FILE_INVALID_INTERNAL(fp) ((fp) && (fp) != (BLVoid*)0x00000000FFFFFFFFULL)
