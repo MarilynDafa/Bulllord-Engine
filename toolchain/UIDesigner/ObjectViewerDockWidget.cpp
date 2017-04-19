@@ -120,6 +120,9 @@ void ObjectViewerDockWidget::slotWidgetAdded( UiWidget *widget )
 	parentItem->addChild(item);
 	_tree->setCurrentItem(item);
 	item->parent()->setExpanded(true);
+
+	item->setCheckState(2, widget->isLock() ? Qt::Checked : Qt::Unchecked);
+	
 }
 
 QTreeWidgetItem * ObjectViewerDockWidget::createTreeWidgetItem( UiWidget *widget )
@@ -284,6 +287,13 @@ void ObjectViewerDockWidget::treeItemDataChanged( QTreeWidgetItem * item, int co
 	}
 	else
 	widgetNameChanged(widget, name);
+}
+
+void ObjectViewerDockWidget::setLock(UiWidget* wid, bool check)
+{
+	QTreeWidgetItem *item = findItemByUiWidget(wid);
+	item->setCheckState(2, check?Qt::Checked : Qt::Unchecked);
+	wid->Lock(item->checkState(2) == Qt::Checked);
 }
 
 void ObjectViewerDockWidget::slotWidgetNameChanged( UiWidget *widget, QString name )

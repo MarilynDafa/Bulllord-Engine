@@ -65,7 +65,9 @@ void SkinEditorWidget::initSignal()
 
 void SkinEditorWidget::slotButtonClicked()
 {
-	QString pathName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath(), tr("Bulllord Texture File (*.bmg)"));
+	QString defdir = QDir::currentPath();
+	defdir += "/pixmap";
+	QString pathName = QFileDialog::getOpenFileName(this, tr("Open File"), defdir, tr("Bulllord Texture File (*.bmg)"));
 	if(!pathName.isEmpty())
 	{
 		SkinFile skinFile(pathName);
@@ -219,7 +221,9 @@ void FontFileEditorWidget::initSignal()
 
 void FontFileEditorWidget::slotButtonClicked()
 {
-	QString pathName = QFileDialog::getOpenFileName(this, tr("Open Font File"), QDir::currentPath(), tr("Font File (*.ttf *.ttc)"));
+	QString defdir = QDir::currentPath();
+	defdir += "/font";
+	QString pathName = QFileDialog::getOpenFileName(this, tr("Open Font File"), defdir, tr("Font File (*.ttf *.ttc)"));
 	if(!pathName.isEmpty())
 	{
 

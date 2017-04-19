@@ -26,10 +26,12 @@ public:
 	void emitSignals(bool yes);
 	void setUserdata(void* ptr) { _userdata = ptr; }
 	void clean();
+	void setLock(UiWidget* wid, bool check);
 protected:
 	virtual void keyPressEvent(QKeyEvent* event);
-protected slots:
+public :
 	void slotWidgetAdded(UiWidget *widget);
+	protected slots:
 	void slotWidgetsDeleted(const QVector<UiWidget*> &widgets);
 	void slotWidgetSelectedChanged(const QVector<UiWidget*> &widgets);
 	void slotWidgetParentChanged(UiWidget *widget);

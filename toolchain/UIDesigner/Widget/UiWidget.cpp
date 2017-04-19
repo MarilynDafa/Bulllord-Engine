@@ -8,6 +8,7 @@
 #include "MainWindow.h"
 #include "CentralWidget.h"
 #include "PropertyEditerDockWidget.h"
+#include "ObjectViewerDockWidget.h"
 #include "PropertyManager.h"
 //////////////////////////////////////////////////////////////////////////
 SizeController::SizeController()
@@ -202,6 +203,8 @@ UiWidget::UiWidget(UiWidget *parent /*= 0*/)
 	, _widget(0)
 	, _parent(0)
 {
+	_defaultskinid = hash(L"default_ui_skin_name");
+	_defaultskinid2 = hash(L"default_ui_skin_name2");
 	_lock = false;
 	_hasStencil = false;
 	_tmpSkin = "Nil";
@@ -306,7 +309,7 @@ QList<UiWidget*> UiWidget::createDefaultWidget(const QString &name, UiWidget *pa
 	p.dim = c_rect(left, top, right, bottom);
 	p.name = text;
 	p.fntid = 0;
-	p.skinid = hash(L"default_ui_skin_name");
+	p.skinid = _defaultskinid2;
 	p.font_height = 32;
 	_widget = c_ui_manager::get_singleton_ptr()->add_widget(type , pw , p);
 
@@ -617,6 +620,7 @@ QDomElement UiWidget::serialize( QDomDocument &doc, const QDomElement &extElemen
 	baseEle.setAttribute("AbsScissor", boolToString(getAbs()));
 	baseEle.setAttribute("Cliped", boolToString(getCliped()));
 	baseEle.setAttribute("Penetration", boolToString(getPenetrate()));
+	baseEle.setAttribute("Lock", boolToString(isLock()));
 
 	ele.appendChild(baseEle);
 	ele.appendChild(extElement);
@@ -696,6 +700,8 @@ void UiWidget::read( QXmlStreamReader &reader, UiWidget *parent /*= NULL*/ )
 				bool abs = StringToBool(atts.value(QLatin1String("AbsScissor")).toString());
 				QStringList minsz = atts.value(QLatin1String("MinSize")).toString().split(",");
 				QStringList maxsz = atts.value(QLatin1String("MaxSize")).toString().split(",");
+				Lock(StringToBool(atts.value(QLatin1String("Lock")).toString()));
+				
 				//QString tooltip = atts.value(QLatin1String("Tooltip")).toString();
 
 				//setVisible(visible);
@@ -703,6 +709,7 @@ void UiWidget::read( QXmlStreamReader &reader, UiWidget *parent /*= NULL*/ )
 				//setTransfer(transmit);
 				setCliped(clip);
 				setAbs(abs);
+				
 				//setToolTip(tooltip);
 				
 				if(minsz.size() == 2)
@@ -979,10 +986,10 @@ QRect UiWidget::getAbsoluteRegion() const
 	if (!_widget)
 		return QRect(0, 0, 100, 100);
 	const c_rect &rect = _widget->get_region();
-	int left = rect.lt_pt().x();
-	int top = rect.lt_pt().y();
-	int width = rect.rb_pt().x() - left;
-	int height = rect.rb_pt().y() - top;
+	int left = round(rect.lt_pt().x());
+	int top = round(rect.lt_pt().y());
+	int width = rect.width();
+	int height = rect.height();
 	return QRect(left, top, width, height);
 }
 
@@ -1101,7 +1108,11 @@ void UiWidget::setRelativeRegion( const QRect &region )
 		qq.setHeight(ph);
 	}
 	setNewRegion(getRelativeRegion(), qq);
-	CentralWidget::getInst()->widgetPropertyChanged(this, QString::fromLatin1("Geometry"), this->property("Geometry"));
+	QVariant var;
+	qq.setWidth(qq.width() - 1);
+	qq.setHeight(qq.height() - 1);
+	var.setValue(qq);
+	CentralWidget::getInst()->widgetPropertyChanged(this, QString::fromLatin1("Geometry"), var);
 	//PropertyEditerDockWidget::getInstance()->setPropertyXX(QString::fromLatin1("Geometry"), qq);
 }
 

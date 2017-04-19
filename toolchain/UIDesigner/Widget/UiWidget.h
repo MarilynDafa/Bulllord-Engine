@@ -229,6 +229,8 @@ protected:
 	double _scale;
 	bool _hasStencil;
 	bool _lock;
+	u32 _defaultskinid;
+	u32 _defaultskinid2;
 };
 
 class TextAlign : public UserPropertyDataType

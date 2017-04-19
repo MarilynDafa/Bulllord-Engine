@@ -99,6 +99,7 @@ public:
 	static MainWindow* getInst();
 	void slotDirty();
 	void lockControl(bool x, bool y);
+	ObjectViewerDockWidget *_objectViewerDockWidget;
 private:
 	void initUi();
 	void initSignal();
@@ -111,6 +112,7 @@ private:
 	void enableAlignAction(int topWidgetCount, int selectWidgetCount, int childsCount);
 	void enableEditAction(int selectWidgetCount);
 	void setBackImage(const QString &imageFile);
+	
 protected:
 	virtual void paintEvent(QPaintEvent *event);
 
@@ -141,7 +143,6 @@ private:
 	WXGAWidget* _wxgaWidget;
 	WidgetBoxDockWidget *_widgetBoxDockWidget;
 	PropertyEditerDockWidget *_properEditerDockWidget;
-	ObjectViewerDockWidget *_objectViewerDockWidget;
 	CentralWidget *_centralWidget;
 	QWidget *_widgetEmitSignals;
 	QAction *_actWidgetBox;
