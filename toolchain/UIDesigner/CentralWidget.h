@@ -128,7 +128,7 @@ private:
 	void duringSelect(const QPoint &point);
 	void endSelect(const QPoint &point);
 	void dragMove(const QVector2D &v);
-	void endDragMove(const QPoint &mousePos);
+	void endDragMove(const QPoint &mousePos, bool changeparent = false);
 	void dragCopy(const QVector2D &v);
 	void endDragCopy(const QPoint &mousePos);
 	bool validWidgetName(UiWidget *widget, QString name);

@@ -12,6 +12,7 @@
 #include "Widget/UiWidget.h"
 #include "Widget\UiDialog.h"
 #include "FocusEventFilter.h"
+#include "ObjectViewerDockWidget.h"
 #include "MainWindow.h"
 //////////////////////////////////////////////////////////////////////////
 CentralWidget* CentralWidget::_self = NULL;
@@ -328,6 +329,16 @@ void CentralWidget::setSelectedWidget( const QVector<UiWidget*> &widgets )
 
 	if(widgetss != _selectedWidgets)
 	{
+		for (int i = 0; i < _selectedWidgets.size(); ++i)
+		{
+			if (_selectedWidgets[i]->getWidget()->get_skinid() == 336830410)
+				_selectedWidgets[i]->getWidget()->set_skin(c_string(L"default_ui_skin_name2"));
+		}
+		for (int i = 0; i < widgets.size(); ++i)
+		{
+			if (widgets[i]->getWidget()->get_skinid() == 1613585325)
+				widgets[i]->getWidget()->set_skin(c_string(L"default_ui_skin_name"));
+		}
 		_selectedWidgets = widgetss;
 		widgetSelectedChanged(_selectedWidgets);
 	}
@@ -451,7 +462,7 @@ void CentralWidget::dragMove( const QVector2D &v )
 	setSelectedWidget(_selectedWidgets);
 }
 
-void CentralWidget::endDragMove( const QPoint &mousePos )
+void CentralWidget::endDragMove( const QPoint &mousePos, bool changeparent)
 {
 	UiWidget *parent = getWidget(mousePos, true, _selectedWidgets);
 	int count = _selectedWidgets.count();
@@ -463,12 +474,15 @@ void CentralWidget::endDragMove( const QPoint &mousePos )
 			UiWidget *pw = widget->getParent();
 			if( !_selectedWidgets.contains(pw) )
 			{
-				QRect r1 = widget->getAbsoluteRegion();
-				if(widget->setParent(parent))
+				if (changeparent)
 				{
-					QRect r2 = widget->getAbsoluteRegion();
-					widget->move(QVector2D(r1.x() - r2.x(), r1.y() - r2.y()));
-					widgetParentChanged(widget);
+					QRect r1 = widget->getAbsoluteRegion();
+					if (widget->setParent(parent))
+					{
+						QRect r2 = widget->getAbsoluteRegion();
+						widget->move(QVector2D(r1.x() - r2.x(), r1.y() - r2.y()));
+						widgetParentChanged(widget);
+					}
 				}
 			}
 		}
@@ -509,7 +523,7 @@ UiWidget * CentralWidget::getWidget( const QPoint &pos, bool acceptChild/* = fal
 	for(int i = count - 1; i >= 0; i--)
 	{
 		UiWidget *widget = widgets[i];
-		if(widget->getParent() == 0)
+		//if(widget->getParent() == 0)
 		{
 			UiWidget *selectW = widget->getWidget(pos, acceptChild, except.toList());
 			if(selectW != 0)
@@ -1087,7 +1101,8 @@ bool CentralWidget::open( const QString &fileName )
 				{
 					if (widget != 0)
 					{
-						widgetAdded(widget);
+						MainWindow::getInst()->_objectViewerDockWidget->slotWidgetAdded(widget);
+						//widgetAdded(widget);
 					}
 				}
 				else
