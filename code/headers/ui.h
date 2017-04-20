@@ -671,7 +671,8 @@ BL_API BLBool blUIActionBegin(
 
 BL_API BLBool blUIActionEnd(
 	IN BLGuid _ID,
-	IN BLBool _Delete);
+	IN BLBool _Delete, 
+	IN BLBool _Loop);
 
 BL_API BLBool blUIParallelBegin(
 	IN BLGuid _ID);

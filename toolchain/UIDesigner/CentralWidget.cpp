@@ -80,7 +80,8 @@ UiWidget * CentralWidget::addUiWidget( const QString &uiName, const QPoint &pos 
 	UiWidget *widget = UiWidgetFactory::getSingletonPtr()->createWidget(uiName,getWidget(pos),pos);
 	if(widget != 0)
 	{
-		widgetAdded(widget);
+		//widgetAdded(widget);
+		MainWindow::getInst()->_objectViewerDockWidget->slotWidgetAdded(widget);
 		selectWidget.append(widget);
 	}
 	setSelectedWidget(selectWidget);
@@ -603,7 +604,9 @@ void CentralWidget::addUiWidgets( const QVector<UiWidget*> &widgets )
 		UiWidget *widget = widgetIterator.next();
 		if(!widget->getInteraction())
 		{
-			widgetAdded(widget);
+			//widgetAdded(widget);
+
+			MainWindow::getInst()->_objectViewerDockWidget->slotWidgetAdded(widget);
 			QList<UiWidget*> childs = widget->getChild();
 			addUiWidgets(childs.toVector());
 		}
@@ -916,7 +919,8 @@ void CentralWidget::setWidgetsVisiable( const QVector<UiWidget*> &widgets, bool 
 		UiWidget *widget = iter.next();
 		widget->setVisible(visible);
 		if(visible)
-			widgetAdded(widget); // 显示的时候要确保对于其它控件相当于添加
+			MainWindow::getInst()->_objectViewerDockWidget->slotWidgetAdded(widget);
+			//widgetAdded(widget); // 显示的时候要确保对于其它控件相当于添加
 		QVector<UiWidget*> childs = widget->getChild().toVector();
 		setWidgetsVisiable(childs, visible);
 	}

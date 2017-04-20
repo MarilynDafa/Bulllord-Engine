@@ -116,10 +116,10 @@ typedef struct _WidgetAction {
 			BLBool bReverse;
 		}sMove;
 		struct _Scale {
-			BLF32 fXInitScale;
-			BLF32 fYInitScale;
-			BLF32 fXScale;
-			BLF32 fYScale;
+			BLF32 fInitScaleX;
+			BLF32 fInitScaleY;
+			BLF32 fScaleX;
+			BLF32 fScaleY;
 			BLBool bReverse;
 		}sScale;
 		struct _Rotate {
@@ -132,10 +132,23 @@ typedef struct _WidgetAction {
 			BLBool bReverse;
 		}sAlpha;
 		struct _Dead {
+			struct _WidgetAction* pBegin;
+			BLF32 fAlphaCache;
+			BLF32 fScaleXCache;
+			BLF32 fScaleYCache;
+			BLF32 fOffsetXCache;
+			BLF32 fOffsetYCache;
+			BLF32 fRotateCache;
 			BLBool bDead;
 		}sDead;
 	} uAction;
 }_BLWidgetAction;
+typedef struct _WidgetRecorder {
+	BLBool bParallelEdit;
+	BLF32 fAlphaRecord;
+	BLF32 fScaleXRecord;
+	BLF32 fScaleYRecord;
+} _BLWidgetRecorder;
 typedef struct _Widget {
 	BLGuid nID;
 	BLEnum eType;
@@ -487,6 +500,7 @@ typedef struct _UIMember {
 	_BLWidget* pFocusWidget;
 	_BLWidget* pModalWidget;
 	BLDictionary* pPixmapsCache;
+	_BLWidgetRecorder sActionRecorder;
 	BLArray* pFonts;
 	BLGuid nQuadGeo;
 	BLAnsi aDir[260];
@@ -501,7 +515,6 @@ typedef struct _UIMember {
 	BLU32 nCaretColor;
 	BLU32 nSelectRangeColor;
 	BLU32 nTextDisableColor;
-	BLBool bParallelEdit;
 	BLBool bProfiler;
 	BLBool bDirty;
 }_BLUIMember;
@@ -11242,20 +11255,21 @@ _UIUpdate(_BLWidget* _Node, BLU32 _Interval)
 						{
 							if (_action->fCurTime * 2 <= _action->fTotalTime)
 							{
-								_Node->fScaleX = 2 * _action->fCurTime / _action->fTotalTime * (_action->uAction.sScale.fXScale - _action->uAction.sScale.fXInitScale) + _action->uAction.sScale.fXInitScale;
-								_Node->fScaleY = 2 * _action->fCurTime / _action->fTotalTime * (_action->uAction.sScale.fYScale - _action->uAction.sScale.fYInitScale) + _action->uAction.sScale.fYInitScale;
+								_Node->fScaleX = 2 * _action->fCurTime / _action->fTotalTime * (_action->uAction.sScale.fScaleX - _action->uAction.sScale.fInitScaleX) + _action->uAction.sScale.fInitScaleX;
+								_Node->fScaleY = 2 * _action->fCurTime / _action->fTotalTime * (_action->uAction.sScale.fScaleY - _action->uAction.sScale.fInitScaleY) + _action->uAction.sScale.fInitScaleY;
 							}
 							else
 							{
-								_Node->fScaleX = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fXInitScale) + _action->uAction.sScale.fXScale;
-								_Node->fScaleY = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fYInitScale) + _action->uAction.sScale.fYScale;
+								_Node->fScaleX = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fInitScaleX) + _action->uAction.sScale.fScaleX;
+								_Node->fScaleY = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fInitScaleY) + _action->uAction.sScale.fScaleY;
 							}
 						}
 						else
 						{
-							_Node->fScaleX = _action->fCurTime / _action->fTotalTime * (_action->uAction.sScale.fXScale - _action->uAction.sScale.fXInitScale) + _action->uAction.sScale.fXInitScale;
-							_Node->fScaleY = _action->fCurTime / _action->fTotalTime * (_action->uAction.sScale.fYScale - _action->uAction.sScale.fYInitScale) + _action->uAction.sScale.fYInitScale;
+							_Node->fScaleX = _action->fCurTime / _action->fTotalTime * (_action->uAction.sScale.fScaleX - _action->uAction.sScale.fInitScaleX) + _action->uAction.sScale.fInitScaleX;
+							_Node->fScaleY = _action->fCurTime / _action->fTotalTime * (_action->uAction.sScale.fScaleY - _action->uAction.sScale.fInitScaleY) + _action->uAction.sScale.fInitScaleY;
 						}
+						blDebugOutput("%f", _action->fCurTime);
 					}
 					break;
 				case UIACTION_ALPHA_INTERNAL:
@@ -11268,13 +11282,54 @@ _UIUpdate(_BLWidget* _Node, BLU32 _Interval)
 								_Node->fAlpha = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fAlpha;
 						}
 						else
-							_Node->fAlpha = _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;
+							_Node->fAlpha = _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;						
+						_Node->fAlpha = blScalarClamp(_Node->fAlpha, 0.f, 1.f);
 					}
 					break;
 				case UIACTION_DEAD_INTERNAL:
-					blInvokeEvent(BL_ET_UI, 0xFFFFFFFF, _Node->eType, NULL, _Node->nID);
-					blDeleteUI(_Node->nID);
-					_delete = TRUE;
+					{
+						if (_action->uAction.sDead.pBegin)
+						{
+							_Node->pCurAction = _action->uAction.sDead.pBegin;
+							_Node->fAlpha = _action->uAction.sDead.fAlphaCache;
+							_Node->fScaleX = _action->uAction.sDead.fScaleXCache;
+							_Node->fScaleY = _action->uAction.sDead.fScaleYCache;
+							_Node->fOffsetX = _action->uAction.sDead.fOffsetXCache;
+							_Node->fOffsetY = _action->uAction.sDead.fOffsetYCache;
+							if (_Node->eType == BL_UT_DIAL && !_Node->uExtension.sDial.bAngleCut)
+								_Node->uExtension.sDial.fAngle = _action->uAction.sDead.fRotateCache;
+							else if (_Node->eType == BL_UT_DIAL && _Node->uExtension.sDial.bAngleCut)
+								_Node->uExtension.sDial.nEndAngle = _Node->uExtension.sDial.nStartAngle;
+							if (_Node->pAction)
+							{
+								_BLWidgetAction* _tmp = _Node->pAction;
+								while (_tmp)
+								{
+									_BLWidgetAction* _tmpnext = _tmp->pNext;
+									if (_tmp->pNeighbor)
+									{
+										_BLWidgetAction* _tmpneb = _tmp->pNeighbor;
+										while (_tmp)
+										{
+											_tmp->fCurTime = 0.f;
+											_tmp = _tmpneb;
+											_tmpneb = _tmp ? _tmp->pNeighbor : NULL;
+										}
+									}
+									else
+										_tmp->fCurTime = 0.f;
+									_tmp = _tmpnext;
+								}
+							}
+							_Node->pCurAction->fCurTime = 0.f;
+						}
+						else
+						{
+							blInvokeEvent(BL_ET_UI, 0xFFFFFFFF, _Node->eType, NULL, _Node->nID);
+							blDeleteUI(_Node->nID);
+							_delete = TRUE;
+						}
+					}
 					break;
 				default: assert(0); break;
 				}
@@ -14589,11 +14644,14 @@ blUIActionBegin(IN BLGuid _ID)
 			_tmp = _tmpnext;
 		}
 	}
-	_PrUIMem->bParallelEdit = FALSE;
+	_PrUIMem->sActionRecorder.bParallelEdit = FALSE;
+	_PrUIMem->sActionRecorder.fAlphaRecord = _widget->fAlpha;
+	_PrUIMem->sActionRecorder.fScaleXRecord = _widget->fScaleX;
+	_PrUIMem->sActionRecorder.fScaleYRecord = _widget->fScaleY;
 	return TRUE;
 }
 BLBool 
-blUIActionEnd(IN BLGuid _ID, IN BLBool _Delete)
+blUIActionEnd(IN BLGuid _ID, IN BLBool _Delete, IN BLBool _Loop)
 {
 	if (_ID == INVALID_GUID)
 		return FALSE;
@@ -14613,13 +14671,40 @@ blUIActionEnd(IN BLGuid _ID, IN BLBool _Delete)
 		_act->fCurTime = 0.f;
 		_act->fTotalTime = 0.f;
 		_act->uAction.sDead.bDead = TRUE;
+		_act->uAction.sDead.pBegin = NULL;
+		_BLWidgetAction* _lastact = _widget->pAction;
+		while (_lastact->pNext)
+			_lastact = _lastact->pNext;
+		_lastact->pNext = _act;
+	}
+	else if (_Loop)
+	{
+		_BLWidgetAction* _act = (_BLWidgetAction*)malloc(sizeof(_BLWidgetAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bParallel = FALSE;
+		_act->bLoop = FALSE;
+		_act->eActionType = UIACTION_DEAD_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = 0.f;
+		_act->uAction.sDead.bDead = TRUE;
+		_act->uAction.sDead.pBegin = _widget->pAction;
+		_act->uAction.sDead.fAlphaCache = _widget->fAlpha;
+		_act->uAction.sDead.fScaleXCache = _widget->fScaleX;
+		_act->uAction.sDead.fScaleYCache = _widget->fScaleY;
+		_act->uAction.sDead.fOffsetXCache = _widget->fOffsetX;
+		_act->uAction.sDead.fOffsetYCache = _widget->fOffsetY;
+		if (_widget->eType == BL_UT_DIAL && !_widget->uExtension.sDial.bAngleCut)
+			_act->uAction.sDead.fRotateCache = _widget->uExtension.sDial.fAngle;
+		else
+			_act->uAction.sDead.fRotateCache = 0.f;
 		_BLWidgetAction* _lastact = _widget->pAction;
 		while (_lastact->pNext)
 			_lastact = _lastact->pNext;
 		_lastact->pNext = _act;
 	}
 	_widget->pCurAction = NULL;
-	_PrUIMem->bParallelEdit = FALSE;
+	_PrUIMem->sActionRecorder.bParallelEdit = FALSE;
 	return TRUE;
 }
 BLBool 
@@ -14627,9 +14712,9 @@ blUIParallelBegin(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
 		return FALSE;
-	if (_PrUIMem->bParallelEdit)
+	if (_PrUIMem->sActionRecorder.bParallelEdit)
 		return FALSE;
-	_PrUIMem->bParallelEdit = TRUE;
+	_PrUIMem->sActionRecorder.bParallelEdit = TRUE;
 	return TRUE;
 }
 BLBool 
@@ -14637,9 +14722,9 @@ blUIParallelEnd(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
 		return FALSE;
-	if (!_PrUIMem->bParallelEdit)
+	if (!_PrUIMem->sActionRecorder.bParallelEdit)
 		return FALSE;
-	_PrUIMem->bParallelEdit = FALSE;
+	_PrUIMem->sActionRecorder.bParallelEdit = FALSE;
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	_BLWidgetAction* _lastact = _widget->pAction;
 	while (_lastact->pNext)
@@ -14710,7 +14795,7 @@ blUIActionUV(IN BLGuid _ID, IN BLAnsi* _Tag, IN BLU32 _FPS, IN BLF32 _Time, IN B
 	_act->pNeighbor = NULL;
 	_act->pNext = NULL;
 	_act->bLoop = _Loop;
-	_act->bParallel = _PrUIMem->bParallelEdit;
+	_act->bParallel = _PrUIMem->sActionRecorder.bParallelEdit;
 	_act->eActionType = UIACTION_UV_INTERNAL;
 	_act->fCurTime = 0.f;
 	_act->fTotalTime = _Time;
@@ -14726,7 +14811,7 @@ blUIActionUV(IN BLGuid _ID, IN BLAnsi* _Tag, IN BLU32 _FPS, IN BLF32 _Time, IN B
 		_BLWidgetAction* _lastact = _widget->pAction;
 		while (_lastact->pNext)
 			_lastact = _lastact->pNext;
-		if (_PrUIMem->bParallelEdit && _lastact->bParallel)
+		if (_PrUIMem->sActionRecorder.bParallelEdit && _lastact->bParallel)
 		{
 			while (_lastact->pNeighbor)
 				_lastact = _lastact->pNeighbor;
@@ -14740,8 +14825,6 @@ blUIActionUV(IN BLGuid _ID, IN BLAnsi* _Tag, IN BLU32 _FPS, IN BLF32 _Time, IN B
 BLBool 
 blUIActionMove(IN BLGuid _ID, IN BLF32 _XVec, IN BLF32 _YVec, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
 {
-	if (_Time <= 0.f)
-		return FALSE;
 	if (_ID == INVALID_GUID)
 		return FALSE;
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14749,43 +14832,50 @@ blUIActionMove(IN BLGuid _ID, IN BLF32 _XVec, IN BLF32 _YVec, IN BLBool _Reverse
 		return FALSE;
 	if (_widget->eType == BL_UT_PRIMITIVE)
 		return FALSE;
-	_BLWidgetAction* _act = (_BLWidgetAction*)malloc(sizeof(_BLWidgetAction));
-	_act->pNeighbor = NULL;
-	_act->pNext = NULL;
-	_act->bLoop = _Loop;
-	_act->bParallel = _PrUIMem->bParallelEdit;
-	_act->eActionType = UIACTION_MOVE_INTERNAL;
-	_act->fCurTime = 0.f;
-	_act->fTotalTime = _Time;
-	_act->uAction.sMove.fVelocityX = _XVec / _Time * (_Reverse ? 2 : 1);
-	_act->uAction.sMove.fVelocityY = _YVec / _Time * (_Reverse ? 2 : 1);
-	_act->uAction.sMove.bReverse = _Reverse;
-	if (!_widget->pAction)
+	if (blScalarApproximate(_Time, 0.f))
 	{
-		_widget->pAction = _act;
-		return TRUE;
+		_widget->fOffsetX = _XVec;
+		_widget->fOffsetY = _YVec;
+		return FALSE;
 	}
 	else
 	{
-		_BLWidgetAction* _lastact = _widget->pAction;
-		while (_lastact->pNext)
-			_lastact = _lastact->pNext;
-		if (_PrUIMem->bParallelEdit && _lastact->bParallel)
+		_BLWidgetAction* _act = (_BLWidgetAction*)malloc(sizeof(_BLWidgetAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bLoop = _Loop;
+		_act->bParallel = _PrUIMem->sActionRecorder.bParallelEdit;
+		_act->eActionType = UIACTION_MOVE_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = _Time;
+		_act->uAction.sMove.fVelocityX = _XVec / _Time * (_Reverse ? 2 : 1);
+		_act->uAction.sMove.fVelocityY = _YVec / _Time * (_Reverse ? 2 : 1);
+		_act->uAction.sMove.bReverse = _Reverse;
+		if (!_widget->pAction)
 		{
-			while (_lastact->pNeighbor)
-				_lastact = _lastact->pNeighbor;
-			_lastact->pNeighbor = _act;
+			_widget->pAction = _act;
+			return TRUE;
 		}
 		else
-			_lastact->pNext = _act;
+		{
+			_BLWidgetAction* _lastact = _widget->pAction;
+			while (_lastact->pNext)
+				_lastact = _lastact->pNext;
+			if (_PrUIMem->sActionRecorder.bParallelEdit && _lastact->bParallel)
+			{
+				while (_lastact->pNeighbor)
+					_lastact = _lastact->pNeighbor;
+				_lastact->pNeighbor = _act;
+			}
+			else
+				_lastact->pNext = _act;
+		}
+		return TRUE;
 	}
-	return TRUE;
 }
 BLBool 
 blUIActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
 {
-	if (_Time <= 0.f)
-		return FALSE;
 	if (_ID == INVALID_GUID)
 		return FALSE;
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14793,45 +14883,56 @@ blUIActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool _Re
 		return FALSE;
 	if (_widget->eType == BL_UT_PRIMITIVE)
 		return FALSE;
-	_BLWidgetAction* _act = (_BLWidgetAction*)malloc(sizeof(_BLWidgetAction));
-	_act->pNeighbor = NULL;
-	_act->pNext = NULL;
-	_act->bLoop = _Loop;
-	_act->bParallel = _PrUIMem->bParallelEdit;
-	_act->eActionType = UIACTION_SCALE_INTERNAL;
-	_act->fCurTime = 0.f;
-	_act->fTotalTime = _Time;
-	_act->uAction.sScale.fXInitScale = _widget->fScaleX;
-	_act->uAction.sScale.fYInitScale = _widget->fScaleY;
-	_act->uAction.sScale.fXScale = _XScale;
-	_act->uAction.sScale.fYScale = _YScale;
-	_act->uAction.sScale.bReverse = _Reverse;
-	if (!_widget->pAction)
+	if (blScalarApproximate(_Time, 0.f))
 	{
-		_widget->pAction = _act;
-		return TRUE;
+		_widget->fScaleX = _XScale;
+		_widget->fScaleY = _YScale;
+		_PrUIMem->sActionRecorder.fScaleXRecord = _XScale;
+		_PrUIMem->sActionRecorder.fScaleYRecord = _YScale;
+		return FALSE;
 	}
 	else
 	{
-		_BLWidgetAction* _lastact = _widget->pAction;
-		while (_lastact->pNext)
-			_lastact = _lastact->pNext;
-		if (_PrUIMem->bParallelEdit && _lastact->bParallel)
+		_BLWidgetAction* _act = (_BLWidgetAction*)malloc(sizeof(_BLWidgetAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bLoop = _Loop;
+		_act->bParallel = _PrUIMem->sActionRecorder.bParallelEdit;
+		_act->eActionType = UIACTION_SCALE_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = _Time;
+		_act->uAction.sScale.fInitScaleX = _PrUIMem->sActionRecorder.fScaleXRecord;
+		_act->uAction.sScale.fInitScaleY = _PrUIMem->sActionRecorder.fScaleYRecord;
+		_act->uAction.sScale.fScaleX = _XScale;
+		_act->uAction.sScale.fScaleY = _YScale;
+		_PrUIMem->sActionRecorder.fScaleXRecord = _XScale;
+		_PrUIMem->sActionRecorder.fScaleYRecord = _YScale;
+		_act->uAction.sScale.bReverse = _Reverse;
+		if (!_widget->pAction)
 		{
-			while (_lastact->pNeighbor)
-				_lastact = _lastact->pNeighbor;
-			_lastact->pNeighbor = _act;
+			_widget->pAction = _act;
+			return TRUE;
 		}
 		else
-			_lastact->pNext = _act;
+		{
+			_BLWidgetAction* _lastact = _widget->pAction;
+			while (_lastact->pNext)
+				_lastact = _lastact->pNext;
+			if (_PrUIMem->sActionRecorder.bParallelEdit && _lastact->bParallel)
+			{
+				while (_lastact->pNeighbor)
+					_lastact = _lastact->pNeighbor;
+				_lastact->pNeighbor = _act;
+			}
+			else
+				_lastact->pNext = _act;
+		}
+		return TRUE;
 	}
-	return TRUE;
 }
 BLBool 
 blUIActionRotate(IN BLGuid _ID, IN BLF32 _Angle, IN BLBool _ClockWise, IN BLF32 _Time, IN BLBool _Loop)
 {
-	if (_Time <= 0.f)
-		return FALSE;
 	if (_ID == INVALID_GUID)
 		return FALSE;
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14839,76 +14940,95 @@ blUIActionRotate(IN BLGuid _ID, IN BLF32 _Angle, IN BLBool _ClockWise, IN BLF32 
 		return FALSE;
 	if (_widget->eType != BL_UT_DIAL)
 		return FALSE;
-	_BLWidgetAction* _act = (_BLWidgetAction*)malloc(sizeof(_BLWidgetAction));
-	_act->pNeighbor = NULL;
-	_act->pNext = NULL;
-	_act->bLoop = _Loop;
-	_act->bParallel = _PrUIMem->bParallelEdit;
-	_act->eActionType = UIACTION_ROTATE_INTERNAL;
-	_act->fCurTime = 0.f;
-	_act->fTotalTime = _Time;
-	_act->uAction.sRotate.bClockWise = _ClockWise;
-	_act->uAction.sRotate.fAngle = _Angle;
-	if (!_widget->pAction)
+	if (blScalarApproximate(_Time, 0.f))
 	{
-		_widget->pAction = _act;
-		return TRUE;
+		if (_widget->uExtension.sDial.bAngleCut)
+			_widget->uExtension.sDial.nEndAngle = (BLS32)(_widget->uExtension.sDial.nStartAngle + _Angle);
+		else
+			_widget->uExtension.sDial.fAngle = _Angle;
+		return FALSE;
 	}
 	else
 	{
-		_BLWidgetAction* _lastact = _widget->pAction;
-		while (_lastact->pNext)
-			_lastact = _lastact->pNext;
-		if (_PrUIMem->bParallelEdit && _lastact->bParallel)
+		_BLWidgetAction* _act = (_BLWidgetAction*)malloc(sizeof(_BLWidgetAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bLoop = _Loop;
+		_act->bParallel = _PrUIMem->sActionRecorder.bParallelEdit;
+		_act->eActionType = UIACTION_ROTATE_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = _Time;
+		_act->uAction.sRotate.bClockWise = _ClockWise;
+		_act->uAction.sRotate.fAngle = _Angle;
+		if (!_widget->pAction)
 		{
-			while (_lastact->pNeighbor)
-				_lastact = _lastact->pNeighbor;
-			_lastact->pNeighbor = _act;
+			_widget->pAction = _act;
+			return TRUE;
 		}
 		else
-			_lastact->pNext = _act;
+		{
+			_BLWidgetAction* _lastact = _widget->pAction;
+			while (_lastact->pNext)
+				_lastact = _lastact->pNext;
+			if (_PrUIMem->sActionRecorder.bParallelEdit && _lastact->bParallel)
+			{
+				while (_lastact->pNeighbor)
+					_lastact = _lastact->pNeighbor;
+				_lastact->pNeighbor = _act;
+			}
+			else
+				_lastact->pNext = _act;
+		}
+		return TRUE;
 	}
-	return TRUE;
 }
 BLBool 
 blUIActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
 {
-	if (_Time <= 0.f)
-		return FALSE;
 	if (_ID == INVALID_GUID)
 		return FALSE;
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
 		return FALSE;
-	_BLWidgetAction* _act = (_BLWidgetAction*)malloc(sizeof(_BLWidgetAction));
-	_act->pNeighbor = NULL;
-	_act->pNext = NULL;
-	_act->bLoop = _Loop;
-	_act->bParallel = _PrUIMem->bParallelEdit;
-	_act->eActionType = UIACTION_ALPHA_INTERNAL;
-	_act->fCurTime = 0.f;
-	_act->fTotalTime = _Time;
-	_act->uAction.sAlpha.fInitAlpha = _widget->fAlpha;
-	_act->uAction.sAlpha.fAlpha = _Alpha;
-	_act->uAction.sAlpha.bReverse = _Reverse;
-	if (!_widget->pAction)
+	if (blScalarApproximate(_Time, 0.f))
 	{
-		_widget->pAction = _act;
-		return TRUE;
+		_widget->fAlpha = _Alpha;
+		_PrUIMem->sActionRecorder.fAlphaRecord = _Alpha;
+		return FALSE;
 	}
 	else
 	{
-		_BLWidgetAction* _lastact = _widget->pAction;
-		while (_lastact->pNext)
-			_lastact = _lastact->pNext;
-		if (_PrUIMem->bParallelEdit && _lastact->bParallel)
+		_BLWidgetAction* _act = (_BLWidgetAction*)malloc(sizeof(_BLWidgetAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bLoop = _Loop;
+		_act->bParallel = _PrUIMem->sActionRecorder.bParallelEdit;
+		_act->eActionType = UIACTION_ALPHA_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = _Time;
+		_act->uAction.sAlpha.fInitAlpha = _PrUIMem->sActionRecorder.fAlphaRecord;
+		_act->uAction.sAlpha.fAlpha = _Alpha;
+		_PrUIMem->sActionRecorder.fAlphaRecord = _Alpha;
+		_act->uAction.sAlpha.bReverse = _Reverse;
+		if (!_widget->pAction)
 		{
-			while (_lastact->pNeighbor)
-				_lastact = _lastact->pNeighbor;
-			_lastact->pNeighbor = _act;
+			_widget->pAction = _act;
+			return TRUE;
 		}
 		else
-			_lastact->pNext = _act;
+		{
+			_BLWidgetAction* _lastact = _widget->pAction;
+			while (_lastact->pNext)
+				_lastact = _lastact->pNext;
+			if (_PrUIMem->sActionRecorder.bParallelEdit && _lastact->bParallel)
+			{
+				while (_lastact->pNeighbor)
+					_lastact = _lastact->pNeighbor;
+				_lastact->pNeighbor = _act;
+			}
+			else
+				_lastact->pNext = _act;
+		}
+		return TRUE;
 	}
-	return TRUE;
 }
