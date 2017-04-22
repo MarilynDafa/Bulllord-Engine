@@ -54,6 +54,12 @@
     <ClInclude Include="..\..\code\externals\zlib\zutil.h">
       <Filter>externals</Filter>
     </ClInclude>
+    <ClInclude Include="AStar.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexPriorityQueue.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tmx.c">
@@ -106,6 +112,12 @@
     </ClCompile>
     <ClCompile Include="..\..\code\externals\zlib\zutil.c">
       <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="AStar.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexPriorityQueue.c">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

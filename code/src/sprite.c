@@ -62,10 +62,25 @@ typedef struct _SpriteAction{
 			BLBool bReverse;
 		}sAlpha;
 		struct _Dead {
+			struct _SpriteAction* pBegin;
+			BLF32 fAlphaCache;
+			BLF32 fScaleXCache;
+			BLF32 fScaleYCache;
+			BLF32 fOffsetXCache;
+			BLF32 fOffsetYCache;
+			BLF32 fRotateCache;
 			BLBool bDead;
 		}sDead;
 	} uAction;
 }_BLSpriteAction;
+typedef struct _SpriteRecorder {
+	BLBool bParallelEdit;
+	BLF32 fAlphaRecord;
+	BLF32 fScaleXRecord;
+	BLF32 fScaleYRecord;
+	BLF32 fPosXRecord;
+	BLF32 fPosYRecord;
+} _BLSpriteRecorder;
 typedef struct _EmitParam {
 	BLF32 fEmitterRadius;
 	BLU32 nLife;
@@ -168,12 +183,13 @@ typedef struct _SpriteMember {
 	BLGuid nFBO;
 	BLGuid nFBOTex;
 	BLGuid nQuadGeo;
+	BLU32 nFboWidth;
+	BLU32 nFboHeight;
     _BLSpriteNode** pNodeList;
 	_BLSpriteNode* pCursor;
+	_BLSpriteRecorder sActionRecorder;
 	BLArray* pTileArray[8];
 	BLRect sViewport;
-	BLBool bParallelEdit;
-	BLU32 nTimeInterval;
     BLU32 nNodeNum;
     BLU32 nNodeCap;
     BLBool bShaking;
@@ -205,8 +221,11 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 	}
 	else if (_Type == BL_ME_LDOWN || _Type == BL_ME_RDOWN)
 	{
-		BLF32 _x = LOWU16(_UParam);
-		BLF32 _y = HIGU16(_UParam);
+		BLU32 _oriw, _orih, _aw, _ah;
+		BLF32 _rx, _ry;
+		blWindowQuery(&_oriw, &_orih, &_aw, &_ah, &_rx, &_ry);
+		BLF32 _x = (BLF32)LOWU16(_UParam) / _rx;
+		BLF32 _y = (BLF32)HIGU16(_UParam) / _ry;
 		BLGuid _id = INVALID_GUID;
 		for (BLU32 _idx = 0; _idx < _PrSpriteMem->nNodeNum; ++_idx)
 		{
@@ -221,27 +240,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 				break;
 			}
 		}
-		blInvokeEvent(BL_ET_SPRITE, _UParam, _Type, NULL, _id);
-	}
-	else if (_Type == BL_ME_LUP || _Type == BL_ME_RUP)
-	{
-		BLF32 _x = LOWU16(_UParam);
-		BLF32 _y = HIGU16(_UParam);
-		BLGuid _id = INVALID_GUID;
-		for (BLU32 _idx = 0; _idx < _PrSpriteMem->nNodeNum; ++_idx)
-		{
-			_BLSpriteNode* _node = _PrSpriteMem->pNodeList[_idx];
-			BLS32 _a = (BLS32)((_node->sAbsLT.fX - _node->sAbsLB.fX) * (_y - _node->sAbsLB.fY) - (_node->sAbsLT.fY - _node->sAbsLB.fY) * (_x - _node->sAbsLB.fX));
-			BLS32 _b = (BLS32)((_node->sAbsRT.fX - _node->sAbsLT.fX) * (_y - _node->sAbsLT.fY) - (_node->sAbsRT.fY - _node->sAbsLT.fY) * (_x - _node->sAbsLT.fX));
-			BLS32 _c = (BLS32)((_node->sAbsRB.fX - _node->sAbsRT.fX) * (_y - _node->sAbsRT.fY) - (_node->sAbsRB.fY - _node->sAbsRT.fY) * (_x - _node->sAbsRT.fX));
-			BLS32 _d = (BLS32)((_node->sAbsLB.fX - _node->sAbsRB.fX) * (_y - _node->sAbsRB.fY) - (_node->sAbsLB.fY - _node->sAbsRB.fY) * (_x - _node->sAbsRB.fX));
-			if ((_a > 0 && _b > 0 && _c > 0 && _d > 0) || (_a < 0 && _b < 0 && _c < 0 && _d < 0))
-			{
-				_id = _node->nID;
-				break;
-			}
-		}
-		blInvokeEvent(BL_ET_SPRITE, _UParam, _Type, NULL, _id);
+		blInvokeEvent(BL_ET_SPRITE, MAKEU32(_y + _PrSpriteMem->sViewport.sLT.fY, _x + _PrSpriteMem->sViewport.sLT.fX), _Type, NULL, _id);
 	}
 	return TRUE;
 }
@@ -252,13 +251,16 @@ _SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, B
 	{
 		blFrameBufferDetach(_PrSpriteMem->nFBO, FALSE);
 		blDeleteTexture(_PrSpriteMem->nFBOTex);
-		BLU32 _w, _h, _aw, _ah;
+		BLU32 _width, _height;
 		BLF32 _rx, _ry;
-		blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
-		_PrSpriteMem->sViewport.sLT.fX = _PrSpriteMem->sViewport.sLT.fY = 0.f;
-		_PrSpriteMem->sViewport.sRB.fX = (BLF32)_aw;
-		_PrSpriteMem->sViewport.sRB.fY = (BLF32)_ah;
-		_PrSpriteMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _aw, _ah, 1, NULL);
+		blWindowQuery(&_width, &_height, &_PrSpriteMem->nFboWidth, &_PrSpriteMem->nFboHeight, &_rx, &_ry);
+		BLF32 _centerx = (_PrSpriteMem->sViewport.sLT.fX + _PrSpriteMem->sViewport.sRB.fX) * 0.5f;
+		BLF32 _centery = (_PrSpriteMem->sViewport.sLT.fY + _PrSpriteMem->sViewport.sRB.fY) * 0.5f;
+		_PrSpriteMem->sViewport.sLT.fX = _centerx - _PrSpriteMem->nFboWidth * 0.5f;
+		_PrSpriteMem->sViewport.sLT.fY = _centery - _PrSpriteMem->nFboHeight * 0.5f;
+		_PrSpriteMem->sViewport.sRB.fX = _centerx + _PrSpriteMem->nFboWidth * 0.5f;
+		_PrSpriteMem->sViewport.sRB.fY = _centery + _PrSpriteMem->nFboHeight * 0.5f;
+		_PrSpriteMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, 1, NULL);
 		blFrameBufferAttach(_PrSpriteMem->nFBO, _PrSpriteMem->nFBOTex, 0, BL_CTF_IGNORE);
 	}
 	return FALSE;
@@ -671,20 +673,19 @@ _SpriteUpdate(BLU32 _Delta)
 				case SPACTION_MOVE_INTERNAL:
 				{
 					BLF32 _s = _action->uAction.sMove.fVelocity * _action->fCurTime + 0.5f * _action->uAction.sMove.fAcceleration * _action->fCurTime * _action->fCurTime;
-					for (BLU32 _jdx = 1; _jdx < _action->uAction.sMove.nPathNum; ++_jdx)
+					BLU32 _jdx = 1;
+					BLF32* _xp = _action->uAction.sMove.pXPath;
+					BLF32* _yp = _action->uAction.sMove.pYPath;
+					BLF32 _subs = 0.f;
+					while (_s > 0.f && _jdx < _action->uAction.sMove.nPathNum)
 					{
-						BLF32* _xp = _action->uAction.sMove.pXPath;
-						BLF32* _yp = _action->uAction.sMove.pYPath;
-						BLF32 _subs = sqrtf((_xp[_jdx] - _xp[_jdx - 1]) * (_xp[_jdx] - _xp[_jdx - 1]) + (_yp[_jdx] - _yp[_jdx - 1]) * (_yp[_jdx] - _yp[_jdx - 1]));
-						if (_s > _subs)
-							_s -= _subs;
-						else
-						{
-							BLF32 _ratio = _s / _subs;
-							_node->sPos.fX = _xp[_jdx - 1] + _ratio * (_xp[_jdx] - _xp[_jdx - 1]);
-							_node->sPos.fY = _yp[_jdx - 1] + _ratio * (_yp[_jdx] - _yp[_jdx - 1]);
-						}
-                    }
+						_subs = sqrtf((_xp[_jdx] - _xp[_jdx - 1]) * (_xp[_jdx] - _xp[_jdx - 1]) + (_yp[_jdx] - _yp[_jdx - 1]) * (_yp[_jdx] - _yp[_jdx - 1]));
+						_s -= _subs;
+						++_jdx;
+					}	
+					BLF32 _ratio = (_s + _subs) / _subs;
+					_node->sPos.fX = _xp[_jdx - 2] + _ratio * (_xp[_jdx - 1] - _xp[_jdx - 2]);
+					_node->sPos.fY = _yp[_jdx - 2] + _ratio * (_yp[_jdx - 1] - _yp[_jdx - 2]);
 				}
 				break;
 				case SPACTION_ROTATE_INTERNAL:
@@ -704,8 +705,8 @@ _SpriteUpdate(BLU32 _Delta)
                         }
                         else
                         {
-                            _node->fScaleX = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fXInitScale) + _action->uAction.sScale.fXScale;
-							_node->fScaleY = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fYInitScale) + _action->uAction.sScale.fYScale;
+                            _node->fScaleX = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fXInitScale - _action->uAction.sScale.fXScale) + _action->uAction.sScale.fXScale;
+							_node->fScaleY = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fYInitScale - _action->uAction.sScale.fYScale) + _action->uAction.sScale.fYScale;
                         }
                     }
                     else
@@ -722,17 +723,53 @@ _SpriteUpdate(BLU32 _Delta)
 						if (_action->fCurTime * 2 <= _action->fTotalTime)
 							_node->fAlpha = 2 * _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;
 						else
-							_node->fAlpha = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fAlpha;
+							_node->fAlpha = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sAlpha.fInitAlpha - _action->uAction.sAlpha.fAlpha) + _action->uAction.sAlpha.fAlpha;
 					}
 					else
 						_node->fAlpha = _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;
+					_node->fAlpha = blScalarClamp(_node->fAlpha, 0.f, 1.f);
 				}
 				break;
 				case SPACTION_DEAD_INTERNAL:
 				{
-					blInvokeEvent(BL_ET_SPRITE, 0xFFFFFFFF, 0, NULL, _node->nID);
-					blDeleteSprite(_node->nID);
-					_delete = TRUE;
+					if (_action->uAction.sDead.pBegin)
+					{
+						_node->pCurAction = _action->uAction.sDead.pBegin;
+						_node->fAlpha = _action->uAction.sDead.fAlphaCache;
+						_node->fScaleX = _action->uAction.sDead.fScaleXCache;
+						_node->fScaleY = _action->uAction.sDead.fScaleYCache;
+						_node->sPos.fX = _action->uAction.sDead.fOffsetXCache;
+						_node->sPos.fY = _action->uAction.sDead.fOffsetYCache;
+						_node->fRotate = _action->uAction.sDead.fRotateCache;
+						if (_node->pAction)
+						{
+							_BLSpriteAction* _tmp = _node->pAction;
+							while (_tmp)
+							{
+								_BLSpriteAction* _tmpnext = _tmp->pNext;
+								if (_tmp->pNeighbor)
+								{
+									_BLSpriteAction* _tmpneb = _tmp->pNeighbor;
+									while (_tmp)
+									{
+										_tmp->fCurTime = 0.f;
+										_tmp = _tmpneb;
+										_tmpneb = _tmp ? _tmp->pNeighbor : NULL;
+									}
+								}
+								else
+									_tmp->fCurTime = 0.f;
+								_tmp = _tmpnext;
+							}
+						}
+						_node->pCurAction->fCurTime = 0.f;
+					}
+					else
+					{
+						blInvokeEvent(BL_ET_SPRITE, 0xFFFFFFFF, 0, NULL, _node->nID);
+						blDeleteSprite(_node->nID);
+						_delete = TRUE;
+					}
 				}
 				break;
 				default:
@@ -797,11 +834,8 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 {
     if (!_Node->bShow || !_Node->bValid)
         return;
-	BLU32 _w, _h, _aw, _ah;
-	BLF32 _rx, _ry;
-	blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 	if (_Node->sScissor.sLT.fX < 0.f)
-		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah, FALSE);
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, FALSE);
 	else
 		blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_Node->sScissor.sLT.fX, (BLS32)_Node->sScissor.sLT.fY, (BLU32)(_Node->sScissor.sRB.fX - _Node->sScissor.sLT.fX), (BLU32)(_Node->sScissor.sRB.fY - _Node->sScissor.sLT.fY), FALSE);
 	if (_Node->nFrameNum > 1)
@@ -1053,7 +1087,6 @@ _SpriteInit(duk_context* _DKC)
     _PrSpriteMem = (_BLSpriteMember*)malloc(sizeof(_BLSpriteMember));
 	_PrSpriteMem->pDukContext = _DKC;
     _PrSpriteMem->pNodeList = NULL;
-	_PrSpriteMem->nTimeInterval = 0;
     _PrSpriteMem->nNodeNum = 0;
     _PrSpriteMem->nNodeCap = 0;
 	_PrSpriteMem->pCursor = NULL;
@@ -1070,27 +1103,27 @@ _SpriteInit(duk_context* _DKC)
 	_PrSpriteMem->nQuadGeo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"#@quadgeosprite@#"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, NULL, sizeof(BLF32) * 32, NULL, 0, BL_IF_INVALID);
     blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	blSubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
-	BLU32 _w, _h, _aw, _ah;
+	BLU32 _width, _height;
 	BLF32 _rx, _ry;
-	blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+	blWindowQuery(&_width, &_height, &_PrSpriteMem->nFboWidth, &_PrSpriteMem->nFboHeight, &_rx, &_ry);
 	_PrSpriteMem->sViewport.sLT.fX = _PrSpriteMem->sViewport.sLT.fY = 0.f;
-	_PrSpriteMem->sViewport.sRB.fX = (BLF32)_aw;
-	_PrSpriteMem->sViewport.sRB.fY = (BLF32)_ah;
-	_PrSpriteMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _aw, _ah, 1, NULL);
+	_PrSpriteMem->sViewport.sRB.fX = (BLF32)_PrSpriteMem->nFboWidth;
+	_PrSpriteMem->sViewport.sRB.fY = (BLF32)_PrSpriteMem->nFboHeight;
+	_PrSpriteMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, 1, NULL);
 	blFrameBufferAttach(_PrSpriteMem->nFBO, _PrSpriteMem->nFBOTex, 0, BL_CTF_IGNORE);
 }
 BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 {
+	BLU32 _width, _height;
 	BLF32 _rx, _ry;
-	BLU32 _w, _h, _aw, _ah;
-	blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+	blWindowQuery(&_width, &_height, &_PrSpriteMem->nFboWidth, &_PrSpriteMem->nFboHeight, &_rx, &_ry);
 	BLU8 _blendfactor[4] = { 0 };
 	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, FALSE);
 	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
     if (_Cursor)
     {
-		BLF32 _screensz[] = { 2.f / (BLF32)_w, 2.f / (BLF32)_h };
+		BLF32 _screensz[] = { 2.f / (BLF32)_width, 2.f / (BLF32)_height };
 		blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
         if (!_PrSpriteMem->pCursor)
             return;
@@ -1110,259 +1143,254 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
     }
     else
     {
-		if (_PrSpriteMem->nTimeInterval > 10)
+		blBindFrameBuffer(_PrSpriteMem->nFBO);
+		BLF32 _screensz[2] = { 2.f / (BLF32)_PrSpriteMem->nFboWidth, 2.f / (BLF32)_PrSpriteMem->nFboHeight };
+		blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
+		blTechUniform(_PrSpriteMem->nSpriteInstTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
+		blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
+		blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
+		blFrameBufferClear(TRUE, FALSE, FALSE);
+		BLRect _scalevp = _PrSpriteMem->sViewport;
+		_scalevp.sLT.fX -= (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.25f;
+		_scalevp.sRB.fX += (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.25f;
+		_scalevp.sLT.fY -= (_PrSpriteMem->sViewport.sRB.fY - _PrSpriteMem->sViewport.sLT.fY) * 0.25f;
+		_scalevp.sRB.fY += (_PrSpriteMem->sViewport.sRB.fY - _PrSpriteMem->sViewport.sLT.fY) * 0.25f;
+		_BLTileInfo* _first = blArrayFrontElement(_PrSpriteMem->pTileArray[0]);
+		if (_first)
 		{
-			blBindFrameBuffer(_PrSpriteMem->nFBO);
-			BLF32 _screensz[] = { 2.f / (BLF32)_aw, 2.f / (BLF32)_ah };
-			blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
-			blTechUniform(_PrSpriteMem->nSpriteInstTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
-			blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
-			blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
-			blFrameBufferClear(TRUE, FALSE, FALSE);
-			BLRect _scalevp = _PrSpriteMem->sViewport;
-			_scalevp.sLT.fX -= (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.25f;
-			_scalevp.sRB.fX += (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.25f;
-			_scalevp.sLT.fY -= (_PrSpriteMem->sViewport.sRB.fY - _PrSpriteMem->sViewport.sLT.fY) * 0.25f;
-			_scalevp.sRB.fY += (_PrSpriteMem->sViewport.sRB.fY - _PrSpriteMem->sViewport.sLT.fY) * 0.25f;
-			_BLTileInfo* _first = blArrayFrontElement(_PrSpriteMem->pTileArray[0]);
-			if (_first)
+			BLU32 _totalnum = (BLU32)((_scalevp.sRB.fX - _scalevp.sLT.fX) * (_scalevp.sRB.fY - _scalevp.sLT.fY) / (_first->sSize.fX * _first->sSize.fY)) * 2;
+			BLGuid _layertex;
+			blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, FALSE);
+			BLU8* _geomem = (BLU8*)alloca(_totalnum * 48 * sizeof(BLF32));
+			for (BLS32 _idx = 0; _idx < 8; ++_idx)
 			{
-				BLU32 _totalnum = (BLU32)((_scalevp.sRB.fX - _scalevp.sLT.fX) * (_scalevp.sRB.fY - _scalevp.sLT.fY) / (_first->sSize.fX * _first->sSize.fY)) * 2;
-				BLGuid _layertex;
-				blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _aw, _ah, FALSE);
-				BLU8* _geomem = (BLU8*)alloca(_totalnum * 48 * sizeof(BLF32));
-				for (BLS32 _idx = 0; _idx < 8; ++_idx)
+				BLU32 _tilenum = 0;
+				BLBool _show = FALSE;
+				_first = blArrayFrontElement(_PrSpriteMem->pTileArray[_idx]);
+				if (_first)
+					_show = _first->bShow;
+				if (!_show)
+					continue;
+				memset(_geomem, 0, _totalnum * 48 * sizeof(BLF32));
+				FOREACH_ARRAY(_BLTileInfo*, _tile, _PrSpriteMem->pTileArray[_idx])
 				{
-					BLU32 _tilenum = 0;
-					BLBool _show = FALSE;
-					_first = blArrayFrontElement(_PrSpriteMem->pTileArray[_idx]);
-					if (_first)
-						_show = _first->bShow;
-					if (!_show)
-						continue;
-					memset(_geomem, 0, _totalnum * 48 * sizeof(BLF32));
-					FOREACH_ARRAY(_BLTileInfo*, _tile, _PrSpriteMem->pTileArray[_idx])
+					if (blRectContains(&_scalevp, &_tile->sPos) && _tile->aFilename[0] != 0)
 					{
-						if (blRectContains(&_scalevp, &_tile->sPos) && _tile->aFilename[0] != 0)
+						_layertex = blGainTexture(blHashUtf8((const BLUtf8*)_tile->aFilename));
+						if (_layertex == INVALID_GUID)
 						{
-							_layertex = blGainTexture(blHashUtf8((const BLUtf8*)_tile->aFilename));
-							if (_layertex == INVALID_GUID)
+							BLGuid _stream;
+							if (_tile->aArchive[0] != 0)
+								_stream = blGenStream(_tile->aFilename, _tile->aArchive);
+							else
 							{
-								BLGuid _stream;
-								if (_tile->aArchive[0] != 0)
-									_stream = blGenStream(_tile->aFilename, _tile->aArchive);
-								else
+								BLAnsi _tmpname[260];
+								strcpy(_tmpname, _tile->aFilename);
+								BLAnsi _path[260] = { 0 };
+								strcpy(_path, blWorkingDir(TRUE));
+								strcat(_path, _tmpname);
+								_stream = blGenStream(_path, NULL);
+								if (INVALID_GUID == _stream)
 								{
-									BLAnsi _tmpname[260];
-									strcpy(_tmpname, _tile->aFilename);
-									BLAnsi _path[260] = { 0 };
-									strcpy(_path, blWorkingDir(TRUE));
-									strcat(_path, _tmpname);
+									memset(_path, 0, sizeof(_path));
+									strcpy(_path, blUserFolderDir());
 									_stream = blGenStream(_path, NULL);
-									if (INVALID_GUID == _stream)
-									{
-										memset(_path, 0, sizeof(_path));
-										strcpy(_path, blUserFolderDir());
-										_stream = blGenStream(_path, NULL);
-									}
-									if (INVALID_GUID == _stream)
-										continue;
 								}
-								BLU8 _identifier[12];
-								blStreamRead(_stream, sizeof(_identifier), _identifier);
-								if (_identifier[0] != 0xDD ||
-									_identifier[1] != 0xDD ||
-									_identifier[2] != 0xDD ||
-									_identifier[3] != 0xEE ||
-									_identifier[4] != 0xEE ||
-									_identifier[5] != 0xEE ||
-									_identifier[6] != 0xAA ||
-									_identifier[7] != 0xAA ||
-									_identifier[8] != 0xAA ||
-									_identifier[9] != 0xDD ||
-									_identifier[10] != 0xDD ||
-									_identifier[11] != 0xDD)
-								{
-									blDeleteStream(_stream);
+								if (INVALID_GUID == _stream)
 									continue;
-								}
-								BLU32 _width, _height, _depth;
-								blStreamRead(_stream, sizeof(BLU32), &_width);
-								blStreamRead(_stream, sizeof(BLU32), &_height);
-								blStreamRead(_stream, sizeof(BLU32), &_depth);
-								BLU32 _array, _faces, _mipmap;
-								blStreamRead(_stream, sizeof(BLU32), &_array);
-								blStreamRead(_stream, sizeof(BLU32), &_faces);
-								blStreamRead(_stream, sizeof(BLU32), &_mipmap);
-								BLU32 _fourcc, _channels, _offset;
-								blStreamRead(_stream, sizeof(BLU32), &_fourcc);
-								blStreamRead(_stream, sizeof(BLU32), &_channels);
-								blStreamRead(_stream, sizeof(BLU32), &_offset);
-								BLEnum _type = BL_TT_2D;
-								blStreamSeek(_stream, _offset);
-								BLU32 _imagesz;
-								BLEnum _format;
-								switch (_fourcc)
-								{
-								case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
-									blStreamRead(_stream, sizeof(BLU32), &_imagesz);
-									_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
-									break;
-								case FOURCC_INTERNAL('S', '3', 'T', '1'):
-									_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-									_format = BL_TF_BC1;
-									break;
-								case FOURCC_INTERNAL('S', '3', 'T', '2'):
-									_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-									_format = BL_TF_BC1A1;
-									break;
-								case FOURCC_INTERNAL('S', '3', 'T', '3'):
-									_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-									_format = BL_TF_BC3;
-									break;
-								case FOURCC_INTERNAL('A', 'S', 'T', '1'):
-									_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-									_format = BL_TF_ASTC;
-									break;
-								case FOURCC_INTERNAL('A', 'S', 'T', '2'):
-									_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-									_format = BL_TF_ASTC;
-									break;
-								case FOURCC_INTERNAL('A', 'S', 'T', '3'):
-									_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-									_format = BL_TF_ASTC;
-									break;
-								case FOURCC_INTERNAL('E', 'T', 'C', '1'):
-									_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-									_format = BL_TF_ETC2;
-									break;
-								case FOURCC_INTERNAL('E', 'T', 'C', '2'):
-									_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-									_format = BL_TF_ETC2A1;
-									break;
-								case FOURCC_INTERNAL('E', 'T', 'C', '3'):
-									_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-									_format = BL_TF_ETC2A;
-									break;
-								default:assert(0); break;
-								}
-								BLU8* _texdata;
-								if (_fourcc == FOURCC_INTERNAL('B', 'M', 'G', 'T'))
-								{
-									BLU8* _data = (BLU8*)malloc(_imagesz);
-									blStreamRead(_stream, _imagesz, _data);
-									BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
-									blRLEDecode(_data, _width * _height * _channels, _data2);
-									free(_data);
-									_texdata = _data2;
-								}
-								else
-								{
-									BLU8* _data = (BLU8*)malloc(_imagesz);
-									blStreamRead(_stream, _imagesz, _data);
-									_texdata = _data;
-								}
-								_layertex = blGenTexture(blHashUtf8(_tile->aFilename), BL_TT_2D, _format, FALSE, TRUE, FALSE, 1, 1, _width, _height, 1, _texdata);
-								free(_texdata);
-								blDeleteStream(_stream);
 							}
-							_tile->nTex = _layertex;
-							BLF32 _vbo[] = {
-								-_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								-_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								1.f,
-								1.f,
-								1.f,
-								_tile->fAlpha,
-								_tile->fTexLTx,
-								_tile->fTexLTy,
-								_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								-_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								1.f,
-								1.f,
-								1.f,
-								_tile->fAlpha,
-								_tile->fTexRBx,
-								_tile->fTexLTy,
-								-_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								1.f,
-								1.f,
-								1.f,
-								_tile->fAlpha,
-								_tile->fTexLTx,
-								_tile->fTexRBy,
-								-_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								1.f,
-								1.f,
-								1.f,
-								_tile->fAlpha,
-								_tile->fTexLTx,
-								_tile->fTexRBy,
-								_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								-_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								1.f,
-								1.f,
-								1.f,
-								_tile->fAlpha,
-								_tile->fTexRBx,
-								_tile->fTexLTy,
-								_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-								1.f,
-								1.f,
-								1.f,
-								_tile->fAlpha,
-								_tile->fTexRBx,
-								_tile->fTexRBy
-							};
-							memcpy(_geomem + _tilenum * 48 * sizeof(BLF32), _vbo, sizeof(_vbo));
-							++_tilenum;
+							BLU8 _identifier[12];
+							blStreamRead(_stream, sizeof(_identifier), _identifier);
+							if (_identifier[0] != 0xDD ||
+								_identifier[1] != 0xDD ||
+								_identifier[2] != 0xDD ||
+								_identifier[3] != 0xEE ||
+								_identifier[4] != 0xEE ||
+								_identifier[5] != 0xEE ||
+								_identifier[6] != 0xAA ||
+								_identifier[7] != 0xAA ||
+								_identifier[8] != 0xAA ||
+								_identifier[9] != 0xDD ||
+								_identifier[10] != 0xDD ||
+								_identifier[11] != 0xDD)
+							{
+								blDeleteStream(_stream);
+								continue;
+							}
+							BLU32 _width, _height, _depth;
+							blStreamRead(_stream, sizeof(BLU32), &_width);
+							blStreamRead(_stream, sizeof(BLU32), &_height);
+							blStreamRead(_stream, sizeof(BLU32), &_depth);
+							BLU32 _array, _faces, _mipmap;
+							blStreamRead(_stream, sizeof(BLU32), &_array);
+							blStreamRead(_stream, sizeof(BLU32), &_faces);
+							blStreamRead(_stream, sizeof(BLU32), &_mipmap);
+							BLU32 _fourcc, _channels, _offset;
+							blStreamRead(_stream, sizeof(BLU32), &_fourcc);
+							blStreamRead(_stream, sizeof(BLU32), &_channels);
+							blStreamRead(_stream, sizeof(BLU32), &_offset);
+							BLEnum _type = BL_TT_2D;
+							blStreamSeek(_stream, _offset);
+							BLU32 _imagesz;
+							BLEnum _format;
+							switch (_fourcc)
+							{
+							case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
+								blStreamRead(_stream, sizeof(BLU32), &_imagesz);
+								_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+								break;
+							case FOURCC_INTERNAL('S', '3', 'T', '1'):
+								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+								_format = BL_TF_BC1;
+								break;
+							case FOURCC_INTERNAL('S', '3', 'T', '2'):
+								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+								_format = BL_TF_BC1A1;
+								break;
+							case FOURCC_INTERNAL('S', '3', 'T', '3'):
+								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+								_format = BL_TF_BC3;
+								break;
+							case FOURCC_INTERNAL('A', 'S', 'T', '1'):
+								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+								_format = BL_TF_ASTC;
+								break;
+							case FOURCC_INTERNAL('A', 'S', 'T', '2'):
+								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+								_format = BL_TF_ASTC;
+								break;
+							case FOURCC_INTERNAL('A', 'S', 'T', '3'):
+								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+								_format = BL_TF_ASTC;
+								break;
+							case FOURCC_INTERNAL('E', 'T', 'C', '1'):
+								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+								_format = BL_TF_ETC2;
+								break;
+							case FOURCC_INTERNAL('E', 'T', 'C', '2'):
+								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
+								_format = BL_TF_ETC2A1;
+								break;
+							case FOURCC_INTERNAL('E', 'T', 'C', '3'):
+								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+								_format = BL_TF_ETC2A;
+								break;
+							default:assert(0); break;
+							}
+							BLU8* _texdata;
+							if (_fourcc == FOURCC_INTERNAL('B', 'M', 'G', 'T'))
+							{
+								BLU8* _data = (BLU8*)malloc(_imagesz);
+								blStreamRead(_stream, _imagesz, _data);
+								BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
+								blRLEDecode(_data, _width * _height * _channels, _data2);
+								free(_data);
+								_texdata = _data2;
+							}
+							else
+							{
+								BLU8* _data = (BLU8*)malloc(_imagesz);
+								blStreamRead(_stream, _imagesz, _data);
+								_texdata = _data;
+							}
+							_layertex = blGenTexture(blHashUtf8(_tile->aFilename), BL_TT_2D, _format, FALSE, TRUE, FALSE, 1, 1, _width, _height, 1, _texdata);
+							free(_texdata);
+							blDeleteStream(_stream);
 						}
-					}
-					if (_tilenum)
-					{
-						blTechSampler(_PrSpriteMem->nSpriteTech, "Texture0", _layertex, 0);
-						BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-						BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-						BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _geomem, _tilenum * 48 * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
-						blDraw(_PrSpriteMem->nSpriteTech, _geo, 1);
-						blDeleteGeometryBuffer(_geo);
+						_tile->nTex = _layertex;
+						BLF32 _vbo[] = {
+							-_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							-_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							1.f,
+							1.f,
+							1.f,
+							_tile->fAlpha,
+							_tile->fTexLTx,
+							_tile->fTexLTy,
+							_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							-_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							1.f,
+							1.f,
+							1.f,
+							_tile->fAlpha,
+							_tile->fTexRBx,
+							_tile->fTexLTy,
+							-_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							1.f,
+							1.f,
+							1.f,
+							_tile->fAlpha,
+							_tile->fTexLTx,
+							_tile->fTexRBy,
+							-_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							1.f,
+							1.f,
+							1.f,
+							_tile->fAlpha,
+							_tile->fTexLTx,
+							_tile->fTexRBy,
+							_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							-_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							1.f,
+							1.f,
+							1.f,
+							_tile->fAlpha,
+							_tile->fTexRBx,
+							_tile->fTexLTy,
+							_tile->sSize.fX * 0.5f + _tile->sPos.fX - _PrSpriteMem->sViewport.sLT.fX + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							_tile->sSize.fY * 0.5f + _tile->sPos.fY - _PrSpriteMem->sViewport.sLT.fY + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+							1.f,
+							1.f,
+							1.f,
+							_tile->fAlpha,
+							_tile->fTexRBx,
+							_tile->fTexRBy
+						};
+						memcpy(_geomem + _tilenum * 48 * sizeof(BLF32), _vbo, sizeof(_vbo));
+						++_tilenum;
 					}
 				}
+				if (_tilenum)
+				{
+					blTechSampler(_PrSpriteMem->nSpriteTech, "Texture0", _layertex, 0);
+					BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+					BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+					BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _geomem, _tilenum * 48 * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
+					blDraw(_PrSpriteMem->nSpriteTech, _geo, 1);
+					blDeleteGeometryBuffer(_geo);
+				}
 			}
-			_SpriteUpdate(_PrSpriteMem->nTimeInterval);
-			for (BLU32 _idx = 0; _idx < _PrSpriteMem->nNodeNum; ++_idx)
-			{
-				_BLSpriteNode* _node = _PrSpriteMem->pNodeList[_idx];
-				BLF32 _mat[6];
-				BLF32 _cos = cosf(_node->fRotate);
-				BLF32 _sin = sinf(_node->fRotate);
-				BLF32 _pivotx = (_node->sPivot.fX - 0.5f) * _node->sSize.fX;
-				BLF32 _pivoty = (_node->sPivot.fY - 0.5f) * _node->sSize.fY;
-				_mat[0] = (_node->fScaleX * _cos);
-				_mat[1] = (_node->fScaleX * _sin);
-				_mat[2] = (-_node->fScaleY * _sin);
-				_mat[3] = (_node->fScaleY * _cos);
-				_mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX;
-				_mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY;
-				_SpriteDraw(_PrSpriteMem->nTimeInterval, _node, _mat);
-			}
-			blFrameBufferResolve(_PrSpriteMem->nFBO);
-			_PrSpriteMem->nTimeInterval = 0;
 		}
-		else
-			_PrSpriteMem->nTimeInterval += _Delta;
+		_SpriteUpdate(_Delta);
+		for (BLU32 _idx = 0; _idx < _PrSpriteMem->nNodeNum; ++_idx)
+		{
+			_BLSpriteNode* _node = _PrSpriteMem->pNodeList[_idx];
+			BLF32 _mat[6];
+			BLF32 _cos = cosf(_node->fRotate);
+			BLF32 _sin = sinf(_node->fRotate);
+			BLF32 _pivotx = (_node->sPivot.fX - 0.5f) * _node->sSize.fX;
+			BLF32 _pivoty = (_node->sPivot.fY - 0.5f) * _node->sSize.fY;
+			_mat[0] = (_node->fScaleX * _cos);
+			_mat[1] = (_node->fScaleX * _sin);
+			_mat[2] = (-_node->fScaleY * _sin);
+			_mat[3] = (_node->fScaleY * _cos);
+			_mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX - _PrSpriteMem->sViewport.sLT.fX;
+			_mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY - _PrSpriteMem->sViewport.sLT.fY;
+			_SpriteDraw(_Delta, _node, _mat);
+		}
+		blFrameBufferResolve(_PrSpriteMem->nFBO);
 		if (_PrSpriteMem->bShaking)
 		{
 			_PrSpriteMem->fShakingForce = -_PrSpriteMem->fShakingForce;
-			_PrSpriteMem->fShakingTime -= _PrSpriteMem->nTimeInterval / 1000.f;
+			_PrSpriteMem->fShakingTime -= _Delta / 1000.f;
 			if (_PrSpriteMem->fShakingTime < 0.f)
 				_PrSpriteMem->bShaking = FALSE;
 		}
 		blBindFrameBuffer(INVALID_GUID);
-		BLF32 _screensz[] = { 2.f / (BLF32)_w, 2.f / (BLF32)_h };
+		_screensz[0] = 2.f / (BLF32)_width;
+		_screensz[1] = 2.f / (BLF32)_height;
 		blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 		BLF32 _vbo[] = {
 			PIXEL_ALIGNED_INTERNAL(0.f),
@@ -1373,7 +1401,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			1.f,
 			0.f,
 			1.f,
-			PIXEL_ALIGNED_INTERNAL(_w),
+			PIXEL_ALIGNED_INTERNAL(_width),
 			PIXEL_ALIGNED_INTERNAL(0.f),
 			1.f,
 			1.f,
@@ -1382,15 +1410,15 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			1.f,
 			1.f,
 			PIXEL_ALIGNED_INTERNAL(0.f),
-			PIXEL_ALIGNED_INTERNAL(_h),
+			PIXEL_ALIGNED_INTERNAL(_height),
 			1.f,
 			1.f,
 			1.f,
 			1.f,
 			0.f,
 			0.f,
-			PIXEL_ALIGNED_INTERNAL(_w),
-			PIXEL_ALIGNED_INTERNAL(_h),
+			PIXEL_ALIGNED_INTERNAL(_width),
+			PIXEL_ALIGNED_INTERNAL(_height),
 			1.f,
 			1.f,
 			1.f,
@@ -1400,6 +1428,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 		};
 		blTechSampler(_PrSpriteMem->nSpriteTech, "Texture0", _PrSpriteMem->nFBOTex, 0);
 		blGeometryBufferUpdate(_PrSpriteMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0, FALSE);
 		blDraw(_PrSpriteMem->nSpriteTech, _PrSpriteMem->nQuadGeo, 1);
     }
 }
@@ -1483,6 +1512,8 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLAnsi* _Tag, IN BLF32
 		_node->nTimePassed = 0;
 		_node->nCurFrame = 0;
 		_node->nFrameNum = 1;
+		_node->bFlipX = FALSE;
+		_node->bFlipY = FALSE;
 		memset(_node->aTag, 0, sizeof(_node->aTag));
 		memset(_node->aFilename, 0, sizeof(_node->aFilename));
 		memset(_node->aArchive, 0, sizeof(_node->aArchive));
@@ -2015,11 +2046,17 @@ blSpriteActionBegin(IN BLGuid _ID)
 			_tmp = _tmpnext;
 		}
     }
-	_PrSpriteMem->bParallelEdit = FALSE;
+	_node->pAction = NULL;
+	_PrSpriteMem->sActionRecorder.bParallelEdit = FALSE;
+	_PrSpriteMem->sActionRecorder.fAlphaRecord = _node->fAlpha;
+	_PrSpriteMem->sActionRecorder.fScaleXRecord = _node->fScaleX;
+	_PrSpriteMem->sActionRecorder.fScaleYRecord = _node->fScaleY;
+	_PrSpriteMem->sActionRecorder.fPosXRecord = _node->sPos.fX;
+	_PrSpriteMem->sActionRecorder.fPosYRecord = _node->sPos.fY;
     return TRUE;
 }
 BLBool
-blSpriteActionEnd(IN BLGuid _ID, IN BLBool _Delete)
+blSpriteActionEnd(IN BLGuid _ID, IN BLBool _Delete, IN BLBool _Loop)
 {
     if (_ID == INVALID_GUID)
         return FALSE;
@@ -2039,13 +2076,37 @@ blSpriteActionEnd(IN BLGuid _ID, IN BLBool _Delete)
 		_act->fCurTime = 0.f;
 		_act->fTotalTime = 0.f;
 		_act->uAction.sDead.bDead = TRUE;
+		_act->uAction.sDead.pBegin = NULL;
+		_BLSpriteAction* _lastact = _node->pAction;
+		while (_lastact->pNext)
+			_lastact = _lastact->pNext;
+		_lastact->pNext = _act;
+	}
+	else if (_Loop)
+	{
+		_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bParallel = FALSE;
+		_act->bLoop = FALSE;
+		_act->eActionType = SPACTION_DEAD_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = 0.f;
+		_act->uAction.sDead.bDead = TRUE;
+		_act->uAction.sDead.pBegin = _node->pAction;
+		_act->uAction.sDead.fAlphaCache = _node->fAlpha;
+		_act->uAction.sDead.fScaleXCache = _node->fScaleX;
+		_act->uAction.sDead.fScaleYCache = _node->fScaleY;
+		_act->uAction.sDead.fOffsetXCache = _node->sPos.fX;
+		_act->uAction.sDead.fOffsetYCache = _node->sPos.fY;
+		_act->uAction.sDead.fRotateCache = _node->fRotate;
 		_BLSpriteAction* _lastact = _node->pAction;
 		while (_lastact->pNext)
 			_lastact = _lastact->pNext;
 		_lastact->pNext = _act;
 	}
 	_node->pCurAction = NULL;
-	_PrSpriteMem->bParallelEdit = FALSE;
+	_PrSpriteMem->sActionRecorder.bParallelEdit = FALSE;
     return TRUE;
 }
 BLBool
@@ -2053,9 +2114,9 @@ blSpriteParallelBegin(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
 		return FALSE;
-	if (_PrSpriteMem->bParallelEdit)
+	if (_PrSpriteMem->sActionRecorder.bParallelEdit)
 		return FALSE;
-	_PrSpriteMem->bParallelEdit = TRUE;
+	_PrSpriteMem->sActionRecorder.bParallelEdit = TRUE;
 	return TRUE;
 }
 BLBool
@@ -2063,9 +2124,9 @@ blSpriteParallelEnd(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
 		return FALSE;
-	if (!_PrSpriteMem->bParallelEdit)
+	if (!_PrSpriteMem->sActionRecorder.bParallelEdit)
 		return FALSE;
-	_PrSpriteMem->bParallelEdit = FALSE;
+	_PrSpriteMem->sActionRecorder.bParallelEdit = FALSE;
 	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
 	_BLSpriteAction* _lastact = _node->pAction;
 	while (_lastact->pNext)
@@ -2107,48 +2168,61 @@ blSpriteActionMove(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	if (_PathNum <= 0 || _Time <= 0.f)
+	if (_PathNum <= 0)
 		return FALSE;
-	_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
-	_act->pNeighbor = NULL;
-	_act->pNext = NULL;
-    _act->bLoop = _Loop;
-    _act->bParallel = _PrSpriteMem->bParallelEdit;
-	_act->eActionType = SPACTION_MOVE_INTERNAL;
-	_act->fCurTime = 0.f;
-	_act->fTotalTime = _Time;
-	_act->uAction.sMove.fAcceleration = _Acceleration;
-	BLF32 _s = sqrtf((_XPath[0] - _node->sPos.fX) * (_XPath[0] - _node->sPos.fX) + (_YPath[0] - _node->sPos.fY) * (_YPath[0] - _node->sPos.fY));
-	for (BLU32 _idx = 1; _idx < _PathNum; ++_idx)
-		_s += sqrtf((_XPath[_idx] - _XPath[_idx - 1]) * (_XPath[_idx] - _XPath[_idx - 1]) + (_YPath[_idx] - _YPath[_idx - 1]) * (_YPath[_idx] - _YPath[_idx - 1]));
-	_act->uAction.sMove.fVelocity = _s / _Time - 0.5f * _Acceleration * _Time;
-	_act->uAction.sMove.pXPath = (BLF32*)malloc((_PathNum + 1) * sizeof(BLF32));
-	_act->uAction.sMove.pYPath = (BLF32*)malloc((_PathNum + 1) * sizeof(BLF32));
-	_act->uAction.sMove.pXPath[0] = _node->sPos.fX;
-	_act->uAction.sMove.pYPath[0] = _node->sPos.fY;
-	_act->uAction.sMove.nPathNum = _PathNum + 1;
-	memcpy(_act->uAction.sMove.pXPath + 1, _XPath, _PathNum * sizeof(BLF32));
-	memcpy(_act->uAction.sMove.pYPath + 1, _YPath, _PathNum * sizeof(BLF32));
-	if (!_node->pAction)
+	if (blScalarApproximate(_Time, 0.f))
 	{
-		_node->pAction = _act;
-		return TRUE;
+		_node->sPos.fX = _XPath[_PathNum - 1];
+		_node->sPos.fY = _YPath[_PathNum - 1];
+		_PrSpriteMem->sActionRecorder.fPosXRecord = _node->sPos.fX;
+		_PrSpriteMem->sActionRecorder.fPosYRecord = _node->sPos.fY;
+		return FALSE;
 	}
 	else
 	{
-		_BLSpriteAction* _lastact = _node->pAction;
-		while (_lastact->pNext)
-			_lastact = _lastact->pNext;
-		if (_PrSpriteMem->bParallelEdit && _lastact->bParallel)
+		_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bLoop = _Loop;
+		_act->bParallel = _PrSpriteMem->sActionRecorder.bParallelEdit;
+		_act->eActionType = SPACTION_MOVE_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = _Time;
+		_act->uAction.sMove.fAcceleration = _Acceleration;
+		BLF32 _s = sqrtf((_XPath[0] - _PrSpriteMem->sActionRecorder.fPosXRecord) * (_XPath[0] - _PrSpriteMem->sActionRecorder.fPosXRecord) + (_YPath[0] - _PrSpriteMem->sActionRecorder.fPosYRecord) * (_YPath[0] - _PrSpriteMem->sActionRecorder.fPosYRecord));
+		for (BLU32 _idx = 1; _idx < _PathNum; ++_idx)
+			_s += sqrtf((_XPath[_idx] - _XPath[_idx - 1]) * (_XPath[_idx] - _XPath[_idx - 1]) + (_YPath[_idx] - _YPath[_idx - 1]) * (_YPath[_idx] - _YPath[_idx - 1]));
+		_act->uAction.sMove.fVelocity = _s / _Time - 0.5f * _Acceleration * _Time;
+		_act->uAction.sMove.pXPath = (BLF32*)malloc((_PathNum + 1) * sizeof(BLF32));
+		_act->uAction.sMove.pYPath = (BLF32*)malloc((_PathNum + 1) * sizeof(BLF32));
+		_act->uAction.sMove.pXPath[0] = _PrSpriteMem->sActionRecorder.fPosXRecord;
+		_act->uAction.sMove.pYPath[0] = _PrSpriteMem->sActionRecorder.fPosYRecord;
+		_act->uAction.sMove.nPathNum = _PathNum + 1;
+		memcpy(_act->uAction.sMove.pXPath + 1, _XPath, _PathNum * sizeof(BLF32));
+		memcpy(_act->uAction.sMove.pYPath + 1, _YPath, _PathNum * sizeof(BLF32));
+		_PrSpriteMem->sActionRecorder.fPosXRecord = _XPath[_PathNum - 1];
+		_PrSpriteMem->sActionRecorder.fPosYRecord = _YPath[_PathNum - 1];
+		if (!_node->pAction)
 		{
-			while (_lastact->pNeighbor)
-				_lastact = _lastact->pNeighbor;
-			_lastact->pNeighbor = _act;
+			_node->pAction = _act;
+			return TRUE;
 		}
 		else
-			_lastact->pNext = _act;
+		{
+			_BLSpriteAction* _lastact = _node->pAction;
+			while (_lastact->pNext)
+				_lastact = _lastact->pNext;
+			if (_PrSpriteMem->sActionRecorder.bParallelEdit && _lastact->bParallel)
+			{
+				while (_lastact->pNeighbor)
+					_lastact = _lastact->pNeighbor;
+				_lastact->pNeighbor = _act;
+			}
+			else
+				_lastact->pNext = _act;
+		}
+		return TRUE;
 	}
-    return TRUE;
 }
 BLBool
 blSpriteActionRotate(IN BLGuid _ID, IN BLF32 _Angle, IN BLBool _ClockWise, IN BLF32 _Time, IN BLBool _Loop)
@@ -2158,36 +2232,44 @@ blSpriteActionRotate(IN BLGuid _ID, IN BLF32 _Angle, IN BLBool _ClockWise, IN BL
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
-	_act->pNeighbor = NULL;
-	_act->pNext = NULL;
-	_act->bLoop = _Loop;
-	_act->bParallel = _PrSpriteMem->bParallelEdit;
-	_act->eActionType = SPACTION_ROTATE_INTERNAL;
-	_act->fCurTime = 0.f;
-	_act->fTotalTime = _Time;
-    _act->uAction.sRotate.bClockWise = _ClockWise;
-	_act->uAction.sRotate.fAngle = _Angle;
-	if (!_node->pAction)
+	if (blScalarApproximate(_Time, 0.f))
 	{
-		_node->pAction = _act;
-		return TRUE;
+		_node->fRotate = _ClockWise ? _Angle * PI_INTERNAL / 180.0f : 2 * PI_INTERNAL - _Angle * PI_INTERNAL / 180.0f;
+		return FALSE;
 	}
 	else
 	{
-		_BLSpriteAction* _lastact = _node->pAction;
-		while (_lastact->pNext)
-			_lastact = _lastact->pNext;
-		if (_PrSpriteMem->bParallelEdit && _lastact->bParallel)
+		_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bLoop = _Loop;
+		_act->bParallel = _PrSpriteMem->sActionRecorder.bParallelEdit;
+		_act->eActionType = SPACTION_ROTATE_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = _Time;
+		_act->uAction.sRotate.bClockWise = _ClockWise;
+		_act->uAction.sRotate.fAngle = _Angle;
+		if (!_node->pAction)
 		{
-			while (_lastact->pNeighbor)
-				_lastact = _lastact->pNeighbor;
-			_lastact->pNeighbor = _act;
+			_node->pAction = _act;
+			return TRUE;
 		}
 		else
-			_lastact->pNext = _act;
+		{
+			_BLSpriteAction* _lastact = _node->pAction;
+			while (_lastact->pNext)
+				_lastact = _lastact->pNext;
+			if (_PrSpriteMem->sActionRecorder.bParallelEdit && _lastact->bParallel)
+			{
+				while (_lastact->pNeighbor)
+					_lastact = _lastact->pNeighbor;
+				_lastact->pNeighbor = _act;
+			}
+			else
+				_lastact->pNext = _act;
+		}
+		return TRUE;
 	}
-    return TRUE;
 }
 BLBool
 blSpriteActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
@@ -2197,39 +2279,55 @@ blSpriteActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
-	_act->pNeighbor = NULL;
-	_act->pNext = NULL;
-	_act->bLoop = _Loop;
-	_act->bParallel = _PrSpriteMem->bParallelEdit;
-	_act->eActionType = SPACTION_SCALE_INTERNAL;
-	_act->fCurTime = 0.f;
-	_act->fTotalTime = _Time;
-	_act->uAction.sScale.fXInitScale = _node->fScaleX;
-	_act->uAction.sScale.fYInitScale = _node->fScaleY;
-	_act->uAction.sScale.fXScale = _XScale;
-	_act->uAction.sScale.fYScale = _YScale;
-    _act->uAction.sScale.bReverse = _Reverse;
-	if (!_node->pAction)
+	if (blScalarApproximate(_Time, 0.f))
 	{
-		_node->pAction = _act;
-		return TRUE;
+		_node->fScaleX = _XScale;
+		_node->fScaleY = _YScale;
+		_PrSpriteMem->sActionRecorder.fScaleXRecord = _XScale;
+		_PrSpriteMem->sActionRecorder.fScaleYRecord = _YScale;
+		return FALSE;
 	}
 	else
 	{
-		_BLSpriteAction* _lastact = _node->pAction;
-		while (_lastact->pNext)
-			_lastact = _lastact->pNext;
-		if (_PrSpriteMem->bParallelEdit && _lastact->bParallel)
+		_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bLoop = _Loop;
+		_act->bParallel = _PrSpriteMem->sActionRecorder.bParallelEdit;
+		_act->eActionType = SPACTION_SCALE_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = _Time;
+		_act->uAction.sScale.fXInitScale = _PrSpriteMem->sActionRecorder.fScaleXRecord;
+		_act->uAction.sScale.fYInitScale = _PrSpriteMem->sActionRecorder.fScaleYRecord;
+		_act->uAction.sScale.fXScale = _XScale;
+		_act->uAction.sScale.fYScale = _YScale;
+		if (!_Reverse)
 		{
-			while (_lastact->pNeighbor)
-				_lastact = _lastact->pNeighbor;
-			_lastact->pNeighbor = _act;
+			_PrSpriteMem->sActionRecorder.fScaleXRecord = _XScale;
+			_PrSpriteMem->sActionRecorder.fScaleYRecord = _YScale;
+		}
+		_act->uAction.sScale.bReverse = _Reverse;
+		if (!_node->pAction)
+		{
+			_node->pAction = _act;
+			return TRUE;
 		}
 		else
-			_lastact->pNext = _act;
+		{
+			_BLSpriteAction* _lastact = _node->pAction;
+			while (_lastact->pNext)
+				_lastact = _lastact->pNext;
+			if (_PrSpriteMem->sActionRecorder.bParallelEdit && _lastact->bParallel)
+			{
+				while (_lastact->pNeighbor)
+					_lastact = _lastact->pNeighbor;
+				_lastact->pNeighbor = _act;
+			}
+			else
+				_lastact->pNext = _act;
+		}
+		return TRUE;
 	}
-    return TRUE;
 }
 BLBool
 blSpriteActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
@@ -2239,37 +2337,48 @@ blSpriteActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
-	_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
-	_act->pNeighbor = NULL;
-	_act->pNext = NULL;
-	_act->bLoop = _Loop;
-	_act->bParallel = _PrSpriteMem->bParallelEdit;
-	_act->eActionType = SPACTION_ALPHA_INTERNAL;
-	_act->fCurTime = 0.f;
-	_act->fTotalTime = _Time;
-	_act->uAction.sAlpha.fInitAlpha = _node->fAlpha;
-	_act->uAction.sAlpha.fAlpha = _Alpha;
-	_act->uAction.sAlpha.bReverse = _Reverse;
-	if (!_node->pAction)
+	if (blScalarApproximate(_Time, 0.f))
 	{
-		_node->pAction = _act;
-		return TRUE;
+		_node->fAlpha = _Alpha;
+		_PrSpriteMem->sActionRecorder.fAlphaRecord = _Alpha;
+		return FALSE;
 	}
 	else
 	{
-		_BLSpriteAction* _lastact = _node->pAction;
-		while (_lastact->pNext)
-			_lastact = _lastact->pNext;
-		if (_PrSpriteMem->bParallelEdit && _lastact->bParallel)
+		_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bLoop = _Loop;
+		_act->bParallel = _PrSpriteMem->sActionRecorder.bParallelEdit;
+		_act->eActionType = SPACTION_ALPHA_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = _Time;
+		_act->uAction.sAlpha.fInitAlpha = _PrSpriteMem->sActionRecorder.fAlphaRecord;
+		_act->uAction.sAlpha.fAlpha = _Alpha;
+		if (!_Reverse)
+			_PrSpriteMem->sActionRecorder.fAlphaRecord = _Alpha;
+		_act->uAction.sAlpha.bReverse = _Reverse;
+		if (!_node->pAction)
 		{
-			while (_lastact->pNeighbor)
-				_lastact = _lastact->pNeighbor;
-			_lastact->pNeighbor = _act;
+			_node->pAction = _act;
+			return TRUE;
 		}
 		else
-			_lastact->pNext = _act;
+		{
+			_BLSpriteAction* _lastact = _node->pAction;
+			while (_lastact->pNext)
+				_lastact = _lastact->pNext;
+			if (_PrSpriteMem->sActionRecorder.bParallelEdit && _lastact->bParallel)
+			{
+				while (_lastact->pNeighbor)
+					_lastact = _lastact->pNeighbor;
+				_lastact->pNeighbor = _act;
+			}
+			else
+				_lastact->pNext = _act;
+		}
+		return TRUE;
 	}
-    return TRUE;
 }
 BLVoid
 blViewportQuery(OUT BLF32* _LTPosX, OUT BLF32* _LTPosY, OUT BLF32* _RBPosX, OUT BLF32* _RBPosY)
@@ -2280,12 +2389,14 @@ blViewportQuery(OUT BLF32* _LTPosX, OUT BLF32* _LTPosY, OUT BLF32* _RBPosX, OUT 
     *_RBPosY = _PrSpriteMem->sViewport.sRB.fY;
 }
 BLVoid
-blViewportMove(IN BLF32 _XVec, IN BLF32 _YVec)
+blViewportMoveTo(IN BLF32 _XPos, IN BLF32 _YPos)
 {
-	_PrSpriteMem->sViewport.sLT.fX += _XVec;
-	_PrSpriteMem->sViewport.sLT.fY += _YVec;
-	_PrSpriteMem->sViewport.sRB.fX += _XVec;
-	_PrSpriteMem->sViewport.sRB.fY += _YVec;
+	BLF32 _x = (_PrSpriteMem->sViewport.sLT.fX + _PrSpriteMem->sViewport.sRB.fX) * 0.5f;
+	BLF32 _y = (_PrSpriteMem->sViewport.sLT.fY + _PrSpriteMem->sViewport.sRB.fY) * 0.5f;
+	_PrSpriteMem->sViewport.sLT.fX += _XPos - _x;
+	_PrSpriteMem->sViewport.sLT.fY += _YPos - _y;
+	_PrSpriteMem->sViewport.sRB.fX += _XPos - _x;
+	_PrSpriteMem->sViewport.sRB.fY += _YPos - _y;
 }
 BLVoid 
 blViewportShake(IN BLF32 _Time, IN BLBool _Vertical, IN BLF32 _Force)

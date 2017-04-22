@@ -11260,8 +11260,8 @@ _UIUpdate(_BLWidget* _Node, BLU32 _Interval)
 							}
 							else
 							{
-								_Node->fScaleX = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fInitScaleX) + _action->uAction.sScale.fScaleX;
-								_Node->fScaleY = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fInitScaleY) + _action->uAction.sScale.fScaleY;
+								_Node->fScaleX = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fInitScaleX - _action->uAction.sScale.fScaleX) + _action->uAction.sScale.fScaleX;
+								_Node->fScaleY = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sScale.fInitScaleY - _action->uAction.sScale.fScaleY) + _action->uAction.sScale.fScaleY;
 							}
 						}
 						else
@@ -11279,7 +11279,7 @@ _UIUpdate(_BLWidget* _Node, BLU32 _Interval)
 							if (_action->fCurTime * 2 <= _action->fTotalTime)
 								_Node->fAlpha = 2 * _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;
 							else
-								_Node->fAlpha = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fAlpha;
+								_Node->fAlpha = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sAlpha.fInitAlpha - _action->uAction.sAlpha.fAlpha) + _action->uAction.sAlpha.fAlpha;
 						}
 						else
 							_Node->fAlpha = _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;						
@@ -14644,6 +14644,7 @@ blUIActionBegin(IN BLGuid _ID)
 			_tmp = _tmpnext;
 		}
 	}
+	_widget->pAction = NULL;
 	_PrUIMem->sActionRecorder.bParallelEdit = FALSE;
 	_PrUIMem->sActionRecorder.fAlphaRecord = _widget->fAlpha;
 	_PrUIMem->sActionRecorder.fScaleXRecord = _widget->fScaleX;
@@ -14905,8 +14906,11 @@ blUIActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool _Re
 		_act->uAction.sScale.fInitScaleY = _PrUIMem->sActionRecorder.fScaleYRecord;
 		_act->uAction.sScale.fScaleX = _XScale;
 		_act->uAction.sScale.fScaleY = _YScale;
-		_PrUIMem->sActionRecorder.fScaleXRecord = _XScale;
-		_PrUIMem->sActionRecorder.fScaleYRecord = _YScale;
+		if (!_Reverse)
+		{
+			_PrUIMem->sActionRecorder.fScaleXRecord = _XScale;
+			_PrUIMem->sActionRecorder.fScaleYRecord = _YScale;
+		}
 		_act->uAction.sScale.bReverse = _Reverse;
 		if (!_widget->pAction)
 		{
@@ -15008,7 +15012,8 @@ blUIActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32 _Ti
 		_act->fTotalTime = _Time;
 		_act->uAction.sAlpha.fInitAlpha = _PrUIMem->sActionRecorder.fAlphaRecord;
 		_act->uAction.sAlpha.fAlpha = _Alpha;
-		_PrUIMem->sActionRecorder.fAlphaRecord = _Alpha;
+		if (!_Reverse)
+			_PrUIMem->sActionRecorder.fAlphaRecord = _Alpha;
 		_act->uAction.sAlpha.bReverse = _Reverse;
 		if (!_widget->pAction)
 		{

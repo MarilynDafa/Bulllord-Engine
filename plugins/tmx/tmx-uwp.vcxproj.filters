@@ -19,6 +19,12 @@
     <ClCompile Include="..\..\code\externals\xml\ezxml.c">
       <Filter>externals</Filter>
     </ClCompile>
+    <ClCompile Include="AStar.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexPriorityQueue.c">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tmx.h">
@@ -26,6 +32,12 @@
     </ClInclude>
     <ClInclude Include="..\..\code\externals\xml\ezxml.h">
       <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="AStar.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexPriorityQueue.h">
+      <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

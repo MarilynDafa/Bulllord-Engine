@@ -28,9 +28,7 @@ BL_API BLVoid blTMXOpenEXT();
 
 BL_API BLVoid blTMXCloseEXT();
 
-//Base64
 //Base64 Zip
-//CSV
 BL_API BLBool blTMXFileEXT(
 	IN BLAnsi* _Filename,
 	IN BLAnsi* _Archive);
@@ -66,6 +64,20 @@ BL_API BLBool blTMXLayerTileAtEXT(
 	IN BLAnsi* _Layer,
 	IN BLS32 _XPos,
 	IN BLS32 _YPos);
+
+BL_API BLBool blTMXLayerAsNavigationEXT(
+	IN BLAnsi* _Layer,
+	IN BLBool _Barrier);
+
+BL_API BLBool blTMXPathFindEXT(
+	IN BLS32 _StartX,
+	IN BLS32 _StartY,
+	IN BLS32 _EndX,
+	IN BLS32 _EndY, 
+	IN BLBool _Strict,
+	OUT BLF32** _XPath,
+	OUT BLF32** _YPath,
+	OUT BLU32* _PathNum);
 #ifdef __cplusplus
 }
 #endif

@@ -176,7 +176,8 @@ BL_API BLBool blSpriteActionBegin(
 
 BL_API BLBool blSpriteActionEnd(
 	IN BLGuid _ID,
-    IN BLBool _Delete);
+    IN BLBool _Delete,
+	IN BLBool _Loop);
 
 BL_API BLBool blSpriteParallelBegin(
 	IN BLGuid _ID);
@@ -227,9 +228,9 @@ BL_API BLVoid blViewportQuery(
     OUT BLF32* _RBPosX,
     OUT BLF32* _RBPosY);
 
-BL_API BLVoid blViewportMove(
-	IN BLF32 _XVec,
-	IN BLF32 _YVec);
+BL_API BLVoid blViewportMoveTo(
+	IN BLF32 _XPos,
+	IN BLF32 _YPos);
 
 BL_API BLVoid blViewportShake(
 	IN BLF32 _Time,
