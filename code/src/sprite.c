@@ -367,7 +367,7 @@ static BLBool
 _SpriteSetup(BLVoid* _Src)
 {
     _BLSpriteNode* _node = (_BLSpriteNode*)_Src;
-    if (_node != _PrSpriteMem->pCursor)
+    if (_node != _PrSpriteMem->pCursor && !_node->pParent)
         _AddToNodeList(_node);
     BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
     BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
@@ -832,7 +832,7 @@ _SpriteUpdate(BLU32 _Delta)
 static BLVoid
 _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 {
-    if (!_Node->bShow || !_Node->bValid)
+    if (!_Node->bValid)
         return;
 	if (_Node->sScissor.sLT.fX < 0.f)
 		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, FALSE);
@@ -849,215 +849,210 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 				_Node->nCurFrame = 0;
 		}
 	}
-	_BLSpriteSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-	BLF32 _minx, _miny, _maxx, _maxy;
-	if (!_ss)
+	if (INVALID_GUID != _Node->nTex && _Node->bShow)
 	{
-		_minx = -_Node->sSize.fX * 0.5f;
-		_miny = -_Node->sSize.fY * 0.5f;
-		_maxx = _Node->sSize.fX * 0.5f;
-		_maxy = _Node->sSize.fY * 0.5f;
-	}
-	else
-	{
-		BLF32 _dif = (BLF32)MAX_INTERNAL(_Node->nStrokePixel, 3);
-		if (_Node->bFlipX)
+		_BLSpriteSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
+		BLF32 _minx, _miny, _maxx, _maxy;
+		if (!_ss)
 		{
-			_maxx = _Node->sSize.fX * 0.5f + _dif - _ss->nOffsetX;
-			_minx = _maxx - _ss->nRBx + _ss->nLTx - _dif;
+			_minx = -_Node->sSize.fX * 0.5f;
+			_miny = -_Node->sSize.fY * 0.5f;
+			_maxx = _Node->sSize.fX * 0.5f;
+			_maxy = _Node->sSize.fY * 0.5f;
 		}
 		else
 		{
-			_minx = -_Node->sSize.fX * 0.5f + _ss->nOffsetX - _dif;
-			_maxx = _minx + _ss->nRBx - _ss->nLTx + _dif;
-		}
-		if (_Node->bFlipY)
-		{
+			BLF32 _dif = (BLF32)MAX_INTERNAL(_Node->nStrokePixel, 3);
+			_maxx = _Node->sSize.fX * 0.5f + _dif - _ss->nOffsetX;
+			_minx = _maxx - _ss->nRBx + _ss->nLTx - _dif;
 			_maxy = _Node->sSize.fY * 0.5f + _dif - _ss->nOffsetY;
 			_miny = _maxy - _ss->nRBy + _ss->nLTy - _dif;
 		}
-		else
-		{
-			_miny = -_Node->sSize.fY * 0.5f + _ss->nOffsetY - _dif;
-			_maxy = _miny + _ss->nRBy - _ss->nLTy + _dif;
-		}
-	}
-    BLF32 _ltx = (_minx * _Mat[0]) + (_miny * _Mat[2]) + _Mat[4];
-    BLF32 _lty = (_minx * _Mat[1]) + (_miny * _Mat[3]) + _Mat[5];
-    BLF32 _rtx = (_maxx * _Mat[0]) + (_miny * _Mat[2]) + _Mat[4];
-    BLF32 _rty = (_maxx * _Mat[1]) + (_miny * _Mat[3]) + _Mat[5];
-    BLF32 _lbx = (_minx * _Mat[0]) + (_maxy * _Mat[2]) + _Mat[4];
-    BLF32 _lby = (_minx * _Mat[1]) + (_maxy * _Mat[3]) + _Mat[5];
-    BLF32 _rbx = (_maxx * _Mat[0]) + (_maxy * _Mat[2]) + _Mat[4];
-    BLF32 _rby = (_maxx * _Mat[1]) + (_maxy * _Mat[3]) + _Mat[5];
-	_Node->sAbsLT.fX = _ltx;
-	_Node->sAbsLT.fY = _lty;
-	_Node->sAbsRT.fX = _rtx;
-	_Node->sAbsRT.fY = _rty;
-	_Node->sAbsLB.fX = _lbx;
-	_Node->sAbsLB.fY = _lby;
-	_Node->sAbsRB.fX = _rbx;
-	_Node->sAbsRB.fY = _rby;
-    if (_Node->pEmitParam)
-    {
-        BLU32 _gen = (BLU32)(_Node->pEmitParam->fGenPerMSec * _Delta);
-        _Node->pEmitParam->nCurAlive = MIN_INTERNAL(_Node->pEmitParam->nMaxAlive, _gen + _Node->pEmitParam->nCurAlive);
-        BLF32* _clrbuf = (BLF32*)alloca(_Node->pEmitParam->nMaxAlive * 4 * sizeof(BLF32));
-        BLF32* _tranbuf = (BLF32*)alloca(_Node->pEmitParam->nMaxAlive * 4 * sizeof(BLF32));
-        for (BLU32 _idx = 0; _idx < _Node->pEmitParam->nCurAlive; ++_idx)
-        {
-            if (_Node->pEmitParam->pAge[_idx] == 0)
-            {
-                _Node->pEmitParam->pPositionX[_idx] = _Node->sPos.fX + cosf(blRandRangeF(0.f , PI_INTERNAL * 2.f)) * _Node->pEmitParam->fEmitterRadius * blRandF();
-                _Node->pEmitParam->pPositionY[_idx] = _Node->sPos.fY + sinf(blRandRangeF(0.f , PI_INTERNAL * 2.f)) * _Node->pEmitParam->fEmitterRadius * blRandF();
-                _Node->pEmitParam->pEmitAngle[_idx] = blRandRangeF(-_Node->pEmitParam->fEmitAngle, _Node->pEmitParam->fEmitAngle);
-                _Node->pEmitParam->pVelocity[_idx] = _Node->pEmitParam->fVelocity + blRandRangeF(-_Node->pEmitParam->fVelVariance, _Node->pEmitParam->fVelVariance);
-                BLS32 _initrot = 100 * (BLS32)(_Node->pEmitParam->fRotation + blRandRangeF(-_Node->pEmitParam->fRotVariance, _Node->pEmitParam->fRotVariance));
-                BLS32 _initscale = 100 * (BLS32)(_Node->pEmitParam->fScale + blRandRangeF(-_Node->pEmitParam->fScaleVariance, _Node->pEmitParam->fScaleVariance));
-                _Node->pEmitParam->pRotScale[_idx] = MAKEU32(MAX_INTERNAL(0, _initrot), MAX_INTERNAL(0, _initscale));
-            }
-            else
-            {
-                BLF32 _s = _Node->pEmitParam->pVelocity[_idx] * _Delta / 1000.f;
-                BLF32 _xvec, _yvec;
-                _xvec = _Node->pEmitParam->fDirectionX * cosf(_Node->pEmitParam->pEmitAngle[_idx]) - _Node->pEmitParam->fDirectionY * sinf(_Node->pEmitParam->pEmitAngle[_idx]);
-                _yvec = _Node->pEmitParam->fDirectionX * sinf(_Node->pEmitParam->pEmitAngle[_idx]) + _Node->pEmitParam->fDirectionY * cosf(_Node->pEmitParam->pEmitAngle[_idx]);
-                _Node->pEmitParam->pPositionX[_idx] += _xvec * _s;
-                _Node->pEmitParam->pPositionY[_idx] += _yvec * _s;
-            }
-            BLF32 _fadeclr[4], _dyeclr[4];
-            blDeColor4F(_Node->pEmitParam->nFadeColor, _fadeclr);
-            blDeColor4F(_Node->nDyeColor, _dyeclr);
-            BLF32 _rot = (BLF32)HIGU16(_Node->pEmitParam->pRotScale[_idx]) / 100.f;
-            BLF32 _scale = (BLF32)LOWU16(_Node->pEmitParam->pRotScale[_idx]) / 100.f;
-            BLF32 _ratio = (BLF32)_Node->pEmitParam->pAge[_idx] / (BLF32)_Node->pEmitParam->nLife;
-            _clrbuf[4 * _idx + 0] = (_fadeclr[0] - _dyeclr[0]) * _ratio + _dyeclr[0];
-            _clrbuf[4 * _idx + 1] = (_fadeclr[1] - _dyeclr[1]) * _ratio + _dyeclr[1];
-            _clrbuf[4 * _idx + 2] = (_fadeclr[2] - _dyeclr[2]) * _ratio + _dyeclr[2];
-            _clrbuf[4 * _idx + 3] = (_fadeclr[3] - _dyeclr[3]) * _ratio + _dyeclr[3];
-            _tranbuf[4 * _idx + 0] = _Node->pEmitParam->pPositionX[_idx];
-            _tranbuf[4 * _idx + 1] = _Node->pEmitParam->pPositionY[_idx];
-            _tranbuf[4 * _idx + 2] = _rot * _ratio;
-            _tranbuf[4 * _idx + 3] = (_scale - 1.f) * _ratio + 1.f;
-            _Node->pEmitParam->pAge[_idx] += _Delta;
-        }
-        if (_Node->pEmitParam->nCurAlive)
-        {
-			blGeometryInstanceUpdate(_Node->nGBO, BL_SL_COLOR1, _clrbuf, _Node->pEmitParam->nCurAlive * 4 * sizeof(BLF32));
-			blGeometryInstanceUpdate(_Node->nGBO, BL_SL_INSTANCE1, _tranbuf, _Node->pEmitParam->nCurAlive * 4 * sizeof(BLF32));
-        }
-        for (BLU32 _idx = 0; _idx < _Node->pEmitParam->nMaxAlive; ++_idx)
-        {
-            if (_Node->pEmitParam->pAge[_idx] < _Node->pEmitParam->nLife)
-            {
-                memmove(_Node->pEmitParam->pAge, _Node->pEmitParam->pAge + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLU32));
-                memmove(_Node->pEmitParam->pPositionX, _Node->pEmitParam->pPositionX + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
-                memmove(_Node->pEmitParam->pPositionY, _Node->pEmitParam->pPositionY + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
-                memmove(_Node->pEmitParam->pEmitAngle, _Node->pEmitParam->pEmitAngle + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
-                memmove(_Node->pEmitParam->pVelocity, _Node->pEmitParam->pVelocity + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
-                memmove(_Node->pEmitParam->pRotScale, _Node->pEmitParam->pRotScale + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLU32));
-                memset(_Node->pEmitParam->pAge + _Node->pEmitParam->nMaxAlive - _idx, 0 , _idx * sizeof(BLU32));
-                break;
-            }
-        }
-		blTechSampler(_PrSpriteMem->nSpriteInstTech, "Texture0", _Node->nTex, 0);
-    }
-	else if (_Node->nBrightness > 0)
-	{
-		blTechSampler(_PrSpriteMem->nSpriteGlowTech, "Texture0", _Node->nTex, 0);
-		BLF32 _glow[4];
-		blDeColor4F(_Node->nGlowColor, _glow);
-		_glow[3] = (BLF32)_Node->nBrightness;
-		blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X4, "Glow", _glow, sizeof(_glow));
-		BLF32 _texsize[] = { (BLF32)_Node->nTexWidth, (BLF32)_Node->nTexHeight };
-		blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X2, "TexSize", _texsize, sizeof(_texsize));
-		BLF32 _border[] = { (BLF32)_ss->nLTx, (BLF32)_ss->nLTy, (BLF32)_ss->nRBx, (BLF32)_ss->nRBy };
-		blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X4, "Border", _border, sizeof(_border));
-	}
-	else if (_Node->nStrokePixel > 0)
-	{
-		blTechSampler(_PrSpriteMem->nSpriteStrokeTech, "Texture0", _Node->nTex, 0);
-		BLF32 _stroke[4];
-		blDeColor4F(_Node->nStrokeColor, _stroke);
-		_stroke[3] = (BLF32)_Node->nStrokePixel;
-		blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X4, "Stroke", _stroke, sizeof(_stroke));
-		BLF32 _texsize[] = { (BLF32)_Node->nTexWidth, (BLF32)_Node->nTexHeight };
-		blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "TexSize", _texsize, sizeof(_texsize));
-		BLF32 _border[] = { (BLF32)_ss->nLTx - (BLF32)_Node->nStrokePixel, (BLF32)_ss->nLTy - (BLF32)_Node->nStrokePixel, (BLF32)_ss->nRBx + (BLF32)_Node->nStrokePixel, (BLF32)_ss->nRBy + (BLF32)_Node->nStrokePixel };
-		blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X4, "Border", _border, sizeof(_border));
-	}
-	else
-		blTechSampler(_PrSpriteMem->nSpriteTech, "Texture0", _Node->nTex, 0);
-	if (_ss)
-	{
-		BLF32 _lttx, _ltty, _rttx, _rtty, _lbtx, _lbty, _rbtx, _rbty;
-		BLS32 _dif = MAX_INTERNAL(_Node->nStrokePixel, 3);
-		_lbtx = _lttx = (BLF32)((BLS32)_ss->nLTx - _dif) / (BLF32)_Node->nTexWidth;
-		_rtty = _ltty = (BLF32)((BLS32)_ss->nLTy - _dif) / (BLF32)_Node->nTexHeight;
-		_rbtx = _rttx = (BLF32)((BLS32)_ss->nRBx + _dif) / (BLF32)_Node->nTexWidth;
-		_rbty = _lbty = (BLF32)((BLS32)_ss->nRBy + _dif) / (BLF32)_Node->nTexHeight;
-		if (_Node->bFlipX)
-		{ 
-			BLF32 _tmp;
-			_tmp = _lbtx;
-			_lbtx = _lttx = _rbtx;
-			_rbtx = _rttx = _tmp;
-		}
-		if (_Node->bFlipY)
-		{
-			BLF32 _tmp;
-			_tmp = _ltty;
-			_rtty = _ltty = _rbty;
-			_rbty = _lbty = _tmp;
-		}
-		BLF32 _rgba[4];
-		blDeColor4F(_Node->nDyeColor, _rgba);
-		BLF32 _vbo[] = {
-			_ltx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-			_lty + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-			_rgba[0],
-			_rgba[1],
-			_rgba[2],
-			_Node->fAlpha,
-			_lttx,
-			_ltty,
-			_rtx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-			_rty + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-			_rgba[0],
-			_rgba[1],
-			_rgba[2],
-			_Node->fAlpha,
-			_rttx,
-			_rtty,
-			_lbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-			_lby + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-			_rgba[0],
-			_rgba[1],
-			_rgba[2],
-			_Node->fAlpha,
-			_lbtx,
-			_lbty,
-			_rbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-			_rby + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-			_rgba[0],
-			_rgba[1],
-			_rgba[2],
-			_Node->fAlpha,
-			_rbtx,
-			_rbty
-		};
-		blGeometryBufferUpdate(_Node->nGBO, 0, (const BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		BLF32 _ltx = (_minx * _Mat[0]) + (_miny * _Mat[2]) + _Mat[4];
+		BLF32 _lty = (_minx * _Mat[1]) + (_miny * _Mat[3]) + _Mat[5];
+		BLF32 _rtx = (_maxx * _Mat[0]) + (_miny * _Mat[2]) + _Mat[4];
+		BLF32 _rty = (_maxx * _Mat[1]) + (_miny * _Mat[3]) + _Mat[5];
+		BLF32 _lbx = (_minx * _Mat[0]) + (_maxy * _Mat[2]) + _Mat[4];
+		BLF32 _lby = (_minx * _Mat[1]) + (_maxy * _Mat[3]) + _Mat[5];
+		BLF32 _rbx = (_maxx * _Mat[0]) + (_maxy * _Mat[2]) + _Mat[4];
+		BLF32 _rby = (_maxx * _Mat[1]) + (_maxy * _Mat[3]) + _Mat[5];
+		_Node->sAbsLT.fX = _ltx;
+		_Node->sAbsLT.fY = _lty;
+		_Node->sAbsRT.fX = _rtx;
+		_Node->sAbsRT.fY = _rty;
+		_Node->sAbsLB.fX = _lbx;
+		_Node->sAbsLB.fY = _lby;
+		_Node->sAbsRB.fX = _rbx;
+		_Node->sAbsRB.fY = _rby;
 		if (_Node->pEmitParam)
-			blDraw(_PrSpriteMem->nSpriteInstTech, _Node->nGBO, _Node->pEmitParam->nCurAlive);
+		{
+			BLU32 _gen = (BLU32)(_Node->pEmitParam->fGenPerMSec * _Delta);
+			_Node->pEmitParam->nCurAlive = MIN_INTERNAL(_Node->pEmitParam->nMaxAlive, _gen + _Node->pEmitParam->nCurAlive);
+			BLF32* _clrbuf = (BLF32*)alloca(_Node->pEmitParam->nMaxAlive * 4 * sizeof(BLF32));
+			BLF32* _tranbuf = (BLF32*)alloca(_Node->pEmitParam->nMaxAlive * 4 * sizeof(BLF32));
+			for (BLU32 _idx = 0; _idx < _Node->pEmitParam->nCurAlive; ++_idx)
+			{
+				if (_Node->pEmitParam->pAge[_idx] == 0)
+				{
+					_Node->pEmitParam->pPositionX[_idx] = _Node->sPos.fX + cosf(blRandRangeF(0.f, PI_INTERNAL * 2.f)) * _Node->pEmitParam->fEmitterRadius * blRandF();
+					_Node->pEmitParam->pPositionY[_idx] = _Node->sPos.fY + sinf(blRandRangeF(0.f, PI_INTERNAL * 2.f)) * _Node->pEmitParam->fEmitterRadius * blRandF();
+					_Node->pEmitParam->pEmitAngle[_idx] = blRandRangeF(-_Node->pEmitParam->fEmitAngle, _Node->pEmitParam->fEmitAngle);
+					_Node->pEmitParam->pVelocity[_idx] = _Node->pEmitParam->fVelocity + blRandRangeF(-_Node->pEmitParam->fVelVariance, _Node->pEmitParam->fVelVariance);
+					BLS32 _initrot = 100 * (BLS32)(_Node->pEmitParam->fRotation + blRandRangeF(-_Node->pEmitParam->fRotVariance, _Node->pEmitParam->fRotVariance));
+					BLS32 _initscale = 100 * (BLS32)(_Node->pEmitParam->fScale + blRandRangeF(-_Node->pEmitParam->fScaleVariance, _Node->pEmitParam->fScaleVariance));
+					_Node->pEmitParam->pRotScale[_idx] = MAKEU32(MAX_INTERNAL(0, _initrot), MAX_INTERNAL(0, _initscale));
+				}
+				else
+				{
+					BLF32 _s = _Node->pEmitParam->pVelocity[_idx] * _Delta / 1000.f;
+					BLF32 _xvec, _yvec;
+					_xvec = _Node->pEmitParam->fDirectionX * cosf(_Node->pEmitParam->pEmitAngle[_idx]) - _Node->pEmitParam->fDirectionY * sinf(_Node->pEmitParam->pEmitAngle[_idx]);
+					_yvec = _Node->pEmitParam->fDirectionX * sinf(_Node->pEmitParam->pEmitAngle[_idx]) + _Node->pEmitParam->fDirectionY * cosf(_Node->pEmitParam->pEmitAngle[_idx]);
+					_Node->pEmitParam->pPositionX[_idx] += _xvec * _s;
+					_Node->pEmitParam->pPositionY[_idx] += _yvec * _s;
+				}
+				BLF32 _fadeclr[4], _dyeclr[4];
+				blDeColor4F(_Node->pEmitParam->nFadeColor, _fadeclr);
+				blDeColor4F(_Node->nDyeColor, _dyeclr);
+				BLF32 _rot = (BLF32)HIGU16(_Node->pEmitParam->pRotScale[_idx]) / 100.f;
+				BLF32 _scale = (BLF32)LOWU16(_Node->pEmitParam->pRotScale[_idx]) / 100.f;
+				BLF32 _ratio = (BLF32)_Node->pEmitParam->pAge[_idx] / (BLF32)_Node->pEmitParam->nLife;
+				_clrbuf[4 * _idx + 0] = (_fadeclr[0] - _dyeclr[0]) * _ratio + _dyeclr[0];
+				_clrbuf[4 * _idx + 1] = (_fadeclr[1] - _dyeclr[1]) * _ratio + _dyeclr[1];
+				_clrbuf[4 * _idx + 2] = (_fadeclr[2] - _dyeclr[2]) * _ratio + _dyeclr[2];
+				_clrbuf[4 * _idx + 3] = (_fadeclr[3] - _dyeclr[3]) * _ratio + _dyeclr[3];
+				_tranbuf[4 * _idx + 0] = _Node->pEmitParam->pPositionX[_idx];
+				_tranbuf[4 * _idx + 1] = _Node->pEmitParam->pPositionY[_idx];
+				_tranbuf[4 * _idx + 2] = _rot * _ratio;
+				_tranbuf[4 * _idx + 3] = (_scale - 1.f) * _ratio + 1.f;
+				_Node->pEmitParam->pAge[_idx] += _Delta;
+			}
+			if (_Node->pEmitParam->nCurAlive)
+			{
+				blGeometryInstanceUpdate(_Node->nGBO, BL_SL_COLOR1, _clrbuf, _Node->pEmitParam->nCurAlive * 4 * sizeof(BLF32));
+				blGeometryInstanceUpdate(_Node->nGBO, BL_SL_INSTANCE1, _tranbuf, _Node->pEmitParam->nCurAlive * 4 * sizeof(BLF32));
+			}
+			for (BLU32 _idx = 0; _idx < _Node->pEmitParam->nMaxAlive; ++_idx)
+			{
+				if (_Node->pEmitParam->pAge[_idx] < _Node->pEmitParam->nLife)
+				{
+					memmove(_Node->pEmitParam->pAge, _Node->pEmitParam->pAge + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLU32));
+					memmove(_Node->pEmitParam->pPositionX, _Node->pEmitParam->pPositionX + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
+					memmove(_Node->pEmitParam->pPositionY, _Node->pEmitParam->pPositionY + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
+					memmove(_Node->pEmitParam->pEmitAngle, _Node->pEmitParam->pEmitAngle + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
+					memmove(_Node->pEmitParam->pVelocity, _Node->pEmitParam->pVelocity + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
+					memmove(_Node->pEmitParam->pRotScale, _Node->pEmitParam->pRotScale + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLU32));
+					memset(_Node->pEmitParam->pAge + _Node->pEmitParam->nMaxAlive - _idx, 0, _idx * sizeof(BLU32));
+					break;
+				}
+			}
+			blTechSampler(_PrSpriteMem->nSpriteInstTech, "Texture0", _Node->nTex, 0);
+		}
 		else if (_Node->nBrightness > 0)
-			blDraw(_PrSpriteMem->nSpriteGlowTech, _Node->nGBO, 1);
+		{
+			blTechSampler(_PrSpriteMem->nSpriteGlowTech, "Texture0", _Node->nTex, 0);
+			BLF32 _glow[4];
+			blDeColor4F(_Node->nGlowColor, _glow);
+			_glow[3] = (BLF32)_Node->nBrightness;
+			blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X4, "Glow", _glow, sizeof(_glow));
+			BLF32 _texsize[] = { (BLF32)_Node->nTexWidth, (BLF32)_Node->nTexHeight };
+			blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X2, "TexSize", _texsize, sizeof(_texsize));
+			BLF32 _border[] = { (BLF32)_ss->nLTx, (BLF32)_ss->nLTy, (BLF32)_ss->nRBx, (BLF32)_ss->nRBy };
+			blTechUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X4, "Border", _border, sizeof(_border));
+		}
 		else if (_Node->nStrokePixel > 0)
-			blDraw(_PrSpriteMem->nSpriteStrokeTech, _Node->nGBO, 1);
+		{
+			blTechSampler(_PrSpriteMem->nSpriteStrokeTech, "Texture0", _Node->nTex, 0);
+			BLF32 _stroke[4];
+			blDeColor4F(_Node->nStrokeColor, _stroke);
+			_stroke[3] = (BLF32)_Node->nStrokePixel;
+			blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X4, "Stroke", _stroke, sizeof(_stroke));
+			BLF32 _texsize[] = { (BLF32)_Node->nTexWidth, (BLF32)_Node->nTexHeight };
+			blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "TexSize", _texsize, sizeof(_texsize));
+			BLF32 _border[] = { (BLF32)_ss->nLTx - (BLF32)_Node->nStrokePixel, (BLF32)_ss->nLTy - (BLF32)_Node->nStrokePixel, (BLF32)_ss->nRBx + (BLF32)_Node->nStrokePixel, (BLF32)_ss->nRBy + (BLF32)_Node->nStrokePixel };
+			blTechUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X4, "Border", _border, sizeof(_border));
+		}
+		else
+			blTechSampler(_PrSpriteMem->nSpriteTech, "Texture0", _Node->nTex, 0);
+		if (_ss)
+		{
+			BLF32 _lttx, _ltty, _rttx, _rtty, _lbtx, _lbty, _rbtx, _rbty;
+			BLS32 _dif = MAX_INTERNAL(_Node->nStrokePixel, 3);
+			_lbtx = _lttx = (BLF32)((BLS32)_ss->nLTx - _dif) / (BLF32)_Node->nTexWidth;
+			_rtty = _ltty = (BLF32)((BLS32)_ss->nLTy - _dif) / (BLF32)_Node->nTexHeight;
+			_rbtx = _rttx = (BLF32)((BLS32)_ss->nRBx + _dif) / (BLF32)_Node->nTexWidth;
+			_rbty = _lbty = (BLF32)((BLS32)_ss->nRBy + _dif) / (BLF32)_Node->nTexHeight;
+			_lttx += 0.01f;
+			_lbtx += 0.01f;
+			_rttx -= 0.01f;
+			_rbtx -= 0.01f;
+			_ltty += 0.01f;
+			_lbty -= 0.01f;
+			_rtty += 0.01f;
+			_rbty -= 0.01f;
+			if (_Node->bFlipX)
+			{
+				BLF32 _tmp;
+				_tmp = _lbtx;
+				_lbtx = _lttx = _rbtx;
+				_rbtx = _rttx = _tmp;
+			}
+			if (_Node->bFlipY)
+			{
+				BLF32 _tmp;
+				_tmp = _ltty;
+				_rtty = _ltty = _rbty;
+				_rbty = _lbty = _tmp;
+			}
+			BLF32 _rgba[4];
+			blDeColor4F(_Node->nDyeColor, _rgba);
+			BLF32 _vbo[] = {
+				_ltx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_lty + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_rgba[0],
+				_rgba[1],
+				_rgba[2],
+				_Node->fAlpha,
+				_lttx,
+				_ltty,
+				_rtx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_rty + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_rgba[0],
+				_rgba[1],
+				_rgba[2],
+				_Node->fAlpha,
+				_rttx,
+				_rtty,
+				_lbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_lby + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_rgba[0],
+				_rgba[1],
+				_rgba[2],
+				_Node->fAlpha,
+				_lbtx,
+				_lbty,
+				_rbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_rby + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_rgba[0],
+				_rgba[1],
+				_rgba[2],
+				_Node->fAlpha,
+				_rbtx,
+				_rbty
+			};
+			blGeometryBufferUpdate(_Node->nGBO, 0, (const BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+			if (_Node->pEmitParam)
+				blDraw(_PrSpriteMem->nSpriteInstTech, _Node->nGBO, _Node->pEmitParam->nCurAlive);
+			else if (_Node->nBrightness > 0)
+				blDraw(_PrSpriteMem->nSpriteGlowTech, _Node->nGBO, 1);
+			else if (_Node->nStrokePixel > 0)
+				blDraw(_PrSpriteMem->nSpriteStrokeTech, _Node->nGBO, 1);
+			else
+				blDraw(_PrSpriteMem->nSpriteTech, _Node->nGBO, 1);
+		}
 		else
 			blDraw(_PrSpriteMem->nSpriteTech, _Node->nGBO, 1);
 	}
-    else
-        blDraw(_PrSpriteMem->nSpriteTech, _Node->nGBO, 1);
     for (BLU32 _idx = 0; _idx < _Node->nChildren; ++_idx)
 	{
 		_BLSpriteNode* _chnode = _Node->pChildren[_idx];
@@ -1517,7 +1512,6 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLAnsi* _Tag, IN BLF32
 		memset(_node->aTag, 0, sizeof(_node->aTag));
 		memset(_node->aFilename, 0, sizeof(_node->aFilename));
 		memset(_node->aArchive, 0, sizeof(_node->aArchive));
-		strcpy(_node->aFilename, _Filename);
 		if (_Archive)
 			strcpy(_node->aArchive, _Archive);
 		if (_Tag)
@@ -1537,8 +1531,19 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLAnsi* _Tag, IN BLF32
 					break;
 			}
 		}
-		_node->nID = blGenGuid(_node, blHashUtf8((const BLUtf8*)_Filename));
-		_FetchResource(_Filename, _Archive, (BLVoid**)&_node, _node->nID, _LoadSprite, _SpriteSetup, TRUE);
+		if (_Filename)
+		{
+			strcpy(_node->aFilename, _Filename);
+			_node->nID = blGenGuid(_node, blHashUtf8((const BLUtf8*)_Filename));
+			_FetchResource(_Filename, _Archive, (BLVoid**)&_node, _node->nID, _LoadSprite, _SpriteSetup, TRUE);
+		}
+		else
+		{
+			_node->pTexData = NULL;
+			_node->bValid = TRUE;
+			_node->nID = blGenGuid(_node, blUniqueUri());
+			_AddToNodeList(_node);
+		}
 		return _node->nID;
 	}
 }
@@ -1955,13 +1960,22 @@ blSpriteTile(IN BLGuid _ID, IN BLAnsi* _ImageFile, IN BLAnsi* _Archive, IN BLF32
 	}
 }
 BLBool
-blSpriteAsEmit(IN BLGuid _ID, IN BLF32 _EmitAngle, IN BLF32 _EmitterRadius, IN BLF32 _Life, IN BLU32 _MaxAlive, IN BLU32 _GenPerSec, IN BLF32 _DirectionX, IN BLF32 _DirectionY, IN BLF32 _Velocity, IN BLF32 _VelVariance, IN BLF32 _Rotation, IN BLF32 _RotVariance, IN BLF32 _Scale, IN BLF32 _ScaleVariance, IN BLU32 _FadeColor)
+blSpriteAsEmit(IN BLGuid _ID, IN BLF32 _EmitAngle, IN BLF32 _EmitterRadius, IN BLF32 _Life, IN BLU32 _MaxAlive, IN BLU32 _GenPerSec, IN BLF32 _DirectionX, IN BLF32 _DirectionY, IN BLF32 _Velocity, IN BLF32 _VelVariance, IN BLF32 _Rotation, IN BLF32 _RotVariance, IN BLF32 _Scale, IN BLF32 _ScaleVariance, IN BLU32 _FadeColor, IN BLBool _Off)
 {
     if (_ID == INVALID_GUID)
         return FALSE;
 	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
 	if (!_node)
 		return FALSE;
+	if (_Off)
+	{
+		if (_node->pEmitParam)
+		{
+			free(_node->pEmitParam);
+			_node->pEmitParam = NULL;
+		}
+		return TRUE;
+	}
 	if (!_node->pEmitParam)
     {
         _node->pEmitParam = (_BLEmitParam*)malloc(sizeof(_BLEmitParam));

@@ -3537,10 +3537,10 @@ _DrawPanel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		if (_Node->uExtension.sPanel.aStencilMap[0] && strcmp(_Node->uExtension.sPanel.aStencilMap, "Nil"))
 		{
 			_stencil = -1.f;
-			_texcoords.sLT.fX = _Node->uExtension.sPanel.sStencilTex.sLT.fX / _Node->uExtension.sPanel.nTexWidth + 0.001f;
-			_texcoords.sLT.fY = _Node->uExtension.sPanel.sStencilTex.sLT.fY / _Node->uExtension.sPanel.nTexHeight + 0.001f;
-			_texcoords.sRB.fX = _Node->uExtension.sPanel.sStencilTex.sRB.fX / _Node->uExtension.sPanel.nTexWidth - 0.001f;
-			_texcoords.sRB.fY = _Node->uExtension.sPanel.sStencilTex.sRB.fY / _Node->uExtension.sPanel.nTexHeight - 0.001f;
+			_texcoords.sLT.fX = _Node->uExtension.sPanel.sStencilTex.sLT.fX / _Node->uExtension.sPanel.nTexWidth + 0.005f;
+			_texcoords.sLT.fY = _Node->uExtension.sPanel.sStencilTex.sLT.fY / _Node->uExtension.sPanel.nTexHeight + 0.005f;
+			_texcoords.sRB.fX = _Node->uExtension.sPanel.sStencilTex.sRB.fX / _Node->uExtension.sPanel.nTexWidth - 0.005f;
+			_texcoords.sRB.fY = _Node->uExtension.sPanel.sStencilTex.sRB.fY / _Node->uExtension.sPanel.nTexHeight - 0.005f;
 			BLF32 _oriw = _Node->uExtension.sPanel.sCommonTex.sRB.fX - _Node->uExtension.sPanel.sCommonTex.sLT.fX;
 			BLF32 _orih = _Node->uExtension.sPanel.sCommonTex.sRB.fY - _Node->uExtension.sPanel.sCommonTex.sLT.fY;
 			BLF32 _dstw = _Node->uExtension.sPanel.sStencilTex.sRB.fX - _Node->uExtension.sPanel.sStencilTex.sLT.fX;
@@ -3997,10 +3997,10 @@ _DrawLabel(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		if (_Node->uExtension.sLabel.aStencilMap[0] && strcmp(_Node->uExtension.sLabel.aStencilMap, "Nil"))
 		{
 			_stencil = -1.f;
-			_texcoords.sLT.fX = _Node->uExtension.sLabel.sStencilTex.sLT.fX / _Node->uExtension.sLabel.nTexWidth + 0.001f;
-			_texcoords.sLT.fY = _Node->uExtension.sLabel.sStencilTex.sLT.fY / _Node->uExtension.sLabel.nTexHeight + 0.001f;
-			_texcoords.sRB.fX = _Node->uExtension.sLabel.sStencilTex.sRB.fX / _Node->uExtension.sLabel.nTexWidth - 0.001f;
-			_texcoords.sRB.fY = _Node->uExtension.sLabel.sStencilTex.sRB.fY / _Node->uExtension.sLabel.nTexHeight - 0.001f;
+			_texcoords.sLT.fX = _Node->uExtension.sLabel.sStencilTex.sLT.fX / _Node->uExtension.sLabel.nTexWidth + 0.005f;
+			_texcoords.sLT.fY = _Node->uExtension.sLabel.sStencilTex.sLT.fY / _Node->uExtension.sLabel.nTexHeight + 0.005f;
+			_texcoords.sRB.fX = _Node->uExtension.sLabel.sStencilTex.sRB.fX / _Node->uExtension.sLabel.nTexWidth - 0.005f;
+			_texcoords.sRB.fY = _Node->uExtension.sLabel.sStencilTex.sRB.fY / _Node->uExtension.sLabel.nTexHeight - 0.005f;
 			BLF32 _oriw = _Node->uExtension.sLabel.sCommonTex.sRB.fX - _Node->uExtension.sLabel.sCommonTex.sLT.fX;
 			BLF32 _orih = _Node->uExtension.sLabel.sCommonTex.sRB.fY - _Node->uExtension.sLabel.sCommonTex.sLT.fY;
 			BLF32 _dstw = _Node->uExtension.sLabel.sStencilTex.sRB.fX - _Node->uExtension.sLabel.sStencilTex.sLT.fX;
@@ -4811,10 +4811,10 @@ _DrawButton(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		if (_Node->uExtension.sButton.aStencilMap[0] && strcmp(_Node->uExtension.sButton.aStencilMap, "Nil"))
 		{
 			_stencil = -1.f;
-			_texcoords.sLT.fX = _Node->uExtension.sButton.sStencilTex.sLT.fX / _Node->uExtension.sButton.nTexWidth + 0.001f;
-			_texcoords.sLT.fY = _Node->uExtension.sButton.sStencilTex.sLT.fY / _Node->uExtension.sButton.nTexHeight + 0.001f;
-			_texcoords.sRB.fX = _Node->uExtension.sButton.sStencilTex.sRB.fX / _Node->uExtension.sButton.nTexWidth - 0.001f;
-			_texcoords.sRB.fY = _Node->uExtension.sButton.sStencilTex.sRB.fY / _Node->uExtension.sButton.nTexHeight - 0.001f;
+			_texcoords.sLT.fX = _Node->uExtension.sButton.sStencilTex.sLT.fX / _Node->uExtension.sButton.nTexWidth + 0.005f;
+			_texcoords.sLT.fY = _Node->uExtension.sButton.sStencilTex.sLT.fY / _Node->uExtension.sButton.nTexHeight + 0.005f;
+			_texcoords.sRB.fX = _Node->uExtension.sButton.sStencilTex.sRB.fX / _Node->uExtension.sButton.nTexWidth - 0.005f;
+			_texcoords.sRB.fY = _Node->uExtension.sButton.sStencilTex.sRB.fY / _Node->uExtension.sButton.nTexHeight - 0.005f;
 			BLF32 _oriw = _Node->uExtension.sButton.sCommonTex.sRB.fX - _Node->uExtension.sButton.sCommonTex.sLT.fX;
 			BLF32 _orih = _Node->uExtension.sButton.sCommonTex.sRB.fY - _Node->uExtension.sButton.sCommonTex.sLT.fY;
 			BLF32 _dstw = _Node->uExtension.sButton.sStencilTex.sRB.fX - _Node->uExtension.sButton.sStencilTex.sLT.fX;
@@ -5327,10 +5327,10 @@ _DrawCheck(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		if (_Node->uExtension.sCheck.aStencilMap[0] && strcmp(_Node->uExtension.sCheck.aStencilMap, "Nil"))
 		{
 			_stencil = -1.f;
-			_texcoords.sLT.fX = _Node->uExtension.sCheck.sStencilTex.sLT.fX / _Node->uExtension.sCheck.nTexWidth + 0.001f;
-			_texcoords.sLT.fY = _Node->uExtension.sCheck.sStencilTex.sLT.fY / _Node->uExtension.sCheck.nTexHeight + 0.001f;
-			_texcoords.sRB.fX = _Node->uExtension.sCheck.sStencilTex.sRB.fX / _Node->uExtension.sCheck.nTexWidth - 0.001f;
-			_texcoords.sRB.fY = _Node->uExtension.sCheck.sStencilTex.sRB.fY / _Node->uExtension.sCheck.nTexHeight - 0.001f;
+			_texcoords.sLT.fX = _Node->uExtension.sCheck.sStencilTex.sLT.fX / _Node->uExtension.sCheck.nTexWidth + 0.005f;
+			_texcoords.sLT.fY = _Node->uExtension.sCheck.sStencilTex.sLT.fY / _Node->uExtension.sCheck.nTexHeight + 0.005f;
+			_texcoords.sRB.fX = _Node->uExtension.sCheck.sStencilTex.sRB.fX / _Node->uExtension.sCheck.nTexWidth - 0.005f;
+			_texcoords.sRB.fY = _Node->uExtension.sCheck.sStencilTex.sRB.fY / _Node->uExtension.sCheck.nTexHeight - 0.005f;
 			BLF32 _oriw = _Node->uExtension.sCheck.sCommonTex.sRB.fX - _Node->uExtension.sCheck.sCommonTex.sLT.fX;
 			BLF32 _orih = _Node->uExtension.sCheck.sCommonTex.sRB.fY - _Node->uExtension.sCheck.sCommonTex.sLT.fY;
 			BLF32 _dstw = _Node->uExtension.sCheck.sStencilTex.sRB.fX - _Node->uExtension.sCheck.sStencilTex.sLT.fX;
@@ -5811,10 +5811,10 @@ _DrawSlider(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		if (_Node->uExtension.sSlider.aStencilMap[0] && strcmp(_Node->uExtension.sSlider.aStencilMap, "Nil"))
 		{
 			_stencil = -1.f;
-			_texcoords.sLT.fX = _Node->uExtension.sSlider.sStencilTex.sLT.fX / _Node->uExtension.sSlider.nTexWidth + 0.001f;
-			_texcoords.sLT.fY = _Node->uExtension.sSlider.sStencilTex.sLT.fY / _Node->uExtension.sSlider.nTexHeight + 0.001f;
-			_texcoords.sRB.fX = _Node->uExtension.sSlider.sStencilTex.sRB.fX / _Node->uExtension.sSlider.nTexWidth - 0.001f;
-			_texcoords.sRB.fY = _Node->uExtension.sSlider.sStencilTex.sRB.fY / _Node->uExtension.sSlider.nTexHeight - 0.001f;
+			_texcoords.sLT.fX = _Node->uExtension.sSlider.sStencilTex.sLT.fX / _Node->uExtension.sSlider.nTexWidth + 0.005f;
+			_texcoords.sLT.fY = _Node->uExtension.sSlider.sStencilTex.sLT.fY / _Node->uExtension.sSlider.nTexHeight + 0.005f;
+			_texcoords.sRB.fX = _Node->uExtension.sSlider.sStencilTex.sRB.fX / _Node->uExtension.sSlider.nTexWidth - 0.005f;
+			_texcoords.sRB.fY = _Node->uExtension.sSlider.sStencilTex.sRB.fY / _Node->uExtension.sSlider.nTexHeight - 0.005f;
 			BLF32 _oriw = _Node->uExtension.sSlider.sCommonTex.sRB.fX - _Node->uExtension.sSlider.sCommonTex.sLT.fX;
 			BLF32 _orih = _Node->uExtension.sSlider.sCommonTex.sRB.fY - _Node->uExtension.sSlider.sCommonTex.sLT.fY;
 			BLF32 _dstw = _Node->uExtension.sSlider.sStencilTex.sRB.fX - _Node->uExtension.sSlider.sStencilTex.sLT.fX;
@@ -6279,32 +6279,32 @@ _DrawSlider(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			1.f,
 			1.f,
 			1.f * _gray,
-			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
-			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth + 0.005f,
+			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight + 0.005f,
 			PIXEL_ALIGNED_INTERNAL(_sx + _Node->uExtension.sSlider.sSliderSize.fX * 0.5f),
 			PIXEL_ALIGNED_INTERNAL(_sy - _Node->uExtension.sSlider.sSliderSize.fY * 0.5f),
 			1.f,
 			1.f,
 			1.f,
 			1.f * _gray,
-			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
-			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight,
+			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth - 0.005f,
+			_texcoord.sLT.fY / _Node->uExtension.sSlider.nTexHeight + 0.005f,
 			PIXEL_ALIGNED_INTERNAL(_sx - _Node->uExtension.sSlider.sSliderSize.fX * 0.5f),
 			PIXEL_ALIGNED_INTERNAL(_sy + _Node->uExtension.sSlider.sSliderSize.fY * 0.5f),
 			1.f,
 			1.f,
 			1.f,
 			1.f * _gray,
-			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth,
-			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight,
+			_texcoord.sLT.fX / _Node->uExtension.sSlider.nTexWidth + 0.005f,
+			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight - 0.005f,
 			PIXEL_ALIGNED_INTERNAL(_sx + _Node->uExtension.sSlider.sSliderSize.fX * 0.5f),
 			PIXEL_ALIGNED_INTERNAL(_sy + _Node->uExtension.sSlider.sSliderSize.fY *0.5f),
 			1.f,
 			1.f,
 			1.f,
 			1.f * _gray,
-			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth,
-			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight
+			_texcoord.sRB.fX / _Node->uExtension.sSlider.nTexWidth - 0.005f,
+			_texcoord.sRB.fY / _Node->uExtension.sSlider.nTexHeight - 0.005f
 		};
 		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
@@ -6342,10 +6342,10 @@ _DrawText(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		if (_Node->uExtension.sText.aStencilMap[0] && strcmp(_Node->uExtension.sText.aStencilMap, "Nil"))
 		{
 			_stencil = -1.f;
-			_texcoords.sLT.fX = _Node->uExtension.sText.sStencilTex.sLT.fX / _Node->uExtension.sText.nTexWidth + 0.001f;
-			_texcoords.sLT.fY = _Node->uExtension.sText.sStencilTex.sLT.fY / _Node->uExtension.sText.nTexHeight + 0.001f;
-			_texcoords.sRB.fX = _Node->uExtension.sText.sStencilTex.sRB.fX / _Node->uExtension.sText.nTexWidth - 0.001f;
-			_texcoords.sRB.fY = _Node->uExtension.sText.sStencilTex.sRB.fY / _Node->uExtension.sText.nTexHeight - 0.001f;
+			_texcoords.sLT.fX = _Node->uExtension.sText.sStencilTex.sLT.fX / _Node->uExtension.sText.nTexWidth + 0.005f;
+			_texcoords.sLT.fY = _Node->uExtension.sText.sStencilTex.sLT.fY / _Node->uExtension.sText.nTexHeight + 0.005f;
+			_texcoords.sRB.fX = _Node->uExtension.sText.sStencilTex.sRB.fX / _Node->uExtension.sText.nTexWidth - 0.005f;
+			_texcoords.sRB.fY = _Node->uExtension.sText.sStencilTex.sRB.fY / _Node->uExtension.sText.nTexHeight - 0.005f;
 			BLF32 _oriw = _Node->uExtension.sText.sCommonTex.sRB.fX - _Node->uExtension.sText.sCommonTex.sLT.fX;
 			BLF32 _orih = _Node->uExtension.sText.sCommonTex.sRB.fY - _Node->uExtension.sText.sCommonTex.sLT.fY;
 			BLF32 _dstw = _Node->uExtension.sText.sStencilTex.sRB.fX - _Node->uExtension.sText.sStencilTex.sLT.fX;
@@ -7029,10 +7029,10 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		if (_Node->uExtension.sProgress.aStencilMap[0] && strcmp(_Node->uExtension.sProgress.aStencilMap, "Nil"))
 		{
 			_stencil = -1.f;
-			_texcoords.sLT.fX = _Node->uExtension.sProgress.sStencilTex.sLT.fX / _Node->uExtension.sProgress.nTexWidth + 0.001f;
-			_texcoords.sLT.fY = _Node->uExtension.sProgress.sStencilTex.sLT.fY / _Node->uExtension.sProgress.nTexHeight + 0.001f;
-			_texcoords.sRB.fX = _Node->uExtension.sProgress.sStencilTex.sRB.fX / _Node->uExtension.sProgress.nTexWidth - 0.001f;
-			_texcoords.sRB.fY = _Node->uExtension.sProgress.sStencilTex.sRB.fY / _Node->uExtension.sProgress.nTexHeight - 0.001f;
+			_texcoords.sLT.fX = _Node->uExtension.sProgress.sStencilTex.sLT.fX / _Node->uExtension.sProgress.nTexWidth + 0.005f;
+			_texcoords.sLT.fY = _Node->uExtension.sProgress.sStencilTex.sLT.fY / _Node->uExtension.sProgress.nTexHeight + 0.005f;
+			_texcoords.sRB.fX = _Node->uExtension.sProgress.sStencilTex.sRB.fX / _Node->uExtension.sProgress.nTexWidth - 0.005f;
+			_texcoords.sRB.fY = _Node->uExtension.sProgress.sStencilTex.sRB.fY / _Node->uExtension.sProgress.nTexHeight - 0.005f;
 			BLF32 _oriw = _Node->uExtension.sProgress.sCommonTex.sRB.fX - _Node->uExtension.sProgress.sCommonTex.sLT.fX;
 			BLF32 _orih = _Node->uExtension.sProgress.sCommonTex.sRB.fY - _Node->uExtension.sProgress.sCommonTex.sLT.fY;
 			BLF32 _dstw = _Node->uExtension.sProgress.sStencilTex.sRB.fX - _Node->uExtension.sProgress.sStencilTex.sLT.fX;
@@ -7475,32 +7475,32 @@ _DrawProgress(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			_texcoords.sLT.fY,
 			1.f * _stencil,
 			1.f * _gray,
-			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
-			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth + 0.005f,
+			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight + 0.005f,
 			PIXEL_ALIGNED_INTERNAL(_X + _Width * (_perc - 0.5f) - _offsetx),
 			PIXEL_ALIGNED_INTERNAL(_Y - _Height * 0.5f + _offsety),
 			_texcoords.sRB.fX,
 			_texcoords.sLT.fY,
 			1.f * _stencil,
 			1.f * _gray,
-			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
-			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight,
+			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth - 0.005f,
+			_texcoord.sLT.fY / _Node->uExtension.sProgress.nTexHeight + 0.005f,
 			PIXEL_ALIGNED_INTERNAL(_X - _Width * 0.5f + _offsetx),
 			PIXEL_ALIGNED_INTERNAL(_Y + _Height * 0.5f - _offsety),
 			_texcoords.sLT.fX,
 			_texcoords.sRB.fY,
 			1.f * _stencil,
 			1.f * _gray,
-			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth,
-			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight,
+			_texcoord.sLT.fX / _Node->uExtension.sProgress.nTexWidth + 0.005f,
+			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight - 0.005f,
 			PIXEL_ALIGNED_INTERNAL(_X + _Width * (_perc - 0.5f) - _offsetx),
 			PIXEL_ALIGNED_INTERNAL(_Y + _Height *0.5f - _offsety),
 			_texcoords.sRB.fX,
 			_texcoords.sRB.fY,
 			1.f * _stencil,
 			1.f * _gray,
-			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth,
-			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight
+			_texcoord.sRB.fX / _Node->uExtension.sProgress.nTexWidth - 0.005f,
+			_texcoord.sRB.fY / _Node->uExtension.sProgress.nTexHeight - 0.005f
 		};
 		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
@@ -7557,10 +7557,10 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 		if (_Node->uExtension.sTable.aStencilMap[0] && strcmp(_Node->uExtension.sTable.aStencilMap, "Nil"))
 		{
 			_stencil = -1.f;
-			_texcoords.sLT.fX = _Node->uExtension.sTable.sStencilTex.sLT.fX / _Node->uExtension.sTable.nTexWidth + 0.001f;
-			_texcoords.sLT.fY = _Node->uExtension.sTable.sStencilTex.sLT.fY / _Node->uExtension.sTable.nTexHeight + 0.001f;
-			_texcoords.sRB.fX = _Node->uExtension.sTable.sStencilTex.sRB.fX / _Node->uExtension.sTable.nTexWidth - 0.001f;
-			_texcoords.sRB.fY = _Node->uExtension.sTable.sStencilTex.sRB.fY / _Node->uExtension.sTable.nTexHeight - 0.001f;
+			_texcoords.sLT.fX = _Node->uExtension.sTable.sStencilTex.sLT.fX / _Node->uExtension.sTable.nTexWidth + 0.005f;
+			_texcoords.sLT.fY = _Node->uExtension.sTable.sStencilTex.sLT.fY / _Node->uExtension.sTable.nTexHeight + 0.005f;
+			_texcoords.sRB.fX = _Node->uExtension.sTable.sStencilTex.sRB.fX / _Node->uExtension.sTable.nTexWidth - 0.005f;
+			_texcoords.sRB.fY = _Node->uExtension.sTable.sStencilTex.sRB.fY / _Node->uExtension.sTable.nTexHeight - 0.005f;
 			BLF32 _oriw = _Node->uExtension.sTable.sCommonTex.sRB.fX - _Node->uExtension.sTable.sCommonTex.sLT.fX;
 			BLF32 _orih = _Node->uExtension.sTable.sCommonTex.sRB.fY - _Node->uExtension.sTable.sCommonTex.sLT.fY;
 			BLF32 _dstw = _Node->uExtension.sTable.sStencilTex.sRB.fX - _Node->uExtension.sTable.sStencilTex.sLT.fX;
@@ -8067,32 +8067,32 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 				1.f,
 				1.f * _stencil,
 				1.f * _gray,
-				_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
-				_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+				_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth + 0.005f,
+				_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight + 0.005f,
 				PIXEL_ALIGNED_INTERNAL(_rc.sRB.fX - _offsetx),
 				PIXEL_ALIGNED_INTERNAL(_rc.sLT.fY + _offsety),
 				1.f,
 				1.f,
 				1.f * _stencil,
 				1.f * _gray,
-				_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
-				_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight,
+				_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth - 0.005f,
+				_texcoord.sLT.fY / _Node->uExtension.sTable.nTexHeight + 0.005f,
 				PIXEL_ALIGNED_INTERNAL(_rc.sLT.fX + _offsetx),
 				PIXEL_ALIGNED_INTERNAL(_rc.sRB.fY - _offsety),
 				1.f,
 				1.f,
 				1.f * _stencil,
 				1.f * _gray,
-				_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth,
-				_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight,
+				_texcoord.sLT.fX / _Node->uExtension.sTable.nTexWidth + 0.005f,
+				_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight - 0.005f,
 				PIXEL_ALIGNED_INTERNAL(_rc.sRB.fX + _offsetx),
 				PIXEL_ALIGNED_INTERNAL(_rc.sRB.fY - _offsety),
 				1.f,
 				1.f,
 				1.f * _stencil,
 				1.f * _gray,
-				_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth,
-				_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight
+				_texcoord.sRB.fX / _Node->uExtension.sTable.nTexWidth - 0.005f,
+				_texcoord.sRB.fY / _Node->uExtension.sTable.nTexHeight - 0.005f
 			};
 			blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sTable.nPixmapTex, 0);
 			blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
@@ -8757,10 +8757,10 @@ _DrawDial(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 			if (_Node->uExtension.sDial.aStencilMap[0] && strcmp(_Node->uExtension.sDial.aStencilMap, "Nil"))
 			{
 				_stencil = -1.f;
-				_texcoords.sLT.fX = _Node->uExtension.sDial.sStencilTex.sLT.fX / _Node->uExtension.sDial.nTexWidth + 0.001f;
-				_texcoords.sLT.fY = _Node->uExtension.sDial.sStencilTex.sLT.fY / _Node->uExtension.sDial.nTexHeight + 0.001f;
-				_texcoords.sRB.fX = _Node->uExtension.sDial.sStencilTex.sRB.fX / _Node->uExtension.sDial.nTexWidth - 0.001f;
-				_texcoords.sRB.fY = _Node->uExtension.sDial.sStencilTex.sRB.fY / _Node->uExtension.sDial.nTexHeight - 0.001f;
+				_texcoords.sLT.fX = _Node->uExtension.sDial.sStencilTex.sLT.fX / _Node->uExtension.sDial.nTexWidth + 0.005f;
+				_texcoords.sLT.fY = _Node->uExtension.sDial.sStencilTex.sLT.fY / _Node->uExtension.sDial.nTexHeight + 0.005f;
+				_texcoords.sRB.fX = _Node->uExtension.sDial.sStencilTex.sRB.fX / _Node->uExtension.sDial.nTexWidth - 0.005f;
+				_texcoords.sRB.fY = _Node->uExtension.sDial.sStencilTex.sRB.fY / _Node->uExtension.sDial.nTexHeight - 0.005f;
 			}
 			else
 			{

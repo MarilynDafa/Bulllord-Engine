@@ -166,7 +166,8 @@ BL_API BLBool blSpriteAsEmit(
     IN BLF32 _RotVariance,
 	IN BLF32 _Scale,
     IN BLF32 _ScaleVariance,
-    IN BLU32 _FadeColor);
+    IN BLU32 _FadeColor,
+	IN BLBool _Off);
     
 BL_API BLBool blSpriteAsCursor(
     IN BLGuid _ID);
