@@ -259,6 +259,7 @@ _LoadSpine(BLGuid _ID, const BLAnsi* _Filename, BLVoid** _ExtData)
 	_sd->pState = spAnimationState_create(spAnimationStateData_create(_sd->pSkeletonData));
 	_sd->pSkeleton->x = 0.f;
 	_sd->pSkeleton->y = _sd->pSkeletonData->height * 0.5f;
+	blSpriteDimension(_ID, _sd->pSkeletonData->width, _sd->pSkeletonData->height, FALSE);
 	spSkeleton_updateWorldTransform(_sd->pSkeleton);
 	if (*_ExtData)
 	{

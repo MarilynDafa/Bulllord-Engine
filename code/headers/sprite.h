@@ -82,6 +82,12 @@ BL_API BLBool blSpriteVisibility(
 	IN BLBool _Show,
     IN BLBool _Passdown);
 
+BL_API BLBool blSpriteDimension(
+	IN BLGuid _ID,
+	IN BLF32 _Width,
+	IN BLF32 _Height,
+	IN BLBool _Passdown);
+
 BL_API BLBool blSpriteFlip(
 	IN BLGuid _ID,
 	IN BLBool _FlipX,

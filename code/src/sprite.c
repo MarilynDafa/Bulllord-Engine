@@ -1756,6 +1756,23 @@ blSpriteVisibility(IN BLGuid _ID, IN BLBool _Show, IN BLBool _Passdown)
     return TRUE;
 }
 BLBool 
+blSpriteDimension(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _Height, IN BLBool _Passdown)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return FALSE;
+	_node->sSize.fX = _Width;
+	_node->sSize.fY = _Height;
+	if (_Passdown)
+	{
+		for (BLU32 _idx = 0; _idx < _node->nChildren; ++_idx)
+			blSpriteDimension(_node->pChildren[_idx]->nID, _Width, _Height, _Passdown);
+	}
+	return TRUE;
+}
+BLBool 
 blSpriteFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY, IN BLBool _Passdown)
 {
 	if (_ID == INVALID_GUID)
