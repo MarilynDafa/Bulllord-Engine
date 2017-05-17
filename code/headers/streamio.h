@@ -26,8 +26,7 @@ extern "C" {
 #endif
 
 BL_API BLGuid blGenStream(
-	IN BLAnsi* _Filename,
-	IN BLAnsi* _Archive);
+	IN BLAnsi* _Filename);
 
 BL_API BLBool blDeleteStream(
 	IN BLGuid _ID);
@@ -59,7 +58,7 @@ BL_API BLVoid blStreamSeek(
 	IN BLU32 _Pos);
 
 BL_API BLBool blFileExist(
-	IN BLAnsi* _Filename);
+	IN BLAnsi* _AbsFilename);
     
 BL_API BLBool blFileWrite(
 	IN BLAnsi* _Filename,

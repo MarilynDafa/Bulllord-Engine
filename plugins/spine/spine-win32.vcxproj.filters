@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="externals">
+      <UniqueIdentifier>{2e72aa2d-c452-4913-b97f-7266af8fe76c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="spineentry.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationState.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationStateData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Atlas.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="AtlasAttachmentLoader.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Attachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="AttachmentLoader.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Bone.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="BoneData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="BoundingBoxAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="EventData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="extension.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="IkConstraint.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="IkConstraintData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Json.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="PathAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="PathConstraint.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="PathConstraintData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="RegionAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Skeleton.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonBinary.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonBounds.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletonJson.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Skin.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="Slot.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="SlotData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformConstraint.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformConstraintData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="spineentry.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationState.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationStateData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="Atlas.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="AtlasAttachmentLoader.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="Attachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="AttachmentLoader.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="Bone.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="BoneData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingBoxAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="EventData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="extension.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="IkConstraint.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="IkConstraintData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="Json.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="kvec.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="PathAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="PathConstraint.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="PathConstraintData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="RegionAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="Skeleton.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonBinary.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonBounds.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletonJson.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="Skin.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="Slot.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="SlotData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="spine.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformConstraint.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformConstraintData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

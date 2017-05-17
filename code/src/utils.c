@@ -354,6 +354,110 @@ blMD5String(IN BLAnsi* _Str)
 		sprintf(_PrUtilsMem->aMd5Buf, "%s%02x", _PrUtilsMem->aMd5Buf, _digest[_i]);
 	return _PrUtilsMem->aMd5Buf;
 }
+BLS32 
+blNatCompare(IN BLAnsi* _StrA, IN BLAnsi* _StrB)
+{
+	BLS32 _ai, _bi, _fractional, _result;
+	BLAnsi _ca, _cb;
+	_ai = _bi = 0;
+	while (1) 
+	{
+		_ca = _StrA[_ai]; 
+		_cb = _StrB[_bi];
+		while (isspace(_ca))
+			_ca = _StrA[++_ai];
+		while (isspace(_cb))
+			_cb = _StrB[++_bi];
+		if (isdigit(_ca) && isdigit(_cb))
+		{
+			_fractional = (_ca == '0' || _cb == '0');
+			if (_fractional) 
+			{
+				BLAnsi* _tmpa = (BLAnsi*)_StrA + _ai;
+				BLAnsi* _tmpb = (BLAnsi*)_StrB + _bi;
+				for (;; _tmpa++, _tmpb++)
+				{
+					if (!isdigit(*_tmpa) && !isdigit(*_tmpb))
+					{
+						_result = 0;
+						break;
+					}
+					if (!isdigit(*_tmpa))
+					{
+						_result = -1;
+						break;
+					}
+					if (!isdigit(*_tmpb))
+					{
+						_result = +1;
+						break;
+					}
+					if (*_tmpa < *_tmpb)
+					{
+						_result = -1;
+						break;
+					}
+					if (*_tmpa > *_tmpb)
+					{
+						_result = +1;
+						break;
+					}
+				}
+				if (_result)
+					return _result;
+			}
+			else 
+			{
+				BLS32 _bias = 0;
+				BLAnsi* _tmpa = (BLAnsi*)_StrA + _ai;
+				BLAnsi* _tmpb = (BLAnsi*)_StrB + _bi;
+				for (;; _tmpa++, _tmpb++)
+				{
+					if (!isdigit(*_tmpa) && !isdigit(*_tmpb))
+					{
+						_result = _bias;
+						break;
+					}
+					if (!isdigit(*_tmpa))
+					{
+						_result = -1;
+						break;
+					}
+					if (!isdigit(*_tmpb))
+					{
+						_result = +1;
+						break;
+					}
+					if (*_tmpa < *_tmpb)
+					{
+						if (!_bias)
+							_bias = -1;
+					}
+					else if (*_tmpa > *_tmpb)
+					{
+						if (!_bias)
+							_bias = +1;
+					}
+					else if (!*_tmpa && !*_tmpb)
+					{
+						_result = _bias;
+						break;
+					}
+				}
+				if (_result)
+					return _result;
+			}
+		}
+		if (!_ca && !_cb)
+			return 0;
+		if (_ca < _cb)
+			return -1;
+		if (_ca > _cb)
+			return +1;
+		++_ai; ++_bi;
+	}
+	return 0;
+}
 BLU32
 blHashUtf8(IN BLUtf8* _Str)
 {
@@ -982,7 +1086,7 @@ blDeleteUtf8Str(INOUT BLUtf8* _Str)
 	_Str = NULL;
 }
 const BLUtf8*
-blGetExtNameUtf8(IN BLUtf8* _Filename)
+blFileSuffixUtf8(IN BLUtf8* _Filename)
 {
 	if (!_Filename)
 		return NULL;
@@ -1009,7 +1113,7 @@ blGetExtNameUtf8(IN BLUtf8* _Filename)
 	return _ext + 1;
 }
 const BLUtf16*
-blGetExtNameUtf16(IN BLUtf16* _Filename)
+blFileSuffixUtf16(IN BLUtf16* _Filename)
 {
 	if (!_Filename)
 		return NULL;

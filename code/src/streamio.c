@@ -1,4 +1,4 @@
-/*
+﻿/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
  
@@ -74,8 +74,7 @@ typedef struct _BpkArchive{
 typedef struct _ResNode {
 	BLVoid* pRes;
 	BLAnsi nFilename[260];
-	BLAnsi nArchive[260];
-	BLBool(*fLoad)(BLVoid*, const BLAnsi*, const BLAnsi*);
+	BLBool(*fLoad)(BLVoid*, const BLAnsi*);
 	BLBool(*fSetup)(BLVoid*);
 	BLGuid nGuid;
 }_BLResNode;
@@ -121,7 +120,7 @@ _ProcessDmlRow(BLVoid* _Db, BLS32 _Count, BLAnsi** _Values, BLAnsi** _Columns)
     return 0;
 }
 BLBool
-_FetchResource(const BLAnsi* _Filename, const BLAnsi* _Archive, BLVoid** _Res, BLGuid _ID, BLBool(*_Load)(BLVoid*, const BLAnsi*, const BLAnsi*), BLBool(*_Setup)(BLVoid*), BLBool _Async)
+_FetchResource(const BLAnsi* _Filename, BLVoid** _Res, BLGuid _ID, BLBool(*_Load)(BLVoid*, const BLAnsi*), BLBool(*_Setup)(BLVoid*), BLBool _Async)
 {
 	_BLResNode* _node = NULL;
 	{
@@ -151,18 +150,15 @@ _FetchResource(const BLAnsi* _Filename, const BLAnsi* _Archive, BLVoid** _Res, B
 		blMutexUnlock(_PrStreamIOMem->pSetupQueue->pMutex);
 		if (!_Async)
 		{
-			_Load(*_Res, _Filename, _Archive);
+			_Load(*_Res, _Filename);
 			_Setup(*_Res);
 			return TRUE;
 		}
 		else
 		{
 			_node = (_BLResNode*)malloc(sizeof(_BLResNode));
-			memset(_node->nArchive, 0, sizeof(_node->nArchive));
 			memset(_node->nFilename, 0, sizeof(_node->nFilename));
 			strcpy(_node->nFilename, _Filename);
-			if (_Archive)
-				strcpy(_node->nArchive, _Archive);
             _node->pRes = _Res ? *_Res : NULL;
 			_node->fSetup = _Setup;
 			_node->fLoad = _Load;
@@ -228,11 +224,7 @@ _LoadThreadFunc(BLVoid* _Userdata)
 		{
 			blMutexLock(_PrStreamIOMem->pLoadingQueue->pMutex);
 			_BLResNode* _res = (_BLResNode*)blListFrontElement(_PrStreamIOMem->pLoadingQueue);
-			BLBool _ret;
-			if (_res->nArchive[0] == 0)
-				_ret = _res->fLoad(_res->pRes, _res->nFilename, NULL);
-			else
-				_ret = _res->fLoad(_res->pRes, _res->nFilename, _res->nArchive);
+			BLBool _ret = _res->fLoad(_res->pRes, _res->nFilename);
 			blListPopFront(_PrStreamIOMem->pLoadingQueue);
 			blMutexUnlock(_PrStreamIOMem->pLoadingQueue->pMutex);
 			if (_ret)
@@ -264,6 +256,54 @@ _StreamIOInit(duk_context* _DKC, BLVoid* _AssetMgr)
 	_PrStreamIOMem->pSetupQueue = blGenList(TRUE);
 	_PrStreamIOMem->pLoadThread = blGenThread(_LoadThreadFunc, NULL, NULL);
 	blThreadRun(_PrStreamIOMem->pLoadThread);
+	blArchiveRegist("localdata0079.bpk", "localdata0079");
+	blArchiveRegist("remotedata0084.bpk", "remotedata0084");
+	BLAnsi _path[MAX_PATH];
+	strcpy(_path, blUserFolderDir());
+	BLAnsi** _pats = NULL;
+	BLU32 _patnum = 0;
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+	WIN32_FIND_DATA _filedata;
+	HANDLE _filelist;
+	strcat(_path, "*.pat");
+	_filelist = FindFirstFile(_path, &_filedata);
+	do
+	{
+		if (_filedata.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
+		{
+			_patnum++;
+			_pats = (BLAnsi**)realloc(_pats, _patnum * sizeof(BLAnsi*));
+			_pats[_patnum - 1] = (BLAnsi*)alloca(strlen(_filedata.cFileName) + 1);
+			strcpy(_pats[_patnum - 1], _filedata.cFileName);
+			_pats[_patnum - 1][strlen(_filedata.cFileName)] = 0;
+		}
+	} while (FindNextFile(_filelist, &_filedata));
+#else
+#endif
+	for (BLU32 _idx = 0; _idx < _patnum; ++_idx)
+	{
+		for (BLU32 _jdx = 0; _idx + _jdx < _patnum - 1; ++_jdx)
+		{
+			if (blNatCompare(_pats[_jdx], _pats[_jdx + 1]) > 0)
+			{
+				BLAnsi* _temp = _pats[_jdx];
+				_pats[_jdx] = _pats[_jdx + 1];
+				_pats[_jdx + 1] = _temp;
+			}
+		}
+	}
+	for (BLU32 _idx = 0; _idx < _patnum; ++_idx)
+	{
+		memset(_path, 0, sizeof(_path));
+		strcpy(_path, blUserFolderDir());
+		strcat(_path, _pats[_idx]);
+		if (!strncmp(_pats[_idx], "local", 5))
+			blArchivePatch(_path, "localdata0079");
+		else if (!strncmp(_pats[_idx], "remot", 5))
+			blArchivePatch(_path, "remotedata0084");
+	}
+	if (_pats)
+		free(_pats);
 	blDebugOutput("IO initialize successfully");
 }
 BLVoid
@@ -318,32 +358,96 @@ _StreamIODestroy()
 	free(_PrStreamIOMem);
 }
 BLGuid
-blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
+blGenStream(IN BLAnsi* _Filename)
 {
-    if (!_Archive && _Filename)
+	if (_Filename)
 	{
+		BLU32 _id, _i;
+		BLAnsi _tmpname[260];
 		_BLStream* _ret = NULL;
-        BLAnsi _trfilename[260] = { 0 };
-        BLU32 _filelen = (BLU32)strlen(_Filename);
-        for (BLU32 _idx = 0; _idx < _filelen; ++_idx)
-        {
+		_BLBpkFileEntry* _file = NULL;
+		FOREACH_ARRAY(_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
+		{
+			memset(_tmpname, 0, sizeof(_tmpname));
+			strcpy(_tmpname, _Filename);
+			BLU32 _tmplen = (BLU32)strlen(_tmpname);
+			for (_i = 0; _i < _tmplen; ++_i)
+			{
+				if (_tmpname[_i] == '\\')
+					_tmpname[_i] = '/';
+			}
+			_id = blHashUtf8((const BLUtf8*)_tmpname);
+			_file = (_BLBpkFileEntry*)blDictElement(_iter->pFiles, _id);
+			if (_file) 
+			{
+				uLongf _sz;
+				BLS32 _uncmpsz;
+				BLU8* _cdata;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-            if (_Filename[_idx] == '/')
-                _trfilename[_idx] = '\\';
+#ifdef WINAPI_FAMILY
+				WCHAR _wfilename[260] = { 0 };
+				MultiByteToWideChar(CP_UTF8, 0, _file->pPatch ? _file->pPatch : _iter->pPath, -1, _wfilename, sizeof(_wfilename));
+				HANDLE _fp = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
 #else
-            if (_Filename[_idx] == '\\')
-                _trfilename[_idx] = '/';
+				HANDLE _fp = CreateFileA(_file->pPatch ? _file->pPatch : _iter->pPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
-            else
-                _trfilename[_idx] = _Filename[_idx];
-        }
+				LARGE_INTEGER _li;
+				_li.LowPart = _file->nOffset;
+				_li.HighPart = 0;
+				SetFilePointerEx(_fp, _li, NULL, FILE_BEGIN);
+				ReadFile(_fp, &_uncmpsz, sizeof(BLU32), NULL, NULL);
+				_cdata = (BLU8*)malloc(_file->nLength);
+				ReadFile(_fp, _cdata, _file->nLength, NULL, NULL);
+				CloseHandle(_fp);
+#elif defined(BL_PLATFORM_ANDROID)
+				AAsset* _fp = AAssetManager_open(_PrStreamIOMem->pAndroidAM, _file->pPatch ? _file->pPatch : _iter->pPath, AASSET_MODE_UNKNOWN);
+				assert(_fp != NULL);
+				AAsset_seek(_fp, _file->nOffset, SEEK_SET);
+				AAsset_read(_fp, &_uncmpsz, sizeof(BLU32) * 1);
+				_cdata = (BLU8*)malloc(_file->nLength);
+				AAsset_read(_fp, _cdata, sizeof(BLU8) * _file->nLength);
+				AAsset_close(_fp);
+#else
+				FILE* _fp = fopen(_file->pPatch ? _file->pPatch : _iter->pPath, "rb");
+				assert(_fp != NULL);
+				fseek(_fp, _file->nOffset, SEEK_SET);
+				fread(&_uncmpsz, sizeof(BLU32), 1, _fp);
+				_cdata = (BLU8*)malloc(_file->nLength);
+				fread(_cdata, sizeof(BLU8), _file->nLength, _fp);
+				fclose(_fp);
+#endif
+				_ret = (_BLStream*)malloc(sizeof(_BLStream));
+				_ret->pBuffer = malloc(_uncmpsz);
+				_ret->nLen = _uncmpsz;
+				_ret->pPos = (BLU8*)_ret->pBuffer;
+				_ret->pEnd = _ret->pPos + _ret->nLen;
+				_sz = _uncmpsz;
+				uncompress((Bytef*)_ret->pBuffer, &_sz, _cdata, _file->nLength);
+				free(_cdata);
+				return blGenGuid(_ret, _id);
+			}
+		}
+		BLAnsi _path[260] = { 0 };
+		strcpy(_path, blWorkingDir());
+		strcat(_path, _Filename);
+		BLU32 _tmplen = (BLU32)strlen(_path);
+		for (_i = 0; _i < _tmplen; ++_i)
+		{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+			if (_path[_i] == '/')
+				_path[_i] = '\\';
+#else
+			if (_path[_i] == '\\')
+				_path[_i] = '/';
+#endif
+		}
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 		WCHAR _wfilename[260] = { 0 };
-		MultiByteToWideChar(CP_UTF8, 0, _trfilename, -1, _wfilename, sizeof(_wfilename));
+		MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
 		HANDLE _fp = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
 #else
-		HANDLE _fp = CreateFileA(_trfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		HANDLE _fp = CreateFileA(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
 		if (FILE_INVALID_INTERNAL(_fp))
 		{
@@ -358,76 +462,14 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 			_ret->pPos = (BLU8*)_ret->pBuffer;
 			_ret->pEnd = _ret->pPos + _ret->nLen;
 			CloseHandle(_fp);
-			return blGenGuid(_ret, blHashUtf8(_trfilename));
+			return blGenGuid(_ret, blHashUtf8(_path));
 		}
 		else
-			return INVALID_GUID;
-#elif defined(BL_PLATFORM_ANDROID)
-		AAsset* _fp = AAssetManager_open(_PrStreamIOMem->pAndroidAM, _trfilename, AASSET_MODE_UNKNOWN);
-		if (FILE_INVALID_INTERNAL(_fp))
 		{
-			BLU32 _datasz;
-			_datasz = (BLU32)AAsset_getLength(_fp);
-			_ret = (_BLStream*)malloc(sizeof(_BLStream));
-			_ret->pBuffer = malloc(_datasz);
-			AAsset_read(_fp, _ret->pBuffer, _datasz);
-			_ret->nLen = _datasz;
-			_ret->pPos = (BLU8*)_ret->pBuffer;
-			_ret->pEnd = _ret->pPos + _ret->nLen;
-			AAsset_close(_fp);
-			return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_trfilename));
-		}
-		else
-			return INVALID_GUID;
-#else
-		FILE* _fp = fopen(_trfilename, "rb");
-		if (FILE_INVALID_INTERNAL(_fp))
-		{
-			BLU32 _datasz;
-			fseek(_fp, 0, SEEK_END);
-			_datasz = (BLU32)ftell(_fp);
-			fseek(_fp, 0, SEEK_SET);
-			_ret = (_BLStream*)malloc(sizeof(_BLStream));
-			_ret->pBuffer = malloc(_datasz);
-			fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp);
-			_ret->nLen = _datasz;
-			_ret->pPos = (BLU8*)_ret->pBuffer;
-			_ret->pEnd = _ret->pPos + _ret->nLen;
-			fclose(_fp);
-			return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_trfilename));
-        }
-		else
-			return INVALID_GUID;
-#endif
-	}
-	else if (_Archive && _Filename)
-	{
-		BLU32 _id, _i;
-		BLAnsi _tmpname[260];
-		_BLStream* _ret = NULL;
-		_BLBpkFileEntry* _file = NULL;
-		FOREACH_ARRAY(_BLBpkArchive*, _iter, _PrStreamIOMem->pArchives)
-		{
-			if (!strcmp(_iter->pArchive, _Archive))
-				break;
-		}
-		strcpy(_tmpname, _Filename);
-        BLU32 _tmplen = (BLU32)strlen(_tmpname);
-		for (_i = 0; _i < _tmplen; ++_i)
-		{
-			if (_tmpname[_i] == '\\')
-				_tmpname[_i] = '/';
-		}
-		_id = blHashUtf8((const BLUtf8*)_tmpname);
-        if (_iter)
-            _file = (_BLBpkFileEntry*)blDictElement(_iter->pFiles, _id);
-		if (!_file)
-		{
-			_BLStream* _ret = NULL;
-			BLAnsi _path[260] = { 0 };
-			strcpy(_path, blWorkingDir(TRUE));
-            strcat(_path, _Filename);
-            _tmplen = (BLU32)strlen(_path);
+			memset(_path, 0, sizeof(_path));
+			strcpy(_path, blUserFolderDir());
+			strcat(_path, _Filename);
+			BLU32 _tmplen = (BLU32)strlen(_path);
 			for (_i = 0; _i < _tmplen; ++_i)
 			{
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -438,13 +480,12 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 					_path[_i] = '/';
 #endif
 			}
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
-			WCHAR _wfilename[260] = { 0 };
+			memset(_wfilename, 0, sizeof(_wfilename));
 			MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
-			HANDLE _fp = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
+			_fp = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
 #else
-			HANDLE _fp = CreateFileA(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			_fp = CreateFileA(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
 			if (FILE_INVALID_INTERNAL(_fp))
 			{
@@ -463,25 +504,91 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 			}
 			else
 				return INVALID_GUID;
+		}
 #elif defined(BL_PLATFORM_ANDROID)
-			AAsset* _fp = AAssetManager_open(_PrStreamIOMem->pAndroidAM, _path, AASSET_MODE_UNKNOWN);
-			if (FILE_INVALID_INTERNAL(_fp))
+		AAsset* _fp = AAssetManager_open(_PrStreamIOMem->pAndroidAM, _path, AASSET_MODE_UNKNOWN);
+		if (FILE_INVALID_INTERNAL(_fp))
+		{
+			BLU32 _datasz;
+			_datasz = (BLU32)AAsset_getLength(_fp);
+			_ret = (_BLStream*)malloc(sizeof(_BLStream));
+			_ret->pBuffer = malloc(_datasz);
+			AAsset_read(_fp, _ret->pBuffer, _datasz);
+			_ret->nLen = _datasz;
+			_ret->pPos = (BLU8*)_ret->pBuffer;
+			_ret->pEnd = _ret->pPos + _ret->nLen;
+			AAsset_close(_fp);
+			return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_path));
+		}
+		else
+		{
+			memset(_path, 0, sizeof(_path));
+			strcpy(_path, blUserFolderDir());
+			strcat(_path, _Filename);
+			BLU32 _tmplen = (BLU32)strlen(_path);
+			for (_i = 0; _i < _tmplen; ++_i)
+			{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+				if (_path[_i] == '/')
+					_path[_i] = '\\';
+#else
+				if (_path[_i] == '\\')
+					_path[_i] = '/';
+#endif
+			}
+			FILE* _fp2 = fopen(_path, "rb");
+			if (FILE_INVALID_INTERNAL(_fp2))
 			{
 				BLU32 _datasz;
-				_datasz = (BLU32)AAsset_getLength(_fp);
+				fseek(_fp2, 0, SEEK_END);
+				_datasz = (BLU32)ftell(_fp2);
+				fseek(_fp2, 0, SEEK_SET);
 				_ret = (_BLStream*)malloc(sizeof(_BLStream));
 				_ret->pBuffer = malloc(_datasz);
-				AAsset_read(_fp, _ret->pBuffer, _datasz);
+				fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp2);
 				_ret->nLen = _datasz;
 				_ret->pPos = (BLU8*)_ret->pBuffer;
 				_ret->pEnd = _ret->pPos + _ret->nLen;
-				AAsset_close(_fp);
+				fclose(_fp2);
 				return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_path));
 			}
 			else
 				return INVALID_GUID;
+		}
 #else
-			FILE* _fp = fopen(_path, "rb");
+		FILE* _fp = fopen(_path, "rb");
+		if (FILE_INVALID_INTERNAL(_fp))
+		{
+			BLU32 _datasz;
+			fseek(_fp, 0, SEEK_END);
+			_datasz = (BLU32)ftell(_fp);
+			fseek(_fp, 0, SEEK_SET);
+			_ret = (_BLStream*)malloc(sizeof(_BLStream));
+			_ret->pBuffer = malloc(_datasz);
+			fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp);
+			_ret->nLen = _datasz;
+			_ret->pPos = (BLU8*)_ret->pBuffer;
+			_ret->pEnd = _ret->pPos + _ret->nLen;
+			fclose(_fp);
+			return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_path));
+		}
+		else
+		{
+			memset(_path, 0, sizeof(_path));
+			strcpy(_path, blUserFolderDir());
+			strcat(_path, _Filename);
+			BLU32 _tmplen = (BLU32)strlen(_path);
+			for (_i = 0; _i < _tmplen; ++_i)
+			{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+				if (_path[_i] == '/')
+					_path[_i] = '\\';
+#else
+				if (_path[_i] == '\\')
+					_path[_i] = '/';
+#endif
+			}
+			_fp = fopen(_path, "rb");
 			if (FILE_INVALID_INTERNAL(_fp))
 			{
 				BLU32 _datasz;
@@ -499,56 +606,9 @@ blGenStream(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 			}
 			else
 				return INVALID_GUID;
-#endif
 		}
-		else
-		{
-			uLongf _sz;
-			BLS32 _uncmpsz;
-			BLU8* _cdata;
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-#ifdef WINAPI_FAMILY
-			WCHAR _wfilename[260] = { 0 };
-			MultiByteToWideChar(CP_UTF8, 0, _file->pPatch ? _file->pPatch : _iter->pPath, -1, _wfilename, sizeof(_wfilename));
-			HANDLE _fp = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
-#else
-			HANDLE _fp = CreateFileA(_file->pPatch ? _file->pPatch : _iter->pPath, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
-			LARGE_INTEGER _li;
-			_li.LowPart = _file->nOffset;
-			_li.HighPart = 0;
-			SetFilePointerEx(_fp, _li, NULL, FILE_BEGIN);
-			ReadFile(_fp, &_uncmpsz, sizeof(BLU32), NULL, NULL);
-			_cdata = (BLU8*)malloc(_file->nLength);
-			ReadFile(_fp, _cdata, _file->nLength, NULL, NULL);
-			CloseHandle(_fp);
-#elif defined(BL_PLATFORM_ANDROID)
-			AAsset* _fp = AAssetManager_open(_PrStreamIOMem->pAndroidAM, _file->pPatch ? _file->pPatch : _iter->pPath, AASSET_MODE_UNKNOWN);
-			assert(_fp != NULL);
-			AAsset_seek(_fp, _file->nOffset, SEEK_SET);
-			AAsset_read(_fp, &_uncmpsz, sizeof(BLU32) * 1);
-			_cdata = (BLU8*)malloc(_file->nLength);
-			AAsset_read(_fp, _cdata, sizeof(BLU8) * _file->nLength);
-			AAsset_close(_fp);
-#else
-			FILE* _fp = fopen(_file->pPatch ? _file->pPatch : _iter->pPath, "rb");
-			assert(_fp != NULL);
-			fseek(_fp, _file->nOffset, SEEK_SET);
-			fread(&_uncmpsz, sizeof(BLU32), 1, _fp);
-			_cdata = (BLU8*)malloc(_file->nLength);
-			fread(_cdata, sizeof(BLU8), _file->nLength, _fp);
-			fclose(_fp);
-#endif
-			_ret = (_BLStream*)malloc(sizeof(_BLStream));
-			_ret->pBuffer = malloc(_uncmpsz);
-			_ret->nLen = _uncmpsz;
-			_ret->pPos = (BLU8*)_ret->pBuffer;
-			_ret->pEnd = _ret->pPos + _ret->nLen;
-			_sz = _uncmpsz;
-			uncompress((Bytef*)_ret->pBuffer, &_sz, _cdata, _file->nLength);
-			free(_cdata);
-			return blGenGuid(_ret, _id);
-		}
+		return INVALID_GUID;
 	}
 	else
 	{
@@ -692,11 +752,11 @@ blStreamSeek(IN BLGuid _ID, IN BLU32 _Pos)
 		blDebugOutput("Invalid Operation blStreamSeek");
 }
 BLBool
-blFileExist(IN BLAnsi* _Filename)
+blFileExist(IN BLAnsi* _AbsFilename)
 {
 	BLU32 _i;
 	BLAnsi _tmpname[260];
-	strcpy(_tmpname, _Filename);
+	strcpy(_tmpname, _AbsFilename);
 	for (_i = 0; _i < strlen(_tmpname); ++_i)
 	{
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -802,7 +862,7 @@ blArchiveRegist(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
     _BLBpkFileHeader _header;
 	_BLBpkArchive* _ret;
     strcpy(_tmpname , _Filename);
-	strcpy(_path, blWorkingDir(TRUE));
+	strcpy(_path, blWorkingDir());
     strcat(_path, _tmpname);
 	for (_i = 0; _i < strlen(_path); ++_i)
 	{
@@ -1005,7 +1065,7 @@ blArchivePatch(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 	{
 		_inworkdir = TRUE;
 		memset(_path, 0, sizeof(_path));
-		strcpy(_path, blWorkingDir(TRUE));
+		strcpy(_path, blWorkingDir());
 		strcat(_path, _tmpname);
 		for (_i = 0; _i < strlen(_path); ++_i)
 		{
@@ -1213,7 +1273,7 @@ blGenSql(IN BLAnsi* _Dbname, IN BLAnsi* _Dbpwd, IN BLBool _Inmem)
             _tmpname[_i] = '/';
 #endif
     }
-    strcpy(_path , blWorkingDir(TRUE));
+    strcpy(_path , blWorkingDir());
     strcat(_path , _tmpname);
     _ret = sqlite3_open(_path, &_db);
     if (_ret != SQLITE_OK)

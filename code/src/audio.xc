@@ -55,7 +55,7 @@
 #endif
 #ifdef __cplusplus
 extern "C" {
-extern BLBool _FetchResource(const BLAnsi*, const BLAnsi*, BLVoid**, BLGuid, BLBool(*)(BLVoid*, const BLAnsi*, const BLAnsi*),BLBool(*)(BLVoid*), BLBool);
+extern BLBool _FetchResource(const BLAnsi*, BLVoid**, BLGuid, BLBool(*)(BLVoid*, const BLAnsi*),BLBool(*)(BLVoid*), BLBool);
 extern BLBool _DiscardResource(BLGuid, BLBool(*)(BLVoid*), BLBool(*)(BLVoid*));
 #endif
 #ifdef __cplusplus
@@ -313,35 +313,12 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx, BLU32* _TotalRead)
     return _ret;
 }
 static BLBool
-_LoadAudio(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
+_LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
-	if (_Archive)
-	{
-		_src->nStream = blGenStream(_Filename, _Archive);
-		if (_src->nStream == INVALID_GUID)
-			return FALSE;
-	}
-	else
-	{
-		BLAnsi _tmpname[260];
-		strcpy(_tmpname, _Filename);
-		BLAnsi _path[260] = { 0 };
-		strcpy(_path, blWorkingDir(TRUE));
-		strcat(_path, _tmpname);
-		BLBool _finded = FALSE;
-		_src->nStream = blGenStream(_path, NULL);
-		_finded = (_src->nStream != INVALID_GUID) ? TRUE : FALSE;
-		if (!_finded)
-		{
-			memset(_path, 0, sizeof(_path));
-			strcpy(_path, blUserFolderDir());
-			strcat(_path, _tmpname);
-			_src->nStream = blGenStream(_path, NULL);
-		}
-		if (!_finded)
-			return FALSE;
-	}
+	_src->nStream = blGenStream(_Filename);
+	if (_src->nStream == INVALID_GUID)
+		return FALSE;
 	_src->nOffset = 0;
 	_src->nSerialno = 0;
 	_src->nPageGranule = 0;
@@ -1285,7 +1262,7 @@ blEmitterPos(IN BLGuid _ID, IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 	blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 }
 BLGuid
-blGenAudio(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _Loop, IN BLBool _3D, IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
+blGenAudio(IN BLAnsi* _Filename, IN BLBool _Loop, IN BLBool _3D, IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLF32 _Zpos)
 {
 	_BLAudioSource* _sound = (_BLAudioSource*)malloc(sizeof(_BLAudioSource));
 	_sound->bLoop = _Loop;
@@ -1296,11 +1273,11 @@ blGenAudio(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _Loop, IN BLBool
 	_sound->nID = blGenGuid(_sound, blHashUtf8((const BLUtf8*)_Filename));
 	_sound->bValid = FALSE;
 #if defined(BL_USE_AL_API)
-	_FetchResource(_Filename, _Archive, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _ALSoundSetup, TRUE);
+	_FetchResource(_Filename, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _ALSoundSetup, TRUE);
 #elif defined(BL_USE_SL_API)
-	_FetchResource(_Filename, _Archive, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _SLSoundSetup, TRUE);
+	_FetchResource(_Filename, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _SLSoundSetup, TRUE);
 #elif defined(BL_USE_COREAUDIO_API)
-	_FetchResource(_Filename, _Archive, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _CASoundSetup, TRUE);
+	_FetchResource(_Filename, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _CASoundSetup, TRUE);
 #endif
 	return _sound->nID;
 }

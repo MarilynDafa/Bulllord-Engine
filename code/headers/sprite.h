@@ -24,10 +24,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+BL_API BLVoid blRegistExternalMethod(
+	IN BLAnsi* _Suffix,
+	IN BLBool(*_LoadCB)(BLGuid, const BLAnsi*, BLVoid**),
+	IN BLBool(*_SetupCB)(BLGuid, BLVoid**),
+	IN BLBool(*_UnloadCB)(BLGuid, BLVoid**),
+	IN BLBool(*_ReleaseCB)(BLGuid, BLVoid**),
+	IN BLVoid(*_DrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**));
+
 BL_API BLGuid blGenSprite(
 	IN BLAnsi* _Filename,
-	IN BLAnsi* _Archive,
 	IN BLAnsi* _Tag,
     IN BLF32 _Width,
     IN BLF32 _Height,
@@ -37,6 +43,10 @@ BL_API BLGuid blGenSprite(
 
 BL_API BLVoid blDeleteSprite(
 	IN BLGuid _ID);
+
+BL_API BLVoid* blSpriteExternalData(
+	IN BLGuid _ID,
+	IN BLVoid* _ExtData);
     
 BL_API BLVoid blSpriteClear(
     IN BLBool _Tiles,
@@ -62,6 +72,9 @@ BL_API BLBool blSpriteQuery(
 	OUT BLF32* _XScale,
 	OUT BLF32* _YScale,
 	OUT BLF32* _Alpha,
+	OUT BLU32* _DyeClr,
+	OUT BLBool* _FlipX,
+	OUT BLBool* _FlipY,
 	OUT BLBool* _Show);
 
 BL_API BLBool blSpriteVisibility(
@@ -141,7 +154,6 @@ BL_API BLBool blSpriteScissor(
 BL_API BLVoid blSpriteTile(
     IN BLGuid _ID,
     IN BLAnsi* _ImageFile,
-    IN BLAnsi* _Archive,
     IN BLF32 _TexLTx,
     IN BLF32 _TexLTy,
     IN BLF32 _TexRBx,

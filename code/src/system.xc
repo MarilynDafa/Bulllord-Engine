@@ -186,7 +186,6 @@ typedef struct _SystemMember {
 	_BLTimer aTimers[8];
 	_BLPlugin aPlugins[64];
 	BLAnsi aWorkDir[260];
-	BLAnsi aContentDir[260];
 	BLAnsi aUserDir[260];
 	BLU8 aClipboard[1024];
 	BLU32 nEventsSz;
@@ -3321,16 +3320,16 @@ _SystemInit()
 	{
 		BLAnsi _tmpname[260] = { 0 };
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		strcpy_s(_tmpname, 260, blWorkingDir(TRUE));
+		strcpy_s(_tmpname, 260, blWorkingDir());
 		strcat_s(_tmpname, 260, "main.js");
 #else
-		strcpy(_tmpname, blWorkingDir(TRUE));
+		strcpy(_tmpname, blWorkingDir());
 		strcat(_tmpname, "main.js");
 #endif
 		duk_push_c_function(_PrSystemMem->pDukContext, _JSExport, 0);
 		duk_call(_PrSystemMem->pDukContext, 0);
 		duk_put_global_string(_PrSystemMem->pDukContext, "bulllord");
-		BLGuid _stream = blGenStream(_tmpname, NULL);
+		BLGuid _stream = blGenStream(_tmpname);
 		BLAnsi* _data = (BLAnsi*)malloc(blStreamLength(_stream) + 1);
 		blStreamRead(_stream, blStreamLength(_stream), _data);
 		_data[blStreamLength(_stream)] = 0;
@@ -3640,7 +3639,7 @@ blUserFolderDir()
 #endif
 }
 const BLAnsi*
-blWorkingDir(IN BLBool _Content)
+blWorkingDir()
 {
 #if defined(BL_PLATFORM_WIN32)
     if (!_PrSystemMem->aWorkDir[0])
@@ -3686,8 +3685,6 @@ blWorkingDir(IN BLBool _Content)
 		_path[_idx + 1] = '\0';
 		const BLAnsi* _tmp = (const BLAnsi*)blGenUtf8Str((const BLUtf16*)_path);
 		strcpy_s(_PrSystemMem->aWorkDir, 260, _tmp);
-		strcpy_s(_PrSystemMem->aContentDir, 260, _PrSystemMem->aWorkDir);
-		strcat_s(_PrSystemMem->aContentDir, 260, "content\\");
 		blDeleteUtf8Str((BLUtf8*)_tmp);
 		free(_path);
     }
@@ -3702,8 +3699,6 @@ blWorkingDir(IN BLBool _Content)
         for (_y = 0; _y < _wsz; ++_y)
 			_PrSystemMem->aWorkDir[_y] = (BLAnsi)_wstr[_y];
         strcat(_PrSystemMem->aWorkDir, "\\Assets\\");
-		strcpy_s(_PrSystemMem->aContentDir, 260, _PrSystemMem->aWorkDir);
-		strcat_s(_PrSystemMem->aContentDir, 260, "content\\");
     }
 #elif defined(BL_PLATFORM_LINUX)
     if (!_PrSystemMem->aWorkDir[0])
@@ -3719,14 +3714,8 @@ blWorkingDir(IN BLBool _Content)
                 break;
         }
         strcpy(_PrSystemMem->aWorkDir, _fullpath);
-		strcpy(_PrSystemMem->aContentDir, _PrSystemMem->aWorkDir);
-		strcat(_PrSystemMem->aContentDir, "content/");
     }
 #elif defined(BL_PLATFORM_ANDROID)
-    if (!_PrSystemMem->aWorkDir[0])
-    {
-		strcpy(_PrSystemMem->aContentDir, "content/");
-    }
 #elif defined(BL_PLATFORM_OSX)
     if (!_PrSystemMem->aWorkDir[0])
     {
@@ -3734,8 +3723,6 @@ blWorkingDir(IN BLBool _Content)
         const BLAnsi* _strtmp = [_path UTF8String];
         strcpy(_PrSystemMem->aWorkDir, _strtmp);
         strcat(_PrSystemMem->aWorkDir, "/");
-		strcpy(_PrSystemMem->aContentDir, _PrSystemMem->aWorkDir);
-		strcat(_PrSystemMem->aContentDir, "content/");
     }
 #elif defined(BL_PLATFORM_IOS)
     if (!_PrSystemMem->aWorkDir[0])
@@ -3744,14 +3731,9 @@ blWorkingDir(IN BLBool _Content)
         const BLAnsi* _strtmp = [_path UTF8String];
         strcpy(_PrSystemMem->aWorkDir, _strtmp);
         strcat(_PrSystemMem->aWorkDir, "/");
-		strcpy(_PrSystemMem->aContentDir, _PrSystemMem->aWorkDir);
-		strcat(_PrSystemMem->aContentDir, "content/");
     }
 #endif
-	if (_Content)
-		return _PrSystemMem->aContentDir;
-	else
-		return _PrSystemMem->aWorkDir;
+	return _PrSystemMem->aWorkDir;
 }
 BLBool
 blClipboardCopy(IN BLUtf8* _Text)
@@ -4182,17 +4164,17 @@ blOpenPlugin(IN BLAnsi* _Basename)
 	_PrSystemMem->aPlugins[_idx].nHash = _hashname;
     BLAnsi _path[260] = { 0 };
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-    strcpy_s(_path, 260, blWorkingDir(FALSE));
+    strcpy_s(_path, 260, blWorkingDir());
     strcat_s(_path, 260, "plugins\\");
     strcat_s(_path, 260, _Basename);
     strcat_s(_path, 260, ".dll");
 #elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID)
-    strcpy(_path, blWorkingDir(FALSE));
+    strcpy(_path, blWorkingDir());
     strcat(_path, "plugins/");
     strcat(_path, _Basename);
     strcat(_path, ".so");
 #else
-    strcpy(_path, blWorkingDir(FALSE));
+    strcpy(_path, blWorkingDir());
     strcat(_path, "plugins/");
     strcat(_path, _Basename);
     strcat(_path, ".dylib");
@@ -4619,7 +4601,6 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 	_PrSystemMem->pEvents = NULL;
 	_PrSystemMem->pDukContext = NULL;
 	memset(_PrSystemMem->aWorkDir, 0, sizeof(_PrSystemMem->aWorkDir));
-	memset(_PrSystemMem->aContentDir, 0, sizeof(_PrSystemMem->aContentDir));
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
 	_PrSystemMem->nEventsSz = 0;
 	_PrSystemMem->nEventIdx = 0;
@@ -4716,7 +4697,6 @@ blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)
 	_PrSystemMem->pEndFunc = NULL;
 	_PrSystemMem->pEvents = NULL;
 	memset(_PrSystemMem->aWorkDir, 0, sizeof(_PrSystemMem->aWorkDir));
-	memset(_PrSystemMem->aContentDir, 0, sizeof(_PrSystemMem->aContentDir));
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
 	_PrSystemMem->nEventsSz = 0;
 	_PrSystemMem->nEventIdx = 0;
@@ -4767,7 +4747,6 @@ blSystemScriptRun()
 	_PrSystemMem->pEvents = NULL;
 	_PrSystemMem->pDukContext = duk_create_heap_default();
 	memset(_PrSystemMem->aWorkDir, 0, sizeof(_PrSystemMem->aWorkDir));
-	memset(_PrSystemMem->aContentDir, 0, sizeof(_PrSystemMem->aContentDir));
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
 	_PrSystemMem->nEventsSz = 0;
 	_PrSystemMem->nEventIdx = 0;

@@ -62,7 +62,6 @@ BL_API BLVoid blEmitterPos(
 
 BL_API BLGuid blGenAudio(
 	IN BLAnsi* _Filename,
-	IN BLAnsi* _Archive,
 	IN BLBool _Loop,
 	IN BLBool _3D,
 	IN BLF32 _Xpos,

@@ -63,8 +63,7 @@ BL_API BLU32 blTickCounts();
 
 BL_API const BLAnsi* blUserFolderDir();
 
-BL_API const BLAnsi* blWorkingDir(
-	IN BLBool _Content);
+BL_API const BLAnsi* blWorkingDir();
 
 BL_API BLBool blClipboardCopy(
 	IN BLUtf8* _Text);

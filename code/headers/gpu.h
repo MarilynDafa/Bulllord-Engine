@@ -237,12 +237,13 @@ BL_API BLVoid blGeometryInstanceUpdate(
 
 BL_API BLGuid blGenTechnique(
     IN BLAnsi* _Filename,
-    IN BLAnsi* _Archive,
-    IN BLBool _ForceCompile,
-    IN BLBool _ContentDir);
+    IN BLBool _ForceCompile);
     
 BL_API BLVoid blDeleteTechnique(
     IN BLGuid _Tech);
+
+BL_API BLGuid blGainTechnique(
+	IN BLU32 _Hash);
     
 BL_API BLVoid blTechUniform(
     IN BLGuid _Tech,

@@ -25,9 +25,10 @@
 extern "C" {
 #endif
 //for BMFont only support xml + none-compression tga format 
-BL_API BLVoid blUIWorkspace(
-	IN BLAnsi* _Dictionary,
-	IN BLAnsi* _Archive);
+BL_API BLVoid blUIStyle(
+	IN BLU32 _CaretColor,
+	IN BLU32 _SelectRangeColor,
+	IN BLU32 _TextDisableColor);
 
 BL_API BLVoid blUIFile(
 	IN BLAnsi* _Filename);
@@ -272,7 +273,7 @@ BL_API BLVoid blUILabelCommonMap(
 
 //#tab:%d(pixel)##font:%s(fontsource):%d(fontheight):%d(fontflag)##align:%s(LT,LM,LB,MT,MM,MB,RT,RM,RB)##color:%zu(txtcolor):%d(linkid)#%s(text)
 //#color:%zu(linecolor)##line:%d(padding optional):%d(length optional):%d(linewidth optional)#
-//#image:(left or right or appand):%s(file):%s(archive):%d(linkid)#
+//#image:(left or right or appand):%s(file):%d(linkid)#
 BL_API BLVoid blUILableText(
 	IN BLGuid _ID,
 	IN BLUtf8* _Text,
@@ -589,7 +590,7 @@ BL_API BLVoid blUITableColumnWidth(
 	IN BLU32 _Column,
 	IN BLU32 _Width);
 
-//#image:picture.bmg:archive#
+//#image:picture.bmg#
 BL_API BLVoid blUITableCell(
 	IN BLGuid _ID,
 	IN BLUtf8* _Text,

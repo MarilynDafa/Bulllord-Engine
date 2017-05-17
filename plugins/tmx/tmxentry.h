@@ -18,8 +18,8 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
-#ifndef __tmx_h_
-#define __tmx_h_
+#ifndef __tmxentry_h_
+#define __tmxentry_h_
 #include "../../code/headers/prerequisites.h"
 #ifdef __cplusplus
 extern "C" {
@@ -30,8 +30,7 @@ BL_API BLVoid blTMXCloseEXT();
 
 //Base64 Zip
 BL_API BLBool blTMXFileEXT(
-	IN BLAnsi* _Filename,
-	IN BLAnsi* _Archive);
+	IN BLAnsi* _Filename);
 
 BL_API BLVoid blTMXQueryEXT(
 	OUT BLAnsi _Orientation[32], 

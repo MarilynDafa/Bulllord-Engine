@@ -163,6 +163,7 @@ typedef struct _Widget {
 	BLEnum eReferenceH;
 	BLEnum eReferenceV;
 	BLEnum ePolicy;
+	BLAnsi aDir[260];
 	BLU32 aTag[64];
 	BLU32 nCurFrame;
 	BLU32 nFrameNum;
@@ -503,8 +504,6 @@ typedef struct _UIMember {
 	_BLWidgetRecorder sActionRecorder;
 	BLArray* pFonts;
 	BLGuid nQuadGeo;
-	BLAnsi aDir[260];
-	BLAnsi aArchive[260];
 	FT_Library sFtLibrary;
 	BLGuid nFBO;
 	BLGuid nFBOTex;
@@ -519,7 +518,7 @@ typedef struct _UIMember {
 	BLBool bDirty;
 }_BLUIMember;
 static _BLUIMember* _PrUIMem = NULL;
-extern BLBool _FetchResource(const BLAnsi*, const BLAnsi*, BLVoid**, BLGuid, BLBool(*)(BLVoid*, const BLAnsi*, const BLAnsi*), BLBool(*)(BLVoid*), BLBool);
+extern BLBool _FetchResource(const BLAnsi*, BLVoid**, BLGuid, BLBool(*)(BLVoid*, const BLAnsi*), BLBool(*)(BLVoid*), BLBool);
 extern BLBool _DiscardResource(BLGuid, BLBool(*)(BLVoid*), BLBool(*)(BLVoid*));
 static _BLWidget*
 _WidgetQuery(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren_)
@@ -578,28 +577,9 @@ _WidgetScissorRect(_BLWidget* _Node, BLRect* _Rect)
 	}
 }
 static _BLFont*
-_FontFace(const BLAnsi* _Filename, const BLAnsi* _Archive)
+_FontFace(const BLAnsi* _Filename)
 {
-	BLGuid _font;
-	if (_Archive && _Archive[0])
-		_font = blGenStream(_Filename, _Archive);
-	else
-	{
-		BLAnsi _tmpname[260];
-		strcpy(_tmpname, _Filename);
-		BLAnsi _path[260] = { 0 };
-		strcpy(_path, blWorkingDir(TRUE));
-		strcat(_path, _tmpname);
-		_font = blGenStream(_path, NULL);
-		if (INVALID_GUID == _font)
-		{
-			memset(_path, 0, sizeof(_path));
-			strcpy(_path, blUserFolderDir());
-			_font = blGenStream(_path, NULL);
-		}
-		if (INVALID_GUID == _font)
-			return NULL;
-	}
+	BLGuid _font = blGenStream(_Filename);
 	_BLFont* _ret = (_BLFont*)malloc(sizeof(_BLFont));
 	BLU32 _endi = 0, _starti = 0;
 	BLS32 _filelen = (BLS32)strlen(_Filename);
@@ -617,7 +597,7 @@ _FontFace(const BLAnsi* _Filename, const BLAnsi* _Archive)
 	strncpy(_basename, _Filename + _starti, _endi - _starti + 1);
 	_ret->nHashName = blHashUtf8((const BLUtf8*)_basename);
 	_ret->pGlyphAtlas = blGenDict(FALSE);
-	if (!strcmp((const BLAnsi*)blGetExtNameUtf8(_Filename), "fnt"))
+	if (!strcmp((const BLAnsi*)blFileSuffixUtf8(_Filename), "fnt"))
 	{
 		_ret->nFTStream = 0xDEAD;
 		_ret->bFreetype = FALSE;
@@ -636,16 +616,8 @@ _FontFace(const BLAnsi* _Filename, const BLAnsi* _Archive)
 					const BLAnsi* _tga = ezxml_attr(_page, "file");
 					BLGuid _image;
 					BLAnsi _tmpname[260];
-					sprintf(_tmpname, "%s/font/%s", _PrUIMem->aDir, _tga);
-					if (_Archive)
-						_image = blGenStream(_tmpname, _Archive);
-					else
-					{
-						BLAnsi _path[260] = { 0 };
-						strcpy(_path, blWorkingDir(TRUE));
-						strcat(_path, _tmpname);
-						_image = blGenStream(_path, NULL);
-					}
+					sprintf(_tmpname, "%s%s", blWorkingDir(), _tga);
+					_image = blGenStream(_tmpname);
 					if (INVALID_GUID == _image)
 					{
 						free(_ret);
@@ -1595,14 +1567,14 @@ _LabelParse(_BLWidget* _Node)
 							BLAnsi _texfilettf[260] = { 0 };
 							BLAnsi _texfilettc[260] = { 0 };
 							BLAnsi _texfilefnt[260] = { 0 };
-							sprintf(_texfilettf, "%s/font/%s.ttf", _PrUIMem->aDir, _Node->uExtension.sLabel.aCurFontSource);
-							sprintf(_texfilettc, "%s/font/%s.ttc", _PrUIMem->aDir, _Node->uExtension.sLabel.aCurFontSource);
-							sprintf(_texfilefnt, "%s/font/%s.fnt", _PrUIMem->aDir, _Node->uExtension.sLabel.aCurFontSource);
-							_ft = _FontFace(_texfilettf, _PrUIMem->aArchive);
+							sprintf(_texfilettf, "content/%s.ttf", _Node->uExtension.sLabel.aCurFontSource);
+							sprintf(_texfilettc, "content/%s.ttc", _Node->uExtension.sLabel.aCurFontSource);
+							sprintf(_texfilefnt, "content/%s.fnt", _Node->uExtension.sLabel.aCurFontSource);
+							_ft = _FontFace(_texfilettf);
 							if (!_ft)
-								_ft = _FontFace(_texfilettc, _PrUIMem->aArchive);
+								_ft = _FontFace(_texfilettc);
 							if (!_ft)
-								_ft = _FontFace(_texfilefnt, _PrUIMem->aArchive);
+								_ft = _FontFace(_texfilefnt);
 							if (_ft)
 								blArrayPushBack(_PrUIMem->pFonts, _ft);
 						}
@@ -1645,7 +1617,7 @@ _LabelParse(_BLWidget* _Node)
 				}
 				else if (blUtf16Equal(_str, L"image"))
 				{
-					if (_tokenparams->nSize == 4)
+					if (_tokenparams->nSize == 3)
 					{
 						BLS8 _position;
 						if (blUtf16Equal(*(BLUtf16**)(_tokenparams->pData + 0), L"left"))
@@ -1658,34 +1630,13 @@ _LabelParse(_BLWidget* _Node)
 						BLAnsi _dir[260] = { 0 };
 						strcpy(_dir, (const BLAnsi*)_tmp);
 						blDeleteUtf8Str((BLUtf8*)_tmp);
-						_tmp = blGenUtf8Str(*(BLUtf16**)(_tokenparams->pData + 2));
-						BLAnsi _archive[260] = { 0 };
-						strcpy(_archive, (const BLAnsi*)_tmp);
-						blDeleteUtf8Str((BLUtf8*)_tmp);
-						BLU32 _linkid = blUtf16ToUInteger(*(BLUtf16**)(_tokenparams->pData + 3));
+						BLU32 _linkid = blUtf16ToUInteger(*(BLUtf16**)(_tokenparams->pData + 2));
 						BLGuid _stream;
-						if (_archive[0])
-						{
-							_archive[strlen(_archive) - 1] = 0;
-							_stream = blGenStream(_dir, _archive);
-						}
-						else
-						{
-							BLAnsi _tmpname[260];
-							strcpy(_tmpname, _dir);
-							BLAnsi _path[260] = { 0 };
-							strcpy(_path, blWorkingDir(TRUE));
-							strcat(_path, _tmpname);
-							_stream = blGenStream(_path, NULL);
-							if (INVALID_GUID == _stream)
-							{
-								memset(_path, 0, sizeof(_path));
-								strcpy(_path, blUserFolderDir());
-								_stream = blGenStream(_path, NULL);
-							}
-							if (INVALID_GUID == _stream)
-								continue;
-						}
+						BLAnsi _tmpname[260];
+						strcpy(_tmpname, _dir);
+						_stream = blGenStream(_tmpname);
+						if (INVALID_GUID == _stream)
+							continue;
 						BLU8 _identifier[12];
 						blStreamRead(_stream, sizeof(_identifier), _identifier);
 						if (_identifier[0] != 0xDD || _identifier[1] != 0xDD || _identifier[2] != 0xDD ||
@@ -2475,7 +2426,7 @@ _UIRelease(BLVoid* _Src)
 	return TRUE;
 }
 static BLBool
-_LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
+_LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 {
 	_BLWidget* _src = (_BLWidget*)_Src;
 	BLGuid _stream;
@@ -2545,27 +2496,7 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 	if (_pixkey)
 	{
 		if (!_streamhead)
-		{
-			if (_Archive)
-				_stream = blGenStream(_Filename, _Archive);
-			else
-			{
-				BLAnsi _tmpname[260];
-				strcpy(_tmpname, _Filename);
-				BLAnsi _path[260] = { 0 };
-				strcpy(_path, blWorkingDir(TRUE));
-				strcat(_path, _tmpname);
-				_stream = blGenStream(_path, NULL);
-				if (INVALID_GUID == _stream)
-				{
-					memset(_path, 0, sizeof(_path));
-					strcpy(_path, blUserFolderDir());
-					_stream = blGenStream(_path, NULL);
-				}
-				if (INVALID_GUID == _stream)
-					return TRUE;
-			}
-		}
+			_stream = blGenStream(_Filename);
 		BLU8 _identifier[12];
 		blStreamRead(_stream, sizeof(_identifier), _identifier);
 		if (_identifier[0] != 0xDD ||
@@ -2968,7 +2899,7 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 			}
 			blMutexLock(_PrUIMem->pPixmapsCache->pMutex);
 			_streamhead = (BLGuid*)malloc(sizeof(BLGuid));
-			BLGuid _tmp = blGenStream(NULL, NULL);
+			BLGuid _tmp = blGenStream(NULL);
 			blStreamWrite(_tmp, _offset, blStreamData(_stream));
 			*_streamhead = _tmp;
 			blDictInsert(_PrUIMem->pPixmapsCache, _pixkey, _streamhead);
@@ -3059,9 +2990,9 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 					break;
 				}
 			}
-			sprintf(_texfilettf, "%s/font/%s.ttf", _PrUIMem->aDir, _src->uExtension.sButton.aFontSource);
-			sprintf(_texfilettc, "%s/font/%s.ttc", _PrUIMem->aDir, _src->uExtension.sButton.aFontSource);
-			sprintf(_texfilefnt, "%s/font/%s.fnt", _PrUIMem->aDir, _src->uExtension.sButton.aFontSource);
+			sprintf(_texfilettf, "content/%s.ttf", _src->uExtension.sButton.aFontSource);
+			sprintf(_texfilettc, "content/%s.ttc", _src->uExtension.sButton.aFontSource);
+			sprintf(_texfilefnt, "content/%s.fnt", _src->uExtension.sButton.aFontSource);
 		}
 		break;
 	case BL_UT_CHECK:
@@ -3074,9 +3005,9 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 					break;
 				}
 			}
-			sprintf(_texfilettf, "%s/font/%s.ttf", _PrUIMem->aDir, _src->uExtension.sCheck.aFontSource);
-			sprintf(_texfilettc, "%s/font/%s.ttc", _PrUIMem->aDir, _src->uExtension.sCheck.aFontSource);
-			sprintf(_texfilefnt, "%s/font/%s.fnt", _PrUIMem->aDir, _src->uExtension.sCheck.aFontSource);
+			sprintf(_texfilettf, "content/%s.ttf", _src->uExtension.sCheck.aFontSource);
+			sprintf(_texfilettc, "content/%s.ttc", _src->uExtension.sCheck.aFontSource);
+			sprintf(_texfilefnt, "content/%s.fnt", _src->uExtension.sCheck.aFontSource);
 		}
 		break;
 	case BL_UT_TEXT:
@@ -3089,9 +3020,9 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 					break;
 				}
 			}
-			sprintf(_texfilettf, "%s/font/%s.ttf", _PrUIMem->aDir, _src->uExtension.sText.aFontSource);
-			sprintf(_texfilettc, "%s/font/%s.ttc", _PrUIMem->aDir, _src->uExtension.sText.aFontSource);
-			sprintf(_texfilefnt, "%s/font/%s.fnt", _PrUIMem->aDir, _src->uExtension.sText.aFontSource);
+			sprintf(_texfilettf, "content/%s.ttf", _src->uExtension.sText.aFontSource);
+			sprintf(_texfilettc, "content/%s.ttc", _src->uExtension.sText.aFontSource);
+			sprintf(_texfilefnt, "content/%s.fnt", _src->uExtension.sText.aFontSource);
 		}
 		break;
 	case BL_UT_PROGRESS:
@@ -3104,9 +3035,9 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 					break;
 				}
 			}
-			sprintf(_texfilettf, "%s/font/%s.ttf", _PrUIMem->aDir, _src->uExtension.sProgress.aFontSource);
-			sprintf(_texfilettc, "%s/font/%s.ttc", _PrUIMem->aDir, _src->uExtension.sProgress.aFontSource);
-			sprintf(_texfilefnt, "%s/font/%s.fnt", _PrUIMem->aDir, _src->uExtension.sProgress.aFontSource);
+			sprintf(_texfilettf, "content/%s.ttf", _src->uExtension.sProgress.aFontSource);
+			sprintf(_texfilettc, "content/%s.ttc", _src->uExtension.sProgress.aFontSource);
+			sprintf(_texfilefnt, "content/%s.fnt", _src->uExtension.sProgress.aFontSource);
 		}
 		break;
 	case BL_UT_TABLE:
@@ -3119,9 +3050,9 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 					break;
 				}
 			}
-			sprintf(_texfilettf, "%s/font/%s.ttf", _PrUIMem->aDir, _src->uExtension.sTable.aFontSource);
-			sprintf(_texfilettc, "%s/font/%s.ttc", _PrUIMem->aDir, _src->uExtension.sTable.aFontSource);
-			sprintf(_texfilefnt, "%s/font/%s.fnt", _PrUIMem->aDir, _src->uExtension.sTable.aFontSource);
+			sprintf(_texfilettf, "content/%s.ttf", _src->uExtension.sTable.aFontSource);
+			sprintf(_texfilettc, "content/%s.ttc", _src->uExtension.sTable.aFontSource);
+			sprintf(_texfilefnt, "content/%s.fnt", _src->uExtension.sTable.aFontSource);
 		}
 		break;
 	default: break;
@@ -3129,11 +3060,11 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename, const BLAnsi* _Archive)
 	blMutexUnlock(_PrUIMem->pFonts->pMutex);
 	if (_loadfont)
 	{
-		_BLFont* _newfont = _FontFace(_texfilettf, _Archive);
+		_BLFont* _newfont = _FontFace(_texfilettf);
 		if (!_newfont)
-			_newfont = _FontFace(_texfilettc, _Archive);
+			_newfont = _FontFace(_texfilettc);
 		if (!_newfont)
-			_newfont = _FontFace(_texfilefnt, _Archive);
+			_newfont = _FontFace(_texfilefnt);
 		if (_newfont)
 			blArrayPushBack(_PrUIMem->pFonts, _newfont);
 	}
@@ -8116,45 +8047,18 @@ _DrawTable(_BLWidget* _Node, BLF32 _X, BLF32 _Y, BLF32 _Width, BLF32 _Height)
 						{
 							BLU32 _richlen = (BLU32)strlen((const BLAnsi*)_Node->uExtension.sTable.pCellText[_cellidx]);
 							BLAnsi _dir[260] = { 0 };
-							BLAnsi _archive[260] = { 0 };
-							BLBool _parsearchive = FALSE;
 							for (BLU32 _kdx = 0; _kdx < _richlen - 7; ++_kdx)
 							{
-								if (_Node->uExtension.sTable.pCellText[_cellidx][_kdx + 7] == ':')
-									_parsearchive = TRUE;
-								else if (_Node->uExtension.sTable.pCellText[_cellidx][_kdx + 7] == '#')
+								if (_Node->uExtension.sTable.pCellText[_cellidx][_kdx + 7] == '#')
 									break;
-								if (_parsearchive)
-								{
-									strcpy(_archive, (const BLAnsi*)(_Node->uExtension.sTable.pCellText[_cellidx]) + _kdx + 8);
-									break;
-								}
-								else
-									_dir[_kdx] = _Node->uExtension.sTable.pCellText[_cellidx][_kdx + 7];
+								_dir[_kdx] = _Node->uExtension.sTable.pCellText[_cellidx][_kdx + 7];
 							}
-							BLGuid _stream;							
-							if (_archive[0])
-							{
-								_archive[strlen(_archive) - 1] = 0;
-								_stream = blGenStream(_dir, _archive);
-							}
-							else
-							{
-								BLAnsi _tmpname[260];
-								strcpy(_tmpname, _dir);
-								BLAnsi _path[260] = { 0 };
-								strcpy(_path, blWorkingDir(TRUE));
-								strcat(_path, _tmpname);
-								_stream = blGenStream(_path, NULL);
-								if (INVALID_GUID == _stream)
-								{
-									memset(_path, 0, sizeof(_path));
-									strcpy(_path, blUserFolderDir());
-									_stream = blGenStream(_path, NULL);
-								}
-								if (INVALID_GUID == _stream)
-									continue;
-							}
+							BLGuid _stream;		
+							BLAnsi _tmpname[260];
+							strcpy(_tmpname, _dir);
+							_stream = blGenStream(_tmpname);
+							if (INVALID_GUID == _stream)
+								continue;
 							BLU8 _identifier[12];
 							blStreamRead(_stream, sizeof(_identifier), _identifier);
 							if (_identifier[0] != 0xDD || _identifier[1] != 0xDD || _identifier[2] != 0xDD ||
@@ -11017,8 +10921,6 @@ BLVoid
 _UIInit(duk_context* _DKC, BLBool _Profiler)
 {
     _PrUIMem = (_BLUIMember*)malloc(sizeof(_BLUIMember));
-    memset(_PrUIMem->aDir, 0, sizeof(_PrUIMem->aDir));
-    memset(_PrUIMem->aArchive, 0, sizeof(_PrUIMem->aArchive));
     FT_Init_FreeType(&_PrUIMem->sFtLibrary);
 	_PrUIMem->pDukContext = _DKC;
 	_PrUIMem->pBasePlate = NULL;
@@ -11041,9 +10943,12 @@ _UIInit(duk_context* _DKC, BLBool _Profiler)
 	_PrUIMem->pHoveredWidget = NULL;
 	_PrUIMem->pFocusWidget = NULL;
     _PrUIMem->pFonts = blGenArray(TRUE);
-	_PrUIMem->nUITech = blGenTechnique("2D.bsl", NULL, FALSE, FALSE);
+	_PrUIMem->nUITech = blGenTechnique("shaders/2D.bsl", FALSE);
 	_PrUIMem->nFBO = blGenFrameBuffer();
 	_PrUIMem->bProfiler = _Profiler;
+	_PrUIMem->nCaretColor = 0xFFFFFFFF;
+	_PrUIMem->nSelectRangeColor = 0xFF264f78;
+	_PrUIMem->nTextDisableColor = 0xFF6d6d6d;
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	_PrUIMem->nQuadGeo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"#@quadgeoui@#"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, NULL, sizeof(BLF32) * 32, NULL, 0, BL_IF_INVALID);
@@ -11583,73 +11488,30 @@ _UIDestroy()
 	FT_Done_FreeType(_PrUIMem->sFtLibrary);
 	free(_PrUIMem);
 }
-BLVoid
-blUIWorkspace(IN BLAnsi* _Dictionary, IN BLAnsi* _Archive)
+BLVoid 
+blUIStyle(IN BLU32 _CaretColor, IN BLU32 _SelectRangeColor, IN BLU32 _TextDisableColor)
 {
-	strcpy(_PrUIMem->aDir, _Dictionary);
-	if (_Archive)
-		strcpy(_PrUIMem->aArchive, _Archive);
-	BLAnsi _path[260] = { 0 };
-	BLGuid _stream;
-	if (_Archive)
+	if (_PrUIMem)
 	{
-		strcpy(_path, _Dictionary);
-		strcat(_path, "/ui.uws");
-		_stream = blGenStream(_path, _Archive);
-		if (INVALID_GUID == _stream)
-		{
-			blDebugOutput("UI workspace open fail");
-			return;
-		}
+		_PrUIMem->nCaretColor = _CaretColor;
+		_PrUIMem->nSelectRangeColor = _SelectRangeColor;
+		_PrUIMem->nTextDisableColor = _TextDisableColor;
 	}
-	else
-	{
-		strcpy(_path, blWorkingDir(TRUE));
-		strcat(_path, _Dictionary);
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		strcat(_path, "\\ui.uws");
-#else
-		strcat(_path, "/ui.uws");
-#endif
-		_stream = blGenStream(_path, _Archive);
-		if (INVALID_GUID == _stream)
-		{
-			blDebugOutput("UI workspace open fail");
-			return;
-		}
-	}
-	ezxml_t _doc = ezxml_parse_str(blStreamData(_stream), blStreamLength(_stream));
-	ezxml_t _resolution = ezxml_child(_doc, "Resolution");
-	ezxml_t _caretcolor = ezxml_child(_doc, "CaretColor");
-	const BLAnsi* _car = ezxml_attr(_caretcolor, "Value");
-	_PrUIMem->nCaretColor = (BLU32)strtoul(_car, NULL, 10);
-	ezxml_t _selectrangecolor = ezxml_child(_doc, "SelectRangeColor");
-	const BLAnsi* _sel = ezxml_attr(_selectrangecolor, "Value");
-	_PrUIMem->nSelectRangeColor = (BLU32)strtoul(_sel, NULL, 10);
-	ezxml_t _textdisablecolor = ezxml_child(_doc, "TextDisableColor");
-	const BLAnsi* _txt = ezxml_attr(_textdisablecolor, "Value");
-	_PrUIMem->nTextDisableColor = (BLU32)strtoul(_txt, NULL, 10);
-	ezxml_free(_doc);
-	blDeleteStream(_stream);
 }
 BLVoid
 blUIFile(IN BLAnsi* _Filename)
 {
-    BLAnsi _path[260] = { 0 };
-    if (_PrUIMem->aArchive[0] == 0)
-    {
-        strcpy(_path, blWorkingDir(TRUE));
-        strcat(_path, _PrUIMem->aDir);
-    }
-    else
-        strcpy(_path, _PrUIMem->aDir);
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-    strcat(_path, "\\bui\\");
-#else
-    strcat(_path, "/bui/");
-#endif
-    strcat(_path, _Filename);
-    BLGuid _layout = blGenStream(_path, _PrUIMem->aArchive[0] ? _PrUIMem->aArchive : NULL);
+    BLGuid _layout = blGenStream(_Filename);
+	BLU32 _tmplen = strlen(_Filename);
+	BLAnsi _pixdir[260] = { 0 };
+	strcpy(_pixdir, _Filename);
+	for (BLS32 _idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+	{
+		if (_pixdir[_idx] == '/' || _pixdir[_idx] == '\\')
+			break;
+		else
+			_pixdir[_idx] = 0;
+	}
 	if (_layout == INVALID_GUID)
 	{
 		blDebugOutput("load ui layout failed>%s", _Filename);
@@ -11748,6 +11610,7 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
 			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
 			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_PANEL);
+			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -11848,6 +11711,7 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
 			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
             BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_BUTTON);
+			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
             blUIReferencePoint(_widguid, _ha, _va);
             blUISizePolicy(_widguid, _policyvar);
             blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -11892,6 +11756,7 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
 			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
 			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_LABEL);
+			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -11978,6 +11843,7 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
 			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
 			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_CHECK);
+			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12068,6 +11934,7 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
 			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
 			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_TEXT);
+			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12131,6 +11998,7 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
 			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
 			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_PROGRESS);
+			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12199,6 +12067,7 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
 			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
 			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_SLIDER);
+			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12257,6 +12126,7 @@ blUIFile(IN BLAnsi* _Filename)
 			BLU32 _rowheightvar = (BLU32)strtoul(_rowheight, NULL, 10);
 			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
 			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_TABLE);
+			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12287,6 +12157,7 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
 			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
 			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_DIAL);
+			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12328,6 +12199,7 @@ blUIFile(IN BLAnsi* _Filename)
             }
 			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
 			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_PRIMITIVE);
+			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
 			blUISizeLimit(_widguid, (BLU32)_maxsizevar[0], (BLU32)_maxsizevar[1], (BLU32)_minsizevar[0], (BLU32)_minsizevar[1]);
@@ -12365,6 +12237,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 	_widget->eType = _Type;
 	_widget->nFrameNum = 0xFFFFFFFF;
 	memset(_widget->aTag, 0, sizeof(_widget->aTag));
+	memset(_widget->aDir, 0, sizeof(_widget->aDir));
 	_widget->fAlpha = 1.f;
 	_widget->fScaleX = 1.f;
 	_widget->fScaleY = 1.f;
@@ -12949,8 +12822,8 @@ blUIPanelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	memset(_widget->uExtension.sPanel.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sPanel.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
-	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
+	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	_FetchResource(_texfile, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -13084,8 +12957,8 @@ blUIButtonPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	memset(_widget->uExtension.sButton.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aPixmap, _Pixmap);
     BLAnsi _texfile[260] = { 0 };
-    sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
-	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
+	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	_FetchResource(_texfile, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -13274,8 +13147,8 @@ blUILabelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	memset(_widget->uExtension.sLabel.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sLabel.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
-	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
+	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	_FetchResource(_texfile, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -13411,8 +13284,8 @@ blUICheckPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	memset(_widget->uExtension.sCheck.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sCheck.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
-	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
+	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	_FetchResource(_texfile, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -13600,8 +13473,8 @@ blUITextPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	memset(_widget->uExtension.sText.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sText.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
-	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
+	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	_FetchResource(_texfile, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -13852,8 +13725,8 @@ blUIProgressPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	memset(_widget->uExtension.sProgress.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sProgress.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
-	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
+	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	_FetchResource(_texfile, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -14014,8 +13887,8 @@ blUISliderPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	memset(_widget->uExtension.sSlider.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sSlider.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
-	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
+	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	_FetchResource(_texfile, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -14196,8 +14069,8 @@ blUITablePixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	memset(_widget->uExtension.sTable.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sTable.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
-	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
+	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	_FetchResource(_texfile, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -14480,8 +14353,8 @@ blUIDialPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	memset(_widget->uExtension.sDial.aPixmap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sDial.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s/pixmap/%s.bmg", _PrUIMem->aDir, _Pixmap);
-	_FetchResource(_texfile, (_PrUIMem->aArchive[0] == 0) ? NULL : _PrUIMem->aArchive, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
+	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	_FetchResource(_texfile, &_widget, _widget->nID, _LoadUI, _UISetup, TRUE);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid

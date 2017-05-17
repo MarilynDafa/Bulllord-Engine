@@ -2836,9 +2836,9 @@ blTextureFilter(IN BLGuid _Tex, IN BLEnum _MinFilter, IN BLEnum _MagFilter, IN B
         }
         GLenum _minfilter;
         if (BL_TF_NEAREST == _MinFilter)
-            _minfilter = GL_NEAREST;
+            _minfilter = (_tex->nNumMips >= 1) ? GL_NEAREST_MIPMAP_LINEAR : GL_NEAREST;
         else
-            _minfilter = GL_LINEAR;
+            _minfilter = (_tex->nNumMips >= 1) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
         GLenum _magfilter;
         if (BL_TF_NEAREST == _MagFilter)
             _magfilter = GL_NEAREST;
@@ -3465,7 +3465,7 @@ blGeometryInstanceUpdate(IN BLGuid _GBO, IN BLEnum _Semantic, IN BLVoid* _Buffer
 #endif
 }
 BLGuid
-blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompile, IN BLBool _ContentDir)
+blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
 {
 	BLBool _cache = FALSE;
 	_BLTechnique* _tech;
@@ -3537,29 +3537,14 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
     if (!_ForceCompile)
     {
         memset(_path, 0, 260 * sizeof(BLAnsi));
-        strcpy(_path, blUserFolderDir());
+        strcpy(_path, "b");
         strcat(_path, _Filename);
-        _stream = blGenStream(_path, NULL);
+        _stream = blGenStream(_path);
         _findbinary = (_stream == INVALID_GUID) ? FALSE : TRUE;
     }
     if (!_findbinary)
     {
-        if (_Archive)
-            _stream = blGenStream(_Filename, _Archive);
-        else
-        {
-            BLAnsi _tmpname[260];
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-            strcpy_s(_tmpname, 260, (const BLAnsi*)_Filename);
-            strcpy_s(_path, 260, blWorkingDir(_ContentDir));
-            strcat_s(_path, 260, _tmpname);
-#else
-            strcpy(_tmpname, (const BLAnsi*)_Filename);
-            strcpy(_path, blWorkingDir(_ContentDir));
-            strcat(_path, _tmpname);
-#endif
-            _stream = blGenStream(_path, NULL);
-        }
+        _stream = blGenStream(_Filename);
         _doc = ezxml_parse_str((BLAnsi*)blStreamData(_stream), blStreamLength(_stream));
         const BLAnsi* _tag = NULL;
         switch (_PrGpuMem->sHardwareCaps.eApiType)
@@ -3692,7 +3677,10 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _ForceCompil
             {
                 BLU8* _binary = (BLU8*)malloc(_len * sizeof(BLU8) + sizeof(GLenum));
                 GL_CHECK_INTERNAL(glGetProgramBinary(_tech->uData.sGL.nHandle, _len, NULL, (GLenum*)_binary, _binary + sizeof(GLenum)));
-                blFileWrite(_Filename, _len * sizeof(BLU8) + sizeof(GLenum), _binary);
+				memset(_path, 0, 260 * sizeof(BLAnsi));
+				strcpy(_path, "b");
+				strcat(_path, _Filename);
+                blFileWrite(_path, _len * sizeof(BLU8) + sizeof(GLenum), _binary);
             }
             if (_vs)
             {
@@ -3804,6 +3792,20 @@ blDeleteTechnique(IN BLGuid _Tech)
 #endif
 	free(_tech);
     blDeleteGuid(_Tech);
+}
+BLGuid 
+blGainTechnique(IN BLU32 _Hash)
+{
+	blMutexLock(_PrGpuMem->pTechCache->pMutex);
+    _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTechCache, _Hash);
+    blMutexUnlock(_PrGpuMem->pTechCache->pMutex);
+    if (_res)
+    {
+        _res->nRefCount++;
+        return ((_BLTechnique*)_res->pRes)->nID;
+    }
+    else
+        return INVALID_GUID;
 }
 BLVoid
 blTechUniform(IN BLGuid _Tech, IN BLEnum _Type, IN BLAnsi* _Name, IN BLVoid* _Data, IN BLU32 _DataSz)

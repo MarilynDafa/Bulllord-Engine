@@ -49,6 +49,10 @@ BL_API BLVoid blDebugOutput(
 BL_API const BLAnsi* blMD5String(
 	IN BLAnsi* _Str);
 
+BL_API BLS32 blNatCompare(
+	IN BLAnsi* _StrA,
+	IN BLAnsi* _StrB);
+
 BL_API BLU32 blHashUtf8(
 	IN BLUtf8* _Str);
 
@@ -123,10 +127,10 @@ BL_API const BLUtf8* blGenUtf8Str(
 BL_API BLVoid blDeleteUtf8Str(
 	INOUT BLUtf8* _Str);
 
-BL_API const BLUtf8* blGetExtNameUtf8(
+BL_API const BLUtf8* blFileSuffixUtf8(
 	IN BLUtf8* _Filename);
 
-BL_API const BLUtf16* blGetExtNameUtf16(
+BL_API const BLUtf16* blFileSuffixUtf16(
 	IN BLUtf16* _Filename);
 
 BL_API const BLAnsi* blGenBase64Encoder(

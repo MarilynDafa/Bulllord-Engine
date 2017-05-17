@@ -176,7 +176,7 @@
     <ClInclude Include="..\..\code\externals\zlib\zutil.h" />
     <ClInclude Include="AStar.h" />
     <ClInclude Include="IndexPriorityQueue.h" />
-    <ClInclude Include="tmx.h" />
+    <ClInclude Include="tmxentry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\code\externals\xml\ezxml.c" />
@@ -207,7 +207,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
-    <ClCompile Include="tmx.c" />
+    <ClCompile Include="tmxentry.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -18,7 +18,7 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
-#include "tmx.h"
+#include "tmxentry.h"
 #include "AStar.h"
 #include "../../code/headers/system.h"
 #include "../../code/headers/utils.h"
@@ -123,7 +123,7 @@ blTMXCloseEXT()
 	free(_PrTmxMem);
 }
 BLBool 
-blTMXFileEXT(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
+blTMXFileEXT(IN BLAnsi* _Filename)
 {
 	if (_PrTmxMem->pTilesets)
 		free(_PrTmxMem->pTilesets);
@@ -174,25 +174,7 @@ blTMXFileEXT(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
         strncpy(_dir, _Filename, _split);
         strcat(_dir, "/");
     }
-	if (_Archive)
-		_stream = blGenStream(_Filename, _Archive);
-	else
-	{
-		BLAnsi _tmpname[260];
-		strcpy(_tmpname, _Filename);
-		BLAnsi _path[260] = { 0 };
-		strcpy(_path, blWorkingDir(TRUE));
-		strcat(_path, _tmpname);
-		_stream = blGenStream(_path, NULL);
-		if (INVALID_GUID == _stream)
-		{
-			memset(_path, 0, sizeof(_path));
-			strcpy(_path, blUserFolderDir());
-			_stream = blGenStream(_path, NULL);
-		}
-		if (INVALID_GUID == _stream)
-			return FALSE;
-	}
+	_stream = blGenStream(_Filename);
 	ezxml_t _doc = ezxml_parse_str(blStreamData(_stream), blStreamLength(_stream));
 	ezxml_t _element = _doc;
 	const BLAnsi* _orientation = ezxml_attr(_element, "orientation");
@@ -313,12 +295,12 @@ blTMXFileEXT(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 									_h = (_h < 2.f) ? 1.f : _h / _PrTmxMem->nTileHeight;
 									BLAnsi _buflayer[32] = { 0 };
 									sprintf(_buflayer, "%d", _layer);
-                                    BLGuid _id = blGenSprite(_buf, _Archive, _buflayer, (BLF32)_PrTmxMem->nTileWidth, (BLF32)_PrTmxMem->nTileHeight, 0, 1, TRUE);
+                                    BLGuid _id = blGenSprite(_buf, _buflayer, (BLF32)_PrTmxMem->nTileWidth, (BLF32)_PrTmxMem->nTileHeight, 0, 1, TRUE);
                                     BLF32 _ltx = (BLF32)((_gid - (BLU32)_first) % (BLU32)_w) / _w;;
                                     BLF32 _lty = (BLF32)((_gid - (BLU32)_first) / _w) / _h;
 									BLF32 _rbx = _ltx + _deltax;
                                     BLF32 _rby = _lty + _deltay;
-                                    blSpriteTile(_id, _source, _Archive, _ltx, _lty, _rbx, _rby, (BLF32)_x * _PrTmxMem->nTileWidth, (BLF32)_y * _PrTmxMem->nTileHeight, _fopacity, TRUE);
+                                    blSpriteTile(_id, _source, _ltx, _lty, _rbx, _rby, (BLF32)_x * _PrTmxMem->nTileWidth, (BLF32)_y * _PrTmxMem->nTileHeight, _fopacity, TRUE);
 									_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pTiles[_y * _PrTmxMem->nWidth + _x] = _id;
                                 }
                             }
@@ -464,7 +446,7 @@ blTMXLayerVisibilityEXT(IN BLAnsi* _Layer, IN BLBool _Show)
 		if (!strcmp(_PrTmxMem->pLayers[_idx].aName, _Layer))
 		{
 			for (BLU32 _jdx = 0; _jdx < _PrTmxMem->nHeight * _PrTmxMem->nWidth; ++_jdx)
-				blSpriteTile(_PrTmxMem->pLayers[_idx].pTiles[_jdx], NULL, NULL, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 1.f, _Show);
+				blSpriteTile(_PrTmxMem->pLayers[_idx].pTiles[_jdx], NULL, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 1.f, _Show);
 		}
 	}
 }
