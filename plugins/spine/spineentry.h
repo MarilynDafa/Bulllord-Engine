@@ -28,11 +28,39 @@ BL_API BLVoid blSpineOpenEXT();
 
 BL_API BLVoid blSpineCloseEXT();
 
-BL_API BLBool blSpriteAnimationEXT(
+BL_API BLVoid blSpriteAnimationSetEXT(
 	IN BLGuid _ID, 
 	IN BLAnsi* _Animation,
 	IN BLS32 _Track,
 	IN BLBool _Loop);
+
+BL_API BLVoid blSpriteAnimationAddEXT(
+	IN BLGuid _ID,
+	IN BLAnsi* _Animation,
+	IN BLS32 _Track,
+	IN BLBool _Loop,
+	IN BLF32 _Delay);
+
+BL_API BLVoid blSpriteAnimationAddEmptyEXT(
+	IN BLGuid _ID,
+	IN BLS32 _Track,
+	IN BLF32 _Duration,
+	IN BLF32 _Delay);
+
+BL_API BLVoid blSpriteAnimationMixEXT(
+	IN BLGuid _ID,
+	IN BLAnsi* _From,
+	IN BLAnsi* _To,
+	IN BLF32 _Duration);
+
+BL_API BLVoid blSpriteAnimationEmptyEXT(
+	IN BLGuid _ID, 
+	IN BLU32 _TrackIndex,
+	IN BLF32 _Duration);
+
+BL_API BLVoid blSpriteTrackEmpty(
+	IN BLGuid _ID,
+	IN BLU32 _TrackIndex);
 
 BL_API BLBool blSpriteBoundingBoxEXT(
 	IN BLGuid _ID,

@@ -35,11 +35,40 @@ typedef struct _TexCacheData {
 	BLBool bRepeatWrap;
 } _BLTexCacheDataExt;
 typedef struct _SpineCacheData {
-	BLAnsi aAniName[64];
-	BLS32 nTrack;
-	BLBool bLoop;
+	BLU32 nType;
+	union {
+		struct _AniSet {
+			BLAnsi aAniName[64];
+			BLS32 nTrack;
+			BLBool bLoop;
+		}sAniSet;
+		struct _AniAdd {
+			BLAnsi aAniName[64];
+			BLS32 nTrack;
+			BLBool bLoop;
+			BLF32 fDelay;
+		}sAniAdd;
+		struct _AniAddE {
+			BLS32 nTrack;
+			BLF32 fDuration;
+			BLF32 fDelay;
+		}sAniAddE;
+		struct _AniMix {
+			BLAnsi aFromAniName[64];
+			BLAnsi aToAniName[64];
+			BLF32 fDuration;
+		}sAniMix;
+		struct _AniEmpty {
+			BLU32 nTrackIndex;
+			BLF32 fDuration;
+		}sAniEmpty;
+		struct _TrackEmpty {
+			BLU32 nTrackIndex;
+		}sTrackEmpty;
+	} uData;
 } _BLSpineCacheData;
 typedef struct _SpineData {
+	BLGuid nID;
 	spAnimationState* pState;
 	spSkeleton* pSkeleton;
 	spSkeletonData* pSkeletonData;
@@ -211,6 +240,14 @@ _spUtil_readFile(const BLAnsi* _Filename, BLS32* _Length)
 	blDeleteStream(_stream);
 	return _ret;
 }
+static void 
+_AnimationCallback(spAnimationState* _State, spEventType _Type, spTrackEntry* _Entry, spEvent* _Event) 
+{
+	if (!_State->rendererObject)
+		return;
+	if (_Type == SP_ANIMATION_COMPLETE && !_Entry->loop)
+		blInvokeEvent(BL_ET_SPRITE, 0xFFFFFFFF, 0, NULL, ((_BLSpineDataExt*)_State->rendererObject)->nID);
+}
 static const BLBool
 _LoadSpine(BLGuid _ID, const BLAnsi* _Filename, BLVoid** _ExtData)
 {
@@ -264,7 +301,28 @@ _LoadSpine(BLGuid _ID, const BLAnsi* _Filename, BLVoid** _ExtData)
 	if (*_ExtData)
 	{
 		_BLSpineCacheData* _scd = (_BLSpineCacheData*)*_ExtData;
-		spAnimationState_setAnimationByName(_sd->pState, _scd->nTrack, _scd->aAniName, _scd->bLoop);
+		if (_scd->nType == 1)
+			spAnimationState_setAnimationByName(_sd->pState, _scd->uData.sAniSet.nTrack, _scd->uData.sAniSet.aAniName, _scd->uData.sAniSet.bLoop);
+		else if (_scd->nType == 2)
+			spAnimationState_addAnimationByName(_sd->pState, _scd->uData.sAniAdd.nTrack, _scd->uData.sAniAdd.aAniName, _scd->uData.sAniAdd.bLoop, _scd->uData.sAniAdd.fDelay);
+		else if (_scd->nType == 3)
+			spAnimationState_addEmptyAnimation(_sd->pState, _scd->uData.sAniAddE.nTrack, _scd->uData.sAniAddE.fDuration, _scd->uData.sAniAddE.fDelay);
+		else if (_scd->nType == 4)
+			spAnimationStateData_setMixByName(_sd->pState->data, _scd->uData.sAniMix.aFromAniName, _scd->uData.sAniMix.aToAniName, _scd->uData.sAniMix.fDuration);
+		else if (_scd->nType == 5)
+		{
+			if (_scd->uData.sAniEmpty.nTrackIndex != 0xFFFFFFFF)
+				spAnimationState_setEmptyAnimation(_sd->pState, _scd->uData.sAniEmpty.nTrackIndex, _scd->uData.sAniEmpty.fDuration);
+			else
+				spAnimationState_setEmptyAnimations(_sd->pState, _scd->uData.sAniEmpty.fDuration);
+		}
+		else if (_scd->nType == 6)
+		{
+			if (_scd->uData.sTrackEmpty.nTrackIndex != 0xFFFFFFFF)
+				spAnimationState_clearTrack(_sd->pState, _scd->uData.sTrackEmpty.nTrackIndex);
+			else
+				spAnimationState_clearTracks(_sd->pState);
+		}
 		free(*_ExtData);
 	}	
 	*_ExtData = _sd;
@@ -274,10 +332,14 @@ static const BLBool
 _SpineSetup(BLGuid _ID, BLVoid** _ExtData)
 {
 	_BLSpineDataExt* _sd = (_BLSpineDataExt*)*_ExtData;
+	_sd->nID = _ID;
 	_BLTexCacheDataExt* _tcd = (_BLTexCacheDataExt*)_sd->pAtlas->pages->rendererObject;
 	_sd->nTexture = blGenTexture(((BLU32)(((BLU64)(_ID)) & 0xFFFFFFFF)), BL_TT_2D, _tcd->eFormat, FALSE, TRUE, FALSE, 1, 1, _tcd->nWidth, _tcd->nHeight, 1, _tcd->pData);
 	blTextureFilter(_sd->nTexture, BL_TF_LINEAR, BL_TF_LINEAR, _tcd->bRepeatWrap ? BL_TW_REPEAT : BL_TW_CLAMP, _tcd->bRepeatWrap ? BL_TW_REPEAT : BL_TW_CLAMP, FALSE);
 	free(_tcd);
+	_sd->pAtlas->pages->rendererObject = NULL;
+	_sd->pState->listener = _AnimationCallback;
+	_sd->pState->rendererObject = _sd;
 	return TRUE;
 }
 static const BLBool
@@ -474,22 +536,113 @@ blSpineCloseEXT()
 	blDeleteTechnique(_PrSpineMem->nTech);
 	free(_PrSpineMem);
 }
-BLBool 
-blSpriteAnimationEXT(IN BLGuid _ID, IN BLAnsi* _Animation, IN BLS32 _Track, IN BLBool _Loop)
+BLVoid
+blSpriteAnimationSetEXT(IN BLGuid _ID, IN BLAnsi* _Animation, IN BLS32 _Track, IN BLBool _Loop)
 {
 	_BLSpineDataExt* _sd = blSpriteExternalData(_ID, NULL);
 	if (!_sd)
 	{
 		_BLSpineCacheData* _scd = (_BLSpineCacheData*)malloc(sizeof(_BLSpineCacheData));
-		memset(_scd->aAniName, 0, sizeof(_scd->aAniName));
-		strcpy(_scd->aAniName, _Animation);
-		_scd->bLoop = _Loop;
-		_scd->nTrack = _Track;
+		_scd->nType = 1;		
+		memset(_scd->uData.sAniSet.aAniName, 0, sizeof(_scd->uData.sAniSet.aAniName));
+		strcpy(_scd->uData.sAniSet.aAniName, _Animation);
+		_scd->uData.sAniSet.bLoop = _Loop;
+		_scd->uData.sAniSet.nTrack = _Track;
 		blSpriteExternalData(_ID, _scd);
 	}
 	else
 		spAnimationState_setAnimationByName(_sd->pState, _Track, _Animation, _Loop);
-	return TRUE;
+}
+BLVoid 
+blSpriteAnimationAddEXT(IN BLGuid _ID, IN BLAnsi* _Animation, IN BLS32 _Track, IN BLBool _Loop, IN BLF32 _Delay)
+{
+	_BLSpineDataExt* _sd = blSpriteExternalData(_ID, NULL);
+	if (!_sd)
+	{
+		_BLSpineCacheData* _scd = (_BLSpineCacheData*)malloc(sizeof(_BLSpineCacheData));
+		_scd->nType = 2;
+		memset(_scd->uData.sAniAdd.aAniName, 0, sizeof(_scd->uData.sAniAdd.aAniName));
+		strcpy(_scd->uData.sAniAdd.aAniName, _Animation);
+		_scd->uData.sAniAdd.bLoop = _Loop;
+		_scd->uData.sAniAdd.nTrack = _Track;
+		_scd->uData.sAniAdd.fDelay = _Delay;
+		blSpriteExternalData(_ID, _scd);
+	}
+	else
+		spAnimationState_addAnimationByName(_sd->pState, _Track, _Animation, _Loop, _Delay);
+}
+BLVoid
+blSpriteAnimationAddEmptyEXT(IN BLGuid _ID, IN BLS32 _Track, IN BLF32 _Duration, IN BLF32 _Delay)
+{
+	_BLSpineDataExt* _sd = blSpriteExternalData(_ID, NULL);
+	if (!_sd)
+	{
+		_BLSpineCacheData* _scd = (_BLSpineCacheData*)malloc(sizeof(_BLSpineCacheData));
+		_scd->nType = 3;
+		_scd->uData.sAniAddE.nTrack = _Track;
+		_scd->uData.sAniAddE.fDuration = _Duration;
+		_scd->uData.sAniAddE.fDelay = _Delay;
+		blSpriteExternalData(_ID, _scd);
+	}
+	else
+		spAnimationState_addEmptyAnimation(_sd->pState, _Track, _Duration, _Delay);
+}
+BLVoid 
+blSpriteAnimationMixEXT(IN BLGuid _ID, IN BLAnsi* _From, IN BLAnsi* _To, IN BLF32 _Duration)
+{
+	_BLSpineDataExt* _sd = blSpriteExternalData(_ID, NULL);
+	if (!_sd)
+	{
+		_BLSpineCacheData* _scd = (_BLSpineCacheData*)malloc(sizeof(_BLSpineCacheData));
+		_scd->nType = 4;
+		memset(_scd->uData.sAniMix.aFromAniName, 0, sizeof(_scd->uData.sAniMix.aFromAniName));
+		strcpy(_scd->uData.sAniMix.aFromAniName, _From);
+		memset(_scd->uData.sAniMix.aToAniName, 0, sizeof(_scd->uData.sAniMix.aToAniName));
+		strcpy(_scd->uData.sAniMix.aToAniName, _To);
+		_scd->uData.sAniMix.fDuration = _Duration;
+		blSpriteExternalData(_ID, _scd);
+	}
+	else
+		spAnimationStateData_setMixByName(_sd->pState->data, _From, _To, _Duration);
+}
+BLVoid 
+blSpriteAnimationEmptyEXT(IN BLGuid _ID, IN BLU32 _TrackIndex, IN BLF32 _Duration)
+{
+	_BLSpineDataExt* _sd = blSpriteExternalData(_ID, NULL);
+	if (!_sd)
+	{
+		_BLSpineCacheData* _scd = (_BLSpineCacheData*)malloc(sizeof(_BLSpineCacheData));
+		_scd->nType = 5;
+		_scd->uData.sAniEmpty.nTrackIndex = _TrackIndex;
+		_scd->uData.sAniEmpty.fDuration = _Duration;
+		blSpriteExternalData(_ID, _scd);
+	}
+	else
+	{
+		if (_TrackIndex == 0xFFFFFFFF)
+			spAnimationState_setEmptyAnimations(_sd->pState, _Duration);
+		else
+			spAnimationState_setEmptyAnimation(_sd->pState, _TrackIndex, _Duration);
+	}
+}
+BLVoid 
+blSpriteTrackEmpty(IN BLGuid _ID, IN BLU32 _TrackIndex)
+{
+	_BLSpineDataExt* _sd = blSpriteExternalData(_ID, NULL);
+	if (!_sd)
+	{
+		_BLSpineCacheData* _scd = (_BLSpineCacheData*)malloc(sizeof(_BLSpineCacheData));
+		_scd->nType = 6;
+		_scd->uData.sTrackEmpty.nTrackIndex = _TrackIndex;
+		blSpriteExternalData(_ID, _scd);
+	}
+	else
+	{
+		if (_TrackIndex == 0xFFFFFFFF)
+			spAnimationState_clearTracks(_sd->pState);
+		else
+			spAnimationState_clearTrack(_sd->pState, _TrackIndex);
+	}
 }
 BLBool 
 blSpriteBoundingBoxEXT(IN BLGuid _ID, OUT BLU32* _Width, OUT BLU32* _Height)
