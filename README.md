@@ -66,6 +66,3 @@ Toolchain Screenshot
 ![image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/Pack.jpg)
 ![image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/textool.jpg)
 QQ交流群：563060511
-
-Donate:
-![image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/zfb.jpg)
