@@ -20,3 +20,8 @@
 *.json
 *.lua
 *.xml
+*.o
+*.apk
+*.intermediate
+*.DS_Store
+*.so

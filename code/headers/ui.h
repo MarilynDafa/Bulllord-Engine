@@ -146,8 +146,8 @@ BL_API BLVoid blUIStick(
 
 BL_API BLVoid blUIFocus(
 	IN BLGuid _ID,
-	IN BLF32 _X,
-	IN BLF32 _Y);
+	IN BLF32 _XPos,
+	IN BLF32 _YPos);
 
 BL_API BLGuid blUIGetFocus();
 

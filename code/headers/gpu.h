@@ -46,10 +46,10 @@ BL_API BLVoid blRasterState(
     IN BLS32 _DepthBias,
     IN BLF32 _SlopeScaledDepthBias,
     IN BLBool _Scissor,
-    IN BLS32 _X,
-    IN BLS32 _Y,
-    IN BLU32 _W,
-    IN BLU32 _H, 
+    IN BLS32 _XPos,
+    IN BLS32 _YPos,
+    IN BLU32 _Width,
+    IN BLU32 _Height, 
 	IN BLBool _Force);
 
 /**

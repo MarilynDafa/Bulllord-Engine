@@ -559,7 +559,7 @@ ezxml_t ezxml_parse_str(char *s, size_t len)
             if (! (q = *s) && e != '>') return ezxml_err(root, d, "missing >");
             *s = '\0'; // temporarily null terminate tag name
             if (ezxml_close_tag(root, d, s)) return &root->xml;
-            if (isspace((unsigned char)*s = q)) s += strspn(s, EZXML_WS);
+            if (isspace((unsigned char)(*s = q))) s += strspn(s, EZXML_WS);
         }
         else if (! strncmp(s, "!--", 3)) { // xml comment
             if (! (s = strstr(s + 3, "--")) || (*(s += 2) != '>' && *s) ||

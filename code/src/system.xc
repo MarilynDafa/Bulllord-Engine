@@ -187,6 +187,7 @@ typedef struct _SystemMember {
 	_BLPlugin aPlugins[64];
 	BLAnsi aWorkDir[260];
 	BLAnsi aUserDir[260];
+	BLAnsi aEncryptkey[260];
 	BLU8 aClipboard[1024];
 	BLU32 nEventsSz;
 	BLU32 nEventIdx;
@@ -1939,7 +1940,7 @@ _ShowWindow()
 	_PrSystemMem->pActivity->vm->DetachCurrentThread();
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 	while (!_PrSystemMem->pWindow);
-	_GpuIntervention(_PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler);
+	_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler);
 }
 BLVoid
 _PollMsg()
@@ -2484,7 +2485,7 @@ _ShowWindow()
     NSTrackingAreaOptions _options = NSTrackingMouseEnteredAndExited|NSTrackingActiveAlways|NSTrackingAssumeInside;
     NSTrackingArea* _area = [[NSTrackingArea alloc] initWithRect:_view.bounds options:_options owner:_view userInfo:nil];
     [_view addTrackingArea:_area];
-    _GpuIntervention(_view, _rect.size.width, _rect.size.height, !_PrSystemMem->sBoostParam.bProfiler);
+    _GpuIntervention(_PrSystemMem->pDukContext, _view, _rect.size.width, _rect.size.height, !_PrSystemMem->sBoostParam.bProfiler);
 #   ifndef DEBUG
     if (_PrSystemMem->sBoostParam.bFullscreen)
         [_PrSystemMem->pWindow setLevel:CGShieldingWindowLevel()];
@@ -3061,7 +3062,7 @@ _CloseWindow()
         blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_BACKSPACE, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
     }
     else
-        blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, [_String UTF8String]);
+        blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, [_String UTF8String], INVALID_GUID);
     return NO;
 }
 - (BOOL)textFieldShouldReturn:(UITextField*)_TextField
@@ -4602,6 +4603,7 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 	_PrSystemMem->pDukContext = NULL;
 	memset(_PrSystemMem->aWorkDir, 0, sizeof(_PrSystemMem->aWorkDir));
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
+	memset(_PrSystemMem->aEncryptkey, 0, sizeof(_PrSystemMem->aEncryptkey));
 	_PrSystemMem->nEventsSz = 0;
 	_PrSystemMem->nEventIdx = 0;
 	_PrSystemMem->nSysTime = 0;
@@ -4645,12 +4647,12 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 	{
 		BLAnsi _tmp[256] = { 0 };
 		if (blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp))
-			_PrSystemMem->sBoostParam.nScreenWidth = strtoul(_tmp, NULL, 10);
+			_PrSystemMem->sBoostParam.nScreenWidth = (BLU32)strtoul(_tmp, NULL, 10);
 		else
 			_PrSystemMem->sBoostParam.nScreenWidth = 0;
 		memset(_tmp, 0, sizeof(_tmp));
 		if (blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp))
-			_PrSystemMem->sBoostParam.nScreenHeight = strtoul(_tmp, NULL, 10);
+			_PrSystemMem->sBoostParam.nScreenHeight = (BLU32)strtoul(_tmp, NULL, 10);
 		else
 			_PrSystemMem->sBoostParam.nScreenHeight = 0;
 		memset(_tmp, 0, sizeof(_tmp));
@@ -4660,7 +4662,7 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 			_PrSystemMem->sBoostParam.bFullscreen = FALSE;
 		memset(_tmp, 0, sizeof(_tmp));
 		if (blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp))
-			_PrSystemMem->sBoostParam.eQuality = strtoul(_tmp, NULL, 10);
+			_PrSystemMem->sBoostParam.eQuality = (BLU32)strtoul(_tmp, NULL, 10);
 		else
 			_PrSystemMem->sBoostParam.eQuality = BL_RQ_NORMAL;
 	}
@@ -4698,6 +4700,7 @@ blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)
 	_PrSystemMem->pEvents = NULL;
 	memset(_PrSystemMem->aWorkDir, 0, sizeof(_PrSystemMem->aWorkDir));
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
+	memset(_PrSystemMem->aEncryptkey, 0, sizeof(_PrSystemMem->aEncryptkey));
 	_PrSystemMem->nEventsSz = 0;
 	_PrSystemMem->nEventIdx = 0;
 	_PrSystemMem->nSysTime = 0;
@@ -4732,7 +4735,7 @@ blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)
 #endif
 }
 BLVoid
-blSystemScriptRun()
+blSystemScriptRun(IN BLAnsi* _Encryptkey)
 {
 #if defined(BL_PLATFORM_UWP)
 	_PrSystemMem = new _BLSystemMember;
@@ -4748,6 +4751,8 @@ blSystemScriptRun()
 	_PrSystemMem->pDukContext = duk_create_heap_default();
 	memset(_PrSystemMem->aWorkDir, 0, sizeof(_PrSystemMem->aWorkDir));
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
+	memset(_PrSystemMem->aEncryptkey, 0, sizeof(_PrSystemMem->aEncryptkey));
+	strcpy(_PrSystemMem->aEncryptkey, _Encryptkey);
 	_PrSystemMem->nEventsSz = 0;
 	_PrSystemMem->nEventIdx = 0;
 	_PrSystemMem->nSysTime = 0;
@@ -4756,12 +4761,12 @@ blSystemScriptRun()
 		_PrSystemMem->aPlugins[_idx].nHash = 0;
 	BLAnsi _tmp[256] = { 0 };
 	if (blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp))
-		_PrSystemMem->sBoostParam.nScreenWidth = strtoul(_tmp, NULL, 10);
+		_PrSystemMem->sBoostParam.nScreenWidth = (BLU32)strtoul(_tmp, NULL, 10);
 	else
 		_PrSystemMem->sBoostParam.nScreenWidth = 0;
 	memset(_tmp, 0, sizeof(_tmp));
 	if (blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp))
-		_PrSystemMem->sBoostParam.nScreenHeight = strtoul(_tmp, NULL, 10);
+		_PrSystemMem->sBoostParam.nScreenHeight = (BLU32)strtoul(_tmp, NULL, 10);
 	else
 		_PrSystemMem->sBoostParam.nScreenHeight = 0;
 	memset(_tmp, 0, sizeof(_tmp));
@@ -4771,7 +4776,7 @@ blSystemScriptRun()
 		_PrSystemMem->sBoostParam.bFullscreen = FALSE;
 	memset(_tmp, 0, sizeof(_tmp));
 	if (blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp))
-		_PrSystemMem->sBoostParam.eQuality = strtoul(_tmp, NULL, 10);
+		_PrSystemMem->sBoostParam.eQuality = (BLU32)strtoul(_tmp, NULL, 10);
 	else
 		_PrSystemMem->sBoostParam.eQuality = BL_RQ_NORMAL;
 #if defined(BL_PLATFORM_WIN32)

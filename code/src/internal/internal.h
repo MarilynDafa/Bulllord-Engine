@@ -68,7 +68,13 @@ extern "C" {
 #define URIPART_INTERNAL(val) ((BLU32)(((BLU64)(val)) & 0xFFFFFFFF))
 #define PTRPART_INTERNAL(val) ((BLU32)((((BLU64)(val)) >> 32) & 0xFFFFFFFF))
 #define MAKEGUID_INTERNAL(sys, user) ((BLU64)(((BLU32)(((BLU64)(user)) & 0xFFFFFFFF)) | ((BLU64)((BLU32)(((BLU64)(sys)) & 0xFFFFFFFF))) << 32))
-/*Managed Resource Config*/
+/* Utf16 char*/
+#if defined (BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+#   define U16(str) L##str
+#else
+#   define U16(str) u##str
+#endif
+/* Managed Resource Config*/
 #define IB_CAP_INTERNAL				4 << 11
 #define VB_CAP_INTERNAL				4 << 11
 #define UB_CAP_INTERNAL				64

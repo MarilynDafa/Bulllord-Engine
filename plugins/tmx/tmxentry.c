@@ -271,7 +271,7 @@ blTMXFileEXT(IN BLAnsi* _Filename)
                                     memset(_buf, 0, 32);
                                     sprintf(_buf, "@#tilespritelayer_%d_%d#@", _layer, _gid);
 									BLAnsi _source[260] = { 0 };
-									BLF32 _w = 1.f, _h = 1.f, _first;
+									BLF32 _w = 1.f, _h = 1.f, _first = 0.f;
 									for (BLU32 _idx = 0; _idx < _PrTmxMem->nTilesetNum; ++_idx)
 									{
 										if (_gid >= _PrTmxMem->pTilesets[_idx].nFirstGid)
@@ -508,8 +508,8 @@ blTMXPathFindEXT(IN BLS32 _StartX, IN BLS32 _StartY, IN BLS32 _EndX, IN BLS32 _E
 	BLS32 _end = astar_getIndexByWidth(_PrTmxMem->nWidth, _EndX / _PrTmxMem->nTileWidth, _EndY / _PrTmxMem->nTileHeight);
 	if (!_Strict && !_PrTmxMem->pNavigation[_EndX / _PrTmxMem->nTileWidth + _EndY / _PrTmxMem->nTileHeight * _PrTmxMem->nWidth])
 	{
-		BLS32 _numx = (BLS32)fabs(_EndX - _StartX) / _PrTmxMem->nTileWidth;
-		BLS32 _numy = (BLS32)fabs(_EndY - _StartY) / _PrTmxMem->nTileHeight;
+		BLS32 _numx = (BLS32)abs(_EndX - _StartX) / _PrTmxMem->nTileWidth;
+		BLS32 _numy = (BLS32)abs(_EndY - _StartY) / _PrTmxMem->nTileHeight;
 		BLS32 _num = (BLS32)((_numx) > (_numy) ? (_numx) : (_numy));
 		if (_num)
 		{
@@ -528,7 +528,7 @@ blTMXPathFindEXT(IN BLS32 _StartX, IN BLS32 _StartY, IN BLS32 _EndX, IN BLS32 _E
 		}
 	}
 	BLS32 _retlen = 0;
-	BLS32* _ret = astar_compute(_PrTmxMem->pNavigation, &_retlen, _PrTmxMem->nWidth, _PrTmxMem->nHeight, _begin, _end);
+	BLS32* _ret = astar_compute((const BLAnsi*)_PrTmxMem->pNavigation, &_retlen, _PrTmxMem->nWidth, _PrTmxMem->nHeight, _begin, _end);
 	if (!_ret || _retlen == 0)
 		return FALSE;
 	_PrTmxMem->pPathXRet = (BLF32*)realloc(_PrTmxMem->pPathXRet, (_retlen + 1) * sizeof(BLF32));

@@ -213,7 +213,7 @@ _BufferWrite(_BLAudioSource* _Src, BLF32* _Pcm, BLS32 _Channels, BLS32 _FrameSiz
 			else
 				memcpy(_Src->pSoundBufC + _sampout + _Offset, (BLU8*)_out, sizeof(BLS16) * _Channels * (_outlen < (BLU32)_Maxout ? _outlen : (BLU32)_Maxout));
 			_sampout += sizeof(BLS16) * _Channels * (_outlen < (BLU32)_Maxout ? _outlen : (BLU32)_Maxout);
-			_Maxout -= sizeof(BLS16) * _Channels * (_outlen < (BLU32)_Maxout ? _outlen : (BLU32)_Maxout);
+            _Maxout -= sizeof(BLS16) * _Channels * (_outlen < (BLU32)_Maxout ? _outlen : (BLU32)_Maxout);
 		}
 	} while (_FrameSize > 0 && _Maxout > 0);
 	return _sampout;
@@ -226,6 +226,7 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx, BLU32* _TotalRead)
 	ogg_packet _packet;
 	BLU32 _fragsize = 0;
 	BLBool _eof = FALSE;
+refill:
 	while (ogg_sync_pageout(&_Src->sSyncState, &_Src->sPage) == 1)
 	{
 		ogg_stream_pagein(&_Src->sStreamState, &_Src->sPage);
@@ -243,7 +244,7 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx, BLU32* _TotalRead)
 			if (_packet.e_o_s && _Src->sStreamState.serialno == _Src->nSerialno)
 				_eof = TRUE;
 			if (!_lost)
-				_framesz = opus_multistream_decode_float(_Src->pDecoder, (BLU8*)_packet.packet, _packet.bytes, _Src->pFPData, 5760, 0);
+				_framesz = (BLS32)opus_multistream_decode_float(_Src->pDecoder, (BLU8*)_packet.packet, (opus_int32)_packet.bytes, _Src->pFPData, 5760, 0);
 			else
 			{
 				opus_int32 _lostsize;
@@ -251,7 +252,7 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx, BLU32* _TotalRead)
 				if (_packet.bytes > 0)
 				{
 					opus_int32 _spp;
-					_spp = opus_packet_get_nb_frames(_packet.packet, _packet.bytes);
+					_spp = (opus_int32)opus_packet_get_nb_frames(_packet.packet, (opus_int32)_packet.bytes);
 					if (_spp > 0)
 					{
 						_spp *= opus_packet_get_samples_per_frame(_packet.packet, 48000);
@@ -310,6 +311,8 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx, BLU32* _TotalRead)
 	if (!_ret)
 		blInvokeEvent(BL_ET_SYSTEM, BL_SE_AUDIOOVER, 0, NULL, _Src->nID);
 	*_TotalRead = _fragsize;
+    if (!*_TotalRead)
+        goto refill;
     return _ret;
 }
 static BLBool
@@ -338,8 +341,8 @@ _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 	_err = ogg_sync_init(&_src->sSyncState);
 	memset(&_src->sStreamState, 0, sizeof(_src->sStreamState));
 	assert(_err == OPUS_OK);
-	BLAnsi* _tmpdata = ogg_sync_buffer(&_src->sSyncState, 256);
-	ogg_sync_wrote(&_src->sSyncState, blStreamRead(_src->nStream, 256, _tmpdata));
+	BLAnsi* _tmpdata = ogg_sync_buffer(&_src->sSyncState, 4096);
+	ogg_sync_wrote(&_src->sSyncState, blStreamRead(_src->nStream, 4096, _tmpdata));
 	while (ogg_sync_pageout(&_src->sSyncState, &_src->sPage) == 1)
 	{
 		if (!_src->sStreamState.body_data)
@@ -365,7 +368,7 @@ _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 						blDebugOutput("Apparent chaining without changing serial number");
 						return FALSE;
 					}
-					_src->nSerialno = _src->sStreamState.serialno;
+					_src->nSerialno = (ogg_int32_t)_src->sStreamState.serialno;
 					_src->bHasOpusStream = TRUE;
 					_src->bHasTagsPacket = FALSE;
 					_src->nLinkOut = 0;
@@ -443,7 +446,7 @@ _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 					_rate = 48000;
 				if (_rate < 8000 || _rate > 192000)
 					_rate = 48000;
-				_src->pDecoder = opus_multistream_decoder_create(48000, _src->nChannels, _streams, _nbcoupled, _streammap, &_err);
+				_src->pDecoder = opus_multistream_decoder_create(_rate, _src->nChannels, _streams, _nbcoupled, _streammap, &_err);
 				if (_err != OPUS_OK || !_src->pDecoder)
 					_src->pDecoder = NULL;
 				if (_gain != 0 && _src->pDecoder)
@@ -483,6 +486,7 @@ _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 					blDebugOutput("Extra packets on initial tags page. Invalid stream.");
 					return FALSE;
 				}
+                break;
 			}
 			_packetcount++;
 		}
@@ -524,12 +528,12 @@ _ALSoundSetup(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
     ALsizei _queuesz = 0;
-	_src->pSoundBufA = (BLU8*)malloc(65536);
-	_src->pSoundBufB = (BLU8*)malloc(65536);
-	_src->pSoundBufC = (BLU8*)malloc(65536);
-    memset(_src->pSoundBufA, 0, 65536);
-    memset(_src->pSoundBufB, 0, 65536);
-    memset(_src->pSoundBufC, 0, 65536);
+	_src->pSoundBufA = (BLU8*)malloc(4 * 3840 * 10);
+	_src->pSoundBufB = (BLU8*)malloc(4 * 3840 * 10);
+	_src->pSoundBufC = (BLU8*)malloc(4 * 3840 * 10);
+    memset(_src->pSoundBufA, 0, 4 * 3840 * 10);
+    memset(_src->pSoundBufB, 0, 4 * 3840 * 10);
+    memset(_src->pSoundBufC, 0, 4 * 3840 * 10);
     alGetError();
     alGenSources(1, &_src->nSource);
     alGenBuffers(3, _src->aBuffers);
@@ -553,8 +557,23 @@ _ALSoundSetup(BLVoid* _Src)
     alSourcei(_src->nSource, AL_BUFFER, 0);
     for (BLU32 _i = 0; _i < 3; ++_i)
     {
-        if (_MakeStream(_src, _i))
+        BLU32 _tmpsz;
+        if (_MakeStream(_src, _i, &_tmpsz))
+        {
+            switch (_i)
+            {
+                case 0:
+                    alBufferData(_src->aBuffers[0], (_src->nChannels == 2) ? 0x1103 : 0x1101, _src->pSoundBufA, _tmpsz, 48000);
+                    break;
+                case 1:
+                    alBufferData(_src->aBuffers[1], (_src->nChannels == 2) ? 0x1103 : 0x1101, _src->pSoundBufB, _tmpsz, 48000);
+                    break;
+                case 2:
+                    alBufferData(_src->aBuffers[2], (_src->nChannels == 2) ? 0x1103 : 0x1101, _src->pSoundBufC, _tmpsz, 48000);
+                    break;
+            }
             ++_queuesz;
+        }
     }
     alSourceQueueBuffers(_src->nSource, _queuesz, _src->aBuffers);
 	alSourcePlay(_src->nSource);
@@ -611,19 +630,19 @@ _ALUpdate(_BLAudioSource* _Src)
             if (_Src->aBuffers[0] == _buffer)
             {
                 if (_MakeStream(_Src, 0, &_totalread))
-					alBufferData(_Src->aBuffers[0], 0x1103, _Src->pSoundBufA, _totalread, 48000);
+					alBufferData(_Src->aBuffers[0], (_Src->nChannels == 2) ? 0x1103 : 0x1101, _Src->pSoundBufA, _totalread, 48000);
                 alSourceQueueBuffers(_Src->nSource, 1, &_buffer);
             }
             else if (_Src->aBuffers[1] == _buffer)
             {
                 if (_MakeStream(_Src, 1, &_totalread))
-					alBufferData(_Src->aBuffers[1], 0x1103, _Src->pSoundBufB, _totalread, 48000);
+					alBufferData(_Src->aBuffers[1], (_Src->nChannels == 2) ? 0x1103 : 0x1101, _Src->pSoundBufB, _totalread, 48000);
                 alSourceQueueBuffers(_Src->nSource, 1, &_buffer);
             }
             else if (_Src->aBuffers[2] == _buffer)
             {
                 if (_MakeStream(_Src, 2, &_totalread))
-					alBufferData(_Src->aBuffers[2], 0x1103, _Src->pSoundBufC, _totalread, 48000);
+					alBufferData(_Src->aBuffers[2], (_Src->nChannels == 2) ? 0x1103 : 0x1101, _Src->pSoundBufC, _totalread, 48000);
                 alSourceQueueBuffers(_Src->nSource, 1, &_buffer);
             }
         }
@@ -639,12 +658,12 @@ static BLBool
 _SLSoundSetup(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
-	_src->pSoundBufA = (BLU8*)malloc(65536);
-	_src->pSoundBufB = (BLU8*)malloc(65536);
-	_src->pSoundBufC = (BLU8*)malloc(65536);
-    memset(_src->pSoundBufA, 0, 65536);
-    memset(_src->pSoundBufB, 0, 65536);
-    memset(_src->pSoundBufC, 0, 65536);
+	_src->pSoundBufA = (BLU8*)malloc(4 * 3840 * 10);
+	_src->pSoundBufB = (BLU8*)malloc(4 * 3840 * 10);
+	_src->pSoundBufC = (BLU8*)malloc(4 * 3840 * 10);
+    memset(_src->pSoundBufA, 0, 4 * 3840 * 10);
+    memset(_src->pSoundBufB, 0, 4 * 3840 * 10);
+    memset(_src->pSoundBufC, 0, 4 * 3840 * 10);
 	_src->nBufTurn = 0;
     SLDataLocator_BufferQueue _bufq = {SL_DATALOCATOR_BUFFERQUEUE, 3};
     SLDataFormat_PCM _pcm; 
@@ -766,12 +785,12 @@ static BLBool
 _CASoundSetup(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
-	_src->pSoundBufA = (BLU8*)malloc(65536);
-	_src->pSoundBufB = (BLU8*)malloc(65536);
-	_src->pSoundBufC = (BLU8*)malloc(65536);
-	memset(_src->pSoundBufA, 0, 65536);
-	memset(_src->pSoundBufB, 0, 65536);
-	memset(_src->pSoundBufC, 0, 65536);
+	_src->pSoundBufA = (BLU8*)malloc(4 * 3840 * 10);
+	_src->pSoundBufB = (BLU8*)malloc(4 * 3840 * 10);
+	_src->pSoundBufC = (BLU8*)malloc(4 * 3840 * 10);
+	memset(_src->pSoundBufA, 0, 4 * 3840 * 10);
+	memset(_src->pSoundBufB, 0, 4 * 3840 * 10);
+	memset(_src->pSoundBufC, 0, 4 * 3840 * 10);
 	WAVEFORMATEX _pwfx;
 	_pwfx.wFormatTag = WAVE_FORMAT_PCM;
 	_pwfx.nChannels = _src->nChannels;
@@ -1135,7 +1154,6 @@ _AudioStep(BLU32 _Delta)
 BLVoid
 _AudioDestroy()
 {
-	blMutexLock(_PrAudioMem->pMusicMutex);
 #if defined(BL_USE_AL_API)
 	if (_PrAudioMem->pBackMusic)
 		_DiscardResource(_PrAudioMem->pBackMusic->nID, _UnloadAudio, _ALSoundRelease);
@@ -1155,7 +1173,6 @@ _AudioDestroy()
 		free(_PrAudioMem->pBackMusic);
 		_PrAudioMem->pBackMusic = NULL;
 	}
-	blMutexUnlock(_PrAudioMem->pMusicMutex);
 	blDebugOutput("Audio shutdown");
 	free(_PrAudioMem);
 }

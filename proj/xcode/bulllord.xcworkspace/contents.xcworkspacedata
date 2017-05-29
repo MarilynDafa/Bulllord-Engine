@@ -5,6 +5,12 @@
       location = "container:"
       name = "Plugins">
       <FileRef
+         location = "group:../../plugins/spine/spine-ios.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:../../plugins/spine/spine-osx.xcodeproj">
+      </FileRef>
+      <FileRef
          location = "group:../../plugins/tmx/tmx-ios.xcodeproj">
       </FileRef>
       <FileRef
@@ -15,7 +21,7 @@
       location = "container:"
       name = "sample">
       <FileRef
-         location = "group:../../samples/sample/sample.xcodeproj">
+         location = "group:../../samples/sampleosx/sampleosx.xcodeproj">
       </FileRef>
    </Group>
    <Group

@@ -258,7 +258,7 @@ _StreamIOInit(duk_context* _DKC, BLVoid* _AssetMgr)
 	blThreadRun(_PrStreamIOMem->pLoadThread);
 	blArchiveRegist("localdata0079.bpk", "localdata0079");
 	blArchiveRegist("remotedata0084.bpk", "remotedata0084");
-	BLAnsi _path[MAX_PATH];
+	BLAnsi _path[260];
 	strcpy(_path, blUserFolderDir());
 	BLAnsi** _pats = NULL;
 	BLU32 _patnum = 0;

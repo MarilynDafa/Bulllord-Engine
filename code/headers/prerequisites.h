@@ -20,13 +20,40 @@
  */
 #ifndef __prerequisiters_h_
 #define __prerequisiters_h_
+#if defined(__EMSCRIPTEN__)
+#	define BL_PLATFORM_WEB
+#elif defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
+#	if defined(WINAPI_FAMILY)
+#		if WINAPI_FAMILY == WINAPI_FAMILY_APP|| WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
+#			define BL_PLATFORM_UWP      2
+#		endif
+#	else
+#		define BL_PLATFORM_WIN32    1
+#	endif
+#elif defined(__APPLE_CC__)
+#   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 40000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 40000
+#       define BL_PLATFORM_IOS  6
+#   else
+#       define BL_PLATFORM_OSX  5
+#   endif
+#elif defined(ANDROID)
+#	define BL_PLATFORM_ANDROID  4
+#elif defined(linux) || defined(__linux) || defined(__linux__)
+#	define BL_PLATFORM_LINUX    3
+#else
+#	error unsupport platform
+#endif
+#if defined(DEBUG) | defined(_DEBUG)
+#	define BL_DEBUG_MODE
+#else
+#	define BL_RELEASE_MODE
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <stddef.h>
 #include <setjmp.h>
-#include "../config.h"
 #if defined(BL_PLATFORM_WIN32)
 #	ifndef WIN32_LEAN_AND_MEAN
 #		define WIN32_LEAN_AND_MEAN
@@ -189,6 +216,12 @@ typedef unsigned long long BLU64;
 typedef BLS32 BLSocket;
 typedef unsigned long long BLGuid;
 #endif
+
+/* BLEngine SDK Version*/
+#define BL_VERSION_MAJOR 1
+#define BL_VERSION_MINOR 0
+#define BL_VERSION_REVISION 0
+#define BL_SDK_VERSION "1.0.0"
 
 /* Symbol Export*/
 #if defined BL_API

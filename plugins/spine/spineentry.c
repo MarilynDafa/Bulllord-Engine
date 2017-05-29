@@ -132,7 +132,6 @@ _spAtlasPage_createTexture(spAtlasPage* _Self, const BLAnsi* _Filename)
 	blStreamRead(_stream, sizeof(BLU32), &_fourcc);
 	blStreamRead(_stream, sizeof(BLU32), &_channels);
 	blStreamRead(_stream, sizeof(BLU32), &_offset);
-	BLEnum _type = BL_TT_2D;
 	while (blStreamTell(_stream) < _offset)
 	{
 		BLS32 _ltx, _lty, _rbx, _rby, _offsetx, _offsety;
@@ -253,7 +252,7 @@ _LoadSpine(BLGuid _ID, const BLAnsi* _Filename, BLVoid** _ExtData)
 {
 	BLAnsi _dir[260] = { 0 };
 	strcpy(_dir, _Filename);
-	BLU32 _tmplen = strlen(_Filename);
+	BLU32 _tmplen = (BLU32)strlen(_Filename);
 	for (BLS32 _idx = _tmplen - 1; _idx >= 0; --_idx)
 	{
 		if (_dir[_idx] == '.')
@@ -266,7 +265,7 @@ _LoadSpine(BLGuid _ID, const BLAnsi* _Filename, BLVoid** _ExtData)
 	_sd->pAtlas = spAtlas_createFromFile(_dir, 0);
 	_sd->pWorldVertices = (BLF32*)malloc(1000 * sizeof(BLF32));
 	spBone_setYDown(TRUE);
-	if (!strcmp(blFileSuffixUtf8(_Filename), "json"))
+	if (!strcmp((const BLAnsi*)blFileSuffixUtf8((const BLUtf8*)_Filename), "json"))
 	{
 		spSkeletonJson* _json = spSkeletonJson_create(_sd->pAtlas);
 		_json->scale = 1.f;
@@ -502,11 +501,11 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 			{
 				BLS32 _index = _mesh->triangles[_jdx] << 1;
 				_gbdata[_gbi++] = (_sd->pWorldVertices[_index] * _Mat[0]) + (_sd->pWorldVertices[_index + 1] * _Mat[2]) + _Mat[4] + _OffsetX;
-				_sd->fMinX = min(_sd->fMinX, _gbdata[_gbi - 1]);
-				_sd->fMaxX = max(_sd->fMaxX, _gbdata[_gbi - 1]);
+                _sd->fMinX = (_sd->fMinX > _gbdata[_gbi - 1]) ? _gbdata[_gbi - 1] : _sd->fMinX;
+                _sd->fMaxX = (_sd->fMaxX > _gbdata[_gbi - 1]) ? _sd->fMaxX : _gbdata[_gbi - 1];
 				_gbdata[_gbi++] = (_sd->pWorldVertices[_index] * _Mat[1]) + (_sd->pWorldVertices[_index + 1] * _Mat[3]) + _Mat[5] + _OffsetY;
-				_sd->fMinY = min(_sd->fMinY, _gbdata[_gbi - 1]);
-				_sd->fMaxY = max(_sd->fMaxY, _gbdata[_gbi - 1]);
+                _sd->fMinY = (_sd->fMinY > _gbdata[_gbi - 1]) ? _gbdata[_gbi - 1] : _sd->fMinY;
+                _sd->fMaxY = (_sd->fMaxY > _gbdata[_gbi - 1]) ? _sd->fMaxY : _gbdata[_gbi - 1];
 				_gbdata[_gbi++] = _r;
 				_gbdata[_gbi++] = _g;
 				_gbdata[_gbi++] = _b;

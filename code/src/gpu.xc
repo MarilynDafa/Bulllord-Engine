@@ -1106,7 +1106,7 @@ _FillTextureFormatGL(BLEnum _BLFmt, GLenum* _IFmt, GLenum* _Fmt, GLenum* _Type, 
         case BL_TF_BGRA8:
             *_IFmt = GL_RGBA8;
             *_SrgbFmt = GL_SRGB8_ALPHA8;
-            *_Fmt = GL_BGRA;
+            *_Fmt = 0x80E1;
             *_Type = GL_UNSIGNED_BYTE;
             *_RtFmt = GL_RGBA8;
             break;
@@ -1301,7 +1301,6 @@ _GpuIntervention(duk_context* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLB
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
 		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	BLBool _vkinited = FALSE;
-	BLBool _gpuok = FALSE;
 	if (_vkinited)
     {
         _PrGpuMem->sHardwareCaps.eApiType = BL_VULKAN_API;
@@ -1352,7 +1351,6 @@ _GpuIntervention(duk_context* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLB
 			HGLRC _hwgl = wglCreateContextAttribsARB(_PrGpuMem->sGLHDC, 0, _attribus);
 			if (_hwgl)
 			{
-				_gpuok = TRUE;
 				wglMakeCurrent(_PrGpuMem->sGLHDC, 0);
 				wglDeleteContext(_PrGpuMem->sGLRC);
 				_PrGpuMem->sGLRC = _hwgl;
@@ -1361,9 +1359,9 @@ _GpuIntervention(duk_context* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLB
 				break;
 			}
 		}
-		if (_gpuok && _PrGpuMem->bVsync)
+		if (_PrGpuMem->bVsync)
 			wglSwapIntervalEXT(1);
-		else if (_gpuok && !_PrGpuMem->bVsync)
+		else if (!_PrGpuMem->bVsync)
 			wglSwapIntervalEXT(0);
 		else
 		{
@@ -1486,7 +1484,6 @@ _GpuIntervention(duk_context* _DKC, Display* _Display, Window _Window, GLXFBConf
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
 		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	BLBool _vkinited = FALSE;
-	BLBool _gpuok = FALSE;
     if (_vkinited)
     {
         _PrGpuMem->sHardwareCaps.eApiType = BL_VULKAN_API;
@@ -1524,10 +1521,9 @@ _GpuIntervention(duk_context* _DKC, Display* _Display, Window _Window, GLXFBConf
 			XSync(_Display, False);
             if (!_PrGpuMem->bCtxError && _PrGpuMem->pContext)
 			{
-				_gpuok = TRUE;
 				blDebugOutput("Opengl %d.%d boost", _versions[_idx][0], _versions[_idx][1]);
 				_glversion = _versions[_idx][0] * 10 + _versions[_idx][1];
-				_gpuok = glXMakeContextCurrent(_Display, _Window, _Window, _PrGpuMem->pContext);
+				glXMakeContextCurrent(_Display, _Window, _Window, _PrGpuMem->pContext);
                 if (glXSwapIntervalEXT)
                     glXSwapIntervalEXT(_Display , _Window , _Vsync ? 1 : 0);
                 else if(glXSwapIntervalSGI)
@@ -1613,7 +1609,6 @@ _GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
 		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	BLBool _vkinited = FALSE;
-	BLBool _gpuok = FALSE;
 	if (_vkinited)
 	{
 		_PrGpuMem->sHardwareCaps.eApiType = BL_VULKAN_API;
@@ -1678,14 +1673,14 @@ _GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
 			return;
 		}
         eglSwapInterval(_PrGpuMem->pEglDisplay, _Vsync ? 1 : 0);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValid(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValid(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValid(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) & _TextureFormatValid(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValid(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValid(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValid(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValid(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValid(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) & _TextureFormatValid(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValid(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) & _TextureFormatValid(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValid(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValid(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValidGL(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValidGL(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValidGL(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
+        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValidGL(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
     }
 }
 BLVoid
@@ -1701,8 +1696,8 @@ _GpuAnitIntervention()
 	}
 	else
 	{
-		wglMakeCurrent(_PrGpuMem->sGLHDC, 0);
-		wglDeleteContext(_PrGpuMem->sGLRC);
+		eglMakeCurrent(_PrGpuMem->pEglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+		eglDestroyContext(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglContext);
 	}
 	{
 		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
@@ -1756,13 +1751,13 @@ _GpuIntervention(duk_context* _DKC, NSView* _View, BLU32 _Width, BLU32 _Height, 
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
 		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	BLBool _vkinited = FALSE;
-	BLBool _gpuok = FALSE;
     if (_vkinited)
     {
         _PrGpuMem->sHardwareCaps.eApiType = BL_VULKAN_API;
     }
     else
     {
+        _PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
         CGDisplayCount _numdisplays;
         CGDirectDisplayID* _displays, _maindis;
         if (kCGErrorSuccess != CGGetOnlineDisplayList(0, NULL, &_numdisplays))
@@ -1866,10 +1861,11 @@ _GpuAnitIntervention()
 	{
 	}
 	else
-	{
-		wglMakeCurrent(_PrGpuMem->sGLHDC, 0);
-		wglDeleteContext(_PrGpuMem->sGLRC);
-	}
+    {
+        [NSOpenGLContext clearCurrentContext];
+        [_PrGpuMem->pGLC update];
+        [_PrGpuMem->pGLC release];
+    }
 	{
 		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
 		{
@@ -1916,13 +1912,11 @@ _GpuIntervention(duk_context* _DKC, BLBool _Vsync)
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
 	_PrGpuMem->pBufferCache = blGenDict(TRUE);
 	_PrGpuMem->pTechCache = blGenDict(TRUE);
-	_PrGpuMem->pGLC = nil;
 	_PrGpuMem->pUBO = (_BLUniformBuffer*)malloc(sizeof(_BLUniformBuffer));
 	_PrGpuMem->pUBO->nSize = 0;
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
 		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	BLBool _vkinited = FALSE;
-	BLBool _gpuok = FALSE;
 }
 BLVoid
 _GpuSwapBuffer()
@@ -1937,8 +1931,6 @@ _GpuAnitIntervention()
 	}
 	else
 	{
-		wglMakeCurrent(_PrGpuMem->sGLHDC, 0);
-		wglDeleteContext(_PrGpuMem->sGLRC);
 	}
 	{
 		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
@@ -2010,25 +2002,25 @@ blHardwareCapsQuery(OUT BLEnum* _Api, OUT BLU32* _MaxTexSize, OUT BLU32* _MaxFra
 		_TexSupport[_idx] = _PrGpuMem->sHardwareCaps.aTexFormats[_idx];
 }
 BLVoid
-blRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDepthBias, IN BLBool _Scissor, IN BLS32 _X, IN BLS32 _Y, IN BLU32 _W, IN BLU32 _H, IN BLBool _Force)
+blRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDepthBias, IN BLBool _Scissor, IN BLS32 _XPos, IN BLS32 _YPos, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Force)
 {
     if (_PrGpuMem->sPipelineState.eCullMode != _CullMode ||
         _PrGpuMem->sPipelineState.nDepthBias != _DepthBias ||
         !blScalarApproximate(_PrGpuMem->sPipelineState.fSlopeScaledDepthBias, _SlopeScaledDepthBias) ||
         _PrGpuMem->sPipelineState.bScissor != _Scissor ||
-        _PrGpuMem->sPipelineState.nScissorX != _X ||
-        _PrGpuMem->sPipelineState.nScissorY != _Y ||
-        _PrGpuMem->sPipelineState.nScissorW != _W ||
-        _PrGpuMem->sPipelineState.nScissorH != _H)
+        _PrGpuMem->sPipelineState.nScissorX != _XPos ||
+        _PrGpuMem->sPipelineState.nScissorY != _YPos ||
+        _PrGpuMem->sPipelineState.nScissorW != _Width ||
+        _PrGpuMem->sPipelineState.nScissorH != _Height)
     {
         _PrGpuMem->sPipelineState.eCullMode = _CullMode;
         _PrGpuMem->sPipelineState.nDepthBias = _DepthBias;
         _PrGpuMem->sPipelineState.fSlopeScaledDepthBias = _SlopeScaledDepthBias;
         _PrGpuMem->sPipelineState.bScissor = _Scissor;
-        _PrGpuMem->sPipelineState.nScissorX = _X;
-		_PrGpuMem->sPipelineState.nScissorY = _Y;
-		_PrGpuMem->sPipelineState.nScissorW = _W;
-		_PrGpuMem->sPipelineState.nScissorH = _H;
+        _PrGpuMem->sPipelineState.nScissorX = _XPos;
+		_PrGpuMem->sPipelineState.nScissorY = _YPos;
+		_PrGpuMem->sPipelineState.nScissorW = _Width;
+		_PrGpuMem->sPipelineState.nScissorH = _Height;
         _PrGpuMem->sPipelineState.bRasterStateDirty = TRUE;
     }
 	else if (_Force)
@@ -2037,10 +2029,10 @@ blRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDep
 		_PrGpuMem->sPipelineState.nDepthBias = _DepthBias;
 		_PrGpuMem->sPipelineState.fSlopeScaledDepthBias = _SlopeScaledDepthBias;
 		_PrGpuMem->sPipelineState.bScissor = _Scissor;
-		_PrGpuMem->sPipelineState.nScissorX = _X;
-		_PrGpuMem->sPipelineState.nScissorY = _Y;
-		_PrGpuMem->sPipelineState.nScissorW = _W;
-		_PrGpuMem->sPipelineState.nScissorH = _H;
+		_PrGpuMem->sPipelineState.nScissorX = _XPos;
+		_PrGpuMem->sPipelineState.nScissorY = _YPos;
+		_PrGpuMem->sPipelineState.nScissorW = _Width;
+		_PrGpuMem->sPipelineState.nScissorH = _Height;
 		_PrGpuMem->sPipelineState.bRasterStateDirty = TRUE;
 		_PipelineStateRefresh();
 	}
@@ -2297,7 +2289,14 @@ blFrameBufferResolve(IN BLGuid _FBO)
 				else
 					_buffers[_idx++] = GL_DEPTH_ATTACHMENT;
 			}
-			GL_CHECK_INTERNAL(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, _idx, _buffers));
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_LINUX)
+            if (_PrGpuMem->sHardwareCaps.nApiVersion >= 430)
+            {
+                GL_CHECK_INTERNAL(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, _idx, _buffers));
+            }
+#else
+            GL_CHECK_INTERNAL(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, _idx, _buffers));
+#endif
 			GL_CHECK_INTERNAL(glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
 			GL_CHECK_INTERNAL(glReadBuffer(GL_NONE));
             GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
@@ -2959,7 +2958,10 @@ blTextureSwizzle(IN BLGuid _Tex, IN BLEnum _ChannelR, IN BLEnum _ChannelG, IN BL
 		default: _target = GL_TEXTURE_2D; break;
 		}
 		GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
-		GL_CHECK_INTERNAL(glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, _swizzle));
+		GL_CHECK_INTERNAL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, _swizzle[0]));
+		GL_CHECK_INTERNAL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, _swizzle[1]));
+		GL_CHECK_INTERNAL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, _swizzle[2]));
+		GL_CHECK_INTERNAL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, _swizzle[3]));
 	}
 #elif defined(BL_MTL_BACKEND)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)

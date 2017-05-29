@@ -662,17 +662,39 @@
     <ClCompile Include="..\..\code\externals\zlib\trees.c" />
     <ClCompile Include="..\..\code\externals\zlib\uncompr.c" />
     <ClCompile Include="..\..\code\externals\zlib\zutil.c" />
-    <ClCompile Include="..\..\code\src\array.c" />
-    <ClCompile Include="..\..\code\src\dictionary.c" />
-    <ClCompile Include="..\..\code\src\internal.c" />
-    <ClCompile Include="..\..\code\src\list.c" />
-    <ClCompile Include="..\..\code\src\mathematics.c" />
-    <ClCompile Include="..\..\code\src\network.c" />
-    <ClCompile Include="..\..\code\src\sprite.c" />
-    <ClCompile Include="..\..\code\src\streamio.c" />
-    <ClCompile Include="..\..\code\src\thread.c" />
-    <ClCompile Include="..\..\code\src\ui.c" />
-    <ClCompile Include="..\..\code\src\utils.c" />
+    <ClCompile Include="..\..\code\src\array.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\dictionary.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\internal.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\list.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\mathematics.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\network.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\sprite.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\streamio.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\thread.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\ui.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\..\code\src\utils.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\code\externals\opus\celt\arm\armopts.s.in">

@@ -71,8 +71,8 @@ BLVoid blArrayErase(
 
 #define FOREACH_ARRAY(type, var , container) type (var) = container->nSize ? (*(type*)(container->pData)) : NULL;\
 	BLU32(_iterator##var) = 0;\
-	for (; (_iterator##var) < (container->nSize); ++_iterator##var, \
-	(var) = *(type*)(container->pData + _iterator##var))
+	for (; (_iterator##var) < (container->nSize);\
+         (var) = *(type*)(container->pData + (++_iterator##var >= container->nSize ? 0 : _iterator##var)))
 #ifdef __cplusplus
 }
 #endif
