@@ -262,6 +262,8 @@ BL_API BLVoid blDraw(
     IN BLGuid _Tech,
     IN BLGuid _GBO,
     IN BLU32 _Instance);
+
+BL_API BLVoid blFlush();
 #ifdef __cplusplus
 }
 #endif

@@ -15,42 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\code\externals\xml\ezxml.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\crc32.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\deflate.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\gzguts.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\inffast.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\inffixed.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\inflate.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\inftrees.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\trees.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\zconf.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\zlib.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\externals\zlib\zutil.h">
-      <Filter>externals</Filter>
-    </ClInclude>
     <ClInclude Include="tmxentry.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -60,56 +24,11 @@
     <ClInclude Include="IndexPriorityQueue.h">
       <Filter>externals</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\externals\xml\ezxml.h">
+      <Filter>externals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\code\externals\xml\ezxml.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\adler32.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\compress.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\crc32.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\deflate.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\gzclose.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\gzlib.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\gzread.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\gzwrite.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\infback.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\inffast.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\inflate.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\inftrees.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\trees.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\uncompr.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\externals\zlib\zutil.c">
-      <Filter>externals</Filter>
-    </ClCompile>
     <ClCompile Include="tmxentry.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -117,6 +36,9 @@
       <Filter>externals</Filter>
     </ClCompile>
     <ClCompile Include="IndexPriorityQueue.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\xml\ezxml.c">
       <Filter>externals</Filter>
     </ClCompile>
   </ItemGroup>

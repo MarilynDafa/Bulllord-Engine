@@ -105,7 +105,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DUK_USE_DEBUGGER_SUPPORT;DUK_USE_INTERRUPT_COUNTER;DUK_USE_DEBUGGER_INSPECT;DUK_USE_DEBUGGER_PAUSE_UNCAUGHT;DUK_USE_DEBUGGER_DUMPHEAP;BL_EXPORT;HAVE_CONFIG_H;WIN32;_DEBUG;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DUK_USE_DEBUGGER_SUPPORT;DUK_USE_INTERRUPT_COUNTER;DUK_USE_DEBUGGER_INSPECT;DUK_USE_DEBUGGER_PAUSE_UNCAUGHT;DUK_USE_DEBUGGER_DUMPHEAP;BL_EXPORT;DLL_EXPORT;ZLIB_DLL;HAVE_CONFIG_H;WIN32;_DEBUG;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -118,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <OmitFramePointers>false</OmitFramePointers>
-      <PreprocessorDefinitions>DUK_USE_DEBUGGER_SUPPORT;DUK_USE_INTERRUPT_COUNTER;DUK_USE_DEBUGGER_INSPECT;DUK_USE_DEBUGGER_PAUSE_UNCAUGHT;DUK_USE_DEBUGGER_DUMPHEAP;BL_EXPORT;HAVE_CONFIG_H;WIN32;_DEBUG;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DUK_USE_DEBUGGER_SUPPORT;DUK_USE_INTERRUPT_COUNTER;DUK_USE_DEBUGGER_INSPECT;DUK_USE_DEBUGGER_PAUSE_UNCAUGHT;DUK_USE_DEBUGGER_DUMPHEAP;BL_EXPORT;DLL_EXPORT;ZLIB_DLL;HAVE_CONFIG_H;WIN32;_DEBUG;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -132,7 +132,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZLIB_DLL;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
@@ -153,7 +153,7 @@
       <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZLIB_DLL;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -715,7 +715,7 @@
     <ClCompile Include="..\..\code\src\gpu.xc">
       <FileType>Document</FileType>
     </ClCompile>
-    <ClCompile Include="..\..\code\src\system.xc">
+    <ClCompile Include="..\..\code\src\system.cpp">
       <FileType>Document</FileType>
     </ClCompile>
   </ItemGroup>

@@ -70,6 +70,14 @@ BL_API BLGuid blGenAudio(
 
 BL_API BLVoid blDeleteAudio(
 	IN BLGuid _ID);
+
+BL_API BLVoid blPCMStreamParam(
+	IN BLU32 _Channels,
+	IN BLU32 _SamplesPerSec);
+
+BL_API BLVoid blPCMStreamData(
+	IN BLS16* _PCM,
+	IN BLU32 _Length);
 #ifdef __cplusplus
 }
 #endif

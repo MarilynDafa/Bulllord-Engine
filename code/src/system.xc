@@ -255,7 +255,7 @@ typedef struct _SystemMember {
 #endif
 }_BLSystemMember;
 BLBool _GbSystemRunning = FALSE;
-BLBool _GbVideoPlaying = FALSE;
+BLBool _GbTVMode = FALSE;
 BLEnum _GbRenderQuality = BL_RQ_ULP;
 static _BLSystemMember* _PrSystemMem = NULL;
 
@@ -3203,11 +3203,7 @@ _PollEvent()
 					while (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx])
 					{
 						if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_NET, _PrSystemMem->pEvents[_idx].uEvent.sNet.nID, _PrSystemMem->pEvents[_idx].uEvent.sNet.nLength, _PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf, INVALID_GUID))
-						{
-							if (_PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf)
-								free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf);
 							break;
-						}
 						++_fidx;
 					}
 				}
@@ -3415,38 +3411,27 @@ _SystemStep()
 			}
 		}
 	}
-	if (_GbVideoPlaying && _GbSystemRunning == TRUE)
-	{
-        _PollMsg();
-		_PollEvent();
-        _PrSystemMem->pStepFunc(_delta);
-        if (_GbSystemRunning == 1)
-            _GpuSwapBuffer();
-	}
-	else
-	{
-		_PollMsg();
-		_PollEvent();
-		_UtilsStep(_delta);
-		_AudioStep(_delta);
-		_NetworkStep(_delta);
-		_UIStep(_delta, TRUE);
-        _SpriteStep(_delta, FALSE);
-		_UIStep(_delta, FALSE);
-        _SpriteStep(_delta, TRUE);
-		_StreamIOStep(_delta);
-        _PrSystemMem->pStepFunc(_delta);
-		if (_GbSystemRunning == 1)
-			_GpuSwapBuffer();
-	}
+	_PollMsg();
+	_PollEvent();
+	_UtilsStep(_delta);
+	_AudioStep(_delta);
+	_NetworkStep(_delta);
+	_UIStep(_delta, TRUE);
+    _SpriteStep(_delta, FALSE);
+	_UIStep(_delta, FALSE);
+    _SpriteStep(_delta, TRUE);
+	_StreamIOStep(_delta);
+    _PrSystemMem->pStepFunc(_delta);
+	if (_GbSystemRunning == 1)
+		_GpuSwapBuffer();
 }
 BLVoid
 _SystemDestroy()
 {
-	if (_GbVideoPlaying)
+	if (_GbTVMode)
 	{
 		blInvokeEvent(BL_ET_SYSTEM, BL_SE_VIDEOOVER, 0, NULL, INVALID_GUID);
-		_GbVideoPlaying = FALSE;
+		_GbTVMode = FALSE;
 	}
 	BLAnsi _tmp[256] = { 0 };
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenWidth);
@@ -3528,6 +3513,19 @@ blTickCounts()
     return (BLU32)((((_now) * _frequency.numer) / _frequency.denom) / 1000000);
 #endif
     return 0;
+}
+BLVoid 
+blTickDelay(IN BLU32 _Ms)
+{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+	Sleep(_Ms);
+#else
+	BLU64 _usecs = _Ms * 1000;
+    timespec _ti;
+    _ti.tv_nsec = (_usecs % 1000000) * 1000;
+    _ti.tv_sec = _usecs / 1000000;
+    while ((nanosleep(&_ti, &_ti) == -1) && (errno == EINTR)) {}
+#endif
 }
 const BLAnsi*
 blUserFolderDir()
@@ -3888,6 +3886,45 @@ blClipboardPaste()
 	}
 #endif
 	return _PrSystemMem->aClipboard;
+}
+BLBool 
+blQuitEvent()
+{
+	BLBool _quit = FALSE;
+	_PollMsg();	
+#ifdef BL_PLATFORM_ANDROID
+	pthread_mutex_lock(&_PrSystemMem->sMutex);
+#endif
+    for (BLU32 _idx = 0; _idx < _PrSystemMem->nEventIdx; ++_idx)
+    {
+        switch (_PrSystemMem->pEvents[_idx].eType)
+        {
+			case BL_ET_NET:
+			{
+				if (_PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf)
+					free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf);
+			} break;
+            case BL_ET_MOUSE:
+			{
+				if (BL_ME_LDOWN == _PrSystemMem->pEvents[_idx].uEvent.sMouse.eEvent)
+					_quit = TRUE;
+            } break;
+            case BL_ET_KEY:
+			{
+				if (_PrSystemMem->pEvents[_idx].uEvent.sKey.eCode == BL_KC_ESCAPE)
+					_quit = TRUE;
+                if (_PrSystemMem->pEvents[_idx].uEvent.sKey.pString)
+                    free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sKey.pString);
+            } break;
+            default:break;
+        }
+    }
+    _PrSystemMem->nEventIdx = 0;
+    _PrSystemMem->nEventsSz = 0;
+#ifdef BL_PLATFORM_ANDROID
+	pthread_mutex_unlock(&_PrSystemMem->sMutex);
+#endif
+	return _quit;
 }
 BLBool
 blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
@@ -4277,11 +4314,6 @@ blPluginProcAddress(IN BLAnsi* _Basename, IN BLAnsi* _Function)
 #endif
     return _ret;
 }
-BLBool
-blVideoOperation(IN BLAnsi* _Filename, IN BLAnsi* _Archive, IN BLBool _Play)
-{
-    return TRUE;
-}
 BLVoid
 blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
 {
@@ -4411,6 +4443,31 @@ blDetachIME()
 	_env->DeleteLocalRef(_blcls);
 	_PrSystemMem->pActivity->vm->DetachCurrentThread();
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
+#endif
+}
+BLVoid 
+blCursorVisiblity(IN BLBool _Show)
+{
+#if defined(BL_PLATFORM_WIN32)
+	ShowCursor(_Show);
+#elif defined(BL_PLATFORM_LINUX)
+	if (_Show)
+		XDefineCursor(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _PrSystemMem->nCursor);
+	else
+		XDefineCursor(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _PrSystemMem->nNilCursor);
+#elif defined(BL_PLATFORM_OSX)
+	if (_Show)
+		[NSCursor unhide];
+	else
+		[NSCursor hide];
+#elif defined(BL_PLATFORM_UWP)
+#	if WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP
+	if (_Show)
+		_Sender->PointerCursor = ref new Windows::UI::Core::CoreCursor(Windows::UI::Core::CoreCursorType::Arrow, 0);
+	else
+		_Sender->PointerCursor = nullptr;
+#	endif
+#else
 #endif
 }
 BLVoid

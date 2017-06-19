@@ -175,7 +175,7 @@ blTMXFileEXT(IN BLAnsi* _Filename)
         strcat(_dir, "/");
     }
 	_stream = blGenStream(_Filename);
-	ezxml_t _doc = ezxml_parse_str(blStreamData(_stream), blStreamLength(_stream));
+	ezxml_t _doc = ezxml_parse_str((BLAnsi*)blStreamData(_stream), blStreamLength(_stream));
 	ezxml_t _element = _doc;
 	const BLAnsi* _orientation = ezxml_attr(_element, "orientation");
 	const BLAnsi* _width = ezxml_attr(_element, "width");

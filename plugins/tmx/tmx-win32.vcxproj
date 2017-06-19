@@ -163,38 +163,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\externals\xml\ezxml.h" />
-    <ClInclude Include="..\..\code\externals\zlib\crc32.h" />
-    <ClInclude Include="..\..\code\externals\zlib\deflate.h" />
-    <ClInclude Include="..\..\code\externals\zlib\gzguts.h" />
-    <ClInclude Include="..\..\code\externals\zlib\inffast.h" />
-    <ClInclude Include="..\..\code\externals\zlib\inffixed.h" />
-    <ClInclude Include="..\..\code\externals\zlib\inflate.h" />
-    <ClInclude Include="..\..\code\externals\zlib\inftrees.h" />
-    <ClInclude Include="..\..\code\externals\zlib\trees.h" />
-    <ClInclude Include="..\..\code\externals\zlib\zconf.h" />
-    <ClInclude Include="..\..\code\externals\zlib\zlib.h" />
-    <ClInclude Include="..\..\code\externals\zlib\zutil.h" />
     <ClInclude Include="AStar.h" />
     <ClInclude Include="IndexPriorityQueue.h" />
     <ClInclude Include="tmxentry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\code\externals\xml\ezxml.c" />
-    <ClCompile Include="..\..\code\externals\zlib\adler32.c" />
-    <ClCompile Include="..\..\code\externals\zlib\compress.c" />
-    <ClCompile Include="..\..\code\externals\zlib\crc32.c" />
-    <ClCompile Include="..\..\code\externals\zlib\deflate.c" />
-    <ClCompile Include="..\..\code\externals\zlib\gzclose.c" />
-    <ClCompile Include="..\..\code\externals\zlib\gzlib.c" />
-    <ClCompile Include="..\..\code\externals\zlib\gzread.c" />
-    <ClCompile Include="..\..\code\externals\zlib\gzwrite.c" />
-    <ClCompile Include="..\..\code\externals\zlib\infback.c" />
-    <ClCompile Include="..\..\code\externals\zlib\inffast.c" />
-    <ClCompile Include="..\..\code\externals\zlib\inflate.c" />
-    <ClCompile Include="..\..\code\externals\zlib\inftrees.c" />
-    <ClCompile Include="..\..\code\externals\zlib\trees.c" />
-    <ClCompile Include="..\..\code\externals\zlib\uncompr.c" />
-    <ClCompile Include="..\..\code\externals\zlib\zutil.c" />
     <ClCompile Include="AStar.c">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
@@ -207,7 +181,9 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
-    <ClCompile Include="tmxentry.c" />
+    <ClCompile Include="tmxentry.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

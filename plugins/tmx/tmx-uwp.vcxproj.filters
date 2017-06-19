@@ -16,28 +16,28 @@
     <ClCompile Include="tmx.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\externals\xml\ezxml.c">
+    <ClCompile Include="AStar.c">
       <Filter>externals</Filter>
     </ClCompile>
-    <ClCompile Include="AStar.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="IndexPriorityQueue.c">
-      <Filter>src</Filter>
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\externals\xml\ezxml.c">
+      <Filter>externals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tmx.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\code\externals\xml\ezxml.h">
+    <ClInclude Include="AStar.h">
       <Filter>externals</Filter>
     </ClInclude>
-    <ClInclude Include="AStar.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="IndexPriorityQueue.h">
-      <Filter>headers</Filter>
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\externals\xml\ezxml.h">
+      <Filter>externals</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3920,7 +3920,7 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 		{
 			if (_tech->aUniformVars[_idx].aName[0])
 			{
-				void* _data = _tech->aUniformVars[_idx].pVar;
+				BLVoid* _data = _tech->aUniformVars[_idx].pVar;
 				BLU32 _count = _tech->aUniformVars[_idx].nCount;
 				if (_tech->aUniformVars[_idx].uData.sGL.nIndices == 0xFFFFFFFF)
 				{
@@ -4040,4 +4040,9 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 		_PipelineStateRefresh();
 	}
 #endif
+}
+BLVoid 
+blFlush()
+{
+	_GpuSwapBuffer();
 }

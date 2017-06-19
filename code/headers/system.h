@@ -61,6 +61,9 @@ BL_API BLEnum blPlatformIdentity();
     
 BL_API BLU32 blTickCounts();
 
+BL_API BLVoid blTickDelay(
+	IN BLU32 _Ms);
+
 BL_API const BLAnsi* blUserFolderDir();
 
 BL_API const BLAnsi* blWorkingDir();
@@ -69,6 +72,8 @@ BL_API BLBool blClipboardCopy(
 	IN BLUtf8* _Text);
 
 BL_API const BLUtf8* blClipboardPaste();
+
+BL_API BLBool blQuitEvent();
 
 /**
 in-build vars
@@ -94,20 +99,14 @@ BL_API BLVoid* blPluginProcAddress(
 	IN BLAnsi* _Basename,
     IN BLAnsi* _Function);
 
-/**
-	Video Format: Daala
-	Audio Format: Opus
-*/
-BL_API BLBool blVideoOperation(
-	IN BLAnsi* _Filename,
-	IN BLAnsi* _Archive,
-	IN BLBool _Play);
-
 BL_API BLVoid blAttachIME(
 	IN BLF32 _Xpos,
 	IN BLF32 _Ypos);
 
 BL_API BLVoid blDetachIME();
+
+BL_API BLVoid blCursorVisiblity(
+	IN BLBool _Show);
 
 BL_API BLVoid blSubscribeEvent(
 	IN BLEnum _Type, 

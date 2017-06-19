@@ -861,7 +861,7 @@
     <ClCompile Include="..\..\code\src\gpu.xc">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\code\src\system.xc">
+    <ClCompile Include="..\..\code\src\system.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

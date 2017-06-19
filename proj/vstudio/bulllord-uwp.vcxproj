@@ -810,7 +810,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZLIB_DLL;HAVE_CONFIG_H;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
@@ -827,7 +827,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;SQLITE_OS_WINRT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZLIB_DLL;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;SQLITE_OS_WINRT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
@@ -844,7 +844,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZLIB_DLL;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
@@ -861,7 +861,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZLIB_DLL;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
@@ -878,7 +878,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZLIB_DLL;HAVE_CONFIG_H;_DEBUG;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>
@@ -895,7 +895,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>BL_EXPORT;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;SQLITE_OS_WINRT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZLIB_DLL;HAVE_CONFIG_H;WIN32;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;SQLITE_OS_WINRT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\externals\opus;..\..\code\externals\opus\silk;..\..\code\externals\opus\celt;..\..\code\externals\opus\silk\fixed;..\..\code\externals\opus\silk\float;..\..\code\externals\opus\include;..\..\code\externals\ogg\include;..\..\code\externals\freetype2\include;..\..\code\externals\zlib</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
     </ClCompile>

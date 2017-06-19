@@ -2629,7 +2629,7 @@ GL_SYMBOL_INTERNAL(PFNGLTEXTUREBARRIERPROC, glTextureBarrier, lib)														
 #	endif
 #endif
     extern BLBool _GbSystemRunning;
-    extern BLBool _GbVideoPlaying;
+    extern BLBool _GbTVMode;
     extern BLEnum _GbRenderQuality;
 #ifdef __cplusplus
 }

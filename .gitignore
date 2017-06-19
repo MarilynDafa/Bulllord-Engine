@@ -25,3 +25,4 @@
 *.intermediate
 *.DS_Store
 *.so
+code/externals/opus/celt/dump_modes/Makefile
