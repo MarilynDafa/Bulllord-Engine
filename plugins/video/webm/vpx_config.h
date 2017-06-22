@@ -9,30 +9,45 @@
 #ifndef VPX_CONFIG_H
 #define VPX_CONFIG_H
 #define RESTRICT    
+#if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #define INLINE      __forceinline
-#define ARCH_ARM 0
-#define ARCH_MIPS 0
-#define ARCH_X86 1
-#define ARCH_X86_64 0
-#define ARCH_PPC 0
-#define HAVE_NEON 0
-#define HAVE_NEON_ASM 0
-#define HAVE_MIPS32 0
-#define HAVE_DSPR2 0
-#define HAVE_MSA 0
-#define HAVE_MIPS64 0
+#else
+#define INLINE inline
+#endif
+
+#if defined(_M_X64)
+#define ARCH_X86_64 1
 #define HAVE_MMX 1
 #define HAVE_SSE 1
 #define HAVE_SSE2 1
 #define HAVE_SSE3 1
 #define HAVE_SSSE3 1
 #define HAVE_SSE4_1 1
-#define HAVE_AVX 1
-#define HAVE_AVX2 1
+#elif defined(_M_IX86)
+#define ARCH_X86 1
+#define HAVE_MMX 1
+#define HAVE_SSE 1
+#define HAVE_SSE2 1
+#define HAVE_SSE3 1
+#define HAVE_SSSE3 1
+#define HAVE_SSE4_1 1
+#else
+#define ARCH_ARM 1
+#define HAVE_NEON 0
+#define HAVE_NEON_ASM 0
+#endif
+
 #define HAVE_VSX 0
 #define HAVE_VPX_PORTS 1
+
+#if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #define HAVE_PTHREAD_H 0
 #define HAVE_UNISTD_H 0
+#else
+#define HAVE_PTHREAD_H 1
+#define HAVE_UNISTD_H 1
+#endif
+
 #define CONFIG_DEPENDENCY_TRACKING 1
 #define CONFIG_EXTERNAL_BUILD 1
 #define CONFIG_INSTALL_DOCS 0
@@ -43,8 +58,13 @@
 #define CONFIG_GPROF 0
 #define CONFIG_GCOV 0
 #define CONFIG_RVCT 0
+#if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #define CONFIG_GCC 0
 #define CONFIG_MSVS 1
+#else
+#define CONFIG_GCC 1
+#define CONFIG_MSVS 0
+#endif
 #define CONFIG_PIC 0
 #define CONFIG_BIG_ENDIAN 0
 #define CONFIG_CODEC_SRCS 0
@@ -56,13 +76,11 @@
 #define CONFIG_VP9_POSTPROC 0
 #define CONFIG_MULTITHREAD 1
 #define CONFIG_INTERNAL_STATS 0
-#define CONFIG_VP8_ENCODER 1
 #define CONFIG_VP8_DECODER 1
-#define CONFIG_VP9_ENCODER 1
 #define CONFIG_VP9_DECODER 1
 #define CONFIG_VP8 1
 #define CONFIG_VP9 1
-#define CONFIG_ENCODERS 1
+#define CONFIG_ENCODERS 0
 #define CONFIG_DECODERS 1
 #define CONFIG_STATIC_MSVCRT 0
 #define CONFIG_SPATIAL_RESAMPLING 1

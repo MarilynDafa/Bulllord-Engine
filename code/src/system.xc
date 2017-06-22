@@ -3517,6 +3517,8 @@ blTickCounts()
 BLVoid 
 blTickDelay(IN BLU32 _Ms)
 {
+	if (_Ms == 0)
+		return;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	Sleep(_Ms);
 #else

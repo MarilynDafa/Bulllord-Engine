@@ -135,9 +135,7 @@ typedef struct _AudioMember {
 	BLU32 nRNGSeed;
 	BLU32 nPCMChannels;
 	BLU32 nPCMSampleRate;
-	BLU8* pPCMBufA;
-	BLU8* pPCMBufB;
-	BLU8* pPCMBufC;
+	BLU8* aPCMBuf[8];
 	BLU32 nPCMBufTurn;
 	BLU32 nPCMFill;
 #if defined(BL_USE_AL_API)
@@ -1082,14 +1080,10 @@ _AudioInit(duk_context* _DKC)
 	_PrAudioMem->nRNGSeed = 22222;
 	_PrAudioMem->nPCMChannels = -1;
 	_PrAudioMem->nPCMSampleRate = -1;
-	_PrAudioMem->pPCMBufA = NULL;
-	_PrAudioMem->pPCMBufB = NULL;
-	_PrAudioMem->pPCMBufC = NULL;
 	_PrAudioMem->nPCMBufTurn = 0;
 	_PrAudioMem->nPCMFill = 0;
-	_PrAudioMem->pPCMBufA = (BLU8*)malloc(80000);
-	_PrAudioMem->pPCMBufB = (BLU8*)malloc(80000);
-	_PrAudioMem->pPCMBufC = (BLU8*)malloc(80000);
+	for (BLU32 _idx = 0; _idx < 8; ++_idx)
+		_PrAudioMem->aPCMBuf[_idx] = NULL;
 #if defined(BL_USE_AL_API)
     _ALInit();
 #elif defined(BL_USE_SL_API)
@@ -1199,9 +1193,6 @@ _AudioDestroy()
 		free(_PrAudioMem->pBackMusic);
 		_PrAudioMem->pBackMusic = NULL;
 	}
-	free(_PrAudioMem->pPCMBufA);
-	free(_PrAudioMem->pPCMBufB);
-	free(_PrAudioMem->pPCMBufC);
 	blDebugOutput("Audio shutdown");
 	free(_PrAudioMem);
 }
@@ -1391,9 +1382,9 @@ blDeleteAudio(IN BLGuid _ID)
 BLVoid 
 blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 {
-	_GbTVMode = TRUE;
-	if (_PrAudioMem->nPCMChannels != _Channels && _PrAudioMem->nPCMSampleRate != _SamplesPerSec)
+	if (_Channels == 0xFFFFFFFF && _SamplesPerSec == 0xFFFFFFFF)
 	{
+		_GbTVMode = FALSE;
 #if defined(BL_USE_AL_API)
 		alSourceStop(_PrAudioMem->pPCMStream);
 		BLS32 _queued = 0;
@@ -1413,19 +1404,55 @@ blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 		{
 			_PrAudioMem->pPCMStream->Stop(0);
 			_PrAudioMem->pPCMStream->DestroyVoice();
-		} 
-		WAVEFORMATEX _pwfx;
-		_pwfx.wFormatTag = WAVE_FORMAT_PCM;
-		_pwfx.nChannels = _Channels;
-		_pwfx.wBitsPerSample = 16;
-		_pwfx.nSamplesPerSec = _SamplesPerSec;
-		_pwfx.nBlockAlign = _pwfx.nChannels*_pwfx.wBitsPerSample / 8;
-		_pwfx.nAvgBytesPerSec = _pwfx.nBlockAlign * _pwfx.nSamplesPerSec;
-		_pwfx.cbSize = 0;
-		HRESULT _rsz = _PrAudioMem->pAudioDev.pCADevice->CreateSourceVoice(&_PrAudioMem->pPCMStream, &_pwfx);
-		assert(SUCCEEDED(_rsz));
-		_PrAudioMem->pPCMStream->Start(0);
+		}
 #endif
+		for (BLU32 _idx = 0; _idx < 8; ++_idx)
+		{
+			if (_PrAudioMem->aPCMBuf[_idx])
+			{
+				free(_PrAudioMem->aPCMBuf[_idx]);
+				_PrAudioMem->aPCMBuf[_idx] = NULL;
+			}
+		}
+	}
+	else
+	{
+		_GbTVMode = TRUE;
+		if (_PrAudioMem->nPCMChannels != _Channels && _PrAudioMem->nPCMSampleRate != _SamplesPerSec)
+		{
+#if defined(BL_USE_AL_API)
+			alSourceStop(_PrAudioMem->pPCMStream);
+			BLS32 _queued = 0;
+			alGetSourcei(_PrAudioMem->pPCMStream, AL_BUFFERS_QUEUED, &_queued);
+			while (_queued--)
+			{
+				ALuint _buffer;
+				alSourceUnqueueBuffers(_PrAudioMem->pPCMStream, 1, &_buffer);
+			}
+			alDeleteSources(1, &_PrAudioMem->pPCMStream);
+			alDeleteBuffers(3, _PrAudioMem->aPCMBuffers);
+#elif defined(BL_USE_SL_API)
+			if ((*_PrAudioMem->pPCMStream))
+				(*_PrAudioMem->pPCMStream)->Destroy(_PrAudioMem->pPCMStream);
+#elif defined(BL_USE_COREAUDIO_API)
+			if (_PrAudioMem->pPCMStream)
+			{
+				_PrAudioMem->pPCMStream->Stop(0);
+				_PrAudioMem->pPCMStream->DestroyVoice();
+			}
+			WAVEFORMATEX _pwfx;
+			_pwfx.wFormatTag = WAVE_FORMAT_PCM;
+			_pwfx.nChannels = _Channels;
+			_pwfx.wBitsPerSample = 16;
+			_pwfx.nSamplesPerSec = _SamplesPerSec;
+			_pwfx.nBlockAlign = _pwfx.nChannels*_pwfx.wBitsPerSample / 8;
+			_pwfx.nAvgBytesPerSec = _pwfx.nBlockAlign * _pwfx.nSamplesPerSec;
+			_pwfx.cbSize = 0;
+			HRESULT _rsz = _PrAudioMem->pAudioDev.pCADevice->CreateSourceVoice(&_PrAudioMem->pPCMStream, &_pwfx);
+			assert(SUCCEEDED(_rsz));
+			_PrAudioMem->pPCMStream->Start(0);
+#endif
+		}
 	}
 }
 BLVoid 
@@ -1435,45 +1462,30 @@ blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 	{
 #if defined(BL_USE_COREAUDIO_API)
 		XAUDIO2_VOICE_STATE _state;
-		for (;;)
-		{
-			_PrAudioMem->pPCMStream->GetState(&_state);
-			if (_state.BuffersQueued < 2)
-			{
-				XAUDIO2_BUFFER _buf = { 0 };
-				_buf.AudioBytes = _PrAudioMem->nPCMFill;
-				if (_PrAudioMem->nPCMBufTurn % 3 == 0)
-					_buf.pAudioData = _PrAudioMem->pPCMBufA;
-				else if (_PrAudioMem->nPCMBufTurn % 3 == 1)
-					_buf.pAudioData = _PrAudioMem->pPCMBufB;
-				else
-					_buf.pAudioData = _PrAudioMem->pPCMBufC;
-				_PrAudioMem->pPCMStream->SubmitSourceBuffer(&_buf);
-				break;
-			}
-		}
+		_PrAudioMem->pPCMStream->GetState(&_state);
+		XAUDIO2_BUFFER _buf = { 0 };
+		_buf.AudioBytes = _PrAudioMem->nPCMFill;
+		_buf.pAudioData = _PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8];
+		_PrAudioMem->pPCMStream->SubmitSourceBuffer(&_buf);
 #elif defined(BL_USE_AL_API)
 #elif defined(BL_USE_SL_API)
 #else
 #endif
 		_PrAudioMem->nPCMFill = 0;
 		_PrAudioMem->nPCMBufTurn++;
-		if (_PrAudioMem->nPCMBufTurn % 3 == 0)
-			memcpy(_PrAudioMem->pPCMBufA, _PCM, _Length);
-		else if (_PrAudioMem->nPCMBufTurn % 3 == 1)
-			memcpy(_PrAudioMem->pPCMBufB, _PCM, _Length);
-		else
-			memcpy(_PrAudioMem->pPCMBufC, _PCM, _Length);
+		_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] = (BLU8*)malloc(80000);
+		memcpy(_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] + _PrAudioMem->nPCMFill, _PCM, _Length);
+		_PrAudioMem->nPCMFill += _Length;
+	}
+	else if (!_PrAudioMem->nPCMFill)
+	{
+		_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] = (BLU8*)malloc(80000);
+		memcpy(_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] + _PrAudioMem->nPCMFill, _PCM, _Length);
 		_PrAudioMem->nPCMFill += _Length;
 	}
 	else
 	{
-		if (_PrAudioMem->nPCMBufTurn % 3 == 0)
-			memcpy(_PrAudioMem->pPCMBufA + _PrAudioMem->nPCMFill, _PCM, _Length);
-		else if (_PrAudioMem->nPCMBufTurn % 3 == 1)
-			memcpy(_PrAudioMem->pPCMBufB + _PrAudioMem->nPCMFill, _PCM, _Length);
-		else
-			memcpy(_PrAudioMem->pPCMBufC + _PrAudioMem->nPCMFill, _PCM, _Length);
+		memcpy(_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] + _PrAudioMem->nPCMFill, _PCM, _Length);
 		_PrAudioMem->nPCMFill += _Length;
 	}
 }

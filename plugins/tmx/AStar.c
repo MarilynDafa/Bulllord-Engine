@@ -267,8 +267,6 @@ static void addToOpenSet (astar_t *astar,
 		changePriority (astar->open, node, newPri);
 	}	
 }
-
-
 // directly translated from "algorithm 2" in the paper
 static int jump (astar_t *astar, direction dir, int start)
 {

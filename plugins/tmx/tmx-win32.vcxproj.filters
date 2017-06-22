@@ -18,13 +18,13 @@
     <ClInclude Include="tmxentry.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="AStar.h">
-      <Filter>externals</Filter>
-    </ClInclude>
     <ClInclude Include="IndexPriorityQueue.h">
       <Filter>externals</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\externals\xml\ezxml.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="AStar.h">
       <Filter>externals</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,13 +32,13 @@
     <ClCompile Include="tmxentry.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="AStar.c">
-      <Filter>externals</Filter>
-    </ClCompile>
     <ClCompile Include="IndexPriorityQueue.c">
       <Filter>externals</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\externals\xml\ezxml.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="AStar.c">
       <Filter>externals</Filter>
     </ClCompile>
   </ItemGroup>

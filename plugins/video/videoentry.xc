@@ -135,7 +135,7 @@ _AudioCodecOpen(_BlWebMDemuxerExt* _Demuxer)
 	case 1:
 	{
 		_ret->nChannels = (BLU32)_Demuxer->pAudioTrack->GetChannels();
-		BLU32 _extradatasz = 0;
+		size_t _extradatasz = 0;
 		const BLU8* _extradata = _Demuxer->pAudioTrack->GetCodecPrivate(_extradatasz);
 		if (_extradatasz < 3 || !_extradata || _extradata[0] != 2)
 			return NULL;
@@ -152,7 +152,7 @@ _AudioCodecOpen(_BlWebMDemuxerExt* _Demuxer)
 					break;
 			}
 		}
-		_headersz[2] = _extradatasz - (_headersz[0] + _headersz[1] + _offset);
+		_headersz[2] = (BLU32)_extradatasz - (_headersz[0] + _headersz[1] + _offset);
 		if (_headersz[0] + _headersz[1] + _headersz[2] + _offset != _extradatasz)
 			return NULL;
 		ogg_packet _op[3];
@@ -568,6 +568,8 @@ blVideoCloseEXT()
 BLBool 
 blVideoPlayEXT(IN BLAnsi* _Filename)
 {
+	BLF64 _framedelta = 0.0;
+	BLS32 _audiodelta = blTickCounts();
 	BLU32 _width, _height, _dwidth, _dheight;
 	BLF32 _rx, _ry;
 	blWindowQuery(&_width, &_height, &_dwidth, &_dheight, &_rx, &_ry);
@@ -576,7 +578,8 @@ blVideoPlayEXT(IN BLAnsi* _Filename)
 	blTechUniform(_PrVideoMem->nTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0, FALSE);
 	_BlWebMDemuxerExt _demuxer;
-	_Demuxer(&_demuxer, new MkvReader(_Filename), 0, 0);
+	MkvReader* _mkv = new MkvReader(_Filename);
+	_Demuxer(&_demuxer, _mkv, 0, 0);
 	if (_demuxer.bOpen)
 	{
 		_PrVideoMem->pVideoDecodec = _VideoCodecOpen(&_demuxer);
@@ -594,8 +597,8 @@ blVideoPlayEXT(IN BLAnsi* _Filename)
 		{
 			if ((_PrVideoMem->pAudioDecodec->pOpus || _PrVideoMem->pAudioDecodec->pVorbis) && (_audioframe.nBufferSize > 0))
 			{
-				int numOutSamples;
-				if (!_PCMS16Data(&_audioframe, _pcm, &numOutSamples))
+				BLS32 _numoutsamples;
+				if (!_PCMS16Data(&_audioframe, _pcm, &_numoutsamples))
 				{
 					blDebugOutput("Audio decode error");
 					break;
@@ -608,10 +611,10 @@ blVideoPlayEXT(IN BLAnsi* _Filename)
 					blTechSampler(_PrVideoMem->nTech, "Texture0", _PrVideoMem->nTex, 0);
 					_PrVideoMem->fTime = 0.0;
 					blVSync(FALSE);
-					_PrVideoMem->bSetParams = FALSE;
 					blCursorVisiblity(FALSE);
+					_PrVideoMem->bSetParams = FALSE;
 				}
-				//blPCMStreamData(_pcm, numOutSamples * demuxer.getChannels() * sizeof(BLS16));
+				blPCMStreamData(_pcm, _numoutsamples * (BLU32)_demuxer.pAudioTrack->GetChannels() * sizeof(BLS16));
 			}
 			if (_PrVideoMem->pVideoDecodec->pCtx && (_videoframe.nBufferSize > 0))
 			{
@@ -673,8 +676,11 @@ blVideoPlayEXT(IN BLAnsi* _Filename)
 					blGeometryBufferUpdate(_PrVideoMem->nGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 					blDraw(_PrVideoMem->nTech, _PrVideoMem->nGeo, 1);
 					blFlush();
-					if ((_videoframe.fTime - _PrVideoMem->fTime) * 1000 > 0.0)
-						blTickDelay((BLU32)((_videoframe.fTime - _PrVideoMem->fTime) * 1000));
+					_framedelta = (_videoframe.fTime) - _PrVideoMem->fTime;
+					_audiodelta = blTickCounts() - _audiodelta;
+					if ((BLS32)(_framedelta * 990) - (_audiodelta > 1000 ? 0 : _audiodelta) >= 0)
+						blTickDelay((BLU32)(_framedelta * 990) - (_audiodelta > 1000 ? 0 : _audiodelta));
+					_audiodelta = blTickCounts();
 					_PrVideoMem->fTime = _videoframe.fTime;
 				}
 			}
@@ -688,18 +694,20 @@ blVideoPlayEXT(IN BLAnsi* _Filename)
 		blVSync(TRUE);
 		if (INVALID_GUID != _PrVideoMem->nTex)
 			blDeleteTexture(_PrVideoMem->nTex);
-		if (INVALID_GUID != _PrVideoMem->nGeo)
-			blDeleteGeometryBuffer(_PrVideoMem->nGeo);
 		_PrVideoMem->nTex = INVALID_GUID;
-		_PrVideoMem->nGeo = INVALID_GUID;
 		_PrVideoMem->fTime = 0.0;
 		if (_videoframe.pBuffer)
 			free(_videoframe.pBuffer);
 		if (_audioframe.pBuffer)
 			free(_audioframe.pBuffer);
+		delete _mkv;
+		blPCMStreamParam(-1, -1);
 		blCursorVisiblity(TRUE);
+		return TRUE;
 	}
 	else
+	{
+		delete _mkv;
 		return FALSE;
-	return TRUE;
+	}
 }

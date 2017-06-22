@@ -69,594 +69,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="webm\vpx_dsp\add_noise.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\alloccommon.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\avg.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\avg_intrin_sse2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\avg_pred_sse2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\bitreader.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\bitreader_buffer.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\bitstream.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\bitwriter.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\bitwriter_buffer.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\blockd.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\boolhuff.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\copy_c.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\decoder\dboolhuff.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\dct.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\deblock.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\decoder\decodeframe.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\decoder\decodemv.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\denoising.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\x86\denoising_sse2.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\dequantize.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\decoder\detokenize.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\encodeframe.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\encodeintra.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\encodemb.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\encodemv.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\entropy.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\entropymode.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\entropymv.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\ethreading.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\extend.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\filter.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\x86\filter_x86.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\findnearmv.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\firstpass.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\fwd_txfm.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\fwd_txfm_avx2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\fwd_txfm_sse2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_scale\generic\gen_scalers.c">
-      <Filter>externals\vpx_scale</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\idct_blk.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\x86\idct_blk_mmx.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\x86\idct_blk_sse2.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\idctllm.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\intrapred.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\inv_txfm.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\inv_txfm_sse2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\inv_txfm_ssse3.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\lookahead.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\loopfilter.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\loopfilter_filters.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\loopfilter_avx2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\loopfilter_sse2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\x86\loopfilter_x86.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\mbpitch.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\mcomp.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\mfqe.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\modecont.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\modecosts.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\decoder\onyxd_if.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\onyx_if.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\pickinter.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\picklpf.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\postproc.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\prob.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\psnr.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\quant_common.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\quantize.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\quantize_sse2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\x86\quantize_sse4.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\x86\quantize_ssse3.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\ratectrl.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\rdopt.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\reconinter.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\reconintra.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\reconintra4x4.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\rtcd.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\sad.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\sad_avx2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\sad4d_avx2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\segmentation.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\setupintrarecon.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\skin_detection.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\subtract.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\sum_squares.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\sum_squares_sse2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\swapyv12buffer.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\generic\systemdependent.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\temporal_filter.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\x86\temporal_filter_sse4.c">
-      <Filter>externals\vp9\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\decoder\threading.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\tokenize.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\treecoder.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\treewriter.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\variance.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\variance_avx2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\variance_impl_avx2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\variance_sse2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\x86\vp8_asm_stubs.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\vp8_cx_iface.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\vp8_dx_iface.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\x86\vp8_enc_stubs_mmx.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\x86\vp8_enc_stubs_sse2.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\vp8_loopfilter.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\vp8_quantize.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\encoder\x86\vp8_quantize_sse2.c">
-      <Filter>externals\vp8\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp8\common\vp8_skin_detection.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_alloccommon.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_alt_ref_aq.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_aq_360.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_aq_complexity.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_aq_cyclicrefresh.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_aq_variance.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_bitstream.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_blockd.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_common_data.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_context_tree.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_cost.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\vp9_cx_iface.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_dct.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\x86\vp9_dct_intrin_sse2.c">
-      <Filter>externals\vp9\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\x86\vp9_dct_ssse3.c">
-      <Filter>externals\vp9\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\decoder\vp9_decodeframe.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\decoder\vp9_decodemv.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\decoder\vp9_decoder.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\decoder\vp9_detokenize.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\x86\vp9_diamond_search_sad_avx.c">
-      <Filter>externals\vp9\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\decoder\vp9_dsubexp.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\decoder\vp9_dthread.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\vp9_dx_iface.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_encodeframe.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_encodemb.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_encodemv.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_encoder.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_entropy.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_entropymode.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_entropymv.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\x86\vp9_error_avx2.c">
-      <Filter>externals\vp9\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_ethread.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_extend.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_filter.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_firstpass.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_frame_buffers.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_frame_scale.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\x86\vp9_frame_scale_ssse3.c">
-      <Filter>externals\vp9\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_idct.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\x86\vp9_idct_intrin_sse2.c">
-      <Filter>externals\vp9\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_lookahead.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_loopfilter.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_mbgraph.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_mcomp.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_multi_thread.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_mvref_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_noise_estimate.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_picklpf.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_pickmode.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_pred_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_quant_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_quantize.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\x86\vp9_quantize_sse2.c">
-      <Filter>externals\vp9\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_ratectrl.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_rd.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_rdopt.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_reconinter.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_reconintra.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_resize.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_rtcd.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_scale.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_scan.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_seg_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_segmentation.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_skin_detection.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_speed_features.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_subexp.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_svc_layercontext.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_temporal_filter.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_tokenize.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\encoder\vp9_treewriter.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\vpx_asm_stubs.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx\src\vpx_codec.c">
-      <Filter>externals\vpx</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_config.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\vpx_convolve.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx\src\vpx_decoder.c">
-      <Filter>externals\vpx</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\vpx_dsp_rtcd.c">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx\src\vpx_encoder.c">
-      <Filter>externals\vpx</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx\src\vpx_image.c">
-      <Filter>externals\vpx</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_mem\vpx_mem.c">
-      <Filter>externals\vpx_mem</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_scale\generic\vpx_scale.c">
-      <Filter>externals\vpx_scale</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_scale\vpx_scale_rtcd.c">
-      <Filter>externals\vpx_scale</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\vpx_subpixel_8t_intrin_avx2.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\vpx_subpixel_8t_intrin_ssse3.c">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_util\vpx_thread.c">
-      <Filter>externals\vpx_util</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_util\vpx_write_yuv_frame.c">
-      <Filter>externals\vpx_util</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_scale\generic\yv12config.c">
-      <Filter>externals\vpx_scale</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vpx_scale\generic\yv12extend.c">
-      <Filter>externals\vpx_scale</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_tile_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="webm\vp9\common\vp9_thread_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
     <ClCompile Include="webm\webm\mkvparser\mkvparser.cc">
       <Filter>externals\webm</Filter>
     </ClCompile>
@@ -726,588 +138,313 @@
     <ClCompile Include="..\..\code\externals\ogg\src\framing.c">
       <Filter>externals\ogg</Filter>
     </ClCompile>
-    <ClCompile Include="videoentry.cpp">
+    <ClCompile Include="videoentry.xc">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\add_noise.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\alloccommon.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\avg_pred_sse2.c">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\bitreader.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\bitreader_buffer.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\blockd.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\copy_c.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\decoder\dboolhuff.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\deblock.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\decoder\decodeframe.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\decoder\decodemv.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\dequantize.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\decoder\detokenize.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\entropy.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\entropymode.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\entropymv.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\extend.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\filter.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\x86\filter_x86.c">
+      <Filter>externals\vp8\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\findnearmv.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_scale\generic\gen_scalers.c">
+      <Filter>externals\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\idct_blk.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\x86\idct_blk_mmx.c">
+      <Filter>externals\vp8\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\x86\idct_blk_sse2.c">
+      <Filter>externals\vp8\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\idctllm.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\intrapred.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\inv_txfm.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\inv_txfm_sse2.c">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\inv_txfm_ssse3.c">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\loopfilter.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\loopfilter_filters.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\x86\loopfilter_x86.c">
+      <Filter>externals\vp8\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\mbpitch.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_mem\vpx_mem.c">
+      <Filter>externals\vpx_mem</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\mfqe.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\modecont.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\decoder\onyxd_if.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\postproc.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\prob.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\quant_common.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\reconinter.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\reconintra.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\reconintra4x4.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\rtcd.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\setupintrarecon.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\skin_detection.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\swapyv12buffer.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\generic\systemdependent.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\decoder\threading.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\treecoder.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\variance.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\variance_sse2.c">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\x86\vp8_asm_stubs.c">
+      <Filter>externals\vp8\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\vp8_dx_iface.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\vp8_loopfilter.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_alloccommon.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_blockd.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_common_data.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\decoder\vp9_decodeframe.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\decoder\vp9_decodemv.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\decoder\vp9_decoder.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\decoder\vp9_detokenize.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\decoder\vp9_dsubexp.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\decoder\vp9_dthread.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\vp9_dx_iface.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_entropy.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_entropymode.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_entropymv.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_filter.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_frame_buffers.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_idct.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\x86\vp9_idct_intrin_sse2.c">
+      <Filter>externals\vp9\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_loopfilter.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_mvref_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_pred_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_quant_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_reconinter.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_reconintra.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_rtcd.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_scale.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_scan.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_seg_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_thread_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\vp9_tile_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\vpx_asm_stubs.c">
+      <Filter>externals\vp9\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx\src\vpx_codec.c">
+      <Filter>externals\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_config.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\vpx_convolve.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx\src\vpx_decoder.c">
+      <Filter>externals\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\vpx_dsp_rtcd.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx\src\vpx_encoder.c">
+      <Filter>externals\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx\src\vpx_image.c">
+      <Filter>externals\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_scale\generic\vpx_scale.c">
+      <Filter>externals\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_scale\vpx_scale_rtcd.c">
+      <Filter>externals\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\vpx_subpixel_8t_intrin_ssse3.c">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_util\vpx_thread.c">
+      <Filter>externals\vpx_util</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_util\vpx_write_yuv_frame.c">
+      <Filter>externals\vpx_util</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_scale\generic\yv12config.c">
+      <Filter>externals\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_scale\generic\yv12extend.c">
+      <Filter>externals\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\loopfilter_sse2.c">
+      <Filter>externals\vpx_dsp\x86</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="webm\vpx.def">
-      <Filter>externals</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="webm\vp8\common\alloccommon.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\x86\bitdepth_conversion_avx2.h">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\x86\bitdepth_conversion_sse2.h">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_ports\bitops.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\bitreader.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\bitreader_buffer.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\bitstream.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\bitwriter.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\bitwriter_buffer.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\block.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\blockd.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\boolhuff.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\coefupdateprobs.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\common.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\x86\convolve.h">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\decoder\dboolhuff.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\dct_value_cost.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\dct_value_tokens.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\decoder\decodemv.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\decoder\decoderthreading.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\default_coef_probs.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\defaultcoefcounts.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\denoising.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\decoder\detokenize.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_ports\emmintrin_compat.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\encodeframe.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\encodeintra.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\encodemb.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\encodemv.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_util\endian_inl.h">
-      <Filter>externals\vpx_util</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\entropy.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\entropymode.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\entropymv.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\extend.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\filter.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\x86\filter_x86.h">
-      <Filter>externals\vp8\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\findnearmv.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\firstpass.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\x86\fwd_dct32x32_impl_avx2.h">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\x86\fwd_dct32x32_impl_sse2.h">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\fwd_txfm.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\x86\fwd_txfm_impl_sse2.h">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\x86\fwd_txfm_sse2.h">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\header.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\inv_txfm.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\x86\inv_txfm_sse2.h">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\invtrans.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\lookahead.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\loopfilter.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\mcomp.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_ports\mem.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_ports\mem_ops.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_ports\mem_ops_aligned.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\modecont.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\modecosts.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_ports\msvc.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\mv.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\onyx.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\decoder\onyxd_int.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\onyx_int.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\onyxc_int.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\onyxd.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\pickinter.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\postproc.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\postproc.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\ppflags.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\prob.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\psnr.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\quant_common.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\quantize.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\quantize.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\ratectrl.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\rdopt.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\reconinter.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\reconintra.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\reconintra4x4.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\segmentation.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\setupintrarecon.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\skin_detection.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\swapyv12buffer.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_ports\system_state.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\systemdependent.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\threading.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\tokenize.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\x86\transpose_sse2.h">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\treecoder.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\decoder\treereader.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\encoder\treewriter.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\txfm_common.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\x86\txfm_common_sse2.h">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\variance.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx\vp8.h">
-      <Filter>externals\vpx</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\vp8_entropymodedata.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8_rtcd.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp8\common\vp8_skin_detection.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx\vp8cx.h">
-      <Filter>externals\vpx</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx\vp8dx.h">
-      <Filter>externals\vpx</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_alloccommon.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_alt_ref_aq.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_aq_360.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_aq_complexity.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_aq_cyclicrefresh.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_aq_variance.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_bitstream.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_block.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_blockd.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_common_data.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_context_tree.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_cost.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\decoder\vp9_decodeframe.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\decoder\vp9_decodemv.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\decoder\vp9_decoder.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\decoder\vp9_detokenize.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\decoder\vp9_dsubexp.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\decoder\vp9_dthread.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\vp9_dx_iface.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_encodeframe.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_encodemb.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_encodemv.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_encoder.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_entropy.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_entropymode.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_entropymv.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_enums.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_ethread.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_extend.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_filter.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_firstpass.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_frame_buffers.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_idct.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\vp9_iface_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_job_queue.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_lookahead.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_loopfilter.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_mbgraph.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_mcomp.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_multi_thread.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_mv.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_mvref_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_noise_estimate.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_onyxc_int.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_picklpf.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_pickmode.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_ppflags.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_pred_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_quant_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_quantize.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_ratectrl.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_rd.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_rdopt.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_reconinter.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_reconintra.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_resize.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9_rtcd.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_scale.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_scan.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_seg_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_segmentation.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_skin_detection.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_speed_features.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_subexp.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_svc_layercontext.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_temporal_filter.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_tokenize.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\encoder\vp9_treewriter.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx\vpx_codec.h">
-      <Filter>externals\vpx</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx\internal\vpx_codec_internal.h">
-      <Filter>externals\vpx</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_config.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\vpx_convolve.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx\vpx_decoder.h">
-      <Filter>externals\vpx</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\vpx_dsp_common.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp_rtcd.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_scale_rtcd.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx\vpx_encoder.h">
-      <Filter>externals\vpx</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_dsp\vpx_filter.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx\vpx_frame_buffer.h">
-      <Filter>externals\vpx</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx\vpx_image.h">
-      <Filter>externals\vpx</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx\vpx_integer.h">
-      <Filter>externals\vpx</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_mem\vpx_mem.h">
-      <Filter>externals\vpx_mem</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_mem\include\vpx_mem_intrnl.h">
-      <Filter>externals\vpx_mem</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_ports\vpx_once.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_scale\vpx_scale.h">
-      <Filter>externals\vpx_scale</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_util\vpx_thread.h">
-      <Filter>externals\vpx_util</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_ports\vpx_timer.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_util\vpx_write_yuv_frame.h">
-      <Filter>externals\vpx_util</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_ports\x86.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vpx_scale\yv12config.h">
-      <Filter>externals\vpx_scale</Filter>
-    </ClInclude>
     <ClInclude Include="videoentry.h">
       <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_tile_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="webm\vp9\common\vp9_thread_common.h">
-      <Filter>externals\vp9</Filter>
     </ClInclude>
     <ClInclude Include="webm\webm\common\webmids.h">
       <Filter>externals\webm</Filter>
@@ -1384,49 +521,364 @@
     <ClInclude Include="webm\yuv2rgb.h">
       <Filter>externals</Filter>
     </ClInclude>
+    <ClInclude Include="webm\vp8\common\alloccommon.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\x86\bitdepth_conversion_sse2.h">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_ports\bitops.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\bitreader.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\bitreader_buffer.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\blockd.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\coefupdateprobs.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\common.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\x86\convolve.h">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\decoder\dboolhuff.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\decoder\decodemv.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\decoder\decoderthreading.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\default_coef_probs.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\decoder\detokenize.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_ports\emmintrin_compat.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_util\endian_inl.h">
+      <Filter>externals\vpx_util</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\entropy.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\entropymode.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\entropymv.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\extend.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\filter.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\x86\filter_x86.h">
+      <Filter>externals\vp8\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\findnearmv.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\header.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\inv_txfm.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\x86\inv_txfm_sse2.h">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\invtrans.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\loopfilter.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_mem\vpx_mem.h">
+      <Filter>externals\vpx_mem</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_mem\include\vpx_mem_intrnl.h">
+      <Filter>externals\vpx_mem</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_ports\mem.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_ports\mem_ops.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_ports\mem_ops_aligned.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\modecont.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_ports\msvc.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\mv.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\onyx.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\onyxc_int.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\onyxd.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\decoder\onyxd_int.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\postproc.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\postproc.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\ppflags.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\prob.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\quant_common.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\reconinter.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\reconintra.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\reconintra4x4.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\setupintrarecon.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\skin_detection.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\swapyv12buffer.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_ports\system_state.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\systemdependent.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\threading.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\x86\transpose_sse2.h">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\treecoder.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\decoder\treereader.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\txfm_common.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\x86\txfm_common_sse2.h">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\variance.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx\vp8.h">
+      <Filter>externals\vpx</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8\common\vp8_entropymodedata.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp8_rtcd.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx\vp8dx.h">
+      <Filter>externals\vpx</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_alloccommon.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_blockd.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_common_data.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\decoder\vp9_decodeframe.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\decoder\vp9_decodemv.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\decoder\vp9_decoder.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\decoder\vp9_detokenize.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\decoder\vp9_dsubexp.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\decoder\vp9_dthread.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\vp9_dx_iface.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_entropy.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_entropymode.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_entropymv.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_enums.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_filter.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_frame_buffers.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_idct.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\vp9_iface_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_loopfilter.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_mv.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_mvref_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_onyxc_int.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_ppflags.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_pred_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_quant_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_reconinter.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_reconintra.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9_rtcd.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_scale.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_scan.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_seg_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_thread_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vp9\common\vp9_tile_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx\vpx_codec.h">
+      <Filter>externals\vpx</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx\internal\vpx_codec_internal.h">
+      <Filter>externals\vpx</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\vpx_convolve.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx\vpx_decoder.h">
+      <Filter>externals\vpx</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\vpx_dsp_common.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp_rtcd.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx\vpx_encoder.h">
+      <Filter>externals\vpx</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\vpx_filter.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx\vpx_frame_buffer.h">
+      <Filter>externals\vpx</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx\vpx_image.h">
+      <Filter>externals\vpx</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx\vpx_integer.h">
+      <Filter>externals\vpx</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_ports\vpx_once.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_scale\vpx_scale.h">
+      <Filter>externals\vpx_scale</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_scale_rtcd.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_util\vpx_thread.h">
+      <Filter>externals\vpx_util</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_ports\vpx_timer.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_util\vpx_write_yuv_frame.h">
+      <Filter>externals\vpx_util</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_ports\x86.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_scale\yv12config.h">
+      <Filter>externals\vpx_scale</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_config.h">
+      <Filter>externals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="webm\vp9\encoder\x86\vp9_dct_sse2.asm">
-      <Filter>externals\vp9\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp9\encoder\x86\vp9_error_sse2.asm">
-      <Filter>externals\vp9\x86</Filter>
-    </CustomBuild>
     <CustomBuild Include="webm\vpx_ports\emms.asm">
       <Filter>externals\vpx_ports\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\copy_sse3.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\encoder\x86\dct_sse2.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\dequantize_mmx.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\encoder\x86\encodeopt.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\encoder\x86\fwalsh_sse2.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\idctllm_mmx.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\idctllm_sse2.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\iwalsh_sse2.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\mfqe_sse2.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\encoder\x86\quantize_mmx.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\encoder\x86\temporal_filter_apply_sse2.asm">
-      <Filter>externals\vp8\x86</Filter>
     </CustomBuild>
     <CustomBuild Include="webm\vpx_dsp\x86\add_noise_sse2.asm">
       <Filter>externals\vpx_dsp\x86</Filter>
@@ -1440,49 +892,10 @@
     <CustomBuild Include="webm\vpx_dsp\x86\intrapred_ssse3.asm">
       <Filter>externals\vpx_dsp\x86</Filter>
     </CustomBuild>
-    <CustomBuild Include="webm\vpx_dsp\x86\sad_sse2.asm">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vpx_dsp\x86\sad4d_sse2.asm">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vpx_dsp\x86\subpel_variance_sse2.asm">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\copy_sse2.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
     <CustomBuild Include="webm\vpx_dsp\x86\inv_wht_sse2.asm">
       <Filter>externals\vpx_dsp\x86</Filter>
     </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\loopfilter_sse2.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\recon_mmx.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\recon_sse2.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vpx_dsp\x86\sad_sse3.asm">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vpx_dsp\x86\sad_sse4.asm">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vpx_dsp\x86\sad_ssse3.asm">
-      <Filter>externals\vpx_dsp\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\subpixel_mmx.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\subpixel_sse2.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\subpixel_ssse3.asm">
-      <Filter>externals\vp8\x86</Filter>
-    </CustomBuild>
-    <CustomBuild Include="webm\vpx_dsp\x86\subtract_sse2.asm">
+    <CustomBuild Include="webm\vpx_dsp\x86\subpel_variance_sse2.asm">
       <Filter>externals\vpx_dsp\x86</Filter>
     </CustomBuild>
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_convolve_copy_sse2.asm">
@@ -1494,11 +907,53 @@
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm">
       <Filter>externals\vpx_dsp\x86</Filter>
     </CustomBuild>
-    <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm">
-      <Filter>externals\vpx_dsp\x86</Filter>
+    <CustomBuild Include="webm\vp8\common\x86\copy_sse3.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\recon_sse2.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\subpixel_sse2.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\copy_sse2.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\dequantize_mmx.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\idctllm_mmx.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\idctllm_sse2.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\iwalsh_sse2.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\loopfilter_sse2.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\mfqe_sse2.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\recon_mmx.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\subpixel_mmx.asm">
+      <Filter>externals\vp8\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\subpixel_ssse3.asm">
+      <Filter>externals\vp8\x86</Filter>
     </CustomBuild>
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm">
       <Filter>externals\vpx_dsp\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\loopfilter_block_sse2_x86_64.asm">
+      <Filter>externals\vp8\x86</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
