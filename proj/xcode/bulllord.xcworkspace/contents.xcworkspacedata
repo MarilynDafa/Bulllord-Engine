@@ -5,6 +5,12 @@
       location = "container:"
       name = "Plugins">
       <FileRef
+         location = "group:../../plugins/video/video-ios.xcodeproj">
+      </FileRef>
+      <FileRef
+         location = "group:../../plugins/video/video-osx.xcodeproj">
+      </FileRef>
+      <FileRef
          location = "group:../../plugins/spine/spine-ios.xcodeproj">
       </FileRef>
       <FileRef

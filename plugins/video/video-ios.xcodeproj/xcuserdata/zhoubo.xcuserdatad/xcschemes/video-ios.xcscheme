@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C7F71B191EF9598E00F31075"
-               BuildableName = "libvideo-ios.dylib"
+               BuildableName = "blVideo.dylib"
                BlueprintName = "video-ios"
                ReferencedContainer = "container:video-ios.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C7F71B191EF9598E00F31075"
-            BuildableName = "libvideo-ios.dylib"
+            BuildableName = "blVideo.dylib"
             BlueprintName = "video-ios"
             ReferencedContainer = "container:video-ios.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C7F71B191EF9598E00F31075"
-            BuildableName = "libvideo-ios.dylib"
+            BuildableName = "blVideo.dylib"
             BlueprintName = "video-ios"
             ReferencedContainer = "container:video-ios.xcodeproj">
          </BuildableReference>

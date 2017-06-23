@@ -393,9 +393,6 @@
     <ClCompile Include="webm\vp9\common\vp9_tile_common.c">
       <Filter>externals\vp9</Filter>
     </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\vpx_asm_stubs.c">
-      <Filter>externals\vp9\x86</Filter>
-    </ClCompile>
     <ClCompile Include="webm\vpx\src\vpx_codec.c">
       <Filter>externals\vpx</Filter>
     </ClCompile>
@@ -439,6 +436,9 @@
       <Filter>externals\vpx_scale</Filter>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\loopfilter_sse2.c">
+      <Filter>externals\vpx_dsp\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\vpx_asm_stubs.c">
       <Filter>externals\vpx_dsp\x86</Filter>
     </ClCompile>
   </ItemGroup>

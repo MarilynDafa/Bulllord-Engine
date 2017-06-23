@@ -47,7 +47,7 @@ public:
 		if (_file == INVALID_GUID)
 			return -1;
 		blStreamSeek(_file, (BLU32)_Pos);
-		BLU32 _size = blStreamRead(_file, _Len, _Buf);
+		BLU32 _size = blStreamRead(_file, (BLU32)_Len, _Buf);
 		if (_size < BLU32(_Len))
 			return -1;
 		return 0;
@@ -203,7 +203,7 @@ _AudioCodecOpen(_BlWebMDemuxerExt* _Demuxer)
 		return NULL;
 	}
 	default:
-		return NULL;
+		break;
 	}
 	if (_ret->pVorbis)
 	{
@@ -494,13 +494,13 @@ _ReadFrame(_BlWebMDemuxerExt* _Demuxer, _BLWebMFrameExt* _VideoFrame, _BLWebMFra
 	const mkvparser::Block::Frame& _blockframe = _Demuxer->pBlock->GetFrame(_Demuxer->nBlockFrameIndex++);
 	if ((BLU32)_blockframe.len > _frame->nBufferCapacity)
 	{
-		BLU8* _newbuff = (BLU8*)realloc(_frame->pBuffer, _frame->nBufferCapacity = _blockframe.len);
+		BLU8* _newbuff = (BLU8*)realloc(_frame->pBuffer, _frame->nBufferCapacity = (BLU32)_blockframe.len);
 		if (_newbuff)
 			_frame->pBuffer = _newbuff;
 		else
 			return FALSE;
 	}
-	_frame->nBufferSize = _blockframe.len;
+	_frame->nBufferSize = (BLU32)_blockframe.len;
 	_frame->fTime = _Demuxer->pBlock->GetTime(_Demuxer->pCluster) / 1e9;
 	_frame->bKey = _Demuxer->pBlock->IsKey();
 	return !_blockframe.Read(_Demuxer->pReader, _frame->pBuffer);

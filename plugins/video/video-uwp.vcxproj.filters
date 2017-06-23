@@ -340,9 +340,6 @@
     <ClCompile Include="webm\vp9\common\x86\vp9_idct_intrin_sse2.c">
       <Filter>externals\vp9\x86</Filter>
     </ClCompile>
-    <ClCompile Include="webm\vpx_dsp\x86\vpx_asm_stubs.c">
-      <Filter>externals\vp9\x86</Filter>
-    </ClCompile>
     <ClCompile Include="webm\vpx\src\vpx_codec.c">
       <Filter>externals\vpx</Filter>
     </ClCompile>
@@ -438,6 +435,9 @@
     </ClCompile>
     <ClCompile Include="webm\vpx_config.c">
       <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\vpx_asm_stubs.c">
+      <Filter>externals\vpx_dsp\x86</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
