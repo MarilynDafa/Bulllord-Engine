@@ -1,15 +1,15 @@
 ﻿/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
- 
+
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
  arising from the use of this software.
- 
+
  Permission is granted to anyone to use this software for any purpose,
  including commercial applications, and to alter it and redistribute it
  freely, subject to the following restrictions:
- 
+
  1. The origin of this software must not be misrepresented; you must not
  claim that you wrote the original software. If you use this software
  in a product, an acknowledgment in the product documentation would be
@@ -541,7 +541,7 @@ _WidgetLocate(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 	_BLWidget* _target = NULL;
 	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
 	{
-		if (_iter->bVisible && 
+		if (_iter->bVisible &&
 			_iter->eType != BL_UT_PRIMITIVE &&
 			_iter->eType != BL_UT_PROGRESS &&
 			!(_iter->eType == BL_UT_PANEL && _iter->uExtension.sPanel.bBasePlate))
@@ -651,7 +651,7 @@ _FontFace(const BLAnsi* _Filename)
 					blArrayPushBack(_glyphatlas->pTextures, _imgdata);
 					blDeleteStream(_image);
 					_page = _page->ordered;
-				} while (_page);				
+				} while (_page);
 			}
 			else if (!strcmp(ezxml_name(_element), "chars"))
 			{
@@ -676,7 +676,7 @@ _FontFace(const BLAnsi* _Filename)
 					_gi->sRect.sRB.fY = _gi->sRect.sLT.fY + strtof(_height, NULL);
 					_gi->sOffset.fX = strtof(_xoffset, NULL);
 					_gi->sOffset.fY = strtof(_yoffset, NULL);
-					_gi->nTexture = strtoul(_page, NULL, 10);	
+					_gi->nTexture = strtoul(_page, NULL, 10);
 					blDictInsert(_glyphatlas->pGlyphs, MAKEU32(strtoul(_id, NULL, 10), 0), _gi);
 				} while (_char);
 			}
@@ -794,13 +794,13 @@ _FontGlyph(_BLFont* _Font, BLU32 _Char, BLU32 _FontHeight)
 		BLU32 _glyphh = _ft->pFtFace->glyph->bitmap.rows;
 		if (_outline)
 		{
-			_glyphw += 2; 
+			_glyphw += 2;
 			_glyphh += 2;
 			_glyph->nAdv += 2;
 		}
 		else if (_bold)
 		{
-			_glyphw += 1; 
+			_glyphw += 1;
 			_glyphh += 1;
 			_glyph->nAdv += 1;
 		}
@@ -882,12 +882,12 @@ _FontGlyph(_BLFont* _Font, BLU32 _Char, BLU32 _FontHeight)
 				for (BLU32 _jdx = 0; _jdx < _bitmap->width; ++_jdx)
 				{
 					*_dstlt++ += 0x00;
-					*_dstt++ += 0x00; 
+					*_dstt++ += 0x00;
 					*_dstrt++ += 0x00;
 					*_dstl++ += 0x00;
 					*_dstr++ += 0x00;
 					*_dstlb++ += 0x00;
-					*_dstb++ += 0x00; 
+					*_dstb++ += 0x00;
 					*_dstrb++ += 0x00;
                     _srctmp = *_src;
                     _dsttmp = *_dst;
@@ -939,8 +939,8 @@ _FontGlyph(_BLFont* _Font, BLU32 _Char, BLU32 _FontHeight)
 				BLU8* _dst4 = (BLU8*)(_tmpbuf4);
 				for (BLU32 _jdx = 0; _jdx < _bitmap->width; ++_jdx)
 				{
-					*_dst2++ = 0xFF; 
-					*_dst3++ = 0xFF; 
+					*_dst2++ = 0xFF;
+					*_dst3++ = 0xFF;
 					*_dst4++ = 0xFF;
                     _srctmp = *_src;
                     _dsttmp = *_dst;
@@ -973,7 +973,7 @@ _FontGlyph(_BLFont* _Font, BLU32 _Char, BLU32 _FontHeight)
 					*_dst2++ = 0x40;
 					_srctmp = *_src;
 					*_dst++ = (BLU8)MIN_INTERNAL(255, 0x40 + (0xFF) * (_srctmp / 255.f));
-					*_dst2++ = (BLU8)(0.5f * (*_src++)); 
+					*_dst2++ = (BLU8)(0.5f * (*_src++));
 					_dsttmp = *_dst;
 					*_dst++ = (BLU8)MIN_INTERNAL(255, _dsttmp + _srctmp);
 				}
@@ -1012,7 +1012,7 @@ _FontGlyph(_BLFont* _Font, BLU32 _Char, BLU32 _FontHeight)
 			return NULL;
 	}
 }
-static BLS32 
+static BLS32
 _FontCharIndex(_BLFont* _Font, BLU32 _FontHeight, const BLUtf16* _Text, BLS32 _XPos, BLU16 _Flag)
 {
 	_BLFont* _ft = NULL;
@@ -1169,7 +1169,7 @@ _LabelRow(_BLWidget* _Node)
 	_Node->uExtension.sLabel.nRowSpaceRemaining = _Node->uExtension.sLabel.nRowSpace;
 	_Node->uExtension.sLabel.pLastAtomCell = NULL;
 }
-static void 
+static void
 _LabelAtom(_BLWidget* _Node, _BLRichAtomCell* _Ele)
 {
 	BLVec2 _dim = _Ele->sDim;
@@ -1182,7 +1182,7 @@ _LabelAtom(_BLWidget* _Node, _BLRichAtomCell* _Ele)
 	(*(_BLRichRowCell**)(_Node->uExtension.sLabel.pRowCells->pData + _Node->uExtension.sLabel.nCurRow))->nWidth += (BLS32)_dim.fX;
 	_Node->uExtension.sLabel.pLastAtomCell = NULL;
 }
-static void 
+static void
 _LabelAnchored(_BLWidget* _Node, _BLRichAtomCell* _Ele, BLBool _Left)
 {
 	BLVec2 _dim = _Ele->sDim;
@@ -1216,7 +1216,7 @@ _LabelAnchored(_BLWidget* _Node, _BLRichAtomCell* _Ele, BLBool _Left)
 	_Node->uExtension.sLabel.nRowSpace -= (BLS32)_dim.fX;
 	_Node->uExtension.sLabel.nRowSpaceRemaining -= (BLS32)_dim.fX;
 }
-static void 
+static void
 _LabelAppendText(_BLWidget* _Node, const BLUtf16* _Text, BLU32 _Width, BLU32 _Height)
 {
 	if (_Width > _Node->uExtension.sLabel.nRowSpaceRemaining)
@@ -1259,7 +1259,7 @@ _LabelAppendText(_BLWidget* _Node, const BLUtf16* _Text, BLU32 _Width, BLU32 _He
 		_LabelAtom(_Node, _Node->uExtension.sLabel.pLastAtomCell);
 	}
 }
-static void 
+static void
 _LabelParse(_BLWidget* _Node)
 {
 	const BLUtf16* _text = blGenUtf16Str(_Node->uExtension.sLabel.pText);
@@ -1279,7 +1279,7 @@ _LabelParse(_BLWidget* _Node)
 	_Node->uExtension.sLabel.nFullSpace = (BLU32)_Node->sDimension.fX - (BLS32)_Node->uExtension.sLabel.fPaddingX * 2;
 	_Node->uExtension.sLabel.nRowSpace = _Node->uExtension.sLabel.nFullSpace;
 	_Node->uExtension.sLabel.nRowSpaceRemaining = _Node->uExtension.sLabel.nRowSpace;
-	_Node->uExtension.sLabel.nCurRow = 0; 
+	_Node->uExtension.sLabel.nCurRow = 0;
 	{
 		FOREACH_ARRAY(_BLRichRowCell*, _iter, _Node->uExtension.sLabel.pRowCells)
 		{
@@ -1764,7 +1764,7 @@ _TextLine(_BLWidget* _Node, BLS32 _Pos)
 	}
 	return (BLS32)_Node->uExtension.sText.nSplitSize - 1;
 }
-static void 
+static void
 _TextRect(_BLWidget* _Node, _BLFont* _Font, BLS32 _Line, BLRect* _Rect, BLU16 _Flag)
 {
 	if (_Line < 0)
@@ -1776,7 +1776,7 @@ _TextRect(_BLWidget* _Node, _BLFont* _Font, BLS32 _Line, BLRect* _Rect, BLU16 _F
 	if (_Node->uExtension.sText.bMultiline)
 	{
 		_FontMeasure(_Node->uExtension.sText.pSplitText[_Line], _Font, _Node->uExtension.sText.nFontHeight, &_d.fX, &_d.fY, _Flag);
-		_d.fY = (_d.fY) ? _d.fY : _Node->uExtension.sText.nFontHeight;
+		_d.fY = ((BLS32)_d.fY) ? _d.fY : _Node->uExtension.sText.nFontHeight;
 	}
 	else
 	{
@@ -1789,14 +1789,14 @@ _TextRect(_BLWidget* _Node, _BLFont* _Font, BLS32 _Line, BLRect* _Rect, BLU16 _F
 				_starph[_jdx] = L'*';
 			_starph[_str16len] = 0;
 			_FontMeasure(_Node->uExtension.sText.bPassword ? _starph : _str16, _Font, _Node->uExtension.sText.nFontHeight, &_d.fX, &_d.fY, _Flag);
-			_d.fY = (_d.fY) ? _d.fY : _Node->uExtension.sText.nFontHeight;
+			_d.fY = ((BLS32)_d.fY) ? _d.fY : _Node->uExtension.sText.nFontHeight;
 			blDeleteUtf16Str((BLUtf16*)_str16);
 		}
 		else
 		{
 			const BLUtf16* _str16 = blGenUtf16Str(_Node->uExtension.sText.pText);
 			_FontMeasure(_str16, _Font, _Node->uExtension.sText.nFontHeight, &_d.fX, &_d.fY, _Flag);
-			_d.fY = (_d.fY) ? _d.fY : _Node->uExtension.sText.nFontHeight;
+			_d.fY = ((BLS32)_d.fY) ? _d.fY : _Node->uExtension.sText.nFontHeight;
 			blDeleteUtf16Str((BLUtf16*)_str16);
 		}
 	}
@@ -1838,7 +1838,7 @@ _TextRect(_BLWidget* _Node, _BLFont* _Font, BLS32 _Line, BLRect* _Rect, BLU16 _F
 	_Node->uExtension.sText.sCurRect.sRB.fX += _Rect->sLT.fX;
 	_Node->uExtension.sText.sCurRect.sRB.fY += _Rect->sLT.fY;
 }
-static void 
+static void
 _TextSplit(_BLWidget* _Node, _BLFont* _Font, BLU16 _Flag)
 {
 	if (!_Node->uExtension.sText.bMultiline)
@@ -1908,11 +1908,11 @@ _TextSplit(_BLWidget* _Node, _BLFont* _Font, BLU16 _Flag)
 			}
 			if (_linebreak)
 			{
-				BLU32 _wslen = blUtf16Length(_whitespace);
-				BLU32 _wdlen = blUtf16Length(_word);
-				BLU32 _llen = blUtf16Length(_line);
+				_wslen = blUtf16Length(_whitespace);
+				_wdlen = blUtf16Length(_word);
+				_llen = blUtf16Length(_line);
 				_line = (BLUtf16*)realloc(_line, (_llen + _wslen + _wdlen + 1) * sizeof(BLUtf16));
-				BLU32 _jdx = 0;
+				_jdx = 0;
 				for (; _jdx < _wslen; ++_jdx)
 					_line[_llen + _jdx] = _whitespace[_jdx];
 				_jdx = 0;
@@ -1957,7 +1957,7 @@ _TextSplit(_BLWidget* _Node, _BLFont* _Font, BLU16 _Flag)
 	_Node->uExtension.sText.nSplitSize++;
 	blDeleteUtf16Str((BLUtf16*)_text);
 }
-static BLS32 
+static BLS32
 _TextCaret(_BLWidget* _Node, BLVec2* _Pos)
 {
 	BLU32 _linecount = _Node->uExtension.sText.bMultiline ? _Node->uExtension.sText.nSplitSize : 1;
@@ -2035,7 +2035,7 @@ _TextCaret(_BLWidget* _Node, BLVec2* _Pos)
 	blDeleteUtf16Str((BLUtf16*)_text16);
 	return _ret;
 }
-static void 
+static void
 _TextScroll(_BLWidget* _Node)
 {
 	if (!_Node->uExtension.sText.bAutoscroll)
@@ -2181,7 +2181,7 @@ _TableSplit(_BLWidget* _Node, _BLFont* _Font, BLU32 _Flag, const BLUtf8* _Text, 
 		if (_line)
 		{
 			for (BLU32 _jdx = 0; _jdx < _tmplen; ++_jdx)
-				_tmp[_jdx] = _line[_jdx];			
+				_tmp[_jdx] = _line[_jdx];
 		}
 		_tmp[_tmplen] = _c[0];
 		_tmp[_tmplen + 1] = 0;
@@ -2230,7 +2230,7 @@ static void
 _TableMake(_BLWidget* _Node)
 {
 	_Node->uExtension.sTable.nTotalHeight = 0;
-	_Node->uExtension.sTable.nTotalWidth = 0;	
+	_Node->uExtension.sTable.nTotalWidth = 0;
 	if (_Node->uExtension.sTable.nColumnNum)
 		_Node->uExtension.sTable.nTotalHeight = _Node->uExtension.sTable.nRowHeight * (BLU32)roundf((BLF32)_Node->uExtension.sTable.nCellNum / (BLF32)_Node->uExtension.sTable.nColumnNum);
 	else
@@ -2421,7 +2421,7 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 	BLGuid _stream;
 	BLGuid* _streamhead = NULL;
 	BLU32 _pixkey = 0;
-	blMutexLock(_PrUIMem->pPixmapsCache->pMutex);	
+	blMutexLock(_PrUIMem->pPixmapsCache->pMutex);
 	switch (_src->eType)
 	{
 	case BL_UT_PANEL:
@@ -3154,13 +3154,13 @@ _UnloadUI(BLVoid* _Src)
 			free(_widget->uExtension.sText.pText);
 		if (_widget->uExtension.sText.pPlaceholder)
 			free(_widget->uExtension.sText.pPlaceholder);
-		for (BLU32 _idx = 0; _idx < _widget->uExtension.sText.nSplitSize; ++_idx)
+		for (_idx = 0; _idx < _widget->uExtension.sText.nSplitSize; ++_idx)
 			free(_widget->uExtension.sText.pSplitText[_idx]);
 	}
 	break;
 	case BL_UT_TABLE:
 	{
-		for (BLU32 _idx = 0; _idx < _widget->uExtension.sTable.nCellNum; ++_idx)
+		for (_idx = 0; _idx < _widget->uExtension.sTable.nCellNum; ++_idx)
 		{
 			if (_widget->uExtension.sTable.pCellText[_idx])
 				free(_widget->uExtension.sTable.pCellText[_idx]);
@@ -4441,7 +4441,7 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 							_rgba[3] * _gray,
 							1.f,
 							1.f
-						}; 
+						};
 						blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nBlankTex, 0);
 						blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 						blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
@@ -6740,14 +6740,13 @@ _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 	{
 		_TextRect(_Node, _ft, _idx, &_framerect, _flag);
 		_curline = _ml ? _Node->uExtension.sText.pSplitText[_idx] : (BLUtf16*)_text;
-		_startpos = _ml ? _Node->uExtension.sText.aSplitPositions[_idx] : 0;			
+		_startpos = _ml ? _Node->uExtension.sText.aSplitPositions[_idx] : 0;
 		BLU32 _txtcolor = (_Node->uExtension.sText.nState == 0) ? _PrUIMem->nTextDisableColor : _Node->uExtension.sText.nTxtColor;
 		_WriteText(_curline, _Node->uExtension.sText.aFontSource, _Node->uExtension.sText.nFontHeight, _Node->uExtension.sText.eTxtAlignmentH, _Node->uExtension.sText.eTxtAlignmentV, TRUE, &_Node->uExtension.sText.sCurRect, &_area, _txtcolor, _gray, _flag, _Node->uExtension.sText.bPassword);
 		if (_focus && _Node->uExtension.sText.nSelectBegin != _Node->uExtension.sText.nSelectEnd && _idx >= _hlinestart && _idx < _hlinestart + _hlinecount)
 		{
 			BLF32 _mbegin = 0.f, _mend = 0.f, _outy;
 			BLU32 _curlen = (BLU32)blUtf16Length(_curline);
-			BLS32 _linestartpos = 0, _lineendpos = _curlen;
 			if (_idx == _hlinestart)
 			{
 				if (_Node->uExtension.sText.bPassword)
@@ -6766,7 +6765,6 @@ _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 					_s1[_realmbgn - _startpos] = 0;
 					_FontMeasure((const BLUtf16*)_s1, _ft, _Node->uExtension.sText.nFontHeight, &_mbegin, &_outy, _flag);
 				}
-				_linestartpos = _realmbgn - _startpos;
 			}
 			if (_idx == _hlinestart + _hlinecount - 1)
 			{
@@ -6786,7 +6784,6 @@ _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 					_s2[_realmend - _startpos] = 0;
 					_FontMeasure((const BLUtf16*)_s2, _ft, _Node->uExtension.sText.nFontHeight, &_mend, &_outy, _flag);
 				}
-				_lineendpos = _realmend - _startpos;
 			}
 			else
 			{
@@ -6849,7 +6846,7 @@ _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 	{
 		BLRect _cv;
 		BLS32 _cursorline = 0;
-		BLS32 _startpos = 0;
+		_startpos = 0;
 		BLF32 _charcursorpos;
 		BLRect _localcliprect = _framerect;
 		if (_Node->uExtension.sText.bMultiline)
@@ -6869,7 +6866,7 @@ _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 		}
 		else
 		{
-			BLU16* _s1 = (BLUtf16*)alloca((_Node->uExtension.sText.nCaretPos - _startpos + 1) * sizeof(BLUtf16));
+			_s1 = (BLUtf16*)alloca((_Node->uExtension.sText.nCaretPos - _startpos + 1) * sizeof(BLUtf16));
 			for (BLS32 _jdx = 0; _jdx < _Node->uExtension.sText.nCaretPos - _startpos; ++_jdx)
 				_s1[_jdx] = _curline[_jdx];
 			_s1[_Node->uExtension.sText.nCaretPos - _startpos] = 0;
@@ -7939,7 +7936,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 	if (_Node->uExtension.sText.bShadow)
 		_flag |= 0x0F00;
 	if (_Node->uExtension.sText.bItalics)
-		_flag |= 0xF000; 
+		_flag |= 0xF000;
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_clientc.sLT.fX, (BLS32)_clientc.sLT.fY, (BLU32)(_clientc.sRB.fX - _clientc.sLT.fX), (BLU32)(_clientc.sRB.fY - _clientc.sLT.fY), FALSE);
 	for (BLU32 _idx = 0; _idx < _rownum; ++_idx)
 	{
@@ -8039,7 +8036,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 									break;
 								_dir[_kdx] = _Node->uExtension.sTable.pCellText[_cellidx][_kdx + 7];
 							}
-							BLGuid _stream;		
+							BLGuid _stream;
 							BLAnsi _tmpname[260];
 							strcpy(_tmpname, _dir);
 							_stream = blGenStream(_tmpname);
@@ -8107,7 +8104,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 							BLF32 _imgratio = (BLF32)_width / _height;
 							BLF32 _imgw, _imgh;
 							BLF32 _minedge = (_textr.sRB.fX - _textr.sLT.fX >= _Node->uExtension.sTable.nRowHeight) ? _Node->uExtension.sTable.nRowHeight : _textr.sRB.fX - _textr.sLT.fX;
-							if (_minedge == _Node->uExtension.sTable.nRowHeight)
+							if ((BLS32)_minedge == (BLS32)_Node->uExtension.sTable.nRowHeight)
 							{
 								_imgw = _minedge * _imgratio;
 								_imgh = _minedge;
@@ -8117,7 +8114,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 								_imgw = _minedge;
 								_imgh = _minedge / _imgratio;
 							}
-							BLF32 _vbo[] = {
+							BLF32 _vbo2[] = {
 								PIXEL_ALIGNED_INTERNAL((_textr.sLT.fX + _textr.sRB.fX) * 0.5f - _imgw * 0.5f),
 								PIXEL_ALIGNED_INTERNAL((_textr.sLT.fY + _textr.sRB.fY) * 0.5f - _imgh * 0.5f),
 								1.f,
@@ -8152,7 +8149,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 								1.f
 							};
 							blTechSampler(_PrUIMem->nUITech, "Texture0", _tex, 0);
-							blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+							blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo2, sizeof(_vbo2), 0, NULL, 0);
 							blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 							blDeleteTexture(_tex);
 						}
@@ -8363,7 +8360,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else
 			{
-				for (BLU32 _idx = 0; _idx < 18; ++_idx)
+				for (_idx = 0; _idx < 18; ++_idx)
 				{
 					_tspts[_idx].fX = 1.f;
 					_tspts[_idx].fY = 1.f;
@@ -8381,7 +8378,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			BLF32 _sth = (_Node->uExtension.sDial.sStencilTex.sRB.fY - _Node->uExtension.sDial.sStencilTex.sLT.fY);
 			if (_startx == 1)
 			{
-				BLF32 _theta = _Node->uExtension.sDial.nStartAngle * PI_INTERNAL / 180.0f;
+				_theta = _Node->uExtension.sDial.nStartAngle * PI_INTERNAL / 180.0f;
 				_pts[_startback].fX = _XPos + tanf(_theta) * _Height * 0.5f;
 				_pts[_startback].fY = _YPos - _Height * 0.5f;
 				_tpts[_startback].fX = (_tx + tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8394,7 +8391,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_startx == 3)
 			{
-				BLF32 _theta = (90.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
+				_theta = (90.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
 				_pts[_startback].fX = _XPos + _Width * 0.5f;
 				_pts[_startback].fY = _YPos - tanf(_theta) * _Width * 0.5f;
 				_tpts[_startback].fX = (_tx + _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8407,7 +8404,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_startx == 5)
 			{
-				BLF32 _theta = (_Node->uExtension.sDial.nStartAngle - 90.f) * PI_INTERNAL / 180.0f;
+				_theta = (_Node->uExtension.sDial.nStartAngle - 90.f) * PI_INTERNAL / 180.0f;
 				_pts[_startback].fX = _XPos + _Width * 0.5f;
 				_pts[_startback].fY = _YPos + tanf(_theta) * _Width * 0.5f;
 				_tpts[_startback].fX = (_tx + _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8420,7 +8417,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_startx == 7)
 			{
-				BLF32 _theta = (180.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
+				_theta = (180.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
 				_pts[_startback].fX = _XPos + tanf(_theta) * _Height * 0.5f;
 				_pts[_startback].fY = _YPos + _Height * 0.5f;
 				_tpts[_startback].fX = (_tx + tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8433,7 +8430,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_startx == 9)
 			{
-				BLF32 _theta = (_Node->uExtension.sDial.nStartAngle - 180.f) * PI_INTERNAL / 180.0f;
+				_theta = (_Node->uExtension.sDial.nStartAngle - 180.f) * PI_INTERNAL / 180.0f;
 				_pts[_startback].fX = _XPos - tanf(_theta) * _Height * 0.5f;
 				_pts[_startback].fY = _YPos + _Height * 0.5f;
 				_tpts[_startback].fX = (_tx - tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8446,7 +8443,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_startx == 11)
 			{
-				BLF32 _theta = (270.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
+				_theta = (270.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
 				_pts[_startback].fX = _XPos - _Width * 0.5f;
 				_pts[_startback].fY = _YPos + tanf(_theta) * _Width * 0.5f;
 				_tpts[_startback].fX = (_tx - _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8459,7 +8456,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_startx == 13)
 			{
-				BLF32 _theta = (_Node->uExtension.sDial.nStartAngle - 270.f) * PI_INTERNAL / 180.0f;
+				_theta = (_Node->uExtension.sDial.nStartAngle - 270.f) * PI_INTERNAL / 180.0f;
 				_pts[_startback].fX = _XPos - _Width * 0.5f;
 				_pts[_startback].fY = _YPos - tanf(_theta) * _Width * 0.5f;
 				_tpts[_startback].fX = (_tx - _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8472,7 +8469,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_startx == 15)
 			{
-				BLF32 _theta = (360.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
+				_theta = (360.f - _Node->uExtension.sDial.nStartAngle) * PI_INTERNAL / 180.0f;
 				_pts[_startback].fX = _XPos - tanf(_theta) * _Height * 0.5f;
 				_pts[_startback].fY = _YPos - _Height * 0.5f;
 				_tpts[_startback].fX = (_tx - tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8485,7 +8482,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			if (_endx == 1)
 			{
-				BLF32 _theta = _Node->uExtension.sDial.nEndAngle * PI_INTERNAL / 180.0f;
+				_theta = _Node->uExtension.sDial.nEndAngle * PI_INTERNAL / 180.0f;
 				_pts[_endback].fX = _XPos + tanf(_theta) * _Height * 0.5f;
 				_pts[_endback].fY = _YPos - _Height * 0.5f;
 				_tpts[_endback].fX = (_tx + tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8498,7 +8495,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_endx == 3)
 			{
-				BLF32 _theta = (90.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
+				_theta = (90.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
 				_pts[_endback].fX = _XPos + _Width * 0.5f;
 				_pts[_endback].fY = _YPos - tanf(_theta) * _Width * 0.5f;
 				_tpts[_endback].fX = (_tx + _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8511,7 +8508,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_endx == 5)
 			{
-				BLF32 _theta = (_Node->uExtension.sDial.nEndAngle - 90.f) * PI_INTERNAL / 180.0f;
+				_theta = (_Node->uExtension.sDial.nEndAngle - 90.f) * PI_INTERNAL / 180.0f;
 				_pts[_endback].fX = _XPos + _Width * 0.5f;
 				_pts[_endback].fY = _YPos + tanf(_theta) * _Width * 0.5f;
 				_tpts[_endback].fX = (_tx + _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8524,7 +8521,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_endx == 7)
 			{
-				BLF32 _theta = (180.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
+				_theta = (180.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
 				_pts[_endback].fX = _XPos + tanf(_theta) * _Height * 0.5f;
 				_pts[_endback].fY = _YPos + _Height * 0.5f;
 				_tpts[_endback].fX = (_tx + tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8537,7 +8534,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_endx == 9)
 			{
-				BLF32 _theta = (_Node->uExtension.sDial.nEndAngle - 180.f) * PI_INTERNAL / 180.0f;
+				_theta = (_Node->uExtension.sDial.nEndAngle - 180.f) * PI_INTERNAL / 180.0f;
 				_pts[_endback].fX = _XPos - tanf(_theta) * _Height * 0.5f;
 				_pts[_endback].fY = _YPos + _Height * 0.5f;
 				_tpts[_endback].fX = (_tx - tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8550,7 +8547,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_endx == 11)
 			{
-				BLF32 _theta = (270.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
+				_theta = (270.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
 				_pts[_endback].fX = _XPos - _Width * 0.5f;
 				_pts[_endback].fY = _YPos + tanf(_theta) * _Width * 0.5f;
 				_tpts[_endback].fX = (_tx - _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8563,7 +8560,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_endx == 13)
 			{
-				BLF32 _theta = (_Node->uExtension.sDial.nEndAngle - 270.f) * PI_INTERNAL / 180.0f;
+				_theta = (_Node->uExtension.sDial.nEndAngle - 270.f) * PI_INTERNAL / 180.0f;
 				_pts[_endback].fX = _XPos - _Width * 0.5f;
 				_pts[_endback].fY = _YPos - tanf(_theta) * _Width * 0.5f;
 				_tpts[_endback].fX = (_tx - _tw * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8576,7 +8573,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			else if (_endx == 15)
 			{
-				BLF32 _theta = (360.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
+				_theta = (360.f - _Node->uExtension.sDial.nEndAngle) * PI_INTERNAL / 180.0f;
 				_pts[_endback].fX = _XPos - tanf(_theta) * _Height * 0.5f;
 				_pts[_endback].fY = _YPos - _Height * 0.5f;
 				_tpts[_endback].fX = (_tx - tanf(_theta) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
@@ -8885,7 +8882,7 @@ _DrawPrimitive(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _
 			if (_dmr2 > 0.000001f)
 			{
 				BLF32 _scale = 1.0f / _dmr2;
-				if (_scale > 100.0f) 
+				if (_scale > 100.0f)
 					_scale = 100.0f;
 				_dm.fX *= _scale;
 				_dm.fY *= _scale;
@@ -9506,7 +9503,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 				blUIFocus(_PrUIMem->pHoveredWidget->nID, _cx, _cy);
 			else
 				_PrUIMem->pFocusWidget = NULL;
-		}			
+		}
 		_BLWidget* _lastfocus = _PrUIMem->pFocusWidget;
 		if (_PrUIMem->pFocusWidget && _PrUIMem->pFocusWidget->bVisible && _PrUIMem->pFocusWidget->bInteractive)
 		{
@@ -10415,7 +10412,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam,
 						strcpy(_old, (const BLAnsi*)_wid->uExtension.sText.pText);
 					BLUtf8* _str = _PParam;
 					const BLUtf16* _s16 = blGenUtf16Str(_str);
-					BLU32 _s16len = blUtf16Length(_s16);					
+					BLU32 _s16len = blUtf16Length(_s16);
 					for (BLU32 _idx = 0; _idx < _s16len; ++_idx)
 					{
 						BLUtf16 _ch = _s16[_idx];
@@ -10571,7 +10568,7 @@ _KeyboardSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam,
 							{
 								BLUtf16* _tmp = (BLUtf16*)blGenUtf16Str(_wid->uExtension.sText.pText);
 								BLU32 _tmplen = blUtf16Length(_tmp);
-								if (!_tmplen || _tmplen == _wid->uExtension.sText.nCaretPos)
+								if (!_tmplen || _tmplen == (BLU32)_wid->uExtension.sText.nCaretPos)
 									break;
 								_s = (BLUtf16*)alloca((_tmplen) * sizeof(BLUtf16));
 								BLS32 _jdx = 0;
@@ -10915,7 +10912,7 @@ _UIInit(duk_context* _DKC, BLBool _Profiler)
     _PrUIMem->pRoot->sDimension.fX = -1.f;
     _PrUIMem->pRoot->sDimension.fY = -1.f;
 	_PrUIMem->pRoot->sPosition.fX = 0.f;
-	_PrUIMem->pRoot->sPosition.fY = 0.f;	
+	_PrUIMem->pRoot->sPosition.fY = 0.f;
 	_PrUIMem->pRoot->bPenetration = TRUE;
 	_PrUIMem->pRoot->pParent = NULL;
 	_PrUIMem->pRoot->eReferenceH = BL_UA_HCENTER;
@@ -10986,8 +10983,8 @@ _UIInit(duk_context* _DKC, BLBool _Profiler)
 				const BLAnsi* _id = ezxml_attr(_char, "id");
 				const BLAnsi* _x = ezxml_attr(_char, "x");
 				const BLAnsi* _y = ezxml_attr(_char, "y");
-				const BLAnsi* _width = ezxml_attr(_char, "width");
-				const BLAnsi* _height = ezxml_attr(_char, "height");
+				const BLAnsi* _cwidth = ezxml_attr(_char, "width");
+				const BLAnsi* _cheight = ezxml_attr(_char, "height");
 				const BLAnsi* _xoffset = ezxml_attr(_char, "xoffset");
 				const BLAnsi* _yoffset = ezxml_attr(_char, "yoffset");
 				const BLAnsi* _xadvance = ezxml_attr(_char, "xadvance");
@@ -10997,8 +10994,8 @@ _UIInit(duk_context* _DKC, BLBool _Profiler)
 				_gi->nAdv = (BLU32)strtoul(_xadvance, NULL, 10);
 				_gi->sRect.sLT.fX = strtof(_x, NULL);
 				_gi->sRect.sLT.fY = strtof(_y, NULL);
-				_gi->sRect.sRB.fX = _gi->sRect.sLT.fX + strtof(_width, NULL);
-				_gi->sRect.sRB.fY = _gi->sRect.sLT.fY + strtof(_height, NULL);
+				_gi->sRect.sRB.fX = _gi->sRect.sLT.fX + strtof(_cwidth, NULL);
+				_gi->sRect.sRB.fY = _gi->sRect.sLT.fY + strtof(_cheight, NULL);
 				_gi->sOffset.fX = strtof(_xoffset, NULL);
 				_gi->sOffset.fY = strtof(_yoffset, NULL);
 				_gi->nTexture = *_tex;
@@ -11169,7 +11166,7 @@ _UIUpdate(_BLWidget* _Node, BLU32 _Interval)
 								_Node->fAlpha = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sAlpha.fInitAlpha - _action->uAction.sAlpha.fAlpha) + _action->uAction.sAlpha.fAlpha;
 						}
 						else
-							_Node->fAlpha = _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;						
+							_Node->fAlpha = _action->fCurTime / _action->fTotalTime * (_action->uAction.sAlpha.fAlpha - _action->uAction.sAlpha.fInitAlpha) + _action->uAction.sAlpha.fInitAlpha;
 						_Node->fAlpha = blScalarClamp(_Node->fAlpha, 0.f, 1.f);
 					}
 					break;
@@ -11383,7 +11380,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 			1.f,
 			1.f,
 			0.f
-		};	
+		};
 		blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nFBOTex, 0);
 		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 		blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0, FALSE);
@@ -11470,7 +11467,7 @@ _UIDestroy()
 	FT_Done_FreeType(_PrUIMem->sFtLibrary);
 	free(_PrUIMem);
 }
-BLVoid 
+BLVoid
 blUIStyle(IN BLU32 _CaretColor, IN BLU32 _SelectRangeColor, IN BLU32 _TextDisableColor)
 {
 	if (_PrUIMem)
@@ -11528,7 +11525,6 @@ blUIFile(IN BLAnsi* _Filename)
 		_geovar[2] = _geovar[2] - _geovar[0];
 		_geovar[3] = _geovar[3] - _geovar[1];
         const BLAnsi* _name = ezxml_attr(_element, "Name");
-        BLEnum _typevar;
         const BLAnsi* _type = ezxml_attr(_element, "Type");
         const BLAnsi* _parent = ezxml_attr(_element, "Parent");
         BLU32 _parentvar = (BLU32)strtoul(_parent, NULL, 10);
@@ -11564,7 +11560,6 @@ blUIFile(IN BLAnsi* _Filename)
             continue;
         if (!strcmp(_type, "Panel"))
         {
-            _typevar = BL_UT_PANEL;
             const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
             BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
             const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
@@ -11609,7 +11604,6 @@ blUIFile(IN BLAnsi* _Filename)
         }
         else if (!strcmp(_type, "Button"))
         {
-            _typevar = BL_UT_BUTTON;
             const BLAnsi* _enable = ezxml_attr(_element, "Enable");
             BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
             const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
@@ -11712,7 +11706,6 @@ blUIFile(IN BLAnsi* _Filename)
         }
         else if (!strcmp(_type, "Label"))
         {
-            _typevar = BL_UT_LABEL;
             const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
             BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
             const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
@@ -11748,11 +11741,11 @@ blUIFile(IN BLAnsi* _Filename)
 			blUILableText(_widguid, (const BLUtf8*)_text, 0xFFFFFFFF, 0, 0, NULL, 0, FALSE, FALSE, FALSE, FALSE, TRUE);
 			blUILabelStencilMap(_widguid, _stencilmap);
 			blUILabelCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUILabelPadding(_widguid, _paddingvar[0], _paddingvar[1]);
 			blUILabelPixmap(_widguid, _pixmap);
         }
         else if (!strcmp(_type, "Check"))
         {
-            _typevar = BL_UT_CHECK;
             const BLAnsi* _enable = ezxml_attr(_element, "Enable");
             BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
             const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
@@ -11843,7 +11836,6 @@ blUIFile(IN BLAnsi* _Filename)
         }
         else if (!strcmp(_type, "Text"))
         {
-            _typevar = BL_UT_TEXT;
             const BLAnsi* _enable = ezxml_attr(_element, "Enable");
             BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
             const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
@@ -11895,7 +11887,7 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _textcolor = ezxml_attr(_element, "TextColor");
             BLU32 _textcolorvar = (BLU32)strtoul(_textcolor, NULL, 10);
 			const BLAnsi* _phcolor = ezxml_attr(_element, "PlaceholderColor");
-			BLU32 _phcolorvar = (BLU32)strtoul(_phcolor, NULL, 10);			
+			BLU32 _phcolorvar = (BLU32)strtoul(_phcolor, NULL, 10);
             const BLAnsi* _padding = ezxml_attr(_element, "Padding");
             BLF32 _paddingvar[2];
             _tmp = strtok((BLAnsi*)_padding, ",");
@@ -11938,7 +11930,6 @@ blUIFile(IN BLAnsi* _Filename)
         }
         else if (!strcmp(_type, "Progress"))
         {
-            _typevar = BL_UT_PROGRESS;
             const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
             BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
             const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
@@ -11998,7 +11989,6 @@ blUIFile(IN BLAnsi* _Filename)
         }
         else if (!strcmp(_type, "Slider"))
         {
-            _typevar = BL_UT_SLIDER;
             const BLAnsi* _enable = ezxml_attr(_element, "Enable");
             BLBool _enablevar = strcmp(_enable, "true") ? FALSE : TRUE;
             const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
@@ -12071,7 +12061,6 @@ blUIFile(IN BLAnsi* _Filename)
         }
         else if (!strcmp(_type, "Table"))
         {
-            _typevar = BL_UT_TABLE;
             const BLAnsi* _flipx = ezxml_attr(_element, "FlipX");
             BLBool _flipxvar = strcmp(_flipx, "true") ? FALSE : TRUE;
             const BLAnsi* _flipy = ezxml_attr(_element, "FlipY");
@@ -12123,7 +12112,6 @@ blUIFile(IN BLAnsi* _Filename)
         }
         else if (!strcmp(_type, "Dial"))
         {
-            _typevar = BL_UT_DIAL;
             const BLAnsi* _clockwise = ezxml_attr(_element, "Clockwise");
             BLBool _clockwisevar = strcmp(_clockwise, "true") ? FALSE : TRUE;
             const BLAnsi* _anglecut = ezxml_attr(_element, "AngleCut");
@@ -12152,7 +12140,6 @@ blUIFile(IN BLAnsi* _Filename)
         }
         else if (!strcmp(_type, "Primitive"))
         {
-            _typevar = BL_UT_PRIMITIVE;
             const BLAnsi* _fill = ezxml_attr(_element, "Fill");
             BLBool _fillvar = strcmp(_fill, "true") ? FALSE : TRUE;
             const BLAnsi* _closed = ezxml_attr(_element, "Closed");
@@ -12205,7 +12192,7 @@ blUIFile(IN BLAnsi* _Filename)
     ezxml_free(_doc);
     blDeleteStream(_layout);
 }
-BLGuid 
+BLGuid
 blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width, IN BLU32 _Height, IN BLGuid _Parent, IN BLEnum _Type)
 {
 	_BLWidget* _widget = (_BLWidget*)malloc(sizeof(_BLWidget));
@@ -12274,7 +12261,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sLabel.aPixmap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sLabel.aCommonMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sLabel.aStencilMap, 0, sizeof(BLAnsi) * 128);
-			memset(_widget->uExtension.sLabel.aCurFontSource, 0, sizeof(BLAnsi) * 32);			
+			memset(_widget->uExtension.sLabel.aCurFontSource, 0, sizeof(BLAnsi) * 32);
 			_widget->uExtension.sLabel.nLeftPadding = 0;
 			_widget->uExtension.sLabel.nRightPadding = 0;
 			_widget->uExtension.sLabel.nTotalHeight = 0;
@@ -12282,10 +12269,10 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
             _widget->uExtension.sLabel.bFlipY = FALSE;
 			_widget->uExtension.sLabel.nScroll = 0;
 			_widget->uExtension.sLabel.nCurRow = 0;
-			_widget->uExtension.sLabel.nCurFontFlag = 0;			
-			_widget->uExtension.sLabel.nCurColor = 0xFFFFFFFF;		
+			_widget->uExtension.sLabel.nCurFontFlag = 0;
+			_widget->uExtension.sLabel.nCurColor = 0xFFFFFFFF;
 			_widget->uExtension.sLabel.nCurLinkID = 0xFFFFFFFF;
-			_widget->uExtension.sLabel.nCurFontHeight = 0xFFFFFFFF;			
+			_widget->uExtension.sLabel.nCurFontHeight = 0xFFFFFFFF;
 			_widget->uExtension.sLabel.nFullSpace = 0;
 			_widget->uExtension.sLabel.nRowSpace = 0;
 			_widget->uExtension.sLabel.fPaddingX = 0.f;
@@ -12294,7 +12281,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sLabel.pLastAtomCell = NULL;
 			_widget->uExtension.sLabel.pAnchoredCells = NULL;
 			_widget->uExtension.sLabel.pRowCells = NULL;
-			_widget->uExtension.sLabel.bDragging = FALSE;			
+			_widget->uExtension.sLabel.bDragging = FALSE;
 			_widget->uExtension.sLabel.pRowCells = blGenArray(FALSE);
 			_widget->uExtension.sLabel.pAnchoredCells = blGenArray(FALSE);
             _widget->uExtension.sLabel.nPixmapTex = INVALID_GUID;
@@ -12518,7 +12505,7 @@ blDeleteUI(IN BLGuid _ID)
     blDeleteGuid(_ID);
     _PrUIMem->bDirty = TRUE;
 }
-BLEnum 
+BLEnum
 blUIGetType(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
@@ -12528,7 +12515,7 @@ blUIGetType(IN BLGuid _ID)
 		return BL_UT_INVALID;
 	return _widget->eType;
 }
-BLVoid 
+BLVoid
 blUIPosition(IN BLGuid _ID, IN BLS32 _XPos, IN BLS32 _YPos)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -12537,7 +12524,7 @@ blUIPosition(IN BLGuid _ID, IN BLS32 _XPos, IN BLS32 _YPos)
 	_widget->sPosition.fX = (BLF32)_XPos;
 	_widget->sPosition.fY = (BLF32)_YPos;
 }
-BLVoid 
+BLVoid
 blUIGetPosition(IN BLGuid _ID, OUT BLS32* _XPos, OUT BLS32* _YPos)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -12546,7 +12533,7 @@ blUIGetPosition(IN BLGuid _ID, OUT BLS32* _XPos, OUT BLS32* _YPos)
 	*_XPos = (BLS32)((_widget->sAbsRegion.sLT.fX + _widget->sAbsRegion.sRB.fX) * 0.5f);
 	*_YPos = (BLS32)((_widget->sAbsRegion.sLT.fY + _widget->sAbsRegion.sRB.fY) * 0.5f);
 }
-BLVoid 
+BLVoid
 blUISize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -12562,7 +12549,7 @@ blUISize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
 	_widget->sDimension.fX = (BLF32)MAX_INTERNAL(MAX_INTERNAL(1, _widget->nMinWidth), (BLU32)_widget->sDimension.fX);
 	_widget->sDimension.fY = (BLF32)MAX_INTERNAL(MAX_INTERNAL(1, _widget->nMinHeight), (BLU32)_widget->sDimension.fY);
 }
-BLVoid 
+BLVoid
 blUIGetSize(IN BLGuid _ID, OUT BLU32* _Width, OUT BLU32* _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -12781,12 +12768,12 @@ blUIFocus(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos)
 	}
 	_PrUIMem->pFocusWidget = _widget;
 }
-BLGuid 
+BLGuid
 blUIGetFocus()
 {
 	return _PrUIMem->pFocusWidget->nID;
 }
-BLGuid 
+BLGuid
 blUIGetHoverd()
 {
 	return _PrUIMem->pHoveredWidget->nID;
@@ -13229,7 +13216,7 @@ blUILableText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _Tx
 	_LabelParse(_widget);
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid 
+BLVoid
 blUILabelPadding(IN BLGuid _ID, IN BLF32 _PaddingX, IN BLF32 _PaddingY)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -13422,7 +13409,7 @@ blUICheckEnable(IN BLGuid _ID, IN BLBool _Enable)
 	_widget->uExtension.sCheck.nState = _Enable ? 1 : 0;
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid 
+BLVoid
 blUICheckState(IN BLGuid _ID, IN BLBool _Checked)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -13432,7 +13419,7 @@ blUICheckState(IN BLGuid _ID, IN BLBool _Checked)
 		return;
 	_widget->uExtension.sCheck.nState = (_Checked ? 2 : 1);
 }
-BLBool 
+BLBool
 blUIGetCheckState(IN BLGuid _ID)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -13598,7 +13585,7 @@ blUITextPlaceholder(IN BLGuid _ID, IN BLUtf8* _Placeholder, IN BLU32 _Placeholde
 	_widget->uExtension.sText.nPlaceholderColor = _PlaceholderColor;
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid 
+BLVoid
 blUITextText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _TxtAlignmentH, IN BLEnum _TxtAlignmentV)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -13764,7 +13751,7 @@ blUIProgressPercent(IN BLGuid _ID, IN BLU32 _Percent)
 	_widget->uExtension.sProgress.nPercent = (BLU32)blScalarClamp((BLF32)_Percent, 0.f, 100.f);
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid 
+BLVoid
 blUIProgressBorder(IN BLGuid _ID, IN BLU32 _BorderX, IN BLU32 _BorderY)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -13846,7 +13833,7 @@ blUIProgressFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_widget->uExtension.sProgress.bFlipY = _FlipY;
 	_PrUIMem->bDirty = TRUE;
 }
-BLF32 
+BLF32
 blUIGetProgressPercent(IN BLGuid _ID)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -13903,7 +13890,7 @@ blUISliderCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN 
 	_widget->uExtension.sSlider.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid 
+BLVoid
 blUISliderDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14106,10 +14093,10 @@ blUITableEvenItemMap(IN BLGuid _ID, IN BLAnsi* _EvenItemMap)
 	if (_widget->eType != BL_UT_TABLE)
 		return;
 	memset(_widget->uExtension.sTable.aEvenItemMap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sTable.aEvenItemMap, _EvenItemMap); 
+	strcpy(_widget->uExtension.sTable.aEvenItemMap, _EvenItemMap);
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid 
+BLVoid
 blUITableMaking(IN BLGuid _ID, IN BLU32 _Row, IN BLU32 _Column)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14142,7 +14129,7 @@ blUITableMaking(IN BLGuid _ID, IN BLU32 _Row, IN BLU32 _Column)
 	_TableMake(_widget);
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid 
+BLVoid
 blUITableRowHeight(IN BLGuid _ID, IN BLU32 _RowHeight)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14154,7 +14141,7 @@ blUITableRowHeight(IN BLGuid _ID, IN BLU32 _RowHeight)
 	_TableMake(_widget);
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid 
+BLVoid
 blUITableColumnWidth(IN BLGuid _ID, IN BLU32 _Column, IN BLU32 _Width)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14256,7 +14243,7 @@ blUITableCell(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLU32 _Row
 	}
 	_PrUIMem->bDirty = TRUE;
 }
-const BLUtf8* 
+const BLUtf8*
 blUIGetTableText(IN BLGuid _ID, IN BLU32 _Row, IN BLU32 _Column)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14372,7 +14359,7 @@ blUIDialAngle(IN BLGuid _ID, IN BLF32 _Angle)
 	_widget->uExtension.sDial.fAngle = (BLS32)_Angle % 360 + (_Angle - (BLS32)_Angle);
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid 
+BLVoid
 blUIDialAngleRange(IN BLGuid _ID, IN BLS32 _StartAngle, IN BLS32 _EndAngle)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14406,7 +14393,7 @@ blUIDialClockwise(IN BLGuid _ID, IN BLBool _Clockwise)
 	_widget->uExtension.sDial.bClockWise = _Clockwise;
 	_PrUIMem->bDirty = TRUE;
 }
-BLF32 
+BLF32
 blUIGetDialAngle(IN BLGuid _ID)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14449,7 +14436,7 @@ blUIPrimitiveColor(IN BLGuid _ID, IN BLU32 _Color)
 	_widget->uExtension.sPrimitive.nColor = _Color;
 	_PrUIMem->bDirty = TRUE;
 }
-BLVoid 
+BLVoid
 blUIPrimitivePath(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _PathNum)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14468,7 +14455,7 @@ blUIPrimitivePath(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _P
 	_widget->uExtension.sPrimitive.nPathNum = _PathNum;
 	_PrUIMem->bDirty = TRUE;
 }
-BLBool 
+BLBool
 blUIActionBegin(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
@@ -14504,7 +14491,7 @@ blUIActionBegin(IN BLGuid _ID)
 	_PrUIMem->sActionRecorder.fScaleYRecord = _widget->fScaleY;
 	return TRUE;
 }
-BLBool 
+BLBool
 blUIActionEnd(IN BLGuid _ID, IN BLBool _Delete, IN BLBool _Loop)
 {
 	if (_ID == INVALID_GUID)
@@ -14561,7 +14548,7 @@ blUIActionEnd(IN BLGuid _ID, IN BLBool _Delete, IN BLBool _Loop)
 	_PrUIMem->sActionRecorder.bParallelEdit = FALSE;
 	return TRUE;
 }
-BLBool 
+BLBool
 blUIParallelBegin(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
@@ -14571,7 +14558,7 @@ blUIParallelBegin(IN BLGuid _ID)
 	_PrUIMem->sActionRecorder.bParallelEdit = TRUE;
 	return TRUE;
 }
-BLBool 
+BLBool
 blUIParallelEnd(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
@@ -14586,7 +14573,7 @@ blUIParallelEnd(IN BLGuid _ID)
 	_lastact->bParallel = FALSE;
 	return TRUE;
 }
-BLBool 
+BLBool
 blUIActionPlay(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
@@ -14599,7 +14586,7 @@ blUIActionPlay(IN BLGuid _ID)
 	_widget->pCurAction = _widget->pAction;
 	return TRUE;
 }
-BLBool 
+BLBool
 blUIActionStop(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
@@ -14612,7 +14599,7 @@ blUIActionStop(IN BLGuid _ID)
 	_widget->pCurAction = NULL;
 	return TRUE;
 }
-BLBool 
+BLBool
 blUIActionUV(IN BLGuid _ID, IN BLAnsi* _Tag, IN BLU32 _FPS, IN BLF32 _Time, IN BLBool _Loop)
 {
 	if (_ID == INVALID_GUID)
@@ -14676,7 +14663,7 @@ blUIActionUV(IN BLGuid _ID, IN BLAnsi* _Tag, IN BLU32 _FPS, IN BLF32 _Time, IN B
 	}
 	return TRUE;
 }
-BLBool 
+BLBool
 blUIActionMove(IN BLGuid _ID, IN BLF32 _XVec, IN BLF32 _YVec, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
 {
 	if (_ID == INVALID_GUID)
@@ -14727,7 +14714,7 @@ blUIActionMove(IN BLGuid _ID, IN BLF32 _XVec, IN BLF32 _YVec, IN BLBool _Reverse
 		return TRUE;
 	}
 }
-BLBool 
+BLBool
 blUIActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
 {
 	if (_ID == INVALID_GUID)
@@ -14787,7 +14774,7 @@ blUIActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool _Re
 		return TRUE;
 	}
 }
-BLBool 
+BLBool
 blUIActionRotate(IN BLGuid _ID, IN BLF32 _Angle, IN BLBool _ClockWise, IN BLF32 _Time, IN BLBool _Loop)
 {
 	if (_ID == INVALID_GUID)
@@ -14839,7 +14826,7 @@ blUIActionRotate(IN BLGuid _ID, IN BLF32 _Angle, IN BLBool _ClockWise, IN BLF32 
 		return TRUE;
 	}
 }
-BLBool 
+BLBool
 blUIActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
 {
 	if (_ID == INVALID_GUID)

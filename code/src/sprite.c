@@ -1,15 +1,15 @@
 ﻿/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
- 
+
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
  arising from the use of this software.
- 
+
  Permission is granted to anyone to use this software for any purpose,
  including commercial applications, and to alter it and redistribute it
  freely, subject to the following restrictions:
- 
+
  1. The origin of this software must not be misrepresented; you must not
  claim that you wrote the original software. If you use this software
  in a product, an acknowledgment in the product documentation would be
@@ -243,7 +243,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 			BLS32 _b = (BLS32)((_node->sAbsRT.fX - _node->sAbsLT.fX) * (_y - _node->sAbsLT.fY) - (_node->sAbsRT.fY - _node->sAbsLT.fY) * (_x - _node->sAbsLT.fX));
 			BLS32 _c = (BLS32)((_node->sAbsRB.fX - _node->sAbsRT.fX) * (_y - _node->sAbsRT.fY) - (_node->sAbsRB.fY - _node->sAbsRT.fY) * (_x - _node->sAbsRT.fX));
 			BLS32 _d = (BLS32)((_node->sAbsLB.fX - _node->sAbsRB.fX) * (_y - _node->sAbsRB.fY) - (_node->sAbsLB.fY - _node->sAbsRB.fY) * (_x - _node->sAbsRB.fX));
-			if ((_a > 0 && _b > 0 && _c > 0 && _d > 0) || (_a < 0 && _b < 0 && _c < 0 && _d < 0)) 
+			if ((_a > 0 && _b > 0 && _c > 0 && _d > 0) || (_a < 0 && _b < 0 && _c < 0 && _d < 0))
 			{
 				_id = _node->nID;
 				break;
@@ -337,7 +337,7 @@ _RemoveFromNodeList(_BLSpriteNode* _Node)
             else
             {
                 BLS32 _tmp = _mid;
-                while (_PrSpriteMem->pNodeList[_tmp]->fZValue == _Node->fZValue)
+                while ((BLS32)_PrSpriteMem->pNodeList[_tmp]->fZValue == (BLS32)_Node->fZValue)
                 {
                     _tmp++;
                     if (_tmp >= (BLS32)_PrSpriteMem->nNodeNum)
@@ -350,7 +350,7 @@ _RemoveFromNodeList(_BLSpriteNode* _Node)
                     }
                 }
                 _tmp = _mid;
-                while (_PrSpriteMem->pNodeList[_tmp]->fZValue == _Node->fZValue)
+                while ((BLS32)_PrSpriteMem->pNodeList[_tmp]->fZValue == (BLS32)_Node->fZValue)
                 {
                     _tmp--;
                     if (_tmp < 0)
@@ -435,7 +435,7 @@ _SpriteSetup(BLVoid* _Src)
 		_node->pTexData = NULL;
 		_node->bValid = TRUE;
 		return TRUE;
-	}   
+	}
 }
 static BLBool
 _SpriteRelease(BLVoid* _Src)
@@ -607,7 +607,7 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 		}
 		blDeleteStream(_stream);
 		return TRUE;
-	}	
+	}
 }
 static BLBool
 _UnloadSprite(BLVoid* _Src)
@@ -695,7 +695,7 @@ _SpriteUpdate(BLU32 _Delta)
 						_subs = sqrtf((_xp[_jdx] - _xp[_jdx - 1]) * (_xp[_jdx] - _xp[_jdx - 1]) + (_yp[_jdx] - _yp[_jdx - 1]) * (_yp[_jdx] - _yp[_jdx - 1]));
 						_s -= _subs;
 						++_jdx;
-					}	
+					}
 					BLF32 _ratio = (_s + _subs) / _subs;
 					_node->sPos.fX = _xp[_jdx - 2] + _ratio * (_xp[_jdx - 1] - _xp[_jdx - 2]);
 					_node->sPos.fY = _yp[_jdx - 2] + _ratio * (_yp[_jdx - 1] - _yp[_jdx - 2]);
@@ -1133,15 +1133,15 @@ _SpriteInit(duk_context* _DKC)
 BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 {
-	BLU32 _width, _height;
+	BLU32 _screenwidth, _screenheight;
 	BLF32 _rx, _ry;
-	blWindowQuery(&_width, &_height, &_PrSpriteMem->nFboWidth, &_PrSpriteMem->nFboHeight, &_rx, &_ry);
+	blWindowQuery(&_screenwidth, &_screenheight, &_PrSpriteMem->nFboWidth, &_PrSpriteMem->nFboHeight, &_rx, &_ry);
 	BLU8 _blendfactor[4] = { 0 };
 	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, FALSE);
 	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
     if (_Cursor)
     {
-		BLF32 _screensz[] = { 2.f / (BLF32)_width, 2.f / (BLF32)_height };
+		BLF32 _screensz[] = { 2.f / (BLF32)_screenwidth, 2.f / (BLF32)_screenheight };
 		blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
         if (!_PrSpriteMem->pCursor)
             return;
@@ -1387,8 +1387,8 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 				_PrSpriteMem->bShaking = FALSE;
 		}
 		blBindFrameBuffer(INVALID_GUID);
-		_screensz[0] = 2.f / (BLF32)_width;
-		_screensz[1] = 2.f / (BLF32)_height;
+		_screensz[0] = 2.f / (BLF32)_screenwidth;
+		_screensz[1] = 2.f / (BLF32)_screenheight;
 		blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 		BLF32 _vbo[] = {
 			PIXEL_ALIGNED_INTERNAL(0.f),
@@ -1399,7 +1399,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			1.f,
 			0.f,
 			1.f,
-			PIXEL_ALIGNED_INTERNAL(_width),
+			PIXEL_ALIGNED_INTERNAL(_screenwidth),
 			PIXEL_ALIGNED_INTERNAL(0.f),
 			1.f,
 			1.f,
@@ -1408,15 +1408,15 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			1.f,
 			1.f,
 			PIXEL_ALIGNED_INTERNAL(0.f),
-			PIXEL_ALIGNED_INTERNAL(_height),
+			PIXEL_ALIGNED_INTERNAL(_screenheight),
 			1.f,
 			1.f,
 			1.f,
 			1.f,
 			0.f,
 			0.f,
-			PIXEL_ALIGNED_INTERNAL(_width),
-			PIXEL_ALIGNED_INTERNAL(_height),
+			PIXEL_ALIGNED_INTERNAL(_screenwidth),
+			PIXEL_ALIGNED_INTERNAL(_screenheight),
 			1.f,
 			1.f,
 			1.f,
@@ -1434,7 +1434,7 @@ BLVoid
 _SpriteDestroy()
 {
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
-	{		
+	{
 		FOREACH_ARRAY(_BLTileInfo*, _tileiter, _PrSpriteMem->pTileArray[_idx])
 		{
 			blDeleteTexture(_tileiter->nTex);
@@ -1456,7 +1456,7 @@ _SpriteDestroy()
     free(_PrSpriteMem);
 	_PrSpriteMem = NULL;
 }
-BLVoid 
+BLVoid
 blRegistExternalMethod(IN BLAnsi* _Suffix, IN BLBool(*_LoadCB)(BLGuid, const BLAnsi*, BLVoid**), IN BLBool(*_SetupCB)(BLGuid, BLVoid**), IN BLBool(*_UnloadCB)(BLGuid, BLVoid**), IN BLBool(*_ReleaseCB)(BLGuid, BLVoid**), IN BLVoid(*_DrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**))
 {
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
@@ -1591,7 +1591,7 @@ blDeleteSprite(IN BLGuid _ID)
 	free(_node);
     blDeleteGuid(_ID);
 }
-BLVoid* 
+BLVoid*
 blSpriteExternalData(IN BLGuid _ID, IN BLVoid* _ExtData)
 {
 	if (_ID == INVALID_GUID)
@@ -1754,7 +1754,7 @@ blSpriteVisibility(IN BLGuid _ID, IN BLBool _Show, IN BLBool _Passdown)
     }
     return TRUE;
 }
-BLBool 
+BLBool
 blSpriteDimension(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _Height, IN BLBool _Passdown)
 {
 	if (_ID == INVALID_GUID)
@@ -1771,7 +1771,7 @@ blSpriteDimension(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _Height, IN BLBool _P
 	}
 	return TRUE;
 }
-BLBool 
+BLBool
 blSpriteFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY, IN BLBool _Passdown)
 {
 	if (_ID == INVALID_GUID)
@@ -1892,7 +1892,7 @@ blSpriteStroke(IN BLGuid _ID, IN BLU32 _Color, IN BLU32 _Pixel, IN BLBool _Passd
         for (BLU32 _idx = 0; _idx < _node->nChildren ; ++_idx)
             blSpriteStroke(_node->pChildren[_idx]->nID, _Color, _Pixel, _Passdown);
     }
-    return TRUE;    
+    return TRUE;
 }
 BLBool
 blSpriteGlow(IN BLGuid _ID, IN BLU32 _Color, IN BLU32 _Brightness, IN BLBool _Passdown)
@@ -2207,7 +2207,7 @@ blSpriteParallelEnd(IN BLGuid _ID)
 	_lastact->bParallel = FALSE;
 	return TRUE;
 }
-BLBool 
+BLBool
 blSpriteActionPlay(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
@@ -2220,7 +2220,7 @@ blSpriteActionPlay(IN BLGuid _ID)
 	_node->pCurAction = _node->pAction;
 	return TRUE;
 }
-BLBool 
+BLBool
 blSpriteActionStop(IN BLGuid _ID)
 {
 	if (_ID == INVALID_GUID)
@@ -2471,7 +2471,7 @@ blViewportMoveTo(IN BLF32 _XPos, IN BLF32 _YPos)
 	_PrSpriteMem->sViewport.sRB.fX += _XPos - _x;
 	_PrSpriteMem->sViewport.sRB.fY += _YPos - _y;
 }
-BLVoid 
+BLVoid
 blViewportShake(IN BLF32 _Time, IN BLBool _Vertical, IN BLF32 _Force)
 {
     _PrSpriteMem->bShaking = TRUE;

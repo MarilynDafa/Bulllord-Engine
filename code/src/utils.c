@@ -1,15 +1,15 @@
 /*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
- 
+
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
  arising from the use of this software.
- 
+
  Permission is granted to anyone to use this software for any purpose,
  including commercial applications, and to alter it and redistribute it
  freely, subject to the following restrictions:
- 
+
  1. The origin of this software must not be misrepresented; you must not
  claim that you wrote the original software. If you use this software
  in a product, an acknowledgment in the product documentation would be
@@ -268,14 +268,14 @@ blGuidAsPointer(IN BLGuid _ID)
 	else
 		return _PrUtilsMem->aPtrBuf[_inptr];
 }
-const BLAnsi* 
+const BLAnsi*
 blGuidAsString(IN BLGuid _ID)
 {
 	memset(_PrUtilsMem->aGuidBuf, 0, sizeof(_PrUtilsMem->aGuidBuf));
 	sprintf((BLAnsi*)_PrUtilsMem->aGuidBuf, "%llu", _ID);
 	return _PrUtilsMem->aGuidBuf;
 }
-BLGuid 
+BLGuid
 blStringAsGuid(IN BLAnsi* _String)
 {
 	return strtoull(_String, NULL, 10);
@@ -354,15 +354,15 @@ blMD5String(IN BLAnsi* _Str)
 		sprintf(_PrUtilsMem->aMd5Buf, "%s%02x", _PrUtilsMem->aMd5Buf, _digest[_i]);
 	return _PrUtilsMem->aMd5Buf;
 }
-BLS32 
+BLS32
 blNatCompare(IN BLAnsi* _StrA, IN BLAnsi* _StrB)
 {
 	BLS32 _ai, _bi, _fractional, _result;
 	BLAnsi _ca, _cb;
 	_ai = _bi = 0;
-	while (1) 
+	while (1)
 	{
-		_ca = _StrA[_ai]; 
+		_ca = _StrA[_ai];
 		_cb = _StrB[_bi];
 		while (isspace(_ca))
 			_ca = _StrA[++_ai];
@@ -371,7 +371,7 @@ blNatCompare(IN BLAnsi* _StrA, IN BLAnsi* _StrB)
 		if (isdigit(_ca) && isdigit(_cb))
 		{
 			_fractional = (_ca == '0' || _cb == '0');
-			if (_fractional) 
+			if (_fractional)
 			{
 				BLAnsi* _tmpa = (BLAnsi*)_StrA + _ai;
 				BLAnsi* _tmpb = (BLAnsi*)_StrB + _bi;
@@ -406,7 +406,7 @@ blNatCompare(IN BLAnsi* _StrA, IN BLAnsi* _StrB)
 				if (_result)
 					return _result;
 			}
-			else 
+			else
 			{
 				BLS32 _bias = 0;
 				BLAnsi* _tmpa = (BLAnsi*)_StrA + _ai;
@@ -734,7 +734,7 @@ blUtf16ToInteger(IN BLUtf16* _Str)
 	}
 	return (BLS32)strtol((BLAnsi*)_buf, NULL, 0);
 }
-BLU32 
+BLU32
 blUtf8ToUInteger(IN BLUtf8* _Str)
 {
 	if (!_Str)
@@ -825,10 +825,8 @@ blUtf16ToFloat(IN BLUtf16* _Str)
 			_ensz = 1;
 		else if (_cp < 0x0800)
 			_ensz = 2;
-		else if (_cp < (BLUtf16)0x10000)
-			_ensz = 3;
 		else
-			_ensz = 4;
+			_ensz = 3;
 		if (_destcapacity < _ensz)
 			break;
 		if (_cp < 0x80)
@@ -1163,7 +1161,7 @@ blGenBase64Encoder(IN BLU8* _Blob, IN BLU32 _Size)
         for (_jdx = 0; _jdx < _dif + 1; ++_jdx)
         {
             _out[_jdx] = (BLAnsi)((_frame & 0xFC0000) >> 18);
-            _out[_jdx] = _b64enc[_out[_jdx]];
+            _out[_jdx] = _b64enc[(BLS32)_out[_jdx]];
             _frame = _frame << 6;
         }
         if (_dif == 1)

@@ -1,15 +1,15 @@
 ﻿/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
- 
+
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
  arising from the use of this software.
- 
+
  Permission is granted to anyone to use this software for any purpose,
  including commercial applications, and to alter it and redistribute it
  freely, subject to the following restrictions:
- 
+
  1. The origin of this software must not be misrepresented; you must not
  claim that you wrote the original software. If you use this software
  in a product, an acknowledgment in the product documentation would be
@@ -63,7 +63,7 @@ extern BLBool _DiscardResource(BLGuid, BLBool(*)(BLVoid*), BLBool(*)(BLVoid*));
 #endif
 typedef struct _ShapeState {
 	BLF32* pABuf;
-	BLF32* pBBuf;	
+	BLF32* pBBuf;
 	BLS32 nFS;
 	BLS32 nMute;
 }_BLShapeState;
@@ -139,7 +139,6 @@ typedef struct _AudioMember {
 	BLU32 nPCMBufTurn;
 	BLU32 nPCMFill;
 #if defined(BL_USE_AL_API)
-	ALuint aPCMBuffers[3];
 	ALuint pPCMStream;
 #elif defined(BL_USE_SL_API)
 	SLObjectItf pPCMStream;
@@ -149,7 +148,7 @@ typedef struct _AudioMember {
 }_BLAudioMember;
 static _BLAudioMember* _PrAudioMem = NULL;
 
-static opus_int64 
+static opus_int64
 _BufferWrite(_BLAudioSource* _Src, BLF32* _Pcm, BLS32 _Channels, BLS32 _FrameSize, BLS32* _Skip, _BLShapeState* _Shapemem, opus_int64 _Maxout, BLU32 _Offset, BLS32 _Turn)
 {
 	opus_int64 _sampout = 0;
@@ -175,7 +174,7 @@ _BufferWrite(_BLAudioSource* _Src, BLF32* _Pcm, BLS32 _Channels, BLS32 _FrameSiz
 		memset(_abuf, 0, sizeof(BLF32) * _Channels * 4);
 	_out = (BLS16*)alloca(960 * 6 * _Channels * sizeof(BLS16));
 	_Maxout = _Maxout < 0 ? 0 : _Maxout;
-	do 
+	do
 	{
 		if (_Skip)
 		{
@@ -195,7 +194,7 @@ _BufferWrite(_BLAudioSource* _Src, BLF32* _Pcm, BLS32 _Channels, BLS32 _FrameSiz
 			{
 				BLS32 _si;
 				BLF32 _r, _s, _err = 0.f;
-				_silent &= _output[_pos + _c] == 0;
+				_silent &= (BLS32)_output[_pos + _c] == 0;
 				_s = _output[_pos + _c] * _gain;
 				for (BLS32 _jdx = 0; _jdx < 4; ++_jdx)
 					_err += _fcoef[_rate][_jdx] * _bbuf[_c * 4 + _jdx] - _fcoef[_rate][_jdx + 4] * _abuf[_c * 4 + _jdx];
@@ -253,7 +252,7 @@ refill:
 			BLS32 _framesz;
 			opus_int64 _maxout, _outsamp;
 			if (_losspercent > 0.f && 100.f * ((BLF32)rand()) / RAND_MAX < _losspercent)
-				_lost = TRUE; 
+				_lost = TRUE;
 			if (_packet.e_o_s && _Src->sStreamState.serialno == _Src->nSerialno)
 				_eof = TRUE;
 			if (!_lost)
@@ -275,7 +274,7 @@ refill:
 				}
 				_framesz = opus_multistream_decode_float(_Src->pDecoder, NULL, 0, _Src->pFPData, _lostsize, 0);
 			}
-			assert(_framesz >= 0); 
+			assert(_framesz >= 0);
 			_maxout = ((_Src->nPageGranule - _Src->nGranOffset) * _Src->sShape.nFS / 48000) - _Src->nLinkOut;
 			_outsamp = _BufferWrite(_Src, _Src->pFPData, _Src->nChannels, _framesz, &_Src->nPreSkip, &_Src->sShape, 0 > _maxout ? 0 : _maxout, _fragsize, _Bufidx);
 			_Src->nLinkOut += _outsamp / (sizeof(BLS16) * _Src->nChannels);
@@ -393,7 +392,6 @@ _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 			if (_packetcount == 0)
 			{
 				BLS32 _mappingfamily, _streams = 0, _rate = 0;
-				BLF32 _mgain = 1.f;
 				BLS32 _version;
 				ogg_uint32_t _inputsamplerate;
 				BLS32 _gain;
@@ -466,9 +464,7 @@ _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 				{
 					BLS32 _gainadj = _gain;
 					_err = opus_multistream_decoder_ctl(_src->pDecoder, OPUS_SET_GAIN(_gainadj));
-					if (_err == OPUS_UNIMPLEMENTED)
-						_mgain = (BLF32)pow(10., _gainadj / 5120.);
-					else if (_err != OPUS_OK)
+					if (_err != OPUS_OK)
 						_src->pDecoder = NULL;
 				}
 				if (!_src->pDecoder)
@@ -584,6 +580,8 @@ _ALSoundSetup(BLVoid* _Src)
                 case 2:
                     alBufferData(_src->aBuffers[2], (_src->nChannels == 2) ? 0x1103 : 0x1101, _src->pSoundBufC, _tmpsz, 48000);
                     break;
+                default:
+                    break;
             }
             ++_queuesz;
         }
@@ -679,7 +677,7 @@ _SLSoundSetup(BLVoid* _Src)
     memset(_src->pSoundBufC, 0, 4 * 3840 * 10);
 	_src->nBufTurn = 0;
     SLDataLocator_BufferQueue _bufq = {SL_DATALOCATOR_BUFFERQUEUE, 3};
-    SLDataFormat_PCM _pcm; 
+    SLDataFormat_PCM _pcm;
     _pcm.endianness = SL_BYTEORDER_LITTLEENDIAN;
     _pcm.formatType = SL_DATAFORMAT_PCM;
 	if (!_src->b3d && _src->bLoop)
@@ -879,7 +877,7 @@ _CAUpdate(_BLAudioSource* _Src)
 					_buf.Flags = XAUDIO2_END_OF_STREAM;
 				_Src->pSource->SubmitSourceBuffer(&_buf);
 				_Src->nBufTurn++;
-				_Src->nBufTurn %= 3;	
+				_Src->nBufTurn %= 3;
 			}
 			if (!_ret)
 				return FALSE;
@@ -924,7 +922,7 @@ _AudioThreadFunc(BLVoid* _Userdata)
 				if (_CAUpdate(_iter))
 #endif
 				{
-					blListErase(_PrAudioMem->pSounds, _iterator_iter); 
+					blListErase(_PrAudioMem->pSounds, _iterator_iter);
 #if defined(BL_USE_AL_API)
 					_DiscardResource(_iter->nID, _UnloadAudio, _ALSoundRelease);
 #elif defined(BL_USE_SL_API)
@@ -1086,6 +1084,7 @@ _AudioInit(duk_context* _DKC)
 		_PrAudioMem->aPCMBuf[_idx] = NULL;
 #if defined(BL_USE_AL_API)
     _ALInit();
+	_PrAudioMem->pPCMStream = -1;
 #elif defined(BL_USE_SL_API)
     _SLInit();
 #elif defined(BL_USE_COREAUDIO_API)
@@ -1379,23 +1378,28 @@ blDeleteAudio(IN BLGuid _ID)
 		blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 	}
 }
-BLVoid 
+BLVoid
 blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 {
 	if (_Channels == 0xFFFFFFFF && _SamplesPerSec == 0xFFFFFFFF)
 	{
 		_GbTVMode = FALSE;
 #if defined(BL_USE_AL_API)
-		alSourceStop(_PrAudioMem->pPCMStream);
-		BLS32 _queued = 0;
-		alGetSourcei(_PrAudioMem->pPCMStream, AL_BUFFERS_QUEUED, &_queued);
-		while (_queued--)
+		if (_PrAudioMem->pPCMStream != 0xFFFFFFFF)
 		{
-			ALuint _buffer;
-			alSourceUnqueueBuffers(_PrAudioMem->pPCMStream, 1, &_buffer);
+            alSourceStop(_PrAudioMem->pPCMStream);
+            ALint _numprocessed;
+            alGetSourcei(_PrAudioMem->pPCMStream, AL_BUFFERS_PROCESSED, &_numprocessed);
+            while (_numprocessed--)
+            {
+                ALuint _buff;
+                alSourceUnqueueBuffers(_PrAudioMem->pPCMStream, 1, &_buff);
+                alDeleteBuffers(1, &_buff);
+            }
+            alSourceStop(_PrAudioMem->pPCMStream);
+            alDeleteSources(1, &_PrAudioMem->pPCMStream);
+            _PrAudioMem->pPCMStream = -1;
 		}
-		alDeleteSources(1, &_PrAudioMem->pPCMStream);
-		alDeleteBuffers(3, _PrAudioMem->aPCMBuffers);
 #elif defined(BL_USE_SL_API)
 		if ((*_PrAudioMem->pPCMStream))
 			(*_PrAudioMem->pPCMStream)->Destroy(_PrAudioMem->pPCMStream);
@@ -1420,17 +1424,27 @@ blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 		_GbTVMode = TRUE;
 		if (_PrAudioMem->nPCMChannels != _Channels && _PrAudioMem->nPCMSampleRate != _SamplesPerSec)
 		{
+            _PrAudioMem->nPCMChannels = _Channels;
+            _PrAudioMem->nPCMSampleRate = _SamplesPerSec;
 #if defined(BL_USE_AL_API)
-			alSourceStop(_PrAudioMem->pPCMStream);
-			BLS32 _queued = 0;
-			alGetSourcei(_PrAudioMem->pPCMStream, AL_BUFFERS_QUEUED, &_queued);
-			while (_queued--)
-			{
-				ALuint _buffer;
-				alSourceUnqueueBuffers(_PrAudioMem->pPCMStream, 1, &_buffer);
-			}
-			alDeleteSources(1, &_PrAudioMem->pPCMStream);
-			alDeleteBuffers(3, _PrAudioMem->aPCMBuffers);
+            if (_PrAudioMem->pPCMStream != 0xFFFFFFFF)
+            {
+                alSourceStop(_PrAudioMem->pPCMStream);
+                ALint _numprocessed;
+                alGetSourcei(_PrAudioMem->pPCMStream, AL_BUFFERS_PROCESSED, &_numprocessed);
+                while (_numprocessed--)
+                {
+                    ALuint _buff;
+                    alSourceUnqueueBuffers(_PrAudioMem->pPCMStream, 1, &_buff);
+                    alDeleteBuffers(1, &_buff);
+                }
+                alSourceStop(_PrAudioMem->pPCMStream);
+                alDeleteSources(1, &_PrAudioMem->pPCMStream);
+            }
+            alGenSources(1, &_PrAudioMem->pPCMStream);
+            alSourcei(_PrAudioMem->pPCMStream, AL_SOURCE_RELATIVE, TRUE);
+            alSourcef(_PrAudioMem->pPCMStream, AL_GAIN, 1.f);
+            assert(alGetError() == AL_NO_ERROR);
 #elif defined(BL_USE_SL_API)
 			if ((*_PrAudioMem->pPCMStream))
 				(*_PrAudioMem->pPCMStream)->Destroy(_PrAudioMem->pPCMStream);
@@ -1455,7 +1469,7 @@ blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 		}
 	}
 }
-BLVoid 
+BLVoid
 blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 {
 	if (_PrAudioMem->nPCMFill >= 65536)
@@ -1468,6 +1482,23 @@ blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 		_buf.pAudioData = _PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8];
 		_PrAudioMem->pPCMStream->SubmitSourceBuffer(&_buf);
 #elif defined(BL_USE_AL_API)
+        ALint _processed = 0;
+        ALenum _state = 0;
+        ALuint _buffer = 0;
+        alGenBuffers(1, &_buffer);
+        alBufferData(_buffer, (_PrAudioMem->nPCMChannels == 2) ? 0x1103 : 0x1101, _PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8], _PrAudioMem->nPCMFill, _PrAudioMem->nPCMSampleRate);
+        alSourceQueueBuffers(_PrAudioMem->pPCMStream, 1, &_buffer);
+        alGetSourcei(_PrAudioMem->pPCMStream, AL_SOURCE_STATE, &_state);
+        if (_state != AL_PLAYING)
+            alSourcePlay(_PrAudioMem->pPCMStream);
+        alGetSourcei(_PrAudioMem->pPCMStream, AL_BUFFERS_PROCESSED, &_processed);
+        while (_processed--)
+        {
+            ALuint _buff;
+            alSourceUnqueueBuffers(_PrAudioMem->pPCMStream, 1, &_buff);
+            alDeleteBuffers(1, &_buff);
+        }
+        assert(alGetError() == AL_NO_ERROR);
 #elif defined(BL_USE_SL_API)
 #else
 #endif
@@ -1477,13 +1508,13 @@ blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 		memcpy(_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] + _PrAudioMem->nPCMFill, _PCM, _Length);
 		_PrAudioMem->nPCMFill += _Length;
 	}
-	else if (!_PrAudioMem->nPCMFill)
+	else if (!_PrAudioMem->nPCMFill && _Length)
 	{
 		_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] = (BLU8*)malloc(80000);
 		memcpy(_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] + _PrAudioMem->nPCMFill, _PCM, _Length);
 		_PrAudioMem->nPCMFill += _Length;
 	}
-	else
+	else if (_PrAudioMem->nPCMFill && _Length)
 	{
 		memcpy(_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] + _PrAudioMem->nPCMFill, _PCM, _Length);
 		_PrAudioMem->nPCMFill += _Length;

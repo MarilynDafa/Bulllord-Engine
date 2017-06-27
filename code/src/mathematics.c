@@ -1,15 +1,15 @@
 /*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
- 
+
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
  arising from the use of this software.
- 
+
  Permission is granted to anyone to use this software for any purpose,
  including commercial applications, and to alter it and redistribute it
  freely, subject to the following restrictions:
- 
+
  1. The origin of this software must not be misrepresented; you must not
  claim that you wrote the original software. If you use this software
  in a product, an acknowledgment in the product documentation would be
@@ -54,7 +54,7 @@ blScalarClamp(IN BLF32 _Val, IN BLF32 _Min, IN BLF32 _Max)
 	else
 		return _Val;
 }
-BLBool 
+BLBool
 blRectApproximate(IN BLRect* _R1, IN BLRect* _R2)
 {
 	if (fabs(_R1->sLT.fX - _R2->sLT.fX) > 0.000001f)
@@ -87,7 +87,7 @@ blRectContains(IN BLRect* _Rc, IN BLVec2* _Pt)
 BLRect
 blRectClip(IN BLRect* _R1, IN BLRect* _R2)
 {
-    BLRect _ret = {0.f , 0.f, 0.f, 0.f};
+    BLRect _ret = { 0 };
 	if (_R2->sRB.fX < _R1->sRB.fX)
 		_ret.sRB.fX = _R2->sRB.fX;
 	if (_R2->sRB.fY < _R1->sRB.fY)
@@ -114,7 +114,7 @@ blRectExtend(INOUT BLRect* _Tar, IN BLVec2* _Pt)
 	if (_Tar->sRB.fY < _Pt->fY)
 		_Tar->sRB.fY = _Pt->fY;
 }
-BLBool 
+BLBool
 blVec2Approximate(IN BLVec2* _V1, IN BLVec2* _V2)
 {
 	if (fabs(_V1->fX - _V2->fX) > 0.000001f)
@@ -200,7 +200,7 @@ blVec3CrossProduct(IN BLVec3* _V1, IN BLVec3* _V2)
 	_ret.fZ = _V1->fX * _V2->fY - _V1->fY * _V2->fX;
 	return _ret;
 }
-BLBool 
+BLBool
 blQuatApproximate(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2)
 {
 	if (fabs(_Q1->fX - _Q2->fX) > 0.000001f)
@@ -517,7 +517,7 @@ blQuatTransform(IN BLQuaternion* _Q, IN BLVec3* _Vec)
 	_ret.fZ = _Vec->fZ + _uv.fZ + _uuv.fZ;
 	return _ret;
 }
-BLBool 
+BLBool
 blMatApproximate(IN BLMatrix* _M1, IN BLMatrix* _M2)
 {
 	for (BLU32 _idx = 0; _idx < 16; ++_idx)
@@ -773,7 +773,7 @@ blMatLookatL(OUT BLMatrix* _Mat, IN BLVec3* _Eye, IN BLVec3* _Focus, IN BLVec3* 
 	_Mat->fData[3][2] = -_zaxis.fX * _Eye->fX + -_zaxis.fY * _Eye->fY + -_zaxis.fZ * _Eye->fZ;
 	_Mat->fData[3][3] = 1.f;
 }
-BLBool 
+BLBool
 blPlaneApproximate(IN BLPlane* _P1, IN BLPlane* _P2)
 {
 	if (fabs(_P1->sNormal.fX - _P2->sNormal.fX) > 0.000001f)
@@ -820,7 +820,7 @@ blPlaneFromPN(IN BLVec3* _Pt, IN BLVec3* _Nor)
 	_ret.fDistance = -_ret.sNormal.fX * _Pt->fX + -_ret.sNormal.fY * _Pt->fY + -_ret.sNormal.fZ * _Pt->fZ;
 	return _ret;
 }
-BLBool 
+BLBool
 blBoxApproximate(IN BLBox* _B1, IN BLBox* _B2)
 {
 	if (fabs(_B1->sMinPt.fX - _B2->sMinPt.fX) > 0.000001f)

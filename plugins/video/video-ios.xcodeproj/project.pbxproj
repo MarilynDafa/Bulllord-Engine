@@ -228,6 +228,32 @@
 		C7F725061EFC07A900F31075 /* vpx_dsp_common.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F724EF1EFC07A900F31075 /* vpx_dsp_common.h */; };
 		C7F725071EFC07A900F31075 /* vpx_dsp_rtcd.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F724F01EFC07A900F31075 /* vpx_dsp_rtcd.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7F725081EFC07A900F31075 /* vpx_filter.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F724F11EFC07A900F31075 /* vpx_filter.h */; };
+		C7F7261E1F018E3700F31075 /* vp9_dx_iface.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F7261D1F018E3700F31075 /* vp9_dx_iface.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F7262B1F018E4100F31075 /* vp9_decodeframe.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F7261F1F018E4100F31075 /* vp9_decodeframe.h */; };
+		C7F7262C1F018E4100F31075 /* vp9_decodemv.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726201F018E4100F31075 /* vp9_decodemv.h */; };
+		C7F7262D1F018E4100F31075 /* vp9_decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726211F018E4100F31075 /* vp9_decoder.h */; };
+		C7F7262E1F018E4100F31075 /* vp9_detokenize.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726221F018E4100F31075 /* vp9_detokenize.h */; };
+		C7F7262F1F018E4100F31075 /* vp9_dsubexp.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726231F018E4100F31075 /* vp9_dsubexp.h */; };
+		C7F726301F018E4100F31075 /* vp9_dthread.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726241F018E4100F31075 /* vp9_dthread.h */; };
+		C7F726311F018E4100F31075 /* vp9_decodeframe.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726251F018E4100F31075 /* vp9_decodeframe.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726321F018E4100F31075 /* vp9_decodemv.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726261F018E4100F31075 /* vp9_decodemv.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726331F018E4100F31075 /* vp9_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726271F018E4100F31075 /* vp9_decoder.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726341F018E4100F31075 /* vp9_detokenize.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726281F018E4100F31075 /* vp9_detokenize.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726351F018E4100F31075 /* vp9_dsubexp.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726291F018E4100F31075 /* vp9_dsubexp.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726361F018E4100F31075 /* vp9_dthread.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F7262A1F018E4100F31075 /* vp9_dthread.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F7265B1F018EE900F31075 /* dboolhuff.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F7264F1F018EE900F31075 /* dboolhuff.h */; };
+		C7F7265C1F018EE900F31075 /* decodemv.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726501F018EE900F31075 /* decodemv.h */; };
+		C7F7265D1F018EE900F31075 /* decoderthreading.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726511F018EE900F31075 /* decoderthreading.h */; };
+		C7F7265E1F018EE900F31075 /* detokenize.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726521F018EE900F31075 /* detokenize.h */; };
+		C7F7265F1F018EE900F31075 /* onyxd_int.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726531F018EE900F31075 /* onyxd_int.h */; };
+		C7F726601F018EE900F31075 /* treereader.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726541F018EE900F31075 /* treereader.h */; };
+		C7F726611F018EE900F31075 /* dboolhuff.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726551F018EE900F31075 /* dboolhuff.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726621F018EE900F31075 /* decodeframe.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726561F018EE900F31075 /* decodeframe.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726631F018EE900F31075 /* decodemv.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726571F018EE900F31075 /* decodemv.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726641F018EE900F31075 /* detokenize.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726581F018EE900F31075 /* detokenize.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726651F018EE900F31075 /* onyxd_if.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726591F018EE900F31075 /* onyxd_if.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726661F018EE900F31075 /* threading.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F7265A1F018EE900F31075 /* threading.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F7266A1F018F5000F31075 /* systemdependent.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726691F018F5000F31075 /* systemdependent.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -498,6 +524,32 @@
 		C7F725791EFC08D400F31075 /* vpx_subpixel_8t_ssse3.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; name = vpx_subpixel_8t_ssse3.asm; path = webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm; sourceTree = "<group>"; };
 		C7F7257A1EFC08D400F31075 /* vpx_subpixel_bilinear_sse2.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; name = vpx_subpixel_bilinear_sse2.asm; path = webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm; sourceTree = "<group>"; };
 		C7F7257B1EFC08D400F31075 /* vpx_subpixel_bilinear_ssse3.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm.asm; name = vpx_subpixel_bilinear_ssse3.asm; path = webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm; sourceTree = "<group>"; };
+		C7F7261D1F018E3700F31075 /* vp9_dx_iface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_dx_iface.c; path = webm/vp9/vp9_dx_iface.c; sourceTree = "<group>"; };
+		C7F7261F1F018E4100F31075 /* vp9_decodeframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_decodeframe.h; path = webm/vp9/decoder/vp9_decodeframe.h; sourceTree = "<group>"; };
+		C7F726201F018E4100F31075 /* vp9_decodemv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_decodemv.h; path = webm/vp9/decoder/vp9_decodemv.h; sourceTree = "<group>"; };
+		C7F726211F018E4100F31075 /* vp9_decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_decoder.h; path = webm/vp9/decoder/vp9_decoder.h; sourceTree = "<group>"; };
+		C7F726221F018E4100F31075 /* vp9_detokenize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_detokenize.h; path = webm/vp9/decoder/vp9_detokenize.h; sourceTree = "<group>"; };
+		C7F726231F018E4100F31075 /* vp9_dsubexp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_dsubexp.h; path = webm/vp9/decoder/vp9_dsubexp.h; sourceTree = "<group>"; };
+		C7F726241F018E4100F31075 /* vp9_dthread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_dthread.h; path = webm/vp9/decoder/vp9_dthread.h; sourceTree = "<group>"; };
+		C7F726251F018E4100F31075 /* vp9_decodeframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_decodeframe.c; path = webm/vp9/decoder/vp9_decodeframe.c; sourceTree = "<group>"; };
+		C7F726261F018E4100F31075 /* vp9_decodemv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_decodemv.c; path = webm/vp9/decoder/vp9_decodemv.c; sourceTree = "<group>"; };
+		C7F726271F018E4100F31075 /* vp9_decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_decoder.c; path = webm/vp9/decoder/vp9_decoder.c; sourceTree = "<group>"; };
+		C7F726281F018E4100F31075 /* vp9_detokenize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_detokenize.c; path = webm/vp9/decoder/vp9_detokenize.c; sourceTree = "<group>"; };
+		C7F726291F018E4100F31075 /* vp9_dsubexp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_dsubexp.c; path = webm/vp9/decoder/vp9_dsubexp.c; sourceTree = "<group>"; };
+		C7F7262A1F018E4100F31075 /* vp9_dthread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_dthread.c; path = webm/vp9/decoder/vp9_dthread.c; sourceTree = "<group>"; };
+		C7F7264F1F018EE900F31075 /* dboolhuff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dboolhuff.h; path = webm/vp8/decoder/dboolhuff.h; sourceTree = "<group>"; };
+		C7F726501F018EE900F31075 /* decodemv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decodemv.h; path = webm/vp8/decoder/decodemv.h; sourceTree = "<group>"; };
+		C7F726511F018EE900F31075 /* decoderthreading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decoderthreading.h; path = webm/vp8/decoder/decoderthreading.h; sourceTree = "<group>"; };
+		C7F726521F018EE900F31075 /* detokenize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = detokenize.h; path = webm/vp8/decoder/detokenize.h; sourceTree = "<group>"; };
+		C7F726531F018EE900F31075 /* onyxd_int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = onyxd_int.h; path = webm/vp8/decoder/onyxd_int.h; sourceTree = "<group>"; };
+		C7F726541F018EE900F31075 /* treereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = treereader.h; path = webm/vp8/decoder/treereader.h; sourceTree = "<group>"; };
+		C7F726551F018EE900F31075 /* dboolhuff.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dboolhuff.c; path = webm/vp8/decoder/dboolhuff.c; sourceTree = "<group>"; };
+		C7F726561F018EE900F31075 /* decodeframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decodeframe.c; path = webm/vp8/decoder/decodeframe.c; sourceTree = "<group>"; };
+		C7F726571F018EE900F31075 /* decodemv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decodemv.c; path = webm/vp8/decoder/decodemv.c; sourceTree = "<group>"; };
+		C7F726581F018EE900F31075 /* detokenize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = detokenize.c; path = webm/vp8/decoder/detokenize.c; sourceTree = "<group>"; };
+		C7F726591F018EE900F31075 /* onyxd_if.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = onyxd_if.c; path = webm/vp8/decoder/onyxd_if.c; sourceTree = "<group>"; };
+		C7F7265A1F018EE900F31075 /* threading.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = threading.c; path = webm/vp8/decoder/threading.c; sourceTree = "<group>"; };
+		C7F726691F018F5000F31075 /* systemdependent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemdependent.c; path = webm/vp8/common/generic/systemdependent.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -711,6 +763,19 @@
 		C7F71B451EF95F8600F31075 /* vp9 */ = {
 			isa = PBXGroup;
 			children = (
+				C7F7261F1F018E4100F31075 /* vp9_decodeframe.h */,
+				C7F726201F018E4100F31075 /* vp9_decodemv.h */,
+				C7F726211F018E4100F31075 /* vp9_decoder.h */,
+				C7F726221F018E4100F31075 /* vp9_detokenize.h */,
+				C7F726231F018E4100F31075 /* vp9_dsubexp.h */,
+				C7F726241F018E4100F31075 /* vp9_dthread.h */,
+				C7F726251F018E4100F31075 /* vp9_decodeframe.c */,
+				C7F726261F018E4100F31075 /* vp9_decodemv.c */,
+				C7F726271F018E4100F31075 /* vp9_decoder.c */,
+				C7F726281F018E4100F31075 /* vp9_detokenize.c */,
+				C7F726291F018E4100F31075 /* vp9_dsubexp.c */,
+				C7F7262A1F018E4100F31075 /* vp9_dthread.c */,
+				C7F7261D1F018E3700F31075 /* vp9_dx_iface.c */,
 				C7F723F31EFC063000F31075 /* vp9_alloccommon.c */,
 				C7F723F41EFC063000F31075 /* vp9_alloccommon.h */,
 				C7F723F51EFC063000F31075 /* vp9_blockd.c */,
@@ -766,6 +831,19 @@
 		C7F71B471EF95F9700F31075 /* vp8 */ = {
 			isa = PBXGroup;
 			children = (
+				C7F726691F018F5000F31075 /* systemdependent.c */,
+				C7F7264F1F018EE900F31075 /* dboolhuff.h */,
+				C7F726501F018EE900F31075 /* decodemv.h */,
+				C7F726511F018EE900F31075 /* decoderthreading.h */,
+				C7F726521F018EE900F31075 /* detokenize.h */,
+				C7F726531F018EE900F31075 /* onyxd_int.h */,
+				C7F726541F018EE900F31075 /* treereader.h */,
+				C7F726551F018EE900F31075 /* dboolhuff.c */,
+				C7F726561F018EE900F31075 /* decodeframe.c */,
+				C7F726571F018EE900F31075 /* decodemv.c */,
+				C7F726581F018EE900F31075 /* detokenize.c */,
+				C7F726591F018EE900F31075 /* onyxd_if.c */,
+				C7F7265A1F018EE900F31075 /* threading.c */,
 				C7F723F11EFC05B800F31075 /* vp8_dx_iface.c */,
 				C7F7232F1EFC04DF00F31075 /* modecont.c */,
 				C7F723301EFC04DF00F31075 /* modecont.h */,
@@ -994,10 +1072,12 @@
 				C7F7234D1EFC04DF00F31075 /* mv.h in Headers */,
 				C7F725001EFC07A900F31075 /* skin_detection.h in Headers */,
 				C7F724361EFC063000F31075 /* vp9_loopfilter.h in Headers */,
+				C7F7262D1F018E4100F31075 /* vp9_decoder.h in Headers */,
 				C7F722661EF995A600F31075 /* system_state.h in Headers */,
 				C7F71FA21EF98C4000F31075 /* lpc.h in Headers */,
 				C7F71FA81EF98C4000F31075 /* psy.h in Headers */,
 				C7F722631EF995A600F31075 /* mem_ops.h in Headers */,
+				C7F7265C1F018EE900F31075 /* decodemv.h in Headers */,
 				C7F7234E1EFC04DF00F31075 /* onyx.h in Headers */,
 				C7F7242E1EFC063000F31075 /* vp9_enums.h in Headers */,
 				C7F724F41EFC07A900F31075 /* bitreader_buffer.h in Headers */,
@@ -1028,6 +1108,7 @@
 				C7F724271EFC063000F31075 /* vp9_common.h in Headers */,
 				C7F7244A1EFC063000F31075 /* vp9_seg_common.h in Headers */,
 				C7F723601EFC04DF00F31075 /* swapyv12buffer.h in Headers */,
+				C7F726301F018E4100F31075 /* vp9_dthread.h in Headers */,
 				C7F722651EF995A600F31075 /* msvc.h in Headers */,
 				C7F71F9C1EF98C4000F31075 /* codebook.h in Headers */,
 				C7F71F861EF98BE400F31075 /* os_types.h in Headers */,
@@ -1041,11 +1122,14 @@
 				C7F724481EFC063000F31075 /* vp9_scan.h in Headers */,
 				C7F724B91EFC070900F31075 /* vpx_decoder.h in Headers */,
 				C7F7231E1EFC047F00F31075 /* entropymode.h in Headers */,
+				C7F7262F1F018E4100F31075 /* vp9_dsubexp.h in Headers */,
 				C7F71E021EF9866D00F31075 /* vpx_dsp_rtcd.h in Headers */,
 				C7F7243D1EFC063000F31075 /* vp9_pred_common.h in Headers */,
+				C7F7265F1F018EE900F31075 /* onyxd_int.h in Headers */,
 				C7F7235E1EFC04DF00F31075 /* setupintrarecon.h in Headers */,
 				C7F723591EFC04DF00F31075 /* reconintra.h in Headers */,
 				C7F723161EFC047F00F31075 /* coefupdateprobs.h in Headers */,
+				C7F7265B1F018EE900F31075 /* dboolhuff.h in Headers */,
 				C7F724321EFC063000F31075 /* vp9_frame_buffers.h in Headers */,
 				C7F71E031EF9866D00F31075 /* vpx_scale_rtcd.h in Headers */,
 				C7F7232A1EFC047F00F31075 /* invtrans.h in Headers */,
@@ -1061,6 +1145,7 @@
 				C7F723151EFC047F00F31075 /* blockd.h in Headers */,
 				C7F723621EFC04DF00F31075 /* threading.h in Headers */,
 				C7F7243B1EFC063000F31075 /* vp9_ppflags.h in Headers */,
+				C7F7262C1F018E4100F31075 /* vp9_decodemv.h in Headers */,
 				C7F71F9F1EF98C4000F31075 /* highlevel.h in Headers */,
 				C7F724301EFC063000F31075 /* vp9_filter.h in Headers */,
 				C7F722701EF995D300F31075 /* yv12config.h in Headers */,
@@ -1068,6 +1153,7 @@
 				C7F722611EF995A600F31075 /* emmintrin_compat.h in Headers */,
 				C7F71F9D1EF98C4000F31075 /* codec_internal.h in Headers */,
 				C7F724261EFC063000F31075 /* vp9_common_data.h in Headers */,
+				C7F7262E1F018E4100F31075 /* vp9_detokenize.h in Headers */,
 				C7F71F9E1EF98C4000F31075 /* envelope.h in Headers */,
 				C7F71FAC1EF98C4000F31075 /* window.h in Headers */,
 				C7F71DFF1EF9866D00F31075 /* vp8_rtcd.h in Headers */,
@@ -1084,6 +1170,8 @@
 				C7F723521EFC04DF00F31075 /* postproc.h in Headers */,
 				C7F723551EFC04DF00F31075 /* quant_common.h in Headers */,
 				C7F723171EFC047F00F31075 /* common.h in Headers */,
+				C7F7262B1F018E4100F31075 /* vp9_decodeframe.h in Headers */,
+				C7F726601F018EE900F31075 /* treereader.h in Headers */,
 				C7F71FA91EF98C4000F31075 /* registry.h in Headers */,
 				C7F724391EFC063000F31075 /* vp9_mvref_common.h in Headers */,
 				C7F7244C1EFC063000F31075 /* vp9_thread_common.h in Headers */,
@@ -1096,7 +1184,9 @@
 				C7F722641EF995A600F31075 /* mem.h in Headers */,
 				C7F723241EFC047F00F31075 /* filter.h in Headers */,
 				C7F723611EFC04DF00F31075 /* systemdependent.h in Headers */,
+				C7F7265D1F018EE900F31075 /* decoderthreading.h in Headers */,
 				C7F7234C1EFC04DF00F31075 /* modecont.h in Headers */,
+				C7F7265E1F018EE900F31075 /* detokenize.h in Headers */,
 				C7F723651EFC04DF00F31075 /* vp8_entropymodedata.h in Headers */,
 				C7F725011EFC07A900F31075 /* txfm_common.h in Headers */,
 				C7F724BA1EFC070900F31075 /* vpx_frame_buffer.h in Headers */,
@@ -1175,6 +1265,8 @@
 				C7F7244B1EFC063000F31075 /* vp9_thread_common.c in Sources */,
 				C7F7242F1EFC063000F31075 /* vp9_filter.c in Sources */,
 				C7F71EC81EF9888400F31075 /* vpx_scale.c in Sources */,
+				C7F726321F018E4100F31075 /* vp9_decodemv.c in Sources */,
+				C7F726661F018EE900F31075 /* threading.c in Sources */,
 				C7F724251EFC063000F31075 /* vp9_common_data.c in Sources */,
 				C7F7232B1EFC047F00F31075 /* loopfilter_filters.c in Sources */,
 				C7F725041EFC07A900F31075 /* vpx_convolve.c in Sources */,
@@ -1186,7 +1278,9 @@
 				C7F724F21EFC07A900F31075 /* add_noise.c in Sources */,
 				C7F71B841EF960A400F31075 /* lsp.c in Sources */,
 				C7F724381EFC063000F31075 /* vp9_mvref_common.c in Sources */,
+				C7F726351F018E4100F31075 /* vp9_dsubexp.c in Sources */,
 				C7F71B7B1EF960A400F31075 /* bitrate.c in Sources */,
+				C7F7261E1F018E3700F31075 /* vp9_dx_iface.c in Sources */,
 				C7F7242C1EFC063000F31075 /* vp9_entropymv.c in Sources */,
 				C7F71B4D1EF9603B00F31075 /* bitwise.c in Sources */,
 				C7F724F91EFC07A900F31075 /* inv_txfm.c in Sources */,
@@ -1197,9 +1291,13 @@
 				C7F7231F1EFC047F00F31075 /* entropymv.c in Sources */,
 				C7F71B831EF960A400F31075 /* lpc.c in Sources */,
 				C7F7243C1EFC063000F31075 /* vp9_pred_common.c in Sources */,
+				C7F726631F018EE900F31075 /* decodemv.c in Sources */,
 				C7F724491EFC063000F31075 /* vp9_seg_common.c in Sources */,
+				C7F726641F018EE900F31075 /* detokenize.c in Sources */,
 				C7F724211EFC063000F31075 /* vp9_alloccommon.c in Sources */,
+				C7F726361F018E4100F31075 /* vp9_dthread.c in Sources */,
 				C7F71B7F1EF960A400F31075 /* floor0.c in Sources */,
+				C7F726621F018EE900F31075 /* decodeframe.c in Sources */,
 				C7F71B811EF960A400F31075 /* info.c in Sources */,
 				C7F71EDA1EF988E700F31075 /* mkvparser.cc in Sources */,
 				C7F71B821EF960A400F31075 /* lookup.c in Sources */,
@@ -1225,21 +1323,26 @@
 				C7F7235F1EFC04DF00F31075 /* swapyv12buffer.c in Sources */,
 				C7F724FB1EFC07A900F31075 /* loopfilter.c in Sources */,
 				C7F71B901EF960CD00F31075 /* res0.c in Sources */,
+				C7F726611F018EE900F31075 /* dboolhuff.c in Sources */,
 				C7F71B7C1EF960A400F31075 /* block.c in Sources */,
 				C7F723561EFC04DF00F31075 /* reconinter.c in Sources */,
 				C7F7235D1EFC04DF00F31075 /* setupintrarecon.c in Sources */,
 				C7F723291EFC047F00F31075 /* idctllm.c in Sources */,
 				C7F71B931EF960CD00F31075 /* synthesis.c in Sources */,
 				C7F724F71EFC07A900F31075 /* deblock.c in Sources */,
+				C7F7266A1F018F5000F31075 /* systemdependent.c in Sources */,
 				C7F723181EFC047F00F31075 /* copy_c.c in Sources */,
 				C7F7231B1EFC047F00F31075 /* entropy.c in Sources */,
 				C7F7232E1EFC047F00F31075 /* mfqe.c in Sources */,
 				C7F723141EFC047F00F31075 /* blockd.c in Sources */,
+				C7F726651F018EE900F31075 /* onyxd_if.c in Sources */,
 				C7F724311EFC063000F31075 /* vp9_frame_buffers.c in Sources */,
 				C7F71EB81EF9884F00F31075 /* vpx_mem.c in Sources */,
 				C7F71B4E1EF9603B00F31075 /* framing.c in Sources */,
 				C7F71B8F1EF960CD00F31075 /* registry.c in Sources */,
 				C7F724FF1EFC07A900F31075 /* skin_detection.c in Sources */,
+				C7F726331F018E4100F31075 /* vp9_decoder.c in Sources */,
+				C7F726311F018E4100F31075 /* vp9_decodeframe.c in Sources */,
 				C7F7243E1EFC063000F31075 /* vp9_quant_common.c in Sources */,
 				C7F724421EFC063000F31075 /* vp9_reconintra.c in Sources */,
 				C7F723541EFC04DF00F31075 /* quant_common.c in Sources */,
@@ -1254,6 +1357,7 @@
 				C7F71B861EF960A400F31075 /* mdct.c in Sources */,
 				C7F724C31EFC072500F31075 /* vpx_decoder.c in Sources */,
 				C7F71EC91EF9888400F31075 /* yv12config.c in Sources */,
+				C7F726341F018E4100F31075 /* vp9_detokenize.c in Sources */,
 				C7F725071EFC07A900F31075 /* vpx_dsp_rtcd.c in Sources */,
 				C7F725021EFC07A900F31075 /* variance.c in Sources */,
 				C7F71E061EF9866D00F31075 /* vpx_config.c in Sources */,

@@ -1,15 +1,15 @@
 ﻿/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
- 
+
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
  arising from the use of this software.
- 
+
  Permission is granted to anyone to use this software for any purpose,
  including commercial applications, and to alter it and redistribute it
  freely, subject to the following restrictions:
- 
+
  1. The origin of this software must not be misrepresented; you must not
  claim that you wrote the original software. If you use this software
  in a product, an acknowledgment in the product documentation would be
@@ -378,7 +378,7 @@ blGenStream(IN BLAnsi* _Filename)
 			}
 			_id = blHashUtf8((const BLUtf8*)_tmpname);
 			_file = (_BLBpkFileEntry*)blDictElement(_iter->pFiles, _id);
-			if (_file) 
+			if (_file)
 			{
 				uLongf _sz;
 				BLS32 _uncmpsz;
@@ -577,7 +577,7 @@ blGenStream(IN BLAnsi* _Filename)
 			memset(_path, 0, sizeof(_path));
 			strcpy(_path, blUserFolderDir());
 			strcat(_path, _Filename);
-			BLU32 _tmplen = (BLU32)strlen(_path);
+			_tmplen = (BLU32)strlen(_path);
 			for (_i = 0; _i < _tmplen; ++_i)
 			{
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -855,7 +855,6 @@ blFileDelete(IN BLAnsi* _Filename)
 BLBool
 blArchiveRegist(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 {
-	BLBool _inworkdir = TRUE;
 	BLU32 _i;
     BLAnsi _tmpname[260];
     BLAnsi _path[260] = {0};
@@ -889,7 +888,6 @@ blArchiveRegist(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 #endif
     if (!FILE_INVALID_INTERNAL(_fp))
     {
-		_inworkdir = FALSE;
         memset(_path , 0 , sizeof(_path));
         strcpy(_path , blUserFolderDir());
         strcat(_path , _tmpname);
@@ -1013,7 +1011,6 @@ blArchiveRegist(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 BLBool
 blArchivePatch(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 {
-	BLBool _inworkdir = FALSE;
 	BLU32 _aidx = 0 , _i;
     BLAnsi _tmpname[260];
     BLAnsi _path[260] = {0};
@@ -1063,7 +1060,6 @@ blArchivePatch(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 #endif
 	if (!FILE_INVALID_INTERNAL(_fp))
 	{
-		_inworkdir = TRUE;
 		memset(_path, 0, sizeof(_path));
 		strcpy(_path, blWorkingDir());
 		strcat(_path, _tmpname);

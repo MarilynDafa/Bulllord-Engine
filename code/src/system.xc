@@ -1,15 +1,15 @@
 ﻿/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
- 
+
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
  arising from the use of this software.
- 
+
  Permission is granted to anyone to use this software for any purpose,
  including commercial applications, and to alter it and redistribute it
  freely, subject to the following restrictions:
- 
+
  1. The origin of this software must not be misrepresented; you must not
  claim that you wrote the original software. If you use this software
  in a product, an acknowledgment in the product documentation would be
@@ -99,7 +99,7 @@ extern BLVoid _GpuIntervention(duk_context*, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_LINUX)
-extern BLVoid _GpuIntervention(duk_context*, Display*, Window, GLXFBConfig, BLVoid*, BLBool);
+extern BLVoid _GpuIntervention(duk_context*, Display*, Window, BLU32, BLU32, GLXFBConfig, BLVoid*, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_ANDROID)
@@ -166,7 +166,7 @@ typedef struct _Timer {
 }_BLTimer;
 typedef struct _Plugins {
 	BLU32 nHash;
-#if defined(BL_PLATFORM_WIN32) 
+#if defined(BL_PLATFORM_WIN32)
 	HMODULE pHandle;
 #elif defined(BL_PLATFORM_UWP)
 	HINSTANCE pHandle;
@@ -210,6 +210,9 @@ typedef struct _SystemMember {
     Atom nDelwin;
     Atom nProtocols;
     Atom nPing;
+    Atom nBorder;
+    Atom nFullScreen;
+    Atom nWMState;
     Colormap nColormap;
     KeyCode nLastCode;
     XIM pIME;
@@ -459,7 +462,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 		POINT _lt;
 		_lt.x = _rc.left;
 		_lt.y = _rc.top;
-		ClientToScreen(_Hwnd, &_lt); 
+		ClientToScreen(_Hwnd, &_lt);
 		_GbSystemRunning = 1;
 	}
 	break;
@@ -1311,7 +1314,7 @@ _ShowWindow()
 	if (_PrSystemMem->sBoostParam.nScreenWidth > _PrSystemMem->sBoostParam.nScreenHeight)
 		_PrSystemMem->nOrientation = SCREEN_LANDSCAPE_INTERNAL;
 	else
-		_PrSystemMem->nOrientation = SCREEN_PORTRAIT_INTERNAL;	
+		_PrSystemMem->nOrientation = SCREEN_PORTRAIT_INTERNAL;
 	Windows::ApplicationModel::Core::CoreApplication::Run(_window);
 }
 BLVoid
@@ -1337,7 +1340,6 @@ _WndProc(XEvent* _Event)
         KeyCode _code = _Event->xkey.keycode;
         BLS32 _mincode, _maxcode;
         XDisplayKeycodes(_PrSystemMem->pDisplay, &_mincode, &_maxcode);
-        KeySym _keysym = NoSymbol;
         BLEnum _scancode = SCANCODE_INTERNAL[_code - _mincode];
 		if (_scancode == BL_KC_LCTRL)
 			_PrSystemMem->bCtrlPressed = TRUE;
@@ -1394,7 +1396,6 @@ _WndProc(XEvent* _Event)
         KeyCode _code = _Event->xkey.keycode;
         BLS32 _mincode, _maxcode;
         XDisplayKeycodes(_PrSystemMem->pDisplay, &_mincode, &_maxcode);
-        KeySym _keysym = NoSymbol;
         BLEnum _scancode = SCANCODE_INTERNAL[_code - _mincode];
 		if (_scancode == BL_KC_LCTRL)
 			_PrSystemMem->bCtrlPressed = FALSE;
@@ -1466,7 +1467,10 @@ _WndProc(XEvent* _Event)
             if (_protocol == None)
                 return;
             if (_protocol == _PrSystemMem->nDelwin)
+            {
+                blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
                 _GbSystemRunning = FALSE;
+            }
             else if (_protocol == _PrSystemMem->nPing)
             {
                 XEvent _reply = *_Event;
@@ -1495,6 +1499,7 @@ _WndProc(XEvent* _Event)
     }
     break;
     case DestroyNotify:
+		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
     break;
     default: break;
     }
@@ -1502,17 +1507,15 @@ _WndProc(XEvent* _Event)
 BLVoid
 _EnterFullscreen()
 {
-    Atom _wmstate = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_STATE", False);
-    Atom _fullScreen = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_STATE_FULLSCREEN", False);
     XEvent _xev;
     _xev.xclient.type = ClientMessage;
     _xev.xclient.serial = 0;
     _xev.xclient.send_event = True;
     _xev.xclient.window = _PrSystemMem->nWindow;
-    _xev.xclient.message_type = _wmstate;
+    _xev.xclient.message_type = _PrSystemMem->nWMState;
     _xev.xclient.format = 32;
     _xev.xclient.data.l[0] = 1;
-    _xev.xclient.data.l[1] = _fullScreen;
+    _xev.xclient.data.l[1] = _PrSystemMem->nFullScreen;
     _xev.xclient.data.l[2] = 0;
     XSendEvent(_PrSystemMem->pDisplay, DefaultRootWindow(_PrSystemMem->pDisplay), False, SubstructureRedirectMask | SubstructureNotifyMask, &_xev);
     XFlush(_PrSystemMem->pDisplay);
@@ -1520,20 +1523,17 @@ _EnterFullscreen()
 BLVoid
 _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 {
-    Atom _wmstate = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_STATE", False);
-    Atom _fullScreen = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_STATE_FULLSCREEN", False);
     XEvent _xev;
     _xev.xclient.type = ClientMessage;
     _xev.xclient.serial = 0;
     _xev.xclient.send_event = True;
     _xev.xclient.window = _PrSystemMem->nWindow;
-    _xev.xclient.message_type = _wmstate;
+    _xev.xclient.message_type = _PrSystemMem->nWMState;
     _xev.xclient.format = 32;
     _xev.xclient.data.l[0] = 0;
-    _xev.xclient.data.l[1] = _fullScreen;
+    _xev.xclient.data.l[1] = _PrSystemMem->nFullScreen;
     _xev.xclient.data.l[2] = 0;
-    Atom _border = XInternAtom(_PrSystemMem->pDisplay, "_MOTIF_WM_HINTS", True);
-    if (_border != None)
+    if (_PrSystemMem->nBorder != None)
     {
         struct
         {
@@ -1545,7 +1545,7 @@ _ExitFullscreen(BLU32 _Width, BLU32 _Height)
         } _bhints = {
             (1L << 1), 0, 1, 0, 0
         };
-        XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _border, _border, 32, PropModeReplace, (BLU8*)&_bhints, sizeof(_bhints) / sizeof(long));
+        XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _PrSystemMem->nBorder, _PrSystemMem->nBorder, 32, PropModeReplace, (BLU8*)&_bhints, sizeof(_bhints) / sizeof(long));
     }
     XSendEvent(_PrSystemMem->pDisplay, DefaultRootWindow(_PrSystemMem->pDisplay), False, SubstructureRedirectMask | SubstructureNotifyMask, &_xev);
     XResizeWindow(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _Width, _Height);
@@ -1558,6 +1558,14 @@ _ShowWindow()
         setlocale(LC_ALL, "C");
     XInitThreads();
     _PrSystemMem->pDisplay = XOpenDisplay(NULL);
+    _PrSystemMem->nProtocols = XInternAtom(_PrSystemMem->pDisplay, "WM_PROTOCOLS", False);
+    _PrSystemMem->nPing = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_PING", False);
+    _PrSystemMem->nBorder = XInternAtom(_PrSystemMem->pDisplay, "_MOTIF_WM_HINTS", True);
+    _PrSystemMem->nDelwin = XInternAtom(_PrSystemMem->pDisplay, "WM_DELETE_WINDOW", False);
+    _PrSystemMem->nFullScreen = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_STATE_FULLSCREEN", False);
+    _PrSystemMem->nWMState = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_STATE", False);
+    Atom _wmpid = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_PID", False);
+    Atom _compositor = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_BYPASS_COMPOSITOR", False);
 	BLS32 _visualattr[] = {
         GLX_X_RENDERABLE    , True,
         GLX_DRAWABLE_TYPE   , GLX_WINDOW_BIT,
@@ -1619,7 +1627,7 @@ _ShowWindow()
             BLS32 _sampbuf, _samples;
             glXGetFBConfigAttrib(_PrSystemMem->pDisplay, _fbc[_idx], GLX_SAMPLE_BUFFERS , &_sampbuf);
             glXGetFBConfigAttrib(_PrSystemMem->pDisplay, _fbc[_idx], GLX_SAMPLES , &_samples);
-            if (_bestfbc < 0 || _sampbuf && _samples > _bestnumsamp)
+            if ((_bestfbc < 0 || _sampbuf) && _samples > _bestnumsamp)
                 _bestfbc = _idx, _bestnumsamp = _samples;
             if (_worstfbc < 0 || !_sampbuf || _samples < _worstnumsamp)
                 _worstfbc = _idx, _worstnumsamp = _samples;
@@ -1642,10 +1650,7 @@ _ShowWindow()
     assert(_PrSystemMem->nWindow);
     XFree(_vi);
     XSelectInput(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, (FocusChangeMask | EnterWindowMask | LeaveWindowMask | ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | PropertyChangeMask | StructureNotifyMask | KeymapStateMask));
-    _PrSystemMem->nProtocols = XInternAtom(_PrSystemMem->pDisplay, "WM_PROTOCOLS", False);
-    _PrSystemMem->nPing = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_PING", False);
-    Atom _border = XInternAtom(_PrSystemMem->pDisplay, "_MOTIF_WM_HINTS", True);
-    if (_border != None)
+    if (_PrSystemMem->nBorder != None)
     {
         struct
         {
@@ -1655,17 +1660,14 @@ _ShowWindow()
             long x4;
             unsigned long x5;
         } _bhints = {
-            (1L << 1), 0, _PrSystemMem->sBoostParam.bFullscreen ? 0 : 1, 0, 0
+            (1L << 1), 0, _PrSystemMem->sBoostParam.bFullscreen ? 0u : 1u, 0, 0
         };
-        XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _border, _border, 32, PropModeReplace, (BLU8*)&_bhints, sizeof(_bhints) / sizeof(long));
+        XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _PrSystemMem->nBorder, _PrSystemMem->nBorder, 32, PropModeReplace, (BLU8*)&_bhints, sizeof(_bhints) / sizeof(long));
     }
-    Atom _wmpid = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_PID", False);
     const pid_t _pid = getpid();
     XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _wmpid, XA_CARDINAL, 32, PropModeReplace, (BLU8*)&_pid, 1);
-    Atom _compositor = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_BYPASS_COMPOSITOR", False);
     BLS32 _comp = 1;
     XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _compositor, XA_CARDINAL, 32, PropModeReplace, (BLU8*)&_comp, 1);
-    _PrSystemMem->nDelwin = XInternAtom(_PrSystemMem->pDisplay, "WM_DELETE_WINDOW", 0);
     XSetWMProtocols(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, &_PrSystemMem->nDelwin, 1);
     XStoreName(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, (const BLAnsi*)_PrSystemMem->sBoostParam.pAppName);
     XMapWindow(_PrSystemMem->pDisplay, _PrSystemMem->nWindow);
@@ -1682,7 +1684,7 @@ _ShowWindow()
 	_alphacolor.red = _alphacolor.blue = _alphacolor.green = 0;
 	_PrSystemMem->nNilCursor = XCreatePixmapCursor(_PrSystemMem->pDisplay, _ncursorpixmap, _ncursorpixmap, &_alphacolor, &_alphacolor, 0, 0);
 	XFreePixmap(_PrSystemMem->pDisplay, _ncursorpixmap);
-    _GpuIntervention(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _bestfbconfig, _PrSystemMem->pLib, !_PrSystemMem->sBoostParam.bProfiler);
+    _GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pDisplay, _PrSystemMem->nWindow, _width, _height, _bestfbconfig, _PrSystemMem->pLib, !_PrSystemMem->sBoostParam.bProfiler);
     XFlush(_PrSystemMem->pDisplay);
 }
 BLVoid
@@ -2121,7 +2123,7 @@ _PollMsg()
 								_PrSystemMem->pActivity->vm->AttachCurrentThread(&_env, NULL);
 								jlong _downtim = AKeyEvent_getDownTime(_event);
 								jlong _eventtim = AKeyEvent_getEventTime(_event);
-								jint _repeat = AKeyEvent_getRepeatCount(_event); 
+								jint _repeat = AKeyEvent_getRepeatCount(_event);
 								jint _meta = AKeyEvent_getMetaState(_event);
 								jint _device = AInputEvent_getDeviceId(_event);
 								jint _scancode = AKeyEvent_getScanCode(_event);
@@ -3211,7 +3213,7 @@ _PollEvent()
                     free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sNet.pBuf);
             } break;
             case BL_ET_UI:
-            {			
+            {
 				if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][0])
 				{
 					BLU32 _fidx = 0;
@@ -3376,25 +3378,6 @@ _SystemInit()
 BLVoid
 _SystemStep()
 {
-	BLU32 _aw, _ah;
-	if (_PrSystemMem->sBoostParam.bUseDesignRes)
-	{
-		if ((BLF32)(_PrSystemMem->sBoostParam.nDesignWidth) / (BLF32)(_PrSystemMem->sBoostParam.nDesignHeight) > (BLF32)_PrSystemMem->sBoostParam.nScreenWidth / (BLF32)_PrSystemMem->sBoostParam.nScreenHeight)
-		{
-			_ah = (BLU32)_PrSystemMem->sBoostParam.nDesignHeight;
-			_aw = (BLU32)((BLF32)_PrSystemMem->sBoostParam.nScreenWidth / (BLF32)_PrSystemMem->sBoostParam.nScreenHeight * _PrSystemMem->sBoostParam.nDesignHeight);
-		}
-		else
-		{
-			_ah = (BLU32)(_PrSystemMem->sBoostParam.nDesignWidth * (BLF32)_PrSystemMem->sBoostParam.nScreenHeight / (BLF32)_PrSystemMem->sBoostParam.nScreenWidth);
-			_aw = (BLU32)_PrSystemMem->sBoostParam.nDesignWidth;
-		}
-	}
-	else
-	{
-		_aw = _PrSystemMem->sBoostParam.nScreenWidth;
-		_ah = _PrSystemMem->sBoostParam.nScreenHeight;
-	}
 	blBindFrameBuffer(INVALID_GUID);
 	blFrameBufferClear(TRUE, TRUE, TRUE);
     BLU32 _now = blTickCounts();
@@ -3500,11 +3483,11 @@ blTickCounts()
 #elif defined(BL_PLATFORM_LINUX)
     struct timeval _val;
     gettimeofday(&_val, NULL);
-    return _val.tv_sec + _val.tv_usec / 1000000.0f;
+    return (BLU32)(_val.tv_sec * 1000 + _val.tv_usec / 1000.0f);
 #elif defined(BL_PLATFORM_ANDROID)
     struct timeval _val;
     gettimeofday(&_val, NULL);
-    return _val.tv_sec + _val.tv_usec / 1000000.0f;
+    return (BLU32)(_val.tv_sec * 1000 + _val.tv_usec / 1000.0f);
 #elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
     static mach_timebase_info_data_t _frequency = { 0 , 0 };
     if (_frequency.denom == 0)
@@ -3514,7 +3497,7 @@ blTickCounts()
 #endif
     return 0;
 }
-BLVoid 
+BLVoid
 blTickDelay(IN BLU32 _Ms)
 {
 	if (_Ms == 0)
@@ -3659,7 +3642,7 @@ blWorkingDir()
 			FreeLibrary(_psapi);
 			return NULL;
 		}
-		while (TRUE) 
+		while (TRUE)
 		{
 			BLVoid* _ptr = realloc(_path, _buflen * sizeof(WCHAR));
 			if (!_ptr)
@@ -3889,11 +3872,11 @@ blClipboardPaste()
 #endif
 	return _PrSystemMem->aClipboard;
 }
-BLBool 
+BLBool
 blQuitEvent()
 {
 	BLBool _quit = FALSE;
-	_PollMsg();	
+	_PollMsg();
 #ifdef BL_PLATFORM_ANDROID
 	pthread_mutex_lock(&_PrSystemMem->sMutex);
 #endif
@@ -3913,7 +3896,7 @@ blQuitEvent()
             } break;
             case BL_ET_KEY:
 			{
-				if (_PrSystemMem->pEvents[_idx].uEvent.sKey.eCode == BL_KC_ESCAPE)
+				if (_PrSystemMem->pEvents[_idx].uEvent.sKey.eCode == BL_KC_ESCAPE || _PrSystemMem->pEvents[_idx].uEvent.sKey.eCode == BL_KC_EXIT)
 					_quit = TRUE;
                 if (_PrSystemMem->pEvents[_idx].uEvent.sKey.pString)
                     free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sKey.pString);
@@ -4391,7 +4374,7 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
     }
 #elif defined(BL_PLATFORM_IOS)
     [_PrSystemMem->pTICcxt becomeFirstResponder];
-#elif defined(BL_PLATFORM_ANDROID)	
+#elif defined(BL_PLATFORM_ANDROID)
 	pthread_mutex_lock(&_PrSystemMem->sMutex);
 	while (!_PrSystemMem->bAvtivityFocus);
 	JNIEnv* _env = _PrSystemMem->pActivity->env;
@@ -4447,7 +4430,7 @@ blDetachIME()
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
 }
-BLVoid 
+BLVoid
 blCursorVisiblity(IN BLBool _Show)
 {
 #if defined(BL_PLATFORM_WIN32)
@@ -4588,7 +4571,7 @@ blTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
 	_PrSystemMem->aTimers[_idx].nLastTime = blTickCounts();
 	return TRUE;
 }
-BLVoid 
+BLVoid
 blWindowQuery(OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _ActualWidth, OUT BLU32* _ActualHeight, OUT BLF32* _RatioX, OUT BLF32* _RatioY)
 {
 	*_Width = _PrSystemMem->sBoostParam.nScreenWidth;
@@ -4645,7 +4628,7 @@ blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
 	blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp);
 #endif
 }
-BLVoid 
+BLVoid
 blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _DesignWidth, IN BLU32 _DesignHeight, IN BLBool _UseDesignRes, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))
 {
 #if defined(BL_PLATFORM_UWP)

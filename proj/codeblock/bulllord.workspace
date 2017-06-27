@@ -3,6 +3,24 @@
 	<Workspace title="bulllord">
 		<Project filename="bulllord-android.cbp" />
 		<Project filename="bulllord-linux.cbp" />
-		<Project filename="../../samples/cbsample/cbsample.cbp" />
+		<Project filename="../../plugins/video/video-android.cbp">
+			<Depends filename="bulllord-android.cbp" />
+		</Project>
+		<Project filename="../../plugins/video/video-linux.cbp">
+			<Depends filename="bulllord-linux.cbp" />
+		</Project>
+		<Project filename="../../plugins/spine/spine-android.cbp">
+			<Depends filename="bulllord-android.cbp" />
+		</Project>
+		<Project filename="../../plugins/spine/spine-linux.cbp">
+			<Depends filename="bulllord-linux.cbp" />
+		</Project>
+		<Project filename="../../plugins/tmx/tmx-android.cbp">
+			<Depends filename="bulllord-android.cbp" />
+		</Project>
+		<Project filename="../../plugins/tmx/tmx-linux.cbp">
+			<Depends filename="bulllord-linux.cbp" />
+		</Project>
+		<Project filename="../../samples/demo/demo.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

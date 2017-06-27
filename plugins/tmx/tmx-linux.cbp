@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="tmx-linux" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="src/;headers/;externals/;" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../../bin/linux/plugins/blTMX" prefix_auto="0" extension_auto="1" />
+				<Option working_dir="../../bin/linux" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../../bin/linux/plugins/blTMX" prefix_auto="0" extension_auto="1" />
+				<Option working_dir="../../bin/linux" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-std=c++11" />
+			<Add option="-m32" />
+			<Add option="-Wno-unused-parameter" />
+			<Add option="-Wno-unused-result" />
+			<Add option="-Wno-missing-field-initializers" />
+			<Add option="-Wno-missing-declarations" />
+			<Add option="-msse4.1" />
+			<Add option="-fshort-wchar" />
+			<Add option="-DBL_EXPORT" />
+			<Add option="-DZ_HAVE_UNISTD_H" />
+			<Add option="-D__linux__" />
+		</Compiler>
+		<Linker>
+			<Add option="-m32" />
+			<Add library="../../bin/linux/libbulllord.so" />
+		</Linker>
+		<Unit filename="AStar.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/" />
+		</Unit>
+		<Unit filename="AStar.h">
+			<Option virtualFolder="externals/" />
+		</Unit>
+		<Unit filename="IndexPriorityQueue.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="externals/" />
+		</Unit>
+		<Unit filename="IndexPriorityQueue.h">
+			<Option virtualFolder="externals/" />
+		</Unit>
+		<Unit filename="tmxentry.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="tmxentry.h">
+			<Option virtualFolder="headers/" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -104,7 +104,7 @@ typedef struct _WebMDemuxerExt {
 	mkvparser::Segment* pSegment;
 	const mkvparser::Cluster* pCluster;
 	const mkvparser::Block* pBlock;
-	const mkvparser::BlockEntry* pBlockEntry;	
+	const mkvparser::BlockEntry* pBlockEntry;
 	const mkvparser::VideoTrack* pVideoTrack;
 	const mkvparser::AudioTrack* pAudioTrack;
 	BLS32 nBlockFrameIndex;
@@ -181,7 +181,7 @@ _AudioCodecOpen(_BlWebMDemuxerExt* _Demuxer)
 		if (vorbis_synthesis_init(&_ret->pVorbis->sDspState, &_ret->pVorbis->sInfo))
 			return NULL;
 		_ret->pVorbis->bHasDSPState = TRUE;
-		if (_ret->pVorbis->sInfo.channels != _ret->nChannels || _ret->pVorbis->sInfo.rate != _Demuxer->pAudioTrack->GetSamplingRate())
+		if (_ret->pVorbis->sInfo.channels != (BLS32)_ret->nChannels || (BLS32)_ret->pVorbis->sInfo.rate != (BLS32)_Demuxer->pAudioTrack->GetSamplingRate())
 			return NULL;
 		if (vorbis_block_init(&_ret->pVorbis->sDspState, &_ret->pVorbis->sBlock))
 			return NULL;
@@ -328,7 +328,7 @@ _VideoCodecClose(_BLVPXDecoderExt* _Codec)
 	}
 	free(_Codec);
 }
-static BLBool 
+static BLBool
 _FrameData(_BLWebMFrameExt* _Frame)
 {
 	_PrVideoMem->pVideoDecodec->pIter = NULL;
@@ -364,7 +364,7 @@ _YUVImage(_BLYUVImageExt* _Image)
 	return FALSE;
 }
 static BLVoid
-_Demuxer(_BlWebMDemuxerExt* _Demuxer, mkvparser::IMkvReader* _Reader, BLS32 _VideoTrack, BLS32 _AudioTrack)	
+_Demuxer(_BlWebMDemuxerExt* _Demuxer, mkvparser::IMkvReader* _Reader, BLS32 _VideoTrack, BLS32 _AudioTrack)
 {
 	_Demuxer->pReader = _Reader;
 	_Demuxer->pSegment = NULL;
@@ -419,7 +419,7 @@ _Demuxer(_BlWebMDemuxerExt* _Demuxer, mkvparser::IMkvReader* _Reader, BLS32 _Vid
 		return;
 	_Demuxer->bOpen = TRUE;
 }
-static BLBool 
+static BLBool
 _NotSupportedTrackNumber(_BlWebMDemuxerExt* _Demuxer, long _VideoTrackNumber, long _AudioTrackNumber)
 {
 	const long _tracknumber = (long)_Demuxer->pBlock->GetTrackNumber();
@@ -505,7 +505,7 @@ _ReadFrame(_BlWebMDemuxerExt* _Demuxer, _BLWebMFrameExt* _VideoFrame, _BLWebMFra
 	_frame->bKey = _Demuxer->pBlock->IsKey();
 	return !_blockframe.Read(_Demuxer->pReader, _frame->pBuffer);
 }
-BLVoid 
+BLVoid
 blVideoOpenEXT()
 {
 	_PrVideoMem = (_BLVideoMemberExt*)malloc(sizeof(_BLVideoMemberExt));
@@ -554,7 +554,7 @@ blVideoOpenEXT()
 	};
 	_PrVideoMem->nGeo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
 }
-BLVoid 
+BLVoid
 blVideoCloseEXT()
 {
 	_AudioCodecClose(_PrVideoMem->pAudioDecodec);
@@ -565,7 +565,7 @@ blVideoCloseEXT()
 		blDeleteGeometryBuffer(_PrVideoMem->nGeo);
 	blDeleteTechnique(_PrVideoMem->nTech);
 }
-BLBool 
+BLBool
 blVideoPlayEXT(IN BLAnsi* _Filename)
 {
 	BLF64 _framedelta = 0.0;
@@ -676,7 +676,7 @@ blVideoPlayEXT(IN BLAnsi* _Filename)
 					blGeometryBufferUpdate(_PrVideoMem->nGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 					blDraw(_PrVideoMem->nTech, _PrVideoMem->nGeo, 1);
 					blFlush();
-					_framedelta = (_videoframe.fTime) - _PrVideoMem->fTime;
+					_framedelta = ((_audioframe.fTime < _videoframe.fTime) ? _audioframe.fTime : _videoframe.fTime) - _PrVideoMem->fTime;
 					_audiodelta = blTickCounts() - _audiodelta;
 					if ((BLS32)(_framedelta * 990) - (_audiodelta > 1000 ? 0 : _audiodelta) >= 0)
 						blTickDelay((BLU32)(_framedelta * 990) - (_audiodelta > 1000 ? 0 : _audiodelta));

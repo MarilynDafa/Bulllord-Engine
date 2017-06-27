@@ -1,15 +1,15 @@
 /*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
- 
+
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
  arising from the use of this software.
- 
+
  Permission is granted to anyone to use this software for any purpose,
  including commercial applications, and to alter it and redistribute it
  freely, subject to the following restrictions:
- 
+
  1. The origin of this software must not be misrepresented; you must not
  claim that you wrote the original software. If you use this software
  in a product, an acknowledgment in the product documentation would be
@@ -1882,9 +1882,10 @@ extern const BLAnsi* DEFAULTFONTIMG_INTERNAL;
 #	define GL_SYMBOL_INTERNAL(type, func, lib) { func = (type)wglGetProcAddress(#func); if(!func) func = (type)GetProcAddress(lib, #func); }
 #   elif defined(BL_PLATFORM_LINUX)
     typedef BLVoid (APIENTRYP PFNGLXSWAPBUFFERSPROC) (Display*, GLXDrawable);
+    typedef BLVoid (APIENTRYP PFNGLXDESTROYCONTEXTPROC) (Display*, GLXContext);
     GL_PROTO_INTERNAL(PFNGLXGETPROCADDRESSPROC, glXGetProcAddress)
     GL_PROTO_INTERNAL(PFNGLXGETPROCADDRESSARBPROC, glXGetProcAddressARB)
-    GL_PROTO_INTERNAL(PFNGLXSWAPBUFFERSPROC, glxSwapBuffersARB)
+    GL_PROTO_INTERNAL(PFNGLXSWAPBUFFERSPROC, glxSwapBuffers)
 #	define GL_SYMBOL_INTERNAL(type, func, lib) { func = (type)dlsym(lib, #func); }
 #   elif defined(BL_PLATFORM_OSX)
 #	define GL_SYMBOL_INTERNAL(type, func, lib) { CFStringRef _proc = CFStringCreateWithCString(kCFAllocatorDefault, #func, kCFStringEncodingASCII); func = (type)CFBundleGetFunctionPointerForName(lib, _proc); CFRelease(_proc); }

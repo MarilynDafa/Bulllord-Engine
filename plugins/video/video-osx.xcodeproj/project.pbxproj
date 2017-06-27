@@ -148,25 +148,11 @@
 		C7F7239C1EFC050800F31075 /* treecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F723801EFC050800F31075 /* treecoder.h */; };
 		C7F7239D1EFC050800F31075 /* vp8_entropymodedata.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F723811EFC050800F31075 /* vp8_entropymodedata.h */; };
 		C7F7239E1EFC050800F31075 /* vp8_loopfilter.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F723821EFC050800F31075 /* vp8_loopfilter.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7F723DB1EFC055D00F31075 /* copy_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723C71EFC055D00F31075 /* copy_sse2.asm */; };
-		C7F723DC1EFC055D00F31075 /* copy_sse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723C81EFC055D00F31075 /* copy_sse3.asm */; };
-		C7F723DD1EFC055D00F31075 /* dequantize_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723C91EFC055D00F31075 /* dequantize_mmx.asm */; };
 		C7F723DE1EFC055D00F31075 /* filter_x86.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F723CA1EFC055D00F31075 /* filter_x86.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7F723DF1EFC055D00F31075 /* filter_x86.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F723CB1EFC055D00F31075 /* filter_x86.h */; };
 		C7F723E01EFC055D00F31075 /* idct_blk_mmx.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F723CC1EFC055D00F31075 /* idct_blk_mmx.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7F723E11EFC055D00F31075 /* idct_blk_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F723CD1EFC055D00F31075 /* idct_blk_sse2.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7F723E21EFC055D00F31075 /* idctllm_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723CE1EFC055D00F31075 /* idctllm_mmx.asm */; };
-		C7F723E31EFC055D00F31075 /* idctllm_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723CF1EFC055D00F31075 /* idctllm_sse2.asm */; };
-		C7F723E41EFC055D00F31075 /* iwalsh_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D01EFC055D00F31075 /* iwalsh_sse2.asm */; };
-		C7F723E51EFC055D00F31075 /* loopfilter_block_sse2_x86_64.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D11EFC055D00F31075 /* loopfilter_block_sse2_x86_64.asm */; };
-		C7F723E61EFC055D00F31075 /* loopfilter_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D21EFC055D00F31075 /* loopfilter_sse2.asm */; };
 		C7F723E71EFC055D00F31075 /* loopfilter_x86.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D31EFC055D00F31075 /* loopfilter_x86.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7F723E81EFC055D00F31075 /* mfqe_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D41EFC055D00F31075 /* mfqe_sse2.asm */; };
-		C7F723E91EFC055D00F31075 /* recon_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D51EFC055D00F31075 /* recon_mmx.asm */; };
-		C7F723EA1EFC055D00F31075 /* recon_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D61EFC055D00F31075 /* recon_sse2.asm */; };
-		C7F723EB1EFC055D00F31075 /* subpixel_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D71EFC055D00F31075 /* subpixel_mmx.asm */; };
-		C7F723EC1EFC055D00F31075 /* subpixel_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D81EFC055D00F31075 /* subpixel_sse2.asm */; };
-		C7F723ED1EFC055D00F31075 /* subpixel_ssse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D91EFC055D00F31075 /* subpixel_ssse3.asm */; };
 		C7F723EE1EFC055D00F31075 /* vp8_asm_stubs.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F723DA1EFC055D00F31075 /* vp8_asm_stubs.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7F723F01EFC059E00F31075 /* vp8_dx_iface.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F723EF1EFC059E00F31075 /* vp8_dx_iface.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7F7247D1EFC065700F31075 /* vp9_alloccommon.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F7244F1EFC065700F31075 /* vp9_alloccommon.c */; settings = {COMPILER_FLAGS = "-w"; }; };
@@ -273,23 +259,63 @@
 		C7F725621EFC086000F31075 /* vpx_subpixel_8t_ssse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F7254B1EFC086000F31075 /* vpx_subpixel_8t_ssse3.asm */; };
 		C7F725631EFC086000F31075 /* vpx_subpixel_bilinear_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F7254C1EFC086000F31075 /* vpx_subpixel_bilinear_sse2.asm */; };
 		C7F725641EFC086000F31075 /* vpx_subpixel_bilinear_ssse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F7254D1EFC086000F31075 /* vpx_subpixel_bilinear_ssse3.asm */; };
+		C7F725F31F016A8300F31075 /* copy_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723C71EFC055D00F31075 /* copy_sse2.asm */; };
+		C7F725F41F016A8300F31075 /* copy_sse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723C81EFC055D00F31075 /* copy_sse3.asm */; };
+		C7F725F51F016A8300F31075 /* dequantize_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723C91EFC055D00F31075 /* dequantize_mmx.asm */; };
+		C7F725F61F016A8300F31075 /* idctllm_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723CE1EFC055D00F31075 /* idctllm_mmx.asm */; };
+		C7F725F71F016A8300F31075 /* idctllm_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723CF1EFC055D00F31075 /* idctllm_sse2.asm */; };
+		C7F725F81F016A8300F31075 /* iwalsh_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D01EFC055D00F31075 /* iwalsh_sse2.asm */; };
+		C7F725F91F016A8300F31075 /* loopfilter_block_sse2_x86_64.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D11EFC055D00F31075 /* loopfilter_block_sse2_x86_64.asm */; };
+		C7F725FA1F016A8300F31075 /* loopfilter_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D21EFC055D00F31075 /* loopfilter_sse2.asm */; };
+		C7F725FB1F016A8300F31075 /* mfqe_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D41EFC055D00F31075 /* mfqe_sse2.asm */; };
+		C7F725FC1F016A8300F31075 /* recon_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D51EFC055D00F31075 /* recon_mmx.asm */; };
+		C7F725FD1F016A8300F31075 /* recon_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D61EFC055D00F31075 /* recon_sse2.asm */; };
+		C7F725FE1F016A8300F31075 /* subpixel_mmx.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D71EFC055D00F31075 /* subpixel_mmx.asm */; };
+		C7F725FF1F016A8300F31075 /* subpixel_sse2.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D81EFC055D00F31075 /* subpixel_sse2.asm */; };
+		C7F726001F016A8300F31075 /* subpixel_ssse3.asm in Sources */ = {isa = PBXBuildFile; fileRef = C7F723D91EFC055D00F31075 /* subpixel_ssse3.asm */; };
+		C7F726041F018DA000F31075 /* vp9_dx_iface.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726031F018DA000F31075 /* vp9_dx_iface.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726111F018E2100F31075 /* vp9_decodeframe.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726051F018E2100F31075 /* vp9_decodeframe.h */; };
+		C7F726121F018E2100F31075 /* vp9_decodemv.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726061F018E2100F31075 /* vp9_decodemv.h */; };
+		C7F726131F018E2100F31075 /* vp9_decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726071F018E2100F31075 /* vp9_decoder.h */; };
+		C7F726141F018E2100F31075 /* vp9_detokenize.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726081F018E2100F31075 /* vp9_detokenize.h */; };
+		C7F726151F018E2100F31075 /* vp9_dsubexp.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726091F018E2100F31075 /* vp9_dsubexp.h */; };
+		C7F726161F018E2100F31075 /* vp9_dthread.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F7260A1F018E2100F31075 /* vp9_dthread.h */; };
+		C7F726171F018E2100F31075 /* vp9_decodeframe.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F7260B1F018E2100F31075 /* vp9_decodeframe.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726181F018E2100F31075 /* vp9_decodemv.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F7260C1F018E2100F31075 /* vp9_decodemv.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726191F018E2100F31075 /* vp9_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F7260D1F018E2100F31075 /* vp9_decoder.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F7261A1F018E2100F31075 /* vp9_detokenize.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F7260E1F018E2100F31075 /* vp9_detokenize.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F7261B1F018E2100F31075 /* vp9_dsubexp.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F7260F1F018E2100F31075 /* vp9_dsubexp.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F7261C1F018E2100F31075 /* vp9_dthread.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726101F018E2100F31075 /* vp9_dthread.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726381F018E8800F31075 /* onyxd_if.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726371F018E8800F31075 /* onyxd_if.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726441F018ECF00F31075 /* dboolhuff.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F726391F018ECF00F31075 /* dboolhuff.h */; };
+		C7F726451F018ECF00F31075 /* decodemv.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F7263A1F018ECF00F31075 /* decodemv.h */; };
+		C7F726461F018ECF00F31075 /* decoderthreading.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F7263B1F018ECF00F31075 /* decoderthreading.h */; };
+		C7F726471F018ECF00F31075 /* detokenize.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F7263C1F018ECF00F31075 /* detokenize.h */; };
+		C7F726481F018ECF00F31075 /* onyxd_int.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F7263D1F018ECF00F31075 /* onyxd_int.h */; };
+		C7F726491F018ECF00F31075 /* treereader.h in Headers */ = {isa = PBXBuildFile; fileRef = C7F7263E1F018ECF00F31075 /* treereader.h */; };
+		C7F7264A1F018ECF00F31075 /* dboolhuff.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F7263F1F018ECF00F31075 /* dboolhuff.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F7264B1F018ECF00F31075 /* decodeframe.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726401F018ECF00F31075 /* decodeframe.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F7264C1F018ECF00F31075 /* decodemv.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726411F018ECF00F31075 /* decodemv.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F7264D1F018ECF00F31075 /* detokenize.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726421F018ECF00F31075 /* detokenize.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F7264E1F018ECF00F31075 /* threading.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726431F018ECF00F31075 /* threading.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7F726681F018F3E00F31075 /* systemdependent.c in Sources */ = {isa = PBXBuildFile; fileRef = C7F726671F018F3E00F31075 /* systemdependent.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
-		C7F725931EFC11ED00F31075 /* PBXBuildRule */ = {
+		C7F725F21F01680B00F31075 /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
 			fileType = sourcecode.asm;
 			isEditable = 1;
 			outputFiles = (
-				"/Users/zhoubo/Library/Developer/Xcode/DerivedData/bulllord-fmfnpvfjndnodebvhxrqolnwijqj/Build/Intermediates/video-osx.build/Debug/video-osx.build/Objects-normal/x86_64/${INPUT_FILE_BASE}.o",
+				"$(DERIVED_FILE_DIR)/${INPUT_FILE_BASE}.o",
 			);
-			script = "#!/bin/bash\n/usr/local/bin/yasm -f macho64 -m amd64 -DPREFIX -DPIC -I\"/Users/zhoubo/Downloads/Bulllord-Engine-master/plugins/video/webm\" -P\"/Users/zhoubo/Downloads/Bulllord-Engine-master/plugins/video/webm/vpx_config.asm\" -o /Users/zhoubo/Library/Developer/Xcode/DerivedData/bulllord-fmfnpvfjndnodebvhxrqolnwijqj/Build/Intermediates/video-osx.build/Debug/video-osx.build/Objects-normal/x86_64/${INPUT_FILE_BASE}.o ${INPUT_FILE_DIR}/${INPUT_FILE}";
+			script = "yasm -f macho64 -m amd64 -I./ -I ./webm/ -DPIC -o ${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.o ${INPUT_FILE_DIR}/${INPUT_FILE_BASE}.asm";
 		};
 /* End PBXBuildRule section */
 
 /* Begin PBXFileReference section */
-		C7F71B0A1EF9596600F31075 /* libblVideo.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libblVideo.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7F71B0A1EF9596600F31075 /* blVideo.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = blVideo.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7F71B221EF95CC200F31075 /* libbulllord.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbulllord.dylib; path = "/Users/zhoubo/Downloads/Bulllord-Engine-master/proj/xcode/../../bin/osx/libbulllord.dylib"; sourceTree = "<absolute>"; };
 		C7F71B301EF95D4600F31075 /* videoentry.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = videoentry.xc; sourceTree = "<group>"; };
 		C7F71B311EF95D4B00F31075 /* videoentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = videoentry.h; sourceTree = "<group>"; };
@@ -556,6 +582,32 @@
 		C7F7254B1EFC086000F31075 /* vpx_subpixel_8t_ssse3.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.asm; name = vpx_subpixel_8t_ssse3.asm; path = webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm; sourceTree = "<group>"; };
 		C7F7254C1EFC086000F31075 /* vpx_subpixel_bilinear_sse2.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.asm; name = vpx_subpixel_bilinear_sse2.asm; path = webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm; sourceTree = "<group>"; };
 		C7F7254D1EFC086000F31075 /* vpx_subpixel_bilinear_ssse3.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.asm; name = vpx_subpixel_bilinear_ssse3.asm; path = webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm; sourceTree = "<group>"; };
+		C7F726031F018DA000F31075 /* vp9_dx_iface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_dx_iface.c; path = webm/vp9/vp9_dx_iface.c; sourceTree = "<group>"; };
+		C7F726051F018E2100F31075 /* vp9_decodeframe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_decodeframe.h; path = webm/vp9/decoder/vp9_decodeframe.h; sourceTree = "<group>"; };
+		C7F726061F018E2100F31075 /* vp9_decodemv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_decodemv.h; path = webm/vp9/decoder/vp9_decodemv.h; sourceTree = "<group>"; };
+		C7F726071F018E2100F31075 /* vp9_decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_decoder.h; path = webm/vp9/decoder/vp9_decoder.h; sourceTree = "<group>"; };
+		C7F726081F018E2100F31075 /* vp9_detokenize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_detokenize.h; path = webm/vp9/decoder/vp9_detokenize.h; sourceTree = "<group>"; };
+		C7F726091F018E2100F31075 /* vp9_dsubexp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_dsubexp.h; path = webm/vp9/decoder/vp9_dsubexp.h; sourceTree = "<group>"; };
+		C7F7260A1F018E2100F31075 /* vp9_dthread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vp9_dthread.h; path = webm/vp9/decoder/vp9_dthread.h; sourceTree = "<group>"; };
+		C7F7260B1F018E2100F31075 /* vp9_decodeframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_decodeframe.c; path = webm/vp9/decoder/vp9_decodeframe.c; sourceTree = "<group>"; };
+		C7F7260C1F018E2100F31075 /* vp9_decodemv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_decodemv.c; path = webm/vp9/decoder/vp9_decodemv.c; sourceTree = "<group>"; };
+		C7F7260D1F018E2100F31075 /* vp9_decoder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_decoder.c; path = webm/vp9/decoder/vp9_decoder.c; sourceTree = "<group>"; };
+		C7F7260E1F018E2100F31075 /* vp9_detokenize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_detokenize.c; path = webm/vp9/decoder/vp9_detokenize.c; sourceTree = "<group>"; };
+		C7F7260F1F018E2100F31075 /* vp9_dsubexp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_dsubexp.c; path = webm/vp9/decoder/vp9_dsubexp.c; sourceTree = "<group>"; };
+		C7F726101F018E2100F31075 /* vp9_dthread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = vp9_dthread.c; path = webm/vp9/decoder/vp9_dthread.c; sourceTree = "<group>"; };
+		C7F726371F018E8800F31075 /* onyxd_if.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = onyxd_if.c; path = webm/vp8/decoder/onyxd_if.c; sourceTree = "<group>"; };
+		C7F726391F018ECF00F31075 /* dboolhuff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dboolhuff.h; path = webm/vp8/decoder/dboolhuff.h; sourceTree = "<group>"; };
+		C7F7263A1F018ECF00F31075 /* decodemv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decodemv.h; path = webm/vp8/decoder/decodemv.h; sourceTree = "<group>"; };
+		C7F7263B1F018ECF00F31075 /* decoderthreading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decoderthreading.h; path = webm/vp8/decoder/decoderthreading.h; sourceTree = "<group>"; };
+		C7F7263C1F018ECF00F31075 /* detokenize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = detokenize.h; path = webm/vp8/decoder/detokenize.h; sourceTree = "<group>"; };
+		C7F7263D1F018ECF00F31075 /* onyxd_int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = onyxd_int.h; path = webm/vp8/decoder/onyxd_int.h; sourceTree = "<group>"; };
+		C7F7263E1F018ECF00F31075 /* treereader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = treereader.h; path = webm/vp8/decoder/treereader.h; sourceTree = "<group>"; };
+		C7F7263F1F018ECF00F31075 /* dboolhuff.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dboolhuff.c; path = webm/vp8/decoder/dboolhuff.c; sourceTree = "<group>"; };
+		C7F726401F018ECF00F31075 /* decodeframe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decodeframe.c; path = webm/vp8/decoder/decodeframe.c; sourceTree = "<group>"; };
+		C7F726411F018ECF00F31075 /* decodemv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = decodemv.c; path = webm/vp8/decoder/decodemv.c; sourceTree = "<group>"; };
+		C7F726421F018ECF00F31075 /* detokenize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = detokenize.c; path = webm/vp8/decoder/detokenize.c; sourceTree = "<group>"; };
+		C7F726431F018ECF00F31075 /* threading.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = threading.c; path = webm/vp8/decoder/threading.c; sourceTree = "<group>"; };
+		C7F726671F018F3E00F31075 /* systemdependent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemdependent.c; path = webm/vp8/common/generic/systemdependent.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -584,7 +636,7 @@
 		C7F71B0B1EF9596600F31075 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7F71B0A1EF9596600F31075 /* libblVideo.dylib */,
+				C7F71B0A1EF9596600F31075 /* blVideo.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -769,6 +821,19 @@
 		C7F71B461EF95F8B00F31075 /* vp9 */ = {
 			isa = PBXGroup;
 			children = (
+				C7F726051F018E2100F31075 /* vp9_decodeframe.h */,
+				C7F726061F018E2100F31075 /* vp9_decodemv.h */,
+				C7F726071F018E2100F31075 /* vp9_decoder.h */,
+				C7F726081F018E2100F31075 /* vp9_detokenize.h */,
+				C7F726091F018E2100F31075 /* vp9_dsubexp.h */,
+				C7F7260A1F018E2100F31075 /* vp9_dthread.h */,
+				C7F7260B1F018E2100F31075 /* vp9_decodeframe.c */,
+				C7F7260C1F018E2100F31075 /* vp9_decodemv.c */,
+				C7F7260D1F018E2100F31075 /* vp9_decoder.c */,
+				C7F7260E1F018E2100F31075 /* vp9_detokenize.c */,
+				C7F7260F1F018E2100F31075 /* vp9_dsubexp.c */,
+				C7F726101F018E2100F31075 /* vp9_dthread.c */,
+				C7F726031F018DA000F31075 /* vp9_dx_iface.c */,
 				C7F7244F1EFC065700F31075 /* vp9_alloccommon.c */,
 				C7F724501EFC065700F31075 /* vp9_alloccommon.h */,
 				C7F724511EFC065700F31075 /* vp9_blockd.c */,
@@ -824,6 +889,19 @@
 		C7F71B481EF95F9C00F31075 /* vp8 */ = {
 			isa = PBXGroup;
 			children = (
+				C7F726671F018F3E00F31075 /* systemdependent.c */,
+				C7F726391F018ECF00F31075 /* dboolhuff.h */,
+				C7F7263A1F018ECF00F31075 /* decodemv.h */,
+				C7F7263B1F018ECF00F31075 /* decoderthreading.h */,
+				C7F7263C1F018ECF00F31075 /* detokenize.h */,
+				C7F7263D1F018ECF00F31075 /* onyxd_int.h */,
+				C7F7263E1F018ECF00F31075 /* treereader.h */,
+				C7F7263F1F018ECF00F31075 /* dboolhuff.c */,
+				C7F726401F018ECF00F31075 /* decodeframe.c */,
+				C7F726411F018ECF00F31075 /* decodemv.c */,
+				C7F726421F018ECF00F31075 /* detokenize.c */,
+				C7F726431F018ECF00F31075 /* threading.c */,
+				C7F726371F018E8800F31075 /* onyxd_if.c */,
 				C7F723EF1EFC059E00F31075 /* vp8_dx_iface.c */,
 				C7F723671EFC050800F31075 /* modecont.c */,
 				C7F723681EFC050800F31075 /* modecont.h */,
@@ -1044,8 +1122,10 @@
 			files = (
 				C7F724851EFC065700F31075 /* vp9_entropy.h in Headers */,
 				C7F723DF1EFC055D00F31075 /* filter_x86.h in Headers */,
+				C7F726461F018ECF00F31075 /* decoderthreading.h in Headers */,
 				C7F71FCC1EF98C7300F31075 /* misc.h in Headers */,
 				C7F724D21EFC073900F31075 /* vpx_integer.h in Headers */,
+				C7F726141F018E2100F31075 /* vp9_detokenize.h in Headers */,
 				C7F722731EF995E300F31075 /* vpx_scale.h in Headers */,
 				C7F722DC1EFC03C800F31075 /* findnearmv.h in Headers */,
 				C7F71FD01EF98C7300F31075 /* scales.h in Headers */,
@@ -1073,6 +1153,7 @@
 				C7F7249F1EFC065700F31075 /* vp9_reconintra.h in Headers */,
 				C7F724801EFC065700F31075 /* vp9_blockd.h in Headers */,
 				C7F71F811EF98BD900F31075 /* ogg.h in Headers */,
+				C7F726481F018ECF00F31075 /* onyxd_int.h in Headers */,
 				C7F71EE61EF9891F00F31075 /* webmids.h in Headers */,
 				C7F7239C1EFC050800F31075 /* treecoder.h in Headers */,
 				C7F725501EFC086000F31075 /* bitdepth_conversion_sse2.h in Headers */,
@@ -1110,6 +1191,7 @@
 				C7F722F41EFC03EA00F31075 /* yuv2rgb.h in Headers */,
 				C7F7248E1EFC065700F31075 /* vp9_frame_buffers.h in Headers */,
 				C7F722781EF9960000F31075 /* endian_inl.h in Headers */,
+				C7F726161F018E2100F31075 /* vp9_dthread.h in Headers */,
 				C7F71FC61EF98C7300F31075 /* lookup_data.h in Headers */,
 				C7F7224E1EF9958B00F31075 /* mem_ops.h in Headers */,
 				C7F71FC71EF98C7300F31075 /* lookup.h in Headers */,
@@ -1117,6 +1199,7 @@
 				C7F722E01EFC03C800F31075 /* invtrans.h in Headers */,
 				C7F722DD1EFC03C800F31075 /* header.h in Headers */,
 				C7F7223E1EF9954500F31075 /* vpx_mem_intrnl.h in Headers */,
+				C7F726151F018E2100F31075 /* vp9_dsubexp.h in Headers */,
 				C7F71EE41EF9891600F31075 /* mkvmuxertypes.h in Headers */,
 				C7F724D41EFC074200F31075 /* vpx_codec_internal.h in Headers */,
 				C7F724871EFC065700F31075 /* vp9_entropymode.h in Headers */,
@@ -1125,6 +1208,7 @@
 				C7F724971EFC065700F31075 /* vp9_ppflags.h in Headers */,
 				C7F71FC41EF98C7300F31075 /* envelope.h in Headers */,
 				C7F7248C1EFC065700F31075 /* vp9_filter.h in Headers */,
+				C7F726111F018E2100F31075 /* vp9_decodeframe.h in Headers */,
 				C7F722D21EFC03C800F31075 /* entropy.h in Headers */,
 				C7F722D61EFC03C800F31075 /* entropymv.h in Headers */,
 				C7F7227A1EF9960000F31075 /* vpx_write_yuv_frame.h in Headers */,
@@ -1143,17 +1227,22 @@
 				C7F722F21EFC03EA00F31075 /* vpx_scale_rtcd.h in Headers */,
 				C7F725341EFC07E400F31075 /* vpx_dsp_common.h in Headers */,
 				C7F722E21EFC03C800F31075 /* loopfilter.h in Headers */,
+				C7F726451F018ECF00F31075 /* decodemv.h in Headers */,
 				C7F724AA1EFC065700F31075 /* vp9_tile_common.h in Headers */,
+				C7F726131F018E2100F31075 /* vp9_decoder.h in Headers */,
 				C7F7238A1EFC050800F31075 /* postproc.h in Headers */,
 				C7F7238D1EFC050800F31075 /* quant_common.h in Headers */,
 				C7F71FCF1EF98C7300F31075 /* registry.h in Headers */,
 				C7F7224B1EF9958B00F31075 /* bitops.h in Headers */,
 				C7F724951EFC065700F31075 /* vp9_mvref_common.h in Headers */,
+				C7F726441F018ECF00F31075 /* dboolhuff.h in Headers */,
 				C7F724A81EFC065700F31075 /* vp9_thread_common.h in Headers */,
+				C7F726491F018ECF00F31075 /* treereader.h in Headers */,
 				C7F7238F1EFC050800F31075 /* reconinter.h in Headers */,
 				C7F722CC1EFC03C800F31075 /* coefupdateprobs.h in Headers */,
 				C7F725561EFC086000F31075 /* inv_txfm_sse2.h in Headers */,
 				C7F725281EFC07E400F31075 /* inv_txfm.h in Headers */,
+				C7F726471F018ECF00F31075 /* detokenize.h in Headers */,
 				C7F722521EF9958B00F31075 /* vpx_once.h in Headers */,
 				C7F722541EF9958B00F31075 /* x86.h in Headers */,
 				C7F7252A1EFC07E400F31075 /* postproc.h in Headers */,
@@ -1166,6 +1255,7 @@
 				C7F724D01EFC073900F31075 /* vpx_frame_buffer.h in Headers */,
 				C7F722791EF9960000F31075 /* vpx_thread.h in Headers */,
 				C7F722D41EFC03C800F31075 /* entropymode.h in Headers */,
+				C7F726121F018E2100F31075 /* vp9_decodemv.h in Headers */,
 				C7F7252C1EFC07E400F31075 /* prob.h in Headers */,
 				C7F722DA1EFC03C800F31075 /* filter.h in Headers */,
 				C7F723931EFC050800F31075 /* reconintra4x4.h in Headers */,
@@ -1185,16 +1275,16 @@
 				C7F71B061EF9596600F31075 /* Sources */,
 				C7F71B071EF9596600F31075 /* Frameworks */,
 				C7F71B081EF9596600F31075 /* Headers */,
-				C7F725A41EFC1BC700F31075 /* ShellScript */,
+				C7F725EF1F01556100F31075 /* ShellScript */,
 			);
 			buildRules = (
-				C7F725931EFC11ED00F31075 /* PBXBuildRule */,
+				C7F725F21F01680B00F31075 /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
 			name = "video-osx";
 			productName = "video-osx";
-			productReference = C7F71B0A1EF9596600F31075 /* libblVideo.dylib */;
+			productReference = C7F71B0A1EF9596600F31075 /* blVideo.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -1230,9 +1320,9 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		C7F725A41EFC1BC700F31075 /* ShellScript */ = {
+		C7F725EF1F01556100F31075 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputPaths = (
@@ -1241,7 +1331,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "";
+			shellScript = "make -C /Users/zhoubo/Downloads/openHEVC-hevc_rext -f /Users/zhoubo/Downloads/openHEVC-hevc_rext/CMakeScripts/LibOpenHevcWrapper_cmakeRulesBuildPhase.makeRelWithDebInfo all";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1250,6 +1340,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7F7261C1F018E2100F31075 /* vp9_dthread.c in Sources */,
 				C7F71B331EF95D5800F31075 /* videoentry.xc in Sources */,
 				C7F71B641EF9609300F31075 /* envelope.c in Sources */,
 				C7F724D81EFC074D00F31075 /* vpx_codec.c in Sources */,
@@ -1257,18 +1348,18 @@
 				C7F71EC01EF9887400F31075 /* vpx_scale.c in Sources */,
 				C7F7254E1EFC086000F31075 /* add_noise_sse2.asm in Sources */,
 				C7F7255F1EFC086000F31075 /* vpx_convolve_copy_sse2.asm in Sources */,
+				C7F725FC1F016A8300F31075 /* recon_mmx.asm in Sources */,
 				C7F7249E1EFC065700F31075 /* vp9_reconintra.c in Sources */,
 				C7F722E11EFC03C800F31075 /* loopfilter_filters.c in Sources */,
 				C7F724A51EFC065700F31075 /* vp9_seg_common.c in Sources */,
-				C7F723E81EFC055D00F31075 /* mfqe_sse2.asm in Sources */,
-				C7F723E21EFC055D00F31075 /* idctllm_mmx.asm in Sources */,
 				C7F71ECE1EF988A200F31075 /* vpx_scale_rtcd.c in Sources */,
 				C7F71B631EF9609300F31075 /* codebook.c in Sources */,
 				C7F724A11EFC065700F31075 /* vp9_scale.c in Sources */,
+				C7F725FF1F016A8300F31075 /* subpixel_sse2.asm in Sources */,
 				C7F725581EFC086000F31075 /* inv_wht_sse2.asm in Sources */,
+				C7F726181F018E2100F31075 /* vp9_decodemv.c in Sources */,
 				C7F7248F1EFC065700F31075 /* vp9_idct.c in Sources */,
 				C7F7249A1EFC065700F31075 /* vp9_quant_common.c in Sources */,
-				C7F723E31EFC055D00F31075 /* idctllm_sse2.asm in Sources */,
 				C7F7248B1EFC065700F31075 /* vp9_filter.c in Sources */,
 				C7F71B6A1EF9609300F31075 /* lsp.c in Sources */,
 				C7F71B611EF9609300F31075 /* bitrate.c in Sources */,
@@ -1277,40 +1368,39 @@
 				C7F725321EFC07E400F31075 /* vpx_convolve.c in Sources */,
 				C7F71B511EF9604500F31075 /* bitwise.c in Sources */,
 				C7F725621EFC086000F31075 /* vpx_subpixel_8t_ssse3.asm in Sources */,
-				C7F723DB1EFC055D00F31075 /* copy_sse2.asm in Sources */,
 				C7F723951EFC050800F31075 /* setupintrarecon.c in Sources */,
 				C7F722D71EFC03C800F31075 /* extend.c in Sources */,
 				C7F722D51EFC03C800F31075 /* entropymv.c in Sources */,
 				C7F71B691EF9609300F31075 /* lpc.c in Sources */,
+				C7F725F81F016A8300F31075 /* iwalsh_sse2.asm in Sources */,
 				C7F71B651EF9609300F31075 /* floor0.c in Sources */,
+				C7F726041F018DA000F31075 /* vp9_dx_iface.c in Sources */,
 				C7F71B671EF9609300F31075 /* info.c in Sources */,
 				C7F725201EFC07E400F31075 /* add_noise.c in Sources */,
 				C7F725521EFC086000F31075 /* deblock_sse2.asm in Sources */,
+				C7F726191F018E2100F31075 /* vp9_decoder.c in Sources */,
 				C7F71EE21EF9890B00F31075 /* mkvparser.cc in Sources */,
 				C7F71B681EF9609300F31075 /* lookup.c in Sources */,
+				C7F725FD1F016A8300F31075 /* recon_sse2.asm in Sources */,
 				C7F725601EFC086000F31075 /* vpx_subpixel_8t_intrin_ssse3.c in Sources */,
 				C7F724881EFC065700F31075 /* vp9_entropymv.c in Sources */,
 				C7F722DE1EFC03C800F31075 /* idct_blk.c in Sources */,
-				C7F723E41EFC055D00F31075 /* iwalsh_sse2.asm in Sources */,
 				C7F724981EFC065700F31075 /* vp9_pred_common.c in Sources */,
 				C7F722E31EFC03C800F31075 /* mbpitch.c in Sources */,
 				C7F723971EFC050800F31075 /* swapyv12buffer.c in Sources */,
 				C7F725631EFC086000F31075 /* vpx_subpixel_bilinear_sse2.asm in Sources */,
 				C7F724861EFC065700F31075 /* vp9_entropymode.c in Sources */,
-				C7F723E61EFC055D00F31075 /* loopfilter_sse2.asm in Sources */,
 				C7F724911EFC065700F31075 /* vp9_loopfilter.c in Sources */,
-				C7F723EC1EFC055D00F31075 /* subpixel_sse2.asm in Sources */,
 				C7F71BA01EF960DD00F31075 /* smallft.c in Sources */,
 				C7F724A31EFC065700F31075 /* vp9_scan.c in Sources */,
 				C7F722DB1EFC03C800F31075 /* findnearmv.c in Sources */,
+				C7F726681F018F3E00F31075 /* systemdependent.c in Sources */,
 				C7F71B661EF9609300F31075 /* floor1.c in Sources */,
-				C7F723E51EFC055D00F31075 /* loopfilter_block_sse2_x86_64.asm in Sources */,
 				C7F725231EFC07E400F31075 /* bitreader.c in Sources */,
 				C7F725351EFC07E400F31075 /* vpx_dsp_rtcd.c in Sources */,
 				C7F7247F1EFC065700F31075 /* vp9_blockd.c in Sources */,
 				C7F71BA21EF960DD00F31075 /* window.c in Sources */,
 				C7F7255A1EFC086000F31075 /* subpel_variance_sse2.asm in Sources */,
-				C7F723E91EFC055D00F31075 /* recon_mmx.asm in Sources */,
 				C7F71B9F1EF960DD00F31075 /* sharedbook.c in Sources */,
 				C7F724941EFC065700F31075 /* vp9_mvref_common.c in Sources */,
 				C7F71ED11EF988C400F31075 /* vpx_thread.c in Sources */,
@@ -1320,24 +1410,30 @@
 				C7F722EF1EFC03EA00F31075 /* vpx_config.c in Sources */,
 				C7F71B6B1EF9609300F31075 /* mapping0.c in Sources */,
 				C7F723901EFC050800F31075 /* reconintra.c in Sources */,
-				C7F723EA1EFC055D00F31075 /* recon_sse2.asm in Sources */,
 				C7F723E11EFC055D00F31075 /* idct_blk_sse2.c in Sources */,
+				C7F726381F018E8800F31075 /* onyxd_if.c in Sources */,
 				C7F725251EFC07E400F31075 /* deblock.c in Sources */,
 				C7F725641EFC086000F31075 /* vpx_subpixel_bilinear_ssse3.asm in Sources */,
 				C7F724D91EFC074D00F31075 /* vpx_decoder.c in Sources */,
 				C7F7255D1EFC086000F31075 /* variance_sse2.c in Sources */,
+				C7F7261A1F018E2100F31075 /* vp9_detokenize.c in Sources */,
 				C7F71B9E1EF960DD00F31075 /* res0.c in Sources */,
 				C7F7249C1EFC065700F31075 /* vp9_reconinter.c in Sources */,
+				C7F7264E1F018ECF00F31075 /* threading.c in Sources */,
+				C7F7261B1F018E2100F31075 /* vp9_dsubexp.c in Sources */,
 				C7F725301EFC07E400F31075 /* variance.c in Sources */,
+				C7F725F91F016A8300F31075 /* loopfilter_block_sse2_x86_64.asm in Sources */,
+				C7F725F41F016A8300F31075 /* copy_sse3.asm in Sources */,
+				C7F725FA1F016A8300F31075 /* loopfilter_sse2.asm in Sources */,
 				C7F71B621EF9609300F31075 /* block.c in Sources */,
 				C7F722DF1EFC03C800F31075 /* idctllm.c in Sources */,
+				C7F725F31F016A8300F31075 /* copy_sse2.asm in Sources */,
 				C7F724A91EFC065700F31075 /* vp9_tile_common.c in Sources */,
 				C7F7248D1EFC065700F31075 /* vp9_frame_buffers.c in Sources */,
-				C7F723EB1EFC055D00F31075 /* subpixel_mmx.asm in Sources */,
-				C7F723DD1EFC055D00F31075 /* dequantize_mmx.asm in Sources */,
 				C7F71BA11EF960DD00F31075 /* synthesis.c in Sources */,
 				C7F7239B1EFC050800F31075 /* treecoder.c in Sources */,
 				C7F722CE1EFC03C800F31075 /* copy_c.c in Sources */,
+				C7F7264B1F018ECF00F31075 /* decodeframe.c in Sources */,
 				C7F722D11EFC03C800F31075 /* entropy.c in Sources */,
 				C7F723DE1EFC055D00F31075 /* filter_x86.c in Sources */,
 				C7F7238E1EFC050800F31075 /* reconinter.c in Sources */,
@@ -1349,10 +1445,13 @@
 				C7F71B521EF9604500F31075 /* framing.c in Sources */,
 				C7F723921EFC050800F31075 /* reconintra4x4.c in Sources */,
 				C7F724A01EFC065700F31075 /* vp9_rtcd.c in Sources */,
+				C7F7264D1F018ECF00F31075 /* detokenize.c in Sources */,
 				C7F724AC1EFC067D00F31075 /* vp9_idct_intrin_sse2.c in Sources */,
 				C7F71B9D1EF960DD00F31075 /* registry.c in Sources */,
+				C7F725F61F016A8300F31075 /* idctllm_mmx.asm in Sources */,
 				C7F722D91EFC03C800F31075 /* filter.c in Sources */,
 				C7F7238C1EFC050800F31075 /* quant_common.c in Sources */,
+				C7F725F71F016A8300F31075 /* idctllm_sse2.asm in Sources */,
 				C7F723941EFC050800F31075 /* rtcd.c in Sources */,
 				C7F7247D1EFC065700F31075 /* vp9_alloccommon.c in Sources */,
 				C7F725211EFC07E400F31075 /* bitreader_buffer.c in Sources */,
@@ -1368,21 +1467,26 @@
 				C7F725261EFC07E400F31075 /* intrapred.c in Sources */,
 				C7F71B6C1EF9609300F31075 /* mdct.c in Sources */,
 				C7F71EC11EF9887400F31075 /* yv12config.c in Sources */,
+				C7F725F51F016A8300F31075 /* dequantize_mmx.asm in Sources */,
 				C7F7252D1EFC07E400F31075 /* skin_detection.c in Sources */,
-				C7F723ED1EFC055D00F31075 /* subpixel_ssse3.asm in Sources */,
 				C7F71B9C1EF960DD00F31075 /* psy.c in Sources */,
 				C7F7239E1EFC050800F31075 /* vp8_loopfilter.c in Sources */,
+				C7F726171F018E2100F31075 /* vp9_decodeframe.c in Sources */,
 				C7F71EC21EF9887400F31075 /* yv12extend.c in Sources */,
+				C7F725FE1F016A8300F31075 /* subpixel_mmx.asm in Sources */,
 				C7F723891EFC050800F31075 /* postproc.c in Sources */,
+				C7F7264C1F018ECF00F31075 /* decodemv.c in Sources */,
 				C7F722D01EFC03C800F31075 /* dequantize.c in Sources */,
+				C7F726001F016A8300F31075 /* subpixel_ssse3.asm in Sources */,
+				C7F7264A1F018ECF00F31075 /* dboolhuff.c in Sources */,
 				C7F722C81EFC03C800F31075 /* alloccommon.c in Sources */,
-				C7F723DC1EFC055D00F31075 /* copy_sse3.asm in Sources */,
 				C7F725571EFC086000F31075 /* inv_txfm_ssse3.c in Sources */,
 				C7F723E01EFC055D00F31075 /* idct_blk_mmx.c in Sources */,
 				C7F723EE1EFC055D00F31075 /* vp8_asm_stubs.c in Sources */,
 				C7F724811EFC065700F31075 /* vp9_common_data.c in Sources */,
 				C7F723E71EFC055D00F31075 /* loopfilter_x86.c in Sources */,
 				C7F725291EFC07E400F31075 /* loopfilter.c in Sources */,
+				C7F725FB1F016A8300F31075 /* mfqe_sse2.asm in Sources */,
 				C7F71F7E1EF98BB400F31075 /* emms.asm in Sources */,
 				C7F724DA1EFC074D00F31075 /* vpx_image.c in Sources */,
 			);
@@ -1519,7 +1623,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -1545,7 +1649,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_PREFIX = "";
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					BL_EXPORT,
