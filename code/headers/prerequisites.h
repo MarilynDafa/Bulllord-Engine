@@ -327,9 +327,8 @@ typedef unsigned long long BLGuid;
 
  /* _SYSTEM_EVENT */
 #define BL_SE_AUDIOOVER		1
-#define BL_SE_VIDEOOVER		2
-#define BL_SE_TIMER			3
-#define BL_SE_RESOLUTION    4
+#define BL_SE_TIMER			2
+#define BL_SE_RESOLUTION    3
 
 /* _MOUSE_EVENT */
 #define BL_ME_LDOWN		0

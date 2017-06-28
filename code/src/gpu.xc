@@ -1,4 +1,4 @@
-/*
+﻿/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
 
@@ -1642,6 +1642,7 @@ _GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
 	else
 	{
 		_PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
+		_PrGpuMem->sHardwareCaps.nApiVersion = 310;
 		EGLint _configattrs[] =
 		{
 			EGL_SAMPLE_BUFFERS,     0,
@@ -1657,7 +1658,7 @@ _GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
 			EGL_NONE
 		};
 		EGLint _configcount;
-		const EGLint _contextattrs[] = { 0x3098, 3, 0x30FB, 0, 0x30FC, 0, EGL_NONE };
+		const EGLint _contextattrs31[] = { 0x3098, 3, 0x30FB, 1, 0x30FC, 0, EGL_NONE };
 		const EGLint _surfaceattrs[] = { EGL_RENDER_BUFFER, EGL_BACK_BUFFER, EGL_NONE };
 		if (_PrGpuMem->pEglDisplay == EGL_NO_DISPLAY && _PrGpuMem->pEglContext == EGL_NO_CONTEXT)
 		{
@@ -1677,11 +1678,17 @@ _GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
 				blDebugOutput("egl no valid config");
 				return;
 			}
-			_PrGpuMem->pEglContext = eglCreateContext(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglConfig, EGL_NO_CONTEXT, _contextattrs);
+			_PrGpuMem->pEglContext = eglCreateContext(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglConfig, EGL_NO_CONTEXT, _contextattrs31);
 			if (_PrGpuMem->pEglContext == EGL_NO_CONTEXT)
 			{
-				blDebugOutput("egl no valid context");
-				return;
+				const EGLint _contextattrs30[] = { 0x3098, 3, 0x30FB, 0, 0x30FC, 0, EGL_NONE };
+				_PrGpuMem->sHardwareCaps.nApiVersion = 300;
+				_PrGpuMem->pEglContext = eglCreateContext(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglConfig, EGL_NO_CONTEXT, _contextattrs30);
+				if (_PrGpuMem->pEglContext == EGL_NO_CONTEXT)
+				{
+					blDebugOutput("egl no valid context");
+					return;
+				}
 			}
 		}
 		EGLint _format;
@@ -1707,11 +1714,29 @@ _GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
         _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
         _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValidGL(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
         _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValidGL(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
+		GLint _extensions = 0;
+		GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
+		for (GLint _idx = 0; _idx < _extensions; ++_idx)
+		{
+			const BLAnsi* _name = (const BLAnsi*)glGetStringi(GL_EXTENSIONS, _idx);
+			if (!strcmp(_name, "GL_EXT_texture_filter_anisotropic"))
+			{
+				GL_CHECK_INTERNAL(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &_PrGpuMem->sHardwareCaps.fMaxAnisotropy));
+			}
+		}
+		_PipelineStateDefaultGL(_Width, _Height);
     }
 }
 BLVoid
 _GpuSwapBuffer()
 {
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+	{
+	}
+	else
+	{
+		eglSwapBuffers(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglSurface);
+	}
 }
 BLVoid
 _GpuAnitIntervention()
@@ -3604,8 +3629,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
-        BLAnsi _glslver[64] = { 0 };
-        sprintf(_glslver, "#version %d core\n", _PrGpuMem->sHardwareCaps.nApiVersion);
+        BLAnsi _glslver[256] = { 0 };
         if (!_findbinary)
         {
             GLint _compiled = 0;
@@ -3614,6 +3638,11 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
             _tech->uData.sGL.nHandle = glCreateProgram();
             if (_vert)
             {
+#if defined(BL_PLATFORM_ANDROID) || defined(BL_PLATFORM_IOS)
+				sprintf(_glslver, "#version %d es\n", _PrGpuMem->sHardwareCaps.nApiVersion);
+#else
+				sprintf(_glslver, "#version %d core\n", _PrGpuMem->sHardwareCaps.nApiVersion);
+#endif
                 BLAnsi* _tmp = (BLAnsi*)alloca(strlen(_glslver) + strlen(_vert) + 1);
                 strcpy(_tmp, _glslver);
                 strcat(_tmp, _vert);
@@ -3640,6 +3669,11 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
             }
             if (_frag)
             {
+#if defined(BL_PLATFORM_ANDROID) || defined(BL_PLATFORM_IOS)
+				sprintf(_glslver, "#version %d es\n#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n", _PrGpuMem->sHardwareCaps.nApiVersion);
+#else
+				sprintf(_glslver, "#version %d core\n", _PrGpuMem->sHardwareCaps.nApiVersion);
+#endif
                 BLAnsi* _tmp = (BLAnsi*)alloca(strlen(_glslver) + strlen(_frag) + 1);
                 strcpy(_tmp, _glslver);
                 strcat(_tmp, _frag);

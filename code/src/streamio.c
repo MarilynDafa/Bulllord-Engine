@@ -882,6 +882,7 @@ blArchiveRegist(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 	HANDLE _fp = CreateFileA(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
 #elif defined(BL_PLATFORM_ANDROID)
+	BLBool _inworkdir = TRUE;
 	BLVoid* _fp = AAssetManager_open(_PrStreamIOMem->pAndroidAM, _path, AASSET_MODE_UNKNOWN);
 #else
     FILE* _fp = fopen(_path , "rb");
@@ -909,6 +910,9 @@ blArchiveRegist(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 #else
 		HANDLE _fp = CreateFileA(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
+#elif defined(BL_PLATFORM_ANDROID)
+		_inworkdir = FALSE;
+		_fp = fopen(_path, "rb");
 #else
         _fp = fopen(_path , "rb");
 #endif
@@ -1054,6 +1058,7 @@ blArchivePatch(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 	HANDLE _fp = CreateFileA(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
 #elif defined(BL_PLATFORM_ANDROID)
+	BLBool _inworkdir = FALSE;
 	BLVoid* _fp = fopen(_path, "rb");
 #else
     FILE* _fp = fopen(_path , "rb");
@@ -1082,6 +1087,7 @@ blArchivePatch(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 		_fp = CreateFileA(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
 #elif defined(BL_PLATFORM_ANDROID)
+		_inworkdir = TRUE;
 		_fp = AAssetManager_open(_PrStreamIOMem->pAndroidAM, _path, AASSET_MODE_UNKNOWN);
 #else
 		_fp = fopen(_path, "rb");

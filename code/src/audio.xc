@@ -680,22 +680,11 @@ _SLSoundSetup(BLVoid* _Src)
     SLDataFormat_PCM _pcm;
     _pcm.endianness = SL_BYTEORDER_LITTLEENDIAN;
     _pcm.formatType = SL_DATAFORMAT_PCM;
-	if (!_src->b3d && _src->bLoop)
-	{
-		_pcm.numChannels = 2;
-        _pcm.channelMask = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
-		_pcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
-        _pcm.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
-		_pcm.samplesPerSec = 48000;
-	}
-	else
-	{
-		_pcm.numChannels = 2;
-        _pcm.channelMask = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
-		_pcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
-        _pcm.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
-		_pcm.samplesPerSec = 48000;
-	}
+	_pcm.numChannels = _src->nChannels;
+    _pcm.channelMask = (2 == _src->nChannels) ? SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT : SL_SPEAKER_FRONT_CENTER;
+	_pcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
+    _pcm.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
+	_pcm.samplesPerSec = 48000*1000;
 	SLresult _result;
     SLDataSource _data = {&_bufq, &_pcm};
     SLDataLocator_OutputMix _outmix = {SL_DATALOCATOR_OUTPUTMIX, _PrAudioMem->pAudioDev.pMixObj};
@@ -1448,6 +1437,30 @@ blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 #elif defined(BL_USE_SL_API)
 			if ((*_PrAudioMem->pPCMStream))
 				(*_PrAudioMem->pPCMStream)->Destroy(_PrAudioMem->pPCMStream);
+			SLDataLocator_BufferQueue _bufq = { SL_DATALOCATOR_BUFFERQUEUE, 3 };
+			SLDataFormat_PCM _pcm;
+			_pcm.endianness = SL_BYTEORDER_LITTLEENDIAN;
+			_pcm.formatType = SL_DATAFORMAT_PCM;
+			_pcm.numChannels = _Channels;
+			_pcm.channelMask = (2 == _Channels) ? SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT : SL_SPEAKER_FRONT_CENTER;
+			_pcm.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
+			_pcm.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
+			_pcm.samplesPerSec = _SamplesPerSec * 1000;
+			SLresult _result;
+			SLDataSource _data = { &_bufq, &_pcm };
+			SLDataLocator_OutputMix _outmix = { SL_DATALOCATOR_OUTPUTMIX, _PrAudioMem->pAudioDev.pMixObj };
+			SLDataSink _snk = { &_outmix, NULL };
+			const SLInterfaceID _ids[3] = { SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND, SL_IID_VOLUME };
+			const SLboolean _req[3] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
+			_result = (*_PrAudioMem->pAudioDev.pDevice)->CreateAudioPlayer(_PrAudioMem->pAudioDev.pDevice, &_PrAudioMem->pPCMStream, &_data, &_snk, 3, _ids, _req);
+			assert(_result == SL_RESULT_SUCCESS);
+			_result = (*_PrAudioMem->pPCMStream)->Realize(_PrAudioMem->pPCMStream, SL_BOOLEAN_FALSE);
+			assert(_result == SL_RESULT_SUCCESS);
+			SLPlayItf _playfunc;
+			_result = (*_PrAudioMem->pPCMStream)->GetInterface(_PrAudioMem->pPCMStream, SL_IID_PLAY, &_playfunc);
+			assert(_result == SL_RESULT_SUCCESS);
+			_result = (*_playfunc)->SetPlayState(_playfunc, SL_PLAYSTATE_PLAYING);
+			assert(_result == SL_RESULT_SUCCESS);
 #elif defined(BL_USE_COREAUDIO_API)
 			if (_PrAudioMem->pPCMStream)
 			{
@@ -1475,8 +1488,6 @@ blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 	if (_PrAudioMem->nPCMFill >= 65536)
 	{
 #if defined(BL_USE_COREAUDIO_API)
-		XAUDIO2_VOICE_STATE _state;
-		_PrAudioMem->pPCMStream->GetState(&_state);
 		XAUDIO2_BUFFER _buf = { 0 };
 		_buf.AudioBytes = _PrAudioMem->nPCMFill;
 		_buf.pAudioData = _PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8];
@@ -1500,6 +1511,9 @@ blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
         }
         assert(alGetError() == AL_NO_ERROR);
 #elif defined(BL_USE_SL_API)
+		SLBufferQueueItf _bufferfunc;
+		(*_PrAudioMem->pPCMStream)->GetInterface(_PrAudioMem->pPCMStream, SL_IID_BUFFERQUEUE, &_bufferfunc);
+		(*_bufferfunc)->Enqueue(_bufferfunc, _PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8], _PrAudioMem->nPCMFill);
 #else
 #endif
 		_PrAudioMem->nPCMFill = 0;

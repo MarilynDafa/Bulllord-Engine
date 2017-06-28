@@ -492,6 +492,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
     case WM_DESTROY:
     case WM_CLOSE:
     {
+		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
         SetCursor(LoadCursorA(NULL, IDC_ARROW));
         ReleaseCapture();
         PostQuitMessage(0);
@@ -1012,6 +1013,7 @@ protected:
 	{
 		if (_GbSystemRunning == 2)
 		{
+			blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 			_GbSystemRunning = FALSE;
 			_SystemDestroy();
 		}
@@ -1468,7 +1470,7 @@ _WndProc(XEvent* _Event)
                 return;
             if (_protocol == _PrSystemMem->nDelwin)
             {
-                blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
                 _GbSystemRunning = FALSE;
             }
             else if (_protocol == _PrSystemMem->nPing)
@@ -2001,6 +2003,7 @@ _PollMsg()
 				break;
 			case 15:
 				pthread_mutex_lock(&_PrSystemMem->sMutex);
+				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				_GbSystemRunning = FALSE;
 				pthread_mutex_unlock(&_PrSystemMem->sMutex);
 				break;
@@ -2335,6 +2338,7 @@ ANativeActivity_onCreate(ANativeActivity* _Activity, BLVoid* _State, size_t _Sta
 }
 - (BLVoid)close
 {
+	blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
     _GbSystemRunning = FALSE;
     [_PrSystemMem->pWindow setDelegate:nil];
     if ([_PrSystemMem->pWindow nextResponder] == self)
@@ -3156,6 +3160,7 @@ _CloseWindow()
 - (BLVoid)applicationDidEnterBackground:(UIApplication*)_App { _GbSystemRunning = 2; }
 - (BLVoid)applicationWillTerminate:(UIApplication*)_App
 {
+	blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
     _GbSystemRunning = FALSE;
     _SystemDestroy();
 }
@@ -3412,10 +3417,7 @@ BLVoid
 _SystemDestroy()
 {
 	if (_GbTVMode)
-	{
-		blInvokeEvent(BL_ET_SYSTEM, BL_SE_VIDEOOVER, 0, NULL, INVALID_GUID);
 		_GbTVMode = FALSE;
-	}
 	BLAnsi _tmp[256] = { 0 };
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenWidth);
 	blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp);
@@ -3589,7 +3591,7 @@ blUserFolderDir()
 #elif defined(BL_PLATFORM_ANDROID)
 	if (!_PrSystemMem->aUserDir[0])
 	{
-		strcpy(_PrSystemMem->aWorkDir, _PrSystemMem->pActivity->externalDataPath);
+		strcpy(_PrSystemMem->aUserDir, _PrSystemMem->pActivity->externalDataPath);
 		mkdir(_PrSystemMem->aUserDir, 0755);
 		strcat(_PrSystemMem->aUserDir, "/");
 	}
