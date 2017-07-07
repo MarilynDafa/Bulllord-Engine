@@ -162,7 +162,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\code\config.h" />
     <ClInclude Include="..\..\code\externals\duktape\duktape.h" />
     <ClInclude Include="..\..\code\externals\duktape\duk_config.h" />
     <ClInclude Include="..\..\code\externals\fastlz\fastlz.h" />
@@ -715,10 +714,10 @@
     <ClCompile Include="..\..\code\src\audio.xc">
       <FileType>Document</FileType>
     </ClCompile>
-    <ClCompile Include="..\..\code\src\gpu.xc">
+    <ClCompile Include="..\..\code\src\system.xc">
       <FileType>Document</FileType>
     </ClCompile>
-    <ClCompile Include="..\..\code\src\system.xc">
+    <ClCompile Include="..\..\code\src\gpu.xc">
       <FileType>Document</FileType>
     </ClCompile>
   </ItemGroup>

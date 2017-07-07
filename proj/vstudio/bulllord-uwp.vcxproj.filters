@@ -60,7 +60,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\code\config.h" />
     <ClInclude Include="..\..\code\headers\audio.h">
       <Filter>headers</Filter>
     </ClInclude>

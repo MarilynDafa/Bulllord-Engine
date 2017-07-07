@@ -103,7 +103,7 @@ extern BLVoid _GpuIntervention(duk_context*, Display*, Window, BLU32, BLU32, GLX
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_ANDROID)
-extern BLVoid _GpuIntervention(duk_context*, ANativeWindow*, BLU32, BLU32, BLBool);
+extern BLVoid _GpuIntervention(duk_context*, ANativeWindow*, BLU32, BLU32, BLBool, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #else
@@ -241,6 +241,7 @@ typedef struct _SystemMember {
 	BLS32 nMsgRead;
 	BLS32 nMsgWrite;
 	BLBool bAvtivityFocus;
+	BLBool bBackendState;
 #elif defined(BL_PLATFORM_OSX)
 	NSAutoreleasePool* pPool;
     NSWindow* pWindow;
@@ -469,7 +470,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 	case WM_SIZE:
 	{
 		if ((SIZE_MAXHIDE == _Wparam) || (SIZE_MINIMIZED == _Wparam))
-			_GbSystemRunning = 2;
+			_GbSystemRunning = 2;		
 		else
 			_GbSystemRunning = 1;
 		RECT _rc;
@@ -1944,7 +1945,7 @@ _ShowWindow()
 	_PrSystemMem->pActivity->vm->DetachCurrentThread();
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 	while (!_PrSystemMem->pWindow);
-	_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler);
+	_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler, FALSE);
 }
 BLVoid
 _PollMsg()
@@ -1985,6 +1986,7 @@ _PollMsg()
 				_PrSystemMem->pWindow = _PrSystemMem->pPendingWindow;
 				pthread_cond_broadcast(&_PrSystemMem->sCond);
 				pthread_mutex_unlock(&_PrSystemMem->sMutex);
+				_PrSystemMem->bBackendState = TRUE;
 				break;
 			case 2:
 				pthread_cond_broadcast(&_PrSystemMem->sCond);
@@ -3196,7 +3198,8 @@ static BLVoid
 _PollEvent()
 {
 #ifdef BL_PLATFORM_ANDROID
-	pthread_mutex_lock(&_PrSystemMem->sMutex);
+	BLS32 _busy;
+	_busy = pthread_mutex_trylock(&_PrSystemMem->sMutex);
 #endif
     for (BLU32 _idx = 0; _idx < _PrSystemMem->nEventIdx; ++_idx)
     {
@@ -3307,7 +3310,8 @@ _PollEvent()
     _PrSystemMem->nEventIdx = 0;
     _PrSystemMem->nEventsSz = 0;
 #ifdef BL_PLATFORM_ANDROID
-	pthread_mutex_unlock(&_PrSystemMem->sMutex);
+	if (!_busy)
+		pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
 }
 BLVoid
@@ -3401,6 +3405,13 @@ _SystemStep()
 	}
 	_PollMsg();
 	_PollEvent();
+#if defined(BL_PLATFORM_ANDROID)
+	if (_PrSystemMem->bBackendState)
+	{
+		_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler, TRUE);
+		_PrSystemMem->bBackendState = FALSE;
+	}
+#endif
 	_UtilsStep(_delta);
 	_AudioStep(_delta);
 	_NetworkStep(_delta);
@@ -3880,7 +3891,8 @@ blQuitEvent()
 	BLBool _quit = FALSE;
 	_PollMsg();
 #ifdef BL_PLATFORM_ANDROID
-	pthread_mutex_lock(&_PrSystemMem->sMutex);
+	BLS32 _busy;
+	_busy = pthread_mutex_trylock(&_PrSystemMem->sMutex);
 #endif
     for (BLU32 _idx = 0; _idx < _PrSystemMem->nEventIdx; ++_idx)
     {
@@ -3909,7 +3921,8 @@ blQuitEvent()
     _PrSystemMem->nEventIdx = 0;
     _PrSystemMem->nEventsSz = 0;
 #ifdef BL_PLATFORM_ANDROID
-	pthread_mutex_unlock(&_PrSystemMem->sMutex);
+	if (!_busy)
+		pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
 	return _quit;
 }
@@ -4469,7 +4482,8 @@ BLVoid
 blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _Pparam, IN BLGuid _ID)
 {
 #ifdef BL_PLATFORM_ANDROID
-	pthread_mutex_lock(&_PrSystemMem->sMutex);
+	BLS32 _busy;
+	_busy = pthread_mutex_trylock(&_PrSystemMem->sMutex);
 #endif
 	BLEnum _etype = _Type;
     if (_PrSystemMem->nEventIdx >= _PrSystemMem->nEventsSz)
@@ -4533,7 +4547,8 @@ blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _P
     }
 	_PrSystemMem->nEventIdx++;
 #ifdef BL_PLATFORM_ANDROID
-	pthread_mutex_unlock(&_PrSystemMem->sMutex);
+	if (!_busy)
+		pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
 }
 BLVoid
@@ -4666,6 +4681,7 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
     _PrSystemMem->bCtrlPressed = FALSE;
 #elif defined(BL_PLATFORM_ANDROID)
     _PrSystemMem->bAvtivityFocus = FALSE;
+    _PrSystemMem->bBackendState = 0;
 #elif defined(BL_PLATFORM_OSX)
 	_PrSystemMem->pPool = nil;
 	_PrSystemMem->pWindow = nil;
@@ -4835,6 +4851,7 @@ blSystemScriptRun(IN BLAnsi* _Encryptkey)
 	_PrSystemMem->bCtrlPressed = FALSE;
 #elif defined(BL_PLATFORM_ANDROID)
 	_PrSystemMem->bAvtivityFocus = FALSE;
+	_PrSystemMem->bBackendState = 0;
 #elif defined(BL_PLATFORM_OSX)
 	_PrSystemMem->pPool = nil;
 	_PrSystemMem->pWindow = nil;

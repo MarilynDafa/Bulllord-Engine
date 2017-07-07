@@ -27,7 +27,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\code\config.h" />
     <ClInclude Include="..\..\code\externals\duktape\duktape.h" />
     <ClInclude Include="..\..\code\externals\duktape\duk_config.h" />
     <ClInclude Include="..\..\code\externals\fastlz\fastlz.h" />

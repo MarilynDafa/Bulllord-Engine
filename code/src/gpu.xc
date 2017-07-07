@@ -1293,7 +1293,7 @@ _GpuIntervention(duk_context* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLB
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
@@ -1366,11 +1366,6 @@ _GpuIntervention(duk_context* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLB
 			wglSwapIntervalEXT(1);
 		else if (!_PrGpuMem->bVsync)
 			wglSwapIntervalEXT(0);
-		else
-		{
-			blDebugOutput("bulllord needs opengl 4.1 or above");
-			return;
-        }
 		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValidGL(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) && _TextureFormatValidGL(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
 		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1A1] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) && _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
 		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) && _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
@@ -1475,7 +1470,7 @@ _GpuIntervention(duk_context* _DKC, Display* _Display, Window _Window, BLU32 _Wi
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
@@ -1613,8 +1608,23 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_ANDROID)
 BLVoid
-_GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync, BLBool _Backend)
 {
+	if (_Backend)
+	{
+		if (_PrGpuMem->pEglSurface != EGL_NO_SURFACE)
+			eglDestroySurface(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglSurface);
+		const EGLint surfaceAttrs[] =
+		{
+			EGL_RENDER_BUFFER,
+			EGL_BACK_BUFFER,
+			EGL_NONE
+		};
+		_PrGpuMem->pEglSurface = eglCreateWindowSurface(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglConfig, _Wnd, surfaceAttrs);
+		if (!eglMakeCurrent(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglSurface, _PrGpuMem->pEglSurface, _PrGpuMem->pEglContext))
+			blDebugOutput("ResetSurface failed EGL unable to eglMakeCurrent");
+		return;
+	}
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
 	_PrGpuMem->pDukContext = _DKC;
 	_PrGpuMem->fPresentElapsed = 0.f;
@@ -1624,12 +1634,14 @@ _GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
 	_PrGpuMem->pBufferCache = blGenDict(TRUE);
 	_PrGpuMem->pTechCache = blGenDict(TRUE);
+	_PrGpuMem->pEglDisplay = EGL_NO_DISPLAY;
+	_PrGpuMem->pEglContext = EGL_NO_CONTEXT;
 	_PrGpuMem->pUBO = (_BLUniformBuffer*)malloc(sizeof(_BLUniformBuffer));
 	_PrGpuMem->pUBO->nSize = 0;
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
@@ -1749,6 +1761,10 @@ _GpuAnitIntervention()
 	{
 		eglMakeCurrent(_PrGpuMem->pEglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 		eglDestroyContext(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglContext);
+		eglDestroySurface(_PrGpuMem->pEglDisplay, _PrGpuMem->pEglSurface);
+		_PrGpuMem->pEglDisplay = EGL_NO_DISPLAY;
+		_PrGpuMem->pEglContext = EGL_NO_CONTEXT;
+		eglTerminate(_PrGpuMem->pEglDisplay);
 	}
 	{
 		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
@@ -1790,7 +1806,7 @@ _GpuIntervention(duk_context* _DKC, NSView* _View, BLU32 _Width, BLU32 _Height, 
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
@@ -1957,7 +1973,7 @@ _GpuIntervention(duk_context* _DKC, BLBool _Vsync)
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
@@ -2025,8 +2041,13 @@ blVSync(IN BLBool _On)
 		GLint _sync = _On;
 		[_PrGpuMem->pGLC setValues : &_sync forParameter : NSOpenGLCPSwapInterval];
 #	elif defined(BL_PLATFORM_LINUX)
+		if (glXSwapIntervalEXT)
+			glXSwapIntervalEXT(_PrGpuMem->pDisplay, _PrGpuMem->nWindow , _On);
+        else if(glXSwapIntervalSGI)
+            glXSwapIntervalSGI(_On);
 #	elif defined(BL_PLATFORM_IOS)
 #	elif defined(BL_PLATFORM_ANDROID)
+        eglSwapInterval(_PrGpuMem->pEglDisplay, _On);
 #	endif
 	}
 #elif defined(BL_MTL_BACKEND)
@@ -2578,7 +2599,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
             case BL_TT_ARRAY1D: _target = GL_TEXTURE_2D_ARRAY; break;
             case BL_TT_ARRAY2D: _target = GL_TEXTURE_2D_ARRAY; break;
             case BL_TT_ARRAYCUBE: _target = GL_TEXTURE_CUBE_MAP_ARRAY; break;
-            default:break;
+            default:assert(0);break;
         }
         GL_CHECK_INTERNAL(glBindTexture(_target, _tex->uData.sGL.nHandle));
 		GL_CHECK_INTERNAL(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
@@ -3171,7 +3192,7 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
 {
     _BLGeometryBuffer* _geo = NULL;
     BLBool _cache = FALSE;
-    if (!_Dynamic)
+    if (!_Dynamic && !_Semantic)
     {
         blMutexLock(_PrGpuMem->pBufferCache->pMutex);
         _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pBufferCache, _Hash);
@@ -3186,7 +3207,7 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
 		memset(_geo, 0, sizeof(_BLGeometryBuffer));
 		_cache = !_Dynamic;
 	}
-	else
+	else if (_geo && !_Semantic)
 		return _geo->nID;
     _geo->eVBTopology = _Topology;
     _geo->eIBFormat = _IBFmt;
@@ -3195,9 +3216,11 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
     _geo->nIBSize = _IBSz;
     _geo->aInsSem[0] = _geo->aInsSem[1] = _geo->aInsSem[2] = _geo->aInsSem[3] = BL_SL_INVALID;
     BLU32 _stride = 0;
+	const BLEnum* _decls = _Decl;
+	const BLEnum* _semantic = _Semantic;
     for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
     {
-        switch(_Decl[_idx])
+        switch(_decls[_idx])
         {
             case BL_VD_BOOLX1: _stride += 1 * 1; break;
             case BL_VD_BOOLX2: _stride += 1 * 2; break;
@@ -3214,7 +3237,7 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
             default:assert(0);break;
         }
     }
-    _geo->nVertexNum = _VBSz / _stride;
+    _geo->nVertexNum = _geo->nVBSize / _stride;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -3226,23 +3249,23 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
         GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
 		if (_Hash == 0xFFFFFFFF)
 		{
-			GL_CHECK_INTERNAL(glBufferData(GL_ARRAY_BUFFER, _VBSz, _VBO, GL_STATIC_DRAW));
+			GL_CHECK_INTERNAL(glBufferData(GL_ARRAY_BUFFER, _geo->nVBSize, _VBO, GL_STATIC_DRAW));
 		}
 		else
 		{
-			GL_CHECK_INTERNAL(glBufferData(GL_ARRAY_BUFFER, _VBSz, _VBO, _Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
+			GL_CHECK_INTERNAL(glBufferData(GL_ARRAY_BUFFER, _geo->nVBSize, _VBO, _Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
 		}
-        if (_IBFmt != BL_IF_INVALID)
+        if (_geo->eIBFormat != BL_IF_INVALID)
         {
             GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nIBHandle));
             GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
 			if (_Hash == 0xFFFFFFFF)
 			{
-				GL_CHECK_INTERNAL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, _IBSz, _IBO, GL_STATIC_DRAW));
+				GL_CHECK_INTERNAL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, _geo->nIBSize, _IBO, GL_STATIC_DRAW));
 			}
 			else
 			{
-				GL_CHECK_INTERNAL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, _IBSz, _IBO, _Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
+				GL_CHECK_INTERNAL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, _geo->nIBSize, _IBO, _Dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW));
 			}
         }
         BLU8* _offset = NULL;
@@ -3252,7 +3275,7 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
             BLU32 _gtsize;
             GLint _numele;
             GLenum _gtype;
-            switch(_Decl[_idx])
+            switch(_decls[_idx])
             {
                 case BL_VD_BOOLX1: _numele = 1; _gtype = GL_BYTE; _gtsize = 1 * 1; break;
                 case BL_VD_BOOLX2: _numele = 2; _gtype = GL_BYTE; _gtsize = 2 * 1; break;
@@ -3268,10 +3291,10 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
                 case BL_VD_FLOATX4: _numele = 4; _gtype = GL_FLOAT; _gtsize = 4 * 4; break;
                 default: assert(0); break;
             }
-            GL_CHECK_INTERNAL(glEnableVertexAttribArray(_Semantic[_idx]));
+            GL_CHECK_INTERNAL(glEnableVertexAttribArray(_semantic[_idx]));
 			GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
-            GL_CHECK_INTERNAL(glVertexAttribPointer(_Semantic[_idx], _numele, _gtype, GL_FALSE, _stride, _offset));
-            _used[_Semantic[_idx]] = 1;
+            GL_CHECK_INTERNAL(glVertexAttribPointer(_semantic[_idx], _numele, _gtype, GL_FALSE, _stride, _offset));
+            _used[_semantic[_idx]] = 1;
             _offset += _gtsize;
         }
         for (BLU32 _idx = 0; _idx < 16; ++_idx)
@@ -3283,7 +3306,7 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
         }
 		GL_CHECK_INTERNAL(glBindVertexArray(0));
 		GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, 0));
-		if (_IBFmt != BL_IF_INVALID)
+		if (_geo->eIBFormat != BL_IF_INVALID)
 			GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
     }
 #elif defined(BL_MTL_BACKEND)
