@@ -169,6 +169,7 @@
 #	include <netinet/tcp.h>
 #	include <arpa/inet.h>
 #   include <android/log.h>
+#	include <android/native_activity.h>
 #   define BL_GL_BACKEND
 #   define BL_VK_BACKEND
 #elif defined(BL_PLATFORM_UWP)
@@ -250,21 +251,26 @@ typedef unsigned long long BLGuid;
  */
 #if defined(BL_PLATFORM_WIN32)
 #	ifdef _DEBUG
-#		define BL_MAIN(argc, argv) int main(int argc, char** argv)
+#		define BL_MAIN(argc, argv) int main(int argc, char** argv) {
 #	else
-#		define BL_MAIN(argc, argv) int _stdcall WinMain(HINSTANCE inst, HINSTANCE hinst, LPSTR argv, int argc)
+#		define BL_MAIN(argc, argv) int _stdcall WinMain(HINSTANCE inst, HINSTANCE hinst, LPSTR argv, int argc) {
 #	endif
+#		define BL_MAINEND return 0; }
 #elif defined(BL_PLATFORM_UWP)
-#		define BL_MAIN(argc, argv) [Platform::MTAThread] int main(Platform::Array<Platform::String^>^ argc)
+#		define BL_MAIN(argc, argv) [Platform::MTAThread] int main(Platform::Array<Platform::String^>^ argc) {
+#		define BL_MAINEND return 0; }
 #elif defined(BL_PLATFORM_OSX)
-#       define BL_MAIN(argc, argv) int main(int argc, const char* argv[])
+#       define BL_MAIN(argc, argv) int main(int argc, const char* argv[]) {
+#		define BL_MAINEND return 0; }
 #elif defined(BL_PLATFORM_IOS)
-#       define BL_MAIN(argc, argv) int main(int argc, const char* argv[])
+#       define BL_MAIN(argc, argv) int main(int argc, const char* argv[]) {
+#		define BL_MAINEND return 0; }
 #elif defined(BL_PLATFORM_LINUX)
-#       define BL_MAIN(argc, argv) int main(int argc, const char* argv[])
-#elif defined(BL_PLATFORM_ANDROID)
-		extern int NDKMain(int argc, char** argv);
-#       define BL_MAIN(argc, argv) int NDKMain(int argc, char** argv)
+#       define BL_MAIN(argc, argv) int main(int argc, const char* argv[]) {
+#		define BL_MAINEND return 0; }
+#elif defined(BL_PLATFORM_ANDROID)		
+#       define BL_MAINBEGIN(argc, argv) void ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _StateSize) {blSystemPrepare(_Activity, _State, _StateSize);
+#		define BL_MAINEND  }
 #else
 #	    error "what's the fucking platform"
 #endif

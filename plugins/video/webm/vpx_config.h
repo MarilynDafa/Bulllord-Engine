@@ -15,14 +15,13 @@
 #define INLINE inline
 #endif
 
-#if defined(_M_X64)
-#define ARCH_X86_64 1
-#define HAVE_MMX 1
-#define HAVE_SSE 1
-#define HAVE_SSE2 1
-#define HAVE_SSE3 1
-#define HAVE_SSSE3 1
-#define HAVE_SSE4_1 1
+#if defined(_M_ARM)
+#define ARCH_ARM 1
+#define HAVE_NEON 1
+#define HAVE_NEON_ASM 0
+#define CONFIG_RUNTIME_CPU_DETECT 0
+#define CONFIG_POSTPROC 0
+#define CONFIG_EXTERNAL_BUILD 0
 #elif defined(_M_IX86)
 #define ARCH_X86 1
 #define HAVE_MMX 1
@@ -31,10 +30,20 @@
 #define HAVE_SSE3 1
 #define HAVE_SSSE3 1
 #define HAVE_SSE4_1 1
+#define CONFIG_RUNTIME_CPU_DETECT 1
+#define CONFIG_POSTPROC 1
+#define CONFIG_EXTERNAL_BUILD 1
 #else
-#define ARCH_ARM 1
-#define HAVE_NEON 0
-#define HAVE_NEON_ASM 0
+#define ARCH_X86_64 1
+#define HAVE_MMX 1
+#define HAVE_SSE 1
+#define HAVE_SSE2 1
+#define HAVE_SSE3 1
+#define HAVE_SSSE3 1
+#define HAVE_SSE4_1 1
+#define CONFIG_RUNTIME_CPU_DETECT 1
+#define CONFIG_POSTPROC 1
+#define CONFIG_EXTERNAL_BUILD 1
 #endif
 
 #define HAVE_VSX 0
@@ -49,7 +58,6 @@
 #endif
 
 #define CONFIG_DEPENDENCY_TRACKING 1
-#define CONFIG_EXTERNAL_BUILD 1
 #define CONFIG_INSTALL_DOCS 0
 #define CONFIG_INSTALL_BINS 1
 #define CONFIG_INSTALL_LIBS 1
@@ -71,8 +79,6 @@
 #define CONFIG_DEBUG_LIBS 0
 #define CONFIG_DEQUANT_TOKENS 0
 #define CONFIG_DC_RECON 0
-#define CONFIG_RUNTIME_CPU_DETECT 1
-#define CONFIG_POSTPROC 1
 #define CONFIG_VP9_POSTPROC 0
 #define CONFIG_MULTITHREAD 1
 #define CONFIG_INTERNAL_STATS 0
@@ -92,9 +98,9 @@
 #define CONFIG_SMALL 0
 #define CONFIG_POSTPROC_VISUALIZER 0
 #define CONFIG_OS_SUPPORT 1
-#define CONFIG_UNIT_TESTS 1
-#define CONFIG_WEBM_IO 1
-#define CONFIG_LIBYUV 1
+#define CONFIG_UNIT_TESTS 0
+#define CONFIG_WEBM_IO 0
+#define CONFIG_LIBYUV 0
 #define CONFIG_DECODE_PERF_TESTS 0
 #define CONFIG_ENCODE_PERF_TESTS 0
 #define CONFIG_MULTI_RES_ENCODING 0

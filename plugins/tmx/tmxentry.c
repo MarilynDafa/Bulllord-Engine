@@ -20,7 +20,6 @@ misrepresented as being the original software.
 */
 #include "tmxentry.h"
 #include "AStar.h"
-#include "../../code/headers/system.h"
 #include "../../code/headers/utils.h"
 #include "../../code/headers/sprite.h"
 #include "../../code/headers/streamio.h"

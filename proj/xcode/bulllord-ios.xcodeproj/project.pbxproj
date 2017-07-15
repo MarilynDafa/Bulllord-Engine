@@ -1254,7 +1254,6 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
-					"$(inherited)",
 					"CODEC_TYPE=CODEC_TYPE_AES128",
 					SQLITE_HAS_CODEC,
 					SQLITE_SECURE_DELETE,
@@ -1271,6 +1270,8 @@
 					HAVE_CONFIG_H,
 					_M_ARM,
 					__ARM_NEON__,
+					DLL_EXPORT,
+					ZLIB_DLL,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1343,6 +1344,8 @@
 					HAVE_CONFIG_H,
 					__ARM_NEON__,
 					_M_ARM,
+					DLL_EXPORT,
+					ZLIB_DLL,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1397,6 +1400,8 @@
 					BL_EXPORT,
 					__ARM_NEON,
 					_M_ARM,
+					DLL_EXPORT,
+					ZLIB_DLL,
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1443,6 +1448,8 @@
 					HAVE_CONFIG_H,
 					_M_ARM,
 					__ARM_NEON,
+					DLL_EXPORT,
+					ZLIB_DLL,
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",

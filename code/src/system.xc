@@ -49,7 +49,6 @@
 #	include <jni.h>
 #	include <android/configuration.h>
 #	include <android/looper.h>
-#	include <android/native_activity.h>
 #   include <android/asset_manager.h>
 #	include <android/window.h>
 #endif
@@ -119,7 +118,10 @@ typedef struct _BoostParam {
 	BLBool bFullscreen;
 	BLBool bProfiler;
 	BLEnum eQuality;
-	BLS32 nHandle;
+	BLS32 nHandle;	
+	const BLVoid(*pBeginFunc)(BLVoid);
+	const BLVoid(*pStepFunc)(BLU32);
+	const BLVoid(*pEndFunc)(BLVoid);
 }_BLBoostParam;
 typedef struct _Event {
 	union
@@ -262,6 +264,9 @@ BLBool _GbSystemRunning = FALSE;
 BLBool _GbTVMode = FALSE;
 BLEnum _GbRenderQuality = BL_RQ_ULP;
 static _BLSystemMember* _PrSystemMem = NULL;
+#if defined(BL_PLATFORM_ANDROID)
+static _BLBoostParam* _PrAndroidGlue = NULL;
+#endif
 
 static const void
 _JSBeginFunc()
@@ -2252,7 +2257,7 @@ _AppEntry(BLVoid* _Param)
 		else
 			break;
 	}
-	NDKMain(0, NULL);
+	blSystemRun(NULL, 84, 84, 84, 84, 1, 1, 1, 1, NULL, NULL, NULL);
 	pthread_mutex_lock(&_PrSystemMem->sMutex);
 	if (_PrSystemMem->pSavedState != NULL)
 	{
@@ -2266,52 +2271,6 @@ _AppEntry(BLVoid* _Param)
 	pthread_cond_broadcast(&_PrSystemMem->sCond);
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 	return NULL;
-}
-BLVoid
-ANativeActivity_onCreate(ANativeActivity* _Activity, BLVoid* _State, size_t _StateSize)
-{
-	_Activity->callbacks->onDestroy = _Destroy;
-	_Activity->callbacks->onStart = _Start;
-	_Activity->callbacks->onResume = _Resume;
-	_Activity->callbacks->onSaveInstanceState = _SaveInstanceState;
-	_Activity->callbacks->onPause = _Pause;
-	_Activity->callbacks->onStop = _Stop;
-	_Activity->callbacks->onConfigurationChanged = _ConfigurationChanged;
-	_Activity->callbacks->onLowMemory = _LowMemory;
-	_Activity->callbacks->onWindowFocusChanged = _WindowFocusChanged;
-	_Activity->callbacks->onNativeWindowCreated = _NativeWindowCreated;
-	_Activity->callbacks->onNativeWindowDestroyed = _NativeWindowDestroyed;
-	_Activity->callbacks->onInputQueueCreated = _InputQueueCreated;
-	_Activity->callbacks->onInputQueueDestroyed = _InputQueueDestroyed;
-	_PrSystemMem = (_BLSystemMember*)malloc(sizeof(_BLSystemMember));
-	_PrSystemMem->pActivity = _Activity;
-	_PrSystemMem->pBLJava = NULL;
-	_PrSystemMem->pWindow = NULL;
-	_PrSystemMem->pSavedState = NULL;
-	_PrSystemMem->pInputQueue = NULL;
-	pthread_mutex_init(&_PrSystemMem->sMutex, NULL);
-	pthread_cond_init(&_PrSystemMem->sCond, NULL);
-	if (_State != NULL)
-	{
-		_PrSystemMem->pSavedState = malloc(_StateSize);
-		_PrSystemMem->nSavedStateSize = _StateSize;
-		memcpy(_PrSystemMem->pSavedState, _State, _StateSize);
-	}
-	BLS32 _msgpipe[2];
-	pipe(_msgpipe);
-	_PrSystemMem->nMsgRead = _msgpipe[0];
-	_PrSystemMem->nMsgWrite = _msgpipe[1];
-	_PrSystemMem->sNativeMethod.name = "textChanged";
-	_PrSystemMem->sNativeMethod.signature = "(Ljava/lang/String;)V";
-	_PrSystemMem->sNativeMethod.fnPtr = (BLVoid*)_TextChanged;
-	pthread_attr_t _attr;
-	pthread_attr_init(&_attr);
-	pthread_attr_setdetachstate(&_attr, PTHREAD_CREATE_DETACHED);
-	pthread_create(&_PrSystemMem->nThread, &_attr, _AppEntry, NULL);
-	pthread_mutex_lock(&_PrSystemMem->sMutex);
-	while (!_GbSystemRunning)
-		pthread_cond_wait(&_PrSystemMem->sCond, &_PrSystemMem->sMutex);
-	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 }
 #elif defined(BL_PLATFORM_OSX)
 @interface OSXDelegate : NSResponder <NSWindowDelegate> @end
@@ -4646,11 +4605,79 @@ blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
 #endif
 }
 BLVoid
+blSystemPrepare(IN BLVoid* _Activity, IN BLVoid* _State, IN BLU32 _StateSize)
+{
+#if defined(BL_PLATFORM_ANDROID)
+	ANativeActivity* _activity = (ANativeActivity*)_Activity;
+	_activity->callbacks->onDestroy = _Destroy;
+	_activity->callbacks->onStart = _Start;
+	_activity->callbacks->onResume = _Resume;
+	_activity->callbacks->onSaveInstanceState = _SaveInstanceState;
+	_activity->callbacks->onPause = _Pause;
+	_activity->callbacks->onStop = _Stop;
+	_activity->callbacks->onConfigurationChanged = _ConfigurationChanged;
+	_activity->callbacks->onLowMemory = _LowMemory;
+	_activity->callbacks->onWindowFocusChanged = _WindowFocusChanged;
+	_activity->callbacks->onNativeWindowCreated = _NativeWindowCreated;
+	_activity->callbacks->onNativeWindowDestroyed = _NativeWindowDestroyed;
+	_activity->callbacks->onInputQueueCreated = _InputQueueCreated;
+	_activity->callbacks->onInputQueueDestroyed = _InputQueueDestroyed;
+	_PrSystemMem = (_BLSystemMember*)malloc(sizeof(_BLSystemMember));
+	_PrSystemMem->pActivity = _activity;
+	_PrSystemMem->pBLJava = NULL;
+	_PrSystemMem->pWindow = NULL;
+	_PrSystemMem->pSavedState = NULL;
+	_PrSystemMem->pInputQueue = NULL;
+	pthread_mutex_init(&_PrSystemMem->sMutex, NULL);
+	pthread_cond_init(&_PrSystemMem->sCond, NULL);
+	if (_State != NULL)
+	{
+		_PrSystemMem->pSavedState = malloc(_StateSize);
+		_PrSystemMem->nSavedStateSize = _StateSize;
+		memcpy(_PrSystemMem->pSavedState, _State, _StateSize);
+	}
+	BLS32 _msgpipe[2];
+	pipe(_msgpipe);
+	_PrSystemMem->nMsgRead = _msgpipe[0];
+	_PrSystemMem->nMsgWrite = _msgpipe[1];
+	_PrSystemMem->sNativeMethod.name = "textChanged";
+	_PrSystemMem->sNativeMethod.signature = "(Ljava/lang/String;)V";
+	_PrSystemMem->sNativeMethod.fnPtr = (BLVoid*)_TextChanged;
+	pthread_attr_t _attr;
+	pthread_attr_init(&_attr);
+	pthread_attr_setdetachstate(&_attr, PTHREAD_CREATE_DETACHED);
+	pthread_create(&_PrSystemMem->nThread, &_attr, _AppEntry, NULL);
+	pthread_mutex_lock(&_PrSystemMem->sMutex);
+	while (!_GbSystemRunning)
+		pthread_cond_wait(&_PrSystemMem->sCond, &_PrSystemMem->sMutex);
+	pthread_mutex_unlock(&_PrSystemMem->sMutex);
+#else
+#endif
+}
+BLVoid
 blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _DesignWidth, IN BLU32 _DesignHeight, IN BLBool _UseDesignRes, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))
 {
 #if defined(BL_PLATFORM_UWP)
 	_PrSystemMem = new _BLSystemMember;
 #elif defined(BL_PLATFORM_ANDROID)
+	if (!_PrAndroidGlue)
+	{
+		_PrAndroidGlue = (_BLBoostParam*)malloc(sizeof(_BLBoostParam));
+		memset(_PrAndroidGlue->pAppName, 0, sizeof(_PrAndroidGlue->pAppName));
+		strcpy((BLAnsi*)_PrAndroidGlue->pAppName, _Appname);
+		_PrAndroidGlue->nScreenWidth = _Width;
+		_PrAndroidGlue->nScreenHeight = _Height;
+		_PrAndroidGlue->nDesignWidth = _DesignWidth;
+		_PrAndroidGlue->nDesignHeight = _DesignHeight;
+		_PrAndroidGlue->bUseDesignRes = _UseDesignRes;
+		_PrAndroidGlue->bFullscreen = _Fullscreen;
+		_PrAndroidGlue->bProfiler = _Profiler;
+		_PrAndroidGlue->eQuality = _Quality;
+		_PrAndroidGlue->pBeginFunc = _Begin;
+		_PrAndroidGlue->pStepFunc = _Step;
+		_PrAndroidGlue->pEndFunc = _End;
+		return;
+	}
 #else
 	_PrSystemMem = (_BLSystemMember*)malloc(sizeof(_BLSystemMember));
 #endif
@@ -4700,6 +4727,8 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 	memset(_PrSystemMem->sBoostParam.pAppName, 0, sizeof(_PrSystemMem->sBoostParam.pAppName));
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	strcpy_s((BLAnsi*)_PrSystemMem->sBoostParam.pAppName, 128, _Appname);
+#elif defined(BL_PLATFORM_ANDROID)
+	strcpy((BLAnsi*)_PrSystemMem->sBoostParam.pAppName, (const BLAnsi*)_PrAndroidGlue->pAppName);
 #else
 	strcpy((BLAnsi*)_PrSystemMem->sBoostParam.pAppName, _Appname);
 #endif
@@ -4728,11 +4757,29 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 	}
 	else
 	{
+#if defined(BL_PLATFORM_ANDROID)
+		_PrSystemMem->sBoostParam.nScreenWidth = _PrAndroidGlue->nScreenWidth;
+		_PrSystemMem->sBoostParam.nScreenHeight = _PrAndroidGlue->nScreenHeight;
+		_PrSystemMem->sBoostParam.bFullscreen = _PrAndroidGlue->bFullscreen;
+		_PrSystemMem->sBoostParam.eQuality = _GbRenderQuality = _PrAndroidGlue->eQuality;
+#else
 		_PrSystemMem->sBoostParam.nScreenWidth = _Width;
 		_PrSystemMem->sBoostParam.nScreenHeight = _Height;
 		_PrSystemMem->sBoostParam.bFullscreen = _Fullscreen;
 		_PrSystemMem->sBoostParam.eQuality = _GbRenderQuality = _Quality;
+#endif
 	}
+#if defined(BL_PLATFORM_ANDROID)
+	_PrSystemMem->sBoostParam.nDesignWidth = _PrAndroidGlue->nDesignWidth;
+	_PrSystemMem->sBoostParam.nDesignHeight = _PrAndroidGlue->nDesignHeight;
+	_PrSystemMem->sBoostParam.bUseDesignRes = _PrAndroidGlue->bUseDesignRes;
+	_PrSystemMem->sBoostParam.bProfiler = _PrAndroidGlue->bProfiler;
+    _PrSystemMem->pBeginFunc = _PrAndroidGlue->pBeginFunc;
+    _PrSystemMem->pStepFunc = _PrAndroidGlue->pStepFunc;
+    _PrSystemMem->pEndFunc = _PrAndroidGlue->pEndFunc;
+	free(_PrAndroidGlue);
+	_PrAndroidGlue = NULL;
+#else
 	_PrSystemMem->sBoostParam.nDesignWidth = _DesignWidth;
 	_PrSystemMem->sBoostParam.nDesignHeight = _DesignHeight;
 	_PrSystemMem->sBoostParam.bUseDesignRes = _UseDesignRes;
@@ -4740,6 +4787,7 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
     _PrSystemMem->pBeginFunc = _Begin;
     _PrSystemMem->pStepFunc = _Step;
     _PrSystemMem->pEndFunc = _End;
+#endif
     _SystemInit();
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
     do {
