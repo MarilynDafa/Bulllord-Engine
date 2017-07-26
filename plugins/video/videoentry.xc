@@ -681,7 +681,7 @@ blVideoPlayEXT(IN BLAnsi* _Filename)
 					if ((BLS32)(_framedelta * 990) - (_audiodelta > 1000 ? 0 : _audiodelta) >= 0)
 						blTickDelay((BLU32)(_framedelta * 990) - (_audiodelta > 1000 ? 0 : _audiodelta));
 					_audiodelta = blTickCounts();
-					_PrVideoMem->fTime = _videoframe.fTime;
+					_PrVideoMem->fTime = (_audioframe.fTime > _videoframe.fTime) ? _audioframe.fTime : _videoframe.fTime;
 				}
 			}
 		}

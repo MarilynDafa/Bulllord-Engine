@@ -29,7 +29,7 @@
 #include "internal/dictionary.h"
 #include "internal/internal.h"
 #include "../externals/xml/ezxml.h"
-#include "../externals/zlib/zlib.h"
+#include "../externals/zstd/zstd.h"
 #include "../externals/duktape/duktape.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
@@ -10944,10 +10944,10 @@ _UIInit(duk_context* _DKC, BLBool _Profiler)
 	blSubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
 	blSubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
 	BLU32 _tmplen;
-	const Bytef* _tmp = blGenBase64Decoder(DEFAULTFONT_INTERNAL, &_tmplen);
-	uLongf _destlen = 11189;
-	Bytef* _dest = (Bytef*)malloc(_destlen);
-	uncompress(_dest, &_destlen, _tmp, _tmplen);
+	const BLU8* _tmp = blGenBase64Decoder(DEFAULTFONT_INTERNAL, &_tmplen);
+	BLU32 _destlen = 11189;
+	BLU8* _dest = (BLU8*)malloc(_destlen);
+	ZSTD_decompress(_dest, _destlen, _tmp, _tmplen);
 	_BLFont* _ret = (_BLFont*)malloc(sizeof(_BLFont));
 	_ret->nHashName = blHashUtf8((const BLUtf8*)"default");
 	_ret->pGlyphAtlas = blGenDict(FALSE);
@@ -10966,8 +10966,8 @@ _UIInit(duk_context* _DKC, BLBool _Profiler)
 			blDeleteBase64Decoder((BLU8*)_tmp);
 			_tmp = blGenBase64Decoder(DEFAULTFONTIMG_INTERNAL, &_tmplen);
 			_destlen = 7056;
-			Bytef* _destimg = (Bytef*)malloc(_destlen);
-			uncompress(_destimg, &_destlen, _tmp, _tmplen);
+			BLU8* _destimg = (BLU8*)malloc(_destlen);
+			ZSTD_decompress(_destimg, _destlen, _tmp, _tmplen);
 			*_tex = blGenTexture(blUniqueUri(), BL_TT_2D, BL_TF_R8, FALSE, TRUE, FALSE, 1, 1, 84, 84, 1, _destimg);
 			blTextureFilter(*_tex, BL_TF_LINEAR, BL_TF_LINEAR, BL_TW_CLAMP, BL_TW_CLAMP, FALSE);
 			blTextureSwizzle(*_tex, BL_TS_ONE, BL_TS_ONE, BL_TS_ONE, BL_TS_RED);

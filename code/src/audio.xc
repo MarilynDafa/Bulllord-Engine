@@ -46,11 +46,9 @@
 #	if(_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
 #		include <xaudio2.h>
 #		include <x3daudio.h>
-#		pragma comment(lib,"xaudio2.lib")
 #	else
 #		include <xaudio2.h>
 #		include <x3daudio.h>
-#		pragma comment(lib,"x3daudio.lib")
 #	endif
 #endif
 #ifdef __cplusplus
@@ -1390,7 +1388,7 @@ blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
             _PrAudioMem->pPCMStream = -1;
 		}
 #elif defined(BL_USE_SL_API)
-		if ((*_PrAudioMem->pPCMStream))
+		if (_PrAudioMem->pPCMStream)
 			(*_PrAudioMem->pPCMStream)->Destroy(_PrAudioMem->pPCMStream);
 #elif defined(BL_USE_COREAUDIO_API)
 		if (_PrAudioMem->pPCMStream)
@@ -1435,7 +1433,7 @@ blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
             alSourcef(_PrAudioMem->pPCMStream, AL_GAIN, 1.f);
             assert(alGetError() == AL_NO_ERROR);
 #elif defined(BL_USE_SL_API)
-			if ((*_PrAudioMem->pPCMStream))
+			if (_PrAudioMem->pPCMStream)
 				(*_PrAudioMem->pPCMStream)->Destroy(_PrAudioMem->pPCMStream);
 			SLDataLocator_BufferQueue _bufq = { SL_DATALOCATOR_BUFFERQUEUE, 3 };
 			SLDataFormat_PCM _pcm;

@@ -27,18 +27,9 @@
 #include "internal/dictionary.h"
 #include "../externals/duktape/duktape.h"
 #if defined BL_PLATFORM_WIN32
-#	if defined(VLD_FORCE_ENABLE)
-#	pragma comment(lib, "vld.lib")
-#	endif
-#	pragma comment(lib, "ws2_32.lib")
-#	pragma comment(lib, "opengl32.lib")
-#	pragma comment(lib, "imm32.lib")
 #elif defined BL_PLATFORM_UWP
 #   include <ppl.h>
 #   include <ppltasks.h>
-#	pragma comment(lib, "d3d12.lib")
-#	pragma comment(lib, "dxgi.lib")
-#	pragma comment(lib, "dxguid.lib")
 #elif defined BL_PLATFORM_OSX
 #   import <Cocoa/Cocoa.h>
 #elif defined BL_PLATFORM_IOS
@@ -499,7 +490,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
     case WM_CLOSE:
     {
 		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
-        SetCursor(LoadCursorA(NULL, IDC_ARROW));
+        SetCursor(LoadCursorW(NULL, IDC_ARROW));
         ReleaseCapture();
         PostQuitMessage(0);
         _GbSystemRunning = FALSE;
@@ -509,7 +500,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 		if (!IsIconic(_Hwnd))
 		{
 			SetWindowLongPtrW(_Hwnd, GWLP_USERDATA, 0);
-			SetCursor(LoadCursorA(NULL, IDC_ARROW));
+			SetCursor(LoadCursorW(NULL, IDC_ARROW));
 		}
 		break;
 	case WM_MOUSEMOVE:
@@ -520,7 +511,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 			if (_UseCustomCursor())
 				ShowCursor(FALSE);
 			else
-				SetCursor(LoadCursorA(NULL, IDC_ARROW));
+				SetCursor(LoadCursorW(NULL, IDC_ARROW));
 		}
 		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_MOVE, NULL, INVALID_GUID);
 		TRACKMOUSEEVENT _tme;
@@ -1727,6 +1718,7 @@ extern "C" {
 	{
 		const BLUtf8* _utf8str = (const BLUtf8*)_Env->GetStringUTFChars(_Text, NULL);
 		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str, INVALID_GUID);
+		_Env->ReleaseStringUTFChars(_Text, (const BLAnsi*)_utf8str);
 	}
 }
 static BLVoid
@@ -1907,6 +1899,7 @@ _ShowWindow()
 	BLAnsi _tmp[260] = { 0 };
 	strcpy(_tmp, (const BLAnsi*)_utfdir);
 	strcat(_tmp, "/org.bulllord.util.jar");
+	_env->ReleaseStringUTFChars(_cstrobj, (const BLAnsi*)_utfdir);
 	jstring _dexst = _env->NewStringUTF(_tmp);
 	if (!_exist)
 	{
@@ -2707,7 +2700,7 @@ _CloseWindow()
     }
     return _point;
 }
-- (BLVoid)touchesBegan:(NSSet*)_Touches withEvent:(UIEvent *)_Event
+- (BLVoid)touchesBegan:(NSSet*)_Touches withEvent:(UIEvent*)_Event
 {
     for (UITouch* _touch in _Touches)
     {
@@ -3477,11 +3470,10 @@ blTickDelay(IN BLU32 _Ms)
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	Sleep(_Ms);
 #else
-	BLU64 _usecs = _Ms * 1000;
-    timespec _ti;
-    _ti.tv_nsec = (_usecs % 1000000) * 1000;
-    _ti.tv_sec = _usecs / 1000000;
-    while ((nanosleep(&_ti, &_ti) == -1) && (errno == EINTR)) {}
+	struct timeval _delay;
+	_delay.tv_sec = 0;
+	_delay.tv_usec = _Ms * 1000;
+	select(0, NULL, NULL, NULL, &_delay);
 #endif
 }
 const BLAnsi*
@@ -4165,11 +4157,24 @@ blOpenPlugin(IN BLAnsi* _Basename)
     strcat_s(_path, 260, "plugins\\");
     strcat_s(_path, 260, _Basename);
     strcat_s(_path, 260, ".dll");
-#elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID)
-    strcpy(_path, blWorkingDir());
-    strcat(_path, "plugins/");
-    strcat(_path, _Basename);
-    strcat(_path, ".so");
+#elif defined(BL_PLATFORM_LINUX) 
+#elif defined(BL_PLATFORM_ANDROID)
+	pthread_mutex_lock(&_PrSystemMem->sMutex);
+	JNIEnv* _env = _PrSystemMem->pActivity->env;
+	_PrSystemMem->pActivity->vm->AttachCurrentThread(&_env, NULL);
+	jmethodID _applicationnfomid = _env->GetMethodID(_env->GetObjectClass(_PrSystemMem->pActivity->clazz), "getApplicationInfo", "()Landroid/content/pm/ApplicationInfo;");
+	jobject _appinfo = _env->CallObjectMethod(_PrSystemMem->pActivity->clazz, _applicationnfomid);
+	jfieldID _fieldid = _env->GetFieldID(_env->GetObjectClass(_appinfo), "nativeLibraryDir", "Ljava/lang/String;");
+	jstring _nativelibrarydir = (jstring)_env->GetObjectField(_appinfo, _fieldid);
+	const BLAnsi* _str = _env->GetStringUTFChars(_nativelibrarydir, NULL);
+	strcpy(_path, _str);
+	_env->ReleaseStringUTFChars(_nativelibrarydir, _str);
+	_env->DeleteLocalRef(_appinfo);
+	_PrSystemMem->pActivity->vm->DetachCurrentThread();
+	pthread_mutex_unlock(&_PrSystemMem->sMutex);
+	strcat(_path, "/lib");
+	strcat(_path, _Basename);
+	strcat(_path, "Plugin.so");
 #else
     strcpy(_path, blWorkingDir());
     strcat(_path, "plugins/");
@@ -4195,10 +4200,12 @@ blOpenPlugin(IN BLAnsi* _Basename)
 #endif
 	memset(_path, 0, sizeof(_path));
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-	strcpy_s(_path, 260, _Basename);
+	strcpy_s(_path, 260, "bl");
+	strcat_s(_path, 260, _Basename);
 	strcat_s(_path, 260, "OpenEXT");
 #else
-	strcpy(_path, _Basename);
+	strcpy(_path, "bl");
+	strcat(_path, _Basename);
 	strcat(_path, "OpenEXT");
 #endif
 	BLVoid(*_open)(BLVoid);
@@ -4220,10 +4227,12 @@ blClosePlugin(IN BLAnsi* _Basename)
 		return FALSE;
 	BLAnsi _path[260] = { 0 };
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-	strcpy_s(_path, 260, _Basename);
+	strcpy_s(_path, 260, "bl");
+	strcat_s(_path, 260, _Basename);
 	strcat_s(_path, 260, "CloseEXT");
 #else
-	strcpy(_path, _Basename);
+	strcpy(_path, "bl");
+	strcat(_path, _Basename);
 	strcat(_path, "CloseEXT");
 #endif
 	BLVoid(*_close)(BLVoid);

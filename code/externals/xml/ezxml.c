@@ -304,7 +304,7 @@ void ezxml_proc_inst(ezxml_root_t root, char *s, size_t len)
         root->pi[i] = malloc(sizeof(char *) * 3);
         root->pi[i][0] = target;
         root->pi[i][1] = (char *)(root->pi[i + 1] = NULL); // terminate pi list
-#ifdef WIN32
+#if defined(WINDLL)
         root->pi[i][2] = _strdup(""); // empty document position list
 #else
 		root->pi[i][2] = strdup(""); // empty document position list
@@ -932,7 +932,7 @@ ezxml_t ezxml_set_attr(ezxml_t xml, const char *name, const char *value)
         if (! value) return xml; // nothing to do
         if (xml->attr == EZXML_NIL) { // first attribute
             xml->attr = malloc(4 * sizeof(char *));
-#ifdef WIN32
+#ifdef WINDLL
 			xml->attr[1] = _strdup(""); // empty list of malloced names/vals
 #else
             xml->attr[1] = strdup(""); // empty list of malloced names/vals

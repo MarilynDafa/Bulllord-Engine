@@ -215,7 +215,7 @@
 /* C++ */
 #undef DUK_F_CPP
 #if defined(__cplusplus)
-#define DUK_F_CPP
+//#define DUK_F_CPP
 #endif
 
 /* Intel x86 (32-bit), x64 (64-bit) or x32 (64-bit but 32-bit pointers),

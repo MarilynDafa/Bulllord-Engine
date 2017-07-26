@@ -21,7 +21,7 @@
 #include "../headers/streamio.h"
 #include "../headers/system.h"
 #include "../headers/utils.h"
-#include "../externals/zlib/zlib.h"
+#include "../externals/zstd/zstd.h"
 #include "../externals/sqlite3/sqlite3.h"
 #include "internal/dictionary.h"
 #include "internal/array.h"
@@ -266,16 +266,20 @@ _StreamIOInit(duk_context* _DKC, BLVoid* _AssetMgr)
 	WIN32_FIND_DATA _filedata;
 	HANDLE _filelist;
 	strcat(_path, "*.pat");
-	_filelist = FindFirstFile(_path, &_filedata);
+	WCHAR _wpath[260] = { 0 };
+	MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wpath, sizeof(_wpath));
+	_filelist = FindFirstFileW(_wpath, &_filedata);
 	do
 	{
 		if (_filedata.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
 		{
 			_patnum++;
 			_pats = (BLAnsi**)realloc(_pats, _patnum * sizeof(BLAnsi*));
-			_pats[_patnum - 1] = (BLAnsi*)alloca(strlen(_filedata.cFileName) + 1);
-			strcpy(_pats[_patnum - 1], _filedata.cFileName);
-			_pats[_patnum - 1][strlen(_filedata.cFileName)] = 0;
+			_pats[_patnum - 1] = (BLAnsi*)alloca(wcslen(_filedata.cFileName) + 1);
+			BLUtf8 _tmp[1024] = { 0 };
+			WideCharToMultiByte(CP_UTF8, 0, _filedata.cFileName, -1, (LPSTR)_tmp, 1024, NULL, NULL);
+			strcpy(_pats[_patnum - 1], (const BLAnsi*)_tmp);
+			_pats[_patnum - 1][wcslen(_filedata.cFileName)] = 0;
 		}
 	} while (FindNextFile(_filelist, &_filedata));
 #else
@@ -380,7 +384,7 @@ blGenStream(IN BLAnsi* _Filename)
 			_file = (_BLBpkFileEntry*)blDictElement(_iter->pFiles, _id);
 			if (_file)
 			{
-				uLongf _sz;
+				BLU32 _sz;
 				BLS32 _uncmpsz;
 				BLU8* _cdata;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -422,7 +426,7 @@ blGenStream(IN BLAnsi* _Filename)
 				_ret->pPos = (BLU8*)_ret->pBuffer;
 				_ret->pEnd = _ret->pPos + _ret->nLen;
 				_sz = _uncmpsz;
-				uncompress((Bytef*)_ret->pBuffer, &_sz, _cdata, _file->nLength);
+				ZSTD_decompress(_ret->pBuffer, _sz, _cdata, _file->nLength);
 				free(_cdata);
 				return blGenGuid(_ret, _id);
 			}
