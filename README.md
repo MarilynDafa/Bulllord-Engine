@@ -14,20 +14,20 @@ Feature lists:
 Supported rendering backends:
 
  * Direct3D 12 (In Development)
- * Metal (In Development) * OpenGL 
+ * Metal (In Development)
+ * OpenGL 
  * OpenGL ES
  * Vulkan(In Development)
  * WebGL(In Development)
 
 Supported platforms:
 
- * Android
-
-* iOS
- * Linux
- * OSX
- * Windows
- * UWP 
+ * Android</br>
+ * iOS</br>
+ * Linux</br>
+ * OSX</br>
+ * Windows</br>
+ * UWP </br>
 
 Supported compilers:
 
@@ -53,8 +53,7 @@ Supported compilers:
     OS: OSX   </br> 
     IDE: xcode    </br>
  * iOS </br> 
-    OS: OSX </br>   
-    IDE: xcode  </br>
+    OS: OSX</br>IDE: xcode  </br>
  
 Future work:
 
