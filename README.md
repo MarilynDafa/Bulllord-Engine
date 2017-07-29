@@ -37,24 +37,43 @@ Supported compilers:
  * VS2015 and above
  
  How to build:
+ 
  * Win32(windows xp compatible)
+ 
     OS: Windows 10 PC
+    
     IDE: visual studio 2017 + Directx SDK(only use x3daudio module)
+    
  * UWP
+ 
     OS: Windows 10 PC
+    
     IDE: visual studio 2017
+    
  * Linux
+ 
     OS: Windows 10 PC and a linux machine additional(openssh gcc x11 mesa3d installed)
+    
     IDE visual studio 2017
+    
  * Android
+ 
     OS: Windows 10 PC
+    
     IDE: visual studio 2017
+    
  * MacOS
+ 
     OS: OSX
+    
     IDE: xcode
+    
  * iOS
+ 
     OS: OSX
+    
     IDE: xcode
+    
  
 Future work:
 
