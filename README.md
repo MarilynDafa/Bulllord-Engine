@@ -1,4 +1,4 @@
-[image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/logo.png)
+![image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/logo.png)
 # Bulllord-Engine
 Bulllord Engine(牛魔王引擎) is an Ansi C99 style Cross-platform, Game Engine
 Currently only support 2D function，easily bind other languages eg. lua, c#, javascript...
@@ -87,4 +87,5 @@ Toolchain Screenshot
 ![image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/UIdesigner.jpg)
 ![image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/Pack.jpg)
 ![image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/textool.jpg)
+
 QQ交流群：563060511
