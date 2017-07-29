@@ -19,6 +19,7 @@ Supported rendering backends:
  * OpenGL ES
  * Vulkan(In Development)
  * WebGL(In Development)
+ * Software(In Development)
 
 Supported platforms:
 
