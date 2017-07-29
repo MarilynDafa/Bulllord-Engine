@@ -38,8 +38,7 @@ Supported compilers:
  
  How to build:
  
- * Win32(windows xp compatible)
- 
+ * Win32(windows xp compatible) 
     OS: Windows 10 PC
     IDE: visual studio 2017 + Directx SDK(only use x3daudio module)    
  * UWP 
