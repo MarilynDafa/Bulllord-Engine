@@ -27,7 +27,8 @@ Supported platforms:
  * Linux</br>
  * OSX</br>
  * Windows</br>
- * UWP </br>
+ * UWP </br> 
+ * Web
 
 Supported compilers:
 
