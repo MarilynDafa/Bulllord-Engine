@@ -40,7 +40,7 @@ Supported compilers:
  
  * Win32(windows xp compatible) 
  
-    OS: Windows 10 PC
+    OS: Windows 10 PC \n
     IDE: visual studio 2017 + Directx SDK(only use x3daudio module)    
  * UWP 
  
