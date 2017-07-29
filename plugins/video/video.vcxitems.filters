@@ -42,744 +42,745 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="E:\Bulllord-Engine\plugins\video\videoentry.xc">
-      <Filter>src</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\videoentry.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)videoentry.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\backends.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\alloccommon.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\backends.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\bitrate.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\bitops.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\bitrate.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\codebook.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\bitreader.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\bitreader_buffer.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\blockd.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\codebook.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\codec_internal.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\codec_internal.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\envelope.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\coefupdateprobs.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\common.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\dboolhuff.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\decodemv.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\default_coef_probs.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\decoderthreading.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\detokenize.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\emmintrin_compat.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_util\endian_inl.h">
+      <Filter>externals\vpx_util</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\entropy.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\entropymode.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\entropymv.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\envelope.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\highlevel.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\extend.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\filter.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\findnearmv.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\highlevel.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\lookup.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\header.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\inv_txfm.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\invtrans.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\lookup_data.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\lookup.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\lpc.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\lookup_data.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\lsp.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\loopfilter.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\lpc.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\masking.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\lsp.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\mdct.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\masking.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\misc.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\mdct.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\os.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\mem.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\mem_ops.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\mem_ops_aligned.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\misc.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\psy.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\webm\mkvmuxer\mkvmuxertypes.h">
+      <Filter>externals\webm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\webm\mkvparser\mkvparser.h">
+      <Filter>externals\webm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\modecont.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\msvc.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\mv.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\onyxd_int.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\onyx.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\onyxc_int.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\onyxd.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\os.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\registry.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\postproc.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\postproc.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\ppflags.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\prob.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\psy.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\scales.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\quant_common.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\reconinter.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\reconintra.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\reconintra4x4.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\registry.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\smallft.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\scales.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\window.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\setupintrarecon.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\skin_detection.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\smallft.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\alloccommon.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\swapyv12buffer.h">
       <Filter>externals\vp8</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\blockd.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\system_state.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\systemdependent.h">
       <Filter>externals\vp8</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\coefupdateprobs.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\threading.h">
       <Filter>externals\vp8</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\common.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\treecoder.h">
       <Filter>externals\vp8</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\default_coef_probs.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\treereader.h">
       <Filter>externals\vp8</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\entropy.h">
-      <Filter>externals\vp8</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\txfm_common.h">
+      <Filter>externals\vpx_dsp</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\entropymode.h">
-      <Filter>externals\vp8</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\variance.h">
+      <Filter>externals\vpx_dsp</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\entropymv.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\extend.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\filter.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\findnearmv.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\header.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\invtrans.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\loopfilter.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\modecont.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\mv.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\onyx.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\onyxc_int.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\onyxd.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\postproc.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\ppflags.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\quant_common.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\reconinter.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\reconintra.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\reconintra4x4.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\setupintrarecon.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\swapyv12buffer.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\systemdependent.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\threading.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\treecoder.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\vp8_entropymodedata.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\dboolhuff.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\decodemv.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\decoderthreading.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\detokenize.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\onyxd_int.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\treereader.h">
-      <Filter>externals\vp8</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_alloccommon.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_blockd.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_common_data.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_entropy.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_entropymode.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_entropymv.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_enums.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_filter.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_frame_buffers.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_idct.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_loopfilter.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_mv.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_mvref_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_onyxc_int.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_ppflags.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_pred_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_quant_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_reconinter.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_reconintra.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_scale.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_scan.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_seg_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_thread_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_tile_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_decodeframe.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_decodemv.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_decoder.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_detokenize.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_dsubexp.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_dthread.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\vp9_dx_iface.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9\vp9_iface_common.h">
-      <Filter>externals\vp9</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx\internal\vpx_codec_internal.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\vp8.h">
       <Filter>externals\vpx</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx\vp8.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\common\vp8_entropymodedata.h">
+      <Filter>externals\vp8</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\vp8dx.h">
       <Filter>externals\vpx</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx\vp8dx.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8_rtcd.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_alloccommon.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_blockd.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_common_data.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_decodeframe.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_decodemv.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_decoder.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_detokenize.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_dsubexp.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_dthread.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\vp9_dx_iface.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_entropy.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_entropymode.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_entropymv.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_enums.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_filter.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_frame_buffers.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_idct.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\vp9_iface_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_loopfilter.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_mv.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_mvref_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_onyxc_int.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_ppflags.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_pred_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_quant_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_reconinter.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_reconintra.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9_rtcd.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_scale.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_scan.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_seg_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_thread_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_tile_common.h">
+      <Filter>externals\vp9</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\internal\vpx_codec_internal.h">
       <Filter>externals\vpx</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx\vpx_codec.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\vpx_codec.h">
       <Filter>externals\vpx</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx\vpx_decoder.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_config.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\vpx_decoder.h">
       <Filter>externals\vpx</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx\vpx_encoder.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\vpx_encoder.h">
       <Filter>externals\vpx</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx\vpx_frame_buffer.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\vpx_frame_buffer.h">
       <Filter>externals\vpx</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx\vpx_image.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\vpx_image.h">
       <Filter>externals\vpx</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx\vpx_integer.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\vpx_integer.h">
       <Filter>externals\vpx</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\bitreader.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\bitreader_buffer.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\inv_txfm.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\postproc.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\prob.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\skin_detection.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\txfm_common.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\variance.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\vpx_convolve.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\vpx_dsp_common.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\vpx_filter.h">
-      <Filter>externals\vpx_dsp</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_mem\include\vpx_mem_intrnl.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_mem\vpx_mem.h">
       <Filter>externals\vpx_mem</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_mem\vpx_mem.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\vpx_filter.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\vpx_dsp_common.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\vpx_convolve.h">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp_rtcd.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_mem\include\vpx_mem_intrnl.h">
       <Filter>externals\vpx_mem</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_ports\bitops.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\vpx_once.h">
       <Filter>externals\vpx_ports</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_ports\emmintrin_compat.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_ports\mem.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_ports\mem_ops.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_ports\mem_ops_aligned.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_ports\msvc.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_ports\system_state.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_ports\vpx_once.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_ports\vpx_timer.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_ports\x86.h">
-      <Filter>externals\vpx_ports</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_scale\vpx_scale.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale\vpx_scale.h">
       <Filter>externals\vpx_scale</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_scale\yv12config.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale_rtcd.h">
       <Filter>externals\vpx_scale</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_util\endian_inl.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_util\vpx_thread.h">
       <Filter>externals\vpx_util</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_util\vpx_thread.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\vpx_timer.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_util\vpx_write_yuv_frame.h">
       <Filter>externals\vpx_util</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_util\vpx_write_yuv_frame.h">
-      <Filter>externals\vpx_util</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\webm\common\webmids.h">
+      <Filter>externals</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\webm\common\webmids.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\window.h">
+      <Filter>externals\vorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\x86.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\arm.h">
+      <Filter>externals\vpx_ports</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\yuv2rgb.h">
       <Filter>externals\webm</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\webm\mkvmuxer\mkvmuxertypes.h">
-      <Filter>externals\webm</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\webm\mkvparser\mkvparser.h">
-      <Filter>externals\webm</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp8_rtcd.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vp9_rtcd.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_config.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp_rtcd.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\vpx_scale_rtcd.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\yuv2rgb.h">
-      <Filter>externals</Filter>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale\yv12config.h">
+      <Filter>externals\vpx_scale</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\analysis.c">
-      <Filter>externals\vorbis</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)videoentry.xc">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\bitrate.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\block.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\codebook.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\envelope.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\floor0.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\floor1.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\info.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\lookup.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\lpc.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\lsp.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\mapping0.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\mdct.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\psy.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\registry.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\res0.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\sharedbook.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\smallft.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\synthesis.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vorbis\window.c">
-      <Filter>externals\vorbis</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\alloccommon.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\blockd.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\copy_c.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\dequantize.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\entropy.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\entropymode.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\entropymv.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\extend.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\filter.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\findnearmv.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\generic\systemdependent.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\idctllm.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\idct_blk.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\loopfilter_filters.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\mbpitch.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\mfqe.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\modecont.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\postproc.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\quant_common.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\reconinter.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\reconintra.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\reconintra4x4.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\rtcd.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\setupintrarecon.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\swapyv12buffer.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\treecoder.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\common\vp8_loopfilter.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\dboolhuff.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\decodeframe.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\decodemv.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\detokenize.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\onyxd_if.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\decoder\threading.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp8\vp8_dx_iface.c">
-      <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_alloccommon.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_blockd.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_common_data.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_entropy.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_entropymode.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_entropymv.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_filter.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_frame_buffers.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_idct.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_loopfilter.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_mvref_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_pred_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_quant_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_reconinter.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_reconintra.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_rtcd.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_scale.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_scan.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_seg_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_thread_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\common\vp9_tile_common.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_decodeframe.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_decodemv.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_decoder.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_detokenize.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_dsubexp.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\decoder\vp9_dthread.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vp9\vp9_dx_iface.c">
-      <Filter>externals\vp9</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx\src\vpx_codec.c">
-      <Filter>externals\vpx</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx\src\vpx_decoder.c">
-      <Filter>externals\vpx</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx\src\vpx_encoder.c">
-      <Filter>externals\vpx</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx\src\vpx_image.c">
-      <Filter>externals\vpx</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\add_noise.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\add_noise.c">
       <Filter>externals\vpx_dsp</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\bitreader.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\alloccommon.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\analysis.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\bitrate.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\bitreader.c">
       <Filter>externals\vpx_dsp</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\bitreader_buffer.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\bitreader_buffer.c">
       <Filter>externals\vpx_dsp</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\deblock.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\block.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\blockd.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\codebook.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\copy_c.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\dboolhuff.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\deblock.c">
       <Filter>externals\vpx_dsp</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\intrapred.c">
-      <Filter>externals\vpx_dsp</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\decodeframe.c">
+      <Filter>externals\vp8</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\inv_txfm.c">
-      <Filter>externals\vpx_dsp</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\decodemv.c">
+      <Filter>externals\vp8</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\loopfilter.c">
-      <Filter>externals\vpx_dsp</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\detokenize.c">
+      <Filter>externals\vp8</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\prob.c">
-      <Filter>externals\vpx_dsp</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\dequantize.c">
+      <Filter>externals\vp8</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\skin_detection.c">
-      <Filter>externals\vpx_dsp</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\entropy.c">
+      <Filter>externals\vp8</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\variance.c">
-      <Filter>externals\vpx_dsp</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\entropymode.c">
+      <Filter>externals\vp8</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\vpx_convolve.c">
-      <Filter>externals\vpx_dsp</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\entropymv.c">
+      <Filter>externals\vp8</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_dsp\vpx_dsp_rtcd.c">
-      <Filter>externals\vpx_dsp</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\envelope.c">
+      <Filter>externals\vorbis</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_mem\vpx_mem.c">
-      <Filter>externals\vpx_mem</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\extend.c">
+      <Filter>externals\vp8</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_scale\generic\gen_scalers.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\filter.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\findnearmv.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\floor1.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\floor0.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_scale\generic\gen_scalers.c">
       <Filter>externals\vpx_scale</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_scale\generic\vpx_scale.c">
-      <Filter>externals\vpx_scale</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\info.c">
+      <Filter>externals\vorbis</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_scale\generic\yv12config.c">
-      <Filter>externals\vpx_scale</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\idctllm.c">
+      <Filter>externals\vp8</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_scale\generic\yv12extend.c">
-      <Filter>externals\vpx_scale</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\idct_blk.c">
+      <Filter>externals\vp8</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_scale\vpx_scale_rtcd.c">
-      <Filter>externals\vpx_scale</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\inv_txfm.c">
+      <Filter>externals\vpx_dsp</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_util\vpx_thread.c">
-      <Filter>externals\vpx_util</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\intrapred.c">
+      <Filter>externals\vpx_dsp</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_util\vpx_write_yuv_frame.c">
-      <Filter>externals\vpx_util</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\lookup.c">
+      <Filter>externals\vorbis</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\webm\mkvparser\mkvparser.cc">
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\loopfilter.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\loopfilter_filters.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\lpc.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\lsp.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\mapping0.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\mbpitch.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\mdct.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\mfqe.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\webm\mkvparser\mkvparser.cc">
       <Filter>externals\webm</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\webm\vpx_config.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\modecont.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\onyxd_if.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\postproc.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\prob.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\psy.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\quant_common.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\reconinter.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\reconintra.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\reconintra4x4.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\registry.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\res0.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\rtcd.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\setupintrarecon.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\sharedbook.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\skin_detection.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\smallft.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\swapyv12buffer.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\synthesis.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\generic\systemdependent.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\threading.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\treecoder.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\variance.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\vp8_dx_iface.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\vp8_loopfilter.c">
+      <Filter>externals\vp8</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_alloccommon.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_blockd.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_common_data.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_decodeframe.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_decodemv.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_decoder.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_detokenize.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_dsubexp.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\decoder\vp9_dthread.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\vp9_dx_iface.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_entropy.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_entropymode.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_entropymv.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_filter.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_frame_buffers.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_idct.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_loopfilter.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_mvref_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_pred_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_quant_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_reconinter.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_reconintra.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_rtcd.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_scale.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_scan.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_seg_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_thread_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_tile_common.c">
+      <Filter>externals\vp9</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx\src\vpx_codec.c">
+      <Filter>externals\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_config.c">
       <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx\src\vpx_decoder.c">
+      <Filter>externals\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\vpx_dsp_rtcd.c">
+      <Filter>externals\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx\src\vpx_encoder.c">
+      <Filter>externals\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx\src\vpx_image.c">
+      <Filter>externals\vpx</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_mem\vpx_mem.c">
+      <Filter>externals\vpx_mem</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\vpx_convolve.c">
+      <Filter>externals\vpx_dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_scale\generic\vpx_scale.c">
+      <Filter>externals\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_scale\vpx_scale_rtcd.c">
+      <Filter>externals\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_util\vpx_thread.c">
+      <Filter>externals\vpx_util</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_util\vpx_write_yuv_frame.c">
+      <Filter>externals\vpx_util</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\window.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_scale\generic\yv12config.c">
+      <Filter>externals\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_scale\generic\yv12extend.c">
+      <Filter>externals\vpx_scale</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

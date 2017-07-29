@@ -587,6 +587,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp_rtcd.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_mem\include\vpx_mem_intrnl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_mem\vpx_mem.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\arm.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\bitops.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\emmintrin_compat.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\mem.h" />

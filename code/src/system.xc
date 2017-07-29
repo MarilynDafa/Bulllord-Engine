@@ -4154,10 +4154,14 @@ blOpenPlugin(IN BLAnsi* _Basename)
     BLAnsi _path[260] = { 0 };
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
     strcpy_s(_path, 260, blWorkingDir());
-    strcat_s(_path, 260, "plugins\\");
+    strcat_s(_path, 260, "lib");
     strcat_s(_path, 260, _Basename);
-    strcat_s(_path, 260, ".dll");
+    strcat_s(_path, 260, "Plugin.dll");
 #elif defined(BL_PLATFORM_LINUX) 
+    strcpy(_path, blWorkingDir());
+    strcat(_path, "lib");
+    strcat(_path, _Basename);
+    strcat(_path, "Plugin.so");
 #elif defined(BL_PLATFORM_ANDROID)
 	pthread_mutex_lock(&_PrSystemMem->sMutex);
 	JNIEnv* _env = _PrSystemMem->pActivity->env;
@@ -4177,9 +4181,9 @@ blOpenPlugin(IN BLAnsi* _Basename)
 	strcat(_path, "Plugin.so");
 #else
     strcpy(_path, blWorkingDir());
-    strcat(_path, "plugins/");
+    strcat(_path, "lib");
     strcat(_path, _Basename);
-    strcat(_path, ".dylib");
+    strcat(_path, "Plugin.dylib");
 #endif
 #if defined(BL_PLATFORM_WIN32)
     WCHAR _wfilename[260] = { 0 };

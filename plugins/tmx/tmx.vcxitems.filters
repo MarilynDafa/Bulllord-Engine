@@ -12,45 +12,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\tmx\tmxentry.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)AStar.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)IndexPriorityQueue.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)miniz.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)miniz_tdef.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)miniz_tinfl.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)tmxentry.c">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\tmx\AStar.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\tmx\IndexPriorityQueue.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\tmx\miniz.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\tmx\miniz_tdef.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\tmx\miniz_tinfl.c">
-      <Filter>externals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\tmx\AStar.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)AStar.h">
       <Filter>externals</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\tmx\IndexPriorityQueue.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)IndexPriorityQueue.h">
       <Filter>externals</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\tmx\miniz.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)miniz.h">
       <Filter>externals</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\tmx\miniz_common.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)miniz_common.h">
       <Filter>externals</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\tmx\miniz_tdef.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)miniz_tdef.h">
       <Filter>externals</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\tmx\miniz_tinfl.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)miniz_tinfl.h">
       <Filter>externals</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\tmx\tmxentry.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)tmxentry.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

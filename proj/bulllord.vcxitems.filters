@@ -55,11 +55,11 @@
     <Filter Include="externals\rsa">
       <UniqueIdentifier>{7356be6b-8c0d-4520-8e27-543f86750e20}</UniqueIdentifier>
     </Filter>
-    <Filter Include="externals\opus\arm">
-      <UniqueIdentifier>{5944f72a-a898-44aa-8b1b-9b1e6b3d5621}</UniqueIdentifier>
-    </Filter>
     <Filter Include="externals\opus\x86">
-      <UniqueIdentifier>{b6df57ec-ee97-45bc-850a-e384b7c4905b}</UniqueIdentifier>
+      <UniqueIdentifier>{9560f31f-f25f-4b2c-b775-9418f22b1d65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\opus\arm">
+      <UniqueIdentifier>{8b583ead-0968-4af0-beed-0d01902ca13b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -666,62 +666,62 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\celt\arm\armcpu.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\arm_celt_map.c">
       <Filter>externals\opus\arm</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\celt\arm\arm_celt_map.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\arm_silk_map.c">
       <Filter>externals\opus\arm</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\celt\arm\celt_neon_intr.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\armcpu.c">
       <Filter>externals\opus\arm</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\silk\arm\arm_silk_map.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\celt_lpc_sse.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\NSQ_del_dec_sse.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\NSQ_sse.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse2.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse4_1.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\VAD_sse.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\vq_sse2.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\VQ_WMat_EC_sse.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\x86_celt_map.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\x86_silk_map.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\x86cpu.c">
+      <Filter>externals\opus\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\celt_neon_intr.c">
       <Filter>externals\opus\arm</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\silk\arm\LPC_inv_pred_gain_neon_intr.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\LPC_inv_pred_gain_neon_intr.c">
       <Filter>externals\opus\arm</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\silk\arm\NSQ_del_dec_neon_intr.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\NSQ_del_dec_neon_intr.c">
       <Filter>externals\opus\arm</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\silk\arm\NSQ_neon.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\NSQ_neon.c">
       <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\celt\x86\celt_lpc_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\celt\x86\pitch_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\celt\x86\pitch_sse2.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\celt\x86\pitch_sse4_1.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\celt\x86\vq_sse2.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\celt\x86\x86cpu.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\celt\x86\x86_celt_map.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\silk\x86\NSQ_del_dec_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\silk\x86\NSQ_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\silk\x86\VAD_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\silk\x86\VQ_WMat_EC_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\opus\silk\x86\x86_silk_map.c">
-      <Filter>externals\opus\x86</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
