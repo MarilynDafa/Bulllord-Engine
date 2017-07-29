@@ -14,8 +14,7 @@ Feature lists:
 Supported rendering backends:
 
  * Direct3D 12 (In Development)
- * Metal (In Development)
- * OpenGL 
+ * Metal (In Development) * OpenGL 
  * OpenGL ES
  * Vulkan(In Development)
  * WebGL(In Development)
@@ -38,30 +37,24 @@ Supported compilers:
  
  How to build:
  
- * Win32(windows xp compatible) 
- 
-    OS: Windows 10 PC \n
-    IDE: visual studio 2017 + Directx SDK(only use x3daudio module)    
- * UWP 
- 
-    OS: Windows 10 PC    
-    IDE: visual studio 2017      
- * Linux 
- 
-    OS: Windows 10 PC and a linux machine additional(openssh gcc x11 mesa3d installed)    
-    IDE visual studio 2017    
- * Android 
- 
-    OS: Windows 10 PC    
-    IDE: visual studio 2017    
- * MacOS 
- 
-    OS: OSX    
-    IDE: xcode    
- * iOS 
- 
-    OS: OSX    
-    IDE: xcode  
+ * Win32(windows xp compatible) </br>
+    OS: Windows 10 PC</br>
+    IDE: visual studio 2017 + Directx SDK(only use x3daudio module)    </br>
+ * UWP </br> 
+    OS: Windows 10 PC    </br>
+    IDE: visual studio 2017   </br>   
+ * Linux </br> 
+    OS: Windows 10 PC and a linux machine additional(openssh gcc x11 mesa3d installed)    </br>
+    IDE visual studio 2017    </br>
+ * Android  
+    OS: Windows 10 PC    </br>
+    IDE: visual studio 2017   </br> 
+ * MacOS </br> 
+    OS: OSX   </br> 
+    IDE: xcode    </br>
+ * iOS </br> 
+    OS: OSX </br>   
+    IDE: xcode  </br>
  
 Future work:
 
