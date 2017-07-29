@@ -26,7 +26,7 @@
 */
 
 /* Original code from libtheora modified to suit to Opus */
-
+#ifdef __ARM_NEON
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -181,5 +181,5 @@ int opus_select_arch(void)
   celt_assert(arch == OPUS_ARCH_ARM_NEON);
   return arch;
 }
-
+#endif
 #endif

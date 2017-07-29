@@ -231,14 +231,17 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\armcpu.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\arm_celt_map.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\celt_neon_intr.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\bands.c">
       <CompileAs>CompileAsC</CompileAs>
@@ -311,30 +314,37 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\celt_lpc_sse.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse2.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse4_1.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\vq_sse2.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\x86cpu.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\x86_celt_map.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\A2NLSF.c">
       <CompileAs>CompileAsC</CompileAs>
@@ -347,18 +357,22 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\arm_silk_map.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\LPC_inv_pred_gain_neon_intr.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\NSQ_del_dec_neon_intr.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\NSQ_neon.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\biquad_alt.c">
       <CompileAs>CompileAsC</CompileAs>
@@ -755,22 +769,27 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\NSQ_del_dec_sse.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\NSQ_sse.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\VAD_sse.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\VQ_WMat_EC_sse.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\x86_silk_map.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\analysis.c">
       <CompileAs>CompileAsC</CompileAs>
@@ -961,22 +980,17 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\thread.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\armopts.s.in">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\celt_pitch_xcorr_arm.s">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-      <FileType>Document</FileType>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
       <FileType>Document</FileType>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <FileType>Document</FileType>
-      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
       <FileType>Document</FileType>
       <CompileAs>CompileAsCpp</CompileAs>

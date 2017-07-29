@@ -25,6 +25,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef __ARM_NEON
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -717,3 +718,4 @@ static OPUS_INLINE void silk_nsq_scale_states_sse4_1(
         }
     }
 }
+#endif

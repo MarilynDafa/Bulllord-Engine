@@ -24,7 +24,7 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
+#ifdef __ARM_NEON
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -141,3 +141,4 @@ void (*const CLT_MDCT_BACKWARD_IMPL[OPUS_ARCHMASK+1])(const mdct_lookup *l,
 # endif /* OPUS_ARM_MAY_HAVE_NEON_INTR */
 
 #endif /* OPUS_HAVE_RTCD */
+#endif

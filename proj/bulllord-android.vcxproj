@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM">
       <Configuration>Debug</Configuration>
@@ -35,27 +35,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{eadd048e-188f-4ebf-8008-6653541bb151}</ProjectGuid>
+    <ProjectGuid>{40cd5f90-f2ba-44c7-a4f8-bda5fc4b4cd2}</ProjectGuid>
     <Keyword>Android</Keyword>
     <RootNamespace>bulllord_android</RootNamespace>
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <ApplicationType>Android</ApplicationType>
-    <ApplicationTypeRevision>2.0</ApplicationTypeRevision>
+    <ApplicationTypeRevision>3.0</ApplicationTypeRevision>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>Clang_3_8</PlatformToolset>
-    <UseOfStl>system</UseOfStl>
     <AndroidAPILevel>android-19</AndroidAPILevel>
+    <UseOfStl>system</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>Clang_3_8</PlatformToolset>
-    <UseOfStl>system</UseOfStl>
     <AndroidAPILevel>android-19</AndroidAPILevel>
+    <UseOfStl>system</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -73,15 +73,15 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>Clang_3_8</PlatformToolset>
-    <UseOfStl>system</UseOfStl>
     <AndroidAPILevel>android-19</AndroidAPILevel>
+    <UseOfStl>system</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>Clang_3_8</PlatformToolset>
-    <UseOfStl>system</UseOfStl>
     <AndroidAPILevel>android-19</AndroidAPILevel>
+    <UseOfStl>system</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -103,131 +103,131 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>libBulllord</TargetName>
     <OutDir>../bin/android/$(Platform)</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
+    <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>libBulllord</TargetName>
     <OutDir>../bin/android/$(Platform)</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
+    <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <TargetName>libBulllord</TargetName>
     <OutDir>../bin/android/$(Platform)</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
+    <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <TargetName>libBulllord</TargetName>
     <OutDir>../bin/android/$(Platform)</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
+    <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <TargetName>libBulllord</TargetName>
     <OutDir>../bin/android/$(Platform)</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
+    <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <TargetName>libBulllord</TargetName>
     <OutDir>../bin/android/$(Platform)</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
+    <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <TargetName>libBulllord</TargetName>
     <OutDir>../bin/android/$(Platform)</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
+    <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <TargetName>libBulllord</TargetName>
     <OutDir>../bin/android/$(Platform)</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
+    <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <LibraryDependencies>GLESv3;EGL;OpenSLES;m;%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <LibraryDependencies>GLESv3;EGL;OpenSLES;m;%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <LibraryDependencies>GLESv3;EGL;OpenSLES;m;%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <LibraryDependencies>GLESv3;EGL;OpenSLES;m;%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <LibraryDependencies>GLESv3;EGL;OpenSLES;m;%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <LibraryDependencies>GLESv3;EGL;OpenSLES;m;%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <LibraryDependencies>GLESv3;EGL;OpenSLES;m;%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <LibraryDependencies>GLESv3;EGL;OpenSLES;m;%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

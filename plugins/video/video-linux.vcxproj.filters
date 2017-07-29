@@ -1,0 +1,260 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="arm">
+      <UniqueIdentifier>{907a2808-eec3-4e09-ad72-882c0d4c2f30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="x86">
+      <UniqueIdentifier>{a03e5d5f-0f5c-40a6-a2a4-227e927eab84}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="webm\vp8\common\arm\neon\bilinearpredict_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\copymem_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\dc_only_idct_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\dequant_idct_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\dequantizeb_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\idct_blk_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\idct_dequant_0_2x_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\idct_dequant_full_2x_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\iwalsh_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\loopfilter_arm.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\loopfiltersimplehorizontaledge_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\loopfiltersimpleverticaledge_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\mbloopfilter_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\shortidct4x4llm_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\sixtappredict_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\arm\neon\vp8_loopfilter_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\arm\neon\vp9_iht4x4_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\arm\neon\vp9_iht8x8_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\avg_pred_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\idct4x4_1_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\idct4x4_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\idct8x8_1_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\idct8x8_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\idct16x16_1_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\idct16x16_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\idct32x32_1_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\idct32x32_34_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\idct32x32_135_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\idct32x32_add_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\intrapred_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\loopfilter_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\vpx_convolve_avg_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\vpx_convolve_copy_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\vpx_convolve_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\arm\vpx_convolve8_neon.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_ports\arm_cpudetect.c">
+      <Filter>arm</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\x86\filter_x86.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\x86\idct_blk_mmx.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\x86\idct_blk_sse2.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\x86\loopfilter_x86.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp8\common\x86\vp8_asm_stubs.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vp9\common\x86\vp9_idct_intrin_sse2.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\avg_pred_sse2.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\inv_txfm_sse2.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\inv_txfm_ssse3.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\loopfilter_sse2.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\variance_sse2.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\vpx_asm_stubs.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+    <ClCompile Include="webm\vpx_dsp\x86\vpx_subpixel_8t_intrin_ssse3.c">
+      <Filter>x86</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="webm\vp8\common\x86\copy_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\copy_sse3.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\dequantize_mmx.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\idctllm_mmx.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\idctllm_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\iwalsh_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\loopfilter_block_sse2_x86_64.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\loopfilter_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\mfqe_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\recon_mmx.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\recon_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\subpixel_mmx.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\subpixel_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vp8\common\x86\subpixel_ssse3.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\add_noise_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\deblock_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\intrapred_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\intrapred_ssse3.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\inv_wht_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\subpel_variance_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\vpx_convolve_copy_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_8t_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webm\vpx_ports\emms.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="webm\vp8\common\x86\filter_x86.h">
+      <Filter>x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\x86\bitdepth_conversion_sse2.h">
+      <Filter>x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\x86\convolve.h">
+      <Filter>x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\x86\inv_txfm_sse2.h">
+      <Filter>x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\x86\transpose_sse2.h">
+      <Filter>x86</Filter>
+    </ClInclude>
+    <ClInclude Include="webm\vpx_dsp\x86\txfm_common_sse2.h">
+      <Filter>x86</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

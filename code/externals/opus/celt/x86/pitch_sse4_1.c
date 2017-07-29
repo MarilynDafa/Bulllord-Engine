@@ -25,6 +25,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef __ARM_NEON
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -192,4 +193,5 @@ void xcorr_kernel_sse4_1(const opus_val16 * x, const opus_val16 * y, opus_val32 
     initSum = _mm_add_epi32(initSum, vecSum);
     _mm_storeu_si128((__m128i *)sum, initSum);
 }
+#endif
 #endif

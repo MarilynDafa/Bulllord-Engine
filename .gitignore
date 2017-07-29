@@ -27,3 +27,7 @@
 *.so
 code/externals/opus/celt/dump_modes/Makefile
 *.mk
+*.resfiles
+*.ipch
+*.db-shm
+*.db-wal

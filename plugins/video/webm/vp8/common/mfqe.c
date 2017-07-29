@@ -25,6 +25,7 @@
 
 #include <limits.h>
 #include <stdlib.h>
+#ifndef _M_ARM
 
 static void filter_by_weight(unsigned char *src, int src_stride,
                              unsigned char *dst, int dst_stride, int block_size,
@@ -328,3 +329,4 @@ void vp8_multiframe_quality_enhance(VP8_COMMON *cm) {
     mode_info_context++; /* Skip border mb */
   }
 }
+#endif

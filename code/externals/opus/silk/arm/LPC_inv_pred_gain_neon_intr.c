@@ -24,7 +24,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ***********************************************************************/
-
+#ifdef __ARM_NEON
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -278,3 +278,4 @@ opus_int32 silk_LPC_inverse_pred_gain_neon(         /* O   Returns inverse predi
 
     return invGain_Q30;
 }
+#endif

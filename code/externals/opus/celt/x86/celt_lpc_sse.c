@@ -25,6 +25,8 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef __ARM_NEON
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -85,5 +87,7 @@ void celt_fir_sse4_1(const opus_val16 *x,
 
    RESTORE_STACK;
 }
+
+#endif
 
 #endif

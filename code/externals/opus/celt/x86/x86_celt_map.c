@@ -25,6 +25,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef __ARM_NEON
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
@@ -163,5 +164,6 @@ opus_val16 (*const OP_PVQ_SEARCH_IMPL[OPUS_ARCHMASK + 1])(
 };
 #endif
 
+#endif
 #endif
 #endif

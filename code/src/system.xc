@@ -967,7 +967,7 @@ public:
 		if (!_GbSystemRunning)
 		{
 			Windows::UI::Core::CoreWindow ^ _window = Windows::UI::Core::CoreWindow::GetForCurrentThread();
-			_GpuIntervention(_window,
+			_GpuIntervention(_PrSystemMem->pDukContext, _window,
 				((BLS32)(0.5f + (((BLF32)(_window->Bounds.Width) * (BLF32)Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi) / 96.f))),
 				((BLS32)(0.5f + (((BLF32)(_window->Bounds.Height) * (BLF32)Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi) / 96.f))),
 				!_PrSystemMem->sBoostParam.bProfiler);
@@ -4431,9 +4431,9 @@ blCursorVisiblity(IN BLBool _Show)
 #elif defined(BL_PLATFORM_UWP)
 #	if WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP
 	if (_Show)
-		_Sender->PointerCursor = ref new Windows::UI::Core::CoreCursor(Windows::UI::Core::CoreCursorType::Arrow, 0);
+		Windows::UI::Core::CoreWindow::GetForCurrentThread()->PointerCursor = ref new Windows::UI::Core::CoreCursor(Windows::UI::Core::CoreCursorType::Arrow, 0);
 	else
-		_Sender->PointerCursor = nullptr;
+		Windows::UI::Core::CoreWindow::GetForCurrentThread()->PointerCursor = nullptr;
 #	endif
 #else
 #endif

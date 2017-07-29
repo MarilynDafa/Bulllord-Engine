@@ -24,7 +24,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ***********************************************************************/
-
+#ifdef __ARM_NEON
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -1122,3 +1122,4 @@ static OPUS_INLINE void silk_nsq_del_dec_scale_states_neon(
         NSQ->prev_gain_Q16 = Gains_Q16[ subfr ];
     }
 }
+#endif

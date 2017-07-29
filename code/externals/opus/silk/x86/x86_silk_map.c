@@ -25,6 +25,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef __ARM_NEON
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
@@ -160,5 +161,6 @@ void (*const SILK_BURG_MODIFIED_IMPL[ OPUS_ARCHMASK + 1 ] )(
   MAY_HAVE_SSE4_1( silk_burg_modified )  /* avx */
 };
 
+#endif
 #endif
 #endif

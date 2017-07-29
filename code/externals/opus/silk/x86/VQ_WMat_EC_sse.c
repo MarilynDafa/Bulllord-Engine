@@ -25,6 +25,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef __ARM_NEON
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -140,3 +141,4 @@ void silk_VQ_WMat_EC_sse4_1(
         cb_row_Q7 += LTP_ORDER;
     }
 }
+#endif

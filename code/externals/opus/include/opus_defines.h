@@ -68,7 +68,7 @@ extern "C" {
 #  if defined(OPUS_BUILD) && defined(DLL_EXPORT)
 #   define OPUS_EXPORT __declspec(dllexport)
 #  else
-#   define OPUS_EXPORT
+#   define OPUS_EXPORT __declspec(dllimport)
 #  endif
 # elif defined(__GNUC__) && defined(OPUS_BUILD)
 #  define OPUS_EXPORT __attribute__ ((visibility ("default")))
