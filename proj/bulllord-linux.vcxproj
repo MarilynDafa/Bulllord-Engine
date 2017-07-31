@@ -69,95 +69,147 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <OutDir>../bin/linux/$(Platform)</OutDir>
-    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>libBulllord</TargetName>
+    <IncludePath>$(IncludePath);$(ISenseIncludePath)</IncludePath>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <OutDir>../bin/linux/$(Platform)</OutDir>
-    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>libBulllord</TargetName>
+    <IncludePath>$(IncludePath);$(ISenseIncludePath)</IncludePath>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>../bin/linux/$(Platform)</OutDir>
-    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>libBulllord</TargetName>
+    <IncludePath>$(IncludePath);$(ISenseIncludePath)</IncludePath>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>../bin/linux/$(Platform)</OutDir>
-    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>libBulllord</TargetName>
+    <IncludePath>$(IncludePath);$(ISenseIncludePath)</IncludePath>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <OutDir>../bin/linux/$(Platform)</OutDir>
-    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>libBulllord</TargetName>
+    <IncludePath>$(IncludePath);$(ISenseIncludePath)</IncludePath>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <OutDir>../bin/linux/$(Platform)</OutDir>
-    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>libBulllord</TargetName>
+    <IncludePath>$(IncludePath);$(ISenseIncludePath)</IncludePath>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-msse4.1 -fshort-wchar %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar %(AdditionalOptions)</AdditionalOptions>
+      <Verbose>false</Verbose>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals/opus;/root/projects/bulllord-linux/externals/opus/silk;/root/projects/bulllord-linux/externals/opus/celt;/root/projects/bulllord-linux/externals/opus/silk/fixed;/root/projects/bulllord-linux/externals/opus/silk/float;/root/projects/bulllord-linux/externals/opus/include;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/bulllord-linux/externals/freetype2/include;/root/projects/bulllord-linux/externals/zstd;/root/projects/bulllord-linux/externals/zstd/common;/root/projects/bulllord-linux/externals/zstd/compress;/root/projects/bulllord-linux/externals/zstd/decompress;/root/projects/bulllord-linux/externals/zstd/dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <PositionIndependentCode>true</PositionIndependentCode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>GL;X11;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>/usr/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>X11;GL;dl;openal;pthread;m;%(LibraryDependencies)</LibraryDependencies>
+      <VerboseOutput>true</VerboseOutput>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-msse4.1 -fshort-wchar %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar %(AdditionalOptions)</AdditionalOptions>
+      <Verbose>false</Verbose>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals/opus;/root/projects/bulllord-linux/externals/opus/silk;/root/projects/bulllord-linux/externals/opus/celt;/root/projects/bulllord-linux/externals/opus/silk/fixed;/root/projects/bulllord-linux/externals/opus/silk/float;/root/projects/bulllord-linux/externals/opus/include;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/bulllord-linux/externals/freetype2/include;/root/projects/bulllord-linux/externals/zstd;/root/projects/bulllord-linux/externals/zstd/common;/root/projects/bulllord-linux/externals/zstd/compress;/root/projects/bulllord-linux/externals/zstd/decompress;/root/projects/bulllord-linux/externals/zstd/dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <PositionIndependentCode>true</PositionIndependentCode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>GL;X11;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>/usr/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>X11;GL;dl;openal;pthread;m;%(LibraryDependencies)</LibraryDependencies>
+      <VerboseOutput>true</VerboseOutput>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-msse4.1 -fshort-wchar -m64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m64 -fPIC %(AdditionalOptions)</AdditionalOptions>
+      <Verbose>false</Verbose>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals/opus;/root/projects/bulllord-linux/externals/opus/silk;/root/projects/bulllord-linux/externals/opus/celt;/root/projects/bulllord-linux/externals/opus/silk/fixed;/root/projects/bulllord-linux/externals/opus/silk/float;/root/projects/bulllord-linux/externals/opus/include;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/bulllord-linux/externals/freetype2/include;/root/projects/bulllord-linux/externals/zstd;/root/projects/bulllord-linux/externals/zstd/common;/root/projects/bulllord-linux/externals/zstd/compress;/root/projects/bulllord-linux/externals/zstd/decompress;/root/projects/bulllord-linux/externals/zstd/dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <PositionIndependentCode>true</PositionIndependentCode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>GL;X11;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>X11;GL;dl;openal;pthread;m;%(LibraryDependencies)</LibraryDependencies>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <VerboseOutput>true</VerboseOutput>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-msse4.1 -fshort-wchar -m64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m64 -fPIC %(AdditionalOptions)</AdditionalOptions>
+      <Verbose>false</Verbose>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals/opus;/root/projects/bulllord-linux/externals/opus/silk;/root/projects/bulllord-linux/externals/opus/celt;/root/projects/bulllord-linux/externals/opus/silk/fixed;/root/projects/bulllord-linux/externals/opus/silk/float;/root/projects/bulllord-linux/externals/opus/include;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/bulllord-linux/externals/freetype2/include;/root/projects/bulllord-linux/externals/zstd;/root/projects/bulllord-linux/externals/zstd/common;/root/projects/bulllord-linux/externals/zstd/compress;/root/projects/bulllord-linux/externals/zstd/decompress;/root/projects/bulllord-linux/externals/zstd/dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <PositionIndependentCode>true</PositionIndependentCode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>GL;X11;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>X11;GL;dl;openal;pthread;m;%(LibraryDependencies)</LibraryDependencies>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <VerboseOutput>true</VerboseOutput>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+      <Verbose>false</Verbose>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals/opus;/root/projects/bulllord-linux/externals/opus/silk;/root/projects/bulllord-linux/externals/opus/celt;/root/projects/bulllord-linux/externals/opus/silk/fixed;/root/projects/bulllord-linux/externals/opus/silk/float;/root/projects/bulllord-linux/externals/opus/include;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/bulllord-linux/externals/freetype2/include;/root/projects/bulllord-linux/externals/zstd;/root/projects/bulllord-linux/externals/zstd/common;/root/projects/bulllord-linux/externals/zstd/compress;/root/projects/bulllord-linux/externals/zstd/decompress;/root/projects/bulllord-linux/externals/zstd/dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <PositionIndependentCode>true</PositionIndependentCode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>GL;X11;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>X11;GL;dl;openal;pthread;m;%(LibraryDependencies)</LibraryDependencies>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <VerboseOutput>true</VerboseOutput>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+      <Verbose>false</Verbose>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals/opus;/root/projects/bulllord-linux/externals/opus/silk;/root/projects/bulllord-linux/externals/opus/celt;/root/projects/bulllord-linux/externals/opus/silk/fixed;/root/projects/bulllord-linux/externals/opus/silk/float;/root/projects/bulllord-linux/externals/opus/include;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/bulllord-linux/externals/freetype2/include;/root/projects/bulllord-linux/externals/zstd;/root/projects/bulllord-linux/externals/zstd/common;/root/projects/bulllord-linux/externals/zstd/compress;/root/projects/bulllord-linux/externals/zstd/decompress;/root/projects/bulllord-linux/externals/zstd/dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <PositionIndependentCode>true</PositionIndependentCode>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>GL;X11;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>X11;GL;dl;openal;pthread;m;%(LibraryDependencies)</LibraryDependencies>
+      <SharedLibrarySearchPath>%(SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <VerboseOutput>true</VerboseOutput>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

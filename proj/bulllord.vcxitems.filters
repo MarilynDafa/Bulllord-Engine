@@ -52,14 +52,14 @@
     <Filter Include="externals\zstd">
       <UniqueIdentifier>{b605e65d-6778-4d58-b91e-824367ef0426}</UniqueIdentifier>
     </Filter>
-    <Filter Include="externals\rsa">
-      <UniqueIdentifier>{7356be6b-8c0d-4520-8e27-543f86750e20}</UniqueIdentifier>
-    </Filter>
     <Filter Include="externals\opus\x86">
       <UniqueIdentifier>{9560f31f-f25f-4b2c-b775-9418f22b1d65}</UniqueIdentifier>
     </Filter>
     <Filter Include="externals\opus\arm">
       <UniqueIdentifier>{8b583ead-0968-4af0-beed-0d01902ca13b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\freetype2\dummy">
+      <UniqueIdentifier>{46e37d5a-5203-4bdf-b23c-3d3471506602}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -723,6 +723,498 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\NSQ_neon.c">
       <Filter>externals\opus\arm</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afpic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afglobal.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afblue.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afangles.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afhints.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afranges.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afdummy.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\aflatin.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afwarp.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afcjk.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afindic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afshaper.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afloader.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afmodule.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftpic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\basepic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftadvanc.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftcalc.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftdbgmem.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftgloadr.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\fthash.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftobjs.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftoutln.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftrfork.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftsnames.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftstream.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\fttrigon.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftutil.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\bdf\bdfdrivr.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\bdf\bdflib.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcbasic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftccache.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftccmap.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcglyph.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcimage.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcmanag.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcmru.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcsbits.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2arrst.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2blues.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2error.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2font.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2ft.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2hints.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2intrp.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2read.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2stack.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffcmap.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffdrivr.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffgload.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffload.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffobjs.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffparse.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffpic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidgload.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidload.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidobjs.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidparse.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidriver.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvalid.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvbsln.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvcommn.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvfeat.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvfgen.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvjust.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvkern.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvlcar.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmod.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmort.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmort0.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmort1.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmort2.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmort4.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmort5.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmorx.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmorx0.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmorx1.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmorx2.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmorx4.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmorx5.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvopbd.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvprop.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvtrak.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\adler32.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\infblock.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\infcodes.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\inflate.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\inftrees.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\infutil.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\zutil.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\lzw\ftzopen.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvalid.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvbase.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvcommn.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvgdef.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvgpos.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvgsub.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvjstf.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvmath.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvmod.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pcf\pcfdrivr.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pcf\pcfread.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pcf\pcfutil.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrcmap.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrdrivr.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrgload.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrload.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrobjs.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrsbit.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\afmparse.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\psauxmod.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\psconv.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\psobjs.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\t1cmap.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\t1decode.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshalgo.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshglob.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshmod.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshpic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshrec.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psnames\psnames.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psnames\pspic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\raster\ftraster.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\raster\ftrend1.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\raster\rastpic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\pngshim.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\sfdriver.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\sfntpic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\sfobjs.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttbdf.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttcmap.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttkern.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttload.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttmtx.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttpost.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttsbit.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\smooth\ftgrays.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\smooth\ftsmooth.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\smooth\ftspic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttdriver.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttgload.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttgxvar.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttinterp.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttobjs.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttpic.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttpload.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttsubpix.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1afm.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1driver.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1gload.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1load.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1objs.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1parse.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type42\t42drivr.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type42\t42objs.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type42\t42parse.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\codec.c">
+      <Filter>externals\sqlite3</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\codecext.c">
+      <Filter>externals\sqlite3</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\extensionfunctions.c">
+      <Filter>externals\sqlite3</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\rijndael.c">
+      <Filter>externals\sqlite3</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sha2.c">
+      <Filter>externals\sqlite3</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\shell.c">
+      <Filter>externals\sqlite3</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3.c">
+      <Filter>externals\sqlite3</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\userauth.c">
+      <Filter>externals\sqlite3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h">
@@ -867,6 +1359,990 @@
       <Filter>externals\zstd</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\compress\zstdmt_compress.h">
+      <Filter>externals\zstd</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afpic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\freetype.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\fttypes.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftsystem.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftimage.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\fterrors.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftmoderr.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\fterrdef.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftobjs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftrender.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftmodapi.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftglyph.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftsizes.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftlcdfil.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftmemory.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftgloadr.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftdriver.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\autohint.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftserv.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftpic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftincrem.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afglobal.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\aftypes.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftoutln.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftdebug.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afblue.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afwrtsys.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afscript.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afcover.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afstyles.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afmodule.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afshaper.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afranges.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afdummy.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\aflatin.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afhints.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afcjk.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afindic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\aferrors.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftcalc.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftadvanc.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afwarp.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afloader.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftautoh.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svbdf.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svcid.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svfntfmt.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svgldict.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svgxval.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svkern.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svmetric.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svmm.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svotval.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svpfr.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svpostnm.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svprop.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svpscmap.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svpsinfo.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svsfnt.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svttcmap.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svtteng.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svttglyf.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\services\svwinfnt.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\basepic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\fttrigon.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\fthash.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftrfork.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftstream.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\fttrace.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\ftvalid.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\internal.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\psaux.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\pshints.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\sfnt.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\t1types.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\internal\tttypes.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftbbox.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftbdf.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftbitmap.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftbzip2.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftcache.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftcffdrv.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftchapters.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftcid.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftfntfmt.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftgasp.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftgxval.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftgzip.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftlist.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftlzw.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftmac.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftmm.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftotval.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftpfr.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftsnames.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftstroke.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftsynth.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftttdrv.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftwinfnt.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\t1tables.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ttnameid.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\tttables.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\tttags.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ttunpat.h">
+      <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftbase.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\md5.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\bdf\bdf.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\bdf\bdfdrivr.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\bdf\bdferror.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftccache.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftccback.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcerror.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcglyph.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcimage.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcmanag.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcmru.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cache\ftcsbits.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2arrst.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2blues.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2error.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2fixed.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2font.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2ft.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2glue.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2hints.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2intrp.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2read.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2stack.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cf2types.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffcmap.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffdrivr.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cfferrs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffgload.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffload.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffobjs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffparse.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cffpic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cfftoken.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cff\cfftypes.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\ciderrs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidgload.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidload.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidobjs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidparse.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidriver.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\cid\cidtoken.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvalid.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvcommn.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxverror.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvfeat.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmod.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmort.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gxvalid\gxvmorx.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\ftzconf.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\infblock.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\infcodes.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\inffixed.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\inftrees.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\infutil.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\zlib.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\gzip\zutil.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\lzw\ftzopen.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvalid.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvcommn.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otverror.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvgpos.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\otvalid\otvmod.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pcf\pcf.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pcf\pcfdrivr.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pcf\pcferror.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pcf\pcfread.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pcf\pcfutil.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrcmap.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrdrivr.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrerror.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrgload.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrload.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrobjs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrsbit.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pfr\pfrtypes.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\afmparse.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\psauxerr.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\psauxmod.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\psconv.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\psobjs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\t1cmap.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psaux\t1decode.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshalgo.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshglob.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshmod.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshnterr.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshpic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\pshinter\pshrec.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psnames\psmodule.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psnames\psnamerr.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psnames\pspic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\psnames\pstables.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\raster\ftmisc.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\raster\ftraster.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\raster\ftrend1.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\raster\rasterrs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\raster\rastpic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\pngshim.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\sfdriver.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\sferrors.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\sfntpic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\sfobjs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttbdf.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttcmap.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttcmapc.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttkern.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttload.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttmtx.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttpost.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\sfnt\ttsbit.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\smooth\ftgrays.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\smooth\ftsmerrs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\smooth\ftsmooth.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\smooth\ftspic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttdriver.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\tterrors.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttgload.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttgxvar.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttinterp.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttobjs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttpic.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttpload.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\truetype\ttsubpix.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1afm.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1driver.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1errors.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1gload.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1load.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1objs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1parse.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type1\t1tokens.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type42\t42drivr.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type42\t42error.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type42\t42objs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type42\t42parse.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type42\t42types.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\winfonts\fnterrs.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\winfonts\winfnt.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\config.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\version.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\bands.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\_kiss_fft_guts.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arch.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\celt.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\celt_lpc.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\cpu_support.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\cwrs.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\ecintrin.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\entcode.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\entdec.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\entenc.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\fixed_c5x.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\fixed_c6x.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\fixed_debug.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\fixed_generic.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\float_cast.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\kiss_fft.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\laplace.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\mathops.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\mdct.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\mfrngcod.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\modes.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\os_support.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\pitch.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\quant_bands.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\rate.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\stack_alloc.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\static_modes_fixed.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\static_modes_fixed_arm_ne10.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\static_modes_float.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\static_modes_float_arm_ne10.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\vq.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\celt_lpc_sse.h">
+      <Filter>externals\opus\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse.h">
+      <Filter>externals\opus\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\vq_sse.h">
+      <Filter>externals\opus\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\x86cpu.h">
+      <Filter>externals\opus\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\armcpu.h">
+      <Filter>externals\opus\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\fft_arm.h">
+      <Filter>externals\opus\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\fixed_arm64.h">
+      <Filter>externals\opus\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\fixed_armv4.h">
+      <Filter>externals\opus\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\fixed_armv5e.h">
+      <Filter>externals\opus\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\kiss_fft_armv4.h">
+      <Filter>externals\opus\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\kiss_fft_armv5e.h">
+      <Filter>externals\opus\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\mdct_arm.h">
+      <Filter>externals\opus\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\pitch_arm.h">
+      <Filter>externals\opus\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\API.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\control.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\debug.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\define.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\errors.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\Inlines.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\MacroCount.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\MacroDebug.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\macros.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\main.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NSQ.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\pitch_est_defines.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\PLC.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_private.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_rom.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_structs.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\SigProc_FIX.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\structs.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tables.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tuning_parameters.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\typedef.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\main_FLP.h">
+      <Filter>externals\opus\float</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\SigProc_FLP.h">
+      <Filter>externals\opus\float</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\structs_FLP.h">
+      <Filter>externals\opus\float</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\analysis.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\mlp.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\mlp_train.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\opus_private.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\tansig_table.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\codec.h">
+      <Filter>externals\sqlite3</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\rijndael.h">
+      <Filter>externals\sqlite3</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sha2.h">
+      <Filter>externals\sqlite3</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3.h">
+      <Filter>externals\sqlite3</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3ext.h">
+      <Filter>externals\sqlite3</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3userauth.h">
+      <Filter>externals\sqlite3</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\compress\zstd_opt.h">
+      <Filter>externals\zstd</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\dictBuilder\divsufsort.h">
+      <Filter>externals\zstd</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\dictBuilder\zdict.h">
       <Filter>externals\zstd</Filter>
     </ClInclude>
   </ItemGroup>

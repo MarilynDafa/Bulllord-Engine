@@ -19,21 +19,46 @@ Supported rendering backends:
  * OpenGL ES
  * Vulkan(In Development)
  * WebGL(In Development)
+ * Software Raster(In Development)
 
 Supported platforms:
 
- * Android
- * iOS
- * Linux
- * OSX
- * Windows
- * UWP 
+ * Android</br>
+ * iOS</br>
+ * Linux</br>
+ * OSX</br>
+ * Windows</br>
+ * UWP </br> 
+ * Web
 
 Supported compilers:
 
  * Clang 3.3 and above
  * GCC 4.6 and above
  * VS2015 and above
+ 
+ How to build:
+ 
+ * Win32(windows xp compatible) </br>
+    OS: Windows 10 PC</br>
+    IDE: visual studio 2017</br>
+	Tips: Install Directx SDK first(for xaudio module)    </br>
+ * UWP </br> 
+    OS: Windows 10 PC    </br>
+    IDE: visual studio 2017   </br>   
+ * Linux </br> 
+    OS: Windows 10 PC and a linux machine additional(openssh gcc x11 mesa3d openal installed)    </br>
+    IDE: visual studio 2017    </br>
+	Tips: You can install Windows 10 Ubuntu Subsystem on your Win10 PC and only support root login(a visual studio project macro bug?)</br>
+ * Android  
+    OS: Windows 10 PC    </br>
+    IDE: visual studio 2017   </br> 
+	Tips: Java code in proj/java </br> 
+ * MacOS </br> 
+    OS: OSX   </br> 
+    IDE: xcode    </br>
+ * iOS </br> 
+    OS: OSX</br>IDE: xcode  </br>
  
 Future work:
 
@@ -65,4 +90,5 @@ Toolchain Screenshot
 ![image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/UIdesigner.jpg)
 ![image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/Pack.jpg)
 ![image](https://github.com/MarilynDafa/Bulllord-Engine/blob/master/icons/textool.jpg)
+
 QQ交流群：563060511

@@ -2041,8 +2041,10 @@ blVSync(IN BLBool _On)
 		GLint _sync = _On;
 		[_PrGpuMem->pGLC setValues : &_sync forParameter : NSOpenGLCPSwapInterval];
 #	elif defined(BL_PLATFORM_LINUX)
+        PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC)glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
+        PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC)glXGetProcAddress((const GLubyte*)"glXSwapIntervalSGI");
 		if (glXSwapIntervalEXT)
-			glXSwapIntervalEXT(_PrGpuMem->pDisplay, _PrGpuMem->nWindow , _On);
+			glXSwapIntervalEXT(_PrGpuMem->pDisplay, _PrGpuMem->nWindow, _On);
         else if(glXSwapIntervalSGI)
             glXSwapIntervalSGI(_On);
 #	elif defined(BL_PLATFORM_IOS)
