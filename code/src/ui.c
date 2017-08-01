@@ -11336,15 +11336,15 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 		_UIUpdate(_PrUIMem->pRoot, _Delta);
 		if (_PrUIMem->bDirty)
 		{
-			blBindFrameBuffer(_PrUIMem->nFBO);
+			blBindFrameBuffer(_PrUIMem->nFBO, TRUE);
 			BLF32 _screensz[2] = { 2.f / (BLF32)_PrUIMem->nFboWidth, 2.f / (BLF32)_PrUIMem->nFboHeight };
 			blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 			blFrameBufferClear(TRUE, FALSE, FALSE);
 			_DrawWidget(_PrUIMem->pRoot, 0.f, 0.f);
 			blFrameBufferResolve(_PrUIMem->nFBO);
+			blBindFrameBuffer(_PrUIMem->nFBO, FALSE);
 			_PrUIMem->bDirty = FALSE;
 		}
-		blBindFrameBuffer(INVALID_GUID);
 		BLF32 _screensz[2] = { 2.f / (BLF32)_width, 2.f / (BLF32)_height };
 		blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 		BLF32 _vbo[] = {

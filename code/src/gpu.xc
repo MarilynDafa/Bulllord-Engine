@@ -169,6 +169,7 @@ typedef struct _FrameBuffer {
         struct _GL {
             GLuint nHandle;
             GLuint nResolveHandle;
+            GLint nPrevHandle;
         } sGL;
 #elif defined(BL_VK_BACKEND)
         struct _VK {
@@ -2269,7 +2270,7 @@ blDeleteFrameBuffer(IN BLGuid _FBO)
     blDeleteGuid(_FBO);
 }
 BLVoid
-blBindFrameBuffer(IN BLGuid _FBO)
+blBindFrameBuffer(IN BLGuid _FBO, IN BLBool _Bind)
 {
 	_BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
 	BLU32 _w, _h, _aw, _ah;
@@ -2278,8 +2279,9 @@ blBindFrameBuffer(IN BLGuid _FBO)
 #if defined(BL_GL_BACKEND)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
 	{
-		if (_fbo)
+		if (_Bind)
 		{
+            GL_CHECK_INTERNAL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &_fbo->uData.sGL.nPrevHandle));
 			GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
 			_BLTextureBuffer* _tex = _fbo->aAttachments[0].pAttachments;
 			if (_tex)
@@ -2289,7 +2291,7 @@ blBindFrameBuffer(IN BLGuid _FBO)
 		}
 		else
 		{
-			GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+			GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)_fbo->uData.sGL.nPrevHandle));
 			GL_CHECK_INTERNAL(glViewport(0, 0, _w, _h));
 		}
 	}
@@ -2348,7 +2350,6 @@ blFrameBufferResolve(IN BLGuid _FBO)
     {
         if (_fbo->uData.sGL.nResolveHandle)
         {
-            GL_CHECK_INTERNAL(glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
             GL_CHECK_INTERNAL(glReadBuffer(GL_COLOR_ATTACHMENT0));
             GL_CHECK_INTERNAL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _fbo->uData.sGL.nResolveHandle));
             GL_CHECK_INTERNAL(glBlitFramebuffer(0, 0, _fbo->nWidth, _fbo->nHeight, 0, 0, _fbo->nWidth, _fbo->nHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
@@ -2373,7 +2374,6 @@ blFrameBufferResolve(IN BLGuid _FBO)
 #endif
 			GL_CHECK_INTERNAL(glBindFramebuffer(GL_READ_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
 			GL_CHECK_INTERNAL(glReadBuffer(GL_NONE));
-            GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
         }
         for (BLU32 _idx = 0; _idx < _fbo->nAttachmentIndex; ++_idx)
         {
@@ -2431,6 +2431,8 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
+		GLint _prev;
+		GL_CHECK_INTERNAL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &_prev));
         GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
         if (0 == _fbo->nAttachmentIndex)
         {
@@ -2483,6 +2485,7 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
                 }
             }
         }
+		GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _prev));
         assert(GL_FRAMEBUFFER_COMPLETE == glCheckFramebufferStatus(GL_FRAMEBUFFER));
     }
 #elif defined(BL_MTL_BACKEND)
@@ -2509,6 +2512,8 @@ blFrameBufferDetach(IN BLGuid _FBO, IN BLBool _DepthStencil)
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
+		GLint _prev;
+		GL_CHECK_INTERNAL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &_prev));
 		if (_fbo->pDSAttachment && _DepthStencil)
 		{
 			GLenum _attachment;
@@ -2541,6 +2546,7 @@ blFrameBufferDetach(IN BLGuid _FBO, IN BLBool _DepthStencil)
             GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_fbo->nAttachmentIndex].nFace : GL_TEXTURE_2D;
             GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentIndex, _target, 0, _fbo->aAttachments[_fbo->nAttachmentIndex].nMip));
         }
+		GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _prev));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
@@ -2836,7 +2842,7 @@ blDeleteTexture(IN BLGuid _Tex)
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
-        GLenum _target;
+        GLenum _target = GL_TEXTURE_2D;
         switch (_tex->eTarget)
         {
             case BL_TT_1D: _target = GL_TEXTURE_2D; break;
@@ -2895,7 +2901,7 @@ blTextureFilter(IN BLGuid _Tex, IN BLEnum _MinFilter, IN BLEnum _MagFilter, IN B
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
-        GLenum _target;
+        GLenum _target = GL_TEXTURE_2D;
         switch (_tex->eTarget)
         {
             case BL_TT_1D: _target = GL_TEXTURE_2D; break;
@@ -2917,7 +2923,7 @@ blTextureFilter(IN BLGuid _Tex, IN BLEnum _MinFilter, IN BLEnum _MagFilter, IN B
             _magfilter = GL_NEAREST;
         else
             _magfilter = GL_LINEAR;
-        GLenum _wraps, _wrapt;
+        GLenum _wraps = GL_REPEAT, _wrapt = GL_REPEAT;
         switch (_WrapS)
         {
             case BL_TW_REPEAT:
@@ -3636,17 +3642,17 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
         ezxml_t _element = ezxml_child(_doc, _tag);
         _element = ezxml_child(_element, "Vert");
         do {
-            if (!strcmp(ezxml_name(_element), "Vert"))
+            if (_element && !strcmp(_element->name, "Vert"))
                 _vert = ezxml_txt(_element);
-            else if (!strcmp(ezxml_name(_element), "Frag"))
+            else if (_element && !strcmp(_element->name, "Frag"))
                 _frag = ezxml_txt(_element);
-            else if (!strcmp(ezxml_name(_element), "Geom"))
+            else if (_element && !strcmp(_element->name, "Geom"))
                 _geom = ezxml_txt(_element);
-            else if (!strcmp(ezxml_name(_element), "Tesc"))
+            else if (_element && !strcmp(_element->name, "Tesc"))
                 _tesc = ezxml_txt(_element);
-            else if (!strcmp(ezxml_name(_element), "Tess"))
+            else if (_element && !strcmp(_element->name, "Tess"))
                 _tess = ezxml_txt(_element);
-            else if (!strcmp(ezxml_name(_element), "Comp"))
+            else if (_element && !strcmp(_element->name, "Comp"))
                 _comp = ezxml_txt(_element);
             _element = _element->sibling;
         } while (_element);

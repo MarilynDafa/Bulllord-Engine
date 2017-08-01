@@ -1161,7 +1161,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
     }
     else
     {
-		blBindFrameBuffer(_PrSpriteMem->nFBO);
+		blBindFrameBuffer(_PrSpriteMem->nFBO, TRUE);
 		BLF32 _screensz[2] = { 2.f / (BLF32)_PrSpriteMem->nFboWidth, 2.f / (BLF32)_PrSpriteMem->nFboHeight };
 		blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 		blTechUniform(_PrSpriteMem->nSpriteInstTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
@@ -1386,7 +1386,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			if (_PrSpriteMem->fShakingTime < 0.f)
 				_PrSpriteMem->bShaking = FALSE;
 		}
-		blBindFrameBuffer(INVALID_GUID);
+		blBindFrameBuffer(_PrSpriteMem->nFBO, FALSE);
 		_screensz[0] = 2.f / (BLF32)_screenwidth;
 		_screensz[1] = 2.f / (BLF32)_screenheight;
 		blTechUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));

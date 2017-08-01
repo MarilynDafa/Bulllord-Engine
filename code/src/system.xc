@@ -109,7 +109,7 @@ typedef struct _BoostParam {
 	BLBool bFullscreen;
 	BLBool bProfiler;
 	BLEnum eQuality;
-	BLS32 nHandle;	
+	BLS32 nHandle;
 	const BLVoid(*pBeginFunc)(BLVoid);
 	const BLVoid(*pStepFunc)(BLU32);
 	const BLVoid(*pEndFunc)(BLVoid);
@@ -466,7 +466,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 	case WM_SIZE:
 	{
 		if ((SIZE_MAXHIDE == _Wparam) || (SIZE_MINIMIZED == _Wparam))
-			_GbSystemRunning = 2;		
+			_GbSystemRunning = 2;
 		else
 			_GbSystemRunning = 1;
 		RECT _rc;
@@ -3339,7 +3339,6 @@ _SystemInit()
 BLVoid
 _SystemStep()
 {
-	blBindFrameBuffer(INVALID_GUID);
 	blFrameBufferClear(TRUE, TRUE, TRUE);
     BLU32 _now = blTickCounts();
     BLU32 _delta = _now - _PrSystemMem->nSysTime;
@@ -4157,7 +4156,7 @@ blOpenPlugin(IN BLAnsi* _Basename)
     strcat_s(_path, 260, "lib");
     strcat_s(_path, 260, _Basename);
     strcat_s(_path, 260, "Plugin.dll");
-#elif defined(BL_PLATFORM_LINUX) 
+#elif defined(BL_PLATFORM_LINUX)
     strcpy(_path, blWorkingDir());
     strcat(_path, "lib");
     strcat(_path, _Basename);

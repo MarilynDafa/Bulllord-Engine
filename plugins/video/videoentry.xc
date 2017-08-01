@@ -573,7 +573,6 @@ blVideoPlayEXT(IN BLAnsi* _Filename)
 	BLU32 _width, _height, _dwidth, _dheight;
 	BLF32 _rx, _ry;
 	blWindowQuery(&_width, &_height, &_dwidth, &_dheight, &_rx, &_ry);
-	blBindFrameBuffer(INVALID_GUID);
 	BLF32 _screensz[2] = { 2.f / (BLF32)_width, 2.f / (BLF32)_height };
 	blTechUniform(_PrVideoMem->nTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0, FALSE);
@@ -681,7 +680,7 @@ blVideoPlayEXT(IN BLAnsi* _Filename)
 					if ((BLS32)(_framedelta * 990) - (_audiodelta > 1000 ? 0 : _audiodelta) >= 0)
 						blTickDelay((BLU32)(_framedelta * 990) - (_audiodelta > 1000 ? 0 : _audiodelta));
 					_audiodelta = blTickCounts();
-					_PrVideoMem->fTime = (_audioframe.fTime > _videoframe.fTime) ? _audioframe.fTime : _videoframe.fTime;
+					_PrVideoMem->fTime = _videoframe.fTime;
 				}
 			}
 		}

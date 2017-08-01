@@ -115,7 +115,8 @@ BL_API BLVoid blDeleteFrameBuffer(
 	IN BLGuid _FBO);
 
 BL_API BLVoid blBindFrameBuffer(
-	IN BLGuid _FBO);
+	IN BLGuid _FBO,
+	IN BLBool _Bind);
     
 BL_API BLVoid blFrameBufferClear(
     IN BLBool _ColorBit,
