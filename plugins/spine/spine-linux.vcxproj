@@ -35,6 +35,7 @@
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
     <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
     <LinuxProjectType>{2238F9CD-F817-4ECC-BD14-2524D2669B35}</LinuxProjectType>
+    <ProjectName>spine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
@@ -69,107 +70,119 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <OutDir>..\..\bin\linux\$(Platform)</OutDir>
+    <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
     <TargetName>libSpinePlugin</TargetName>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <OutDir>..\..\bin\linux\$(Platform)</OutDir>
+    <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
     <TargetName>libSpinePlugin</TargetName>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\bin\linux\$(Platform)</OutDir>
+    <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
     <TargetName>libSpinePlugin</TargetName>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\bin\linux\$(Platform)</OutDir>
+    <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
     <TargetName>libSpinePlugin</TargetName>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <OutDir>..\..\bin\linux\$(Platform)</OutDir>
+    <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
     <TargetName>libSpinePlugin</TargetName>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <OutDir>..\..\bin\linux\$(Platform)</OutDir>
+    <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
     <TargetName>libSpinePlugin</TargetName>
+    <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <PreprocessorDefinitions>BL_EXPORT;__linux__;</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <PreprocessorDefinitions>BL_EXPORT;__linux__;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>BL_EXPORT;__linux__;</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);/usr/lib/x86_64-linux-gnu;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>BL_EXPORT;__linux__;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);/usr/lib/x86_64-linux-gnu;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
       <PreprocessorDefinitions>BL_EXPORT;__linux__;</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);/usr/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
       <PreprocessorDefinitions>BL_EXPORT;__linux__;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);/usr/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

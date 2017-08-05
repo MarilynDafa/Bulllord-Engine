@@ -22,11 +22,11 @@ misrepresented as being the original software.
 #include "spine.h"
 #include "extension.h"
 #include "spine.h"
-#include "../../code/headers/system.h"
-#include "../../code/headers/streamio.h"
-#include "../../code/headers/utils.h"
-#include "../../code/headers/sprite.h"
-#include "../../code/headers/gpu.h"
+#include "system.h"
+#include "streamio.h"
+#include "utils.h"
+#include "sprite.h"
+#include "gpu.h"
 typedef struct _TexCacheData {
 	BLU8* pData;
 	BLEnum eFormat;

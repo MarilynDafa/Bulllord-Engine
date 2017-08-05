@@ -2180,6 +2180,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tables.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tuning_parameters.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\typedef.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\main_sse.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\SigProc_FIX_sse.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\analysis.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\mlp.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\mlp_train.h" />

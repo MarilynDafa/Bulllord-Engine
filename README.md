@@ -42,12 +42,12 @@ Supported compilers:
  * Win32(windows xp compatible) </br>
     OS: Windows 10 PC</br>
     IDE: visual studio 2017</br>
-	Tips: Install Directx SDK first(for xaudio module)    </br>
+	Tips: Install DirectX SDK first(for xaudio module)    </br>
  * UWP </br> 
     OS: Windows 10 PC    </br>
     IDE: visual studio 2017   </br>   
  * Linux </br> 
-    OS: Windows 10 PC and a linux machine additional(openssh gcc x11 mesa3d openal installed)    </br>
+    OS: Windows 10 PC and a linux machine additional(openssh yasm gcc-multilib:i386 glibc:i386 x11:i386 mesa3d:i386 openal:i386 installed)    </br>
     IDE: visual studio 2017    </br>
 	Tips: You can install Windows 10 Ubuntu Subsystem on your Win10 PC and only support root login(a visual studio project macro bug?)</br>
  * Android  

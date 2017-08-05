@@ -35,10 +35,12 @@
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
     <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
     <LinuxProjectType>{2238F9CD-F817-4ECC-BD14-2524D2669B35}</LinuxProjectType>
+    <ProjectName>video</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -46,6 +48,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -53,6 +56,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -66,19 +70,46 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <OutDir>..\..\bin\linux\$(Platform)</OutDir>
+    <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
-    <TargetName>libViedeoPlugin</TargetName>
+    <TargetName>libVideoPlugin</TargetName>
+    <TargetExt>.so</TargetExt>
+    <AdditionalSourcesToCopyMapping>$(ProjectDir)webm\vp8\common\x86\copy_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm;$(ProjectDir)webm\vp8\common\x86\copy_sse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm;$(ProjectDir)webm\vp8\common\x86\dequantize_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_sse2.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm;$(ProjectDir)webm\vp8\common\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vp8\common\x86\loopfilter_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm;$(ProjectDir)webm\vp8\common\x86\mfqe_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm;$(ProjectDir)webm\vp8\common\x86\recon_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm;$(ProjectDir)webm\vp8\common\x86\recon_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_ssse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm;$(ProjectDir)webm\vpx_ports\emms.asm:=/root/projects/video-linux/webm/vpx_ports/emms.asm;$(ProjectDir)webm\vpx_dsp\x86\add_noise_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\deblock_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\inv_wht_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\subpel_variance_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_convolve_copy_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm;$(ProjectDir)webm\vpx_ports\x86_abi_support.asm:=/root/projects/video-linux/webm/vpx_ports/x86_abi_support.asm;$(ProjectDir)webm\vpx_config.asm:=/root/projects/video-linux/webm/vpx_config.asm;$(ProjectDir)webm\vpx_config_32.asm:=/root/projects/video-linux/webm/vpx_config_32.asm;$(ProjectDir)webm\vpx_config_64.asm:=/root/projects/video-linux/webm/vpx_config_64.asm;$(ProjectDir)webm\third_party\x86inc\x86inc.asm:=/root/projects/video-linux/webm/third_party/x86inc/x86inc.asm;$(ProjectDir)webm\vpx_dsp\x86\bitdepth_conversion_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/bitdepth_conversion_sse2.asm</AdditionalSourcesToCopyMapping>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\bin\linux\$(Platform)</OutDir>
+    <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
-    <TargetName>libViedeoPlugin</TargetName>
+    <TargetName>libVideoPlugin</TargetName>
+    <TargetExt>.so</TargetExt>
+    <AdditionalSourcesToCopyMapping>$(ProjectDir)webm\vp8\common\x86\copy_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm;$(ProjectDir)webm\vp8\common\x86\copy_sse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm;$(ProjectDir)webm\vp8\common\x86\dequantize_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_sse2.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm;$(ProjectDir)webm\vp8\common\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vp8\common\x86\loopfilter_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm;$(ProjectDir)webm\vp8\common\x86\mfqe_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm;$(ProjectDir)webm\vp8\common\x86\recon_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm;$(ProjectDir)webm\vp8\common\x86\recon_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_ssse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm;$(ProjectDir)webm\vpx_ports\emms.asm:=/root/projects/video-linux/webm/vpx_ports/emms.asm;$(ProjectDir)webm\vpx_dsp\x86\add_noise_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\deblock_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\inv_wht_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\subpel_variance_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_convolve_copy_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm;$(ProjectDir)webm\vpx_ports\x86_abi_support.asm:=/root/projects/video-linux/webm/vpx_ports/x86_abi_support.asm;$(ProjectDir)webm\vpx_config.asm:=/root/projects/video-linux/webm/vpx_config.asm;$(ProjectDir)webm\vpx_config_32.asm:=/root/projects/video-linux/webm/vpx_config_32.asm;$(ProjectDir)webm\vpx_config_64.asm:=/root/projects/video-linux/webm/vpx_config_64.asm;$(ProjectDir)webm\third_party\x86inc\x86inc.asm:=/root/projects/video-linux/webm/third_party/x86inc/x86inc.asm;$(ProjectDir)webm\vpx_dsp\x86\bitdepth_conversion_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/bitdepth_conversion_sse2.asm</AdditionalSourcesToCopyMapping>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <OutDir>..\..\bin\linux\$(Platform)</OutDir>
+    <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
-    <TargetName>libViedeoPlugin</TargetName>
+    <TargetName>libVideoPlugin</TargetName>
+    <TargetExt>.so</TargetExt>
+    <AdditionalSourcesToCopyMapping>$(ProjectDir)webm\vp8\common\x86\copy_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm;$(ProjectDir)webm\vp8\common\x86\copy_sse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm;$(ProjectDir)webm\vp8\common\x86\dequantize_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_sse2.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm;$(ProjectDir)webm\vp8\common\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vp8\common\x86\loopfilter_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm;$(ProjectDir)webm\vp8\common\x86\mfqe_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm;$(ProjectDir)webm\vp8\common\x86\recon_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm;$(ProjectDir)webm\vp8\common\x86\recon_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_ssse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm;$(ProjectDir)webm\vpx_ports\emms.asm:=/root/projects/video-linux/webm/vpx_ports/emms.asm;$(ProjectDir)webm\vpx_dsp\x86\add_noise_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\deblock_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\inv_wht_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\subpel_variance_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_convolve_copy_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm;$(ProjectDir)webm\vpx_ports\x86_abi_support.asm:=/root/projects/video-linux/webm/vpx_ports/x86_abi_support.asm;$(ProjectDir)webm\vpx_config.asm:=/root/projects/video-linux/webm/vpx_config.asm;$(ProjectDir)webm\vpx_config_32.asm:=/root/projects/video-linux/webm/vpx_config_32.asm;$(ProjectDir)webm\vpx_config_64.asm:=/root/projects/video-linux/webm/vpx_config_64.asm;$(ProjectDir)webm\third_party\x86inc\x86inc.asm:=/root/projects/video-linux/webm/third_party/x86inc/x86inc.asm;$(ProjectDir)webm\vpx_dsp\x86\bitdepth_conversion_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/bitdepth_conversion_sse2.asm</AdditionalSourcesToCopyMapping>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <OutDir>..\..\bin\linux</OutDir>
+    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+    <TargetName>libVideoPlugin</TargetName>
+    <TargetExt>.so</TargetExt>
+    <AdditionalSourcesToCopyMapping>$(ProjectDir)webm\vp8\common\x86\copy_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm;$(ProjectDir)webm\vp8\common\x86\copy_sse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm;$(ProjectDir)webm\vp8\common\x86\dequantize_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_sse2.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm;$(ProjectDir)webm\vp8\common\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vp8\common\x86\loopfilter_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm;$(ProjectDir)webm\vp8\common\x86\mfqe_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm;$(ProjectDir)webm\vp8\common\x86\recon_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm;$(ProjectDir)webm\vp8\common\x86\recon_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_ssse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm;$(ProjectDir)webm\vpx_ports\emms.asm:=/root/projects/video-linux/webm/vpx_ports/emms.asm;$(ProjectDir)webm\vpx_dsp\x86\add_noise_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\deblock_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\inv_wht_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\subpel_variance_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_convolve_copy_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm;$(ProjectDir)webm\vpx_ports\x86_abi_support.asm:=/root/projects/video-linux/webm/vpx_ports/x86_abi_support.asm;$(ProjectDir)webm\vpx_config.asm:=/root/projects/video-linux/webm/vpx_config.asm;$(ProjectDir)webm\vpx_config_32.asm:=/root/projects/video-linux/webm/vpx_config_32.asm;$(ProjectDir)webm\vpx_config_64.asm:=/root/projects/video-linux/webm/vpx_config_64.asm;$(ProjectDir)webm\third_party\x86inc\x86inc.asm:=/root/projects/video-linux/webm/third_party/x86inc/x86inc.asm;$(ProjectDir)webm\vpx_dsp\x86\bitdepth_conversion_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/bitdepth_conversion_sse2.asm</AdditionalSourcesToCopyMapping>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\..\bin\linux</OutDir>
+    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+    <TargetName>libVideoPlugin</TargetName>
+    <TargetExt>.so</TargetExt>
+    <AdditionalSourcesToCopyMapping>$(ProjectDir)webm\vp8\common\x86\copy_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm;$(ProjectDir)webm\vp8\common\x86\copy_sse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm;$(ProjectDir)webm\vp8\common\x86\dequantize_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_sse2.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm;$(ProjectDir)webm\vp8\common\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vp8\common\x86\loopfilter_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm;$(ProjectDir)webm\vp8\common\x86\mfqe_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm;$(ProjectDir)webm\vp8\common\x86\recon_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm;$(ProjectDir)webm\vp8\common\x86\recon_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_ssse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm;$(ProjectDir)webm\vpx_ports\emms.asm:=/root/projects/video-linux/webm/vpx_ports/emms.asm;$(ProjectDir)webm\vpx_dsp\x86\add_noise_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\deblock_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\inv_wht_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\subpel_variance_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_convolve_copy_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm;$(ProjectDir)webm\vpx_ports\x86_abi_support.asm:=/root/projects/video-linux/webm/vpx_ports/x86_abi_support.asm;$(ProjectDir)webm\vpx_config.asm:=/root/projects/video-linux/webm/vpx_config.asm;$(ProjectDir)webm\vpx_config_32.asm:=/root/projects/video-linux/webm/vpx_config_32.asm;$(ProjectDir)webm\vpx_config_64.asm:=/root/projects/video-linux/webm/vpx_config_64.asm;$(ProjectDir)webm\third_party\x86inc\x86inc.asm:=/root/projects/video-linux/webm/third_party/x86inc/x86inc.asm;$(ProjectDir)webm\vpx_dsp\x86\bitdepth_conversion_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/bitdepth_conversion_sse2.asm</AdditionalSourcesToCopyMapping>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <OutDir>..\..\bin\linux</OutDir>
+    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+    <TargetName>libVideoPlugin</TargetName>
+    <TargetExt>.so</TargetExt>
+    <AdditionalSourcesToCopyMapping>$(ProjectDir)webm\vp8\common\x86\copy_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm;$(ProjectDir)webm\vp8\common\x86\copy_sse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm;$(ProjectDir)webm\vp8\common\x86\dequantize_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idct_blk_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idct_blk_sse2.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm;$(ProjectDir)webm\vp8\common\x86\idctllm_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm;$(ProjectDir)webm\vp8\common\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vp8\common\x86\loopfilter_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm;$(ProjectDir)webm\vp8\common\x86\mfqe_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm;$(ProjectDir)webm\vp8\common\x86\recon_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm;$(ProjectDir)webm\vp8\common\x86\recon_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_mmx.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_sse2.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm;$(ProjectDir)webm\vp8\common\x86\subpixel_ssse3.asm:=/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm;$(ProjectDir)webm\vpx_ports\emms.asm:=/root/projects/video-linux/webm/vpx_ports/emms.asm;$(ProjectDir)webm\vpx_dsp\x86\add_noise_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\deblock_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\intrapred_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\inv_wht_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\iwalsh_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/iwalsh_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\subpel_variance_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_convolve_copy_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm;$(ProjectDir)webm\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm;$(ProjectDir)webm\vpx_ports\x86_abi_support.asm:=/root/projects/video-linux/webm/vpx_ports/x86_abi_support.asm;$(ProjectDir)webm\vpx_config.asm:=/root/projects/video-linux/webm/vpx_config.asm;$(ProjectDir)webm\vpx_config_32.asm:=/root/projects/video-linux/webm/vpx_config_32.asm;$(ProjectDir)webm\vpx_config_64.asm:=/root/projects/video-linux/webm/vpx_config_64.asm;$(ProjectDir)webm\third_party\x86inc\x86inc.asm:=/root/projects/video-linux/webm/third_party/x86inc/x86inc.asm;$(ProjectDir)webm\vpx_dsp\x86\bitdepth_conversion_sse2.asm:=/root/projects/video-linux/webm/vpx_dsp/x86/bitdepth_conversion_sse2.asm</AdditionalSourcesToCopyMapping>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="webm\vp8\common\arm\loopfilter_arm.c">
@@ -318,6 +349,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\x86\idct_blk_mmx.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -332,6 +375,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\x86\idct_blk_sse2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -346,6 +401,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\x86\loopfilter_x86.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -360,6 +427,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\x86\vp8_asm_stubs.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -374,6 +453,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vp9\common\arm\neon\vp9_iht4x4_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -416,6 +507,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\avg_pred_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -668,6 +771,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\inv_txfm_sse2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -682,6 +797,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\inv_txfm_ssse3.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -696,6 +823,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\loopfilter_sse2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -710,6 +849,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\variance_sse2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -724,6 +875,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\vpx_asm_stubs.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -738,6 +901,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\vpx_subpixel_8t_intrin_ssse3.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -752,6 +927,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClCompile>
     <ClCompile Include="webm\vpx_ports\arm_cpudetect.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">CompileAsC</CompileAs>
@@ -771,24 +958,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\copy_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -800,24 +969,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\copy_sse3.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -829,24 +980,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\dequantize_mmx.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -863,6 +996,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClInclude>
     <ClInclude Include="webm\vpx_dsp\x86\bitdepth_conversion_sse2.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
@@ -871,6 +1016,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClInclude>
     <ClInclude Include="webm\vpx_dsp\x86\convolve.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
@@ -879,6 +1036,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClInclude>
     <ClInclude Include="webm\vpx_dsp\x86\inv_txfm_sse2.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
@@ -887,6 +1056,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClInclude>
     <ClInclude Include="webm\vpx_dsp\x86\transpose_sse2.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
@@ -895,6 +1076,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClInclude>
     <ClInclude Include="webm\vpx_dsp\x86\txfm_common_sse2.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
@@ -903,29 +1096,23 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">@(SourcesToCopyRemotely)</RemoteFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\idctllm_mmx.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -937,24 +1124,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\idctllm_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -966,24 +1135,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\iwalsh_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -993,49 +1144,8 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="webm\vp8\common\x86\loopfilter_block_sse2_x86_64.asm">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</ExcludedFromBuild>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\loopfilter_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1047,24 +1157,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\mfqe_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1076,24 +1168,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\recon_mmx.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1105,24 +1179,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\recon_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1134,24 +1190,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\subpixel_mmx.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1163,24 +1201,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\subpixel_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1192,24 +1212,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\subpixel_ssse3.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1221,24 +1223,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\add_noise_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1250,24 +1234,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\deblock_sse2.asm">
       <FileType>Document</FileType>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1279,24 +1245,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\intrapred_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1308,24 +1256,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\intrapred_ssse3.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1337,24 +1267,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\inv_wht_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1366,24 +1278,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\subpel_variance_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1395,24 +1289,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_convolve_copy_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1424,24 +1300,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_8t_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1453,24 +1311,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1482,24 +1322,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1511,24 +1333,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1540,24 +1344,6 @@
   <ItemGroup>
     <CustomBuild Include="webm\vpx_ports\emms.asm">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_ports_emms_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_ports_emms_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_ports_emms_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_ports_emms_asm.obj</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(PROJECT_DIR)yasml -f elf32 -I./ -I $(PROJECT_DIR)webm -DPIC -o $object  $file</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x86'">Assembling %(Filename)%(Extension)</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x86'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
@@ -1566,83 +1352,142 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="webm\vpx_ports\x86_abi_support.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="webm\third_party\x86inc\x86inc.asm" />
+    <None Include="webm\vpx_config.asm" />
+    <None Include="webm\vpx_config_32.asm" />
+    <None Include="webm\vpx_config_64.asm" />
+  </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_ARM;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/video-linux/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>-lpthread;$(RemoteRootDir)/bin/linux/libBulllord.so;"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o";%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <RemotePreBuildEvent>
+      <Command>
+      </Command>
+    </RemotePreBuildEvent>
+    <RemotePreLinkEvent>
+      <Command>/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o"  "/root/projects/video-linux/webm/vpx_ports/emms.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm"</Command>
+    </RemotePreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/video-linux/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);/usr/lib/x86_64-linux-gnu;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>-lpthread;$(RemoteRootDir)/bin/linux/libBulllord.so;"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o";%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <RemotePreBuildEvent>
+      <Command>
+      </Command>
+    </RemotePreBuildEvent>
+    <RemotePreLinkEvent>
+      <Command>/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o"  "/root/projects/video-linux/webm/vpx_ports/emms.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm"</Command>
+    </RemotePreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/video-linux/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);/usr/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>-lpthread;$(RemoteRootDir)/bin/linux/libBulllord.so;"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o";%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <RemotePreBuildEvent>
+      <Command>
+      </Command>
+    </RemotePreBuildEvent>
+    <RemotePreLinkEvent>
+      <Command>/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o"  "/root/projects/video-linux/webm/vpx_ports/emms.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm"</Command>
+    </RemotePreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_ARM;</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-march=native -msse4.1 -fshort %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/video-linux/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>-lpthread;$(RemoteRootDir)/bin/linux/libBulllord.so;"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o";%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <RemotePreBuildEvent>
+      <Command>
+      </Command>
+    </RemotePreBuildEvent>
+    <RemotePreLinkEvent>
+      <Command>/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o"  "/root/projects/video-linux/webm/vpx_ports/emms.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm"</Command>
+    </RemotePreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m64 %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/video-linux/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);/usr/lib/x86_64-linux-gnu;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>-lpthread;$(RemoteRootDir)/bin/linux/libBulllord.so;"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o";%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <RemotePreBuildEvent>
+      <Command>
+      </Command>
+    </RemotePreBuildEvent>
+    <RemotePreLinkEvent>
+      <Command>/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o"  "/root/projects/video-linux/webm/vpx_ports/emms.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm"</Command>
+    </RemotePreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
       <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;/root/projects/bulllord-linux/externals/ogg/include;/root/projects/video-linux/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++1y</CppLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\..\bin\linux\$(Platform);/usr/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Bulllord;X11;GL;$(StlAdditionalDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>-lpthread;$(RemoteRootDir)/bin/linux/libBulllord.so;"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o";"/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o";%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <RemotePreBuildEvent>
+      <Command>
+      </Command>
+    </RemotePreBuildEvent>
+    <RemotePreLinkEvent>
+      <Command>/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_copy_sse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/copy_sse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_dequantize_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/dequantize_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_idctllm_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/idctllm_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_iwalsh_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/iwalsh_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_loopfilter_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/loopfilter_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_mfqe_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/mfqe_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_recon_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/recon_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_mmx.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_mmx.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_sse2.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpixel_ssse3.o"  "/root/projects/video-linux/webm/vp8/common/x86/subpixel_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_emms.o"  "/root/projects/video-linux/webm/vpx_ports/emms.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_add_noise_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/add_noise_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_deblock_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/deblock_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_inv_wht_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/inv_wht_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_subpel_variance_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/subpel_variance_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_convolve_copy_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_convolve_copy_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_8t_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_8t_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_vpx_subpixel_bilinear_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/vpx_subpixel_bilinear_ssse3.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_sse2.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_sse2.asm";/usr/bin/yasm -f elf32 -I./ -I "/root/projects/video-linux/webm" -DPIC -o "/root/projects/video-linux/$(ConfigurationName)/linux/$(Platform)/asm_intrapred_ssse3.o"  "/root/projects/video-linux/webm/vpx_dsp/x86/intrapred_ssse3.asm"</Command>
+    </RemotePreLinkEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

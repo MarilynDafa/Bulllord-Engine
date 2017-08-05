@@ -24,12 +24,12 @@ misrepresented as being the original software.
 #include "vpx/vpx_decoder.h"
 #include "vpx/vp8dx.h"
 #include "webm/mkvparser/mkvparser.h"
-#include "../../code/headers/audio.h"
-#include "../../code/headers/streamio.h"
-#include "../../code/headers/utils.h"
-#include "../../code/headers/system.h"
-#include "../../code/headers/gpu.h"
-#include "../../code/externals/opus/include/opus.h"
+#include "audio.h"
+#include "streamio.h"
+#include "utils.h"
+#include "system.h"
+#include "gpu.h"
+#include "opus/include/opus.h"
 class MkvReader : public mkvparser::IMkvReader
 {
 public:

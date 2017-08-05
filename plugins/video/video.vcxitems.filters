@@ -453,6 +453,36 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale\yv12config.h">
       <Filter>externals\vpx_scale</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\codec.h">
+      <Filter>externals\vorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8_rtcd_arm.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8_rtcd_x86.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9_rtcd_arm.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9_rtcd_x86.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp_rtcd_arm.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp_rtcd_x86.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale_rtcd_arm.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale_rtcd_x86.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_version.h">
+      <Filter>externals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)videoentry.xc">

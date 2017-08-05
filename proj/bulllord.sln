@@ -34,34 +34,70 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bulllord-linux", "bulllord-linux.vcxproj", "{B65F834E-92AA-4EFB-8CCF-437836BEBC20}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tmx-win32", "..\plugins\tmx\tmx-win32.vcxproj", "{A25C913D-857A-4490-982D-017BAFD4C7C6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{12CD8F03-B670-4693-A7A4-06BE8F9BDD64} = {12CD8F03-B670-4693-A7A4-06BE8F9BDD64}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tmx-uwp", "..\plugins\tmx\tmx-uwp.vcxproj", "{5197B97B-3141-44D2-9D74-1AE1766E2D6F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5592F429-8CD2-4782-BE57-FB14C46AE60A} = {5592F429-8CD2-4782-BE57-FB14C46AE60A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tmx-android", "..\plugins\tmx\tmx-android.vcxproj", "{1BA669B7-D3DF-4CBC-87A4-59BEDE688777}"
+	ProjectSection(ProjectDependencies) = postProject
+		{40CD5F90-F2BA-44C7-A4F8-BDA5FC4B4CD2} = {40CD5F90-F2BA-44C7-A4F8-BDA5FC4B4CD2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tmx-linux", "..\plugins\tmx\tmx-linux.vcxproj", "{188B2C3A-5F8E-417F-9BFB-64AE650153C0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B65F834E-92AA-4EFB-8CCF-437836BEBC20} = {B65F834E-92AA-4EFB-8CCF-437836BEBC20}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tmx", "..\plugins\tmx\tmx.vcxitems", "{63CA9361-7D3A-46F2-A6F7-F22D3507E583}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spine", "..\plugins\spine\spine.vcxitems", "{F01ED052-3AD3-4660-9832-5A7DE273DAC6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spine-win32", "..\plugins\spine\spine-win32.vcxproj", "{0F9B1020-D186-4DBF-A3CA-700DE5417336}"
+	ProjectSection(ProjectDependencies) = postProject
+		{12CD8F03-B670-4693-A7A4-06BE8F9BDD64} = {12CD8F03-B670-4693-A7A4-06BE8F9BDD64}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spine-uwp", "..\plugins\spine\spine-uwp.vcxproj", "{56979B28-1096-4648-8E0C-6E3487A64DE7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5592F429-8CD2-4782-BE57-FB14C46AE60A} = {5592F429-8CD2-4782-BE57-FB14C46AE60A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spine-linux", "..\plugins\spine\spine-linux.vcxproj", "{26FDF730-5C47-4061-9BEF-9AEC46D82E02}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B65F834E-92AA-4EFB-8CCF-437836BEBC20} = {B65F834E-92AA-4EFB-8CCF-437836BEBC20}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spine-android", "..\plugins\spine\spine-android.vcxproj", "{8ACD93CD-2AEE-42ED-954B-4FBEA9B2E4A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{40CD5F90-F2BA-44C7-A4F8-BDA5FC4B4CD2} = {40CD5F90-F2BA-44C7-A4F8-BDA5FC4B4CD2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "video", "..\plugins\video\video.vcxitems", "{C6B9EA47-DC9F-4DE3-8CF5-50F605F5A15D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "video-win32", "..\plugins\video\video-win32.vcxproj", "{D8C1C546-6025-4588-89C2-452FF0FC5D6A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{12CD8F03-B670-4693-A7A4-06BE8F9BDD64} = {12CD8F03-B670-4693-A7A4-06BE8F9BDD64}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "video-uwp", "..\plugins\video\video-uwp.vcxproj", "{74B432D6-2772-4C9A-BC9A-A05E237C15A1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5592F429-8CD2-4782-BE57-FB14C46AE60A} = {5592F429-8CD2-4782-BE57-FB14C46AE60A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "video-linux", "..\plugins\video\video-linux.vcxproj", "{455D41D5-272F-41E2-A26E-A898647801E6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B65F834E-92AA-4EFB-8CCF-437836BEBC20} = {B65F834E-92AA-4EFB-8CCF-437836BEBC20}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "video-android", "..\plugins\video\video-android.vcxproj", "{E9AB3EF0-3292-412F-AC91-D229E7A086B3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{40CD5F90-F2BA-44C7-A4F8-BDA5FC4B4CD2} = {40CD5F90-F2BA-44C7-A4F8-BDA5FC4B4CD2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample2", "..\samples\sample2\sample2.vcxproj", "{E24D06A1-684C-4C62-AA94-53B9827F003A}"
 	ProjectSection(ProjectDependencies) = postProject

@@ -475,6 +475,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\backends.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\bitrate.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\codebook.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\codec.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\codec_internal.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\envelope.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\highlevel.h" />
@@ -529,6 +530,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\onyxd_int.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8\decoder\treereader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8_rtcd.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8_rtcd_arm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp8_rtcd_x86.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_alloccommon.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_blockd.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\common\vp9_common.h" />
@@ -563,6 +566,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\vp9_dx_iface.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9\vp9_iface_common.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9_rtcd.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9_rtcd_arm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vp9_rtcd_x86.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\internal\vpx_codec_internal.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\vp8.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx\vp8dx.h" />
@@ -585,6 +590,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\vpx_dsp_common.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\vpx_filter.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp_rtcd.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp_rtcd_arm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_dsp_rtcd_x86.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_mem\include\vpx_mem_intrnl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_mem\vpx_mem.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\arm.h" />
@@ -601,9 +608,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale\vpx_scale.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale\yv12config.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale_rtcd.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale_rtcd_arm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_scale_rtcd_x86.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_util\endian_inl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_util\vpx_thread.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_util\vpx_write_yuv_frame.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_version.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\webm\common\webmids.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\webm\mkvmuxer\mkvmuxertypes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\webm\mkvparser\mkvparser.h" />

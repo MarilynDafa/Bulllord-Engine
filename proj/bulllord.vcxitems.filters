@@ -2345,5 +2345,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\dictBuilder\zdict.h">
       <Filter>externals\zstd</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\SigProc_FIX_sse.h">
+      <Filter>externals\opus\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\main_sse.h">
+      <Filter>externals\opus\x86</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

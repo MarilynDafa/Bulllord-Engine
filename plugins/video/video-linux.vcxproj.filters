@@ -176,9 +176,6 @@
     <CustomBuild Include="webm\vp8\common\x86\iwalsh_sse2.asm">
       <Filter>x86</Filter>
     </CustomBuild>
-    <CustomBuild Include="webm\vp8\common\x86\loopfilter_block_sse2_x86_64.asm">
-      <Filter>x86</Filter>
-    </CustomBuild>
     <CustomBuild Include="webm\vp8\common\x86\loopfilter_sse2.asm">
       <Filter>x86</Filter>
     </CustomBuild>
@@ -236,6 +233,9 @@
     <CustomBuild Include="webm\vpx_ports\emms.asm">
       <Filter>x86</Filter>
     </CustomBuild>
+    <CustomBuild Include="webm\vpx_ports\x86_abi_support.asm">
+      <Filter>x86</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="webm\vp8\common\x86\filter_x86.h">
@@ -256,5 +256,19 @@
     <ClInclude Include="webm\vpx_dsp\x86\txfm_common_sse2.h">
       <Filter>x86</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="webm\vpx_config.asm">
+      <Filter>x86</Filter>
+    </None>
+    <None Include="webm\vpx_config_32.asm">
+      <Filter>x86</Filter>
+    </None>
+    <None Include="webm\vpx_config_64.asm">
+      <Filter>x86</Filter>
+    </None>
+    <None Include="webm\third_party\x86inc\x86inc.asm">
+      <Filter>x86</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -20,7 +20,7 @@ misrepresented as being the original software.
 */
 #ifndef __spineentry_h_
 #define __spineentry_h_
-#include "../../code/headers/prerequisites.h"
+#include "prerequisites.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
