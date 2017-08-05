@@ -1517,7 +1517,7 @@ _GpuIntervention(duk_context* _DKC, Display* _Display, Window _Window, BLU32 _Wi
 		{
 			_attribus[1] = _versions[_idx][0];
 			_attribus[3] = _versions[_idx][1];
-			_PrGpuMem->pContext = glXCreateContextAttribsARB(_Display, _Config, NULL, true, _attribus);
+			_PrGpuMem->pContext = glXCreateContextAttribsARB(_Display, _Config, 0, True, _attribus);
 			XSync(_Display, False);
             if (_PrGpuMem->pContext)
 			{
@@ -1531,6 +1531,7 @@ _GpuIntervention(duk_context* _DKC, Display* _Display, Window _Window, BLU32 _Wi
 				break;
 			}
 		}
+        XSync(_Display, False);
 		_PrGpuMem->pDisplay = _Display;
 		_PrGpuMem->nWindow = _Window;
         XSetErrorHandler(_err);

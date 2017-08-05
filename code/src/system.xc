@@ -214,6 +214,7 @@ typedef struct _SystemMember {
     BLU32 nMouseX;
     BLU32 nMouseY;
     BLBool bCtrlPressed;
+    BLBool bEWMHSupported;
 #elif defined(BL_PLATFORM_ANDROID)
 	ANativeActivity* pActivity;
 	AConfiguration* pConfig;
@@ -1557,13 +1558,56 @@ _ShowWindow()
         setlocale(LC_ALL, "C");
     XInitThreads();
     _PrSystemMem->pDisplay = XOpenDisplay(NULL);
+    Atom _wmcheck = XInternAtom(_PrSystemMem->pDisplay, "_NET_SUPPORTING_WM_CHECK", True);
+    Atom _netsupported = XInternAtom(_PrSystemMem->pDisplay, "_NET_SUPPORTED", True);
+    _PrSystemMem->bEWMHSupported = _wmcheck && _netsupported;
+    Atom _actualtype;
+    BLS32 _actualformat;
+    unsigned long _numitems;
+    unsigned long _numbytes;
+    BLU8* _data;
+    BLS32 _result = XGetWindowProperty(_PrSystemMem->pDisplay, DefaultRootWindow(_PrSystemMem->pDisplay), _wmcheck, 0, 1, False, XA_WINDOW, &_actualtype, &_actualformat, &_numitems, &_numbytes, &_data);
+    if (_result != Success || _actualtype != XA_WINDOW || _numitems != 1)
+    {
+        if(_result == Success)
+            XFree(_data);
+        _PrSystemMem->bEWMHSupported = FALSE;
+    }
+    else
+    {
+        Window _root = *(Window*)(_data);
+        XFree(_data);
+        if (!_root)
+            _PrSystemMem->bEWMHSupported = FALSE;
+        else
+        {
+            _result = XGetWindowProperty(_PrSystemMem->pDisplay, _root, _wmcheck, 0, 1, False, XA_WINDOW, &_actualtype, &_actualformat, &_numitems, &_numbytes, &_data);
+            if (_result != Success || _actualtype != XA_WINDOW || _numitems != 1)
+            {
+                if(_result == Success)
+                    XFree(_data);
+                _PrSystemMem->bEWMHSupported = FALSE;
+            }
+            else
+            {
+                Window _child = *(Window*)(_data);
+                XFree(_data);
+                if (!_child)
+                    _PrSystemMem->bEWMHSupported = FALSE;
+                else if (_root != _child)
+                    _PrSystemMem->bEWMHSupported = FALSE;
+                else
+                    _PrSystemMem->bEWMHSupported = TRUE;
+            }
+        }
+    }
     _PrSystemMem->nProtocols = XInternAtom(_PrSystemMem->pDisplay, "WM_PROTOCOLS", False);
-    _PrSystemMem->nPing = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_PING", False);
     _PrSystemMem->nBorder = XInternAtom(_PrSystemMem->pDisplay, "_MOTIF_WM_HINTS", True);
     _PrSystemMem->nDelwin = XInternAtom(_PrSystemMem->pDisplay, "WM_DELETE_WINDOW", False);
     _PrSystemMem->nFullScreen = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_STATE_FULLSCREEN", False);
     _PrSystemMem->nWMState = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_STATE", False);
-    Atom _wmpid = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_PID", False);
+    _PrSystemMem->nPing = None;
+    Atom _wmpid = None;
     Atom _compositor = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_BYPASS_COMPOSITOR", False);
 	BLS32 _visualattr[] = {
         GLX_X_RENDERABLE    , True,
@@ -1579,6 +1623,81 @@ _ShowWindow()
         5 , True,
         None
     };
+    BLS32 _fbcount;
+    _PrSystemMem->pLib = dlopen("libGL.so.1", RTLD_LAZY | RTLD_GLOBAL);
+    glXGetProcAddress = (PFNGLXGETPROCADDRESSPROC)dlsym(_PrSystemMem->pLib, "glXGetProcAddress");
+    glXGetProcAddressARB = (PFNGLXGETPROCADDRESSARBPROC)glXGetProcAddress((const GLubyte*)"glXGetProcAddressARB");
+    PFNGLXCHOOSEFBCONFIGPROC glXChooseFBConfig = (PFNGLXCHOOSEFBCONFIGPROC)glXGetProcAddress((const GLubyte*)"glXChooseFBConfig");
+    PFNGLXGETVISUALFROMFBCONFIGPROC glXGetVisualFromFBConfig = (PFNGLXGETVISUALFROMFBCONFIGPROC)glXGetProcAddress((const GLubyte*)"glXGetVisualFromFBConfig");
+    PFNGLXGETFBCONFIGATTRIBPROC glXGetFBConfigAttrib = (PFNGLXGETFBCONFIGATTRIBPROC)glXGetProcAddress((const GLubyte*)"glXGetFBConfigAttrib");
+    GLXFBConfig* _fbc = glXChooseFBConfig(_PrSystemMem->pDisplay, DefaultScreen(_PrSystemMem->pDisplay), _visualattr, &_fbcount);
+    assert(_fbc);
+    BLS32 _bestfbc = -1, _worstfbc = -1, _bestnumsamp = -1, _worstnumsamp = 999;
+    for (BLS32 _idx = 0; _idx < _fbcount; ++_idx)
+    {
+        XVisualInfo* _vi = glXGetVisualFromFBConfig(_PrSystemMem->pDisplay, _fbc[_idx]);
+        if (_vi)
+        {
+            BLS32 _sampbuf, _samples;
+            glXGetFBConfigAttrib(_PrSystemMem->pDisplay, _fbc[_idx], GLX_SAMPLE_BUFFERS , &_sampbuf);
+            glXGetFBConfigAttrib(_PrSystemMem->pDisplay, _fbc[_idx], GLX_SAMPLES , &_samples);
+            if (_bestfbc < 0 || (_sampbuf && _samples > _bestnumsamp))
+                _bestfbc = _idx, _bestnumsamp = _samples;
+            if (_worstfbc < 0 || !_sampbuf || _samples < _worstnumsamp)
+                _worstfbc = _idx, _worstnumsamp = _samples;
+        }
+        XFree(_vi);
+    }
+    GLXFBConfig _bestfbconfig = _fbc[_bestfbc];
+    XFree(_fbc);
+    XVisualInfo* _vi = glXGetVisualFromFBConfig(_PrSystemMem->pDisplay, _bestfbconfig);
+    XSetWindowAttributes _swa;
+    _swa.colormap = _PrSystemMem->nColormap = XCreateColormap(_PrSystemMem->pDisplay, RootWindow(_PrSystemMem->pDisplay, _vi->screen), _vi->visual, AllocNone);
+    _swa.background_pixmap = None;
+    _swa.border_pixel = 0;
+    _swa.event_mask = 6520959;
+    _swa.override_redirect = (_PrSystemMem->sBoostParam.bFullscreen && !_PrSystemMem->bEWMHSupported) ? True : False;
+    BLU32 _width = _PrSystemMem->sBoostParam.nScreenWidth;
+    BLU32 _height = _PrSystemMem->sBoostParam.nScreenHeight;
+    BLS32 _x = (DisplayWidth(_PrSystemMem->pDisplay, XDefaultScreen(_PrSystemMem->pDisplay))) - _width;
+    BLS32 _y = (DisplayHeight(_PrSystemMem->pDisplay, XDefaultScreen(_PrSystemMem->pDisplay))) - _height;
+    _PrSystemMem->nWindow = XCreateWindow(_PrSystemMem->pDisplay, RootWindow(_PrSystemMem->pDisplay, _vi->screen), _x/2, _y/2, _width, _height, 0, _vi->depth, InputOutput, _vi->visual, (CWEventMask | CWOverrideRedirect | CWColormap), &_swa);
+    assert(_PrSystemMem->nWindow);
+    XFree(_vi);
+    XSelectInput(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, (FocusChangeMask | EnterWindowMask | LeaveWindowMask | ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | PropertyChangeMask | StructureNotifyMask | KeymapStateMask));
+    if (_PrSystemMem->bEWMHSupported)
+    {
+        _PrSystemMem->nPing = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_PING", False);
+        _wmpid = XInternAtom(_PrSystemMem->pDisplay, "_NET_WM_PID", False);
+        if (_PrSystemMem->nPing && _wmpid)
+        {
+            const pid_t _pid = getpid();
+            XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _wmpid, XA_CARDINAL, 32, PropModeReplace, (const BLU8*)&_pid, 1);
+            XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _PrSystemMem->nProtocols, XA_ATOM, 32, PropModeReplace, (const BLU8*)&_wmpid, 1);
+        }
+    }
+    XWMHints* _hints = XAllocWMHints();
+    _hints->flags = StateHint;
+    _hints->initial_state = NormalState;
+    XSetWMHints(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _hints);
+    XFree(_hints);
+    if (_PrSystemMem->sBoostParam.bFullscreen && _PrSystemMem->nBorder != None)
+    {
+        struct
+        {
+            unsigned long flags;
+            unsigned long functions;
+            unsigned long decorations;
+            long inputmode;
+            unsigned long state;
+        } _bhints;
+        _bhints.flags = (1 << 0) | (1 << 1);
+        _bhints.decorations = (1 << 6) | (1 << 2);
+        _bhints.functions = (1 << 4) | (1 << 1) | (1 << 5);
+        _bhints.inputmode = 0;
+        _bhints.state = 0;
+        XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _PrSystemMem->nBorder, _PrSystemMem->nBorder, 32, PropModeReplace, (const BLU8*)&_bhints, 5);
+    }
     if (XSupportsLocale())
     {
         if (XSetLocaleModifiers("") != NULL)
@@ -1608,63 +1727,6 @@ _ShowWindow()
             }
         }
     }
-    BLS32 _fbcount;
-    _PrSystemMem->pLib = dlopen("libGL.so.1", RTLD_LAZY | RTLD_GLOBAL);
-    glXGetProcAddress = (PFNGLXGETPROCADDRESSPROC)dlsym(_PrSystemMem->pLib, "glXGetProcAddress");
-    glXGetProcAddressARB = (PFNGLXGETPROCADDRESSARBPROC)glXGetProcAddress((const GLubyte*)"glXGetProcAddressARB");
-    PFNGLXCHOOSEFBCONFIGPROC glXChooseFBConfig = (PFNGLXCHOOSEFBCONFIGPROC)glXGetProcAddress((const GLubyte*)"glXChooseFBConfig");
-    PFNGLXGETVISUALFROMFBCONFIGPROC glXGetVisualFromFBConfig = (PFNGLXGETVISUALFROMFBCONFIGPROC)glXGetProcAddress((const GLubyte*)"glXGetVisualFromFBConfig");
-    PFNGLXGETFBCONFIGATTRIBPROC glXGetFBConfigAttrib = (PFNGLXGETFBCONFIGATTRIBPROC)glXGetProcAddress((const GLubyte*)"glXGetFBConfigAttrib");
-    GLXFBConfig* _fbc = glXChooseFBConfig(_PrSystemMem->pDisplay, DefaultScreen(_PrSystemMem->pDisplay), _visualattr, &_fbcount);
-    assert(_fbc);
-    BLS32 _bestfbc = -1, _worstfbc = -1, _bestnumsamp = -1, _worstnumsamp = 999;
-    for (BLS32 _idx = 0; _idx < _fbcount; ++_idx)
-    {
-        XVisualInfo* _vi = glXGetVisualFromFBConfig(_PrSystemMem->pDisplay, _fbc[_idx]);
-        if (_vi)
-        {
-            BLS32 _sampbuf, _samples;
-            glXGetFBConfigAttrib(_PrSystemMem->pDisplay, _fbc[_idx], GLX_SAMPLE_BUFFERS , &_sampbuf);
-            glXGetFBConfigAttrib(_PrSystemMem->pDisplay, _fbc[_idx], GLX_SAMPLES , &_samples);
-            if ((_bestfbc < 0 || _sampbuf) && _samples > _bestnumsamp)
-                _bestfbc = _idx, _bestnumsamp = _samples;
-            if (_worstfbc < 0 || !_sampbuf || _samples < _worstnumsamp)
-                _worstfbc = _idx, _worstnumsamp = _samples;
-        }
-        XFree(_vi);
-    }
-    GLXFBConfig _bestfbconfig = _fbc[_bestfbc];
-    XFree(_fbc);
-    XVisualInfo* _vi = glXGetVisualFromFBConfig(_PrSystemMem->pDisplay, _bestfbconfig);
-    XSetWindowAttributes _swa;
-    _swa.colormap = _PrSystemMem->nColormap = XCreateColormap(_PrSystemMem->pDisplay, RootWindow(_PrSystemMem->pDisplay, _vi->screen), _vi->visual, AllocNone);
-    _swa.background_pixmap = None;
-    _swa.border_pixel = 0;
-    _swa.event_mask = 6520959;
-    BLU32 _width = _PrSystemMem->sBoostParam.nScreenWidth;
-    BLU32 _height = _PrSystemMem->sBoostParam.nScreenHeight;
-    BLS32 _x = (DisplayWidth(_PrSystemMem->pDisplay, XDefaultScreen(_PrSystemMem->pDisplay))) - _width;
-    BLS32 _y = (DisplayHeight(_PrSystemMem->pDisplay, XDefaultScreen(_PrSystemMem->pDisplay))) - _height;
-    _PrSystemMem->nWindow = XCreateWindow(_PrSystemMem->pDisplay, RootWindow(_PrSystemMem->pDisplay, _vi->screen), _x/2, _y/2, _width, _height, 0, _vi->depth, InputOutput, _vi->visual, (CWOverrideRedirect | CWBackPixmap | CWBorderPixel | CWColormap), &_swa);
-    assert(_PrSystemMem->nWindow);
-    XFree(_vi);
-    XSelectInput(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, (FocusChangeMask | EnterWindowMask | LeaveWindowMask | ExposureMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | KeyPressMask | KeyReleaseMask | PropertyChangeMask | StructureNotifyMask | KeymapStateMask));
-    if (_PrSystemMem->nBorder != None)
-    {
-        struct
-        {
-            unsigned long x1;
-            unsigned long x2;
-            unsigned long x3;
-            long x4;
-            unsigned long x5;
-        } _bhints = {
-            (1L << 1), 0, _PrSystemMem->sBoostParam.bFullscreen ? 0u : 1u, 0, 0
-        };
-        XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _PrSystemMem->nBorder, _PrSystemMem->nBorder, 32, PropModeReplace, (BLU8*)&_bhints, sizeof(_bhints) / sizeof(long));
-    }
-    const pid_t _pid = getpid();
-    XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _wmpid, XA_CARDINAL, 32, PropModeReplace, (BLU8*)&_pid, 1);
     BLS32 _comp = 1;
     XChangeProperty(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, _compositor, XA_CARDINAL, 32, PropModeReplace, (BLU8*)&_comp, 1);
     XSetWMProtocols(_PrSystemMem->pDisplay, _PrSystemMem->nWindow, &_PrSystemMem->nDelwin, 1);
@@ -4204,7 +4266,7 @@ blOpenPlugin(IN BLAnsi* _Basename)
 	memset(_path, 0, sizeof(_path));
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	strcpy_s(_path, 260, "bl");
-	strcat_s(_path, 260, _Basename);
+	strcat_s(_path,-fPIC 260, _Basename);
 	strcat_s(_path, 260, "OpenEXT");
 #else
 	strcpy(_path, "bl");
@@ -4718,6 +4780,7 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
     _PrSystemMem->pIC = NULL;
     _PrSystemMem->pLib = NULL;
     _PrSystemMem->bCtrlPressed = FALSE;
+	_PrSystemMem->bEWMHSupported = FALSE;
 #elif defined(BL_PLATFORM_ANDROID)
     _PrSystemMem->bAvtivityFocus = FALSE;
     _PrSystemMem->bBackendState = 0;
@@ -4835,6 +4898,7 @@ blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)
     _PrSystemMem->pIC = NULL;
     _PrSystemMem->pLib = NULL;
     _PrSystemMem->bCtrlPressed = FALSE;
+	_PrSystemMem->bEWMHSupported = FALSE;
 #elif defined(BL_PLATFORM_OSX)
     _PrSystemMem->pPool = nil;
     _PrSystemMem->pWindow = nil;
@@ -4909,6 +4973,7 @@ blSystemScriptRun(IN BLAnsi* _Encryptkey)
 	_PrSystemMem->pIC = NULL;
 	_PrSystemMem->pLib = NULL;
 	_PrSystemMem->bCtrlPressed = FALSE;
+	_PrSystemMem->bEWMHSupported = FALSE;
 #elif defined(BL_PLATFORM_ANDROID)
 	_PrSystemMem->bAvtivityFocus = FALSE;
 	_PrSystemMem->bBackendState = 0;
