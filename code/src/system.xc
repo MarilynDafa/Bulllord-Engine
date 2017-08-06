@@ -4266,7 +4266,7 @@ blOpenPlugin(IN BLAnsi* _Basename)
 	memset(_path, 0, sizeof(_path));
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	strcpy_s(_path, 260, "bl");
-	strcat_s(_path,-fPIC 260, _Basename);
+	strcat_s(_path, 260, _Basename);
 	strcat_s(_path, 260, "OpenEXT");
 #else
 	strcpy(_path, "bl");

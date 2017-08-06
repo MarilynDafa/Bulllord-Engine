@@ -718,9 +718,9 @@
     <CustomBuild Include="webm\vp8\common\x86\loopfilter_block_sse2_x86_64.asm">
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
