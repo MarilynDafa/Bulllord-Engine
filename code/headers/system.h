@@ -101,9 +101,11 @@ BL_API BLVoid* blPluginProcAddress(
 
 BL_API BLVoid blAttachIME(
 	IN BLF32 _Xpos,
-	IN BLF32 _Ypos);
+	IN BLF32 _Ypos,
+	IN BLEnum _Type);
 
-BL_API BLVoid blDetachIME();
+BL_API BLVoid blDetachIME(
+	IN BLEnum _Type);
 
 BL_API BLVoid blCursorVisiblity(
 	IN BLBool _Show);

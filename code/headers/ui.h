@@ -30,7 +30,7 @@ BL_API BLVoid blUIStyle(
 	IN BLU32 _SelectRangeColor,
 	IN BLU32 _TextDisableColor);
 
-BL_API BLVoid blUIFile(
+BL_API BLGuid blUIFile(
 	IN BLAnsi* _Filename);
 
 BL_API BLGuid blGenUI(
@@ -39,10 +39,16 @@ BL_API BLGuid blGenUI(
 	IN BLS32 _PosY,
 	IN BLU32 _Width,
 	IN BLU32 _Height,
-	IN BLGuid _Parent,
 	IN BLEnum _Type);
 
 BL_API BLVoid blDeleteUI(
+	IN BLGuid _ID);
+
+BL_API BLBool blUIAttach(
+	IN BLGuid _Parent,
+	IN BLGuid _Child);
+
+BL_API BLBool blUIDetach(
 	IN BLGuid _ID);
 
 BL_API BLEnum blUIGetType(
@@ -134,9 +140,6 @@ BL_API BLVoid blUIGetPenetration(
 	IN BLGuid _ID,
 	OUT BLBool* _Penetration);
 
-BL_API BLGuid blUIQuery(
-	IN BLAnsi* _WidgetName);
-
 BL_API BLGuid blUILocate(
 	IN BLS32 _XPos,
 	IN BLS32 _YPos);
@@ -152,6 +155,17 @@ BL_API BLVoid blUIFocus(
 BL_API BLGuid blUIGetFocus();
 
 BL_API BLGuid blUIGetHoverd();
+
+BL_API BLU32 blUIChildrenCount(
+	IN BLGuid _ID);
+
+BL_API BLGuid blUIChildIndexOf(
+	IN BLGuid _ID,
+	IN BLU32 _Idx);
+
+BL_API BLGuid blUIChildNameOf(
+	IN BLGuid _ID,
+	IN BLAnsi* _WidgetName);
 
 BL_API BLVoid blUIPanelPixmap(
 	IN BLGuid _ID,
@@ -431,6 +445,10 @@ BL_API BLVoid blUITextFlip(
 BL_API BLVoid blUITextEnable(
 	IN BLGuid _ID,
 	IN BLBool _Enable);
+
+BL_API BLVoid blUITextCaret(
+	IN BLGuid _ID,
+	IN BLBool _Show);
 
 BL_API const BLUtf8* blUIGetTextText(
 	IN BLGuid _ID);

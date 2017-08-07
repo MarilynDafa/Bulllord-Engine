@@ -358,6 +358,7 @@ typedef struct _Widget {
 			BLBool bFlipY;
 			BLU32 nLastRecord;
 			BLBool bShowCaret;
+			BLBool bCaretState;
             BLU32 nState;
             BLGuid nPixmapTex;
 			BLU32 nTexWidth;
@@ -547,7 +548,7 @@ _WidgetLocate(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 			!(_iter->eType == BL_UT_PANEL && _iter->uExtension.sPanel.bBasePlate))
 		{
 			_target = _WidgetLocate(_iter, _XPos, _YPos);
-			if (_target)
+			if (_target && _target->sDimension.fX > 0.f && _target->sDimension.fY > 0.f)
 				return _target;
 		}
 	}
@@ -6230,7 +6231,7 @@ _DrawSlider(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Hei
 static BLVoid
 _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Height)
 {
-	if (!_Node->bValid || !_Node->bVisible)
+	if (!_Node->bVisible)
 		return;
 	BLRect _scissorrect = { 0 };
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
@@ -6842,7 +6843,7 @@ _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 		}
 	}
 	_curline = (BLUtf16*)_text;
-	if (_Node->uExtension.sText.bShowCaret)
+	if (_Node->uExtension.sText.bCaretState && _Node->uExtension.sText.bShowCaret)
 	{
 		BLRect _cv;
 		BLS32 _cursorline = 0;
@@ -11055,7 +11056,8 @@ _UIUpdate(_BLWidget* _Node, BLU32 _Interval)
 			else
 			{
 				_Node->uExtension.sText.nLastRecord = 0;
-				_Node->uExtension.sText.bShowCaret = !_Node->uExtension.sText.bShowCaret;
+				if (_Node->uExtension.sText.bShowCaret)
+					_Node->uExtension.sText.bCaretState = !_Node->uExtension.sText.bCaretState;
 				_PrUIMem->bDirty = TRUE;
 			}
 		}
@@ -11259,7 +11261,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 	if (_Baseplate)
 	{
 		_BLWidget* _node = _PrUIMem->pBasePlate;
-        if (!_node || _node->pParent != _PrUIMem->pRoot)
+        if (!_node || _node->pParent->sDimension.fX > 0.f || _node->pParent->sDimension.fY >0.f)
             return;
 		BLF32 _x, _y, _w, _h;
 		BLF32 _pw = (BLF32)_width;
@@ -11477,9 +11479,24 @@ blUIStyle(IN BLU32 _CaretColor, IN BLU32 _SelectRangeColor, IN BLU32 _TextDisabl
 		_PrUIMem->nTextDisableColor = _TextDisableColor;
 	}
 }
-BLVoid
+BLGuid
 blUIFile(IN BLAnsi* _Filename)
 {
+	_BLWidget* _dummy = (_BLWidget*)malloc(sizeof(_BLWidget));
+	memset(_dummy, 0, sizeof(_BLWidget));
+	_dummy->sDimension.fX = -1.f;
+	_dummy->sDimension.fY = -1.f;
+	_dummy->sPosition.fX = 0.f;
+	_dummy->sPosition.fY = 0.f;
+	_dummy->bPenetration = TRUE;
+	_dummy->pParent = NULL;
+	_dummy->eReferenceH = BL_UA_HCENTER;
+	_dummy->eReferenceV = BL_UA_VCENTER;
+	_dummy->pChildren = blGenArray(FALSE);
+	_dummy->eType = BL_UT_PANEL;
+	_dummy->bVisible = TRUE;
+	_dummy->uExtension.sPanel.nPixmapTex = INVALID_GUID;
+	_dummy->nID = blGenGuid(_dummy, blUniqueUri());
     BLGuid _layout = blGenStream(_Filename);
 	BLU32 _tmplen = (BLU32)strlen(_Filename);
 	BLAnsi _pixdir[260] = { 0 };
@@ -11494,7 +11511,7 @@ blUIFile(IN BLAnsi* _Filename)
 	if (_layout == INVALID_GUID)
 	{
 		blDebugOutput("load ui layout failed>%s", _Filename);
-		return;
+		return INVALID_GUID;
 	}
     ezxml_t _doc = ezxml_parse_str(blStreamData(_layout), blStreamLength(_layout));
     ezxml_t _element = ezxml_child(_doc, "Element");
@@ -11585,8 +11602,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_PANEL);
+			_BLWidget* _parentwid = _WidgetQuery(_dummy, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], BL_UT_PANEL);
 			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
@@ -11601,6 +11618,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIPanelModal(_widguid, _modalvar);
 			blUIPanelScrollable(_widguid, _scrollablevar);
 			blUIPanelPixmap(_widguid, _pixmap);
+			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
         }
         else if (!strcmp(_type, "Button"))
         {
@@ -11685,8 +11703,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
-            BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_BUTTON);
+			_BLWidget* _parentwid = _WidgetQuery(_dummy, _parentvar, TRUE);
+            BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], BL_UT_BUTTON);
 			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
             blUIReferencePoint(_widguid, _ha, _va);
             blUISizePolicy(_widguid, _policyvar);
@@ -11703,6 +11721,7 @@ blUIFile(IN BLAnsi* _Filename)
             blUIButtonDisableMap(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
             blUIButtonEnable(_widguid, _enablevar);
 			blUIButtonPixmap(_widguid, _pixmap);
+			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
         }
         else if (!strcmp(_type, "Label"))
         {
@@ -11729,8 +11748,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_LABEL);
+			_BLWidget* _parentwid = _WidgetQuery(_dummy, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], BL_UT_LABEL);
 			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
@@ -11743,6 +11762,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUILabelCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
 			blUILabelPadding(_widguid, _paddingvar[0], _paddingvar[1]);
 			blUILabelPixmap(_widguid, _pixmap);
+			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
         }
         else if (!strcmp(_type, "Check"))
         {
@@ -11816,8 +11836,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_CHECK);
+			_BLWidget* _parentwid = _WidgetQuery(_dummy, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], BL_UT_CHECK);
 			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
@@ -11833,6 +11853,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUICheckDisableMap(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
 			blUICheckEnable(_widguid, _enablevar);
 			blUICheckPixmap(_widguid, _pixmap);
+			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
         }
         else if (!strcmp(_type, "Text"))
         {
@@ -11906,8 +11927,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _idx++;
             }
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_TEXT);
+			_BLWidget* _parentwid = _WidgetQuery(_dummy, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], BL_UT_TEXT);
 			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
@@ -11927,6 +11948,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUITextMaxLength(_widguid, _maxlengthvar);
 			blUITextEnable(_widguid, _enablevar);
 			blUITextPixmap(_widguid, _pixmap);
+			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
         }
         else if (!strcmp(_type, "Progress"))
         {
@@ -11969,8 +11991,8 @@ blUIFile(IN BLAnsi* _Filename)
             }
             const BLAnsi* _fillmap = ezxml_attr(_element, "FillMap");
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_PROGRESS);
+			_BLWidget* _parentwid = _WidgetQuery(_dummy, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], BL_UT_PROGRESS);
 			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
@@ -11986,6 +12008,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIProgressPercent(_widguid, _percentvar);
 			blUIProgressBorder(_widguid, _bordevarr[0], _bordevarr[1]);
 			blUIProgressPixmap(_widguid, _pixmap);
+			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
         }
         else if (!strcmp(_type, "Slider"))
         {
@@ -12037,8 +12060,8 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _slidercommonmap = ezxml_attr(_element, "SliderCommonMap");
             const BLAnsi* _slidersisablemap = ezxml_attr(_element, "SliderDisableMap");
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_SLIDER);
+			_BLWidget* _parentwid = _WidgetQuery(_dummy, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], BL_UT_SLIDER);
 			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
@@ -12058,6 +12081,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUISliderSliderRange(_widguid, _rangevar[0], _rangevar[1]);
 			blUISliderEnable(_widguid, _enablevar);
 			blUISliderPixmap(_widguid, _pixmap);
+			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
         }
         else if (!strcmp(_type, "Table"))
         {
@@ -12093,8 +12117,8 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
 			const BLAnsi* _rowheight = ezxml_attr(_element, "RowHeight");
 			BLU32 _rowheightvar = (BLU32)strtoul(_rowheight, NULL, 10);
-			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_TABLE);
+			_BLWidget* _parentwid = _WidgetQuery(_dummy, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], BL_UT_TABLE);
 			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
@@ -12109,6 +12133,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUITableFlip(_widguid, _flipxvar, _flipyvar);
 			blUITableRowHeight(_widguid, _rowheightvar);
 			blUITablePixmap(_widguid, _pixmap);
+			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
         }
         else if (!strcmp(_type, "Dial"))
         {
@@ -12123,8 +12148,8 @@ blUIFile(IN BLAnsi* _Filename)
             const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
             const BLAnsi* _commonmap = ezxml_attr(_element, "CommonMap");
             const BLAnsi* _stencilmap = ezxml_attr(_element, "StencilMap");
-			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_DIAL);
+			_BLWidget* _parentwid = _WidgetQuery(_dummy, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], BL_UT_DIAL);
 			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
@@ -12137,6 +12162,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIDialAngleCut(_widguid, _anglecutvar);
 			blUIDialAngleRange(_widguid, _startanglevar, _endanglevar);
 			blUIDialPixmap(_widguid, _pixmap);
+			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
         }
         else if (!strcmp(_type, "Primitive"))
         {
@@ -12164,8 +12190,8 @@ blUIFile(IN BLAnsi* _Filename)
                 _tmp = strtok(NULL, ",");
                 _idx++;
             }
-			_BLWidget* _parentwid = _WidgetQuery(_PrUIMem->pRoot, _parentvar, TRUE);
-			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], _parentwid ? _parentwid->nID : _PrUIMem->pRoot->nID, BL_UT_PRIMITIVE);
+			_BLWidget* _parentwid = _WidgetQuery(_dummy, _parentvar, TRUE);
+			BLGuid _widguid = blGenUI(_name, _geovar[0], _geovar[1], _geovar[2], _geovar[3], BL_UT_PRIMITIVE);
 			strcpy(((_BLWidget*)blGuidAsPointer(_widguid))->aDir, _pixdir);
 			blUIReferencePoint(_widguid, _ha, _va);
 			blUISizePolicy(_widguid, _policyvar);
@@ -12176,6 +12202,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIPrimitiveColor(_widguid, _colorvar);
 			blUIPrimitiveFill(_widguid, _fillvar);
 			blUIPrimitivePath(_widguid, _xpath, _ypath, _pathnum);
+			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
         }
 		if (_element->sibling)
 			_element = _element->sibling;
@@ -12191,16 +12218,15 @@ blUIFile(IN BLAnsi* _Filename)
     } while (_element);
     ezxml_free(_doc);
     blDeleteStream(_layout);
+	return _dummy->nID;
 }
 BLGuid
-blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width, IN BLU32 _Height, IN BLGuid _Parent, IN BLEnum _Type)
+blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width, IN BLU32 _Height, IN BLEnum _Type)
 {
 	_BLWidget* _widget = (_BLWidget*)malloc(sizeof(_BLWidget));
 	_widget->sDimension.fX = (BLF32)_Width;
-	_widget->sDimension.fY = (BLF32)_Height;
-	_widget->pParent = blGuidAsPointer(_Parent);
-	if (!_widget->pParent)
-		_widget->pParent = _PrUIMem->pRoot;
+	_widget->sDimension.fY = (BLF32)_Height;	
+	_widget->pParent = NULL;
 	_widget->eType = _Type;
 	_widget->nFrameNum = 0xFFFFFFFF;
 	memset(_widget->aTag, 0, sizeof(_widget->aTag));
@@ -12225,10 +12251,11 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 	_widget->nMinHeight = 1;
 	_widget->bVisible = TRUE;
 	_widget->bCliped = TRUE;
-	_widget->bPenetration = TRUE;
+	_widget->bPenetration = FALSE;
 	_widget->bAbsScissor = FALSE;
 	_widget->bInteractive = TRUE;
     _widget->bValid = (_Type == BL_UT_PRIMITIVE) ? TRUE : FALSE;
+	_widget->pTagSheet = NULL;
 	switch (_widget->eType)
 	{
 		case BL_UT_PANEL:
@@ -12367,6 +12394,8 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sText.aCommonMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sText.aStencilMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sText.pSplitText, 0, sizeof(BLUtf16*) * 2048);
+			memset(_widget->uExtension.sText.aFontSource, 0, sizeof(BLAnsi) * 32);
+			strcpy(_widget->uExtension.sText.aFontSource, "default");
 			_widget->uExtension.sText.nMaxLength = 999999;
 			_widget->uExtension.sText.nMinValue = 0;
 			_widget->uExtension.sText.nMaxValue = 999999;
@@ -12377,7 +12406,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sText.bNumeric = FALSE;
 			_widget->uExtension.sText.eTxtAlignmentH = BL_UA_HCENTER;
 			_widget->uExtension.sText.eTxtAlignmentV = BL_UA_VCENTER;
-			_widget->uExtension.sText.nFontHeight = 0;
+			_widget->uExtension.sText.nFontHeight = 14;
 			_widget->uExtension.sText.bOutline = FALSE;
 			_widget->uExtension.sText.bBold = FALSE;
 			_widget->uExtension.sText.bShadow = FALSE;
@@ -12394,7 +12423,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sText.bFlipX = FALSE;
 			_widget->uExtension.sText.bFlipY = FALSE;
             _widget->uExtension.sText.nState = 1;
-			_widget->uExtension.sText.bShowCaret = FALSE;
+			_widget->uExtension.sText.bShowCaret = TRUE;
 			_widget->uExtension.sText.nLastRecord = 0;
             _widget->uExtension.sText.nPixmapTex = INVALID_GUID;
 			_widget->uExtension.sText.pTexData = NULL;
@@ -12480,7 +12509,6 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 	}
 	BLU32 _hashname = blHashUtf8((const BLUtf8*)_WidgetName);
 	_widget->nID = blGenGuid(_widget, _hashname);
-	blArrayPushBack(_widget->pParent->pChildren, _widget);
 	_PrUIMem->bDirty = TRUE;
 	return _widget->nID;
 }
@@ -12504,6 +12532,75 @@ blDeleteUI(IN BLGuid _ID)
     free(_widget);
     blDeleteGuid(_ID);
     _PrUIMem->bDirty = TRUE;
+}
+BLBool 
+blUIAttach(IN BLGuid _Parent, IN BLGuid _Child)
+{
+	if (_Child == INVALID_GUID)
+		return FALSE;
+	_BLWidget* _parent;
+	if (_Parent == INVALID_GUID)
+		_parent = _PrUIMem->pRoot;
+	else
+		_parent = blGuidAsPointer(_Parent);
+	if (!_parent)
+		return FALSE;
+	_BLWidget* _child = blGuidAsPointer(_Child);
+	if (!_child)
+		return FALSE;
+	{
+		FOREACH_ARRAY(_BLWidget*, _iter, _parent->pChildren)
+		{
+			if (_iter->nID == _Child)
+				return FALSE;
+		}
+	}
+	if (_child->pParent)
+	{
+		BLU32 _idx = 0;
+		BLBool _ret = FALSE;
+		FOREACH_ARRAY(_BLWidget*, _iter, _child->pParent->pChildren)
+		{
+			if (_iter == _child)
+			{
+				_ret = TRUE;
+				break;
+			}
+			_idx++;
+		}
+		if (_ret)
+			blArrayErase(_child->pParent->pChildren, _idx);
+	}
+	blArrayPushFront(_parent->pChildren, _child);
+	_child->pParent = _parent;
+	return TRUE;
+}
+BLBool 
+blUIDetach(IN BLGuid _ID)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	_BLWidget* _widget = blGuidAsPointer(_ID);
+	if (!_widget)
+		return FALSE;
+	BLU32 _idx = 0;
+	BLBool _ret = FALSE;
+	if (_widget->pParent)
+	{
+		FOREACH_ARRAY(_BLWidget*, _iter, _widget->pParent->pChildren)
+		{
+			if (_iter == _widget)
+			{
+				_ret = TRUE;
+				break;
+			}
+			_idx++;
+		}
+	}
+	if (_ret)
+		blArrayErase(_widget->pParent->pChildren, _idx);
+	_widget->pParent = NULL;
+	return _ret;
 }
 BLEnum
 blUIGetType(IN BLGuid _ID)
@@ -12694,15 +12791,6 @@ blUIGetPenetration(IN BLGuid _ID, OUT BLBool* _Penetration)
 	*_Penetration = _widget->bPenetration;
 }
 BLGuid
-blUIQuery(IN BLAnsi* _WidgetName)
-{
-	_BLWidget* _widget = _WidgetQuery(_PrUIMem->pRoot, blHashUtf8((const BLUtf8*)_WidgetName), TRUE);
-	if (_widget)
-		return _widget->nID;
-	else
-		return INVALID_GUID;
-}
-BLGuid
 blUILocate(IN BLS32 _XPos, IN BLS32 _YPos)
 {
 	return _WidgetLocate(_PrUIMem->pRoot, (BLF32)_XPos, (BLF32)_YPos)->nID;
@@ -12751,7 +12839,12 @@ blUIFocus(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos)
 		{
 			_PrUIMem->pFocusWidget->uExtension.sText.nLastRecord = 0;
 			_PrUIMem->pFocusWidget->uExtension.sText.bShowCaret = FALSE;
-			blDetachIME();
+			if (_widget->uExtension.sText.bNumeric)
+				blDetachIME(KEYBOARD_NUMERIC_INTERNAL);
+			else if (_widget->uExtension.sText.bNumeric)
+				blDetachIME(KEYBOARD_PASSWORD_INTERNAL);
+			else
+				blDetachIME(KEYBOARD_TEXT_INTERNAL);
 		}
 		else if (_PrUIMem->pFocusWidget->eType == BL_UT_TABLE)
 			_PrUIMem->pFocusWidget->uExtension.sTable.bDragging = FALSE;
@@ -12762,8 +12855,12 @@ blUIFocus(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos)
 	{
 		if (_widget->eType == BL_UT_TEXT && _widget->uExtension.sText.nState)
 		{
-			_widget->uExtension.sText.bShowCaret = TRUE;
-			blAttachIME(_XPos, _YPos + _widget->sDimension.fY * 0.5f);
+			if (_widget->uExtension.sText.bNumeric)
+				blAttachIME(_XPos, _YPos + _widget->sDimension.fY * 0.5f, KEYBOARD_NUMERIC_INTERNAL);
+			else if (_widget->uExtension.sText.bPassword)
+				blAttachIME(_XPos, _YPos + _widget->sDimension.fY * 0.5f, KEYBOARD_PASSWORD_INTERNAL);
+			else
+				blAttachIME(_XPos, _YPos + _widget->sDimension.fY * 0.5f, KEYBOARD_TEXT_INTERNAL);
 		}
 	}
 	_PrUIMem->pFocusWidget = _widget;
@@ -12777,6 +12874,46 @@ BLGuid
 blUIGetHoverd()
 {
 	return _PrUIMem->pHoveredWidget->nID;
+}
+BLU32 
+blUIChildrenCount(IN BLGuid _ID)
+{
+	if (_ID == INVALID_GUID)
+		return 0;
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return 0;
+	return _widget->pChildren->nSize;
+}
+BLGuid
+blUIChildIndexOf(IN BLGuid _ID, IN BLU32 _Idx)
+{
+	if (_ID == INVALID_GUID)
+		return INVALID_GUID;
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return INVALID_GUID;
+	if (_Idx >= _widget->pChildren->nSize)
+		return INVALID_GUID;
+	_BLWidget* _child = blArrayElement(_widget->pChildren, _Idx);
+	if (!_child)
+		return INVALID_GUID;
+	return _child->nID;
+}
+BLGuid
+blUIChildNameOf(IN BLGuid _ID, IN BLAnsi* _WidgetName)
+{
+	if (_ID == INVALID_GUID)
+		return INVALID_GUID;
+	_BLWidget* _widget = NULL;
+	if (_ID == INVALID_GUID)
+		_widget = _WidgetQuery(_PrUIMem->pRoot, blHashUtf8((const BLUtf8*)_WidgetName), TRUE);
+	else 
+		_widget = _WidgetQuery((_BLWidget*)blGuidAsPointer(_ID), blHashUtf8((const BLUtf8*)_WidgetName), TRUE);
+	if (_widget)
+		return _widget->nID;
+	else
+		return INVALID_GUID;
 }
 BLVoid
 blUIPanelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
@@ -13669,6 +13806,17 @@ blUITextEnable(IN BLGuid _ID, IN BLBool _Enable)
 	if (_widget->eType != BL_UT_TEXT)
 		return;
 	_widget->uExtension.sText.nState = _Enable ? 1 : 0;
+	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUITextCaret(IN BLGuid _ID, IN BLBool _Show)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TEXT)
+		return;
+	_widget->uExtension.sText.bShowCaret = _Show;
 	_PrUIMem->bDirty = TRUE;
 }
 const BLUtf8*

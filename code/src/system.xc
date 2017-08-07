@@ -3281,11 +3281,7 @@ _PollEvent()
 					while (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx])
 					{
 						if (_PrSystemMem->pSubscriber[_PrSystemMem->pEvents[_idx].eType][_fidx](BL_ET_KEY, MAKEU32(_PrSystemMem->pEvents[_idx].uEvent.sKey.eCode, _PrSystemMem->pEvents[_idx].uEvent.sKey.bPressed), 0, _PrSystemMem->pEvents[_idx].uEvent.sKey.pString, INVALID_GUID))
-						{
-							if (_PrSystemMem->pEvents[_idx].uEvent.sKey.pString)
-								free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sKey.pString);
 							break;
-						}
 						_fidx++;
 					}
 				}
@@ -4348,7 +4344,7 @@ blPluginProcAddress(IN BLAnsi* _Basename, IN BLAnsi* _Function)
     return _ret;
 }
 BLVoid
-blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
+blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
 {
 	BLF32 _x = _Xpos, _y = _Ypos;
 	if (_PrSystemMem->sBoostParam.bUseDesignRes)
@@ -4372,7 +4368,7 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
 		_y *= (BLF32)(_PrSystemMem->sBoostParam.nScreenHeight) / (BLF32)(_actualh);
 	}
 #if defined(BL_PLATFORM_WIN32)
-	if (_PrSystemMem->nIMC)
+	if (_PrSystemMem->nIMC && _Type == KEYBOARD_TEXT_INTERNAL)
 	{
 		COMPOSITIONFORM _com;
 		ImmAssociateContext(_PrSystemMem->nHwnd, _PrSystemMem->nIMC);
@@ -4436,10 +4432,10 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos)
 #endif
 }
 BLVoid
-blDetachIME()
+blDetachIME(IN BLEnum _Type)
 {
 #if defined(BL_PLATFORM_WIN32)
-	if (_PrSystemMem->nIMC)
+	if (_PrSystemMem->nIMC && _Type == KEYBOARD_TEXT_INTERNAL)
 	{
 		ImmAssociateContext(_PrSystemMem->nHwnd, NULL);
 		ImmReleaseContext(_PrSystemMem->nHwnd, _PrSystemMem->nIMC);

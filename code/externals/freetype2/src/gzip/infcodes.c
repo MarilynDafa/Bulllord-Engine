@@ -216,7 +216,7 @@ int r )
     case WASH:          /* o: got eob, possibly more output */
       if (k > 7)        /* return unused byte, if any */
       {
-        //Assert(k < 16, "inflate_codes grabbed too many bytes")
+        Assert(k < 16, "inflate_codes grabbed too many bytes")
         k -= 8;
         n++;
         p--;            /* can always return one */
