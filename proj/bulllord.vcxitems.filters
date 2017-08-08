@@ -1215,6 +1215,27 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftapi.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftbdf.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftcid.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftmac.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\md5.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\bzip2\ftbzip2.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\aflatin2.c">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h">
@@ -2350,6 +2371,15 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\main_sse.h">
       <Filter>externals\opus\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afangles.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\aflatin2.h">
+      <Filter>externals\freetype2\dummy</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftpcfdrv.h">
+      <Filter>externals\freetype2</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

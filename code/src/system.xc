@@ -4379,12 +4379,22 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
 		ImmSetCompositionWindow(_PrSystemMem->nIMC, &_com);
 	}
 #elif defined(BL_PLATFORM_UWP)
+#	if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
 	_PrSystemMem->sIMEpos.X = _x;
 	_PrSystemMem->sIMEpos.Y = _y;
 	_PrSystemMem->pCTEcxt->NotifyFocusEnter();
 	_PrSystemMem->pCTEcxt->NotifyLayoutChanged();
+#	else
+	if (_Type == KEYBOARD_TEXT_INTERNAL)
+	{
+		_PrSystemMem->sIMEpos.X = _x;
+		_PrSystemMem->sIMEpos.Y = _y;
+		_PrSystemMem->pCTEcxt->NotifyFocusEnter();
+		_PrSystemMem->pCTEcxt->NotifyLayoutChanged();
+	}
+#	endif
 #elif defined(BL_PLATFORM_LINUX)
-    if (_PrSystemMem->pIME)
+    if (_PrSystemMem->pIME && _Type == KEYBOARD_TEXT_INTERNAL)
     {
         if (_PrSystemMem->pIME)
             _PrSystemMem->pIC = XCreateIC(_PrSystemMem->pIME, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, _PrSystemMem->nWindow, XNFocusWindow, _PrSystemMem->nWindow, NULL);
@@ -4442,9 +4452,14 @@ blDetachIME(IN BLEnum _Type)
 		SetFocus(_PrSystemMem->nHwnd);
 	}
 #elif defined(BL_PLATFORM_UWP)
+#	if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
 	_PrSystemMem->pCTEcxt->NotifyFocusLeave();
+#	else
+	if (_Type == KEYBOARD_TEXT_INTERNAL)
+		_PrSystemMem->pCTEcxt->NotifyFocusLeave();
+#	endif
 #elif defined(BL_PLATFORM_LINUX)
-    if (_PrSystemMem->pIME)
+    if (_PrSystemMem->pIME && _Type == KEYBOARD_TEXT_INTERNAL)
     {
         BLAnsi* _contents = Xutf8ResetIC(_PrSystemMem->pIC);
         if (_contents)
