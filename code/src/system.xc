@@ -1377,6 +1377,7 @@ _WndProc(XEvent* _Event)
                 BLS32 _count;
                 Status _status;
                 BLAnsi* _temp = (BLAnsi*)alloca(101);
+                memset(_temp, 0, 101);
                 _count = Xutf8LookupString(_PrSystemMem->pIC, &_Event->xkey, _temp, 100, NULL, &_status);
                 if (_status == XBufferOverflow)
                 {
@@ -4394,23 +4395,20 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
 	}
 #	endif
 #elif defined(BL_PLATFORM_LINUX)
-    if (_PrSystemMem->pIME && _Type == KEYBOARD_TEXT_INTERNAL)
+    if (_PrSystemMem->pIME)
+        _PrSystemMem->pIC = XCreateIC(_PrSystemMem->pIME, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, _PrSystemMem->nWindow, XNFocusWindow, _PrSystemMem->nWindow, NULL);
+    if (_PrSystemMem->pIC)
     {
-        if (_PrSystemMem->pIME)
-            _PrSystemMem->pIC = XCreateIC(_PrSystemMem->pIME, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, _PrSystemMem->nWindow, XNFocusWindow, _PrSystemMem->nWindow, NULL);
-        if (_PrSystemMem->pIC)
-        {
-            XVaNestedList _attr;
-            XPoint _spot;
-            _spot.x = _x;
-            _spot.y = _y;
-            _attr = XVaCreateNestedList(0, XNSpotLocation, &_spot, NULL);
-            XSetICValues(_PrSystemMem->pIC, XNPreeditAttributes, _attr, NULL);
-            XFree(_attr);
-            BLAnsi* _contents = Xutf8ResetIC(_PrSystemMem->pIC);
-            if (_contents)
-                XFree(_contents);
-        }
+        XVaNestedList _attr;
+        XPoint _spot;
+        _spot.x = _x;
+        _spot.y = _y;
+        _attr = XVaCreateNestedList(0, XNSpotLocation, &_spot, NULL);
+        XSetICValues(_PrSystemMem->pIC, XNPreeditAttributes, _attr, NULL);
+        XFree(_attr);
+        BLAnsi* _contents = Xutf8ResetIC(_PrSystemMem->pIC);
+        if (_contents)
+            XFree(_contents);
     }
 #elif defined(BL_PLATFORM_OSX)
     if (!_PrSystemMem->pTICcxt)
@@ -4459,7 +4457,7 @@ blDetachIME(IN BLEnum _Type)
 		_PrSystemMem->pCTEcxt->NotifyFocusLeave();
 #	endif
 #elif defined(BL_PLATFORM_LINUX)
-    if (_PrSystemMem->pIME && _Type == KEYBOARD_TEXT_INTERNAL)
+    if (_PrSystemMem->pIME)
     {
         BLAnsi* _contents = Xutf8ResetIC(_PrSystemMem->pIC);
         if (_contents)

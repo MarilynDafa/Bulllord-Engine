@@ -113,7 +113,7 @@
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
       <CppLanguageStandard>gnu++11</CppLanguageStandard>
-      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
@@ -126,7 +126,7 @@
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
       <CppLanguageStandard>gnu++11</CppLanguageStandard>
-      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
@@ -139,7 +139,7 @@
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
       <CppLanguageStandard>gnu++11</CppLanguageStandard>
-      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
@@ -152,7 +152,7 @@
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
       <CppLanguageStandard>gnu++11</CppLanguageStandard>
-      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
@@ -165,7 +165,7 @@
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
       <CppLanguageStandard>gnu++11</CppLanguageStandard>
-      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
@@ -178,7 +178,7 @@
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
       <CppLanguageStandard>gnu++11</CppLanguageStandard>
-      <AdditionalIncludeDirectories>/root/projects/bulllord-linux/externals;/root/projects/bulllord-linux/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
