@@ -784,7 +784,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 		{
 			_text[0] = 0xE0 | (BLUtf8)((_codepoint >> 12) & 0x0F);
 			_text[1] = 0x80 | (BLUtf8)((_codepoint >> 6) & 0x3F);
-			_text[2] = 0x80 | (BLUtf8)(_codepoint & 0x3F);
+			_text[2] = 0x80 | (BLUtf8)(_codepoint & 0x3F);9
 			_text[3] = '\0';
 		}
 		else if (_codepoint <= 0x10FFFF)
