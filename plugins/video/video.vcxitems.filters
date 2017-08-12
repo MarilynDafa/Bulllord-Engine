@@ -485,9 +485,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)videoentry.xc">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\add_noise.c">
       <Filter>externals\vpx_dsp</Filter>
     </ClCompile>
@@ -811,6 +808,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_scale\generic\yv12extend.c">
       <Filter>externals\vpx_scale</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\plugins\video\videoentry.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

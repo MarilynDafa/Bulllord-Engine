@@ -104,42 +104,42 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>../bin/android/$(Platform)</OutDir>
+    <OutDir>../bin/android</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>../bin/android/$(Platform)</OutDir>
+    <OutDir>../bin/android</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <OutDir>../bin/android/$(Platform)</OutDir>
+    <OutDir>../bin/android</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <OutDir>../bin/android/$(Platform)</OutDir>
+    <OutDir>../bin/android</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <OutDir>../bin/android/$(Platform)</OutDir>
+    <OutDir>../bin/android</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <OutDir>../bin/android/$(Platform)</OutDir>
+    <OutDir>../bin/android</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <OutDir>../bin/android/$(Platform)</OutDir>
+    <OutDir>../bin/android</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <OutDir>../bin/android/$(Platform)</OutDir>
+    <OutDir>../bin/android</OutDir>
     <IntDir>$(Configuration)\android\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
   </PropertyGroup>
@@ -229,6 +229,7 @@
     </ClCompile>
     <Link>
       <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
+      <DebuggerSymbolInformation>OmitAllSymbolInformation</DebuggerSymbolInformation>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -784,7 +784,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 		{
 			_text[0] = 0xE0 | (BLUtf8)((_codepoint >> 12) & 0x0F);
 			_text[1] = 0x80 | (BLUtf8)((_codepoint >> 6) & 0x3F);
-			_text[2] = 0x80 | (BLUtf8)(_codepoint & 0x3F);9
+			_text[2] = 0x80 | (BLUtf8)(_codepoint & 0x3F);
 			_text[3] = '\0';
 		}
 		else if (_codepoint <= 0x10FFFF)
@@ -3527,11 +3527,20 @@ blTickDelay(IN BLU32 _Ms)
 		return;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	Sleep(_Ms);
-#else
-	struct timeval _delay;
-	_delay.tv_sec = 0;
-	_delay.tv_usec = _Ms * 1000;
-	select(0, NULL, NULL, NULL, &_delay);
+#elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID)
+	struct timespec _res;
+    _res.tv_sec = _Ms / 1000;
+    _res.tv_nsec = (_Ms * 1000000) % 1000000000;
+    clock_nanosleep(CLOCK_MONOTONIC, 0, &_res, NULL);
+#elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
+    static BLF64 _timebase = -1.0;
+    if (_timebase < 0)
+	{
+		mach_timebase_info_data_t _frequency = { 0 , 0 };
+		mach_timebase_info(&_frequency);
+		_timebase = (BLF64)_frequency.numer / (BLF64)_frequency.denom * 1e-9;
+	}
+    mach_wait_until(_Ms * 1000 / 1e6 / _timebase + mach_absolute_time());
 #endif
 }
 const BLAnsi*

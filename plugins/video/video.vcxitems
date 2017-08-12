@@ -14,7 +14,7 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)videoentry.xc">
+    <ClCompile Include="$(MSBuildThisFileDirectory)videoentry.cpp">
       <FileType>CppCode</FileType>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
