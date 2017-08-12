@@ -116,8 +116,9 @@
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>-lBulllord;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 -Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>/root/projects/bin/linux;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -129,8 +130,9 @@
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>-lBulllord;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 -Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>/root/projects/bin/linux;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -142,8 +144,9 @@
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>-lBulllord;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 -Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>/root/projects/bin/linux;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -155,8 +158,9 @@
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>-lBulllord;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 -Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>/root/projects/bin/linux;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
@@ -168,8 +172,9 @@
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>-lBulllord;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 -Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>/root/projects/bin/linux;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
@@ -181,8 +186,9 @@
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(RemoteRootDir)/bin/linux/libBulllord.so;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>-m32 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>-lBulllord;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>-m32 -Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>/root/projects/bin/linux;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
