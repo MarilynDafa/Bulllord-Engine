@@ -199,16 +199,16 @@
 
 
 #ifndef ZEXPORT
-#  define ZEXPORT(x)   static x
+#  define ZEXPORT(x)   extern x
 #endif
 #ifndef ZEXPORTVA
-#  define ZEXPORTVA(x)   static x
+#  define ZEXPORTVA(x)   extern x
 #endif
 #ifndef ZEXTERN
-#  define ZEXTERN(x) static x
+#  define ZEXTERN(x) extern x
 #endif
 #ifndef ZEXTERNDEF
-#  define ZEXTERNDEF(x)  static x
+#  define ZEXTERNDEF(x)  extern x
 #endif
 
 #ifndef FAR

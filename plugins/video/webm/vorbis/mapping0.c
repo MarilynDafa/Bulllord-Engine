@@ -152,7 +152,7 @@ static vorbis_info_mapping *mapping0_unpack(vorbis_info *vi,oggpack_buffer *opb)
 #include "lpc.h"
 #include "lsp.h"
 #include "envelope.h"
-#include "mdct.h"
+#include "mdctvorbis.h"
 #include "psy.h"
 #include "scales.h"
 

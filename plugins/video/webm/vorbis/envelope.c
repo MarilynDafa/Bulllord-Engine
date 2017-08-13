@@ -26,7 +26,7 @@
 #include "os.h"
 #include "scales.h"
 #include "envelope.h"
-#include "mdct.h"
+#include "mdctvorbis.h"
 #include "misc.h"
 
 void _ve_envelope_init(envelope_lookup *e,vorbis_info *vi){

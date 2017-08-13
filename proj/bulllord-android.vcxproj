@@ -147,8 +147,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
@@ -158,8 +158,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
@@ -169,8 +169,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
@@ -180,8 +180,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
@@ -191,8 +191,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
@@ -202,8 +202,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
@@ -213,8 +213,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>
@@ -224,8 +224,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;ANDROID;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <LibraryDependencies>m;GLESv3;EGL;OpenSLES;%(LibraryDependencies)</LibraryDependencies>

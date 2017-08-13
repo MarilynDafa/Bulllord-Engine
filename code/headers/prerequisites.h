@@ -239,8 +239,8 @@ typedef unsigned long long BLGuid;
 #		endif
 #	endif
 #else
-#	ifdef PLUGIN_EXPORT
-#       define BL_API __attribute__ ((visibility("default")))
+#	ifdef BL_EXPORT
+#		define BL_API __attribute__ ((visibility("default")))
 #	else
 #		define BL_API
 #	endif
@@ -332,9 +332,8 @@ typedef unsigned long long BLGuid;
 #define BL_ET_COUNT		6
 
  /* _SYSTEM_EVENT */
-#define BL_SE_AUDIOOVER		1
-#define BL_SE_TIMER			2
-#define BL_SE_RESOLUTION    3
+#define BL_SE_TIMER			1
+#define BL_SE_RESOLUTION    2
 
 /* _MOUSE_EVENT */
 #define BL_ME_LDOWN		0

@@ -18,15 +18,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)IndexPriorityQueue.c">
       <Filter>externals</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)miniz.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)miniz_tdef.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)miniz_tinfl.c">
-      <Filter>externals</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)tmxentry.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -36,18 +27,6 @@
       <Filter>externals</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)IndexPriorityQueue.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)miniz.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)miniz_common.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)miniz_tdef.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)miniz_tinfl.h">
       <Filter>externals</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)tmxentry.h">

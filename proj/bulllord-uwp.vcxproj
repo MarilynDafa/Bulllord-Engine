@@ -145,8 +145,9 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;WINAPI_FAMILY;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -160,8 +161,9 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;_CRT_SECURE_NO_WARNINGS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;WINAPI_FAMILY;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;_CRT_SECURE_NO_WARNINGS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -175,8 +177,9 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;DUK_F_32BIT_PTRS;__ARM_NEON;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;WINAPI_FAMILY;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;DUK_F_32BIT_PTRS;__ARM_NEON;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -190,8 +193,9 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;DUK_F_32BIT_PTRS;__ARM_NEON;_CRT_SECURE_NO_WARNINGS;_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;WINAPI_FAMILY;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;DUK_F_32BIT_PTRS;__ARM_NEON;_CRT_SECURE_NO_WARNINGS;_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -205,8 +209,9 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;WINAPI_FAMILY;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;_CRT_SECURE_NO_WARNINGS;D3DCOMPILE_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -220,8 +225,9 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\code\externals\opus;..\code\externals\opus\silk;..\code\externals\opus\celt;..\code\externals\opus\silk\fixed;..\code\externals\opus\silk\float;..\code\externals\opus\include;..\code\externals\ogg\include;..\code\externals\freetype2\include;..\code\externals\zstd;..\code\externals\zstd\common;..\code\externals\zstd\compress;..\code\externals\zstd\decompress;..\code\externals\zstd\dictBuilder;C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;OPUS_BUILD;ZSTD_DLL_EXPORT=1;ZSTD_MULTITHREAD=1;HAVE_CONFIG_H;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;_CRT_SECURE_NO_WARNINGS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;WINAPI_FAMILY;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;SQLITE_OS_WINRT;FT2_BUILD_LIBRARY;WINDLL;WIN32;_CRT_SECURE_NO_WARNINGS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -21,7 +21,7 @@
 #include "../headers/streamio.h"
 #include "../headers/system.h"
 #include "../headers/utils.h"
-#include "../externals/zstd/zstd.h"
+#include "../externals/miniz/miniz.h"
 #include "../externals/sqlite3/sqlite3.h"
 #include "internal/dictionary.h"
 #include "internal/array.h"
@@ -426,7 +426,7 @@ blGenStream(IN BLAnsi* _Filename)
 				_ret->pPos = (BLU8*)_ret->pBuffer;
 				_ret->pEnd = _ret->pPos + _ret->nLen;
 				_sz = _uncmpsz;
-				ZSTD_decompress(_ret->pBuffer, _sz, _cdata, _file->nLength);
+				mz_uncompress((BLU8*)_ret->pBuffer, &_sz, _cdata, _file->nLength);
 				free(_cdata);
 				return blGenGuid(_ret, _id);
 			}

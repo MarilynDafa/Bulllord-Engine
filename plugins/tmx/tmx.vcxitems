@@ -16,18 +16,11 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)AStar.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IndexPriorityQueue.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)miniz.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)miniz_tdef.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)miniz_tinfl.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)tmxentry.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AStar.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IndexPriorityQueue.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)miniz.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)miniz_common.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)miniz_tdef.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)miniz_tinfl.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)tmxentry.h" />
   </ItemGroup>
 </Project>

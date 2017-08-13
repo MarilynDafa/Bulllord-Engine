@@ -20,11 +20,11 @@ misrepresented as being the original software.
 */
 #include "tmxentry.h"
 #include "AStar.h"
-#include "miniz.h"
 #include "utils.h"
 #include "sprite.h"
 #include "streamio.h"
 #include "xml/ezxml.h"
+#include "miniz/miniz.h"
 typedef struct _TMXTileset {
 	BLAnsi aName[256];
 	BLAnsi aSource[260];
@@ -251,10 +251,10 @@ blTMXFileEXT(IN BLAnsi* _Filename)
                     const BLU8* _mem = blGenBase64Decoder(_trimdata, &_sz);
                     if(_mem)
                     {
-                        uLongf _orisz = 4 * _PrTmxMem->nHeight * _PrTmxMem->nWidth;
-                        Bytef* _orimem = (Bytef*)malloc(_orisz);
-                        BLS32 _zipret = uncompress(_orimem, &_orisz, _mem, _sz);
-                        if (_zipret == Z_OK)
+						mz_ulong _orisz = 4 * _PrTmxMem->nHeight * _PrTmxMem->nWidth;
+                        BLU8* _orimem = (BLU8*)malloc(_orisz);
+                        BLS32 _zipret = mz_uncompress(_orimem, &_orisz, _mem, _sz);
+                        if (_zipret == MZ_OK)
                         {
 							BLU32 _tidx = 0;
                             BLAnsi _buf[32] = { 0 };

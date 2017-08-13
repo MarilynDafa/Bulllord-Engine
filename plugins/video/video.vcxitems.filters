@@ -40,6 +40,12 @@
     <Filter Include="externals\webm">
       <UniqueIdentifier>{22efb050-0a16-4ed3-8273-422ecc5e20af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="externals\ogg">
+      <UniqueIdentifier>{7f46f9d5-f7c7-41d2-9696-25b2e6d8c0ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\opus">
+      <UniqueIdentifier>{cf87ca96-64b6-4b19-97a1-dc95a38f5aa5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)videoentry.h">
@@ -148,9 +154,6 @@
       <Filter>externals\vorbis</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\masking.h">
-      <Filter>externals\vorbis</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\mdct.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_ports\mem.h">
@@ -483,6 +486,259 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vpx_version.h">
       <Filter>externals</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\src\analysis.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\API.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\_kiss_fft_guts.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\armcpu.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\bands.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\celt.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\celt_lpc.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\celt_lpc_sse.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\config.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\control.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\cpu_support.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\cwrs.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\define.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\ecintrin.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\entcode.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\entdec.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\entenc.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\errors.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\fft_arm.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\fixed_arm64.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\fixed_armv4.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\fixed_armv5e.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\fixed_c5x.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\fixed_c6x.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\fixed_debug.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\fixed_generic.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\float_cast.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\Inlines.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\kiss_fft.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\kiss_fft_armv4.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\kiss_fft_armv5e.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\laplace.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\arm\LPC_inv_pred_gain_arm.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\MacroCount.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\MacroDebug.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\macros.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\main.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\main_FLP.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\x86\main_sse.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\mathops.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\mdct.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\mdct_arm.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\mfrngcod.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\src\mlp.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\modes.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\NSQ.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\arm\NSQ_del_dec_arm.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\arm\NSQ_neon.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\include\opus.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\include\opus_custom.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\include\opus_defines.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\include\opus_multistream.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\src\opus_private.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\include\opus_types.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\os_support.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\pitch.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\pitch_arm.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\pitch_est_defines.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\pitch_sse.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\PLC.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\quant_bands.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\rate.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler_private.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler_rom.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler_structs.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\SigProc_FIX.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\x86\SigProc_FIX_sse.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\SigProc_FLP.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\static_modes_fixed.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\static_modes_fixed_arm_ne10.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\static_modes_float.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\static_modes_float_arm_ne10.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\structs.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\structs_FLP.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\tables.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\src\tansig_table.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\tuning_parameters.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\typedef.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\version.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\vq.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\vq_sse.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\x86cpu.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\ogg\include\ogg\ogg.h">
+      <Filter>externals\ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\ogg\include\ogg\os_types.h">
+      <Filter>externals\ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\mdctvorbis.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\add_noise.c">
@@ -490,9 +746,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\alloccommon.c">
       <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\analysis.c">
-      <Filter>externals\vorbis</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\bitrate.c">
       <Filter>externals\vorbis</Filter>
@@ -598,9 +851,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\mbpitch.c">
       <Filter>externals\vp8</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\mdct.c">
-      <Filter>externals\vorbis</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\vp8\common\mfqe.c">
       <Filter>externals\vp8</Filter>
@@ -809,8 +1059,448 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_scale\generic\yv12extend.c">
       <Filter>externals\vpx_scale</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\videoentry.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\A2NLSF.c">
+      <Filter>externals\opus</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\ana_filt_bank_1.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\src\analysis.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\apply_sine_window_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\arm_celt_map.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\arm\arm_silk_map.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\armcpu.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\autocorrelation_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\bands.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\biquad_alt.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\burg_modified_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\bwexpander.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\bwexpander_32.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\bwexpander_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\celt.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\celt_decoder.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\celt_lpc.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\celt_lpc_sse.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\arm\celt_neon_intr.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\check_control_input.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\CNG.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\code_signs.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\control_audio_bandwidth.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\control_codec.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\control_SNR.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\corrMatrix_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\cwrs.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\dec_API.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\decode_core.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\decode_frame.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\decode_indices.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\decode_parameters.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\decode_pitch.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\decode_pulses.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\decoder_set_fs.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\encode_frame_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\encode_indices.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\encode_pulses.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\energy_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\entcode.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\entdec.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\entenc.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\find_LPC_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\find_LTP_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\find_pitch_lags_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\find_pred_coefs_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\gain_quant.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\init_decoder.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\inner_prod_aligned.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\inner_product_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\interpolate.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\k2a_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\kiss_fft.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\laplace.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\lin2log.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\log2lin.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\LP_variable_cutoff.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\LPC_analysis_filter.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\LPC_analysis_filter_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\LPC_fit.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\LPC_inv_pred_gain.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\LPC_inv_pred_gain_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\arm\LPC_inv_pred_gain_neon_intr.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\LTP_analysis_filter_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\LTP_scale_ctrl_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\mathops.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\mdct.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\src\mlp.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\src\mlp_data.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\modes.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\NLSF_decode.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\NLSF_del_dec_quant.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\NLSF_encode.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\NLSF_stabilize.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\NLSF_unpack.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\NLSF_VQ.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\NLSF_VQ_weights_laroia.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\NLSF2A.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\noise_shape_analysis_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\NSQ.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\NSQ_del_dec.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\arm\NSQ_del_dec_neon_intr.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\x86\NSQ_del_dec_sse.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\arm\NSQ_neon.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\x86\NSQ_sse.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\src\opus.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\src\opus_decoder.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\src\opus_multistream.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\src\opus_multistream_decoder.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\pitch.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\pitch_analysis_core_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\pitch_est_tables.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\pitch_sse.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\pitch_sse2.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\pitch_sse4_1.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\PLC.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\process_gains_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\process_NLSFs.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\quant_bands.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\quant_LTP_gains.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\rate.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\regularize_correlations_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\src\repacketizer.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler_down2.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler_down2_3.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler_private_AR2.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler_private_down_FIR.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler_private_IIR_FIR.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler_private_up2_HQ.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\resampler_rom.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\residual_energy_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\scale_copy_vector_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\scale_vector_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\schur_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\shell_coder.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\sigm_Q15.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\sort.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\sort_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\stereo_decode_pred.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\stereo_find_predictor.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\stereo_LR_to_MS.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\stereo_MS_to_LR.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\stereo_quant_pred.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\sum_sqr_shift.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\table_LSF_cos.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\tables_gain.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\tables_LTP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\tables_NLSF_CB_NB_MB.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\tables_NLSF_CB_WB.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\tables_other.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\tables_pitch_lag.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\tables_pulses_per_block.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\VAD.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\x86\VAD_sse.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)videoentry.cpp">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\vq.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\vq_sse2.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\VQ_WMat_EC.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\x86\VQ_WMat_EC_sse.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\warped_autocorrelation_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\float\wrappers_FLP.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\x86_celt_map.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\x86\x86_silk_map.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\x86\x86cpu.c">
+      <Filter>externals\opus</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\ogg\src\bitwise.c">
+      <Filter>externals\ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\ogg\src\framing.c">
+      <Filter>externals\ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\analysisvorbis.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\mdctvorbis.c" />
   </ItemGroup>
 </Project>

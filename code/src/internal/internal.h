@@ -22,16 +22,16 @@
 #define __internal_h_
 #include "../../headers/prerequisites.h"
 #if defined(BL_PLATFORM_WIN32)
-#include "../gl/glcorearb.h"
-#include "../gl/wglext.h"
+#include "../../externals/gl/glcorearb.h"
+#include "../../externals/gl/wglext.h"
 #elif defined(BL_PLATFORM_LINUX)
-#include "../gl/glcorearb.h"
+#include "../../externals/gl/glcorearb.h"
 typedef XID GLXPixmap;
 typedef XID GLXDrawable;
 typedef struct __GLXcontextRec *GLXContext;
-#include "../gl/glxext.h"
+#include "../../externals/gl/glxext.h"
 #elif defined(BL_PLATFORM_OSX)
-#include "../gl/glcorearb.h"
+#include "../../externals/gl/glcorearb.h"
 #include <CoreGraphics/CoreGraphics.h>
 #elif defined(BL_PLATFORM_IOS)
 #include <OpenGLES/ES3/gl.h>

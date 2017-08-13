@@ -26,7 +26,7 @@
 #include "codec_internal.h"
 
 #include "window.h"
-#include "mdct.h"
+#include "mdctvorbis.h"
 #include "lpc.h"
 #include "registry.h"
 #include "misc.h"

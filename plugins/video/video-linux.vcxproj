@@ -1372,7 +1372,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;/root/projects/bulllord/externals/ogg/include;/root/projects/video/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;__OPTIMIZE__;__linux__;_M_IX86</PreprocessorDefinitions>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
       <CppLanguageStandard>gnu++11</CppLanguageStandard>
@@ -1394,7 +1394,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;/root/projects/bulllord/externals/ogg/include;/root/projects/video/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;__OPTIMIZE__;__linux__;_M_IX86</PreprocessorDefinitions>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
       <CppLanguageStandard>gnu++11</CppLanguageStandard>
@@ -1416,7 +1416,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;/root/projects/bulllord/externals/ogg/include;/root/projects/video/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;__OPTIMIZE__;__linux__;_M_IX86</PreprocessorDefinitions>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
       <CppLanguageStandard>gnu++11</CppLanguageStandard>
@@ -1437,7 +1437,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;__OPTIMIZE__;__linux__;_M_IX86</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;/root/projects/bulllord/externals/ogg/include;/root/projects/video/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
@@ -1459,7 +1459,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;__OPTIMIZE__;__linux__;_M_IX86</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;/root/projects/bulllord/externals/ogg/include;/root/projects/video/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>
@@ -1481,7 +1481,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;_M_IX86;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;__OPTIMIZE__;__linux__;_M_IX86</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;/root/projects/bulllord/externals/ogg/include;/root/projects/video/webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <CLanguageStandard>gnu11</CLanguageStandard>

@@ -31,15 +31,6 @@
     <Filter Include="externals\duktape">
       <UniqueIdentifier>{bf01a848-05f9-4226-ab46-2e4daa8909bc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="externals\ogg">
-      <UniqueIdentifier>{7a461722-1b81-4657-adeb-65a82b76be07}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="externals\opus">
-      <UniqueIdentifier>{7bdd3cd2-7703-4224-9f62-61e172e11c69}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="externals\opus\float">
-      <UniqueIdentifier>{e0e2b22b-15e5-4c2c-a8cf-dd4c270bb8b0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{0d54445b-998a-4bb8-8593-64dbc3e19a3c}</UniqueIdentifier>
     </Filter>
@@ -49,17 +40,14 @@
     <Filter Include="headers">
       <UniqueIdentifier>{4935d9e3-ede5-42ea-9aa7-5802a75634d4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="externals\zstd">
-      <UniqueIdentifier>{b605e65d-6778-4d58-b91e-824367ef0426}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="externals\opus\x86">
-      <UniqueIdentifier>{9560f31f-f25f-4b2c-b775-9418f22b1d65}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="externals\opus\arm">
-      <UniqueIdentifier>{8b583ead-0968-4af0-beed-0d01902ca13b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="externals\freetype2\dummy">
       <UniqueIdentifier>{46e37d5a-5203-4bdf-b23c-3d3471506602}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\mpaudec">
+      <UniqueIdentifier>{7ff1c05b-435c-48d9-addd-13bb27e7e28c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\miniz">
+      <UniqueIdentifier>{7f82e891-c144-4ead-b9cd-b90ef7e98a40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -195,387 +183,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.c">
       <Filter>externals\duktape</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\ogg\src\bitwise.c">
-      <Filter>externals\ogg</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\ogg\src\framing.c">
-      <Filter>externals\ogg</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\bands.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\celt.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\celt_decoder.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\celt_lpc.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\cwrs.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\entcode.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\entdec.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\entenc.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\kiss_fft.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\laplace.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\mathops.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\mdct.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\modes.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\pitch.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\quant_bands.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\rate.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\vq.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\A2NLSF.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\ana_filt_bank_1.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\biquad_alt.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\bwexpander.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\bwexpander_32.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\check_control_input.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\CNG.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\code_signs.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\control_audio_bandwidth.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\control_codec.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\control_SNR.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\decoder_set_fs.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\decode_core.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\decode_frame.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\decode_indices.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\decode_parameters.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\decode_pitch.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\decode_pulses.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\dec_API.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\encode_indices.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\encode_pulses.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\gain_quant.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\init_decoder.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\inner_prod_aligned.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\interpolate.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\lin2log.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\log2lin.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\LPC_analysis_filter.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\LPC_fit.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\LPC_inv_pred_gain.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\LP_variable_cutoff.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NLSF2A.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NLSF_decode.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NLSF_del_dec_quant.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NLSF_encode.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NLSF_stabilize.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NLSF_unpack.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NLSF_VQ.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NLSF_VQ_weights_laroia.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NSQ.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NSQ_del_dec.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\pitch_est_tables.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\PLC.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\process_NLSFs.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\quant_LTP_gains.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_down2.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_down2_3.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_private_AR2.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_private_down_FIR.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_private_IIR_FIR.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_private_up2_HQ.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_rom.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\shell_coder.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\sigm_Q15.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\sort.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\stereo_decode_pred.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\stereo_find_predictor.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\stereo_LR_to_MS.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\stereo_MS_to_LR.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\stereo_quant_pred.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\sum_sqr_shift.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tables_gain.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tables_LTP.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tables_NLSF_CB_NB_MB.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tables_NLSF_CB_WB.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tables_other.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tables_pitch_lag.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tables_pulses_per_block.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\table_LSF_cos.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\VAD.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\VQ_WMat_EC.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\analysis.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\mlp.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\mlp_data.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\opus.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\opus_decoder.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\opus_multistream.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\opus_multistream_decoder.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\repacketizer.c">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\apply_sine_window_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\autocorrelation_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\burg_modified_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\bwexpander_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\corrMatrix_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\encode_frame_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\energy_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\find_LPC_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\find_LTP_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\find_pitch_lags_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\find_pred_coefs_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\inner_product_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\k2a_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\LPC_analysis_filter_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\LPC_inv_pred_gain_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\LTP_analysis_filter_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\LTP_scale_ctrl_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\noise_shape_analysis_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\pitch_analysis_core_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\process_gains_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\regularize_correlations_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\residual_energy_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\scale_copy_vector_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\scale_vector_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\schur_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\sort_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\warped_autocorrelation_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\wrappers_FLP.c">
-      <Filter>externals\opus\float</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\array.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -608,114 +215,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\utils.c">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\dictBuilder\cover.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\dictBuilder\divsufsort.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\entropy_common.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\error_private.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\fse_decompress.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\compress\fse_compress.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\compress\huf_compress.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\decompress\huf_decompress.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\pool.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\threading.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\xxhash.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\dictBuilder\zdict.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\zstd_common.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\compress\zstd_compress.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\decompress\zstd_decompress.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\compress\zstdmt_compress.c">
-      <Filter>externals\zstd</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\arm_celt_map.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\arm_silk_map.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\armcpu.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\celt_lpc_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\NSQ_del_dec_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\NSQ_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse2.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse4_1.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\VAD_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\vq_sse2.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\VQ_WMat_EC_sse.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\x86_celt_map.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\x86_silk_map.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\x86cpu.c">
-      <Filter>externals\opus\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\celt_neon_intr.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\LPC_inv_pred_gain_neon_intr.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\NSQ_del_dec_neon_intr.c">
-      <Filter>externals\opus\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\arm\NSQ_neon.c">
-      <Filter>externals\opus\arm</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afpic.c">
       <Filter>externals\freetype2\dummy</Filter>
@@ -1236,6 +735,24 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\aflatin2.c">
       <Filter>externals\freetype2\dummy</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\bits.c">
+      <Filter>externals\mpaudec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudec.c">
+      <Filter>externals\mpaudec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz.c">
+      <Filter>externals\miniz</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tdef.c">
+      <Filter>externals\miniz</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tinfl.c">
+      <Filter>externals\miniz</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h">
@@ -1279,27 +796,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duk_config.h">
       <Filter>externals\duktape</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\ogg\include\ogg\ogg.h">
-      <Filter>externals\ogg</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\ogg\include\ogg\os_types.h">
-      <Filter>externals\ogg</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\include\opus.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\include\opus_custom.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\include\opus_defines.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\include\opus_multistream.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\include\opus_types.h">
-      <Filter>externals\opus</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\array.h">
       <Filter>src\internal</Filter>
@@ -1345,42 +841,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\utils.h">
       <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\bitstream.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\error_private.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\fse.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\huf.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\mem.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\pool.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\threading.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\xxhash.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\zstd.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\zstd_errors.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\common\zstd_internal.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\compress\zstdmt_compress.h">
-      <Filter>externals\zstd</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afpic.h">
       <Filter>externals\freetype2\dummy</Filter>
@@ -2111,234 +1571,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\winfonts\winfnt.h">
       <Filter>externals\freetype2\dummy</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\config.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\version.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\bands.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\_kiss_fft_guts.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arch.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\celt.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\celt_lpc.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\cpu_support.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\cwrs.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\ecintrin.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\entcode.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\entdec.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\entenc.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\fixed_c5x.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\fixed_c6x.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\fixed_debug.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\fixed_generic.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\float_cast.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\kiss_fft.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\laplace.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\mathops.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\mdct.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\mfrngcod.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\modes.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\os_support.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\pitch.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\quant_bands.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\rate.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\stack_alloc.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\static_modes_fixed.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\static_modes_fixed_arm_ne10.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\static_modes_float.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\static_modes_float_arm_ne10.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\vq.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\celt_lpc_sse.h">
-      <Filter>externals\opus\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\pitch_sse.h">
-      <Filter>externals\opus\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\vq_sse.h">
-      <Filter>externals\opus\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\x86\x86cpu.h">
-      <Filter>externals\opus\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\armcpu.h">
-      <Filter>externals\opus\arm</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\fft_arm.h">
-      <Filter>externals\opus\arm</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\fixed_arm64.h">
-      <Filter>externals\opus\arm</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\fixed_armv4.h">
-      <Filter>externals\opus\arm</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\fixed_armv5e.h">
-      <Filter>externals\opus\arm</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\kiss_fft_armv4.h">
-      <Filter>externals\opus\arm</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\kiss_fft_armv5e.h">
-      <Filter>externals\opus\arm</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\mdct_arm.h">
-      <Filter>externals\opus\arm</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\celt\arm\pitch_arm.h">
-      <Filter>externals\opus\arm</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\API.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\control.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\debug.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\define.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\errors.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\Inlines.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\MacroCount.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\MacroDebug.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\macros.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\main.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\NSQ.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\pitch_est_defines.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\PLC.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_private.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_rom.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\resampler_structs.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\SigProc_FIX.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\structs.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tables.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\tuning_parameters.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\typedef.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\main_FLP.h">
-      <Filter>externals\opus\float</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\SigProc_FLP.h">
-      <Filter>externals\opus\float</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\float\structs_FLP.h">
-      <Filter>externals\opus\float</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\analysis.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\mlp.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\mlp_train.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\opus_private.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\src\tansig_table.h">
-      <Filter>externals\opus</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\codec.h">
       <Filter>externals\sqlite3</Filter>
     </ClInclude>
@@ -2357,21 +1589,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3userauth.h">
       <Filter>externals\sqlite3</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\compress\zstd_opt.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\dictBuilder\divsufsort.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\zstd\dictBuilder\zdict.h">
-      <Filter>externals\zstd</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\SigProc_FIX_sse.h">
-      <Filter>externals\opus\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\opus\silk\x86\main_sse.h">
-      <Filter>externals\opus\x86</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afangles.h">
       <Filter>externals\freetype2\dummy</Filter>
     </ClInclude>
@@ -2380,6 +1597,27 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\ftpcfdrv.h">
       <Filter>externals\freetype2</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudec.h">
+      <Filter>externals\mpaudec</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudectab.h">
+      <Filter>externals\mpaudec</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpegaudio.h">
+      <Filter>externals\mpaudec</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz.h">
+      <Filter>externals\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_common.h">
+      <Filter>externals\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tdef.h">
+      <Filter>externals\miniz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tinfl.h">
+      <Filter>externals\miniz</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

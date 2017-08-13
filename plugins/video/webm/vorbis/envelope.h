@@ -18,7 +18,7 @@
 #ifndef _V_ENVELOPE_
 #define _V_ENVELOPE_
 
-#include "mdct.h"
+#include "mdctvorbis.h"
 
 #define VE_PRE    16
 #define VE_WIN    4
