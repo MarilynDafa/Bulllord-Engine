@@ -228,7 +228,7 @@ typedef unsigned long long BLGuid;
 #if defined BL_API
 #	undef BL_API
 #endif
-#if defined(_MSC_VER)
+#if defined(WIN32) || defined(WIN64)
 #	if defined(VLD_FORCE_ENABLE)
 #		define BL_API extern
 #	else

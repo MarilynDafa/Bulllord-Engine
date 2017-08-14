@@ -738,7 +738,18 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\ogg\include\ogg\os_types.h">
       <Filter>externals\ogg</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\mdctvorbis.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\mdctvorbis.h">
+      <Filter>externals\vorbis</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\opus\celt\arch.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\opus\celt\stack_alloc.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\opus\silk\debug.h">
+      <Filter>externals\opus</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\vpx_dsp\add_noise.c">
@@ -1464,9 +1475,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\silk\x86\VAD_sse.c">
       <Filter>externals\opus</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)videoentry.cpp">
-      <Filter>externals\opus</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\opus\celt\vq.c">
       <Filter>externals\opus</Filter>
     </ClCompile>
@@ -1500,7 +1508,14 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\ogg\src\framing.c">
       <Filter>externals\ogg</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\analysisvorbis.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\mdctvorbis.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\analysisvorbis.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\mdctvorbis.c">
+      <Filter>externals\vorbis</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\plugins\video\videoentry.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

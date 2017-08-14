@@ -31,3 +31,11 @@ code/externals/opus/celt/dump_modes/Makefile
 *.ipch
 *.db-shm
 *.db-wal
+*.recipe
+*.cfg
+*.tmp
+*.ipdb
+*.iobj
+*.uws
+*.pri
+*.o-3bff322a

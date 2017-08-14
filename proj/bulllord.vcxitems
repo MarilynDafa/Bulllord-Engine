@@ -1490,6 +1490,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_common.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tdef.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tinfl.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\internal.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudec.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudectab.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpegaudio.h" />

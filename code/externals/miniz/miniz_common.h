@@ -75,21 +75,6 @@ typedef struct mz_dummy_time_t_tag
 #define MZ_FORCEINLINE inline
 #endif
 
-
-#if defined(_MSC_VER)
-#	ifdef DLL_EXPORT
-#		define MZ_API __declspec(dllexport)
-#	else
-#		define MZ_API __declspec(dllimport)
-#	endif
-#else
-#	ifdef DLL_EXPORT
-#       define BL_API __attribute__ ((visibility("default")))
-#	else
-#		define BL_API
-#	endif
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -100,9 +85,7 @@ extern void *miniz_def_realloc_func(void *opaque, void *address, size_t items, s
 
 #define MZ_UINT16_MAX (0xFFFFU)
 #define MZ_UINT32_MAX (0xFFFFFFFFU)
-
-
-
+#define MINIZ_NO_ZLIB_COMPATIBLE_NAMES
 #ifdef __cplusplus
 }
 #endif

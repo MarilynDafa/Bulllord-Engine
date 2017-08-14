@@ -2047,8 +2047,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;ANDROID;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/fixed;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;ANDROID;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\x86_64-linux-android\$(ToolchainFullVersionName);$(StlLibraryPath)</AdditionalLibraryDirectories>
@@ -2060,8 +2060,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;ANDROID;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/fixed;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;ANDROID;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\x86_64-linux-android\$(ToolchainFullVersionName);$(StlLibraryPath)</AdditionalLibraryDirectories>
@@ -2073,8 +2073,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;ANDROID;_M_IX86;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/fixed;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;ANDROID;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;_M_IX86;</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\i686-linux-android\$(ToolchainFullVersionName);$(StlLibraryPath)</AdditionalLibraryDirectories>
@@ -2086,8 +2086,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;ANDROID;_M_IX86;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/fixed;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;ANDROID;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;_M_IX86;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\i686-linux-android\$(ToolchainFullVersionName);$(StlLibraryPath)</AdditionalLibraryDirectories>
@@ -2099,8 +2099,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;ANDROID;_M_ARM;__ARM_NEON;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/fixed;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;ANDROID;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;_M_ARM;__ARM_NEON;</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\$(ToolchainName)\$(ToolchainFullVersionName);$(StlLibraryPath)</AdditionalLibraryDirectories>
@@ -2112,8 +2112,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;ANDROID;_M_ARM;__ARM_NEON;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/fixed;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;ANDROID;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;_M_ARM;__ARM_NEON;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\$(ToolchainName)\$(ToolchainFullVersionName);$(StlLibraryPath)</AdditionalLibraryDirectories>
@@ -2125,8 +2125,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;ANDROID;_M_ARM;__ARM_NEON;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/fixed;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;ANDROID;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;_M_ARM;__ARM_NEON;</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\$(ToolchainName)\$(ToolchainFullVersionName)\$(PlatformShortName);$(StlLibraryPath)</AdditionalLibraryDirectories>
@@ -2138,8 +2138,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;ANDROID;_M_ARM;__ARM_NEON;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/fixed;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;ANDROID;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;_M_ARM;__ARM_NEON;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\$(ToolchainName)\$(ToolchainFullVersionName)\$(PlatformShortName);$(StlLibraryPath)</AdditionalLibraryDirectories>

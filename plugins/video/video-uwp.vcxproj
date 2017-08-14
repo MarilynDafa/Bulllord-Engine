@@ -2105,8 +2105,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_IX86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_IX86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
@@ -2122,8 +2122,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_IX86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_IX86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
@@ -2139,8 +2139,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_ARM;_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_ARM;_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
@@ -2156,8 +2156,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_ARM;_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_ARM;_ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
@@ -2173,8 +2173,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
@@ -2190,8 +2190,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>true</CompileAsWinRT>
-      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;..\..\code\externals\ogg\include;./webm;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
     </ClCompile>
     <Link>
