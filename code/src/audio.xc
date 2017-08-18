@@ -1261,6 +1261,8 @@ blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 		_GbTVMode = TRUE;
 		if (_PrAudioMem->nPCMChannels != _Channels && _PrAudioMem->nPCMSampleRate != _SamplesPerSec)
 		{
+			for (BLU32 _idx = 0; _idx < 8; ++_idx)
+				_PrAudioMem->aPCMBuf[_idx] = (BLU8*)malloc(80000);
             _PrAudioMem->nPCMChannels = _Channels;
             _PrAudioMem->nPCMSampleRate = _SamplesPerSec;
 #if defined(BL_USE_AL_API)
@@ -1340,43 +1342,54 @@ blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 		_buf.AudioBytes = _PrAudioMem->nPCMFill;
 		_buf.pAudioData = _PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8];
 		_PrAudioMem->pPCMStream->SubmitSourceBuffer(&_buf);
+		XAUDIO2_VOICE_STATE _state;
+		do {
+			_PrAudioMem->pPCMStream->GetState(&_state);
+			if (_state.BuffersQueued > 6)
+				blTickDelay(10);
+		} while (_state.BuffersQueued > 6);
 #elif defined(BL_USE_AL_API)
-        ALint _processed = 0;
-        ALenum _state = 0;
-        ALuint _buffer = 0;
-        alGenBuffers(1, &_buffer);
-        alBufferData(_buffer, (_PrAudioMem->nPCMChannels == 2) ? 0x1103 : 0x1101, _PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8], _PrAudioMem->nPCMFill, _PrAudioMem->nPCMSampleRate);
-        alSourceQueueBuffers(_PrAudioMem->pPCMStream, 1, &_buffer);
-        alGetSourcei(_PrAudioMem->pPCMStream, AL_SOURCE_STATE, &_state);
-        if (_state != AL_PLAYING)
-            alSourcePlay(_PrAudioMem->pPCMStream);
-        alGetSourcei(_PrAudioMem->pPCMStream, AL_BUFFERS_PROCESSED, &_processed);
-        while (_processed--)
-        {
-            ALuint _buff;
-            alSourceUnqueueBuffers(_PrAudioMem->pPCMStream, 1, &_buff);
-            alDeleteBuffers(1, &_buff);
-        }
-        assert(alGetError() == AL_NO_ERROR);
+		ALint _processed = 0;
+		ALenum _state = 0;
+		ALuint _buffer = 0;
+		alGenBuffers(1, &_buffer);
+		alBufferData(_buffer, (_PrAudioMem->nPCMChannels == 2) ? 0x1103 : 0x1101, _PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8], _PrAudioMem->nPCMFill, _PrAudioMem->nPCMSampleRate);
+		alSourceQueueBuffers(_PrAudioMem->pPCMStream, 1, &_buffer);
+		alGetSourcei(_PrAudioMem->pPCMStream, AL_SOURCE_STATE, &_state);
+		if (_state != AL_PLAYING)
+			alSourcePlay(_PrAudioMem->pPCMStream);
+		alGetSourcei(_PrAudioMem->pPCMStream, AL_BUFFERS_PROCESSED, &_processed);
+		while (_processed--)
+		{
+			ALuint _buff;
+			alSourceUnqueueBuffers(_PrAudioMem->pPCMStream, 1, &_buff);
+			alDeleteBuffers(1, &_buff);
+		}
+		ALint _queued;
+		do {
+			alGetSourcei(_PrAudioMem->pPCMStream, AL_BUFFERS_QUEUED, &_queued);
+			if (_queued > 6)
+				blTickDelay(10);
+		} while (_queued > 6);
+		assert(alGetError() == AL_NO_ERROR);
 #elif defined(BL_USE_SL_API)
 		SLBufferQueueItf _bufferfunc;
 		(*_PrAudioMem->pPCMStream)->GetInterface(_PrAudioMem->pPCMStream, SL_IID_BUFFERQUEUE, &_bufferfunc);
 		(*_bufferfunc)->Enqueue(_bufferfunc, _PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8], _PrAudioMem->nPCMFill);
+		SLBufferQueueState _queued;
+		do {
+			(*_bufferfunc)->GetState(_bufferfunc, &_queued);
+			if (_queued.count > 6)
+				blTickDelay(10);
+		} while (_queued.count > 6);
 #else
 #endif
 		_PrAudioMem->nPCMFill = 0;
 		_PrAudioMem->nPCMBufTurn++;
-		_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] = (BLU8*)malloc(80000);
 		memcpy(_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] + _PrAudioMem->nPCMFill, _PCM, _Length);
 		_PrAudioMem->nPCMFill += _Length;
 	}
-	else if (!_PrAudioMem->nPCMFill && _Length)
-	{
-		_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] = (BLU8*)malloc(80000);
-		memcpy(_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] + _PrAudioMem->nPCMFill, _PCM, _Length);
-		_PrAudioMem->nPCMFill += _Length;
-	}
-	else if (_PrAudioMem->nPCMFill && _Length)
+	else if (_Length)
 	{
 		memcpy(_PrAudioMem->aPCMBuf[_PrAudioMem->nPCMBufTurn % 8] + _PrAudioMem->nPCMFill, _PCM, _Length);
 		_PrAudioMem->nPCMFill += _Length;

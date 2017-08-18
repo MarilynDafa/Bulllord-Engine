@@ -112,8 +112,6 @@ blThreadRun(INOUT BLThread* _Tr)
 	_Tr->bRunning = TRUE;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	DWORD _tid;
-#endif
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	_Tr->sHandle = CreateThread(NULL, 0, _Tr->pThreadFunc, (LPVOID)_Tr->pUserdata, 0, &_tid);
 #else
 	if (pthread_create(&_Tr->sHandle, NULL, _Tr->pThreadFunc, (BLVoid*)_Tr->pUserdata) != 0)

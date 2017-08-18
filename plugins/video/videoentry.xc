@@ -87,6 +87,15 @@ typedef struct _YUVImage {
 	BLU8* aPlanes[3];
 	BLS32 aLinesize[3];
 }_BLYUVImageExt;
+typedef struct _RGBFrameList {
+	struct _ListNode {
+		BLU8* pData;
+		BLF64 fTime;
+		struct _ListNode* pNext;
+		struct _ListNode* pPrev;
+	} *pFirst, *pLast;
+	BLU32 nSize;
+}_BLRGBFrameList;
 typedef struct _VPXDecoderExt {
 	vpx_codec_ctx* pCtx;
 	BLVoid* pIter;
@@ -116,8 +125,19 @@ typedef struct _WebMDemuxerExt {
 typedef struct _VideoMemberExt {
 	_BLOpusVorbisDecoderExt* pAudioDecodec;
 	_BLVPXDecoderExt* pVideoDecodec;
+	_BLRGBFrameList* pImgDataCache;
+#if defined(WIN32)
+	CRITICAL_SECTION sHandle;
+	HANDLE sThread;
+#else
+	pthread_mutex_t sHandle;
+	pthread_t sThread;
+#endif
+	BLU32 nVideoWidth;
+	BLU32 nVideoHeight;
 	BLBool bAudioSetParams;
 	BLBool bVideoSetParams;
+	BLBool bVideoOver;
 	BLGuid nTex;
 	BLGuid nGeo;
 	BLGuid nTech;
@@ -511,23 +531,19 @@ _RenderAudioFrame(_BLWebMFrameExt* _AudioFrame, _BlWebMDemuxerExt* _Demuxer, BLS
 {
 	if ((_PrVideoMem->pAudioDecodec->pOpus || _PrVideoMem->pAudioDecodec->pVorbis) && (_AudioFrame->nBufferSize > 0))
 	{
-		BLS32 _numoutsamples;
-		if (!_PCMS16Data(_AudioFrame, _Pcm, &_numoutsamples))
-		{
-			blDebugOutput("Audio decode error");
-			return FALSE;
-		}
 		if (_PrVideoMem->bAudioSetParams)
 		{
 			blPCMStreamParam((BLU32)_Demuxer->pAudioTrack->GetChannels(), (BLU32)_Demuxer->pAudioTrack->GetSamplingRate());
 			_PrVideoMem->bAudioSetParams = FALSE;
 		}
-		blPCMStreamData(_Pcm, _numoutsamples * (BLU32)_Demuxer->pAudioTrack->GetChannels() * sizeof(BLS16));
+		BLS32 _numoutsamples;
+		if (_PCMS16Data(_AudioFrame, _Pcm, &_numoutsamples))
+			blPCMStreamData(_Pcm, _numoutsamples * (BLU32)_Demuxer->pAudioTrack->GetChannels() * sizeof(BLS16));
 	}
 	return TRUE;
 }
 static BLBool
-_RenderVideoFrame(_BLWebMFrameExt* _VideoFrame, _BlWebMDemuxerExt* _Demuxer, BLU32 _Height, BLU32 _Width, BLU8* _ImageData)
+_RenderVideoFrame(_BLWebMFrameExt* _VideoFrame, _BlWebMDemuxerExt* _Demuxer)
 {
 	if (_PrVideoMem->pVideoDecodec->pCtx && (_VideoFrame->nBufferSize > 0))
 	{
@@ -539,68 +555,100 @@ _RenderVideoFrame(_BLWebMFrameExt* _VideoFrame, _BlWebMDemuxerExt* _Demuxer, BLU
 		}
 		if (_PrVideoMem->bVideoSetParams)
 		{
-			_PrVideoMem->nTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, (BLU32)_Demuxer->pVideoTrack->GetWidth(), (BLU32)_Demuxer->pVideoTrack->GetHeight(), 1, NULL);
-			blTextureFilter(_PrVideoMem->nTex, BL_TF_LINEAR, BL_TF_LINEAR, BL_TW_CLAMP, BL_TW_CLAMP, FALSE);
-			blTechSampler(_PrVideoMem->nTech, "Texture0", _PrVideoMem->nTex, 0);
-			_PrVideoMem->fTime = 0.0;
+			_PrVideoMem->nVideoWidth = (BLU32)_Demuxer->pVideoTrack->GetWidth();
+			_PrVideoMem->nVideoHeight = (BLU32)_Demuxer->pVideoTrack->GetHeight();
 			_PrVideoMem->bVideoSetParams = FALSE;
 		}
 		while (_YUVImage(&_image))
 		{
+			BLU8* _imgdata = (BLU8*)malloc((BLU32)(_Demuxer->pVideoTrack->GetWidth() * _Demuxer->pVideoTrack->GetHeight() * sizeof(BLU32)));
 			if (_image.nChromaShiftW == 1 && _image.nChromaShiftH == 1)
-				yuv420_2_rgb8888(_ImageData, _image.aPlanes[0], _image.aPlanes[2], _image.aPlanes[1], _image.nWidth, _image.nHeight, _image.aLinesize[0], _image.aLinesize[1], _image.nWidth << 2, 0);
+				yuv420_2_rgb8888(_imgdata, _image.aPlanes[0], _image.aPlanes[2], _image.aPlanes[1], _image.nWidth, _image.nHeight, _image.aLinesize[0], _image.aLinesize[1], _image.nWidth << 2, 0);
 			else if (_image.nChromaShiftW == 1 && _image.nChromaShiftH == 0)
-				yuv422_2_rgb8888(_ImageData, _image.aPlanes[0], _image.aPlanes[2], _image.aPlanes[1], _image.nWidth, _image.nHeight, _image.aLinesize[0], _image.aLinesize[1], _image.nWidth << 2, 0);
+				yuv422_2_rgb8888(_imgdata, _image.aPlanes[0], _image.aPlanes[2], _image.aPlanes[1], _image.nWidth, _image.nHeight, _image.aLinesize[0], _image.aLinesize[1], _image.nWidth << 2, 0);
 			else if (_image.nChromaShiftW == 0 && _image.nChromaShiftH == 0)
-				yuv444_2_rgb8888(_ImageData, _image.aPlanes[0], _image.aPlanes[2], _image.aPlanes[1], _image.nWidth, _image.nHeight, _image.aLinesize[0], _image.aLinesize[1], _image.nWidth << 2, 0);
+				yuv444_2_rgb8888(_imgdata, _image.aPlanes[0], _image.aPlanes[2], _image.aPlanes[1], _image.nWidth, _image.nHeight, _image.aLinesize[0], _image.aLinesize[1], _image.nWidth << 2, 0);
 			else
 			{
 				blDebugOutput("Invalid YUV Format");
 				return FALSE;
 			}
-			blFrameBufferClear(TRUE, TRUE, FALSE);
-			BLF32 _videoratio = (BLF32)_image.nWidth / (BLF32)_image.nHeight;
-			blTextureUpdate(_PrVideoMem->nTex, 0, 0, BL_CTF_IGNORE, 0, 0, 0, _image.nWidth, _image.nHeight, 1, _ImageData);
-			BLF32 _vbo[] = {
-				0.f,
-				(_Height - _Width / _videoratio) * 0.5f,
-				1.f,
-				1.f,
-				1.f,
-				1.f,
-				0.f,
-				0.f,
-				(BLF32)_Width,
-				(_Height - _Width / _videoratio) * 0.5f,
-				1.f,
-				1.f,
-				1.f,
-				1.f,
-				1.f,
-				0.f,
-				0.f,
-				(_Height - _Width / _videoratio) * 0.5f + _Width / _videoratio,
-				1.f,
-				1.f,
-				1.f,
-				1.f,
-				0.f,
-				1.f,
-				(BLF32)_Width,
-				(_Height - _Width / _videoratio) * 0.5f + _Width / _videoratio,
-				1.f,
-				1.f,
-				1.f,
-				1.f,
-				1.f,
-				1.f
-			};
-			blGeometryBufferUpdate(_PrVideoMem->nGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-			blDraw(_PrVideoMem->nTech, _PrVideoMem->nGeo, 1);
-			blFlush();
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+			EnterCriticalSection(&(_PrVideoMem->sHandle));
+#else
+			pthread_mutex_lock(&(_PrVideoMem->sHandle));
+#endif
+			_BLRGBFrameList::_ListNode* _node;
+			_node = (_BLRGBFrameList::_ListNode*)malloc(sizeof(_BLRGBFrameList::_ListNode));
+			_node->pData = _imgdata;
+			_node->fTime = _VideoFrame->fTime;
+			_node->pPrev = _PrVideoMem->pImgDataCache->pLast;
+			_node->pNext = NULL;
+			if (_node->pPrev != NULL)
+				_node->pPrev->pNext = _node;
+			_PrVideoMem->pImgDataCache->pLast = _node;
+			if (_PrVideoMem->pImgDataCache->pFirst == NULL)
+				_PrVideoMem->pImgDataCache->pFirst = _node;
+			_PrVideoMem->pImgDataCache->nSize++;
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+			LeaveCriticalSection(&(_PrVideoMem->sHandle));
+#else
+			pthread_mutex_unlock(&(_PrVideoMem->sHandle));
+#endif
 		}
 	}
 	return TRUE;
+}
+#if defined(WIN32)
+static DWORD __stdcall
+_DecodeThreadFunc(BLVoid* _Userdata)
+#else
+static BLVoid*
+_DecodeThreadFunc(BLVoid* _Userdata)
+#endif
+{
+	BLAnsi* _filename = (BLAnsi*)_Userdata;
+	_BlWebMDemuxerExt _demuxer;
+	MkvReader* _mkv = new MkvReader(_filename);
+	_Demuxer(&_demuxer, _mkv, 0, 0);
+	BLF64 _lasttime = 0.0;
+	if (_demuxer.bOpen)
+	{
+		_PrVideoMem->pVideoDecodec = _VideoCodecOpen(&_demuxer);
+		_PrVideoMem->pAudioDecodec = _AudioCodecOpen(&_demuxer);
+		_BLWebMFrameExt _videoframe, _audioframe;
+		_videoframe.nBufferSize = _audioframe.nBufferSize = 0;
+		_videoframe.nBufferCapacity = _audioframe.nBufferCapacity = 0;
+		_videoframe.pBuffer = _audioframe.pBuffer = NULL;
+		_videoframe.fTime = _audioframe.fTime = 0.0;
+		_videoframe.bKey = _audioframe.bKey = FALSE;		
+		BLS16* _pcm = (_PrVideoMem->pAudioDecodec->pOpus || _PrVideoMem->pAudioDecodec->pVorbis) ? (BLS16*)malloc((BLU32)(_PrVideoMem->pAudioDecodec->nNumSamples * _demuxer.pAudioTrack->GetChannels() * sizeof(BLS16))) : NULL;
+		do
+		{
+			if (!_ReadFrame(&_demuxer, &_videoframe, &_audioframe))
+				break;
+			if (!_RenderAudioFrame(&_audioframe, &_demuxer, _pcm))
+				break;
+			if (!_RenderVideoFrame(&_videoframe, &_demuxer))
+				break;
+			BLF64 _mintime = _audioframe.fTime < _videoframe.fTime ? _audioframe.fTime : _videoframe.fTime;
+			blTickDelay((BLU32)((_mintime - _lasttime) * 500));
+			_lasttime = _mintime;
+		} while (!blQuitEvent());
+		free(_pcm);
+		_PrVideoMem->fTime = 0.0;
+		if (_videoframe.pBuffer)
+			free(_videoframe.pBuffer);
+		if (_audioframe.pBuffer)
+			free(_audioframe.pBuffer);
+	}
+	delete _mkv;
+	_PrVideoMem->bVideoOver = TRUE;
+#if defined(WIN32)
+	return 0xDEAD;
+#else
+	return (BLVoid*)0xDEAD;
+#endif
 }
 BLVoid
 blVideoOpenEXT()
@@ -613,6 +661,12 @@ blVideoOpenEXT()
 	_PrVideoMem->fTime = 0.0;
 	_PrVideoMem->pAudioDecodec = NULL;
 	_PrVideoMem->pVideoDecodec = NULL;
+	_PrVideoMem->nVideoWidth = 0;
+	_PrVideoMem->nVideoHeight = 0;
+	_PrVideoMem->bVideoOver = FALSE;
+	_PrVideoMem->pImgDataCache = (_BLRGBFrameList*)malloc(sizeof(_BLRGBFrameList));
+	_PrVideoMem->pImgDataCache->nSize = 0;
+	_PrVideoMem->pImgDataCache->pFirst = _PrVideoMem->pImgDataCache->pLast = NULL;
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	_PrVideoMem->nTech = blGainTechnique(blHashUtf8((const BLUtf8*)"shaders/2D.bsl"));
@@ -653,10 +707,20 @@ blVideoOpenEXT()
 	_PrVideoMem->nGeo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
 	blVSync(FALSE);
 	blCursorVisiblity(FALSE);
+#if defined(WIN32)
+	InitializeCriticalSectionEx(&(_PrVideoMem->sHandle), 0, 0);
+#else
+	pthread_mutex_init(&(_PrVideoMem->sHandle), NULL);
+#endif
 }
 BLVoid
 blVideoCloseEXT()
 {
+#if defined(WIN32)
+	DeleteCriticalSection(&(_PrVideoMem->sHandle));
+#else
+	pthread_mutex_destroy(&(_PrVideoMem->sHandle));
+#endif
 	blVSync(TRUE);
 	blCursorVisiblity(TRUE);
 	blPCMStreamParam(-1, -1);
@@ -667,71 +731,111 @@ blVideoCloseEXT()
 	if (INVALID_GUID != _PrVideoMem->nGeo)
 		blDeleteGeometryBuffer(_PrVideoMem->nGeo);
 	blDeleteTechnique(_PrVideoMem->nTech);
+	free(_PrVideoMem->pImgDataCache);
 }
 BLBool
 blVideoPlayEXT(IN BLAnsi* _Filename)
 {
 	BLF64 _framedelta = 0.0;
-	BLS32 _progdelta = blTickCounts();
-	BLS32 _progdelta2 = blTickCounts();
 	BLU32 _width, _height, _dwidth, _dheight;
 	BLF32 _rx, _ry;
 	blWindowQuery(&_width, &_height, &_dwidth, &_dheight, &_rx, &_ry);
 	BLF32 _screensz[2] = { 2.f / (BLF32)_width, 2.f / (BLF32)_height };
 	blTechUniform(_PrVideoMem->nTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0, FALSE);
-	_BlWebMDemuxerExt _demuxer;
-	MkvReader* _mkv = new MkvReader(_Filename);
-	_Demuxer(&_demuxer, _mkv, 0, 0);
-	if (_demuxer.bOpen)
-	{
-		_PrVideoMem->pVideoDecodec = _VideoCodecOpen(&_demuxer);
-		_PrVideoMem->pAudioDecodec = _AudioCodecOpen(&_demuxer);
-		_BLWebMFrameExt _videoframe, _audioframe;
-		_videoframe.nBufferSize = _audioframe.nBufferSize = 0;
-		_videoframe.nBufferCapacity = _audioframe.nBufferCapacity = 0;
-		_videoframe.pBuffer = _audioframe.pBuffer = NULL;
-		_videoframe.fTime = _audioframe.fTime = 0.0;
-		_videoframe.bKey = _audioframe.bKey = FALSE;
-		BLU8* _imgdata = (BLU8*)malloc((BLU32)(_demuxer.pVideoTrack->GetWidth() * _demuxer.pVideoTrack->GetHeight() * sizeof(BLU32)));
-		BLS16* _pcm = (_PrVideoMem->pAudioDecodec->pOpus || _PrVideoMem->pAudioDecodec->pVorbis) ? (BLS16*)malloc((BLU32)(_PrVideoMem->pAudioDecodec->nNumSamples * _demuxer.pAudioTrack->GetChannels() * sizeof(BLS16))) : NULL;
-		do
-		{
-			BLBool _compensate = FALSE;
-			_progdelta2 = blTickCounts();
-			if (!_ReadFrame(&_demuxer, &_videoframe, &_audioframe))
-				break;
-			if (!_RenderAudioFrame(&_audioframe, &_demuxer, _pcm))
-				break;
-			//if (!_RenderVideoFrame(&_videoframe, &_demuxer, _height, _width, _imgdata))
-			//	break;
-			_progdelta2 = blTickCounts() - _progdelta2;
-			if (_audioframe.nBufferSize)
-			{
-				_framedelta = _audioframe.fTime - _PrVideoMem->fTime;
-				_progdelta = blTickCounts() - _progdelta;
-				blTickDelay(((BLS32)(_framedelta * 990 - _progdelta - (_compensate ? _progdelta2 : 0)) > 0) ? (BLU32)(_framedelta * 990 - _progdelta - (_compensate ? _progdelta2 : 0)) : 0);
-				_progdelta = blTickCounts();
-				_PrVideoMem->fTime = _audioframe.fTime;
-				_compensate = FALSE;
-			}
-			else
-				_compensate = TRUE;
-		} while (!blQuitEvent());
-		free(_pcm);
-		free(_imgdata);
-		_PrVideoMem->nTex = INVALID_GUID;
-		_PrVideoMem->fTime = 0.0;
-		if (_videoframe.pBuffer)
-			free(_videoframe.pBuffer);
-		if (_audioframe.pBuffer)
-			free(_audioframe.pBuffer);
-		delete _mkv;
-		return TRUE;
-	}
-	else
-	{
-		delete _mkv;
+#if defined(WIN32)
+	DWORD _tid;
+	_PrVideoMem->sThread = CreateThread(NULL, 0, _DecodeThreadFunc, (LPVOID)_Filename, 0, &_tid);
+#else
+	pthread_create(&_PrVideoMem->sThread, NULL, _DecodeThreadFunc, (BLVoid*)_Filename);
+#endif
+	while (_PrVideoMem->bVideoSetParams || _PrVideoMem->bAudioSetParams)
+		blTickDelay(5);
+	if (_PrVideoMem->nVideoWidth == 0 || _PrVideoMem->nVideoHeight == 0)
 		return FALSE;
-	}
+	_PrVideoMem->fTime = 0.0;
+	_PrVideoMem->nTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, (BLU32)_PrVideoMem->nVideoWidth, (BLU32)_PrVideoMem->nVideoHeight, 1, NULL);
+	blTextureFilter(_PrVideoMem->nTex, BL_TF_LINEAR, BL_TF_LINEAR, BL_TW_CLAMP, BL_TW_CLAMP, FALSE);
+	blTechSampler(_PrVideoMem->nTech, "Texture0", _PrVideoMem->nTex, 0);
+	BLF32 _videoratio = (BLF32)_PrVideoMem->nVideoWidth / (BLF32)_PrVideoMem->nVideoHeight;
+	BLF32 _vbo[] = {
+		0.f,
+		(_height - _width / _videoratio) * 0.5f,
+		1.f,
+		1.f,
+		1.f,
+		1.f,
+		0.f,
+		0.f,
+		(BLF32)_width,
+		(_height - _width / _videoratio) * 0.5f,
+		1.f,
+		1.f,
+		1.f,
+		1.f,
+		1.f,
+		0.f,
+		0.f,
+		(_height - _width / _videoratio) * 0.5f + _width / _videoratio,
+		1.f,
+		1.f,
+		1.f,
+		1.f,
+		0.f,
+		1.f,
+		(BLF32)_width,
+		(_height - _width / _videoratio) * 0.5f + _width / _videoratio,
+		1.f,
+		1.f,
+		1.f,
+		1.f,
+		1.f,
+		1.f
+	};
+	blGeometryBufferUpdate(_PrVideoMem->nGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+	do {
+		while (!_PrVideoMem->pImgDataCache->nSize)
+		{
+			if (_PrVideoMem->bVideoOver)
+				goto videoend;
+			blTickDelay(10);
+		}
+		blFrameBufferClear(TRUE, TRUE, FALSE);
+		blTextureUpdate(_PrVideoMem->nTex, 0, 0, BL_CTF_IGNORE, 0, 0, 0, _PrVideoMem->nVideoWidth, _PrVideoMem->nVideoHeight, 1, _PrVideoMem->pImgDataCache->pFirst->pData);
+		blDraw(_PrVideoMem->nTech, _PrVideoMem->nGeo, 1);
+		blFlush();
+		_framedelta = _PrVideoMem->pImgDataCache->pFirst->fTime - _PrVideoMem->fTime;
+		blTickDelay((BLU32)(_framedelta * 1000));
+		_PrVideoMem->fTime = _PrVideoMem->pImgDataCache->pFirst->fTime;
+#if defined(WIN32)
+		EnterCriticalSection(&(_PrVideoMem->sHandle));
+#else
+		pthread_mutex_lock(&(_PrVideoMem->sHandle));
+#endif
+		_BLRGBFrameList::_ListNode* _node;
+		_node = _PrVideoMem->pImgDataCache->pFirst;		
+		_PrVideoMem->pImgDataCache->pFirst = _node->pNext;
+		if (_node == _PrVideoMem->pImgDataCache->pLast)
+			_PrVideoMem->pImgDataCache->pLast = _node->pPrev;
+		else
+			_node->pNext->pPrev = _node->pPrev;
+		_PrVideoMem->pImgDataCache->nSize--;
+		free(_node->pData);
+		free(_node);
+#if defined(WIN32)
+		LeaveCriticalSection(&(_PrVideoMem->sHandle));
+#else
+		pthread_mutex_unlock(&(_PrVideoMem->sHandle));
+#endif
+	} while (!_PrVideoMem->bVideoOver);
+videoend:
+#if defined(WIN32)
+	WaitForSingleObjectEx(_PrVideoMem->sThread, INFINITE, TRUE);
+	CloseHandle(_PrVideoMem->sThread);
+#else
+	pthread_join(_PrVideoMem->sThread, NULL);
+#endif	
+	for (struct _BLRGBFrameList::_ListNode* _iter = _PrVideoMem->pImgDataCache->pFirst; _iter; _iter = _iter->pNext)	
+		free(_iter->pData);
+	return TRUE;
 }

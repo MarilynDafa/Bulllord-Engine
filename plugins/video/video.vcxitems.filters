@@ -741,13 +741,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)webm\vorbis\mdctvorbis.h">
       <Filter>externals\vorbis</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\opus\celt\arch.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\arch.h">
       <Filter>externals\opus</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\opus\celt\stack_alloc.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\celt\stack_alloc.h">
       <Filter>externals\opus</Filter>
     </ClInclude>
-    <ClInclude Include="E:\Bulllord-Engine\plugins\video\webm\opus\silk\debug.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)webm\opus\silk\debug.h">
       <Filter>externals\opus</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1514,7 +1514,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)webm\vorbis\mdctvorbis.c">
       <Filter>externals\vorbis</Filter>
     </ClCompile>
-    <ClCompile Include="E:\Bulllord-Engine\plugins\video\videoentry.cpp">
+    <ClCompile Include="$(MSBuildThisFileDirectory)videoentry.xc">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

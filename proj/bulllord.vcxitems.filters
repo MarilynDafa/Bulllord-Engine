@@ -741,9 +741,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudec.c">
       <Filter>externals\mpaudec</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz.c">
       <Filter>externals\miniz</Filter>
     </ClCompile>
@@ -752,6 +749,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tinfl.c">
       <Filter>externals\miniz</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1619,8 +1619,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tinfl.h">
       <Filter>externals\miniz</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\internal.h">
-      <Filter>externals\mpaudec</Filter>
-    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\internal.h" />
   </ItemGroup>
 </Project>
