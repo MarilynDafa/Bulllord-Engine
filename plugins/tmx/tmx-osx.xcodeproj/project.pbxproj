@@ -13,69 +13,17 @@
 		C7E3C23E1ED8EB7A00B60781 /* IndexPriorityQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C23A1ED8EB7A00B60781 /* IndexPriorityQueue.h */; };
 		C7E3C23F1ED8EB7A00B60781 /* AStar.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C23B1ED8EB7A00B60781 /* AStar.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7E3C2401ED8EB7A00B60781 /* IndexPriorityQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C23C1ED8EB7A00B60781 /* IndexPriorityQueue.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C25B1ED8EB9100B60781 /* crc32.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2411ED8EB9100B60781 /* crc32.h */; };
-		C7E3C25C1ED8EB9100B60781 /* deflate.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2421ED8EB9100B60781 /* deflate.h */; };
-		C7E3C25D1ED8EB9100B60781 /* gzguts.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2431ED8EB9100B60781 /* gzguts.h */; };
-		C7E3C25E1ED8EB9100B60781 /* inffast.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2441ED8EB9100B60781 /* inffast.h */; };
-		C7E3C25F1ED8EB9100B60781 /* inffixed.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2451ED8EB9100B60781 /* inffixed.h */; };
-		C7E3C2601ED8EB9100B60781 /* inflate.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2461ED8EB9100B60781 /* inflate.h */; };
-		C7E3C2611ED8EB9100B60781 /* inftrees.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2471ED8EB9100B60781 /* inftrees.h */; };
-		C7E3C2621ED8EB9100B60781 /* trees.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2481ED8EB9100B60781 /* trees.h */; };
-		C7E3C2631ED8EB9100B60781 /* zconf.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2491ED8EB9100B60781 /* zconf.h */; };
-		C7E3C2641ED8EB9100B60781 /* zlib.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C24A1ED8EB9100B60781 /* zlib.h */; };
-		C7E3C2651ED8EB9100B60781 /* zutil.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C24B1ED8EB9100B60781 /* zutil.h */; };
-		C7E3C2661ED8EB9100B60781 /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C24C1ED8EB9100B60781 /* adler32.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C2671ED8EB9100B60781 /* compress.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C24D1ED8EB9100B60781 /* compress.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C2681ED8EB9100B60781 /* crc32.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C24E1ED8EB9100B60781 /* crc32.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C2691ED8EB9100B60781 /* deflate.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C24F1ED8EB9100B60781 /* deflate.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C26A1ED8EB9100B60781 /* gzclose.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2501ED8EB9100B60781 /* gzclose.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C26B1ED8EB9100B60781 /* gzlib.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2511ED8EB9100B60781 /* gzlib.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C26C1ED8EB9100B60781 /* gzread.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2521ED8EB9100B60781 /* gzread.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C26D1ED8EB9100B60781 /* gzwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2531ED8EB9100B60781 /* gzwrite.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C26E1ED8EB9100B60781 /* infback.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2541ED8EB9100B60781 /* infback.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C26F1ED8EB9100B60781 /* inffast.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2551ED8EB9100B60781 /* inffast.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C2701ED8EB9100B60781 /* inflate.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2561ED8EB9100B60781 /* inflate.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C2711ED8EB9100B60781 /* inftrees.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2571ED8EB9100B60781 /* inftrees.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C2721ED8EB9100B60781 /* trees.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2581ED8EB9100B60781 /* trees.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C2731ED8EB9100B60781 /* uncompr.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2591ED8EB9100B60781 /* uncompr.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C2741ED8EB9100B60781 /* zutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C25A1ED8EB9100B60781 /* zutil.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7E3C2771ED8EE2200B60781 /* libbulllord.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C7E3C2761ED8EE2200B60781 /* libbulllord.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C7E3C1F21ED8DF7D00B60781 /* blTMX.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = blTMX.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7E3C1F21ED8DF7D00B60781 /* libTMXPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libTMXPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7E3C2351ED8EB6400B60781 /* tmxentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tmxentry.h; sourceTree = "<group>"; };
 		C7E3C2371ED8EB6E00B60781 /* tmxentry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tmxentry.c; sourceTree = "<group>"; };
 		C7E3C2391ED8EB7A00B60781 /* AStar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AStar.h; sourceTree = "<group>"; };
 		C7E3C23A1ED8EB7A00B60781 /* IndexPriorityQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IndexPriorityQueue.h; sourceTree = "<group>"; };
 		C7E3C23B1ED8EB7A00B60781 /* AStar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = AStar.c; sourceTree = "<group>"; };
 		C7E3C23C1ED8EB7A00B60781 /* IndexPriorityQueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = IndexPriorityQueue.c; sourceTree = "<group>"; };
-		C7E3C2411ED8EB9100B60781 /* crc32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32.h; path = ../../code/externals/zlib/crc32.h; sourceTree = "<group>"; };
-		C7E3C2421ED8EB9100B60781 /* deflate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = deflate.h; path = ../../code/externals/zlib/deflate.h; sourceTree = "<group>"; };
-		C7E3C2431ED8EB9100B60781 /* gzguts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gzguts.h; path = ../../code/externals/zlib/gzguts.h; sourceTree = "<group>"; };
-		C7E3C2441ED8EB9100B60781 /* inffast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inffast.h; path = ../../code/externals/zlib/inffast.h; sourceTree = "<group>"; };
-		C7E3C2451ED8EB9100B60781 /* inffixed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inffixed.h; path = ../../code/externals/zlib/inffixed.h; sourceTree = "<group>"; };
-		C7E3C2461ED8EB9100B60781 /* inflate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inflate.h; path = ../../code/externals/zlib/inflate.h; sourceTree = "<group>"; };
-		C7E3C2471ED8EB9100B60781 /* inftrees.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inftrees.h; path = ../../code/externals/zlib/inftrees.h; sourceTree = "<group>"; };
-		C7E3C2481ED8EB9100B60781 /* trees.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trees.h; path = ../../code/externals/zlib/trees.h; sourceTree = "<group>"; };
-		C7E3C2491ED8EB9100B60781 /* zconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zconf.h; path = ../../code/externals/zlib/zconf.h; sourceTree = "<group>"; };
-		C7E3C24A1ED8EB9100B60781 /* zlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zlib.h; path = ../../code/externals/zlib/zlib.h; sourceTree = "<group>"; };
-		C7E3C24B1ED8EB9100B60781 /* zutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zutil.h; path = ../../code/externals/zlib/zutil.h; sourceTree = "<group>"; };
-		C7E3C24C1ED8EB9100B60781 /* adler32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = adler32.c; path = ../../code/externals/zlib/adler32.c; sourceTree = "<group>"; };
-		C7E3C24D1ED8EB9100B60781 /* compress.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = compress.c; path = ../../code/externals/zlib/compress.c; sourceTree = "<group>"; };
-		C7E3C24E1ED8EB9100B60781 /* crc32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crc32.c; path = ../../code/externals/zlib/crc32.c; sourceTree = "<group>"; };
-		C7E3C24F1ED8EB9100B60781 /* deflate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = deflate.c; path = ../../code/externals/zlib/deflate.c; sourceTree = "<group>"; };
-		C7E3C2501ED8EB9100B60781 /* gzclose.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gzclose.c; path = ../../code/externals/zlib/gzclose.c; sourceTree = "<group>"; };
-		C7E3C2511ED8EB9100B60781 /* gzlib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gzlib.c; path = ../../code/externals/zlib/gzlib.c; sourceTree = "<group>"; };
-		C7E3C2521ED8EB9100B60781 /* gzread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gzread.c; path = ../../code/externals/zlib/gzread.c; sourceTree = "<group>"; };
-		C7E3C2531ED8EB9100B60781 /* gzwrite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gzwrite.c; path = ../../code/externals/zlib/gzwrite.c; sourceTree = "<group>"; };
-		C7E3C2541ED8EB9100B60781 /* infback.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = infback.c; path = ../../code/externals/zlib/infback.c; sourceTree = "<group>"; };
-		C7E3C2551ED8EB9100B60781 /* inffast.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = inffast.c; path = ../../code/externals/zlib/inffast.c; sourceTree = "<group>"; };
-		C7E3C2561ED8EB9100B60781 /* inflate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = inflate.c; path = ../../code/externals/zlib/inflate.c; sourceTree = "<group>"; };
-		C7E3C2571ED8EB9100B60781 /* inftrees.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = inftrees.c; path = ../../code/externals/zlib/inftrees.c; sourceTree = "<group>"; };
-		C7E3C2581ED8EB9100B60781 /* trees.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = trees.c; path = ../../code/externals/zlib/trees.c; sourceTree = "<group>"; };
-		C7E3C2591ED8EB9100B60781 /* uncompr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uncompr.c; path = ../../code/externals/zlib/uncompr.c; sourceTree = "<group>"; };
-		C7E3C25A1ED8EB9100B60781 /* zutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zutil.c; path = ../../code/externals/zlib/zutil.c; sourceTree = "<group>"; };
 		C7E3C2761ED8EE2200B60781 /* libbulllord.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbulllord.dylib; path = ../../bin/osx/libbulllord.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -105,7 +53,7 @@
 		C7E3C1F31ED8DF7D00B60781 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7E3C1F21ED8DF7D00B60781 /* blTMX.dylib */,
+				C7E3C1F21ED8DF7D00B60781 /* libTMXPlugin.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -113,32 +61,6 @@
 		C7E3C2321ED8EB0F00B60781 /* externals */ = {
 			isa = PBXGroup;
 			children = (
-				C7E3C2411ED8EB9100B60781 /* crc32.h */,
-				C7E3C2421ED8EB9100B60781 /* deflate.h */,
-				C7E3C2431ED8EB9100B60781 /* gzguts.h */,
-				C7E3C2441ED8EB9100B60781 /* inffast.h */,
-				C7E3C2451ED8EB9100B60781 /* inffixed.h */,
-				C7E3C2461ED8EB9100B60781 /* inflate.h */,
-				C7E3C2471ED8EB9100B60781 /* inftrees.h */,
-				C7E3C2481ED8EB9100B60781 /* trees.h */,
-				C7E3C2491ED8EB9100B60781 /* zconf.h */,
-				C7E3C24A1ED8EB9100B60781 /* zlib.h */,
-				C7E3C24B1ED8EB9100B60781 /* zutil.h */,
-				C7E3C24C1ED8EB9100B60781 /* adler32.c */,
-				C7E3C24D1ED8EB9100B60781 /* compress.c */,
-				C7E3C24E1ED8EB9100B60781 /* crc32.c */,
-				C7E3C24F1ED8EB9100B60781 /* deflate.c */,
-				C7E3C2501ED8EB9100B60781 /* gzclose.c */,
-				C7E3C2511ED8EB9100B60781 /* gzlib.c */,
-				C7E3C2521ED8EB9100B60781 /* gzread.c */,
-				C7E3C2531ED8EB9100B60781 /* gzwrite.c */,
-				C7E3C2541ED8EB9100B60781 /* infback.c */,
-				C7E3C2551ED8EB9100B60781 /* inffast.c */,
-				C7E3C2561ED8EB9100B60781 /* inflate.c */,
-				C7E3C2571ED8EB9100B60781 /* inftrees.c */,
-				C7E3C2581ED8EB9100B60781 /* trees.c */,
-				C7E3C2591ED8EB9100B60781 /* uncompr.c */,
-				C7E3C25A1ED8EB9100B60781 /* zutil.c */,
 				C7E3C2391ED8EB7A00B60781 /* AStar.h */,
 				C7E3C23A1ED8EB7A00B60781 /* IndexPriorityQueue.h */,
 				C7E3C23B1ED8EB7A00B60781 /* AStar.c */,
@@ -178,20 +100,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C7E3C2641ED8EB9100B60781 /* zlib.h in Headers */,
-				C7E3C2611ED8EB9100B60781 /* inftrees.h in Headers */,
-				C7E3C25E1ED8EB9100B60781 /* inffast.h in Headers */,
-				C7E3C2651ED8EB9100B60781 /* zutil.h in Headers */,
-				C7E3C25C1ED8EB9100B60781 /* deflate.h in Headers */,
 				C7E3C23D1ED8EB7A00B60781 /* AStar.h in Headers */,
 				C7E3C23E1ED8EB7A00B60781 /* IndexPriorityQueue.h in Headers */,
-				C7E3C25B1ED8EB9100B60781 /* crc32.h in Headers */,
-				C7E3C25F1ED8EB9100B60781 /* inffixed.h in Headers */,
-				C7E3C2621ED8EB9100B60781 /* trees.h in Headers */,
-				C7E3C25D1ED8EB9100B60781 /* gzguts.h in Headers */,
-				C7E3C2631ED8EB9100B60781 /* zconf.h in Headers */,
 				C7E3C2361ED8EB6400B60781 /* tmxentry.h in Headers */,
-				C7E3C2601ED8EB9100B60781 /* inflate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,7 +123,7 @@
 			);
 			name = "tmx-osx";
 			productName = "tmx-osx";
-			productReference = C7E3C1F21ED8DF7D00B60781 /* blTMX.dylib */;
+			productReference = C7E3C1F21ED8DF7D00B60781 /* libTMXPlugin.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -252,24 +163,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C7E3C2741ED8EB9100B60781 /* zutil.c in Sources */,
-				C7E3C2711ED8EB9100B60781 /* inftrees.c in Sources */,
-				C7E3C26B1ED8EB9100B60781 /* gzlib.c in Sources */,
 				C7E3C2401ED8EB7A00B60781 /* IndexPriorityQueue.c in Sources */,
-				C7E3C26C1ED8EB9100B60781 /* gzread.c in Sources */,
-				C7E3C26F1ED8EB9100B60781 /* inffast.c in Sources */,
-				C7E3C26A1ED8EB9100B60781 /* gzclose.c in Sources */,
 				C7E3C2381ED8EB6E00B60781 /* tmxentry.c in Sources */,
-				C7E3C2691ED8EB9100B60781 /* deflate.c in Sources */,
-				C7E3C2701ED8EB9100B60781 /* inflate.c in Sources */,
 				C7E3C23F1ED8EB7A00B60781 /* AStar.c in Sources */,
-				C7E3C2731ED8EB9100B60781 /* uncompr.c in Sources */,
-				C7E3C2681ED8EB9100B60781 /* crc32.c in Sources */,
-				C7E3C2721ED8EB9100B60781 /* trees.c in Sources */,
-				C7E3C26E1ED8EB9100B60781 /* infback.c in Sources */,
-				C7E3C2661ED8EB9100B60781 /* adler32.c in Sources */,
-				C7E3C26D1ED8EB9100B60781 /* gzwrite.c in Sources */,
-				C7E3C2671ED8EB9100B60781 /* compress.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,7 +194,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
-				CONFIGURATION_BUILD_DIR = ../../bin/osx/plugins;
+				CONFIGURATION_BUILD_DIR = ../../bin/osx;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -320,11 +216,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../code/externals,
+					../../code/headers,
+				);
 				LIBRARY_SEARCH_PATHS = ../../bin/osx;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = blTMX;
+				PRODUCT_NAME = libTMXPlugin;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -351,7 +251,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
-				CONFIGURATION_BUILD_DIR = ../../bin/osx/plugins;
+				CONFIGURATION_BUILD_DIR = ../../bin/osx;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -369,10 +269,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../code/externals,
+					../../code/headers,
+				);
 				LIBRARY_SEARCH_PATHS = ../../bin/osx;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = blTMX;
+				PRODUCT_NAME = libTMXPlugin;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -380,22 +284,30 @@
 		C7E3C1F71ED8DF7D00B60781 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CONFIGURATION_BUILD_DIR = ../../bin/osx/plugins;
+				CONFIGURATION_BUILD_DIR = ../../bin/osx;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = "";
-				PRODUCT_NAME = blTMX;
+				HEADER_SEARCH_PATHS = (
+					../../code/externals,
+					../../code/headers,
+				);
+				PRODUCT_NAME = libTMXPlugin;
 			};
 			name = Debug;
 		};
 		C7E3C1F81ED8DF7D00B60781 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CONFIGURATION_BUILD_DIR = ../../bin/osx/plugins;
+				CONFIGURATION_BUILD_DIR = ../../bin/osx;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = "";
-				PRODUCT_NAME = blTMX;
+				HEADER_SEARCH_PATHS = (
+					../../code/externals,
+					../../code/headers,
+				);
+				PRODUCT_NAME = libTMXPlugin;
 			};
 			name = Release;
 		};

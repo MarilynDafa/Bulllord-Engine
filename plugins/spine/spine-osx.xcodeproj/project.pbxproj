@@ -79,7 +79,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C7E3C2121ED8E84C00B60781 /* blSpine.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = blSpine.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7E3C2121ED8E84C00B60781 /* libSpinePlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libSpinePlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7E3C2BC1ED8F38500B60781 /* libbulllord.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbulllord.dylib; path = ../../bin/osx/libbulllord.dylib; sourceTree = "<group>"; };
 		C7E3C2BE1ED8F9A700B60781 /* spineentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spineentry.h; sourceTree = "<group>"; };
 		C7E3C2C01ED8F9B500B60781 /* spineentry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = spineentry.c; sourceTree = "<group>"; };
@@ -177,7 +177,7 @@
 		C7E3C2131ED8E84C00B60781 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7E3C2121ED8E84C00B60781 /* blSpine.dylib */,
+				C7E3C2121ED8E84C00B60781 /* libSpinePlugin.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -341,7 +341,7 @@
 			);
 			name = "spine-osx";
 			productName = "spine-osx";
-			productReference = C7E3C2121ED8E84C00B60781 /* blSpine.dylib */;
+			productReference = C7E3C2121ED8E84C00B60781 /* libSpinePlugin.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -442,7 +442,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
-				CONFIGURATION_BUILD_DIR = ../../bin/osx/plugins;
+				CONFIGURATION_BUILD_DIR = ../../bin/osx;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -462,11 +462,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../code/externals,
+					../../code/headers,
+				);
 				LIBRARY_SEARCH_PATHS = ../../bin/osx;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = blSpine;
+				PRODUCT_NAME = libSpinePlugin;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -493,7 +497,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
-				CONFIGURATION_BUILD_DIR = ../../bin/osx/plugins;
+				CONFIGURATION_BUILD_DIR = ../../bin/osx;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -508,10 +512,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../code/externals,
+					../../code/headers,
+				);
 				LIBRARY_SEARCH_PATHS = ../../bin/osx;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = blSpine;
+				PRODUCT_NAME = libSpinePlugin;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -520,12 +528,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
-				CONFIGURATION_BUILD_DIR = ../../bin/osx/plugins;
+				CONFIGURATION_BUILD_DIR = ../../bin/osx;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = "";
 				GCC_C_LANGUAGE_STANDARD = c11;
-				PRODUCT_NAME = blSpine;
+				HEADER_SEARCH_PATHS = (
+					../../code/externals,
+					../../code/headers,
+				);
+				PRODUCT_NAME = libSpinePlugin;
 			};
 			name = Debug;
 		};
@@ -533,12 +545,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
-				CONFIGURATION_BUILD_DIR = ../../bin/osx/plugins;
+				CONFIGURATION_BUILD_DIR = ../../bin/osx;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = "";
 				GCC_C_LANGUAGE_STANDARD = c11;
-				PRODUCT_NAME = blSpine;
+				HEADER_SEARCH_PATHS = (
+					../../code/externals,
+					../../code/headers,
+				);
+				PRODUCT_NAME = libSpinePlugin;
 			};
 			name = Release;
 		};

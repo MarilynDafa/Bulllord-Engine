@@ -43,7 +43,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C7E3C2021ED8DFD500B60781 /* blTMX.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = blTMX.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7E3C2021ED8DFD500B60781 /* libTMXPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libTMXPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7E3C2781ED8F2F500B60781 /* tmxentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tmxentry.h; sourceTree = "<group>"; };
 		C7E3C27A1ED8F2FC00B60781 /* tmxentry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tmxentry.c; sourceTree = "<group>"; };
 		C7E3C27C1ED8F30600B60781 /* AStar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AStar.h; sourceTree = "<group>"; };
@@ -105,7 +105,7 @@
 		C7E3C2031ED8DFD500B60781 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7E3C2021ED8DFD500B60781 /* blTMX.dylib */,
+				C7E3C2021ED8DFD500B60781 /* libTMXPlugin.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -212,7 +212,7 @@
 			);
 			name = "tmx-ios";
 			productName = "tmx-ios";
-			productReference = C7E3C2021ED8DFD500B60781 /* blTMX.dylib */;
+			productReference = C7E3C2021ED8DFD500B60781 /* libTMXPlugin.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -322,7 +322,7 @@
 				LIBRARY_SEARCH_PATHS = ../../bin/ios;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = blTMX;
+				PRODUCT_NAME = libTMXPlugin;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -367,7 +367,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LIBRARY_SEARCH_PATHS = ../../bin/ios;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = blTMX;
+				PRODUCT_NAME = libTMXPlugin;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -390,7 +390,7 @@
 					Z_HAVE_UNISTD_H,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
-				PRODUCT_NAME = blTMX;
+				PRODUCT_NAME = libTMXPlugin;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -413,7 +413,7 @@
 					Z_HAVE_UNISTD_H,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
-				PRODUCT_NAME = blTMX;
+				PRODUCT_NAME = libTMXPlugin;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				TARGETED_DEVICE_FAMILY = "1,2";
