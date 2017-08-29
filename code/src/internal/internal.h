@@ -101,7 +101,7 @@ extern "C" {
 #define SPACTION_DEAD_INTERNAL			4
 /* IME Type */
 #define KEYBOARD_TEXT_INTERNAL			0
-#define KEYBOARD_NUMERIC_INTERNAL			1
+#define KEYBOARD_NUMERIC_INTERNAL		1
 #define KEYBOARD_PASSWORD_INTERNAL		2
 /* UI Action Type */
 #define UIACTION_UV_INTERNAL			0
@@ -1085,7 +1085,6 @@ extern const BLAnsi* DEFAULTFONTIMG_INTERNAL;
         BL_KC_UNKNOWN,
         BL_KC_UNKNOWN,
     };
-    extern const BLAnsi* DEXCODE_INTERNAL;
 #elif defined(BL_PLATFORM_OSX)
     static const BLEnum SCANCODE_INTERNAL[] =
     {

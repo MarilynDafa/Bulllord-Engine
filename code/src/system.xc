@@ -1,4 +1,4 @@
-﻿/*
+/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
 
@@ -223,7 +223,6 @@ typedef struct _SystemMember {
 	AInputQueue* pInputQueue;
 	ANativeWindow* pPendingWindow;
 	AInputQueue* pPendingInputQueue;
-	JNINativeMethod sNativeMethod;
 	pthread_mutex_t sMutex;
 	pthread_cond_t sCond;
 	pthread_t nThread;
@@ -1777,11 +1776,17 @@ _CloseWindow()
 }
 #elif defined(BL_PLATFORM_ANDROID)
 extern "C" {
-	JNIEXPORT BLVoid JNICALL _TextChanged(JNIEnv* _Env, jclass, jstring _Text)
+	JNIEXPORT BLVoid JNICALL Java_org_bulllord_app_BLActivity_textChanged(JNIEnv* _Env, jclass, jstring _Text)
 	{
 		const BLUtf8* _utf8str = (const BLUtf8*)_Env->GetStringUTFChars(_Text, NULL);
 		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str, INVALID_GUID);
 		_Env->ReleaseStringUTFChars(_Text, (const BLAnsi*)_utf8str);
+	}
+	JNIEXPORT BLVoid JNICALL Java_org_bulllord_app_BLActivity_activityReady(JNIEnv* _Env, jclass, jobject _Activity)
+	{
+		_PrSystemMem->pBLJava = _Activity;
+		JNIEnv* _env = _PrSystemMem->pActivity->env;
+		_PrSystemMem->pBLJava = _env->NewGlobalRef(_PrSystemMem->pBLJava);
 	}
 }
 static BLVoid
@@ -1938,63 +1943,6 @@ _ShowWindow()
 		_PrSystemMem->sBoostParam.nScreenWidth = _minv;
 		_PrSystemMem->sBoostParam.nScreenHeight = _maxv;
 	}
-	jclass _cxtcls = _env->FindClass("android/content/Context");
-	jmethodID _getmid = _env->GetMethodID(_cxtcls, "getDir", "(Ljava/lang/String;I)Ljava/io/File;");
-	jstring _dexdir = _env->NewStringUTF("dex");
-	jstring _outdexdir = _env->NewStringUTF("outdex");
-	jobject _dirobj = _env->CallObjectMethod(_PrSystemMem->pActivity->clazz, _getmid, _dexdir, 0);
-	jobject _outdirobj = _env->CallObjectMethod(_PrSystemMem->pActivity->clazz, _getmid, _outdexdir, 0);
-	_env->DeleteLocalRef(_dexdir);
-	_env->DeleteLocalRef(_outdexdir);
-	jclass _filecls = _env->FindClass("java/io/File");
-	jstring _dexfile = _env->NewStringUTF("org.bulllord.util.jar");
-	jmethodID _filectormid = _env->GetMethodID(_filecls, "<init>", "(Ljava/io/File;Ljava/lang/String;)V");
-	jmethodID _clsloadctormid = _env->GetMethodID(_cxtcls, "getClassLoader", "()Ljava/lang/ClassLoader;");
-	jobject _clsloadobj = _env->CallObjectMethod(_PrSystemMem->pActivity->clazz, _clsloadctormid);
-	jobject _dexfileobj = _env->NewObject(_filecls, _filectormid, _dirobj, _dexfile);
-	_env->DeleteLocalRef(_dexfile);
-	jmethodID _existmid = _env->GetMethodID(_filecls, "exists", "()Z");
-	jboolean _exist = _env->CallBooleanMethod(_dexfileobj, _existmid);
-	jmethodID _pathmid = _env->GetMethodID(_filecls, "getAbsolutePath", "()Ljava/lang/String;");
-	jstring _cstrobj = (jstring)_env->CallObjectMethod(_dirobj, _pathmid);
-	jstring _ostrobj = (jstring)_env->CallObjectMethod(_outdirobj, _pathmid);
-	const BLUtf8* _utfdir = (const BLUtf8*)_env->GetStringUTFChars(_cstrobj, NULL);
-	BLAnsi _tmp[260] = { 0 };
-	strcpy(_tmp, (const BLAnsi*)_utfdir);
-	strcat(_tmp, "/org.bulllord.util.jar");
-	_env->ReleaseStringUTFChars(_cstrobj, (const BLAnsi*)_utfdir);
-	jstring _dexst = _env->NewStringUTF(_tmp);
-	if (!_exist)
-	{
-		FILE* _fp = fopen(_tmp, "wb");
-		BLU32 _bufsz;
-		const BLU8* _buf = blGenBase64Decoder(DEXCODE_INTERNAL, &_bufsz);
-		fwrite(_buf, 1, _bufsz, _fp);
-		fclose(_fp);
-		blDeleteBase64Decoder((BLU8*)_buf);
-	}
-	jclass _dalvikcls = _env->FindClass("dalvik/system/DexClassLoader");
-	jmethodID _dvctormid = _env->GetMethodID(_dalvikcls, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;)V");
-	jobject _dexloaderobj = _env->NewObject(_dalvikcls, _dvctormid, _dexst, _ostrobj, NULL, _clsloadobj);
-	jmethodID _loadmid = _env->GetMethodID(_dalvikcls, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
-	jstring _devfile = _env->NewStringUTF("org.bulllord.util.BLInput");
-	jclass _ret = (jclass)_env->CallObjectMethod(_dexloaderobj, _loadmid, _devfile);
-	_env->DeleteLocalRef(_cxtcls);
-	_env->DeleteLocalRef(_dirobj);
-	_env->DeleteLocalRef(_outdirobj);
-	_env->DeleteLocalRef(_filecls);
-	_env->DeleteLocalRef(_dexfileobj);
-	_env->DeleteLocalRef(_clsloadobj);
-	_env->DeleteLocalRef(_dalvikcls);
-	_env->DeleteLocalRef(_dexst);
-	_env->DeleteLocalRef(_devfile);
-	_env->DeleteLocalRef(_dexloaderobj);
-	_env->RegisterNatives(_ret, &_PrSystemMem->sNativeMethod, 1);
-	jmethodID _ctxctormid = _env->GetMethodID(_ret, "<init>", "(Landroid/content/Context;)V");
-	_PrSystemMem->pBLJava = _env->NewObject(_ret, _ctxctormid, _PrSystemMem->pActivity->clazz);
-	_PrSystemMem->pBLJava = _env->NewGlobalRef(_PrSystemMem->pBLJava);
-	jmethodID _hideviewmid = _env->GetStaticMethodID(_ret, "addTextEdit", "()V");
-	_env->CallStaticVoidMethod(_ret, _hideviewmid);
 	_env->DeleteLocalRef(_acticls);
 	_env->DeleteLocalRef(_metcls);
 	_env->DeleteLocalRef(_disobj);
@@ -2002,7 +1950,6 @@ _ShowWindow()
 	_env->DeleteLocalRef(_mgrcls);
 	_env->DeleteLocalRef(_metobj);
 	_env->DeleteLocalRef(_discls);
-	_env->DeleteLocalRef(_ret);
 	_PrSystemMem->pActivity->vm->DetachCurrentThread();
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 	while (!_PrSystemMem->pWindow);
@@ -4436,16 +4383,18 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
 #elif defined(BL_PLATFORM_IOS)
     [_PrSystemMem->pTICcxt becomeFirstResponder];
 #elif defined(BL_PLATFORM_ANDROID)
-	pthread_mutex_lock(&_PrSystemMem->sMutex);
+	BLS32 _busy;
+	_busy = pthread_mutex_trylock(&_PrSystemMem->sMutex);
 	while (!_PrSystemMem->bAvtivityFocus);
 	JNIEnv* _env = _PrSystemMem->pActivity->env;
 	_PrSystemMem->pActivity->vm->AttachCurrentThread(&_env, NULL);
 	jclass _blcls = _env->GetObjectClass(_PrSystemMem->pBLJava);
-	jmethodID _showviewmid = _env->GetStaticMethodID(_blcls, "showTextInput", "()V");
-	_env->CallStaticVoidMethod(_blcls, _showviewmid);
+	jmethodID _showviewmid = _env->GetMethodID(_blcls, "showTextInput", "(I)V");
+	_env->CallVoidMethod(_PrSystemMem->pBLJava, _showviewmid, (jint)_Type);
 	_env->DeleteLocalRef(_blcls);
 	_PrSystemMem->pActivity->vm->DetachCurrentThread();
-	pthread_mutex_unlock(&_PrSystemMem->sMutex);
+	if (!_busy)
+		pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
 }
 BLVoid
@@ -4485,15 +4434,17 @@ blDetachIME(IN BLEnum _Type)
 #elif defined(BL_PLATFORM_IOS)
     [_PrSystemMem->pTICcxt resignFirstResponder];
 #elif defined(BL_PLATFORM_ANDROID)
-	pthread_mutex_lock(&_PrSystemMem->sMutex);
+	BLS32 _busy;
+	_busy = pthread_mutex_trylock(&_PrSystemMem->sMutex);
 	JNIEnv* _env = _PrSystemMem->pActivity->env;
 	_PrSystemMem->pActivity->vm->AttachCurrentThread(&_env, NULL);
 	jclass _blcls = _env->GetObjectClass(_PrSystemMem->pBLJava);
-	jmethodID _hideviewmid = _env->GetStaticMethodID(_blcls, "hideTextInput", "()V");
-	_env->CallStaticVoidMethod(_blcls, _hideviewmid);
+	jmethodID _hideviewmid = _env->GetMethodID(_blcls, "hideTextInput", "()V");
+	_env->CallVoidMethod(_PrSystemMem->pBLJava, _hideviewmid);
 	_env->DeleteLocalRef(_blcls);
 	_PrSystemMem->pActivity->vm->DetachCurrentThread();
-	pthread_mutex_unlock(&_PrSystemMem->sMutex);
+	if (!_busy)
+		pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
 }
 BLVoid
@@ -4732,9 +4683,6 @@ blSystemPrepare(IN BLVoid* _Activity, IN BLVoid* _State, IN BLU32 _StateSize)
 	pipe(_msgpipe);
 	_PrSystemMem->nMsgRead = _msgpipe[0];
 	_PrSystemMem->nMsgWrite = _msgpipe[1];
-	_PrSystemMem->sNativeMethod.name = "textChanged";
-	_PrSystemMem->sNativeMethod.signature = "(Ljava/lang/String;)V";
-	_PrSystemMem->sNativeMethod.fnPtr = (BLVoid*)_TextChanged;
 	pthread_attr_t _attr;
 	pthread_attr_init(&_attr);
 	pthread_attr_setdetachstate(&_attr, PTHREAD_CREATE_DETACHED);

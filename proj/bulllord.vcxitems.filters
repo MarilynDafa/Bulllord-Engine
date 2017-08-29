@@ -1619,6 +1619,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tinfl.h">
       <Filter>externals\miniz</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\internal.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\internal.h">
+      <Filter>externals\mpaudec</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

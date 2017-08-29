@@ -19,6 +19,7 @@
  3. This notice may not be removed or altered from any source distribution.
  */
 #include "internal/mathematics.h"
+#define FORCE_NO_INTRINSICS
 #if defined(BL_PLATFORM_WEB) || defined(FORCE_NO_INTRINSICS)
 #	define BL_NO_INTRINSICS
 #elif defined(_M_ARM)
