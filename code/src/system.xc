@@ -1919,13 +1919,21 @@ _ShowWindow()
 	jclass _metcls = _env->FindClass("android/util/DisplayMetrics");
 	jmethodID _initmid = _env->GetMethodID(_metcls, "<init>", "()V");
 	jobject _metobj = _env->NewObject(_metcls, _initmid);
+	jmethodID _getwndmid = _env->GetMethodID(_acticls, "getWindow", "()Landroid/view/Window;");
+	jobject _wndobj = _env->CallObjectMethod(_actiobj, _getwndmid);
+	jclass _wndcls = _env->FindClass("android/view/Window");
+	jmethodID _getviewmid = _env->GetMethodID(_wndcls, "getDecorView", "()Landroid/view/View;");
+	jobject _viewobj = _env->CallObjectMethod(_wndobj, _getviewmid);
+	jclass _viewcls = _env->FindClass("android/view/View");
+	jmethodID _getvismid = _env->GetMethodID(_viewcls, "setSystemUiVisibility", "(I)V");
+	_env->CallVoidMethod(_viewobj, _getvismid, (0x00000800 | 0x00000004 | 0x00000002));
 	jmethodID _getmgrmid = _env->GetMethodID(_acticls, "getWindowManager", "()Landroid/view/WindowManager;");
 	jobject _mgrobj = _env->CallObjectMethod(_actiobj, _getmgrmid);
 	jclass _mgrcls = _env->FindClass("android/view/WindowManager");
 	jmethodID _getdismid = _env->GetMethodID(_mgrcls, "getDefaultDisplay", "()Landroid/view/Display;");
 	jobject _disobj = _env->CallObjectMethod(_mgrobj, _getdismid);
 	jclass _discls = _env->FindClass("android/view/Display");
-	jmethodID _getmetmid = _env->GetMethodID(_discls, "getMetrics", "(Landroid/util/DisplayMetrics;)V");
+	jmethodID _getmetmid = _env->GetMethodID(_discls, "getRealMetrics", "(Landroid/util/DisplayMetrics;)V");
 	_env->CallVoidMethod(_disobj, _getmetmid, _metobj);
 	jfieldID _wfiled = _env->GetFieldID(_metcls, "widthPixels", "I");
 	jfieldID _hfield = _env->GetFieldID(_metcls, "heightPixels", "I");
@@ -1943,6 +1951,8 @@ _ShowWindow()
 		_PrSystemMem->sBoostParam.nScreenWidth = _minv;
 		_PrSystemMem->sBoostParam.nScreenHeight = _maxv;
 	}
+	_env->DeleteLocalRef(_wndobj);
+	_env->DeleteLocalRef(_viewobj);
 	_env->DeleteLocalRef(_acticls);
 	_env->DeleteLocalRef(_metcls);
 	_env->DeleteLocalRef(_disobj);
