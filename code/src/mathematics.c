@@ -19,14 +19,6 @@
  3. This notice may not be removed or altered from any source distribution.
  */
 #include "internal/mathematics.h"
-#define FORCE_NO_INTRINSICS
-#if defined(BL_PLATFORM_WEB) || defined(FORCE_NO_INTRINSICS)
-#	define BL_NO_INTRINSICS
-#elif defined(_M_ARM)
-#	define BL_NEON_INTRINSICS
-#else
-#	define BL_SSE_INTRINSICS
-#endif
 BLS32
 blRandI()
 {
@@ -164,9 +156,6 @@ blVec2CrossProduct(IN BLVec2* _V1, IN BLVec2* _V2)
 BLBool
 blVec3Approximate(IN BLVec3* _V1, IN BLVec3* _V2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	if (fabs(_V1->fX - _V2->fX) > 0.000001f)
 		return FALSE;
 	if (fabs(_V1->fY - _V2->fY) > 0.000001f)
@@ -174,32 +163,20 @@ blVec3Approximate(IN BLVec3* _V1, IN BLVec3* _V2)
 	if (fabs(_V1->fZ - _V2->fZ) > 0.000001f)
 		return FALSE;
 	return TRUE;
-#endif
 }
 BLF32
 blVec3Length(IN BLVec3* _V)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	return sqrtf(_V->fX * _V->fX + _V->fY * _V->fY + _V->fZ * _V->fZ);
-#endif
 }
 BLF32
 blVec3Sqlength(IN BLVec3* _V)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	return _V->fX * _V->fX + _V->fY * _V->fY + _V->fZ * _V->fZ;
-#endif
 }
 BLVoid
 blVec3Normalize(INOUT BLVec3* _V)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _len = sqrtf(_V->fX * _V->fX + _V->fY * _V->fY + _V->fZ * _V->fZ);
 	if (_len > 0.0f)
 	{
@@ -208,36 +185,24 @@ blVec3Normalize(INOUT BLVec3* _V)
 		_V->fY *= _invlen;
 		_V->fZ *= _invlen;
 	}
-#endif
 }
 BLF32
 blVec3DotProduct(IN BLVec3* _V1, IN BLVec3* _V2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	return _V1->fX * _V2->fX + _V1->fY * _V2->fY + _V1->fZ * _V2->fZ;
-#endif
 }
 BLVec3
 blVec3CrossProduct(IN BLVec3* _V1, IN BLVec3* _V2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLVec3 _ret;
 	_ret.fX = _V1->fY * _V2->fZ - _V1->fZ * _V2->fY;
 	_ret.fY = _V1->fZ * _V2->fX - _V1->fX * _V2->fZ;
 	_ret.fZ = _V1->fX * _V2->fY - _V1->fY * _V2->fX;
 	return _ret;
-#endif
 }
 BLBool
 blQuatApproximate(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	if (fabs(_Q1->fX - _Q2->fX) > 0.000001f)
 		return FALSE;
 	if (fabs(_Q1->fY - _Q2->fY) > 0.000001f)
@@ -247,14 +212,10 @@ blQuatApproximate(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2)
 	if (fabs(_Q1->fW - _Q2->fW) > 0.000001f)
 		return FALSE;
 	return TRUE;
-#endif
 }
 BLQuaternion
 blQuatFromAxNRad(IN BLVec3* _Axis, IN BLF32 _Rad)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLQuaternion _ret;
 	BLF32 _fsin = sinf(0.5f * _Rad);
 	_ret.fW = cosf(0.5f * _Rad);
@@ -262,14 +223,10 @@ blQuatFromAxNRad(IN BLVec3* _Axis, IN BLF32 _Rad)
 	_ret.fY = _fsin * _Axis->fY;
 	_ret.fZ = _fsin * _Axis->fZ;
 	return _ret;
-#endif
 }
 BLQuaternion
 blQuatFromRPY(IN BLF32 _Roll, IN BLF32 _Pitch, IN BLF32 _Yaw)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _sr, _cr, _sp, _cp, _sy, _cy, _cpcy, _spcy, _cpsy, _spsy, _angle, _len, _factor;
 	BLQuaternion _ret;
 	_angle = _Roll * 0.5f;
@@ -296,14 +253,10 @@ blQuatFromRPY(IN BLF32 _Roll, IN BLF32 _Pitch, IN BLF32 _Yaw)
 	_ret.fZ = _ret.fZ * _factor;
 	_ret.fW = _ret.fW * _factor;
 	return _ret;
-#endif
 }
 BLQuaternion
 blQuatFrom2Vec(IN BLVec3* _Src, IN BLVec3* _Dest)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLQuaternion _ret;
 	BLVec3 _v0 = *_Src;
 	BLVec3 _v1 = *_Dest;
@@ -378,14 +331,10 @@ blQuatFrom2Vec(IN BLVec3* _Src, IN BLVec3* _Dest)
 		_ret.fW = _ret.fW * _factor;
 	}
 	return _ret;
-#endif
 }
 BLQuaternion
 blQuatFromTran(IN BLVec3* _Xa, IN BLVec3* _Ya, IN BLVec3* _Za)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLQuaternion _ret;
 	BLF32 _trace , _root;
 	BLF32 _krot[3][3];
@@ -430,14 +379,10 @@ blQuatFromTran(IN BLVec3* _Xa, IN BLVec3* _Ya, IN BLVec3* _Za)
 		*_apkquat[_k] = (_krot[_k][_i] + _krot[_i][_k]) * _root;
 	}
 	return _ret;
-#endif
 }
 BLVoid
 blQuat2Rotation(IN BLQuaternion* _Q, OUT BLF32* _Angle, OUT BLVec3* _Axis)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _sqrlength = _Q->fX * _Q->fX + _Q->fY * _Q->fY + _Q->fZ * _Q->fZ;
 	if (_sqrlength > 0.0)
 	{
@@ -463,28 +408,20 @@ blQuat2Rotation(IN BLQuaternion* _Q, OUT BLF32* _Angle, OUT BLVec3* _Axis)
 		_Axis->fY = 0.f;
 		_Axis->fZ = 0.f;
 	}
-#endif
 }
 BLVoid
 blQuatNormalize(INOUT BLQuaternion* _Q)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _len = _Q->fW * _Q->fW + _Q->fX * _Q->fX + _Q->fY * _Q->fY + _Q->fZ * _Q->fZ;
 	BLF32 _factor = 1.0f / sqrtf(_len);
 	_Q->fX = _Q->fX * _factor;
 	_Q->fY = _Q->fY * _factor;
 	_Q->fZ = _Q->fZ * _factor;
 	_Q->fW = _Q->fW * _factor;
-#endif
 }
 BLVoid
 blQuatInverse(INOUT BLQuaternion* _Q)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _norm = _Q->fW * _Q->fW + _Q->fX * _Q->fX + _Q->fY * _Q->fY + _Q->fZ * _Q->fZ;
 	if (_norm > 0.0f)
 	{
@@ -501,37 +438,25 @@ blQuatInverse(INOUT BLQuaternion* _Q)
 		_Q->fZ = 0.f;
 		_Q->fW = 0.f;
 	}
-#endif
 }
 BLF32
 blQuatDotProduct(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	return _Q1->fW * _Q2->fW + _Q1->fX * _Q2->fX + _Q1->fY * _Q2->fY + _Q1->fZ * _Q2->fZ;
-#endif
 }
 BLQuaternion
 blQuatCrossproduct(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLQuaternion _ret;
 	_ret.fX = _Q1->fW * _Q2->fX + _Q1->fX * _Q2->fW + _Q1->fY * _Q2->fZ - _Q1->fZ * _Q2->fY;
 	_ret.fY = _Q1->fW * _Q2->fY + _Q1->fY * _Q2->fW + _Q1->fZ * _Q2->fX - _Q1->fX * _Q2->fZ;
 	_ret.fZ = _Q1->fW * _Q2->fZ + _Q1->fZ * _Q2->fW + _Q1->fX * _Q2->fY - _Q1->fY * _Q2->fX;
 	_ret.fW = _Q1->fW * _Q2->fW - _Q1->fX * _Q2->fX - _Q1->fY * _Q2->fY - _Q1->fZ * _Q2->fZ;
 	return _ret;
-#endif
 }
 BLQuaternion
 blQuatSlerp(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2, IN BLF32 _T)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _fcos = _Q1->fW * _Q2->fW + _Q1->fX * _Q2->fX + _Q1->fY * _Q2->fY + _Q1->fZ * _Q2->fZ;
 	BLQuaternion _rkt , _ret;
 	if (_fcos < 0.0f)
@@ -567,15 +492,11 @@ blQuatSlerp(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2, IN BLF32 _T)
 		_ret.fW = (1.0f - _T) * _Q1->fW + _T * _rkt.fW;
 		return _ret;
 	}
-#endif
 }
 BLVec3
 blQuatTransform(IN BLQuaternion* _Q, IN BLVec3* _Vec)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
-	BLVec3 _ret , _uv , _uuv , _qvec;
+	BLVec3 _ret, _uv, _uuv, _qvec;
 	_qvec.fX = _Q->fX;
 	_qvec.fY = _Q->fY;
 	_qvec.fZ = _Q->fZ;
@@ -595,26 +516,18 @@ blQuatTransform(IN BLQuaternion* _Q, IN BLVec3* _Vec)
 	_ret.fY = _Vec->fY + _uv.fY + _uuv.fY;
 	_ret.fZ = _Vec->fZ + _uv.fZ + _uuv.fZ;
 	return _ret;
-#endif
 }
 BLBool
 blMatApproximate(IN BLMatrix* _M1, IN BLMatrix* _M2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	for (BLU32 _idx = 0; _idx < 16; ++_idx)
 		if (fabs(_M1->fEle[_idx] - _M1->fEle[_idx]) > 0.000001f)
 			return FALSE;
 	return TRUE;
-#endif
 }
 BLMatrix
 blMatFromTransform(IN BLVec3* _Trans, IN BLVec3* _Scale, IN BLQuaternion* _Rotate)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLMatrix _ret;
 	BLF32 _tx = _Rotate->fX + _Rotate->fX;
 	BLF32 _ty = _Rotate->fY + _Rotate->fY;
@@ -645,14 +558,10 @@ blMatFromTransform(IN BLVec3* _Trans, IN BLVec3* _Scale, IN BLQuaternion* _Rotat
 	_ret.fData[2][3] = 0.f;
 	_ret.fData[3][3] = 1.f;
 	return _ret;
-#endif
 }
 BLMatrix
 blMatMultiply(IN BLMatrix* _M1, IN BLMatrix* _M2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLMatrix _ret;
 	_ret.fData[0][0] = _M1->fData[0][0] * _M2->fData[0][0] + _M1->fData[1][0] * _M2->fData[0][1] + _M1->fData[2][0] * _M2->fData[0][2] + _M1->fData[3][0] * _M2->fData[0][3];
 	_ret.fData[1][0] = _M1->fData[0][0] * _M2->fData[1][0] + _M1->fData[1][0] * _M2->fData[1][1] + _M1->fData[2][0] * _M2->fData[1][2] + _M1->fData[3][0] * _M2->fData[1][3];
@@ -671,14 +580,10 @@ blMatMultiply(IN BLMatrix* _M1, IN BLMatrix* _M2)
 	_ret.fData[2][3] = _M1->fData[0][3] * _M2->fData[2][0] + _M1->fData[1][3] * _M2->fData[2][1] + _M1->fData[2][3] * _M2->fData[2][2] + _M1->fData[3][3] * _M2->fData[2][3];
 	_ret.fData[3][3] = _M1->fData[0][3] * _M2->fData[3][0] + _M1->fData[1][3] * _M2->fData[3][1] + _M1->fData[2][3] * _M2->fData[3][2] + _M1->fData[3][3] * _M2->fData[3][3];
 	return _ret;
-#endif
 }
 BLVoid
 blMatDecompose(IN BLMatrix* _Mat, OUT BLVec3* _Trans, OUT BLVec3* _Scale, OUT BLQuaternion* _Rotate)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _invlen, _dot, _det, _trace, _root;
 	BLMatrix _matq;
 	_Trans->fX = _Mat->fData[3][0];
@@ -758,14 +663,10 @@ blMatDecompose(IN BLMatrix* _Mat, OUT BLVec3* _Trans, OUT BLVec3* _Scale, OUT BL
 		*_apkquat[_j] = (_matq.fData[_i][_j] + _matq.fData[_j][_i]) * _root;
 		*_apkquat[_k] = (_matq.fData[_i][_k] + _matq.fData[_k][_i]) * _root;
 	}
-#endif
 }
 BLVoid
 blMatTranspose(INOUT BLMatrix* _Mat)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _m01 = _Mat->fData[0][1];
 	BLF32 _m02 = _Mat->fData[0][2];
 	BLF32 _m03 = _Mat->fData[0][3];
@@ -790,14 +691,10 @@ blMatTranspose(INOUT BLMatrix* _Mat)
 	_Mat->fData[0][3] = _m30;
 	_Mat->fData[1][3] = _m31;
 	_Mat->fData[2][3] = _m32;
-#endif
 }
 BLVec3
 blMatTransform(IN BLMatrix* _Mat, IN BLVec3* _Vec)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLVec3 _ret;
 	BLF32 _x = _Vec->fX;
 	BLF32 _y = _Vec->fY;
@@ -807,14 +704,10 @@ blMatTransform(IN BLMatrix* _Mat, IN BLVec3* _Vec)
 	_ret.fY = (_Mat->fData[0][1] * _x + _Mat->fData[1][1] * _y + _Mat->fData[2][1] * _z + _Mat->fData[3][1]) * _finvw;
 	_ret.fZ = (_Mat->fData[0][2] * _x + _Mat->fData[1][2] * _y + _Mat->fData[2][2] * _z + _Mat->fData[3][2]) * _finvw;
 	return _ret;
-#endif
 }
 BLVoid
 blMatPerspectiveL(OUT BLMatrix* _Mat, IN BLF32 _Fov, IN BLF32 _Aspect, IN BLF32 _Near, IN BLF32 _Far)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _h = 1.f / tanf(_Fov*0.5f);
 	_Mat->fData[0][0] = _h / _Aspect;
 	_Mat->fData[0][1] = 0.f;
@@ -832,14 +725,10 @@ blMatPerspectiveL(OUT BLMatrix* _Mat, IN BLF32 _Fov, IN BLF32 _Aspect, IN BLF32 
 	_Mat->fData[3][1] = 0.f;
 	_Mat->fData[3][2] = -_Near*_Far / (_Far - _Near);
 	_Mat->fData[3][3] = 0.f;
-#endif
 }
 BLVoid
 blMatLookatL(OUT BLMatrix* _Mat, IN BLVec3* _Eye, IN BLVec3* _Focus, IN BLVec3* _Up)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _len;
 	BLVec3 _zaxis, _xaxis, _yaxis;
 	_zaxis.fX = _Focus->fX - _Eye->fX;
@@ -883,14 +772,10 @@ blMatLookatL(OUT BLMatrix* _Mat, IN BLVec3* _Eye, IN BLVec3* _Focus, IN BLVec3* 
 	_Mat->fData[3][1] = -_yaxis.fX * _Eye->fX + -_yaxis.fY * _Eye->fY + -_yaxis.fZ * _Eye->fZ;
 	_Mat->fData[3][2] = -_zaxis.fX * _Eye->fX + -_zaxis.fY * _Eye->fY + -_zaxis.fZ * _Eye->fZ;
 	_Mat->fData[3][3] = 1.f;
-#endif
 }
 BLBool
 blPlaneApproximate(IN BLPlane* _P1, IN BLPlane* _P2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	if (fabs(_P1->sNormal.fX - _P2->sNormal.fX) > 0.000001f)
 		return FALSE;
 	if (fabs(_P1->sNormal.fY - _P2->sNormal.fY) > 0.000001f)
@@ -900,14 +785,10 @@ blPlaneApproximate(IN BLPlane* _P1, IN BLPlane* _P2)
 	if (fabs(_P1->fDistance - _P2->fDistance) > 0.000001f)
 		return FALSE;
 	return TRUE;
-#endif
 }
 BLPlane
 blPlaneFrom3P(IN BLVec3* _P1, IN BLVec3* _P2, IN BLVec3* _P3)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _len;
 	BLPlane _ret;
 	BLVec3 _kedge1, _kedge2;
@@ -930,26 +811,18 @@ blPlaneFrom3P(IN BLVec3* _P1, IN BLVec3* _P2, IN BLVec3* _P3)
 	}
 	_ret.fDistance = -_ret.sNormal.fX * _P1->fX + -_ret.sNormal.fY * _P1->fY + -_ret.sNormal.fZ * _P1->fZ;
 	return _ret;
-#endif
 }
 BLPlane
 blPlaneFromPN(IN BLVec3* _Pt, IN BLVec3* _Nor)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLPlane _ret;
 	_ret.sNormal = *_Nor;
 	_ret.fDistance = -_ret.sNormal.fX * _Pt->fX + -_ret.sNormal.fY * _Pt->fY + -_ret.sNormal.fZ * _Pt->fZ;
 	return _ret;
-#endif
 }
 BLBool
 blBoxApproximate(IN BLBox* _B1, IN BLBox* _B2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	if (fabs(_B1->sMinPt.fX - _B2->sMinPt.fX) > 0.000001f)
 		return FALSE;
 	if (fabs(_B1->sMinPt.fY - _B2->sMinPt.fY) > 0.000001f)
@@ -963,40 +836,28 @@ blBoxApproximate(IN BLBox* _B1, IN BLBox* _B2)
 	if (fabs(_B1->sMaxPt.fZ - _B2->sMaxPt.fZ) > 0.000001f)
 		return FALSE;
 	return TRUE;
-#endif
 }
 BLVoid
 blBoxMerge(INOUT BLBox* _Box, IN BLVec3* _Pt)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	if (_Pt->fX > _Box->sMaxPt.fX) _Box->sMaxPt.fX = _Pt->fX;
 	if (_Pt->fY > _Box->sMaxPt.fY) _Box->sMaxPt.fY = _Pt->fY;
 	if (_Pt->fZ > _Box->sMaxPt.fZ) _Box->sMaxPt.fZ = _Pt->fZ;
 	if (_Pt->fX < _Box->sMinPt.fX) _Box->sMinPt.fX = _Pt->fX;
 	if (_Pt->fY < _Box->sMinPt.fY) _Box->sMinPt.fY = _Pt->fY;
 	if (_Pt->fZ < _Box->sMinPt.fZ) _Box->sMinPt.fZ = _Pt->fZ;
-#endif
 }
 BLBool
 blBoxContains(IN BLBox* _Box, IN BLVec3* _Pt)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	if (_Pt->fX > _Box->sMaxPt.fX || _Pt->fX < _Box->sMinPt.fX) return FALSE;
 	if (_Pt->fY > _Box->sMaxPt.fY || _Pt->fY < _Box->sMinPt.fY) return FALSE;
 	if (_Pt->fZ > _Box->sMaxPt.fZ || _Pt->fZ < _Box->sMinPt.fZ) return FALSE;
 	return TRUE;
-#endif
 }
 BLBool
 blBoxIntersects(IN BLBox* _B1, IN BLBox* _B2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	if (_B1->sMinPt.fX > _B2->sMinPt.fX &&
 		_B1->sMinPt.fX < _B2->sMaxPt.fX &&
 		_B1->sMinPt.fY > _B2->sMinPt.fY &&
@@ -1026,14 +887,10 @@ blBoxIntersects(IN BLBox* _B1, IN BLBox* _B2)
 		_B2->sMaxPt.fZ < _B1->sMaxPt.fZ)
 		return TRUE;
 	return FALSE;
-#endif
 }
 BLBool
 blSphereContains(IN BLSphere* _Sp, IN BLVec3* _Pt)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _x, _y, _z;
 	_x = _Sp->sPt.fX - _Pt->fX;
 	_y = _Sp->sPt.fY - _Pt->fY;
@@ -1042,14 +899,10 @@ blSphereContains(IN BLSphere* _Sp, IN BLVec3* _Pt)
 		return FALSE;
 	else
 		return TRUE;
-#endif
 }
 BLBool
 blSphereIntersects(IN BLSphere* _S1, IN BLSphere* _S2)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _x, _y, _z;
 	_x = _S1->sPt.fX - _S2->sPt.fX;
 	_y = _S1->sPt.fY - _S2->sPt.fY;
@@ -1058,14 +911,10 @@ blSphereIntersects(IN BLSphere* _S1, IN BLSphere* _S2)
 		return FALSE;
 	else
 		return TRUE;
-#endif
 }
 BLBool
 blBoxSphereIntersects(IN BLBox* _Box, IN BLSphere* _Sp)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLF32 _s, _d = 0;
 	if (_Sp->sPt.fX < _Box->sMinPt.fX)
 	{
@@ -1098,14 +947,10 @@ blBoxSphereIntersects(IN BLBox* _Box, IN BLSphere* _Sp)
 		_d += _s * _s;
 	}
 	return _d <= _Sp->fR * _Sp->fR;
-#endif
 }
 BLBool
 blFrustumCullBox(IN BLFrustum* _Fru, IN BLBox* _Box)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLU32 _idx;
 	BLVec3 _centre;
 	BLVec3 _halfsz;
@@ -1124,14 +969,10 @@ blFrustumCullBox(IN BLFrustum* _Fru, IN BLBox* _Box)
 			return FALSE;
 	}
 	return TRUE;
-#endif
 }
 BLBool
 blFrustumCullSphere(IN BLFrustum* _Fru, IN BLSphere* _Sp)
 {
-#if defined(BL_NEON_INTRINSICS)
-#elif defined(BL_SSE_INTRINSICS)
-#else
 	BLU32 _idx;
 	for (_idx = 0; _idx < 6; ++_idx)
 	{
@@ -1141,5 +982,4 @@ blFrustumCullSphere(IN BLFrustum* _Fru, IN BLSphere* _Sp)
 			return FALSE;
 	}
 	return TRUE;
-#endif
 }
