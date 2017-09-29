@@ -39,3 +39,4 @@ code/externals/opus/celt/dump_modes/Makefile
 *.uws
 *.pri
 *.o-3bff322a
+*.sqlite

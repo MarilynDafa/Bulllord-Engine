@@ -85,7 +85,7 @@ extern BLVoid _GpuIntervention(duk_context*, NSView*, BLU32, BLU32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_IOS)
-extern BLVoid _GpuIntervention(duk_context*, BLBool);
+extern BLVoid _GpuIntervention(duk_context*, UIView*, BLU32, BLU32, BLF32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_LINUX)
@@ -3101,6 +3101,7 @@ _CloseWindow()
     _PrSystemMem->pWindow.rootViewController = _controller;
     [_PrSystemMem->pWindow layoutIfNeeded];
     [_PrSystemMem->pWindow makeKeyAndVisible];
+    _GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pCtlView, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, _PrSystemMem->nRetinaScale, !_PrSystemMem->sBoostParam.bProfiler);
     _GbSystemRunning = TRUE;
     _PrSystemMem->pBeginFunc();
     if (_launch)

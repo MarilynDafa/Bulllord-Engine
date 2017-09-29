@@ -724,7 +724,7 @@
 		C7D0298F1F478C6500E35DB0 /* tables_pulses_per_block.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tables_pulses_per_block.c; path = webm/opus/silk/tables_pulses_per_block.c; sourceTree = "<group>"; };
 		C7D029901F478C6500E35DB0 /* VAD.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VAD.c; path = webm/opus/silk/VAD.c; sourceTree = "<group>"; };
 		C7D029911F478C6500E35DB0 /* VQ_WMat_EC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VQ_WMat_EC.c; path = webm/opus/silk/VQ_WMat_EC.c; sourceTree = "<group>"; };
-		C7F71B1A1EF9598E00F31075 /* libVideoPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libVideoPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7F71B1A1EF9598E00F31075 /* liblibVideoPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblibVideoPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7F71B251EF95CCD00F31075 /* libbulllord.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbulllord.dylib; path = "/Users/zhoubo/Downloads/Bulllord-Engine-master/proj/xcode/../../bin/ios/libbulllord.dylib"; sourceTree = "<absolute>"; };
 		C7F71B2D1EF95D3800F31075 /* videoentry.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = videoentry.xc; sourceTree = "<group>"; };
 		C7F71B2E1EF95D3E00F31075 /* videoentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = videoentry.h; sourceTree = "<group>"; };
@@ -1285,7 +1285,7 @@
 		C7F71B1B1EF9598E00F31075 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7F71B1A1EF9598E00F31075 /* libVideoPlugin.dylib */,
+				C7F71B1A1EF9598E00F31075 /* liblibVideoPlugin.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2002,7 +2002,7 @@
 			);
 			name = "video-ios";
 			productName = "video-ios";
-			productReference = C7F71B1A1EF9598E00F31075 /* libVideoPlugin.dylib */;
+			productReference = C7F71B1A1EF9598E00F31075 /* liblibVideoPlugin.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -2329,6 +2329,8 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = ../../bin/ios;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -2360,7 +2362,9 @@
 					./webm/ogg/include,
 					../../code/externals,
 				);
+				INSTALL_PATH = "@executable_path/";
 				LIBRARY_SEARCH_PATHS = ../../bin/ios;
+				MACH_O_TYPE = mh_dylib;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = libVideoPlugin;
@@ -2396,6 +2400,8 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = ../../bin/ios;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -2424,7 +2430,9 @@
 					./webm/ogg/include,
 					../../code/externals,
 				);
+				INSTALL_PATH = "@executable_path/";
 				LIBRARY_SEARCH_PATHS = ../../bin/ios;
+				MACH_O_TYPE = mh_dylib;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = libVideoPlugin;
 				SDKROOT = iphoneos;
@@ -2437,7 +2445,7 @@
 			buildSettings = {
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_PREFIX = lib;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					HAVE_CONFIG_H,
 					DLL_EXPORT,
@@ -2458,6 +2466,7 @@
 					./webm/ogg/include,
 					../../code/externals,
 				);
+				INSTALL_PATH = "@executable_path/";
 				PRODUCT_NAME = libVideoPlugin;
 				SDKROOT = iphoneos;
 			};
@@ -2468,7 +2477,7 @@
 			buildSettings = {
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_PREFIX = lib;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					BL_EXPORT,
 					_M_ARM,
@@ -2488,6 +2497,7 @@
 					./webm/ogg/include,
 					../../code/externals,
 				);
+				INSTALL_PATH = "@executable_path/";
 				PRODUCT_NAME = libVideoPlugin;
 				SDKROOT = iphoneos;
 			};

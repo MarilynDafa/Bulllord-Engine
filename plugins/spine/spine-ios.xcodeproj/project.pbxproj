@@ -79,7 +79,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C7E3C2221ED8E8B800B60781 /* blSpine.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = blSpine.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7E3C2221ED8E8B800B60781 /* libblSpine.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libblSpine.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7E3C3461ED8FC2700B60781 /* spineentry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = spineentry.c; sourceTree = "<group>"; };
 		C7E3C3481ED8FC2F00B60781 /* spineentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spineentry.h; sourceTree = "<group>"; };
 		C7E3C34A1ED8FC3B00B60781 /* Animation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Animation.h; sourceTree = "<group>"; };
@@ -177,7 +177,7 @@
 		C7E3C2231ED8E8B800B60781 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7E3C2221ED8E8B800B60781 /* blSpine.dylib */,
+				C7E3C2221ED8E8B800B60781 /* libblSpine.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -341,7 +341,7 @@
 			);
 			name = "spine-ios";
 			productName = "spine-ios";
-			productReference = C7E3C2221ED8E8B800B60781 /* blSpine.dylib */;
+			productReference = C7E3C2221ED8E8B800B60781 /* libblSpine.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -355,6 +355,7 @@
 				TargetAttributes = {
 					C7E3C2211ED8E8B800B60781 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = SK9226BSS3;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -447,6 +448,8 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = ../../bin/ios;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -462,7 +465,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = "@executable_path/";
 				LIBRARY_SEARCH_PATHS = ../../bin/ios;
+				MACH_O_TYPE = mh_dylib;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = blSpine;
@@ -497,6 +502,8 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = ../../bin/ios;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -507,7 +514,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = "@executable_path/";
 				LIBRARY_SEARCH_PATHS = ../../bin/ios;
+				MACH_O_TYPE = mh_dylib;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = blSpine;
 				SDKROOT = iphoneos;
@@ -517,11 +526,15 @@
 		C7E3C2271ED8E8B800B60781 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = SK9226BSS3;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_PREFIX = lib;
+				INSTALL_PATH = "@executable_path/";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				PRODUCT_NAME = blSpine;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -530,11 +543,15 @@
 		C7E3C2281ED8E8B800B60781 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = SK9226BSS3;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = "";
+				EXECUTABLE_PREFIX = lib;
+				INSTALL_PATH = "@executable_path/";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				PRODUCT_NAME = blSpine;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

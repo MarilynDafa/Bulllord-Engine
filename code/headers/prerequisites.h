@@ -188,7 +188,6 @@
 #	include <assert.h>
 #	include <malloc.h>
 #   define BL_DX_BACKEND
-#	define BL_SOFT_BACKEND
 #else
 #	error "what's the fucking platform"
 #endif

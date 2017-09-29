@@ -27,7 +27,7 @@
       location = "container:"
       name = "sample">
       <FileRef
-         location = "group:../../samples/demo/demo.xcodeproj">
+         location = "group:../samples/demo/demo.xcodeproj">
       </FileRef>
    </Group>
    <Group

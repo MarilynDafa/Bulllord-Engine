@@ -496,7 +496,7 @@ blQuatSlerp(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2, IN BLF32 _T)
 BLVec3
 blQuatTransform(IN BLQuaternion* _Q, IN BLVec3* _Vec)
 {
-	BLVec3 _ret, _uv, _uuv, _qvec;
+	BLVec3 _ret , _uv , _uuv , _qvec;
 	_qvec.fX = _Q->fX;
 	_qvec.fY = _Q->fY;
 	_qvec.fZ = _Q->fZ;

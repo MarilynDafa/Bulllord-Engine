@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		370F86761F79F96B00A517D0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F86751F79F96B00A517D0 /* Foundation.framework */; };
+		370F86781F79F97600A517D0 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F86771F79F97600A517D0 /* OpenGLES.framework */; };
 		C75E46DE1E617DD300091110 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75E46DD1E617DD300091110 /* OpenAL.framework */; };
 		C75E46E01E617DD900091110 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75E46DF1E617DD900091110 /* UIKit.framework */; };
 		C7C769A11F365C8200EB0AEE /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769931F365C8200EB0AEE /* array.c */; };
@@ -87,7 +89,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		C73218951D9D2E9500E58DD8 /* libBulllord.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBulllord.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		370F86751F79F96B00A517D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		370F86771F79F97600A517D0 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		C73218951D9D2E9500E58DD8 /* libBulllord.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libBulllord.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C75E46DD1E617DD300091110 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		C75E46DF1E617DD900091110 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		C7C7698A1F365C7500EB0AEE /* audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = audio.h; path = ../code/headers/audio.h; sourceTree = "<group>"; };
@@ -195,6 +199,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				370F86781F79F97600A517D0 /* OpenGLES.framework in Frameworks */,
+				370F86761F79F96B00A517D0 /* Foundation.framework in Frameworks */,
 				C75E46E01E617DD900091110 /* UIKit.framework in Frameworks */,
 				C75E46DE1E617DD300091110 /* OpenAL.framework in Frameworks */,
 			);
@@ -360,6 +366,8 @@
 		C75E46DC1E617DD200091110 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				370F86771F79F97600A517D0 /* OpenGLES.framework */,
+				370F86751F79F96B00A517D0 /* Foundation.framework */,
 				C75E46DF1E617DD900091110 /* UIKit.framework */,
 				C75E46DD1E617DD300091110 /* OpenAL.framework */,
 			);
@@ -448,7 +456,7 @@
 			name = bulllord;
 			productName = "bulllord-ios";
 			productReference = C73218951D9D2E9500E58DD8 /* libBulllord.dylib */;
-			productType = "com.apple.product-type.library.static";
+			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
 
@@ -461,6 +469,8 @@
 				TargetAttributes = {
 					C73218941D9D2E9500E58DD8 = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = SK9226BSS3;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -579,6 +589,8 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -625,6 +637,7 @@
 					../code/externals/zstd/dictBuilder,
 					../code/externals/zstd,
 				);
+				INSTALL_PATH = "@executable_path/";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -658,6 +671,8 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -700,6 +715,7 @@
 					../code/externals/zstd/dictBuilder,
 					../code/externals/zstd,
 				);
+				INSTALL_PATH = "@executable_path/";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "-fshort-wchar";
@@ -713,9 +729,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CONFIGURATION_BUILD_DIR = ../bin/ios;
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				DEVELOPMENT_TEAM = SK9226BSS3;
 				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					BL_EXPORT,
 					DLL_EXPORT,
@@ -752,12 +771,14 @@
 					../code/externals/zstd,
 				);
 				INSTALL_OWNER = trix;
+				INSTALL_PATH = "@executable_path/";
 				MACH_O_TYPE = mh_dylib;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-dynamiclib",
 				);
 				PRODUCT_NAME = Bulllord;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -766,9 +787,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CONFIGURATION_BUILD_DIR = ../bin/ios;
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				DEVELOPMENT_TEAM = SK9226BSS3;
 				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					BL_EXPORT,
 					DLL_EXPORT,
@@ -804,12 +828,14 @@
 					../code/externals/zstd,
 				);
 				INSTALL_OWNER = trix;
+				INSTALL_PATH = "@executable_path/";
 				MACH_O_TYPE = mh_dylib;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-dynamiclib",
 				);
 				PRODUCT_NAME = Bulllord;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
