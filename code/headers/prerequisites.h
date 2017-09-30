@@ -20,7 +20,7 @@
  */
 #ifndef __prerequisiters_h_
 #define __prerequisiters_h_
-#if defined(__EMSCRIPTEN__)
+#if defined(EMSCRIPTEN)
 #	define BL_PLATFORM_WEB
 #elif defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #	if defined(WINAPI_FAMILY)
@@ -188,6 +188,28 @@
 #	include <assert.h>
 #	include <malloc.h>
 #   define BL_DX_BACKEND
+#elif defined(BL_PLATFORM_WEB)
+#	include <unistd.h>
+#   include <stdarg.h>
+#   include <ctype.h>
+#   include <fcntl.h>
+#   include <locale.h>
+#	include <pthread.h>
+#   include <assert.h>
+#	include <signal.h>
+#	include <sched.h>
+#	include <dlfcn.h>
+#   include <netdb.h>
+#   include <sys/stat.h>
+#	include <sys/types.h>
+#	include <sys/ioctl.h>
+#	include <sys/time.h>
+#	include <sys/socket.h>
+#	include <netinet/in.h>
+#	include <netinet/tcp.h>
+#	include <arpa/inet.h>
+#   include <errno.h>
+#   define BL_GL_BACKEND
 #else
 #	error "what's the fucking platform"
 #endif
@@ -271,6 +293,9 @@ typedef unsigned long long BLGuid;
 #elif defined(BL_PLATFORM_ANDROID)		
 #       define BL_MAINBEGIN(argc, argv) void ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _StateSize) {blSystemPrepare(_Activity, _State, _StateSize);
 #		define BL_MAINEND  }
+#elif defined(BL_PLATFORM_WEB)
+#       define BL_MAINBEGIN(argc, argv) int main(int argc, const char* argv[]) {
+#		define BL_MAINEND return 0; }
 #else
 #	    error "what's the fucking platform"
 #endif

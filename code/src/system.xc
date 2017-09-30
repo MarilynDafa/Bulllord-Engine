@@ -42,6 +42,7 @@
 #	include <android/looper.h>
 #   include <android/asset_manager.h>
 #	include <android/window.h>
+#else
 #endif
 
 #ifdef __cplusplus
@@ -96,6 +97,7 @@ extern BLVoid _GpuAnitIntervention();
 extern BLVoid _GpuIntervention(duk_context*, ANativeWindow*, BLU32, BLU32, BLBool, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
+#elif defined(BL_PLATFORM_WEB)
 #else
 #	"error what's the fucking platform"
 #endif
@@ -249,6 +251,7 @@ typedef struct _SystemMember {
     UIView* pCtlView;
     BLS32 nKeyboardHeight;
     BLU32 nRetinaScale;
+#elif defined(BL_PLATFORM_WEB)
 #endif
 }_BLSystemMember;
 BLBool _GbSystemRunning = FALSE;

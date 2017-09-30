@@ -752,6 +752,8 @@ reconnect:
 					: "cc");
 			} while (__builtin_expect(_status != 0, 0));
 		}
+#elif defined(BL_PLATFORM_WEB)
+		__sync_fetch_and_add(&_PrNetworkMem->nCurDownSize, _filesz);
 #else
 #error	unsupport platform
 #endif
@@ -843,6 +845,8 @@ reconnect:
 						: "cc");
 				} while (__builtin_expect(_status != 0, 0));
 			}
+#elif defined(BL_PLATFORM_WEB)
+			__sync_fetch_and_sub(&_PrNetworkMem->nCurDownSize, _filesz);
 #else
 #error		unsupport platform
 #endif
@@ -882,6 +886,8 @@ reconnect:
 					: "cc");
 			} while (__builtin_expect(_status != 0, 0));
 		}
+#elif defined(BL_PLATFORM_WEB)
+		__sync_fetch_and_add(&_PrNetworkMem->nCurDownSize, _len);
 #else
 #error	unsupport platform
 #endif

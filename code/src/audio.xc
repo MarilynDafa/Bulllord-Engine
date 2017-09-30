@@ -36,6 +36,10 @@
 #   define BL_USE_AL_API
 #include <AL/al.h>
 #include <AL/alc.h>
+#elif defined(BL_PLATFORM_WEB)
+#	define BL_USE_AL_API
+#include <AL/al.h>
+#include <AL/alc.h>
 #elif defined(BL_PLATFORM_ANDROID)
 #   define BL_USE_SL_API
 #include <SLES/OpenSLES.h>
