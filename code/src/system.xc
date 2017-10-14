@@ -974,6 +974,9 @@ public:
 				((BLS32)(0.5f + (((BLF32)(_window->Bounds.Width) * (BLF32)Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi) / 96.f))),
 				((BLS32)(0.5f + (((BLF32)(_window->Bounds.Height) * (BLF32)Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi) / 96.f))),
 				!_PrSystemMem->sBoostParam.bProfiler);
+			_AudioInit(_PrSystemMem->pDukContext);
+			_UIInit(_PrSystemMem->pDukContext, _PrSystemMem->sBoostParam.bProfiler);
+			_SpriteInit(_PrSystemMem->pDukContext);
 			_GbSystemRunning = TRUE;
 			_PrSystemMem->pBeginFunc();
 		}
@@ -3296,6 +3299,7 @@ _SystemInit()
 #else
 	_StreamIOInit(_PrSystemMem->pDukContext, NULL);
 #endif
+    _NetworkInit(_PrSystemMem->pDukContext);
 	if (_PrSystemMem->pDukContext)
 	{
 		BLAnsi _tmpname[260] = { 0 };
@@ -3347,11 +3351,10 @@ _SystemInit()
 		blDeleteStream(_stream);
 	}
 	_ShowWindow();
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
     _AudioInit(_PrSystemMem->pDukContext);
     _UIInit(_PrSystemMem->pDukContext, _PrSystemMem->sBoostParam.bProfiler);
     _SpriteInit(_PrSystemMem->pDukContext);
-    _NetworkInit(_PrSystemMem->pDukContext);
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_ANDROID)
 	_GbSystemRunning = TRUE;
 	_PrSystemMem->pBeginFunc();
 #endif

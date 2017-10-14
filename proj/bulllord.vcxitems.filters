@@ -750,9 +750,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
-      <Filter>src</Filter>
-    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h">

@@ -103,7 +103,7 @@
     <GenerateManifest>false</GenerateManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
     <TargetName>libBulllord</TargetName>
-    <OutDir>../bin/uwp/$(Platform)</OutDir>
+    <OutDir>..\bin\uwp\Win32\AppX</OutDir>
     <IntDir>$(Configuration)\uwp\$(Platform)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

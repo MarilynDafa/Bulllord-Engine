@@ -1538,7 +1538,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.cpp">
       <FileType>Document</FileType>
       <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>

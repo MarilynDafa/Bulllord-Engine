@@ -286,10 +286,7 @@ typedef struct _GpuMember {
 	duk_context* pDukContext;
 	_BLHardwareCaps sHardwareCaps;
     _BLPipelineState sPipelineState;
-	BLF32 fPresentElapsed;
 	BLBool bVsync;
-	BLU16 nCurFramebufferHandle;
-	BLU16 nBackBufferIdx;
     BLDictionary* pTextureCache;
     BLDictionary* pBufferCache;
 	BLDictionary* pTechCache;
@@ -298,6 +295,19 @@ typedef struct _GpuMember {
 	HGLRC sGLRC;
 	HDC sGLHDC;
 #elif defined(BL_PLATFORM_UWP)
+	ID3D12Device* pDX;
+	IDXGISwapChain3* pSwapChain;
+	ID3D12Resource* aSwapBuffer[2];
+	ID3D12DescriptorHeap* pRTVHeap;
+	ID3D12CommandQueue* pCmdQueue;
+	ID3D12CommandAllocator* pCmdAllocator;
+	ID3D12Fence* pFence;
+	HANDLE nFenceEvent;
+	UINT64 nFenceValue;
+	ID3D12RootSignature* pRootSignature;
+	UINT nSyncInterval;
+	UINT nRTVSiz;
+	UINT nBackBuffer;
 #elif defined(BL_PLATFORM_OSX)
     NSOpenGLContext* pGLC;
 #elif defined(BL_PLATFORM_IOS)
@@ -1215,6 +1225,19 @@ _FillTextureFormatGL(BLEnum _BLFmt, GLenum* _IFmt, GLenum* _Fmt, GLenum* _Type, 
             break;
     }
 }
+#elif defined(BL_DX_BACKEND)
+static BLVoid
+_PipelineStateDefaultDX(BLU32 _Width, BLU32 _Height)
+{
+}
+static BLVoid
+_PipelineStateRefreshDX()
+{
+}
+#elif defined(BL_VK_BACKEND)
+#elif defined(BL_MTL_BACKEND)
+#else
+#endif
 static void
 _AllocUBO(_BLUniformBuffer* _UBO)
 {
@@ -1263,15 +1286,6 @@ _FreeUBO(_BLUniformBuffer* _UBO)
 	}
 #endif
 }
-#elif defined(BL_DX_BACKEND)
-static BLVoid
-_PipelineStateRefreshDX()
-{
-}
-#elif defined(BL_VK_BACKEND)
-#elif defined(BL_MTL_BACKEND)
-#else
-#endif
 static void
 _PipelineStateRefresh()
 {
@@ -1295,10 +1309,7 @@ _GpuIntervention(duk_context* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLB
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
 	_PrGpuMem->pDukContext = _DKC;
-	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
-	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
-	_PrGpuMem->nBackBufferIdx = 0;
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
@@ -1451,14 +1462,165 @@ _GpuAnitIntervention(HWND _Hwnd)
 BLVoid
 _GpuIntervention(duk_context* _DKC, Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
+	_PrGpuMem = new _BLGpuMember;
+	_PrGpuMem->pDukContext = _DKC;
+	_PrGpuMem->bVsync = _Vsync;
+	_PrGpuMem->sHardwareCaps.bCSSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bAnisotropy = TRUE;
+	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bFloatRTSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
+	_PrGpuMem->pTextureCache = blGenDict(TRUE);
+	_PrGpuMem->pBufferCache = blGenDict(TRUE);
+	_PrGpuMem->pTechCache = blGenDict(TRUE);
+	_PrGpuMem->nSyncInterval = _Vsync ? 60 : 1;
+	_PrGpuMem->pUBO = new _BLUniformBuffer;
+	_PrGpuMem->pUBO->nSize = 0;
+	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
+		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
+	_PrGpuMem->sHardwareCaps.eApiType = BL_DX_API;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = TRUE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1A1] = TRUE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = TRUE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = TRUE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = FALSE;
+	IDXGIFactory5* _factory;
+	UINT _dxgifactoryflags = 0;
+#if defined(_DEBUG)
+	ID3D12Debug* _debugcontroller;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&_debugcontroller))))
+	{
+		_debugcontroller->EnableDebugLayer();
+		_dxgifactoryflags |= DXGI_CREATE_FACTORY_DEBUG;
+	}
+	_debugcontroller->Release();
+#endif
+	DX_CHECK_INTERNAL(CreateDXGIFactory2(_dxgifactoryflags, IID_PPV_ARGS(&_factory)));
+	D3D_FEATURE_LEVEL _flvl[4] = { D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0, D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
+	for (BLU32 _i = 0; _i < 4; ++_i)
+	{
+		IDXGIAdapter1* _adapter;
+		for (UINT _j = 0; DXGI_ERROR_NOT_FOUND != _factory->EnumAdapters1(_j, &_adapter); ++_j)
+		{
+			DXGI_ADAPTER_DESC1 _desc;
+			_adapter->GetDesc1(&_desc);
+			if (_desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+				continue;
+			if (SUCCEEDED(D3D12CreateDevice(_adapter, _flvl[_i], _uuidof(ID3D12Device), nullptr)))
+				break;
+		}
+		if (SUCCEEDED(D3D12CreateDevice(_adapter, _flvl[_i], IID_PPV_ARGS(&_PrGpuMem->pDX))))
+		{
+			_adapter->Release();
+			break;
+		}
+	}
+	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_PrGpuMem->pCmdAllocator))); 
+	D3D12_COMMAND_QUEUE_DESC _queuedesc = {};
+	_queuedesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+	_queuedesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateCommandQueue(&_queuedesc, IID_PPV_ARGS(&_PrGpuMem->pCmdQueue)));
+	DXGI_SWAP_CHAIN_DESC1 _scdesc = {};
+	_scdesc.BufferCount = 2;
+	_scdesc.Width = _Width;
+	_scdesc.Height = _Height;
+	_scdesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	_scdesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	_scdesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	_scdesc.SampleDesc.Count = 1;
+	IDXGISwapChain1* _tmpsc;
+	DX_CHECK_INTERNAL(_factory->CreateSwapChainForCoreWindow(_PrGpuMem->pCmdQueue, (IUnknown*)(_Hwnd), &_scdesc, nullptr, &_tmpsc));
+	_tmpsc->QueryInterface(__uuidof(IDXGISwapChain3), (BLVoid**)&_PrGpuMem->pSwapChain);
+	_tmpsc->Release();
+	_PrGpuMem->nBackBuffer = _PrGpuMem->pSwapChain->GetCurrentBackBufferIndex();
+	D3D12_DESCRIPTOR_HEAP_DESC _rtvdesc = {};
+	_rtvdesc.NumDescriptors = 1024;
+	_rtvdesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	_rtvdesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateDescriptorHeap(&_rtvdesc, IID_PPV_ARGS(&_PrGpuMem->pRTVHeap)));
+	_PrGpuMem->nRTVSiz = _PrGpuMem->pDX->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	D3D12_CPU_DESCRIPTOR_HANDLE _rtvhandle = _PrGpuMem->pRTVHeap->GetCPUDescriptorHandleForHeapStart();
+	for (BLU32 _i = 0; _i < 2; ++_i)
+	{
+		DX_CHECK_INTERNAL(_PrGpuMem->pSwapChain->GetBuffer(_i, IID_PPV_ARGS(&_PrGpuMem->aSwapBuffer[_i])));
+		_PrGpuMem->pDX->CreateRenderTargetView(_PrGpuMem->aSwapBuffer[_i], nullptr, _rtvhandle);
+		_rtvhandle.ptr += _PrGpuMem->nRTVSiz;
+	}
+	D3D12_ROOT_SIGNATURE_DESC _sigdesc;
+	_sigdesc.NumParameters = 0;
+	_sigdesc.pParameters = nullptr;
+	_sigdesc.NumStaticSamplers = 0;
+	_sigdesc.pStaticSamplers = nullptr;
+	_sigdesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	ID3DBlob* _signature;
+	ID3DBlob* _error;
+	DX_CHECK_INTERNAL(D3D12SerializeRootSignature(&_sigdesc, D3D_ROOT_SIGNATURE_VERSION_1, &_signature, &_error));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateRootSignature(0, _signature->GetBufferPointer(), _signature->GetBufferSize(), IID_PPV_ARGS(&_PrGpuMem->pRootSignature)));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_PrGpuMem->pFence)));
+	_PrGpuMem->nFenceValue = 1;
+	_PrGpuMem->nFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	if (_PrGpuMem->nFenceEvent == nullptr)
+		DX_CHECK_INTERNAL(HRESULT_FROM_WIN32(GetLastError()));
+	_PipelineStateDefaultDX(_Width, _Height);
 }
 BLVoid
 _GpuSwapBuffer()
 {
+	DX_CHECK_INTERNAL(_PrGpuMem->pSwapChain->Present(_PrGpuMem->nSyncInterval, 0));
 }
 BLVoid
 _GpuAnitIntervention()
 {
+	_FreeUBO(_PrGpuMem->pUBO);
+	const UINT64 _fence = _PrGpuMem->nFenceValue;
+	DX_CHECK_INTERNAL(_PrGpuMem->pCmdQueue->Signal(_PrGpuMem->pFence, _fence));
+	_PrGpuMem->nFenceValue++;
+	if (_PrGpuMem->pFence->GetCompletedValue() < _fence)
+	{
+		DX_CHECK_INTERNAL(_PrGpuMem->pFence->SetEventOnCompletion(_fence, _PrGpuMem->nFenceEvent));
+		WaitForSingleObject(_PrGpuMem->nFenceEvent, INFINITE);
+	}
+	CloseHandle(_PrGpuMem->nFenceEvent);
+	_PrGpuMem->pFence->Release();
+	_PrGpuMem->pSwapChain->Release();
+	_PrGpuMem->aSwapBuffer[0]->Release();
+	_PrGpuMem->aSwapBuffer[1]->Release();
+	_PrGpuMem->pRTVHeap->Release();
+	_PrGpuMem->pCmdAllocator->Release();
+	_PrGpuMem->pCmdQueue->Release();
+	_PrGpuMem->pRootSignature->Release();
+	_PrGpuMem->pDX->Release();
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		{
+			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
+			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
+		}
+	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		{
+			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
+			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
+		}
+	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		{
+			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
+			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
+		}
+	}
+	blDeleteDict(_PrGpuMem->pTechCache);
+	blDeleteDict(_PrGpuMem->pTextureCache);
+	blDeleteDict(_PrGpuMem->pBufferCache);
+	delete _PrGpuMem->pUBO;
+	delete _PrGpuMem;
 }
 #elif defined(BL_PLATFORM_LINUX)
 static BLS32
@@ -1472,10 +1634,7 @@ _GpuIntervention(duk_context* _DKC, Display* _Display, Window _Window, BLU32 _Wi
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
 	_PrGpuMem->pDukContext = _DKC;
-	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
-	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
-	_PrGpuMem->nBackBufferIdx = 0;
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
@@ -1637,10 +1796,7 @@ _GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
 	}
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
 	_PrGpuMem->pDukContext = _DKC;
-	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
-	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
-	_PrGpuMem->nBackBufferIdx = 0;
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
@@ -1809,10 +1965,7 @@ _GpuIntervention(duk_context* _DKC, NSView* _View, BLU32 _Width, BLU32 _Height, 
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
 	_PrGpuMem->pDukContext = _DKC;
-	_PrGpuMem->fPresentElapsed = 0.f;
 	_PrGpuMem->bVsync = _Vsync;
-	_PrGpuMem->nCurFramebufferHandle = 0xFFFF;
-	_PrGpuMem->nBackBufferIdx = 0;
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
@@ -1976,10 +2129,7 @@ _GpuIntervention(duk_context* _DKC, UIView* _View, BLU32 _Width, BLU32 _Height, 
 {
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
     _PrGpuMem->pDukContext = _DKC;
-    _PrGpuMem->fPresentElapsed = 0.f;
     _PrGpuMem->bVsync = _Vsync;
-    _PrGpuMem->nCurFramebufferHandle = 0xFFFF;
-    _PrGpuMem->nBackBufferIdx = 0;
     _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
@@ -3726,7 +3876,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
                 _tess = ezxml_txt(_element);
             else if (_element && !strcmp(_element->name, "Comp"))
                 _comp = ezxml_txt(_element);
-            _element = _element->sibling;
+            _element = _element ? _element->sibling : NULL;
         } while (_element);
     }
 #if defined(BL_GL_BACKEND)
