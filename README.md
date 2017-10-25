@@ -59,6 +59,10 @@ Supported compilers:
     IDE: xcode    </br>
  * iOS </br> 
     OS: OSX</br>IDE: xcode  </br>
+ * Web </br> 
+    OS: Windows 10 PC and emscripten installed  </br>
+    IDE: visual studio 2017    </br>
+	Tips: Only support WebGL2, please use firefox or chrome</br>
  
 Future work:
 
