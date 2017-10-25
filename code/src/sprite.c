@@ -135,7 +135,7 @@ typedef struct _ExternalMethod {
 	const BLVoid(*pDrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**);
 } _BLExternalMethod;
 typedef struct _SpriteNode{
-	duk_context* pDukContext;
+	DUK_CONTEXT* pDukContext;
     struct _SpriteNode* pParent;
     struct _SpriteNode** pChildren;
 	_BLSpriteAction* pAction;
@@ -183,7 +183,7 @@ typedef struct _SpriteNode{
     BLBool bShow;
 }_BLSpriteNode;
 typedef struct _SpriteMember {
-	duk_context* pDukContext;
+	DUK_CONTEXT* pDukContext;
     BLGuid nSpriteTech;
     BLGuid nSpriteInstTech;
 	BLGuid nSpriteStrokeTech;
@@ -430,7 +430,7 @@ _SpriteSetup(BLVoid* _Src)
 			BLEnum _decle[] = { BL_VD_FLOATX4, BL_VD_FLOATX4 };
 			blGeometryBufferInstance(_node->nGBO, _semantice, _decle, 2, _node->pEmitParam->nMaxAlive);
 		}
-		_node->nTex = blGenTexture(blHashUtf8((const BLUtf8*)_node->aFilename), BL_TT_2D, _node->eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->nTexWidth, _node->nTexHeight, 1, _node->pTexData);
+		_node->nTex = blGenTexture(blHashString((const BLUtf8*)_node->aFilename), BL_TT_2D, _node->eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->nTexWidth, _node->nTexHeight, 1, _node->pTexData);
 		free(_node->pTexData);
 		_node->pTexData = NULL;
 		_node->bValid = TRUE;
@@ -533,7 +533,7 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 			blStreamRead(_stream, sizeof(BLU32), &_taglen);
 			BLAnsi _tag[256] = { 0 };
 			blStreamRead(_stream, _taglen, _tag);
-			_ss->nTag = blHashUtf8((const BLUtf8*)_tag);
+			_ss->nTag = blHashString((const BLUtf8*)_tag);
 			blStreamRead(_stream, sizeof(BLU32), &_ss->nLTx);
 			blStreamRead(_stream, sizeof(BLU32), &_ss->nLTy);
 			blStreamRead(_stream, sizeof(BLU32), &_ss->nRBx);
@@ -1092,7 +1092,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 	}
 }
 BLVoid
-_SpriteInit(duk_context* _DKC)
+_SpriteInit(DUK_CONTEXT* _DKC)
 {
     _PrSpriteMem = (_BLSpriteMember*)malloc(sizeof(_BLSpriteMember));
 	_PrSpriteMem->pDukContext = _DKC;
@@ -1118,7 +1118,7 @@ _SpriteInit(duk_context* _DKC)
 	_PrSpriteMem->aExternalMethod[7].aSuffix[0] = 0;
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-	_PrSpriteMem->nQuadGeo = blGenGeometryBuffer(blHashUtf8((const BLUtf8*)"#@quadgeosprite@#"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, NULL, sizeof(BLF32) * 32, NULL, 0, BL_IF_INVALID);
+	_PrSpriteMem->nQuadGeo = blGenGeometryBuffer(blHashString((const BLUtf8*)"#@quadgeosprite@#"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, NULL, sizeof(BLF32) * 32, NULL, 0, BL_IF_INVALID);
     blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	blSubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
 	BLU32 _width, _height;
@@ -1194,7 +1194,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 				{
 					if (blRectContains(&_scalevp, &_tile->sPos) && _tile->aFilename[0] != 0)
 					{
-						_layertex = blGainTexture(blHashUtf8((const BLUtf8*)_tile->aFilename));
+						_layertex = blGainTexture(blHashString((const BLUtf8*)_tile->aFilename));
 						if (_layertex == INVALID_GUID)
 						{
 							BLGuid _stream = blGenStream(_tile->aFilename);
@@ -1291,7 +1291,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 								blStreamRead(_stream, _imagesz, _data);
 								_texdata = _data;
 							}
-							_layertex = blGenTexture(blHashUtf8((const BLUtf8*)_tile->aFilename), BL_TT_2D, _format, FALSE, TRUE, FALSE, 1, 1, _width, _height, 1, _texdata);
+							_layertex = blGenTexture(blHashString((const BLUtf8*)_tile->aFilename), BL_TT_2D, _format, FALSE, TRUE, FALSE, 1, 1, _width, _height, 1, _texdata);
 							free(_texdata);
 							blDeleteStream(_stream);
 						}
@@ -1487,7 +1487,7 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Tag, IN BLF32 _Width, IN BLF32 _He
 		_tile->bShow = TRUE;
 		memset(_tile->aFilename, 0, sizeof(_tile->aFilename));
 		strcpy(_tile->aFilename, _Filename);
-		_tile->nID = blGenGuid(_tile, blHashUtf8((const BLUtf8*)_Filename));
+		_tile->nID = blGenGuid(_tile, blHashString((const BLUtf8*)_Filename));
 		blArrayPushBack(_PrSpriteMem->pTileArray[strtol(_Tag, NULL, 10)], _tile);
 		return _tile->nID;
 	}
@@ -1541,7 +1541,7 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Tag, IN BLF32 _Width, IN BLF32 _He
 			_tmp = strtok((BLAnsi*)_tag, ",");
 			while (_tmp)
 			{
-				_node->aTag[_node->nFrameNum] = blHashUtf8((const BLUtf8*)_tmp);
+				_node->aTag[_node->nFrameNum] = blHashString((const BLUtf8*)_tmp);
 				_tmp = strtok(NULL, ",");
 				_node->nFrameNum++;
 				if (_node->nFrameNum >= 63)
@@ -1551,7 +1551,7 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Tag, IN BLF32 _Width, IN BLF32 _He
 		if (_Filename)
 		{
 			strcpy(_node->aFilename, _Filename);
-			_node->nID = blGenGuid(_node, blHashUtf8((const BLUtf8*)_Filename));
+			_node->nID = blGenGuid(_node, blHashString((const BLUtf8*)_Filename));
 			if (!strcmp((const BLAnsi*)blFileSuffixUtf8((const BLUtf8*)_Filename), "bmg"))
 				_FetchResource(_Filename, (BLVoid**)&_node, _node->nID, _LoadSprite, _SpriteSetup, TRUE);
 			else

@@ -28,16 +28,19 @@
 #include "internal/internal.h"
 #include "../externals/xml/ezxml.h"
 #include "../externals/duktape/duktape.h"
-#if defined BL_PLATFORM_OSX
+#if defined(BL_PLATFORM_OSX)
 #   include <AppKit/NSOpenGL.h>
 #   include <AppKit/NSApplication.h>
-#elif defined BL_PLATFORM_IOS
+#elif defined(BL_PLATFORM_IOS)
 #   include <UIKit/UIKit.h>
 #   include <OpenGLES/EAGLDrawable.h>
-#elif defined BL_PLATFORM_ANDROID
+#elif defined(BL_PLATFORM_ANDROID)
 #	include <EGL/egl.h>
 #	include <EGL/eglext.h>
 #	include <android/native_window.h>
+#elif defined(BL_PLATFORM_WEB)
+#	include <EGL/egl.h>
+#	include <EGL/eglext.h>
 #endif
 typedef struct _GpuRes{
     void* pRes;
@@ -46,13 +49,11 @@ typedef struct _GpuRes{
 typedef struct _HardwareCaps{
 	BLEnum eApiType;
     BLU32 nApiVersion;
-	BLU16 nMaxTextureSize;
-	BLU8  nMaxFBAttachments;
     BLBool bCSSupport;
     BLBool bGSSupport;
+	BLBool bTSSupport;
+	BLBool bFloatRTSupport;
     BLBool bAnisotropy;
-    BLBool bTessellationSupport;
-    BLBool bFloatRTSupport;
     BLF32 fMaxAnisotropy;
 	BLBool aTexFormats[BL_TF_COUNT];
 }_BLHardwareCaps;
@@ -153,6 +154,7 @@ typedef struct _TextureBuffer {
         } sMTL;
 #elif defined(BL_DX_BACKEND)
         struct _DX{
+			ID3D12Resource* pHandle;
         } sDX;
 #endif
     } uData;
@@ -275,15 +277,36 @@ typedef struct _Technique{
         } sMTL;
 #elif defined(BL_DX_BACKEND)
         struct _DX{
+			ID3DBlob* pVS;
+			ID3DBlob* pPS;
+			ID3DBlob* pDS;
+			ID3DBlob* pHS;
+			ID3DBlob* pGS;
         } sDX;
 #endif
     } uData;
 }_BLTechnique;
-#if defined(BL_GL_BACKEND)
+typedef struct _CommandQueue {
+#if defined(BL_VK_BACKEND)
+	struct _VK {
+	} sVK;
+#elif defined(BL_MTL_BACKEND)
+	struct _MTL {
+	} sMTL;
 #elif defined(BL_DX_BACKEND)
+	struct _DX {
+		ID3D12CommandQueue* pCmdQueue;
+		ID3D12Fence* pFence;
+		ID3D12GraphicsCommandList* aCmdList[256];
+		ID3D12CommandAllocator* aCmdAllocator[256];
+		UINT64 nCurrentFence;
+		UINT64 nCompletedFence;
+		HANDLE nEvent;
+	} sDX;
 #endif
+}_BLCommandQueue;
 typedef struct _GpuMember {
-	duk_context* pDukContext;
+	DUK_CONTEXT* pDukContext;
 	_BLHardwareCaps sHardwareCaps;
     _BLPipelineState sPipelineState;
 	BLBool bVsync;
@@ -297,16 +320,15 @@ typedef struct _GpuMember {
 #elif defined(BL_PLATFORM_UWP)
 	ID3D12Device* pDX;
 	IDXGISwapChain3* pSwapChain;
-	ID3D12Resource* aSwapBuffer[2];
+	ID3D12Resource* aBackBuffer[4];
+	ID3D12Resource* pBackBufferDS;
 	ID3D12DescriptorHeap* pRTVHeap;
-	ID3D12CommandQueue* pCmdQueue;
-	ID3D12CommandAllocator* pCmdAllocator;
-	ID3D12Fence* pFence;
-	HANDLE nFenceEvent;
-	UINT64 nFenceValue;
+	ID3D12DescriptorHeap* pDSVHeap;
 	ID3D12RootSignature* pRootSignature;
+	_BLCommandQueue pCmdQueue;
+	UINT64 aBackBufferFence[4];
+	BLDictionary* pPSOCache;
 	UINT nSyncInterval;
-	UINT nRTVSiz;
 	UINT nBackBuffer;
 #elif defined(BL_PLATFORM_OSX)
     NSOpenGLContext* pGLC;
@@ -326,102 +348,11 @@ typedef struct _GpuMember {
 	EGLContext pEglContext;
 	EGLSurface pEglSurface;
 	EGLConfig pEglConfig;
+#elif defined(BL_PLATFORM_WEB)
+	GLFWwindow* pWindow;
 #endif
 }_BLGpuMember;
 static _BLGpuMember* _PrGpuMem = NULL;
-static BLU32
-_TextureSize(BLEnum _BLFmt, BLU32 _Width, BLU32 _Height, BLU32 _Depth)
-{
-    switch (_BLFmt)
-    {
-        case BL_TF_BC1:
-            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
-        case BL_TF_BC1A1:
-            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
-        case BL_TF_BC3:
-            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
-        case BL_TF_ETC2:
-            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
-        case BL_TF_ETC2A1:
-            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
-        case BL_TF_ETC2A:
-            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
-        case BL_TF_ASTC:
-            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
-        case BL_TF_BC5:
-            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
-        case BL_TF_ETC2RG:
-            return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
-        case BL_TF_R8:
-            return _Width * _Height * _Depth * 1;
-        case BL_TF_R8I:
-            return _Width * _Height * _Depth * 1;
-        case BL_TF_R8U:
-            return _Width * _Height * _Depth * 1;
-        case BL_TF_R8S:
-            return _Width * _Height * _Depth * 1;
-        case BL_TF_R32I:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_R32U:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_R32F:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_RG8:
-            return _Width * _Height * _Depth * 2;
-        case BL_TF_RG8I:
-            return _Width * _Height * _Depth * 2;
-        case BL_TF_RG8U:
-            return _Width * _Height * _Depth * 2;
-        case BL_TF_RG8S:
-            return _Width * _Height * _Depth * 2;
-        case BL_TF_RG32I:
-            return _Width * _Height * _Depth * 8;
-        case BL_TF_RG32U:
-            return _Width * _Height * _Depth * 8;
-        case BL_TF_RG32F:
-            return _Width * _Height * _Depth * 8;
-        case BL_TF_RGB8:
-            return _Width * _Height * _Depth * 3;
-        case BL_TF_RGB8I:
-            return _Width * _Height * _Depth * 3;
-        case BL_TF_RGB8U:
-            return _Width * _Height * _Depth * 3;
-        case BL_TF_RGB8S:
-            return _Width * _Height * _Depth * 3;
-        case BL_TF_RGB9E5F:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_R11G11B10F:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_BGRA8:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_RGBA8:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_RGBA8I:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_RGBA8U:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_RGBA8S:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_RGBA32I:
-            return _Width * _Height * _Depth * 16;
-        case BL_TF_RGBA32U:
-            return _Width * _Height * _Depth * 16;
-        case BL_TF_RGBA32F:
-            return _Width * _Height * _Depth * 16;
-        case BL_TF_RGB10A2:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_D16:
-            return _Width * _Height * _Depth * 2;
-        case BL_TF_D24:
-            return _Width * _Height * _Depth * 3;
-        case BL_TF_D32:
-            return _Width * _Height * _Depth * 4;
-        case BL_TF_D24S8:
-            return _Width * _Height * _Depth * 4;
-        default:
-            return 0;
-    }
-}
 #if defined(BL_GL_BACKEND)
 static BLVoid
 _PipelineStateDefaultGL(BLU32 _Width, BLU32 _Height)
@@ -1195,13 +1126,6 @@ _FillTextureFormatGL(BLEnum _BLFmt, GLenum* _IFmt, GLenum* _Fmt, GLenum* _Type, 
             *_Type = GL_UNSIGNED_SHORT;
             *_RtFmt = GL_DEPTH_COMPONENT16;
             break;
-        case BL_TF_D24:
-            *_IFmt = GL_DEPTH_COMPONENT24;
-            *_SrgbFmt = GL_DEPTH_COMPONENT24;
-            *_Fmt = GL_DEPTH_COMPONENT;
-            *_Type = GL_UNSIGNED_INT;
-            *_RtFmt = GL_DEPTH_COMPONENT24;
-            break;
         case BL_TF_D32:
             *_IFmt = GL_DEPTH_COMPONENT32F;
             *_SrgbFmt = GL_DEPTH_COMPONENT32F;
@@ -1229,15 +1153,324 @@ _FillTextureFormatGL(BLEnum _BLFmt, GLenum* _IFmt, GLenum* _Fmt, GLenum* _Type, 
 static BLVoid
 _PipelineStateDefaultDX(BLU32 _Width, BLU32 _Height)
 {
+	_PrGpuMem->pPSOCache = blGenDict(FALSE);
 }
 static BLVoid
 _PipelineStateRefreshDX()
 {
 }
+static BLVoid
+_FillTextureFormatDX(BLEnum _BLFmt, DXGI_FORMAT* _IFmt, DXGI_FORMAT* _SrgbFmt, DXGI_FORMAT* _RtFmt)
+{
+	switch (_BLFmt)
+	{
+	case BL_TF_BC1:
+		*_IFmt = DXGI_FORMAT_BC1_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_BC1_UNORM_SRGB;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_BC1A1:
+		*_IFmt = DXGI_FORMAT_BC1_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_BC1_UNORM_SRGB;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_BC3:
+		*_IFmt = DXGI_FORMAT_BC3_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_BC3_UNORM_SRGB;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_ETC2:
+		*_IFmt = DXGI_FORMAT_UNKNOWN;
+		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_ETC2A1:
+		*_IFmt = DXGI_FORMAT_UNKNOWN;
+		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_ETC2A:
+		*_IFmt = DXGI_FORMAT_UNKNOWN;
+		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_ASTC:
+		*_IFmt = DXGI_FORMAT_UNKNOWN;
+		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_BC5:
+		*_IFmt = DXGI_FORMAT_BC5_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_BC5_UNORM;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_ETC2RG:
+		*_IFmt = DXGI_FORMAT_UNKNOWN;
+		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_R8:
+		*_IFmt = DXGI_FORMAT_R8_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_R8_UNORM;
+		*_RtFmt = DXGI_FORMAT_R8_UNORM;
+		break;
+	case BL_TF_R8I:
+		*_IFmt = DXGI_FORMAT_R8_SINT;
+		*_SrgbFmt = DXGI_FORMAT_R8_SINT;
+		*_RtFmt = DXGI_FORMAT_R8_SINT;
+		break;
+	case BL_TF_R8U:
+		*_IFmt = DXGI_FORMAT_R8_UINT;
+		*_SrgbFmt = DXGI_FORMAT_R8_UINT;
+		*_RtFmt = DXGI_FORMAT_R8_UINT;
+		break;
+	case BL_TF_R8S:
+		*_IFmt = DXGI_FORMAT_R8_SNORM;
+		*_SrgbFmt = DXGI_FORMAT_R8_SNORM;
+		*_RtFmt = DXGI_FORMAT_R8_SNORM;
+		break;
+	case BL_TF_R32I:
+		*_IFmt = DXGI_FORMAT_R32_SINT;
+		*_SrgbFmt = DXGI_FORMAT_R32_SINT;
+		*_RtFmt = DXGI_FORMAT_R32_SINT;
+		break;
+	case BL_TF_R32U:
+		*_IFmt = DXGI_FORMAT_R32_UINT;
+		*_SrgbFmt = DXGI_FORMAT_R32_UINT;
+		*_RtFmt = DXGI_FORMAT_R32_UINT;
+		break;
+	case BL_TF_R32F:
+		*_IFmt = DXGI_FORMAT_R32_FLOAT;
+		*_SrgbFmt = DXGI_FORMAT_R32_FLOAT;
+		*_RtFmt = DXGI_FORMAT_R32_FLOAT;
+		break;
+	case BL_TF_RG8:
+		*_IFmt = DXGI_FORMAT_R8G8_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_R8G8_UNORM;
+		*_RtFmt = DXGI_FORMAT_R8G8_UNORM;
+		break;
+	case BL_TF_RG8I:
+		*_IFmt = DXGI_FORMAT_R8G8_SINT;
+		*_SrgbFmt = DXGI_FORMAT_R8G8_SINT;
+		*_RtFmt = DXGI_FORMAT_R8G8_SINT;
+		break;
+	case BL_TF_RG8U:
+		*_IFmt = DXGI_FORMAT_R8G8_UINT;
+		*_SrgbFmt = DXGI_FORMAT_R8G8_UINT;
+		*_RtFmt = DXGI_FORMAT_R8G8_UINT;
+		break;
+	case BL_TF_RG8S:
+		*_IFmt = DXGI_FORMAT_R8G8_SNORM;
+		*_SrgbFmt = DXGI_FORMAT_R8G8_SNORM;
+		*_RtFmt = DXGI_FORMAT_R8G8_SNORM;
+		break;
+	case BL_TF_RG32I:
+		*_IFmt = DXGI_FORMAT_R32G32_SINT;
+		*_SrgbFmt = DXGI_FORMAT_R32G32_SINT;
+		*_RtFmt = DXGI_FORMAT_R32G32_SINT;
+		break;
+	case BL_TF_RG32U:
+		*_IFmt = DXGI_FORMAT_R32G32_UINT;
+		*_SrgbFmt = DXGI_FORMAT_R32G32_UINT;
+		*_RtFmt = DXGI_FORMAT_R32G32_UINT;
+		break;
+	case BL_TF_RG32F:
+		*_IFmt = DXGI_FORMAT_R32G32_FLOAT;
+		*_SrgbFmt = DXGI_FORMAT_R32G32_FLOAT;
+		*_RtFmt = DXGI_FORMAT_R32G32_FLOAT;
+		break;
+	case BL_TF_RGB8:
+		*_IFmt = DXGI_FORMAT_UNKNOWN;
+		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_RGB8I:
+		*_IFmt = DXGI_FORMAT_UNKNOWN;
+		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_RGB8U:
+		*_IFmt = DXGI_FORMAT_UNKNOWN;
+		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_RGB8S:
+		*_IFmt = DXGI_FORMAT_UNKNOWN;
+		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	case BL_TF_RGB9E5F:
+		*_IFmt = DXGI_FORMAT_R9G9B9E5_SHAREDEXP;
+		*_SrgbFmt = DXGI_FORMAT_R9G9B9E5_SHAREDEXP;
+		*_RtFmt = DXGI_FORMAT_R9G9B9E5_SHAREDEXP;
+		break;
+	case BL_TF_R11G11B10F:
+		*_IFmt = DXGI_FORMAT_R11G11B10_FLOAT;
+		*_SrgbFmt = DXGI_FORMAT_R11G11B10_FLOAT;
+		*_RtFmt = DXGI_FORMAT_R11G11B10_FLOAT;
+		break;
+	case BL_TF_BGRA8:
+		*_IFmt = DXGI_FORMAT_B8G8R8A8_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+		*_RtFmt = DXGI_FORMAT_B8G8R8A8_UNORM;
+		break;
+	case BL_TF_RGBA8:
+		*_IFmt = DXGI_FORMAT_R8G8B8A8_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		*_RtFmt = DXGI_FORMAT_R8G8B8A8_UNORM;
+		break;
+	case BL_TF_RGBA8I:
+		*_IFmt = DXGI_FORMAT_R8G8B8A8_SINT;
+		*_SrgbFmt = DXGI_FORMAT_R8G8B8A8_SINT;
+		*_RtFmt = DXGI_FORMAT_R8G8B8A8_SINT;
+		break;
+	case BL_TF_RGBA8U:
+		*_IFmt = DXGI_FORMAT_R8G8B8A8_UINT;
+		*_SrgbFmt = DXGI_FORMAT_R8G8B8A8_UINT;
+		*_RtFmt = DXGI_FORMAT_R8G8B8A8_UINT;
+		break;
+	case BL_TF_RGBA8S:
+		*_IFmt = DXGI_FORMAT_R8G8B8A8_SNORM;
+		*_SrgbFmt = DXGI_FORMAT_R8G8B8A8_SNORM;
+		*_RtFmt = DXGI_FORMAT_R8G8B8A8_SNORM;
+		break;
+	case BL_TF_RGBA32I:
+		*_IFmt = DXGI_FORMAT_R32G32B32A32_SINT;
+		*_SrgbFmt = DXGI_FORMAT_R32G32B32A32_SINT;
+		*_RtFmt = DXGI_FORMAT_R32G32B32A32_SINT;
+		break;
+	case BL_TF_RGBA32U:
+		*_IFmt = DXGI_FORMAT_R32G32B32A32_UINT;
+		*_SrgbFmt = DXGI_FORMAT_R32G32B32A32_UINT;
+		*_RtFmt = DXGI_FORMAT_R32G32B32A32_UINT;
+		break;
+	case BL_TF_RGBA32F:
+		*_IFmt = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		*_SrgbFmt = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		*_RtFmt = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		break;
+	case BL_TF_RGB10A2:
+		*_IFmt = DXGI_FORMAT_R10G10B10A2_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_R10G10B10A2_UNORM;
+		*_RtFmt = DXGI_FORMAT_R10G10B10A2_UNORM;
+		break;
+	case BL_TF_D16:
+		*_IFmt = DXGI_FORMAT_D16_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_D16_UNORM;
+		*_RtFmt = DXGI_FORMAT_D16_UNORM;
+		break;
+	case BL_TF_D32:
+		*_IFmt = DXGI_FORMAT_D32_FLOAT;
+		*_SrgbFmt = DXGI_FORMAT_D32_FLOAT;
+		*_RtFmt = DXGI_FORMAT_D32_FLOAT;
+		break;
+	case BL_TF_D24S8:
+		*_IFmt = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		*_SrgbFmt = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		*_RtFmt = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		break;
+	default:
+		*_IFmt = DXGI_FORMAT_UNKNOWN;
+		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_RtFmt = DXGI_FORMAT_UNKNOWN;
+		break;
+	}
+}
 #elif defined(BL_VK_BACKEND)
 #elif defined(BL_MTL_BACKEND)
 #else
 #endif
+static BLU32
+_TextureSize(BLEnum _BLFmt, BLU32 _Width, BLU32 _Height, BLU32 _Depth)
+{
+	switch (_BLFmt)
+	{
+	case BL_TF_BC1:
+		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
+	case BL_TF_BC1A1:
+		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
+	case BL_TF_BC3:
+		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+	case BL_TF_ETC2:
+		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
+	case BL_TF_ETC2A1:
+		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
+	case BL_TF_ETC2A:
+		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+	case BL_TF_ASTC:
+		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+	case BL_TF_BC5:
+		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+	case BL_TF_ETC2RG:
+		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+	case BL_TF_R8:
+		return _Width * _Height * _Depth * 1;
+	case BL_TF_R8I:
+		return _Width * _Height * _Depth * 1;
+	case BL_TF_R8U:
+		return _Width * _Height * _Depth * 1;
+	case BL_TF_R8S:
+		return _Width * _Height * _Depth * 1;
+	case BL_TF_R32I:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_R32U:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_R32F:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RG8:
+		return _Width * _Height * _Depth * 2;
+	case BL_TF_RG8I:
+		return _Width * _Height * _Depth * 2;
+	case BL_TF_RG8U:
+		return _Width * _Height * _Depth * 2;
+	case BL_TF_RG8S:
+		return _Width * _Height * _Depth * 2;
+	case BL_TF_RG32I:
+		return _Width * _Height * _Depth * 8;
+	case BL_TF_RG32U:
+		return _Width * _Height * _Depth * 8;
+	case BL_TF_RG32F:
+		return _Width * _Height * _Depth * 8;
+	case BL_TF_RGB8:
+		return _Width * _Height * _Depth * 3;
+	case BL_TF_RGB8I:
+		return _Width * _Height * _Depth * 3;
+	case BL_TF_RGB8U:
+		return _Width * _Height * _Depth * 3;
+	case BL_TF_RGB8S:
+		return _Width * _Height * _Depth * 3;
+	case BL_TF_RGB9E5F:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_R11G11B10F:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_BGRA8:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RGBA8:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RGBA8I:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RGBA8U:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RGBA8S:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RGBA32I:
+		return _Width * _Height * _Depth * 16;
+	case BL_TF_RGBA32U:
+		return _Width * _Height * _Depth * 16;
+	case BL_TF_RGBA32F:
+		return _Width * _Height * _Depth * 16;
+	case BL_TF_RGB10A2:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_D16:
+		return _Width * _Height * _Depth * 2;
+	case BL_TF_D32:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_D24S8:
+		return _Width * _Height * _Depth * 4;
+	default:
+		return 0;
+	}
+}
 static void
 _AllocUBO(_BLUniformBuffer* _UBO)
 {
@@ -1305,7 +1538,7 @@ _PipelineStateRefresh()
 }
 #if defined(BL_PLATFORM_WIN32)
 BLVoid
-_GpuIntervention(duk_context* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(DUK_CONTEXT* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
 	_PrGpuMem->pDukContext = _DKC;
@@ -1313,7 +1546,7 @@ _GpuIntervention(duk_context* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLB
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-	_PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bTSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
@@ -1460,7 +1693,7 @@ _GpuAnitIntervention(HWND _Hwnd)
 }
 #elif defined(BL_PLATFORM_UWP)
 BLVoid
-_GpuIntervention(duk_context* _DKC, Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(DUK_CONTEXT* _DKC, Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 	_PrGpuMem = new _BLGpuMember;
 	_PrGpuMem->pDukContext = _DKC;
@@ -1468,13 +1701,17 @@ _GpuIntervention(duk_context* _DKC, Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 
 	_PrGpuMem->sHardwareCaps.bCSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = TRUE;
-	_PrGpuMem->sHardwareCaps.bTessellationSupport = TRUE;
+	_PrGpuMem->sHardwareCaps.bTSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bFloatRTSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
 	_PrGpuMem->pBufferCache = blGenDict(TRUE);
 	_PrGpuMem->pTechCache = blGenDict(TRUE);
 	_PrGpuMem->nSyncInterval = _Vsync ? 60 : 1;
+	_PrGpuMem->aBackBufferFence[0] = 0;
+	_PrGpuMem->aBackBufferFence[1] = 0;
+	_PrGpuMem->aBackBufferFence[2] = 0;
+	_PrGpuMem->aBackBufferFence[3] = 0;
 	_PrGpuMem->pUBO = new _BLUniformBuffer;
 	_PrGpuMem->pUBO->nSize = 0;
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
@@ -1498,7 +1735,6 @@ _GpuIntervention(duk_context* _DKC, Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 
 		_debugcontroller->EnableDebugLayer();
 		_dxgifactoryflags |= DXGI_CREATE_FACTORY_DEBUG;
 	}
-	_debugcontroller->Release();
 #endif
 	DX_CHECK_INTERNAL(CreateDXGIFactory2(_dxgifactoryflags, IID_PPV_ARGS(&_factory)));
 	D3D_FEATURE_LEVEL _flvl[4] = { D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0, D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
@@ -1520,52 +1756,98 @@ _GpuIntervention(duk_context* _DKC, Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 
 			break;
 		}
 	}
-	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&_PrGpuMem->pCmdAllocator))); 
-	D3D12_COMMAND_QUEUE_DESC _queuedesc = {};
-	_queuedesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	_queuedesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateCommandQueue(&_queuedesc, IID_PPV_ARGS(&_PrGpuMem->pCmdQueue)));
 	DXGI_SWAP_CHAIN_DESC1 _scdesc = {};
-	_scdesc.BufferCount = 2;
+	_scdesc.BufferCount = 4;
+	_scdesc.Stereo = 0;
 	_scdesc.Width = _Width;
 	_scdesc.Height = _Height;
 	_scdesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	_scdesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	_scdesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	_scdesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+	_scdesc.Scaling = DXGI_SCALING_STRETCH;
+	_scdesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	_scdesc.SampleDesc.Count = 1;
+	_scdesc.SampleDesc.Quality = 0;
 	IDXGISwapChain1* _tmpsc;
-	DX_CHECK_INTERNAL(_factory->CreateSwapChainForCoreWindow(_PrGpuMem->pCmdQueue, (IUnknown*)(_Hwnd), &_scdesc, nullptr, &_tmpsc));
+	DX_CHECK_INTERNAL(_factory->CreateSwapChainForCoreWindow(_PrGpuMem->pDX, (IUnknown*)(_Hwnd), &_scdesc, nullptr, &_tmpsc));
 	_tmpsc->QueryInterface(__uuidof(IDXGISwapChain3), (BLVoid**)&_PrGpuMem->pSwapChain);
 	_tmpsc->Release();
-	_PrGpuMem->nBackBuffer = _PrGpuMem->pSwapChain->GetCurrentBackBufferIndex();
-	D3D12_DESCRIPTOR_HEAP_DESC _rtvdesc = {};
-	_rtvdesc.NumDescriptors = 1024;
-	_rtvdesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-	_rtvdesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateDescriptorHeap(&_rtvdesc, IID_PPV_ARGS(&_PrGpuMem->pRTVHeap)));
-	_PrGpuMem->nRTVSiz = _PrGpuMem->pDX->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	D3D12_CPU_DESCRIPTOR_HANDLE _rtvhandle = _PrGpuMem->pRTVHeap->GetCPUDescriptorHandleForHeapStart();
-	for (BLU32 _i = 0; _i < 2; ++_i)
+	D3D12_DESCRIPTOR_HEAP_DESC _rtvheapdesc = {};
+	_rtvheapdesc.NumDescriptors = 1028;
+	_rtvheapdesc.NodeMask = 1;
+	_rtvheapdesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+	_rtvheapdesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateDescriptorHeap(&_rtvheapdesc, IID_PPV_ARGS(&_PrGpuMem->pRTVHeap)));
+	D3D12_DESCRIPTOR_HEAP_DESC _dsvheapdesc = {};
+	_dsvheapdesc.NumDescriptors = 129;
+	_dsvheapdesc.NodeMask = 1;
+	_dsvheapdesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+	_dsvheapdesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateDescriptorHeap(&_dsvheapdesc, IID_PPV_ARGS(&_PrGpuMem->pDSVHeap)));
+	D3D12_DESCRIPTOR_RANGE _descrange[] =
 	{
-		DX_CHECK_INTERNAL(_PrGpuMem->pSwapChain->GetBuffer(_i, IID_PPV_ARGS(&_PrGpuMem->aSwapBuffer[_i])));
-		_PrGpuMem->pDX->CreateRenderTargetView(_PrGpuMem->aSwapBuffer[_i], nullptr, _rtvhandle);
-		_rtvhandle.ptr += _PrGpuMem->nRTVSiz;
-	}
+		{ D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 16, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
+		{ D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 16, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
+		{ D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
+		{ D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 16, 0, 0, D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND },
+	};
+	D3D12_ROOT_PARAMETER _rootparameter[] =
+	{
+		{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,{ { 1, &_descrange[0] } }, D3D12_SHADER_VISIBILITY_ALL },
+		{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,{ { 1, &_descrange[1] } }, D3D12_SHADER_VISIBILITY_ALL },
+		{ D3D12_ROOT_PARAMETER_TYPE_CBV,{ { 0, 0 } }, D3D12_SHADER_VISIBILITY_ALL },
+		{ D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,{ { 1, &_descrange[3] } }, D3D12_SHADER_VISIBILITY_ALL },
+	};
+	_rootparameter[2].Descriptor.RegisterSpace = 0;
+	_rootparameter[2].Descriptor.ShaderRegister = 0;
 	D3D12_ROOT_SIGNATURE_DESC _sigdesc;
-	_sigdesc.NumParameters = 0;
-	_sigdesc.pParameters = nullptr;
+	_sigdesc.NumParameters = 4;
+	_sigdesc.pParameters = _rootparameter;
 	_sigdesc.NumStaticSamplers = 0;
-	_sigdesc.pStaticSamplers = nullptr;
+	_sigdesc.pStaticSamplers = NULL;
 	_sigdesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
-	ID3DBlob* _signature;
 	ID3DBlob* _error;
-	DX_CHECK_INTERNAL(D3D12SerializeRootSignature(&_sigdesc, D3D_ROOT_SIGNATURE_VERSION_1, &_signature, &_error));
-	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateRootSignature(0, _signature->GetBufferPointer(), _signature->GetBufferSize(), IID_PPV_ARGS(&_PrGpuMem->pRootSignature)));
-	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&_PrGpuMem->pFence)));
-	_PrGpuMem->nFenceValue = 1;
-	_PrGpuMem->nFenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	if (_PrGpuMem->nFenceEvent == nullptr)
-		DX_CHECK_INTERNAL(HRESULT_FROM_WIN32(GetLastError()));
+	ID3DBlob* _outblob;
+	DX_CHECK_INTERNAL(D3D12SerializeRootSignature(&_sigdesc, D3D_ROOT_SIGNATURE_VERSION_1, &_outblob, &_error));
+	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateRootSignature(0, _outblob->GetBufferPointer(), _outblob->GetBufferSize(), IID_PPV_ARGS(&_PrGpuMem->pRootSignature)));
+	_outblob->Release();
+	_error->Release();
+	UINT _rtvsize = _PrGpuMem->pDX->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	for (BLU32 _i = 0; _i < 4; ++_i)
+	{
+		D3D12_CPU_DESCRIPTOR_HANDLE _handle = _PrGpuMem->pRTVHeap->GetCPUDescriptorHandleForHeapStart();
+		_handle.ptr += _i * _rtvsize;
+		DX_CHECK_INTERNAL(_PrGpuMem->pSwapChain->GetBuffer(_i, IID_PPV_ARGS(&_PrGpuMem->aBackBuffer[_i])));
+		_PrGpuMem->pDX->CreateRenderTargetView(_PrGpuMem->aBackBuffer[_i], NULL, _handle);
+	}
+	D3D12_RESOURCE_DESC _resdesc;
+	_resdesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	_resdesc.Alignment = 0;
+	_resdesc.Width = _Width;
+	_resdesc.Height = _Height;
+	_resdesc.DepthOrArraySize = 1;
+	_resdesc.MipLevels = 0;
+	_resdesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	_resdesc.SampleDesc.Count = 1;
+	_resdesc.SampleDesc.Quality = 0;
+	_resdesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	_resdesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+	D3D12_CLEAR_VALUE _clearvalue;
+	_clearvalue.Format = _resdesc.Format;
+	_clearvalue.DepthStencil.Depth = 1.0f;
+	_clearvalue.DepthStencil.Stencil = 0;
+	D3D12_HEAP_PROPERTIES _heapproperty = { D3D12_HEAP_TYPE_DEFAULT,  D3D12_CPU_PAGE_PROPERTY_UNKNOWN, D3D12_MEMORY_POOL_UNKNOWN, 1, 1 };
+	ID3D12Resource* _resource;
+	DX_CHECK_INTERNAL(_PrGpuMem->pDX->CreateCommittedResource(&_heapproperty, D3D12_HEAP_FLAG_NONE, &_resdesc, D3D12_RESOURCE_STATE_COMMON, &_clearvalue, IID_PPV_ARGS(&_resource)));
+	assert(NULL != _resource);
+	D3D12_DEPTH_STENCIL_VIEW_DESC _dsvdesc;
+	ZeroMemory(&_dsvdesc, sizeof(_dsvdesc));
+	_dsvdesc.Format = _resdesc.Format;
+	_dsvdesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	_dsvdesc.Flags = D3D12_DSV_FLAGS(0);
+	_PrGpuMem->pDX->CreateDepthStencilView(_PrGpuMem->pBackBufferDS, &_dsvdesc, _PrGpuMem->pDSVHeap->GetCPUDescriptorHandleForHeapStart());
+
+
 	_PipelineStateDefaultDX(_Width, _Height);
 }
 BLVoid
@@ -1577,22 +1859,21 @@ BLVoid
 _GpuAnitIntervention()
 {
 	_FreeUBO(_PrGpuMem->pUBO);
-	const UINT64 _fence = _PrGpuMem->nFenceValue;
-	DX_CHECK_INTERNAL(_PrGpuMem->pCmdQueue->Signal(_PrGpuMem->pFence, _fence));
-	_PrGpuMem->nFenceValue++;
-	if (_PrGpuMem->pFence->GetCompletedValue() < _fence)
 	{
-		DX_CHECK_INTERNAL(_PrGpuMem->pFence->SetEventOnCompletion(_fence, _PrGpuMem->nFenceEvent));
-		WaitForSingleObject(_PrGpuMem->nFenceEvent, INFINITE);
+		FOREACH_DICT(ID3D12PipelineState*, _iter, _PrGpuMem->pPSOCache)
+		{
+			_iter->Release();
+		}
 	}
-	CloseHandle(_PrGpuMem->nFenceEvent);
-	_PrGpuMem->pFence->Release();
+	blDeleteDict(_PrGpuMem->pPSOCache);
 	_PrGpuMem->pSwapChain->Release();
-	_PrGpuMem->aSwapBuffer[0]->Release();
-	_PrGpuMem->aSwapBuffer[1]->Release();
+	_PrGpuMem->aBackBuffer[0]->Release();
+	_PrGpuMem->aBackBuffer[1]->Release();
+	_PrGpuMem->aBackBuffer[2]->Release();
+	_PrGpuMem->aBackBuffer[3]->Release();
+	_PrGpuMem->pBackBufferDS->Release();
 	_PrGpuMem->pRTVHeap->Release();
-	_PrGpuMem->pCmdAllocator->Release();
-	_PrGpuMem->pCmdQueue->Release();
+	_PrGpuMem->pDSVHeap->Release();
 	_PrGpuMem->pRootSignature->Release();
 	_PrGpuMem->pDX->Release();
 	{
@@ -1630,7 +1911,7 @@ _CtxErrorHandler(Display*, XErrorEvent*)
     return 0;
 }
 BLVoid
-_GpuIntervention(duk_context* _DKC, Display* _Display, Window _Window, BLU32 _Width, BLU32 _Height, GLXFBConfig _Config, BLVoid* _Lib, BLBool _Vsync)
+_GpuIntervention(DUK_CONTEXT* _DKC, Display* _Display, Window _Window, BLU32 _Width, BLU32 _Height, GLXFBConfig _Config, BLVoid* _Lib, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
 	_PrGpuMem->pDukContext = _DKC;
@@ -1638,7 +1919,7 @@ _GpuIntervention(duk_context* _DKC, Display* _Display, Window _Window, BLU32 _Wi
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-	_PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bTSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
@@ -1777,7 +2058,7 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_ANDROID)
 BLVoid
-_GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync, BLBool _Backend)
+_GpuIntervention(DUK_CONTEXT* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync, BLBool _Backend)
 {
 	if (_Backend)
 	{
@@ -1800,7 +2081,7 @@ _GpuIntervention(duk_context* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-	_PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bTSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
@@ -1961,7 +2242,7 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_OSX)
 BLVoid
-_GpuIntervention(duk_context* _DKC, NSView* _View, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(DUK_CONTEXT* _DKC, NSView* _View, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
 	_PrGpuMem->pDukContext = _DKC;
@@ -1969,7 +2250,7 @@ _GpuIntervention(duk_context* _DKC, NSView* _View, BLU32 _Width, BLU32 _Height, 
 	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
 	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-	_PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bTSSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
 	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
 	_PrGpuMem->pTextureCache = blGenDict(TRUE);
@@ -2125,7 +2406,7 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_IOS)
 BLVoid
-_GpuIntervention(duk_context* _DKC, UIView* _View, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)
+_GpuIntervention(DUK_CONTEXT* _DKC, UIView* _View, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)
 {
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
     _PrGpuMem->pDukContext = _DKC;
@@ -2133,7 +2414,7 @@ _GpuIntervention(duk_context* _DKC, UIView* _View, BLU32 _Width, BLU32 _Height, 
     _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
-    _PrGpuMem->sHardwareCaps.bTessellationSupport = FALSE;
+    _PrGpuMem->sHardwareCaps.bTSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
     _PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
     _PrGpuMem->pTextureCache = blGenDict(TRUE);
@@ -2249,6 +2530,86 @@ _GpuAnitIntervention()
 	free(_PrGpuMem->pUBO);
 	free(_PrGpuMem);
 }
+#elif defined(BL_PLATFORM_WEB)
+BLVoid
+_GpuIntervention(DUK_CONTEXT* _DKC, GLFWwindow* _Window, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+{
+	_PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
+	_PrGpuMem->pDukContext = _DKC;
+	_PrGpuMem->bVsync = _Vsync;
+	_PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bAnisotropy = FALSE;
+	_PrGpuMem->sHardwareCaps.bTSSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.bFloatRTSupport = FALSE;
+	_PrGpuMem->sHardwareCaps.fMaxAnisotropy = 0.f;
+	_PrGpuMem->pTextureCache = blGenDict(TRUE);
+	_PrGpuMem->pBufferCache = blGenDict(TRUE);
+	_PrGpuMem->pTechCache = blGenDict(TRUE);
+	_PrGpuMem->pUBO = (_BLUniformBuffer*)malloc(sizeof(_BLUniformBuffer));
+	_PrGpuMem->pUBO->nSize = 0;
+	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
+		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
+	_PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
+	_PrGpuMem->pWindow = _Window;
+	glfwMakeContextCurrent(_Window);
+	_PrGpuMem->sHardwareCaps.nApiVersion = 300;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = FALSE;
+	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = FALSE;
+	GLint _extensions = 0;
+	GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
+	for (GLint _idx = 0; _idx < _extensions; ++_idx)
+	{
+		const BLAnsi* _name = (const BLAnsi*)glGetStringi(GL_EXTENSIONS, _idx);
+		if (!strcmp(_name, "GL_EXT_texture_filter_anisotropic"))
+		{
+			GL_CHECK_INTERNAL(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &_PrGpuMem->sHardwareCaps.fMaxAnisotropy));
+		}
+	}
+	_PipelineStateDefaultGL(_Width, _Height);
+}
+BLVoid
+_GpuSwapBuffer()
+{
+	glfwSwapBuffers(_PrGpuMem->pWindow);
+}
+BLVoid
+_GpuAnitIntervention()
+{
+	_FreeUBO(_PrGpuMem->pUBO);
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTextureCache)
+		{
+			_BLTextureBuffer* _tex = (_BLTextureBuffer*)_iter->pRes;
+			blDebugOutput("detected texture resource leak: hash>%u", URIPART_INTERNAL(_tex->nID));
+		}
+	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pBufferCache)
+		{
+			_BLGeometryBuffer* _geo = (_BLGeometryBuffer*)_iter->pRes;
+			blDebugOutput("detected geometry buffer resource leak: hash>%u", URIPART_INTERNAL(_geo->nID));
+		}
+	}
+	{
+		FOREACH_DICT(_BLGpuRes*, _iter, _PrGpuMem->pTechCache)
+		{
+			_BLTechnique* _tech = (_BLTechnique*)_iter->pRes;
+			blDebugOutput("detected technique resource leak: hash>%u", URIPART_INTERNAL(_tech->nID));
+		}
+	}
+	blDeleteDict(_PrGpuMem->pTechCache);
+	blDeleteDict(_PrGpuMem->pTextureCache);
+	blDeleteDict(_PrGpuMem->pBufferCache);
+	free(_PrGpuMem->pUBO);
+	free(_PrGpuMem);
+}
 #else
 #   "error what's the fucking platform"
 #endif
@@ -2273,6 +2634,7 @@ blVSync(IN BLBool _On)
 #	elif defined(BL_PLATFORM_IOS)
 #	elif defined(BL_PLATFORM_ANDROID)
         eglSwapInterval(_PrGpuMem->pEglDisplay, _On);
+#	elif defined(BL_PLATFORM_WEB)
 #	endif
 	}
 #elif defined(BL_MTL_BACKEND)
@@ -2286,15 +2648,18 @@ blVSync(IN BLBool _On)
 #elif defined(BL_DX_BACKEND)
 	if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
 	{
+		_PrGpuMem->nSyncInterval = _On ? 60 : 1;
 	}
 #endif
 }
-BLVoid
-blHardwareCapsQuery(OUT BLEnum* _Api, OUT BLU32* _MaxTexSize, OUT BLU32* _MaxFramebuffer, OUT BLBool _TexSupport[BL_TF_COUNT], IN BLBool _Force)
+BLVoid 
+blHardwareCapsQuery(OUT BLEnum* _Api, OUT BLBool* _CSSupport, OUT BLBool* _GSSupport, OUT BLBool* _TSSupport, OUT BLBool* _FloatRTSupport, OUT BLBool _TexSupport[BL_TF_COUNT])
 {
 	*_Api = _PrGpuMem->sHardwareCaps.eApiType;
-	*_MaxTexSize = _PrGpuMem->sHardwareCaps.nMaxTextureSize;
-	*_MaxFramebuffer = _PrGpuMem->sHardwareCaps.nMaxFBAttachments;
+	*_CSSupport = _PrGpuMem->sHardwareCaps.bCSSupport;
+	*_GSSupport = _PrGpuMem->sHardwareCaps.bGSSupport;
+	*_TSSupport = _PrGpuMem->sHardwareCaps.bTSSupport;
+	*_FloatRTSupport = _PrGpuMem->sHardwareCaps.bFloatRTSupport;
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
 		_TexSupport[_idx] = _PrGpuMem->sHardwareCaps.aTexFormats[_idx];
 }
@@ -3776,7 +4141,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
 	BLBool _cache = FALSE;
 	_BLTechnique* _tech;
 	blMutexLock(_PrGpuMem->pTechCache->pMutex);
-	_BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTechCache, blHashUtf8((const BLUtf8*)_Filename));
+	_BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTechCache, blHashString((const BLUtf8*)_Filename));
 	_tech = _res ? (_BLTechnique*)_res->pRes : NULL;
 	if (_res)
 		_res->nRefCount++;
@@ -3834,12 +4199,13 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
 		}
 #endif
 	}
-    BLU32 _hash = blHashUtf8((const BLUtf8*)_Filename);
+    BLU32 _hash = blHashString((const BLUtf8*)_Filename);
     BLGuid _stream = INVALID_GUID;
     BLAnsi _path[260] = { 0 };
     BLBool _findbinary = FALSE;
     ezxml_t _doc = NULL;
     const BLAnsi* _vert = NULL, *_frag = NULL, *_geom = NULL, *_tesc = NULL, *_tess = NULL, *_comp = NULL;
+#if !defined(BL_PLATFORM_WEB)
     if (!_ForceCompile)
     {
         memset(_path, 0, 260 * sizeof(BLAnsi));
@@ -3848,6 +4214,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
         _stream = blGenStream(_path);
         _findbinary = (_stream == INVALID_GUID) ? FALSE : TRUE;
     }
+#endif
     if (!_findbinary)
     {
         _stream = blGenStream(_Filename);
@@ -3891,7 +4258,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
             _tech->uData.sGL.nHandle = glCreateProgram();
             if (_vert)
             {
-#if defined(BL_PLATFORM_ANDROID) || defined(BL_PLATFORM_IOS)
+#if defined(BL_PLATFORM_ANDROID) || defined(BL_PLATFORM_IOS) || defined(BL_PLATFORM_WEB)
 				sprintf(_glslver, "#version %d es\n", _PrGpuMem->sHardwareCaps.nApiVersion);
 #else
 				sprintf(_glslver, "#version %d core\n", _PrGpuMem->sHardwareCaps.nApiVersion);
@@ -3922,7 +4289,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
             }
             if (_frag)
             {
-#if defined(BL_PLATFORM_ANDROID) || defined(BL_PLATFORM_IOS)
+#if defined(BL_PLATFORM_ANDROID) || defined(BL_PLATFORM_IOS) || defined(BL_PLATFORM_WEB)
 				sprintf(_glslver, "#version %d es\n#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n", _PrGpuMem->sHardwareCaps.nApiVersion);
 #else
 				sprintf(_glslver, "#version %d core\n", _PrGpuMem->sHardwareCaps.nApiVersion);
@@ -3973,7 +4340,9 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
                     GL_CHECK_INTERNAL(glAttachShader(_tech->uData.sGL.nHandle, _gs));
                 }
             }
+#if !defined(BL_PLATFORM_WEB)
             GL_CHECK_INTERNAL(glProgramParameteri(_tech->uData.sGL.nHandle, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE));
+#endif
             GL_CHECK_INTERNAL(glLinkProgram(_tech->uData.sGL.nHandle));
             GL_CHECK_INTERNAL(glGetProgramiv(_tech->uData.sGL.nHandle, GL_LINK_STATUS, &_linked));
             if (!_linked)
@@ -3987,6 +4356,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
                     blDebugOutput(_info);
                 }
             }
+#if !defined(BL_PLATFORM_WEB)
             GLint _len = 0;
             GL_CHECK_INTERNAL(glGetProgramiv(_tech->uData.sGL.nHandle, GL_PROGRAM_BINARY_LENGTH, &_len));
             if (_len)
@@ -3998,6 +4368,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
 				strcat(_path, _Filename);
                 blFileWrite(_path, _len * sizeof(BLU8) + sizeof(GLenum), _binary);
             }
+#endif
             if (_vs)
             {
                 GL_CHECK_INTERNAL(glDeleteShader(_vs));
@@ -4013,6 +4384,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
         }
         else
         {
+#if !defined(BL_PLATFORM_WEB)
             GLint _linked = 0;
             _tech->uData.sGL.nHandle = glCreateProgram();
             GLenum _format = 0;
@@ -4031,6 +4403,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
                     blDebugOutput(_info);
                 }
             }
+#endif
         }
     }
 #elif defined(BL_MTL_BACKEND)
@@ -4044,6 +4417,138 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
 #elif defined(BL_DX_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
     {
+#if defined(_DEBUG)
+		UINT _compileflags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#else
+		UINT _compileflags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
+#endif
+		BLU32 _written = 0;
+		if (!_findbinary)
+		{
+			BLU8* _bs = NULL;
+			if (_vert)
+			{
+				ID3DBlob* _err;
+				D3DCompile(_vert, strlen(_vert), "VS", nullptr, nullptr, "main", "vs_5_0", _compileflags, 0, &_tech->uData.sDX.pVS, &_err);
+				if (_err)
+				{
+					blDebugOutput((LPCSTR)_err->GetBufferPointer());
+					_err->Release();
+				}
+				else
+				{
+					_bs = (BLU8*)realloc(_bs, _written + sizeof(BLU8) + sizeof(BLU32) + _tech->uData.sDX.pVS->GetBufferSize());
+					BLU8 _tag = 0;
+					memcpy(_bs + _written, &_tag, sizeof(BLU8));
+					_written += sizeof(BLU8);
+					BLU32 _sz = _tech->uData.sDX.pVS->GetBufferSize();
+					memcpy(_bs + _written, &_sz, sizeof(BLU32));
+					_written += sizeof(BLU32);
+					memcpy(_bs + _written, _tech->uData.sDX.pVS->GetBufferPointer(), _tech->uData.sDX.pVS->GetBufferSize());
+					_written += _tech->uData.sDX.pVS->GetBufferSize();
+				}
+			}
+			if (_frag)
+			{
+				ID3DBlob* _err;
+				D3DCompile(_frag, strlen(_frag), "PS", nullptr, nullptr, "main", "ps_5_0", _compileflags, 0, &_tech->uData.sDX.pPS, &_err);
+				if (_err)
+				{
+					blDebugOutput((LPCSTR)_err->GetBufferPointer());
+					_err->Release();
+				}
+				else
+				{
+					_bs = (BLU8*)realloc(_bs, _written + sizeof(BLU8) + sizeof(BLU32) + _tech->uData.sDX.pPS->GetBufferSize());
+					BLU8 _tag = 1;
+					memcpy(_bs + _written, &_tag, sizeof(BLU8));
+					_written += sizeof(BLU8);
+					BLU32 _sz = _tech->uData.sDX.pPS->GetBufferSize();
+					memcpy(_bs + _written, &_sz, sizeof(BLU32));
+					_written += sizeof(BLU32);
+					memcpy(_bs + _written, _tech->uData.sDX.pPS->GetBufferPointer(), _tech->uData.sDX.pPS->GetBufferSize());
+					_written += _tech->uData.sDX.pPS->GetBufferSize();
+				}
+			}
+			if (_geom && _PrGpuMem->sHardwareCaps.bGSSupport)
+			{
+				ID3DBlob* _err;
+				D3DCompile(_geom, strlen(_geom), "GS", nullptr, nullptr, "main", "gs_5_0", _compileflags, 0, &_tech->uData.sDX.pGS, &_err);
+				if (_err)
+				{
+					blDebugOutput((LPCSTR)_err->GetBufferPointer());
+					_err->Release();
+				}
+				else
+				{
+					_bs = (BLU8*)realloc(_bs, _written + sizeof(BLU8) + sizeof(BLU32) + _tech->uData.sDX.pGS->GetBufferSize());
+					BLU8 _tag = 2;
+					memcpy(_bs + _written, &_tag, sizeof(BLU8));
+					_written += sizeof(BLU8);
+					BLU32 _sz = _tech->uData.sDX.pGS->GetBufferSize();
+					memcpy(_bs + _written, &_sz, sizeof(BLU32));
+					_written += sizeof(BLU32);
+					memcpy(_bs + _written, _tech->uData.sDX.pGS->GetBufferPointer(), _tech->uData.sDX.pGS->GetBufferSize());
+					_written += _tech->uData.sDX.pGS->GetBufferSize();
+				}
+			}
+			if (_written && _compileflags == D3DCOMPILE_OPTIMIZATION_LEVEL3)
+			{
+				memset(_path, 0, 260 * sizeof(BLAnsi));
+				strcpy(_path, "b");
+				strcat(_path, _Filename);
+				blFileWrite(_path, _written, _bs);
+			}
+		}
+		else
+		{
+			while (!blStreamEos(_stream))
+			{
+				BLU8 _tag;
+				blStreamRead(_stream, sizeof(BLU8), &_tag);
+				BLU32 _sz;
+				blStreamRead(_stream, sizeof(BLU32), &_sz);
+				BLU8* _buf = NULL;
+				switch (_tag)
+				{
+				case 0:
+					_buf = (BLU8*)realloc(_buf, _sz);
+					blStreamRead(_stream, _sz, _buf);
+					D3DCreateBlob(_sz, &_tech->uData.sDX.pVS);
+					CopyMemory(_tech->uData.sDX.pVS->GetBufferPointer(), _buf, _sz);
+					break;
+				case 1:
+					_buf = (BLU8*)realloc(_buf, _sz);
+					blStreamRead(_stream, _sz, _buf);
+					D3DCreateBlob(_sz, &_tech->uData.sDX.pPS);
+					CopyMemory(_tech->uData.sDX.pPS->GetBufferPointer(), _buf, _sz);
+					break;
+				case 2:
+					_buf = (BLU8*)realloc(_buf, _sz);
+					blStreamRead(_stream, _sz, _buf);
+					D3DCreateBlob(_sz, &_tech->uData.sDX.pGS);
+					CopyMemory(_tech->uData.sDX.pGS->GetBufferPointer(), _buf, _sz);
+					break;
+				case 3:
+					_buf = (BLU8*)realloc(_buf, _sz);
+					blStreamRead(_stream, _sz, _buf);
+					D3DCreateBlob(_sz, &_tech->uData.sDX.pDS);
+					CopyMemory(_tech->uData.sDX.pDS->GetBufferPointer(), _buf, _sz);
+					break;
+				case 4:
+					_buf = (BLU8*)realloc(_buf, _sz);
+					blStreamRead(_stream, _sz, _buf);
+					D3DCreateBlob(_sz, &_tech->uData.sDX.pHS);
+					CopyMemory(_tech->uData.sDX.pHS->GetBufferPointer(), _buf, _sz);
+					break;
+				default:
+					assert(0);
+					break;
+				}
+				if (_buf)
+					free(_buf);
+			}
+		}
     }
 #endif
 	if (!_findbinary)
@@ -4104,6 +4609,16 @@ blDeleteTechnique(IN BLGuid _Tech)
 #elif defined(BL_DX_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
     {
+		if (_tech->uData.sDX.pVS)
+			_tech->uData.sDX.pVS->Release();
+		if (_tech->uData.sDX.pPS)
+			_tech->uData.sDX.pPS->Release();
+		if (_tech->uData.sDX.pGS)
+			_tech->uData.sDX.pGS->Release();
+		if (_tech->uData.sDX.pDS)
+			_tech->uData.sDX.pDS->Release();
+		if (_tech->uData.sDX.pHS)
+			_tech->uData.sDX.pHS->Release();
     }
 #endif
 	free(_tech);

@@ -708,9 +708,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\userauth.c">
       <Filter>externals\sqlite3</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftapi.c">
       <Filter>externals\freetype2\dummy</Filter>
     </ClCompile>
@@ -747,10 +744,15 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tinfl.c">
       <Filter>externals\miniz</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h">

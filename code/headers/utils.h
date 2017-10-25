@@ -53,11 +53,8 @@ BL_API BLS32 blNatCompare(
 	IN BLAnsi* _StrA,
 	IN BLAnsi* _StrB);
 
-BL_API BLU32 blHashUtf8(
+BL_API BLU32 blHashString(
 	IN BLUtf8* _Str);
-
-BL_API BLU32 blHashUtf16(
-	IN BLUtf16* _Str);
 
 BL_API BLU32 blUtf8Length(
 	IN BLUtf8* _Str);

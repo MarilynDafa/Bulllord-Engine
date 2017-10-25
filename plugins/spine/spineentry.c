@@ -524,7 +524,7 @@ BLVoid
 blSpineOpenEXT()
 {
 	_PrSpineMem = (_BLSpineMemberExt*)malloc(sizeof(_BLSpineMemberExt));
-	_PrSpineMem->nTech = blGainTechnique(blHashUtf8((const BLUtf8*)"shaders/2D.bsl"));
+	_PrSpineMem->nTech = blGainTechnique(blHashString((const BLUtf8*)"shaders/2D.bsl"));
 	_PrSpineMem->nBlendMode = 0;
 	blRegistExternalMethod("json", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw);
 	blRegistExternalMethod("skel", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw);

@@ -669,7 +669,7 @@ blVideoOpenEXT()
 	_PrVideoMem->pImgDataCache->pFirst = _PrVideoMem->pImgDataCache->pLast = NULL;
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-	_PrVideoMem->nTech = blGainTechnique(blHashUtf8((const BLUtf8*)"shaders/2D.bsl"));
+	_PrVideoMem->nTech = blGainTechnique(blHashString((const BLUtf8*)"shaders/2D.bsl"));
 	BLF32 _vbo[] = {
 		0.f,
 		0.f,

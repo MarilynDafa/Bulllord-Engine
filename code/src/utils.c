@@ -34,7 +34,7 @@ typedef struct _MemCache {
 	BLU32* pSparse;
 }_BLMemCache;
 typedef struct _UtilsMember {
-	duk_context* pDukContext;
+	DUK_CONTEXT* pDukContext;
 	_BLMemCache sMemCache;
 	BLVoid* aPtrBuf[MEMCACHE_CAP_INTERNAL];
 	blMutex* pMutex;
@@ -176,7 +176,7 @@ _MD5Update(BLU8* _Input, BLU32 _Inputlen)
 	memcpy(_PrUtilsMem->sContext.aBuffer + _index, _Input + _i, _Inputlen - _i);
 }
 BLVoid
-_UtilsInit(duk_context* _DKC)
+_UtilsInit(DUK_CONTEXT* _DKC)
 {
 	BLU32 _idx;
 	_PrUtilsMem = (_BLUtilsMember*)malloc(sizeof(_BLUtilsMember));
@@ -217,7 +217,7 @@ blUniqueUri()
 #else
     sprintf(_buf, "%s_%u", "BulllordEngineUniqueUriCount", _PrUtilsMem->nUriCount);
 #endif
-    return blHashUtf8((const BLUtf8*)_buf);
+    return blHashString((const BLUtf8*)_buf);
 }
 BLGuid
 blGenGuid(IN BLVoid* _Ptr, IN BLU32 _Uri)
@@ -309,6 +309,8 @@ blDebugOutput(IN BLAnsi* _Format, ...)
 #elif defined(BL_PLATFORM_OSX)
     printf("BULLLORD DEBUG INFORMATION > %s\n", _szbuf);
 #elif defined(BL_PLATFORM_IOS)
+	printf("BULLLORD DEBUG INFORMATION > %s\n", _szbuf);
+#elif defined(BL_PLATFORM_WEB)
 	printf("BULLLORD DEBUG INFORMATION > %s\n", _szbuf);
 #endif
 #endif
@@ -459,111 +461,18 @@ blNatCompare(IN BLAnsi* _StrA, IN BLAnsi* _StrB)
 	return 0;
 }
 BLU32
-blHashUtf8(IN BLUtf8* _Str)
+blHashString(IN BLUtf8* _Str)
 {
-	BLS8* _data;
-	BLS32 _rem;
-	BLU32 _h , _tmp;
-	const BLUtf8* _stmp = _Str;
-	BLU32 _len = 0;
-	while (*_stmp++)
-		_len++;
-	_data = (BLS8*)_Str;
-	_h = _len;
-	if (_len <= 0 || _data == NULL)
+	if (!_Str)
 		return 0;
-	_rem = _len & 3;
-	_len >>= 2;
-	for (; _len > 0; _len--)
-	{
-		_h += *((const BLU16*)_data);
-		_tmp = (*((const BLU16*)(_data + 2)) << 11) ^ _h;
-		_h = (_h << 16) ^ _tmp;
-		_data += 2 * sizeof (BLU16);
-		_h += _h >> 11;
-	}
-	switch (_rem)
-	{
-	case 3:
-		_h += *((const BLU16*)_data);
-		_h ^= _h << 16;
-		_h ^= ((BLS8)_data[sizeof (BLU16)]) << 18;
-		_h += _h >> 11;
-		break;
-	case 2:
-		_h += *((const BLU16*)_data);
-		_h ^= _h << 11;
-		_h += _h >> 17;
-		break;
-	case 1:
-		_h += (BLS8)*_data;
-		_h ^= _h << 10;
-		_h += _h >> 1;
-		break;
-    default:
-        break;
-	}
-	_h ^= _h << 3;
-	_h += _h >> 5;
-	_h ^= _h << 4;
-	_h += _h >> 17;
-	_h ^= _h << 25;
-	_h += _h >> 6;
-	return _h;
-}
-BLU32
-blHashUtf16(IN BLUtf16* _Str)
-{
-	BLS8* _data;
-	BLS32 _rem;
-	BLU32 _h , _tmp;
-	const BLUtf16* _stmp = _Str;
-	BLU32 _len = 0;
-	while (*_stmp++)
-		_len++;
-	_len = 2 * _len;
-	_data = (BLS8*)_Str;
-	_h = _len;
-	if (_len <= 0 || _data == NULL)
-		return 0;
-	_rem = _len & 3;
-	_len >>= 2;
-	for (; _len > 0; _len--)
-	{
-		_h += *((const BLU16*)_data);
-		_tmp = (*((const BLU16*)(_data + 2)) << 11) ^ _h;
-		_h = (_h << 16) ^ _tmp;
-		_data += 2 * sizeof (BLU16);
-		_h += _h >> 11;
-	}
-	switch (_rem)
-	{
-	case 3:
-		_h += *((const BLU16*)_data);
-		_h ^= _h << 16;
-		_h ^= ((BLS8)_data[sizeof (BLU16)]) << 18;
-		_h += _h >> 11;
-		break;
-	case 2:
-		_h += *((const BLU16*)_data);
-		_h ^= _h << 11;
-		_h += _h >> 17;
-		break;
-	case 1:
-		_h += (BLS8)*_data;
-		_h ^= _h << 10;
-		_h += _h >> 1;
-		break;
-    default:
-        break;
-	}
-	_h ^= _h << 3;
-	_h += _h >> 5;
-	_h ^= _h << 4;
-	_h += _h >> 17;
-	_h ^= _h << 25;
-	_h += _h >> 6;
-	return _h;
+	const BLUtf8* _tmp = _Str;
+	BLU32 _cnt = 0;
+	while (*_tmp++)
+		_cnt++;
+	BLU32 _crc32val = 0;
+	for (BLU32 _i = 0; _i < _cnt; ++_i)
+		_crc32val = CRCCODE_INTERNAL[(_crc32val ^ _Str[_i]) & 0xFF] ^ (_crc32val >> 8);
+	return _crc32val;
 }
 BLU32
 blUtf8Length(IN BLUtf8* _Str)
@@ -1274,8 +1183,8 @@ blRLEDecode(IN BLU8* _Src, IN BLU32 _Dstlen, INOUT BLU8* _Dst)
 	BLU8 *_ip = (BLU8*)_Src, *_op = _Dst;
 	BLU32 _idx;
 	BLS32 _c, _pc = -1;
-	BLS64 _t[256] = { 0 };
-	BLS64 _run = 0;
+	BLS32 _t[256] = { 0 };
+	BLS32 _run = 0;
 	for (_idx = 0; _idx < 32; ++_idx)
 	{
 		BLU32 _jdx;
@@ -1294,7 +1203,7 @@ blRLEDecode(IN BLU8* _Src, IN BLU32 _Dstlen, INOUT BLU8* _Dst)
 				*_op++ = _c;
 		}
 		else
-			*_op++ = _c;
+			*(_op++) = _c;
 	}
 }
 

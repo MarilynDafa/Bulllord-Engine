@@ -29,8 +29,10 @@ BL_API BLVoid blVSync(
 
 BL_API BLVoid blHardwareCapsQuery(
 	OUT BLEnum* _Api,
-	OUT BLU32* _MaxTexSize,
-	OUT BLU32* _MaxFramebuffer,
+	OUT BLBool* _CSSupport,
+	OUT BLBool* _GSSupport,
+	OUT BLBool* _TSSupport,
+	OUT BLBool* _FloatRTSupport,
     OUT BLBool _TexSupport[BL_TF_COUNT]);
     
 /**

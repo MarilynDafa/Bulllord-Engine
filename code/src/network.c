@@ -52,7 +52,7 @@ typedef struct  _HttpSect {
 }_BLHttpSect;
 #pragma pack()
 typedef struct _NetworkMember {
-	duk_context* pDukContext;
+	DUK_CONTEXT* pDukContext;
 	BLAnsi aHost[64];
 	BLU16 nPort;
 	BLList* pCriList;
@@ -84,7 +84,7 @@ typedef struct _NetworkMember {
 static _BLNetworkMember* _PrNetworkMem = NULL;
 
 BLVoid
-_NetworkInit(duk_context* _DKC)
+_NetworkInit(DUK_CONTEXT* _DKC)
 {
 	_PrNetworkMem = (_BLNetworkMember*)malloc(sizeof(_BLNetworkMember));
 	memset(_PrNetworkMem->aHost, 0, sizeof(_PrNetworkMem->aHost));
@@ -1407,7 +1407,7 @@ success:
 		}
 		_PrNetworkMem->nCurDownTotal = _filesz;
 		_PrNetworkMem->nCurDownSize = 0;
-		_PrNetworkMem->_PrCurDownHash = blHashUtf8((const BLUtf8*)_url);
+		_PrNetworkMem->_PrCurDownHash = blHashString((const BLUtf8*)_url);
 		BLThread* _workthread[3];
 		for (_idx = 0; _idx < 3; ++_idx)
 		{
@@ -2277,7 +2277,7 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 #endif
 	blArrayPushBack(_PrNetworkMem->pDownList, _remoteurl);
 	blArrayPushBack(_PrNetworkMem->pLocalList, _localpath);
-	*_Taskid = blHashUtf8((const BLUtf8*)_Host);
+	*_Taskid = blHashString((const BLUtf8*)_Host);
 	return TRUE;
 }
 BLVoid

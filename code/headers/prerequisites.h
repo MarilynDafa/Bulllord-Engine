@@ -21,7 +21,7 @@
 #ifndef __prerequisiters_h_
 #define __prerequisiters_h_
 #if defined(EMSCRIPTEN)
-#	define BL_PLATFORM_WEB
+#	define BL_PLATFORM_WEB	0
 #elif defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #	if defined(WINAPI_FAMILY)
 #		if WINAPI_FAMILY == WINAPI_FAMILY_APP|| WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
@@ -176,6 +176,7 @@
 #	ifndef WIN32_LEAN_AND_MEAN
 #		define WIN32_LEAN_AND_MEAN
 #	endif
+#	pragma warning(disable: 4005)
 #	include <windows.h>
 #	include <WinSock2.h>
 #	include <Ws2tcpip.h>
@@ -209,6 +210,9 @@
 #	include <netinet/tcp.h>
 #	include <arpa/inet.h>
 #   include <errno.h>
+#	include <emscripten/emscripten.h>
+#	include <emscripten/threading.h>
+#	include <GLFW/glfw3.h>
 #   define BL_GL_BACKEND
 #else
 #	error "what's the fucking platform"
@@ -731,10 +735,9 @@ typedef unsigned long long BLGuid;
 #define BL_TF_RGB10A2	38	//Lighting accumulate
 #define BL_TF_DS_UNKNOWN	39
 #define BL_TF_D16		40
-#define BL_TF_D24		41
-#define BL_TF_D32		42
-#define BL_TF_D24S8		43
-#define BL_TF_COUNT		44
+#define BL_TF_D32		41
+#define BL_TF_D24S8		42
+#define BL_TF_COUNT		43
 
 /* _CUBE_TEXTURE_FACE */
 #define BL_CTF_IGNORE		-1

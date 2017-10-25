@@ -86,7 +86,7 @@ typedef struct _Stream {
 	BLU8* pEnd;
 }_BLStream;
 typedef struct _StreamIOMember {
-	duk_context* pDukContext;
+	DUK_CONTEXT* pDukContext;
 	BLVoid* pAndroidAM;
 	BLArray* pArchives;
 	sqlite3* pSqlDB;
@@ -119,6 +119,47 @@ _ProcessDmlRow(BLVoid* _Db, BLS32 _Count, BLAnsi** _Values, BLAnsi** _Columns)
     sqlite3_free(_stmt);
     return 0;
 }
+#if defined(BL_PLATFORM_WEB)
+BLVoid 
+_OnWGetLoaded(const BLAnsi* _Filename)
+{
+	blDebugOutput("download file %s", _Filename);
+	FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
+	{
+		blDebugOutput("%s -> %s", _iter->nFilename, _Filename);
+		if (!strcmp(_iter->nFilename, _Filename + 1))
+		{
+			blDebugOutput("beginsize %d", _PrStreamIOMem->pLoadingQueue->nSize);
+			BLBool _ret = _iter->fLoad(_iter->pRes, _iter->nFilename);
+			if (_ret)
+			{
+				blListPushBack(_PrStreamIOMem->pSetupQueue, _iter);
+				//blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
+			}
+			else
+			{
+				//blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
+				free(_iter);
+			}			
+			blDebugOutput("end %d", _PrStreamIOMem->pLoadingQueue->nSize);
+		}
+	}
+}
+BLVoid
+_OnWGetError(const BLAnsi* _Filename)
+{
+	blDebugOutput("%s wget error", _Filename);
+	FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
+	{
+		if (!strcmp(_iter->nFilename, _Filename + 1))
+		{			
+			blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
+			free(_iter);
+			break;
+		}
+	}
+}
+#endif
 BLBool
 _FetchResource(const BLAnsi* _Filename, BLVoid** _Res, BLGuid _ID, BLBool(*_Load)(BLVoid*, const BLAnsi*), BLBool(*_Setup)(BLVoid*), BLBool _Async)
 {
@@ -156,6 +197,29 @@ _FetchResource(const BLAnsi* _Filename, BLVoid** _Res, BLGuid _ID, BLBool(*_Load
 		}
 		else
 		{
+#if defined(BL_PLATFORM_WEB)
+			_Load(*_Res, _Filename);
+			_Setup(*_Res);
+			return TRUE;
+			BLAnsi _tmp[260] = { 0 };
+			strcpy(_tmp, blWorkingDir());
+			strcat(_tmp, _Filename);
+			blDebugOutput("loadfile : %s", _tmp);
+			if (access(_tmp, 0) == -1)
+			{
+				BLBool _needwget = TRUE;
+				FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
+				{
+					if (!strcmp(_Filename, _Filename))
+					{
+						_needwget = FALSE;
+						break;
+					}	
+				}
+				if (_needwget)
+					emscripten_async_wget(_tmp, _tmp, _OnWGetLoaded, _OnWGetError);
+			}
+#endif
 			_node = (_BLResNode*)malloc(sizeof(_BLResNode));
 			memset(_node->nFilename, 0, sizeof(_node->nFilename));
 			strcpy(_node->nFilename, _Filename);
@@ -246,7 +310,7 @@ _LoadThreadFunc(BLVoid* _Userdata)
 #endif
 }
 BLVoid
-_StreamIOInit(duk_context* _DKC, BLVoid* _AssetMgr)
+_StreamIOInit(DUK_CONTEXT* _DKC, BLVoid* _AssetMgr)
 {
 	_PrStreamIOMem = (_BLStreamIOMember*)malloc(sizeof(_BLStreamIOMember));
 	_PrStreamIOMem->pDukContext = _DKC;
@@ -254,8 +318,10 @@ _StreamIOInit(duk_context* _DKC, BLVoid* _AssetMgr)
 	_PrStreamIOMem->pArchives = blGenArray(FALSE);
 	_PrStreamIOMem->pLoadingQueue = blGenList(TRUE);
 	_PrStreamIOMem->pSetupQueue = blGenList(TRUE);
+#if !defined(BL_PLATFORM_WEB)
 	_PrStreamIOMem->pLoadThread = blGenThread(_LoadThreadFunc, NULL, NULL);
 	blThreadRun(_PrStreamIOMem->pLoadThread);
+#endif
 	blArchiveRegist("localdata0079.bpk", "localdata0079");
 	blArchiveRegist("remotedata0084.bpk", "remotedata0084");
 	BLAnsi _path[260];
@@ -380,7 +446,7 @@ blGenStream(IN BLAnsi* _Filename)
 				if (_tmpname[_i] == '\\')
 					_tmpname[_i] = '/';
 			}
-			_id = blHashUtf8((const BLUtf8*)_tmpname);
+			_id = blHashString((const BLUtf8*)_tmpname);
 			_file = (_BLBpkFileEntry*)blDictElement(_iter->pFiles, _id);
 			if (_file)
 			{
@@ -466,7 +532,7 @@ blGenStream(IN BLAnsi* _Filename)
 			_ret->pPos = (BLU8*)_ret->pBuffer;
 			_ret->pEnd = _ret->pPos + _ret->nLen;
 			CloseHandle(_fp);
-			return blGenGuid(_ret, blHashUtf8(_path));
+			return blGenGuid(_ret, blHashString(_path));
 		}
 		else
 		{
@@ -504,7 +570,7 @@ blGenStream(IN BLAnsi* _Filename)
 				_ret->pPos = (BLU8*)_ret->pBuffer;
 				_ret->pEnd = _ret->pPos + _ret->nLen;
 				CloseHandle(_fp);
-				return blGenGuid(_ret, blHashUtf8(_path));
+				return blGenGuid(_ret, blHashString(_path));
 			}
 			else
 				return INVALID_GUID;
@@ -522,7 +588,7 @@ blGenStream(IN BLAnsi* _Filename)
 			_ret->pPos = (BLU8*)_ret->pBuffer;
 			_ret->pEnd = _ret->pPos + _ret->nLen;
 			AAsset_close(_fp);
-			return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_path));
+			return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
 		}
 		else
 		{
@@ -532,13 +598,8 @@ blGenStream(IN BLAnsi* _Filename)
 			BLU32 _tmplen = (BLU32)strlen(_path);
 			for (_i = 0; _i < _tmplen; ++_i)
 			{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-				if (_path[_i] == '/')
-					_path[_i] = '\\';
-#else
 				if (_path[_i] == '\\')
 					_path[_i] = '/';
-#endif
 			}
 			FILE* _fp2 = fopen(_path, "rb");
 			if (FILE_INVALID_INTERNAL(_fp2))
@@ -554,7 +615,46 @@ blGenStream(IN BLAnsi* _Filename)
 				_ret->pPos = (BLU8*)_ret->pBuffer;
 				_ret->pEnd = _ret->pPos + _ret->nLen;
 				fclose(_fp2);
-				return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_path));
+				return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
+			}
+			else
+				return INVALID_GUID;
+		}
+#elif defined(BL_PLATFORM_WEB)
+		FILE* _fp = fopen(_path, "rb");
+		if (FILE_INVALID_INTERNAL(_fp))
+		{
+			BLU32 _datasz;
+			fseek(_fp, 0, SEEK_END);
+			_datasz = (BLU32)ftell(_fp);
+			fseek(_fp, 0, SEEK_SET);
+			_ret = (_BLStream*)malloc(sizeof(_BLStream));
+			_ret->pBuffer = malloc(_datasz);
+			fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp);
+			_ret->nLen = _datasz;
+			_ret->pPos = (BLU8*)_ret->pBuffer;
+			_ret->pEnd = _ret->pPos + _ret->nLen;
+			fclose(_fp);
+			return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
+		}
+		else
+		{
+			emscripten_wget(_path, _path);
+			FILE* _fp = fopen(_path, "rb");
+			if (FILE_INVALID_INTERNAL(_fp))
+			{
+				BLU32 _datasz;
+				fseek(_fp, 0, SEEK_END);
+				_datasz = (BLU32)ftell(_fp);
+				fseek(_fp, 0, SEEK_SET);
+				_ret = (_BLStream*)malloc(sizeof(_BLStream));
+				_ret->pBuffer = malloc(_datasz);
+				fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp);
+				_ret->nLen = _datasz;
+				_ret->pPos = (BLU8*)_ret->pBuffer;
+				_ret->pEnd = _ret->pPos + _ret->nLen;
+				fclose(_fp);
+				return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
 			}
 			else
 				return INVALID_GUID;
@@ -574,7 +674,7 @@ blGenStream(IN BLAnsi* _Filename)
 			_ret->pPos = (BLU8*)_ret->pBuffer;
 			_ret->pEnd = _ret->pPos + _ret->nLen;
 			fclose(_fp);
-			return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_path));
+			return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
 		}
 		else
 		{
@@ -584,13 +684,8 @@ blGenStream(IN BLAnsi* _Filename)
 			_tmplen = (BLU32)strlen(_path);
 			for (_i = 0; _i < _tmplen; ++_i)
 			{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-				if (_path[_i] == '/')
-					_path[_i] = '\\';
-#else
 				if (_path[_i] == '\\')
 					_path[_i] = '/';
-#endif
 			}
 			_fp = fopen(_path, "rb");
 			if (FILE_INVALID_INTERNAL(_fp))
@@ -606,7 +701,7 @@ blGenStream(IN BLAnsi* _Filename)
 				_ret->pPos = (BLU8*)_ret->pBuffer;
 				_ret->pEnd = _ret->pPos + _ret->nLen;
 				fclose(_fp);
-				return blGenGuid(_ret, blHashUtf8((const BLUtf8*)_path));
+				return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
 			}
 			else
 				return INVALID_GUID;

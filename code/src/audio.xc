@@ -109,7 +109,7 @@ typedef struct _AudioSource{
 #endif
 }_BLAudioSource;
 typedef struct _AudioMember {
-	duk_context* pDukContext;
+	DUK_CONTEXT* pDukContext;
 	_BLAudioDevice pAudioDev;
 	_BLAudioSource* pBackMusic;
 	BLList* pSounds;
@@ -399,13 +399,13 @@ _ALSoundSetup(BLVoid* _Src)
     alSourcei(_src->nSource, AL_BUFFER, 0);
 	ALint _alfmt = 0;
 	if (_src->nChannels == 1 && _src->nBPS == 8)
-		return 0x1100;
+		_alfmt = 0x1100;
 	else if (_src->nChannels == 1 && _src->nBPS == 16)
-		return 0x1101;
+		_alfmt = 0x1101;
 	else if (_src->nChannels == 2 && _src->nBPS == 8)
-		return 0x1102;
+		_alfmt = 0x1102;
 	else
-		return 0x1103;
+		_alfmt = 0x1103;
     for (BLU32 _i = 0; _i < 3; ++_i)
     {
         BLU32 _tmpsz;
@@ -473,13 +473,13 @@ _ALUpdate(_BLAudioSource* _Src)
     ALenum _state = 0;
 	ALint _alfmt = 0;
 	if (_Src->nChannels == 1 && _Src->nBPS == 8)
-		return 0x1100;
+		_alfmt = 0x1100;
 	else if (_Src->nChannels == 1 && _Src->nBPS == 16)
-		return 0x1101;
+		_alfmt = 0x1101;
 	else if (_Src->nChannels == 2 && _Src->nBPS == 8)
-		return 0x1102;
+		_alfmt = 0x1102;
 	else
-		return 0x1103;
+		_alfmt = 0x1103;
     alGetSourcei(_Src->nSource, AL_SOURCE_STATE, &_state);
     if (_state == AL_PLAYING)
     {
@@ -908,7 +908,7 @@ _CADestroy()
 }
 #endif
 BLVoid
-_AudioInit(duk_context* _DKC)
+_AudioInit(DUK_CONTEXT* _DKC)
 {
 	_PrAudioMem = (_BLAudioMember*)malloc(sizeof(_BLAudioMember));
 	_PrAudioMem->pDukContext = _DKC;
@@ -1146,7 +1146,7 @@ blGenAudio(IN BLAnsi* _Filename, IN BLBool _Loop, IN BLBool _3D, IN BLF32 _Xpos,
 	_sound->sPos.fX = _Xpos;
 	_sound->sPos.fY = _Ypos;
 	_sound->sPos.fZ = _Zpos;
-	_sound->nID = blGenGuid(_sound, blHashUtf8((const BLUtf8*)_Filename));
+	_sound->nID = blGenGuid(_sound, blHashString((const BLUtf8*)_Filename));
 	_sound->bValid = FALSE;
 	_sound->pMp3Context = NULL;
 #if defined(BL_USE_AL_API)
@@ -1386,7 +1386,6 @@ blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 			if (_queued.count > 6)
 				blTickDelay(10);
 		} while (_queued.count > 6);
-#else
 #endif
 		_PrAudioMem->nPCMFill = 0;
 		_PrAudioMem->nPCMBufTurn++;
