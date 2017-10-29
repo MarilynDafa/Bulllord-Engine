@@ -39,6 +39,7 @@ typedef struct _HttpJob {
 	BLBool bOver;
 	BLSocket sSocket;
 	BLThread* pThread;
+	_BLNetMsg* pMsg;
 }_BLHttpJob;
 typedef struct  _HttpSect {
 	BLAnsi* pHost;
@@ -53,8 +54,12 @@ typedef struct  _HttpSect {
 #pragma pack()
 typedef struct _NetworkMember {
 	DUK_CONTEXT* pDukContext;
-	BLAnsi aHost[64];
-	BLU16 nPort;
+	BLAnsi aHostTCP[64];
+	BLU16 nPortTCP;
+	BLAnsi aHostUDP[64];
+	BLU16 nPortUDP;
+	BLAnsi aHostHTTP[64];
+	BLU16 nPortHTTP;
 	BLList* pCriList;
 	BLList* pNorList;
 	BLList* pRevList;
@@ -80,231 +85,9 @@ typedef struct _NetworkMember {
 	BLBool bIpv6;
 	BLBool bConnected;
 	BLSocket sTcpSocket;
+	BLSocket sUdpSocket;
 }_BLNetworkMember;
 static _BLNetworkMember* _PrNetworkMem = NULL;
-
-BLVoid
-_NetworkInit(DUK_CONTEXT* _DKC)
-{
-	_PrNetworkMem = (_BLNetworkMember*)malloc(sizeof(_BLNetworkMember));
-	memset(_PrNetworkMem->aHost, 0, sizeof(_PrNetworkMem->aHost));
-	_PrNetworkMem->pDukContext = _DKC;
-	_PrNetworkMem->nPort = 0;
-	_PrNetworkMem->pCriList = NULL;
-	_PrNetworkMem->pNorList = NULL;
-	_PrNetworkMem->pRevList = NULL;
-	_PrNetworkMem->pHttpJobArray = NULL;
-	_PrNetworkMem->pDownList = NULL;
-	_PrNetworkMem->pLocalList = NULL;
-	memset(_PrNetworkMem->nFinish, 0, sizeof(_PrNetworkMem->nFinish));
-	_PrNetworkMem->pConnThread = NULL;
-	_PrNetworkMem->pSendThread = NULL;
-	_PrNetworkMem->pRecvThread = NULL;
-	_PrNetworkMem->pDownMain = NULL;
-	_PrNetworkMem->_PrCurDownHash = -1;
-	_PrNetworkMem->nCurDownTotal = 0;
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-	_PrNetworkMem->nCurDownSize = 0;
-#elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
-	_PrNetworkMem->nCurDownSize = 0;
-#elif defined(BL_PLATFORM_LINUX)
-	_PrNetworkMem->nCurDownSize = 0;
-#else
-	_PrNetworkMem->nCurDownSize = 0;
-#endif
-	_PrNetworkMem->bIpv6 = FALSE;
-	_PrNetworkMem->bConnected = FALSE;
-	_PrNetworkMem->sTcpSocket = INVALID_SOCKET_INTERNAL;
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-	WSADATA ws;
-	WSAStartup(MAKEWORD(2, 2), &ws);
-#endif
-	_PrNetworkMem->pCriList = blGenList(TRUE);
-	_PrNetworkMem->pNorList = blGenList(TRUE);
-	_PrNetworkMem->pRevList = blGenList(TRUE);
-	_PrNetworkMem->pHttpJobArray = blGenList(TRUE);
-	_PrNetworkMem->pDownList = blGenArray(TRUE);
-	_PrNetworkMem->pLocalList = blGenArray(TRUE);
-	struct addrinfo* _result = NULL;
-	struct addrinfo* _curr;
-	BLS32 _ret = getaddrinfo("www.bing.com", NULL, NULL, &_result);
-	if (_ret == 0)
-	{
-		for (_curr = _result; _curr != NULL; _curr = _curr->ai_next)
-		{
-			switch (_curr->ai_family)
-			{
-			case AF_INET6:
-				_PrNetworkMem->bIpv6 = TRUE;
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	freeaddrinfo(_result);
-	blDebugOutput("Network initialize successfully");
-}
-BLVoid
-_NetworkDestroy()
-{
-	if (_PrNetworkMem->pConnThread)
-	{
-		blDeleteThread(_PrNetworkMem->pConnThread);
-		_PrNetworkMem->pConnThread = NULL;
-	}
-	if (_PrNetworkMem->pSendThread)
-	{
-		blDeleteThread(_PrNetworkMem->pSendThread);
-		_PrNetworkMem->pSendThread = NULL;
-	}
-	if (_PrNetworkMem->pRecvThread)
-	{
-		blDeleteThread(_PrNetworkMem->pRecvThread);
-		_PrNetworkMem->pRecvThread = NULL;
-	}
-	if (_PrNetworkMem->pDownMain)
-	{
-		blDeleteThread(_PrNetworkMem->pDownMain);
-		_PrNetworkMem->pDownMain = NULL;
-	}
-	{
-		FOREACH_LIST(_BLNetMsg*, _citer, _PrNetworkMem->pCriList)
-		{
-			free(_citer->pBuf);
-			free(_citer);
-		}
-	}
-	{
-		FOREACH_LIST(_BLNetMsg*, _niter, _PrNetworkMem->pNorList)
-		{
-			free(_niter->pBuf);
-			free(_niter);
-		}
-	}
-	{
-		FOREACH_LIST(_BLNetMsg*, _riter, _PrNetworkMem->pRevList)
-		{
-			free(_riter->pBuf);
-			free(_riter);
-		}
-	}
-	{
-		FOREACH_ARRAY(BLAnsi*, _riter, _PrNetworkMem->pDownList)
-		{
-			free(_riter);
-		}
-	}
-	{
-		FOREACH_ARRAY(BLAnsi*, _riter, _PrNetworkMem->pLocalList)
-		{
-			free(_riter);
-		}
-	}
-	blDeleteList(_PrNetworkMem->pCriList);
-	blDeleteList(_PrNetworkMem->pNorList);
-	blDeleteList(_PrNetworkMem->pRevList);
-	blDeleteArray(_PrNetworkMem->pDownList);
-	blDeleteArray(_PrNetworkMem->pLocalList);
-	if (_PrNetworkMem->sTcpSocket != INVALID_SOCKET_INTERNAL)
-	{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		shutdown(_PrNetworkMem->sTcpSocket, SD_SEND);
-		closesocket(_PrNetworkMem->sTcpSocket);
-		_PrNetworkMem->sTcpSocket = INVALID_SOCKET_INTERNAL;
-#else
-		shutdown(_PrNetworkMem->sTcpSocket, SHUT_WR);
-		close(_PrNetworkMem->sTcpSocket);
-		_PrNetworkMem->sTcpSocket = INVALID_SOCKET_INTERNAL;
-#endif
-	}
-	FOREACH_LIST(_BLHttpJob*, _iter, _PrNetworkMem->pHttpJobArray)
-	{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		shutdown(_iter->sSocket, SD_SEND);
-		closesocket(_iter->sSocket);
-#else
-		shutdown(_iter->sSocket, SHUT_WR);
-		close(_iter->sSocket);
-#endif
-		blDeleteThread(_iter->pThread);
-	}
-	if (_PrNetworkMem->pHttpJobArray)
-	{
-		blDeleteList(_PrNetworkMem->pHttpJobArray);
-		_PrNetworkMem->pHttpJobArray = NULL;
-	}
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-	WSACleanup();
-#endif
-	blDebugOutput("Network shutdown");
-	free(_PrNetworkMem);
-}
-BLVoid
-_NetworkStep(BLU32 _Delta)
-{
-	if (_PrNetworkMem->pSendThread && _PrNetworkMem->pRecvThread)
-	{
-		if (_PrNetworkMem->pConnThread)
-		{
-			blDeleteThread(_PrNetworkMem->pConnThread);
-			_PrNetworkMem->pConnThread = NULL;
-			blInvokeEvent(BL_ET_NET, 0xFFFFFFFF, 0xFFFFFFFF, NULL, INVALID_GUID);
-		}
-		if (!_PrNetworkMem->bConnected)
-		{
-			blDeleteThread(_PrNetworkMem->pSendThread);
-			_PrNetworkMem->pSendThread = NULL;
-			blDeleteThread(_PrNetworkMem->pRecvThread);
-			_PrNetworkMem->pRecvThread = NULL;
-			blInvokeEvent(BL_ET_NET, 0, 0, NULL, INVALID_GUID);
-		}
-		blMutexLock(_PrNetworkMem->pRevList->pMutex);
-		{
-			FOREACH_LIST(_BLNetMsg*, _iter, _PrNetworkMem->pRevList)
-			{
-				BLVoid* _buf = malloc(_iter->nLength);
-				memcpy(_buf, _iter->pBuf, _iter->nLength);
-				blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
-				free(_iter);
-			}
-		}
-		blClearList(_PrNetworkMem->pRevList);
-		blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
-	}
-	blMutexLock(_PrNetworkMem->pRevList->pMutex);
-	{
-		FOREACH_LIST(_BLNetMsg*, _iter, _PrNetworkMem->pRevList)
-		{
-			BLVoid* _buf = malloc(_iter->nLength);
-			memcpy(_buf, _iter->pBuf, _iter->nLength);
-			blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
-			free(_iter);
-		}
-	}
-	blClearList(_PrNetworkMem->pRevList);
-	blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
-	blMutexLock(_PrNetworkMem->pHttpJobArray->pMutex);
-	{
-		FOREACH_LIST(_BLHttpJob*, _iter, _PrNetworkMem->pHttpJobArray)
-		{
-			if (_iter->bOver)
-			{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-				shutdown(_iter->sSocket, SD_SEND);
-				closesocket(_iter->sSocket);
-#else
-				shutdown(_iter->sSocket, SHUT_WR);
-				close(_iter->sSocket);
-#endif
-				blDeleteThread(_iter->pThread);
-				blListErase(_PrNetworkMem->pHttpJobArray, _iterator_iter);
-				break;
-			}
-		}
-	}
-	blMutexUnlock(_PrNetworkMem->pHttpJobArray->pMutex);
-}
 static BLS32
 _GetError()
 {
@@ -517,7 +300,71 @@ _OnWGetProg(BLU32 _Dummy, BLVoid* _Param, BLS32 _Prog)
 {
 	_PrNetworkMem->nCurDownSize = _Prog;
 }
-#else
+static BLVoid
+_OnWebSocketError(BLS32 _Fd, BLS32 _Err, const BLAnsi* _Msg, BLVoid* _UserData)
+{
+	if (_PrNetworkMem->sTcpSocket == _Fd)
+		_PrNetworkMem->bConnected = FALSE;
+}
+static BLVoid 
+_OnWebSocketMsg(BLS32 _Fd, BLVoid* _UserData)
+{
+	BLAnsi* _bufin = NULL;
+	BLU32 _msgsz = 0;
+	_bufin = _Recv(_PrNetworkMem->sTcpSocket, &_msgsz);
+	if (_bufin)
+	{
+		BLU32 _osz = *(BLU32*)_bufin;
+		if (_osz == _msgsz)
+		{
+			BLAnsi* _rp = _bufin + sizeof(unsigned int);
+			BLU32 _packsz = 0;
+			while (_rp < _bufin + sizeof(unsigned int) + _msgsz)
+			{
+				BLU32* _rc = (BLU32*)_rp;
+				_BLNetMsg* _ele = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
+				_ele->nID = *_rc;
+				_rc++;
+				_packsz = _ele->nLength = *_rc;
+				_rc++;
+				_ele->pBuf = malloc(_ele->nLength);
+				memcpy(_ele->pBuf, (BLU8*)_rc, _ele->nLength);
+				blMutexLock(_PrNetworkMem->pRevList->pMutex);
+				blListPushBack(_PrNetworkMem->pRevList, _ele);
+				blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
+				_rp += _packsz;
+			}
+		}
+		else
+		{
+			BLU8* _buflzo = (BLU8*)malloc(_osz);
+			BLU32 _sz = fastlz_decompress((BLU8*)_bufin + sizeof(unsigned int), _msgsz, _buflzo, _osz);
+			if (_sz)
+			{
+				BLAnsi* _rp = (BLAnsi*)_buflzo;
+				BLU32 _packsz = 0;
+				while (_rp < (BLAnsi*)_buflzo + _osz)
+				{
+					BLU32* _rc = (BLU32*)_rp;
+					_BLNetMsg* _ele = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
+					_ele->nID = *_rc;
+					_rc++;
+					_packsz = _ele->nLength = *_rc;
+					_rc++;
+					_ele->pBuf = malloc(_ele->nLength);
+					memcpy(_ele->pBuf, (BLU8*)_rc, _ele->nLength);
+					blMutexLock(_PrNetworkMem->pRevList->pMutex);
+					blListPushBack(_PrNetworkMem->pRevList, _ele);
+					blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
+					_rp += _packsz;
+				}
+				free(_buflzo);
+			}
+		}
+		free(_bufin);
+	}
+}
+#endif
 static BLU32
 _HttpDownloadRequest(BLSocket _Sock, const BLAnsi* _Host, const BLAnsi* _Addr, const BLAnsi* _Filename, BLU32 _Pos, BLU32 _End, BLAnsi _Redirect[1024])
 {
@@ -968,10 +815,10 @@ failed:
 }
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 static DWORD __stdcall
-_NetTCPSendThreadFunc(BLVoid* _Userdata)
+_NetSocketSendThreadFunc(BLVoid* _Userdata)
 #else
 static BLVoid*
-_NetTCPSendThreadFunc(BLVoid* _Userdata)
+_NetSocketSendThreadFunc(BLVoid* _Userdata)
 #endif
 {
 	while (!_PrNetworkMem->pSendThread)
@@ -984,18 +831,20 @@ _NetTCPSendThreadFunc(BLVoid* _Userdata)
 			{
 				blMutexLock(_PrNetworkMem->pCriList->pMutex);
 				_BLNetMsg* _msg = (_BLNetMsg*)blListFrontElement(_PrNetworkMem->pCriList);
-				if (!_Send(_PrNetworkMem->sTcpSocket, _msg, NULL))
+				if (!_Send((_msg->eNetType == BL_NT_UDP) ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, _msg, NULL))
 					_PrNetworkMem->bConnected = FALSE;
 				blListPopFront(_PrNetworkMem->pCriList);
+				free(_msg);
 				blMutexUnlock(_PrNetworkMem->pCriList->pMutex);
 			}
 			if (_PrNetworkMem->pNorList->nSize)
 			{
 				blMutexLock(_PrNetworkMem->pNorList->pMutex);
 				_BLNetMsg* _msg = (_BLNetMsg*)blListFrontElement(_PrNetworkMem->pNorList);
-				if (!_Send(_PrNetworkMem->sTcpSocket, _msg, NULL))
+				if (!_Send((_msg->eNetType == BL_NT_UDP) ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, _msg, NULL))
 					_PrNetworkMem->bConnected = FALSE;
 				blListPopFront(_PrNetworkMem->pNorList);
+				free(_msg);
 				blMutexUnlock(_PrNetworkMem->pNorList->pMutex);
 			}
 		}
@@ -1009,29 +858,51 @@ _NetTCPSendThreadFunc(BLVoid* _Userdata)
 }
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 static DWORD __stdcall
-_NetTCPRecvThreadFunc(BLVoid* _Userdata)
+_NetSocketRecvThreadFunc(BLVoid* _Userdata)
 #else
 static BLVoid*
-_NetTCPRecvThreadFunc(BLVoid* _Userdata)
+_NetSocketRecvThreadFunc(BLVoid* _Userdata)
 #endif
 {
 	while (!_PrNetworkMem->pRecvThread)
 		blYield();
 	do
 	{
-		if (_PrNetworkMem->bConnected)
+		BLAnsi* _bufin = NULL;
+		BLU32 _msgsz = 0;
+		_bufin = _Recv(_PrNetworkMem->sTcpSocket, &_msgsz);
+		if (_bufin)
 		{
-			BLAnsi* _bufin = NULL;
-			BLU32 _msgsz = 0;
-			_bufin = _Recv(_PrNetworkMem->sTcpSocket, &_msgsz);
-			if (_bufin)
+			BLU32 _osz = *(BLU32*)_bufin;
+			if (_osz == _msgsz)
 			{
-				BLU32 _osz = *(BLU32*)_bufin;
-				if (_osz == _msgsz)
+				BLAnsi* _rp = _bufin + sizeof(unsigned int);
+				BLU32 _packsz = 0;
+				while (_rp < _bufin + sizeof(unsigned int) + _msgsz)
 				{
-					BLAnsi* _rp = _bufin + sizeof(unsigned int);
+					BLU32* _rc = (BLU32*)_rp;
+					_BLNetMsg* _ele = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
+					_ele->nID = *_rc;
+					_rc++;
+					_packsz = _ele->nLength = *_rc;
+					_rc++;
+					_ele->pBuf = malloc(_ele->nLength);
+					memcpy(_ele->pBuf, (BLU8*)_rc, _ele->nLength);
+					blMutexLock(_PrNetworkMem->pRevList->pMutex);
+					blListPushBack(_PrNetworkMem->pRevList, _ele);
+					blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
+					_rp += _packsz;
+				}
+			}
+			else
+			{
+				BLU8* _buflzo = (BLU8*)malloc(_osz);
+				BLU32 _sz = fastlz_decompress((BLU8*)_bufin + sizeof(unsigned int), _msgsz, _buflzo, _osz);
+				if (_sz)
+				{
+					BLAnsi* _rp = (BLAnsi*)_buflzo;
 					BLU32 _packsz = 0;
-					while (_rp < _bufin + sizeof(unsigned int) + _msgsz)
+					while (_rp < (BLAnsi*)_buflzo + _osz)
 					{
 						BLU32* _rc = (BLU32*)_rp;
 						_BLNetMsg* _ele = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
@@ -1046,38 +917,13 @@ _NetTCPRecvThreadFunc(BLVoid* _Userdata)
 						blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
 						_rp += _packsz;
 					}
+					free(_buflzo);
 				}
-				else
-				{
-					BLU8* _buflzo = (BLU8*)malloc(_osz);
-					BLU32 _sz = fastlz_decompress((BLU8*)_bufin + sizeof(unsigned int), _msgsz, _buflzo, _osz);
-					if (_sz)
-					{
-						BLAnsi* _rp = (BLAnsi*)_buflzo;
-						BLU32 _packsz = 0;
-						while (_rp < (BLAnsi*)_buflzo + _osz)
-						{
-							BLU32* _rc = (BLU32*)_rp;
-							_BLNetMsg* _ele = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
-							_ele->nID = *_rc;
-							_rc++;
-							_packsz = _ele->nLength = *_rc;
-							_rc++;
-							_ele->pBuf = malloc(_ele->nLength);
-							memcpy(_ele->pBuf, (BLU8*)_rc, _ele->nLength);
-							blMutexLock(_PrNetworkMem->pRevList->pMutex);
-							blListPushBack(_PrNetworkMem->pRevList, _ele);
-							blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
-							_rp += _packsz;
-						}
-						free(_buflzo);
-					}
-				}
-				free(_bufin);
 			}
-			else
-				_PrNetworkMem->bConnected = FALSE;
+			free(_bufin);
 		}
+		else
+			_PrNetworkMem->bConnected = FALSE;
 		blYield();
 	} while (_PrNetworkMem->pRecvThread->bRunning);
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -1088,10 +934,10 @@ _NetTCPRecvThreadFunc(BLVoid* _Userdata)
 }
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 static DWORD __stdcall
-_NetTCPConnThreadFunc(BLVoid* _Userdata)
+_NetSocketConnThreadFunc(BLVoid* _Userdata)
 #else
 static BLVoid*
-_NetTCPConnThreadFunc(BLVoid* _Userdata)
+_NetSocketConnThreadFunc(BLVoid* _Userdata)
 #endif
 {
 	BLU32 _n;
@@ -1099,16 +945,16 @@ _NetTCPConnThreadFunc(BLVoid* _Userdata)
 	{
 		struct sockaddr_in6 _address;
 		blYield();
-		inet_pton(PF_INET6, _PrNetworkMem->aHost, (BLVoid*)&_address.sin6_addr);
+		inet_pton(PF_INET6, _Userdata ? _PrNetworkMem->aHostUDP : _PrNetworkMem->aHostTCP, (BLVoid*)&_address.sin6_addr);
 		_address.sin6_family = PF_INET6;
-		_address.sin6_port = htons(_PrNetworkMem->nPort);
-		if (connect(_PrNetworkMem->sTcpSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
+		_address.sin6_port = htons(_Userdata ? _PrNetworkMem->nPortUDP : _PrNetworkMem->nPortTCP);
+		if (connect(_Userdata ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
 		{
 			if (0xEA == _GetError())
 			{
 				for (_n = 0; _n < 64; ++_n)
 				{
-					if (_Select(_PrNetworkMem->sTcpSocket, FALSE))
+					if (_Select(_Userdata ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, FALSE))
 						goto beginthread;
 				}
 			}
@@ -1119,16 +965,16 @@ _NetTCPConnThreadFunc(BLVoid* _Userdata)
 	{
 		struct sockaddr_in _address;
 		blYield();
-		inet_pton(PF_INET, _PrNetworkMem->aHost, (BLVoid*)&_address.sin_addr);
+		inet_pton(PF_INET, _Userdata ? _PrNetworkMem->aHostUDP : _PrNetworkMem->aHostTCP, (BLVoid*)&_address.sin_addr);
 		_address.sin_family = PF_INET;
-		_address.sin_port = htons(_PrNetworkMem->nPort);
-		if (connect(_PrNetworkMem->sTcpSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
+		_address.sin_port = htons(_Userdata ? _PrNetworkMem->nPortUDP : _PrNetworkMem->nPortTCP);
+		if (connect(_Userdata ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
 		{
 			if (0xEA == _GetError())
 			{
 				for (_n = 0; _n < 64; ++_n)
 				{
-					if (_Select(_PrNetworkMem->sTcpSocket, FALSE))
+					if (_Select(_Userdata ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, FALSE))
 						goto beginthread;
 				}
 			}
@@ -1136,10 +982,15 @@ _NetTCPConnThreadFunc(BLVoid* _Userdata)
 		}
 	}
 beginthread:
-	_PrNetworkMem->pSendThread = blGenThread(_NetTCPSendThreadFunc, NULL, NULL);
-	_PrNetworkMem->pRecvThread = blGenThread(_NetTCPRecvThreadFunc, NULL, NULL);
+#if defined(BL_PLATFORM_WEB)
+	_PrNetworkMem->pSendThread = (BLVoid*)0xFFFFFFFF;
+	_PrNetworkMem->pRecvThread = (BLVoid*)0xFFFFFFFF;
+#else
+	_PrNetworkMem->pSendThread = blGenThread(_NetSocketSendThreadFunc, NULL, NULL);
+	_PrNetworkMem->pRecvThread = blGenThread(_NetSocketRecvThreadFunc, NULL, NULL);
 	blThreadRun(_PrNetworkMem->pSendThread);
 	blThreadRun(_PrNetworkMem->pRecvThread);
+#endif
 	_PrNetworkMem->bConnected = TRUE;
 end:
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -1160,14 +1011,16 @@ _NetHTTPWorkThreadFunc(BLVoid* _Userdata)
 	BLU32 _n;
 	BLAnsi _httpheader[1024];
 	BLAnsi* _bufin = NULL;
+	_BLHttpJob* _job = (_BLHttpJob*)_Userdata;
+	_BLNetMsg* _msg = _job->pMsg;
 	BLU32 _msgsz = 0;
 	if (_PrNetworkMem->bIpv6)
 	{
 		struct sockaddr_in6 _address;
 		blYield();
-		inet_pton(PF_INET6, _PrNetworkMem->aHost, (BLVoid*)&_address.sin6_addr);
+		inet_pton(PF_INET6, _PrNetworkMem->aHostHTTP, (BLVoid*)&_address.sin6_addr);
 		_address.sin6_family = PF_INET6;
-		_address.sin6_port = htons(_PrNetworkMem->nPort);
+		_address.sin6_port = htons(_PrNetworkMem->nPortHTTP);
 		if (connect(((_BLHttpJob*)_Userdata)->sSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
 		{
 			if (0xEA == _GetError())
@@ -1178,9 +1031,7 @@ _NetHTTPWorkThreadFunc(BLVoid* _Userdata)
 						goto beginwork;
 				}
 			}
-			blMutexLock(_PrNetworkMem->pCriList->pMutex);
-			blListPopFront(_PrNetworkMem->pCriList);
-			blMutexUnlock(_PrNetworkMem->pCriList->pMutex);
+			free(((_BLHttpJob*)_Userdata)->pMsg);
 			goto end;
 		}
 	}
@@ -1188,9 +1039,9 @@ _NetHTTPWorkThreadFunc(BLVoid* _Userdata)
 	{
 		struct sockaddr_in _address;
 		blYield();
-		inet_pton(PF_INET, _PrNetworkMem->aHost, (BLVoid*)&_address.sin_addr);
+		inet_pton(PF_INET, _PrNetworkMem->aHostHTTP, (BLVoid*)&_address.sin_addr);
 		_address.sin_family = PF_INET;
-		_address.sin_port = htons(_PrNetworkMem->nPort);
+		_address.sin_port = htons(_PrNetworkMem->nPortHTTP);
 		if (connect(((_BLHttpJob*)_Userdata)->sSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
 		{
 			if (0xEA == _GetError())
@@ -1201,23 +1052,15 @@ _NetHTTPWorkThreadFunc(BLVoid* _Userdata)
 						goto beginwork;
 				}
 			}
-			blMutexLock(_PrNetworkMem->pCriList->pMutex);
-			blListPopFront(_PrNetworkMem->pCriList);
-			blMutexUnlock(_PrNetworkMem->pCriList->pMutex);
+			free(((_BLHttpJob*)_Userdata)->pMsg);
 			goto end;
 		}
 	}
 beginwork:
-	if (_PrNetworkMem->pCriList->nSize)
-	{
-		blMutexLock(_PrNetworkMem->pCriList->pMutex);
-		_BLNetMsg* _msg = (_BLNetMsg*)blListFrontElement(_PrNetworkMem->pCriList);
-		sprintf(_httpheader, "POST /%d HTTP/1.1\r\nHost: %s:%d\r\nAccept: */*\r\nConnection: close\r\nContent-Length: %zu\r\n\r\n", _msg->nID, _PrNetworkMem->aHost, _PrNetworkMem->nPort, _msg->nComLen + sizeof(BLU32));
-		_Send(((_BLHttpJob*)_Userdata)->sSocket, _msg, _httpheader);
-		blListPopFront(_PrNetworkMem->pCriList);
-		blMutexUnlock(_PrNetworkMem->pCriList->pMutex);
-	}
+	sprintf(_httpheader, "POST /%d HTTP/1.1\r\nHost: %s:%d\r\nAccept: */*\r\nConnection: close\r\nContent-Length: %zu\r\n\r\n", _msg->nID, _PrNetworkMem->aHostHTTP, _PrNetworkMem->nPortHTTP, _msg->nComLen + sizeof(BLU32));
+	_Send(((_BLHttpJob*)_Userdata)->sSocket, _msg, _httpheader);
 	blYield();
+#if !defined(BL_PLATFORM_WEB)
 	_bufin = _Recv(((_BLHttpJob*)_Userdata)->sSocket, &_msgsz);
 	if (_bufin)
 	{
@@ -1236,7 +1079,9 @@ beginwork:
 				_rc++;
 				_ele->pBuf = malloc(_ele->nLength);
 				memcpy(_ele->pBuf, (BLU8*)_rc, _ele->nLength);
+				blMutexLock(_PrNetworkMem->pRevList->pMutex);
 				blListPushBack(_PrNetworkMem->pRevList, _ele);
+				blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
 				_rp += _packsz;
 			}
 		}
@@ -1258,7 +1103,9 @@ beginwork:
 					_rc++;
 					_ele->pBuf = malloc(_ele->nLength);
 					memcpy(_ele->pBuf, (BLU8*)_rc, _ele->nLength);
+					blMutexLock(_PrNetworkMem->pRevList->pMutex);
 					blListPushBack(_PrNetworkMem->pRevList, _ele);
+					blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
 					_rp += _packsz;
 				}
 				free(_buflzo);
@@ -1266,6 +1113,7 @@ beginwork:
 		}
 		free(_bufin);
 	}
+#endif
 end:
 	((_BLHttpJob*)_Userdata)->bOver = TRUE;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -1615,25 +1463,294 @@ failed:
 	return (BLVoid*)0xdead;
 #endif
 }
+BLVoid
+_NetworkInit(DUK_CONTEXT* _DKC)
+{
+	_PrNetworkMem = (_BLNetworkMember*)malloc(sizeof(_BLNetworkMember));
+	memset(_PrNetworkMem->aHostTCP, 0, sizeof(_PrNetworkMem->aHostTCP));
+	_PrNetworkMem->nPortTCP = 0;
+	memset(_PrNetworkMem->aHostUDP, 0, sizeof(_PrNetworkMem->aHostUDP));
+	_PrNetworkMem->nPortUDP = 0;
+	memset(_PrNetworkMem->aHostHTTP, 0, sizeof(_PrNetworkMem->aHostHTTP));
+	_PrNetworkMem->nPortHTTP = 0;
+	_PrNetworkMem->pDukContext = _DKC;
+	_PrNetworkMem->pCriList = NULL;
+	_PrNetworkMem->pNorList = NULL;
+	_PrNetworkMem->pRevList = NULL;
+	_PrNetworkMem->pHttpJobArray = NULL;
+	_PrNetworkMem->pDownList = NULL;
+	_PrNetworkMem->pLocalList = NULL;
+	memset(_PrNetworkMem->nFinish, 0, sizeof(_PrNetworkMem->nFinish));
+	_PrNetworkMem->pConnThread = NULL;
+	_PrNetworkMem->pSendThread = NULL;
+	_PrNetworkMem->pRecvThread = NULL;
+	_PrNetworkMem->pDownMain = NULL;
+	_PrNetworkMem->_PrCurDownHash = -1;
+	_PrNetworkMem->nCurDownTotal = 0;
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+	_PrNetworkMem->nCurDownSize = 0;
+#elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
+	_PrNetworkMem->nCurDownSize = 0;
+#elif defined(BL_PLATFORM_LINUX)
+	_PrNetworkMem->nCurDownSize = 0;
+#else
+	_PrNetworkMem->nCurDownSize = 0;
 #endif
+	_PrNetworkMem->bIpv6 = FALSE;
+	_PrNetworkMem->bConnected = FALSE;
+	_PrNetworkMem->sTcpSocket = INVALID_SOCKET_INTERNAL;
+	_PrNetworkMem->sUdpSocket = INVALID_SOCKET_INTERNAL;
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+	WSADATA ws;
+	WSAStartup(MAKEWORD(2, 2), &ws);
+#endif
+	_PrNetworkMem->pCriList = blGenList(TRUE);
+	_PrNetworkMem->pNorList = blGenList(TRUE);
+	_PrNetworkMem->pRevList = blGenList(TRUE);
+	_PrNetworkMem->pHttpJobArray = blGenList(TRUE);
+	_PrNetworkMem->pDownList = blGenArray(TRUE);
+	_PrNetworkMem->pLocalList = blGenArray(TRUE);
+	struct addrinfo* _result = NULL;
+	struct addrinfo* _curr;
+	BLS32 _ret = getaddrinfo("www.bing.com", NULL, NULL, &_result);
+	if (_ret == 0)
+	{
+		for (_curr = _result; _curr != NULL; _curr = _curr->ai_next)
+		{
+			switch (_curr->ai_family)
+			{
+			case AF_INET6:
+				_PrNetworkMem->bIpv6 = TRUE;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	freeaddrinfo(_result);
+#if defined(BL_PLATFORM_WEB)
+	emscripten_set_socket_message_callback(NULL, _OnWebSocketMsg);
+	emscripten_set_socket_error_callback(NULL, _OnWebSocketError);
+#endif
+	blDebugOutput("Network initialize successfully");
+}
+BLVoid
+_NetworkDestroy()
+{
+	if (_PrNetworkMem->pConnThread)
+	{
+		blDeleteThread(_PrNetworkMem->pConnThread);
+		_PrNetworkMem->pConnThread = NULL;
+	}
+	if (_PrNetworkMem->pSendThread)
+	{
+		blDeleteThread(_PrNetworkMem->pSendThread);
+		_PrNetworkMem->pSendThread = NULL;
+	}
+	if (_PrNetworkMem->pRecvThread)
+	{
+		blDeleteThread(_PrNetworkMem->pRecvThread);
+		_PrNetworkMem->pRecvThread = NULL;
+	}
+	if (_PrNetworkMem->pDownMain)
+	{
+		blDeleteThread(_PrNetworkMem->pDownMain);
+		_PrNetworkMem->pDownMain = NULL;
+	}
+	{
+		FOREACH_LIST(_BLNetMsg*, _citer, _PrNetworkMem->pCriList)
+		{
+			free(_citer->pBuf);
+			free(_citer);
+		}
+	}
+	{
+		FOREACH_LIST(_BLNetMsg*, _niter, _PrNetworkMem->pNorList)
+		{
+			free(_niter->pBuf);
+			free(_niter);
+		}
+	}
+	{
+		FOREACH_LIST(_BLNetMsg*, _riter, _PrNetworkMem->pRevList)
+		{
+			free(_riter->pBuf);
+			free(_riter);
+		}
+	}
+	{
+		FOREACH_ARRAY(BLAnsi*, _riter, _PrNetworkMem->pDownList)
+		{
+			free(_riter);
+		}
+	}
+	{
+		FOREACH_ARRAY(BLAnsi*, _riter, _PrNetworkMem->pLocalList)
+		{
+			free(_riter);
+		}
+	}
+	blDeleteList(_PrNetworkMem->pCriList);
+	blDeleteList(_PrNetworkMem->pNorList);
+	blDeleteList(_PrNetworkMem->pRevList);
+	blDeleteArray(_PrNetworkMem->pDownList);
+	blDeleteArray(_PrNetworkMem->pLocalList);
+	if (_PrNetworkMem->sTcpSocket != INVALID_SOCKET_INTERNAL)
+	{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+		shutdown(_PrNetworkMem->sTcpSocket, SD_SEND);
+		closesocket(_PrNetworkMem->sTcpSocket);
+		_PrNetworkMem->sTcpSocket = INVALID_SOCKET_INTERNAL;
+#else
+		shutdown(_PrNetworkMem->sTcpSocket, SHUT_WR);
+		close(_PrNetworkMem->sTcpSocket);
+		_PrNetworkMem->sTcpSocket = INVALID_SOCKET_INTERNAL;
+#endif
+	}
+	if (_PrNetworkMem->sUdpSocket != INVALID_SOCKET_INTERNAL)
+	{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+		shutdown(_PrNetworkMem->sUdpSocket, SD_SEND);
+		closesocket(_PrNetworkMem->sUdpSocket);
+		_PrNetworkMem->sUdpSocket = INVALID_SOCKET_INTERNAL;
+#else
+		shutdown(_PrNetworkMem->sUdpSocket, SHUT_WR);
+		close(_PrNetworkMem->sUdpSocket);
+		_PrNetworkMem->sUdpSocket = INVALID_SOCKET_INTERNAL;
+#endif
+	}
+	FOREACH_LIST(_BLHttpJob*, _iter, _PrNetworkMem->pHttpJobArray)
+	{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+		shutdown(_iter->sSocket, SD_SEND);
+		closesocket(_iter->sSocket);
+#else
+		shutdown(_iter->sSocket, SHUT_WR);
+		close(_iter->sSocket);
+#endif
+		blDeleteThread(_iter->pThread);
+	}
+	if (_PrNetworkMem->pHttpJobArray)
+	{
+		blDeleteList(_PrNetworkMem->pHttpJobArray);
+		_PrNetworkMem->pHttpJobArray = NULL;
+	}
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+	WSACleanup();
+#endif
+	blDebugOutput("Network shutdown");
+	free(_PrNetworkMem);
+}
+BLVoid
+_NetworkStep(BLU32 _Delta)
+{
+	if (_PrNetworkMem->pSendThread && _PrNetworkMem->pRecvThread)
+	{
+		if (_PrNetworkMem->pConnThread)
+		{
+			blDeleteThread(_PrNetworkMem->pConnThread);
+			_PrNetworkMem->pConnThread = NULL;
+			blInvokeEvent(BL_ET_NET, 0xFFFFFFFF, 0xFFFFFFFF, NULL, INVALID_GUID);
+		}
+		if (!_PrNetworkMem->bConnected)
+		{
+			blDeleteThread(_PrNetworkMem->pSendThread);
+			_PrNetworkMem->pSendThread = NULL;
+			blDeleteThread(_PrNetworkMem->pRecvThread);
+			_PrNetworkMem->pRecvThread = NULL;
+			blInvokeEvent(BL_ET_NET, 0, 0, NULL, INVALID_GUID);
+		}
+		blMutexLock(_PrNetworkMem->pRevList->pMutex);
+		{
+			FOREACH_LIST(_BLNetMsg*, _iter, _PrNetworkMem->pRevList)
+			{
+				BLVoid* _buf = malloc(_iter->nLength);
+				memcpy(_buf, _iter->pBuf, _iter->nLength);
+				blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
+				free(_iter);
+			}
+		}
+		blClearList(_PrNetworkMem->pRevList);
+		blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
+	}
+	blMutexLock(_PrNetworkMem->pRevList->pMutex);
+	{
+		FOREACH_LIST(_BLNetMsg*, _iter, _PrNetworkMem->pRevList)
+		{
+			BLVoid* _buf = malloc(_iter->nLength);
+			memcpy(_buf, _iter->pBuf, _iter->nLength);
+			blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
+			free(_iter);
+		}
+	}
+	blClearList(_PrNetworkMem->pRevList);
+	blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
+	blMutexLock(_PrNetworkMem->pHttpJobArray->pMutex);
+	{
+		FOREACH_LIST(_BLHttpJob*, _iter, _PrNetworkMem->pHttpJobArray)
+		{
+			if (_iter->bOver)
+			{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+				shutdown(_iter->sSocket, SD_SEND);
+				closesocket(_iter->sSocket);
+#else
+				shutdown(_iter->sSocket, SHUT_WR);
+				close(_iter->sSocket);
+#endif
+				blDeleteThread(_iter->pThread);
+				blListErase(_PrNetworkMem->pHttpJobArray, _iterator_iter);
+			}
+		}
+	}
+	blMutexUnlock(_PrNetworkMem->pHttpJobArray->pMutex);
+#if defined(BL_PLATFORM_WEB)
+	if (_PrNetworkMem->bConnected)
+	{
+		while (_PrNetworkMem->pCriList->nSize)
+		{
+			blMutexLock(_PrNetworkMem->pCriList->pMutex);
+			_BLNetMsg* _msg = (_BLNetMsg*)blListFrontElement(_PrNetworkMem->pCriList);
+			if (!_Send((_msg->eNetType == BL_NT_UDP) ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, _msg, NULL))
+				_PrNetworkMem->bConnected = FALSE;
+			blListPopFront(_PrNetworkMem->pCriList);
+			free(_msg);
+			blMutexUnlock(_PrNetworkMem->pCriList->pMutex);
+		}
+		if (_PrNetworkMem->pNorList->nSize)
+		{
+			blMutexLock(_PrNetworkMem->pNorList->pMutex);
+			_BLNetMsg* _msg = (_BLNetMsg*)blListFrontElement(_PrNetworkMem->pNorList);
+			if (!_Send((_msg->eNetType == BL_NT_UDP) ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, _msg, NULL))
+				_PrNetworkMem->bConnected = FALSE;
+			blListPopFront(_PrNetworkMem->pNorList);
+			free(_msg);
+			blMutexUnlock(_PrNetworkMem->pNorList->pMutex);
+		}
+	}
+#endif
+}
 BLVoid
 blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 {
-	memset(_PrNetworkMem->aHost, 0, sizeof(_PrNetworkMem->aHost));
-	strcpy(_PrNetworkMem->aHost, _Host);
-	_PrNetworkMem->nPort = _Port;
 	if (_Type == BL_NT_UDP)
 	{
-		_PrNetworkMem->sTcpSocket = socket(AF_UNSPEC, SOCK_DGRAM, 0);
+		memset(_PrNetworkMem->aHostUDP, 0, sizeof(_PrNetworkMem->aHostUDP));
+		strcpy(_PrNetworkMem->aHostUDP, _Host);
+		_PrNetworkMem->nPortUDP = _Port;
+		_PrNetworkMem->sUdpSocket = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	}
 	else if (_Type == BL_NT_TCP)
 	{
+		memset(_PrNetworkMem->aHostTCP, 0, sizeof(_PrNetworkMem->aHostTCP));
+		strcpy(_PrNetworkMem->aHostTCP, _Host);
+		_PrNetworkMem->nPortTCP = _Port;
 		BLS32 _nodelay = 1, _reuse = 1;
 		struct linger _lin;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 		u_long _nonblocking = 1;
 #endif
-		_PrNetworkMem->sTcpSocket = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
+		_PrNetworkMem->sTcpSocket = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, IPPROTO_TCP);
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 		ioctlsocket(_PrNetworkMem->sTcpSocket, FIONBIO, &_nonblocking);
 #else
@@ -1645,17 +1762,23 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 		_lin.l_onoff = 1;
 		setsockopt(_PrNetworkMem->sTcpSocket, SOL_SOCKET, SO_LINGER, (BLAnsi*)&_lin, sizeof(_lin));
 #if defined(BL_PLATFORM_WEB)
+		_PrNetworkMem->pConnThread = (BLVoid*)0xFFFFFFFF;
+		_NetSocketConnThreadFunc(NULL);
 #else
-		_PrNetworkMem->pConnThread = blGenThread(_NetTCPConnThreadFunc, NULL, NULL);
-#endif
+		_PrNetworkMem->pConnThread = blGenThread(_NetSocketConnThreadFunc, NULL, NULL);
 		blThreadRun(_PrNetworkMem->pConnThread);
+#endif
+	}
+	else
+	{
+		memset(_PrNetworkMem->aHostHTTP, 0, sizeof(_PrNetworkMem->aHostHTTP));
+		strcpy(_PrNetworkMem->aHostHTTP, _Host);
+		_PrNetworkMem->nPortHTTP = _Port;
 	}
 }
 BLVoid
 blDisconnect()
 {
-	memset(_PrNetworkMem->aHost, 0, sizeof(_PrNetworkMem->aHost));
-	_PrNetworkMem->nPort = -1;
 	{
 		FOREACH_LIST(_BLNetMsg*, _citer, _PrNetworkMem->pCriList)
 		{
@@ -1704,6 +1827,18 @@ blDisconnect()
 		_PrNetworkMem->sTcpSocket = INVALID_SOCKET_INTERNAL;
 #endif
 	}
+	if (_PrNetworkMem->sUdpSocket != INVALID_SOCKET_INTERNAL)
+	{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+		shutdown(_PrNetworkMem->sUdpSocket, SD_SEND);
+		closesocket(_PrNetworkMem->sUdpSocket);
+		_PrNetworkMem->sUdpSocket = INVALID_SOCKET_INTERNAL;
+#else
+		shutdown(_PrNetworkMem->sUdpSocket, SHUT_WR);
+		close(_PrNetworkMem->sUdpSocket);
+		_PrNetworkMem->sUdpSocket = INVALID_SOCKET_INTERNAL;
+#endif
+	}
 }
 BLVoid
 blSendNetMsg(IN BLU32 _MsgID, IN BLVoid* _Msgbuf, IN BLU32 _Msgsz, IN BLBool _Critical, IN BLBool _Overwrite, IN BLBool _Autocompress, IN BLEnum _Nettype)
@@ -1714,7 +1849,7 @@ blSendNetMsg(IN BLU32 _MsgID, IN BLVoid* _Msgbuf, IN BLU32 _Msgsz, IN BLBool _Cr
 	_msg->eNetType = _Nettype;
 	if (_Critical || _Nettype == BL_NT_HTTP)
 	{
-		if (_Overwrite)
+		if (_Overwrite && _Nettype != BL_NT_HTTP)
 		{
 			blMutexLock(_PrNetworkMem->pCriList->pMutex);
 			{
@@ -1756,7 +1891,8 @@ blSendNetMsg(IN BLU32 _MsgID, IN BLVoid* _Msgbuf, IN BLU32 _Msgsz, IN BLBool _Cr
 				memcpy(_msg->pBuf, _stream, _sz);
 			}
 		}
-		blListPushBack(_PrNetworkMem->pCriList, _msg);
+		if (_Nettype != BL_NT_HTTP)
+			blListPushBack(_PrNetworkMem->pCriList, _msg);
 	}
 	else
 	{
@@ -1812,26 +1948,28 @@ blSendNetMsg(IN BLU32 _MsgID, IN BLVoid* _Msgbuf, IN BLU32 _Msgsz, IN BLBool _Cr
 		u_long _nonblocking = 1;
 #endif
 		_BLHttpJob* _job = (_BLHttpJob*)malloc(sizeof(_BLHttpJob));
-		_job->sSocket = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
+		_job->sSocket = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, IPPROTO_TCP);
 		_job->bOver = FALSE;
+		_job->pMsg = _msg;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 		ioctlsocket(_job->sSocket, FIONBIO, &_nonblocking);
 #else
-		fcntl(_job->sSocket, F_SETFL, fcntl(_PrNetworkMem->sTcpSocket, F_GETFL) | O_NONBLOCK);
+		fcntl(_job->sSocket, F_SETFL, fcntl(_job->sSocket, F_GETFL) | O_NONBLOCK);
 #endif
 		setsockopt(_job->sSocket, IPPROTO_TCP, TCP_NODELAY, (BLAnsi*)&_nodelay, sizeof(_nodelay));
 		setsockopt(_job->sSocket, SOL_SOCKET, SO_REUSEADDR, (BLAnsi*)&_reuse, sizeof(_reuse));
 		_lin.l_linger = 0;
 		_lin.l_onoff = 1;
 		setsockopt(_job->sSocket, SOL_SOCKET, SO_LINGER, (BLAnsi*)&_lin, sizeof(_lin));
-#if defined(BL_PLATFORM_WEB)
-#else
-		_job->pThread = blGenThread(_NetHTTPWorkThreadFunc, NULL, _job);
-#endif
 		blMutexLock(_PrNetworkMem->pCriList->pMutex);
 		blListPushBack(_PrNetworkMem->pHttpJobArray, _job);
 		blMutexUnlock(_PrNetworkMem->pCriList->pMutex);
+#if defined(BL_PLATFORM_WEB)
+		_NetHTTPWorkThreadFunc(_job);
+#else
+		_job->pThread = blGenThread(_NetHTTPWorkThreadFunc, NULL, _job);
 		blThreadRun(_job->pThread);
+#endif
 	}
 }
 BLBool
