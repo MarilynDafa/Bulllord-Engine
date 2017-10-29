@@ -125,11 +125,12 @@ blArrayPopBack(INOUT BLArray* _Arr)
 		return;
 	_Arr->nSize--;
 }
-BLVoid
+BLU32
 blArrayErase(INOUT BLArray* _Arr, IN BLU32 _Idx)
 {
 	if (_Idx >= _Arr->nSize)
-		return;
+		return _Arr->nSize;
 	memmove(_Arr->pData + _Idx, _Arr->pData + (1 + _Idx), sizeof(BLVoid*)*(_Arr->nSize - _Idx - 1));
 	_Arr->nSize--;
+	return _Idx ? _Idx - 1 : 0;
 }

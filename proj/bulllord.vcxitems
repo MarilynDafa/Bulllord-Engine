@@ -774,6 +774,10 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
+      <CompileAs>CompileAsCpp</CompileAs>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\dictionary.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
@@ -1531,21 +1535,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\thread.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
-      <FileType>Document</FileType>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <CompileAs>CompileAsCpp</CompileAs>
       <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild>false</ExcludedFromBuild>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
-      <FileType>Document</FileType>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>

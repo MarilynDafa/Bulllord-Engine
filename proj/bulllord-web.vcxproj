@@ -120,10 +120,11 @@
       <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;ASSERTIONS=1;SAFE_HEAP=1;EMCC_DEBUG=1;DEBUG;EMTERPRETIFY_ASYNC=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
-      <AdditionalOptions>-x c -g -fshort-wchar %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-g -fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
+      <VerboseOutput>NoVerboseOutput</VerboseOutput>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s USE_PTHREADS=0 -s -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s USE_PTHREADS=0 -s -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=268435456 -s DEMANGLE_SUPPORT=1 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
@@ -131,10 +132,10 @@
       <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
-      <AdditionalOptions>-x c -fshort-wchar %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s WASM=1 -s USE_PTHREADS=0 -s -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s WASM=1 -s USE_PTHREADS=0 -s -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s USE_PTHREADS=0 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=268435456 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

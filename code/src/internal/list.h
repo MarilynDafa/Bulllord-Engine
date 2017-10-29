@@ -69,18 +69,20 @@ BLVoid blListInsert(
 	IN BLU32 _Idx, 
 	IN BLVoid* _Ele);
 
-BLVoid blListErase(
-	INOUT BLList* _Lst, 
+BLVoid* blListErase(
+	INOUT BLList* _Lst,
 	IN BLVoid* _Node);
-    
+
 #ifdef __cplusplus
 #   define FOREACH_LIST(type , var , container) type var = (container->pFirst)?(*(type*)(container->pFirst->pData)):NULL;\
+	BLU32 _container##size = container->nSize; \
     for (struct BLList::_ListNode* _iterator##var = container->pFirst; _iterator##var; \
-         _iterator##var = _iterator##var->pNext, _iterator##var ? var = (*(type*)((_iterator##var)->pData)) : var)
+         _iterator##var = (container->nSize == _container##size) ? _iterator##var->pNext : _iterator##var, _iterator##var ? var = (*(type*)((_iterator##var)->pData)) : var, _container##size = container->nSize)
 #else
 #   define FOREACH_LIST(type , var , container) type var = (container->pFirst)?(*(type*)(container->pFirst->pData)):NULL;\
 		struct _ListNode* _iterator##var = container->pFirst;\
-        for (; _iterator##var; _iterator##var = _iterator##var->pNext, _iterator##var ? var = (*(type*)((_iterator##var)->pData)) : var)
+		BLU32 _container##size = container->nSize; \
+		for (; _iterator##var; _iterator##var = (container->nSize == _container##size) ? _iterator##var->pNext : _iterator##var, _iterator##var ? var = (*(type*)((_iterator##var)->pData)) : var, _container##size = container->nSize)
 #endif
             
 #ifdef __cplusplus

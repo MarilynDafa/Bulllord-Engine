@@ -4444,64 +4444,65 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 	_scissorrect.sRB.fY = _YPos + 0.5f * _Height - _Node->uExtension.sLabel.fPaddingY;
 	BLS32 _y = (BLS32)(_YPos - _Height * 0.5f + _Node->uExtension.sLabel.fPaddingY - _Node->uExtension.sLabel.nScroll);
 	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
-	FOREACH_ARRAY(_BLRichRowCell*, _iter, _Node->uExtension.sLabel.pRowCells)
 	{
-		if (_y <= _scissorrect.sRB.fY && _y + _iter->nHeight >= _scissorrect.sLT.fY)
+		FOREACH_ARRAY(_BLRichRowCell*, _iter, _Node->uExtension.sLabel.pRowCells)
 		{
-			BLEnum _halign = _iter->eAlignmentH;
-			BLEnum _valign = _iter->eAlignmentV;
-			BLU32 _width = _iter->nWidth;
-			BLU32 _height = _iter->nHeight;
-			BLF32 _leftx = _XPos - _Width * 0.5f + _Node->uExtension.sLabel.fPaddingX + _iter->nLeftPadding;
-			BLF32 _rightx = _XPos + _Width * 0.5f - _Node->uExtension.sLabel.fPaddingX - _iter->nRightPadding;
-			BLF32 _topy = _YPos - _Height * 0.5f + _Node->uExtension.sLabel.fPaddingY;
-			BLF32 _bottomy = _YPos + _Height * 0.5f - _Node->uExtension.sLabel.fPaddingY;
-			BLS32 _x;
-			switch (_halign)
+			if (_y <= _scissorrect.sRB.fY && _y + _iter->nHeight >= _scissorrect.sLT.fY)
 			{
-			case BL_UA_LEFT:
-				_x = (BLS32)_leftx;
-				break;
-			case BL_UA_HCENTER:
-				_x = (BLS32)(_leftx + (_rightx - _leftx - _width) * 0.5f);
-				break;
-			case BL_UA_RIGHT:
-				_x = (BLS32)(_rightx - _width);
-				break;
-			default:
-				_x = (BLS32)_leftx;
-				break;
-			}
-			if (_Node->uExtension.sLabel.pRowCells->nSize == 1)
-			{
-				switch (_valign)
+				BLEnum _halign = _iter->eAlignmentH;
+				BLEnum _valign = _iter->eAlignmentV;
+				BLU32 _width = _iter->nWidth;
+				BLU32 _height = _iter->nHeight;
+				BLF32 _leftx = _XPos - _Width * 0.5f + _Node->uExtension.sLabel.fPaddingX + _iter->nLeftPadding;
+				BLF32 _rightx = _XPos + _Width * 0.5f - _Node->uExtension.sLabel.fPaddingX - _iter->nRightPadding;
+				BLF32 _topy = _YPos - _Height * 0.5f + _Node->uExtension.sLabel.fPaddingY;
+				BLF32 _bottomy = _YPos + _Height * 0.5f - _Node->uExtension.sLabel.fPaddingY;
+				BLS32 _x;
+				switch (_halign)
 				{
-				case BL_UA_TOP:
-					_y = (BLS32)_topy;
+				case BL_UA_LEFT:
+					_x = (BLS32)_leftx;
 					break;
-				case BL_UA_VCENTER:
-					_y = (BLS32)(_topy + (_bottomy - _topy - (_Node->uExtension.sLabel.pRowCells->nSize) * _height) * 0.5f);
+				case BL_UA_HCENTER:
+					_x = (BLS32)(_leftx + (_rightx - _leftx - _width) * 0.5f);
 					break;
-				case BL_UA_BOTTOM:
-					_y = (BLS32)(_bottomy - (_Node->uExtension.sLabel.pRowCells->nSize) * _height);
+				case BL_UA_RIGHT:
+					_x = (BLS32)(_rightx - _width);
 					break;
 				default:
-					_y = (BLS32)_topy;
+					_x = (BLS32)_leftx;
 					break;
 				}
-			}
-			FOREACH_LIST(_BLRichAtomCell*, _iter2, _iter->pElements)
-			{
-				BLRect _dstrect;
-				_dstrect.sLT.fX = (BLF32)_x;
-				_dstrect.sLT.fY = (BLF32)_y;
-				_dstrect.sRB.fX = (BLF32)_x + _iter2->sDim.fX;
-				_dstrect.sRB.fY = (BLF32)_y + _iter2->sDim.fY;
-				switch (_iter2->nType)
+				if (_Node->uExtension.sLabel.pRowCells->nSize == 1)
 				{
-				case 1:
-					break;
-				case 2:
+					switch (_valign)
+					{
+					case BL_UA_TOP:
+						_y = (BLS32)_topy;
+						break;
+					case BL_UA_VCENTER:
+						_y = (BLS32)(_topy + (_bottomy - _topy - (_Node->uExtension.sLabel.pRowCells->nSize) * _height) * 0.5f);
+						break;
+					case BL_UA_BOTTOM:
+						_y = (BLS32)(_bottomy - (_Node->uExtension.sLabel.pRowCells->nSize) * _height);
+						break;
+					default:
+						_y = (BLS32)_topy;
+						break;
+					}
+				}
+				FOREACH_LIST(_BLRichAtomCell*, _iter2, _iter->pElements)
+				{
+					BLRect _dstrect;
+					_dstrect.sLT.fX = (BLF32)_x;
+					_dstrect.sLT.fY = (BLF32)_y;
+					_dstrect.sRB.fX = (BLF32)_x + _iter2->sDim.fX;
+					_dstrect.sRB.fY = (BLF32)_y + _iter2->sDim.fY;
+					switch (_iter2->nType)
+					{
+					case 1:
+						break;
+					case 2:
 					{
 						BLF32 _rgba[4];
 						blDeColor4F(_iter2->nColor, _rgba);
@@ -4545,7 +4546,7 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 						blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 					}
 					break;
-				case 3:
+					case 3:
 					{
 						if (_iter2->nTexture != INVALID_GUID)
 						{
@@ -4590,37 +4591,39 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 							blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 						}
 					}
-				break;
-				case 4:
-					_WriteText(_iter2->pText, _iter2->aFontSource, _iter2->nFontHeight, _halign, _valign, FALSE, &_dstrect, &_scissorrect, _iter2->nColor, _gray, _iter2->nFontFlag, FALSE);
-				break;
-				default:
-					assert(0);
 					break;
+					case 4:
+						_WriteText(_iter2->pText, _iter2->aFontSource, _iter2->nFontHeight, _halign, _valign, FALSE, &_dstrect, &_scissorrect, _iter2->nColor, _gray, _iter2->nFontFlag, FALSE);
+						break;
+					default:
+						assert(0);
+						break;
+					}
+					_x += (BLS32)_iter2->sDim.fX;
 				}
-				_x += (BLS32)_iter2->sDim.fX;
 			}
+			_y += _iter->nHeight;
 		}
-		_y += _iter->nHeight;
 	}
-	FOREACH_ARRAY(_BLRichAnchoredCell*, _iter3, _Node->uExtension.sLabel.pAnchoredCells)
 	{
-		_y = (BLS32)(_YPos - _Height * 0.5f - _Node->uExtension.sLabel.fPaddingY + _iter3->nBottomy - _iter3->pElement->sDim.fY);
-		BLF32 _x;
-		if (_iter3->bLeft)
-			_x = _XPos - _Width * 0.5f + _Node->uExtension.sLabel.fPaddingX;
-		else
-			_x = _XPos + _Width * 0.5f - _Node->uExtension.sLabel.fPaddingX - _iter3->pElement->sDim.fX;
-		BLRect _dstrect;
-		_dstrect.sLT.fX = (BLF32)_x;
-		_dstrect.sLT.fY = (BLF32)_y;
-		_dstrect.sRB.fX = (BLF32)_x + _iter3->pElement->sDim.fX;
-		_dstrect.sRB.fY = (BLF32)_y + _iter3->pElement->sDim.fY;
-		switch (_iter3->pElement->nType)
+		FOREACH_ARRAY(_BLRichAnchoredCell*, _iter3, _Node->uExtension.sLabel.pAnchoredCells)
 		{
-		case 1:
-			break;
-		case 2:
+			_y = (BLS32)(_YPos - _Height * 0.5f - _Node->uExtension.sLabel.fPaddingY + _iter3->nBottomy - _iter3->pElement->sDim.fY);
+			BLF32 _x;
+			if (_iter3->bLeft)
+				_x = _XPos - _Width * 0.5f + _Node->uExtension.sLabel.fPaddingX;
+			else
+				_x = _XPos + _Width * 0.5f - _Node->uExtension.sLabel.fPaddingX - _iter3->pElement->sDim.fX;
+			BLRect _dstrect;
+			_dstrect.sLT.fX = (BLF32)_x;
+			_dstrect.sLT.fY = (BLF32)_y;
+			_dstrect.sRB.fX = (BLF32)_x + _iter3->pElement->sDim.fX;
+			_dstrect.sRB.fY = (BLF32)_y + _iter3->pElement->sDim.fY;
+			switch (_iter3->pElement->nType)
+			{
+			case 1:
+				break;
+			case 2:
 			{
 				BLF32 _rgba[4];
 				blDeColor4F(_iter3->pElement->nColor, _rgba);
@@ -4663,8 +4666,8 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 				blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 				blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 			}
-		break;
-		case 3:
+			break;
+			case 3:
 			{
 				if (_iter3->pElement->nTexture != INVALID_GUID)
 				{
@@ -4710,12 +4713,13 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 				}
 			}
 			break;
-		case 4:
-			_WriteText(_iter3->pElement->pText, _iter3->pElement->aFontSource, _iter3->pElement->nFontHeight, BL_UA_LEFT, BL_UA_VCENTER, FALSE, &_dstrect, &_scissorrect, _iter3->pElement->nColor, _gray, _iter3->pElement->nFontFlag, FALSE);
-		break;
-		default:
-			assert(0);
-			break;
+			case 4:
+				_WriteText(_iter3->pElement->pText, _iter3->pElement->aFontSource, _iter3->pElement->nFontHeight, BL_UA_LEFT, BL_UA_VCENTER, FALSE, &_dstrect, &_scissorrect, _iter3->pElement->nColor, _gray, _iter3->pElement->nFontFlag, FALSE);
+				break;
+			default:
+				assert(0);
+				break;
+			}
 		}
 	}
 }
@@ -10024,101 +10028,105 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					if (blRectContains(&_drawarea, &_pos))
 					{
 						BLS32 _y = (BLS32)(_drawarea.sLT.fY + _wid->uExtension.sLabel.fPaddingY - _wid->uExtension.sLabel.nScroll);
-						FOREACH_ARRAY(_BLRichRowCell*, _iter, _wid->uExtension.sLabel.pRowCells)
 						{
-							if (_y <= _drawarea.sRB.fY && _y + _iter->nHeight >= _drawarea.sLT.fY)
+							FOREACH_ARRAY(_BLRichRowCell*, _iter, _wid->uExtension.sLabel.pRowCells)
 							{
-								BLEnum _halign = _iter->eAlignmentH;
-								BLEnum _valign = _iter->eAlignmentV;
-								BLU32 _width = _iter->nWidth;
-								BLU32 _height = _iter->nHeight;
-								BLF32 _leftx = _drawarea.sLT.fX + _wid->uExtension.sLabel.fPaddingX + _iter->nLeftPadding;
-								BLF32 _rightx = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingX - _iter->nRightPadding;
-								BLF32 _topy = _drawarea.sLT.fY + _wid->uExtension.sLabel.fPaddingY;
-								BLF32 _bottomy = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingY;
-								BLS32 _x;
-								switch (_halign)
+								if (_y <= _drawarea.sRB.fY && _y + _iter->nHeight >= _drawarea.sLT.fY)
 								{
-								case BL_UA_LEFT:
-									_x = (BLS32)_leftx;
-									break;
-								case BL_UA_HCENTER:
-									_x = (BLS32)(_leftx + (_rightx - _leftx - _width) * 0.5f);
-									break;
-								case BL_UA_RIGHT:
-									_x = (BLS32)(_rightx - _width);
-									break;
-								default:
-									_x = (BLS32)_leftx;
-									break;
-								}
-								if (_wid->uExtension.sLabel.pRowCells->nSize == 1)
-								{
-									switch (_valign)
+									BLEnum _halign = _iter->eAlignmentH;
+									BLEnum _valign = _iter->eAlignmentV;
+									BLU32 _width = _iter->nWidth;
+									BLU32 _height = _iter->nHeight;
+									BLF32 _leftx = _drawarea.sLT.fX + _wid->uExtension.sLabel.fPaddingX + _iter->nLeftPadding;
+									BLF32 _rightx = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingX - _iter->nRightPadding;
+									BLF32 _topy = _drawarea.sLT.fY + _wid->uExtension.sLabel.fPaddingY;
+									BLF32 _bottomy = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingY;
+									BLS32 _x;
+									switch (_halign)
 									{
-									case BL_UA_TOP:
-										_y = (BLS32)_topy;
+									case BL_UA_LEFT:
+										_x = (BLS32)_leftx;
 										break;
-									case BL_UA_VCENTER:
-										_y = (BLS32)(_topy + (_bottomy - _topy - (_wid->uExtension.sLabel.pRowCells->nSize) * _height) * 0.5f);
+									case BL_UA_HCENTER:
+										_x = (BLS32)(_leftx + (_rightx - _leftx - _width) * 0.5f);
 										break;
-									case BL_UA_BOTTOM:
-										_y = (BLS32)(_bottomy - (_wid->uExtension.sLabel.pRowCells->nSize) * _height);
+									case BL_UA_RIGHT:
+										_x = (BLS32)(_rightx - _width);
 										break;
 									default:
-										_y = (BLS32)_topy;
+										_x = (BLS32)_leftx;
 										break;
 									}
-								}
-								FOREACH_LIST(_BLRichAtomCell*, _iter2, _iter->pElements)
-								{
-									BLRect _dstrect;
-									_dstrect.sLT.fX = (BLF32)_x;
-									_dstrect.sLT.fY = (BLF32)_y;
-									_dstrect.sRB.fX = (BLF32)_x + _iter2->sDim.fX;
-									_dstrect.sRB.fY = (BLF32)_y + _iter2->sDim.fY;
-									switch (_iter2->nType)
+									if (_wid->uExtension.sLabel.pRowCells->nSize == 1)
 									{
-									case 3:
-										if ((_iter2->nTexture != INVALID_GUID) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-											blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
-									break;
-									case 4:
-										if ((_iter2->pText) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-											blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
-										break;
-									default:
-										break;
+										switch (_valign)
+										{
+										case BL_UA_TOP:
+											_y = (BLS32)_topy;
+											break;
+										case BL_UA_VCENTER:
+											_y = (BLS32)(_topy + (_bottomy - _topy - (_wid->uExtension.sLabel.pRowCells->nSize) * _height) * 0.5f);
+											break;
+										case BL_UA_BOTTOM:
+											_y = (BLS32)(_bottomy - (_wid->uExtension.sLabel.pRowCells->nSize) * _height);
+											break;
+										default:
+											_y = (BLS32)_topy;
+											break;
+										}
 									}
-									_x += (BLS32)_iter2->sDim.fX;
+									FOREACH_LIST(_BLRichAtomCell*, _iter2, _iter->pElements)
+									{
+										BLRect _dstrect;
+										_dstrect.sLT.fX = (BLF32)_x;
+										_dstrect.sLT.fY = (BLF32)_y;
+										_dstrect.sRB.fX = (BLF32)_x + _iter2->sDim.fX;
+										_dstrect.sRB.fY = (BLF32)_y + _iter2->sDim.fY;
+										switch (_iter2->nType)
+										{
+										case 3:
+											if ((_iter2->nTexture != INVALID_GUID) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
+												blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
+											break;
+										case 4:
+											if ((_iter2->pText) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
+												blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
+											break;
+										default:
+											break;
+										}
+										_x += (BLS32)_iter2->sDim.fX;
+									}
 								}
+								_y += _iter->nHeight;
 							}
-							_y += _iter->nHeight;
 						}
-						FOREACH_ARRAY(_BLRichAnchoredCell*, _iter3, _wid->uExtension.sLabel.pAnchoredCells)
 						{
-							_y = (BLS32)(_drawarea.sLT.fY - _wid->uExtension.sLabel.fPaddingY + _iter3->nBottomy - _iter3->pElement->sDim.fY);
-							BLF32 _x;
-							if (_iter3->bLeft)
-								_x = _drawarea.sLT.fX + _wid->uExtension.sLabel.fPaddingX;
-							else
-								_x = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingX - _iter3->pElement->sDim.fX;
-							BLRect _dstrect;
-							_dstrect.sLT.fX = (BLF32)_x;
-							_dstrect.sLT.fY = (BLF32)_y;
-							_dstrect.sRB.fX = (BLF32)_x + _iter3->pElement->sDim.fX;
-							_dstrect.sRB.fY = (BLF32)_y + _iter3->pElement->sDim.fY;
-							switch (_iter3->pElement->nType)
+							FOREACH_ARRAY(_BLRichAnchoredCell*, _iter3, _wid->uExtension.sLabel.pAnchoredCells)
 							{
-							case 3:
-								if ((_iter3->pElement->nTexture != INVALID_GUID) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-									blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
-								break;
-							case 4:
-								if ((_iter3->pElement->pText) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-									blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
-								break;
-							default: break;
+								_y = (BLS32)(_drawarea.sLT.fY - _wid->uExtension.sLabel.fPaddingY + _iter3->nBottomy - _iter3->pElement->sDim.fY);
+								BLF32 _x;
+								if (_iter3->bLeft)
+									_x = _drawarea.sLT.fX + _wid->uExtension.sLabel.fPaddingX;
+								else
+									_x = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingX - _iter3->pElement->sDim.fX;
+								BLRect _dstrect;
+								_dstrect.sLT.fX = (BLF32)_x;
+								_dstrect.sLT.fY = (BLF32)_y;
+								_dstrect.sRB.fX = (BLF32)_x + _iter3->pElement->sDim.fX;
+								_dstrect.sRB.fY = (BLF32)_y + _iter3->pElement->sDim.fY;
+								switch (_iter3->pElement->nType)
+								{
+								case 3:
+									if ((_iter3->pElement->nTexture != INVALID_GUID) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
+										blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
+									break;
+								case 4:
+									if ((_iter3->pElement->pText) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
+										blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
+									break;
+								default: break;
+								}
 							}
 						}
 					}
@@ -10229,100 +10237,104 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					if (blRectContains(&_drawarea, &_pos))
 					{
 						BLS32 _y = (BLS32)(_drawarea.sLT.fY + _wid->uExtension.sLabel.fPaddingY - _wid->uExtension.sLabel.nScroll);
-						FOREACH_ARRAY(_BLRichRowCell*, _iter, _wid->uExtension.sLabel.pRowCells)
 						{
-							if (_y <= _drawarea.sRB.fY && _y + _iter->nHeight >= _drawarea.sLT.fY)
+							FOREACH_ARRAY(_BLRichRowCell*, _iter, _wid->uExtension.sLabel.pRowCells)
 							{
-								BLEnum _halign = _iter->eAlignmentH;
-								BLEnum _valign = _iter->eAlignmentV;
-								BLU32 _width = _iter->nWidth;
-								BLU32 _height = _iter->nHeight;
-								BLF32 _leftx = _drawarea.sLT.fX + _wid->uExtension.sLabel.fPaddingX + _iter->nLeftPadding;
-								BLF32 _rightx = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingX - _iter->nRightPadding;
-								BLF32 _topy = _drawarea.sLT.fY + _wid->uExtension.sLabel.fPaddingY;
-								BLF32 _bottomy = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingY;
-								BLS32 _x;
-								switch (_halign)
+								if (_y <= _drawarea.sRB.fY && _y + _iter->nHeight >= _drawarea.sLT.fY)
 								{
-								case BL_UA_LEFT:
-									_x = (BLS32)_leftx;
-									break;
-								case BL_UA_HCENTER:
-									_x = (BLS32)(_leftx + (_rightx - _leftx - _width) * 0.5f);
-									break;
-								case BL_UA_RIGHT:
-									_x = (BLS32)(_rightx - _width);
-									break;
-								default:
-									_x = (BLS32)_leftx;
-									break;
-								}
-								if (_wid->uExtension.sLabel.pRowCells->nSize == 1)
-								{
-									switch (_valign)
+									BLEnum _halign = _iter->eAlignmentH;
+									BLEnum _valign = _iter->eAlignmentV;
+									BLU32 _width = _iter->nWidth;
+									BLU32 _height = _iter->nHeight;
+									BLF32 _leftx = _drawarea.sLT.fX + _wid->uExtension.sLabel.fPaddingX + _iter->nLeftPadding;
+									BLF32 _rightx = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingX - _iter->nRightPadding;
+									BLF32 _topy = _drawarea.sLT.fY + _wid->uExtension.sLabel.fPaddingY;
+									BLF32 _bottomy = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingY;
+									BLS32 _x;
+									switch (_halign)
 									{
-									case BL_UA_TOP:
-										_y = (BLS32)_topy;
+									case BL_UA_LEFT:
+										_x = (BLS32)_leftx;
 										break;
-									case BL_UA_VCENTER:
-										_y = (BLS32)(_topy + (_bottomy - _topy - (_wid->uExtension.sLabel.pRowCells->nSize) * _height) * 0.5f);
+									case BL_UA_HCENTER:
+										_x = (BLS32)(_leftx + (_rightx - _leftx - _width) * 0.5f);
 										break;
-									case BL_UA_BOTTOM:
-										_y = (BLS32)(_bottomy - (_wid->uExtension.sLabel.pRowCells->nSize) * _height);
+									case BL_UA_RIGHT:
+										_x = (BLS32)(_rightx - _width);
 										break;
 									default:
-										_y = (BLS32)_topy;
+										_x = (BLS32)_leftx;
 										break;
 									}
-								}
-								FOREACH_LIST(_BLRichAtomCell*, _iter2, _iter->pElements)
-								{
-									BLRect _dstrect;
-									_dstrect.sLT.fX = (BLF32)_x;
-									_dstrect.sLT.fY = (BLF32)_y;
-									_dstrect.sRB.fX = (BLF32)_x + _iter2->sDim.fX;
-									_dstrect.sRB.fY = (BLF32)_y + _iter2->sDim.fY;
-									switch (_iter2->nType)
+									if (_wid->uExtension.sLabel.pRowCells->nSize == 1)
 									{
-									case 3:
-										if ((_iter2->nTexture != INVALID_GUID) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-											blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
-										break;
-									case 4:
-										if ((_iter2->pText) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-											blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
-										break;
-									default: break;
+										switch (_valign)
+										{
+										case BL_UA_TOP:
+											_y = (BLS32)_topy;
+											break;
+										case BL_UA_VCENTER:
+											_y = (BLS32)(_topy + (_bottomy - _topy - (_wid->uExtension.sLabel.pRowCells->nSize) * _height) * 0.5f);
+											break;
+										case BL_UA_BOTTOM:
+											_y = (BLS32)(_bottomy - (_wid->uExtension.sLabel.pRowCells->nSize) * _height);
+											break;
+										default:
+											_y = (BLS32)_topy;
+											break;
+										}
 									}
-									_x += (BLS32)_iter2->sDim.fX;
+									FOREACH_LIST(_BLRichAtomCell*, _iter2, _iter->pElements)
+									{
+										BLRect _dstrect;
+										_dstrect.sLT.fX = (BLF32)_x;
+										_dstrect.sLT.fY = (BLF32)_y;
+										_dstrect.sRB.fX = (BLF32)_x + _iter2->sDim.fX;
+										_dstrect.sRB.fY = (BLF32)_y + _iter2->sDim.fY;
+										switch (_iter2->nType)
+										{
+										case 3:
+											if ((_iter2->nTexture != INVALID_GUID) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
+												blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
+											break;
+										case 4:
+											if ((_iter2->pText) && (_iter2->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
+												blInvokeEvent(BL_ET_UI, _iter2->nLinkID, _wid->eType, NULL, _wid->nID);
+											break;
+										default: break;
+										}
+										_x += (BLS32)_iter2->sDim.fX;
+									}
 								}
+								_y += _iter->nHeight;
 							}
-							_y += _iter->nHeight;
 						}
-						FOREACH_ARRAY(_BLRichAnchoredCell*, _iter3, _wid->uExtension.sLabel.pAnchoredCells)
 						{
-							_y = (BLS32)(_drawarea.sLT.fY - _wid->uExtension.sLabel.fPaddingY + _iter3->nBottomy - _iter3->pElement->sDim.fY);
-							BLF32 _x;
-							if (_iter3->bLeft)
-								_x = _drawarea.sLT.fX + _wid->uExtension.sLabel.fPaddingX;
-							else
-								_x = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingX - _iter3->pElement->sDim.fX;
-							BLRect _dstrect;
-							_dstrect.sLT.fX = (BLF32)_x;
-							_dstrect.sLT.fY = (BLF32)_y;
-							_dstrect.sRB.fX = (BLF32)_x + _iter3->pElement->sDim.fX;
-							_dstrect.sRB.fY = (BLF32)_y + _iter3->pElement->sDim.fY;
-							switch (_iter3->pElement->nType)
+							FOREACH_ARRAY(_BLRichAnchoredCell*, _iter3, _wid->uExtension.sLabel.pAnchoredCells)
 							{
-							case 3:
-								if ((_iter3->pElement->nTexture != INVALID_GUID) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-									blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
-								break;
-							case 4:
-								if ((_iter3->pElement->pText) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
-									blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
-								break;
-							default: break;
+								_y = (BLS32)(_drawarea.sLT.fY - _wid->uExtension.sLabel.fPaddingY + _iter3->nBottomy - _iter3->pElement->sDim.fY);
+								BLF32 _x;
+								if (_iter3->bLeft)
+									_x = _drawarea.sLT.fX + _wid->uExtension.sLabel.fPaddingX;
+								else
+									_x = _drawarea.sRB.fX - _wid->uExtension.sLabel.fPaddingX - _iter3->pElement->sDim.fX;
+								BLRect _dstrect;
+								_dstrect.sLT.fX = (BLF32)_x;
+								_dstrect.sLT.fY = (BLF32)_y;
+								_dstrect.sRB.fX = (BLF32)_x + _iter3->pElement->sDim.fX;
+								_dstrect.sRB.fY = (BLF32)_y + _iter3->pElement->sDim.fY;
+								switch (_iter3->pElement->nType)
+								{
+								case 3:
+									if ((_iter3->pElement->nTexture != INVALID_GUID) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
+										blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
+									break;
+								case 4:
+									if ((_iter3->pElement->pText) && (_iter3->pElement->nLinkID != 0xFFFFFFFF) && blRectContains(&_dstrect, &_pos))
+										blInvokeEvent(BL_ET_UI, _iter3->pElement->nLinkID, _wid->eType, NULL, _wid->nID);
+									break;
+								default: break;
+								}
 							}
 						}
 					}

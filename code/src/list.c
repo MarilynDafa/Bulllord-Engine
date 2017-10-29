@@ -207,10 +207,11 @@ blListInsert(INOUT BLList* _Lst, IN BLU32 _Idx, IN BLVoid* _Ele)
 	}
 	_Lst->nSize++;
 }
-BLVoid
+BLVoid*
 blListErase(INOUT BLList* _Lst,	IN BLVoid* _Node)
 {
 	struct _ListNode* _obj = (struct _ListNode*)_Node;
+	struct _ListNode* _ret = _obj->pPrev ? _obj->pPrev : _obj->pNext;
 	if (_obj->pPrev == NULL)
 		_Lst->pFirst = _obj->pNext;
 	else
@@ -222,4 +223,5 @@ blListErase(INOUT BLList* _Lst,	IN BLVoid* _Node)
 	free(_obj->pData);
 	free(_obj);
 	_Lst->nSize--;
+	return _ret;
 }

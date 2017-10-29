@@ -476,6 +476,48 @@ _Recv(BLSocket _Sock, BLU32* _Msgsz)
 	}
 	return NULL;
 }
+#if defined(BL_PLATFORM_WEB)
+static BLVoid
+_OnWGetLoaded(BLU32 _Dummy, BLVoid* _Param, const BLAnsi* _Filename)
+{
+	const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
+	const BLAnsi* _local = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList);
+	free(_url);
+	free(_local);
+	blArrayPopFront(_PrNetworkMem->pDownList);
+	blArrayPopFront(_PrNetworkMem->pLocalList);
+	for (BLU32 _idx = 0; _idx < 64; ++_idx)
+	{
+		if (_PrNetworkMem->nFinish[_idx] == 0)
+		{
+			_PrNetworkMem->nFinish[_idx] = _PrNetworkMem->_PrCurDownHash;
+			break;
+		}
+	}
+	if (_PrNetworkMem->pDownList->nSize)
+		blBeginDownload();
+}
+static BLVoid
+_OnWGetError(BLU32 _Dummy, BLVoid* _Param, BLS32 _Dummy2)
+{
+	if (_PrNetworkMem->pDownList->nSize)
+	{
+		const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
+		const BLAnsi* _local = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList);
+		free(_url);
+		free(_local);
+		blArrayPopFront(_PrNetworkMem->pDownList);
+		blArrayPopFront(_PrNetworkMem->pLocalList);
+		if (_PrNetworkMem->pDownList->nSize)
+			blBeginDownload();
+	}
+}
+static BLVoid
+_OnWGetProg(BLU32 _Dummy, BLVoid* _Param, BLS32 _Prog)
+{
+	_PrNetworkMem->nCurDownSize = _Prog;
+}
+#else
 static BLU32
 _HttpDownloadRequest(BLSocket _Sock, const BLAnsi* _Host, const BLAnsi* _Addr, const BLAnsi* _Filename, BLU32 _Pos, BLU32 _End, BLAnsi _Redirect[1024])
 {
@@ -489,7 +531,7 @@ _HttpDownloadRequest(BLSocket _Sock, const BLAnsi* _Host, const BLAnsi* _Addr, c
 		sprintf_s(_temp, 512, "HEAD %s%s HTTP/1.1\r\nHost: %s\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)\r\n\r\n", _Addr, _Filename, _Host);
 	else
 		sprintf_s(_temp, 512, "GET %s%s HTTP/1.1\r\nHost: %s\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)\r\nConnection: close\r\nRange: bytes=%lu-%lu\r\n\r\n", _Addr, _Filename, _Host, (unsigned long)_Pos, (unsigned long)_End);
-#elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID)
+#elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID) || defined(BL_PLATFORM_WEB)
 	if (_End == 0xFFFFFFFF)
 		sprintf(_temp, "HEAD %s%s HTTP/1.1\r\nHost: %s\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)\r\n\r\n", _Addr, _Filename, _Host);
 	else
@@ -1573,6 +1615,7 @@ failed:
 	return (BLVoid*)0xdead;
 #endif
 }
+#endif
 BLVoid
 blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 {
@@ -1601,7 +1644,10 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 		_lin.l_linger = 0;
 		_lin.l_onoff = 1;
 		setsockopt(_PrNetworkMem->sTcpSocket, SOL_SOCKET, SO_LINGER, (BLAnsi*)&_lin, sizeof(_lin));
+#if defined(BL_PLATFORM_WEB)
+#else
 		_PrNetworkMem->pConnThread = blGenThread(_NetTCPConnThreadFunc, NULL, NULL);
+#endif
 		blThreadRun(_PrNetworkMem->pConnThread);
 	}
 }
@@ -1778,7 +1824,10 @@ blSendNetMsg(IN BLU32 _MsgID, IN BLVoid* _Msgbuf, IN BLU32 _Msgsz, IN BLBool _Cr
 		_lin.l_linger = 0;
 		_lin.l_onoff = 1;
 		setsockopt(_job->sSocket, SOL_SOCKET, SO_LINGER, (BLAnsi*)&_lin, sizeof(_lin));
+#if defined(BL_PLATFORM_WEB)
+#else
 		_job->pThread = blGenThread(_NetHTTPWorkThreadFunc, NULL, _job);
+#endif
 		blMutexLock(_PrNetworkMem->pCriList->pMutex);
 		blListPushBack(_PrNetworkMem->pHttpJobArray, _job);
 		blMutexUnlock(_PrNetworkMem->pCriList->pMutex);
@@ -2112,20 +2161,23 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 		if (_localpath[_idx] == '/')
 			_localpath[_idx] = '\\';
+		if (_Localpath[_idx] == '\\')
+		{
+			BLAnsi _tmppath[256] = { 0 };
+			strncpy(_tmppath, _localpath, _idx);
+			CreateDirectoryA(_tmppath, NULL);
+		}
 #else
 		if (_localpath[_idx] == '\\')
 			_localpath[_idx] = '/';
+		if (_localpath[_idx] == '/')
+		{
+			BLAnsi _tmppath[256] = { 0 };
+			strncpy(_tmppath, _localpath, _idx);
+			mkdir(_tmppath, 0755);
+		}
 #endif
 	}
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-    if (!_ispath)
-        _localpath[_idx] = '\\';
-	CreateDirectoryA(_localpath, NULL);
-#else
-    if (!_ispath)
-        _localpath[_idx] = '/';
-	mkdir(_localpath, 0755);
-#endif
 	FOREACH_ARRAY(BLAnsi*, _iter, _PrNetworkMem->pDownList)
 	{
 		if (strcmp(_iter, _Host) == 0)
@@ -2221,7 +2273,7 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 			DeleteFileA(_tmp);
 		}
 	}
-#else
+#elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID) || defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
 	FILE* _fp = fopen(_tmp, "rb");
 	if (FILE_INVALID_INTERNAL(_fp))
 	{
@@ -2283,15 +2335,23 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 BLVoid
 blBeginDownload()
 {
+#if defined(BL_PLATFORM_WEB)
+	const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
+	const BLAnsi* _local = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList);
+	_PrNetworkMem->_PrCurDownHash = blHashString((const BLUtf8*)_url);
+	_PrNetworkMem->nCurDownSize = 0;
+	_PrNetworkMem->nCurDownTotal = 1;
+	emscripten_async_wget2(_url, _local, "GET", NULL, NULL, _OnWGetLoaded, _OnWGetError, _OnWGetProg);
+#else
 	_PrNetworkMem->pDownMain = blGenThread(_NetDownMainThread, NULL, NULL);
 	blThreadRun(_PrNetworkMem->pDownMain);
+#endif
 }
 BLVoid
-blProgressQuery(OUT BLU32* _Curtask, OUT BLU32* _Downloaded, OUT BLU32* _Total, OUT BLU32 _Finish[64])
+blProgressQuery(OUT BLU32* _Curtask, OUT BLU32* _Progress, OUT BLU32 _Finish[64])
 {
 	*_Curtask = _PrNetworkMem->_PrCurDownHash;
-	*_Downloaded = _PrNetworkMem->nCurDownSize;
-	*_Total = _PrNetworkMem->nCurDownTotal;
+	*_Progress = _PrNetworkMem->nCurDownSize * 100 / _PrNetworkMem->nCurDownTotal;
 	for (BLU32 _idx = 0; _idx < 64; ++_idx)
 		_Finish[_idx] = _PrNetworkMem->nFinish[_idx];
 }

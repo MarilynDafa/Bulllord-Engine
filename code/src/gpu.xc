@@ -94,16 +94,16 @@ typedef struct _PipelineState{
     BLBool bBlendStateDirty;
     union {
 #if defined(BL_GL_BACKEND)
-        struct _GL {
+        struct _GLPS {
         } sGL;
 #elif defined(BL_VK_BACKEND)
-        struct _VK {
+        struct _VKPS {
         } sVK;
 #elif defined(BL_MTL_BACKEND)
-        struct _MTL{
+        struct _MTLPS{
         } sMTL;
 #elif defined(BL_DX_BACKEND)
-        struct _DX{
+        struct _DXPS {
         } sDX;
 #endif
     } uData;
@@ -111,17 +111,17 @@ typedef struct _PipelineState{
 typedef struct _UniformBuffer {
 	union {
 #if defined(BL_GL_BACKEND)
-		struct _GL {
+		struct _GLUBO {
 			GLuint nHandle;
 		} sGL;
 #elif defined(BL_VK_BACKEND)
-		struct _VK {
+		struct _VKUBO {
 		} sVK;
 #elif defined(BL_MTL_BACKEND)
-		struct _MTL {
+		struct _MTLUBO {
 		} sMTL;
 #elif defined(BL_DX_BACKEND)
-		struct _DX {
+		struct _DXUBO {
 		} sDX;
 #endif
 	} uData;
@@ -139,7 +139,7 @@ typedef struct _TextureBuffer {
     BLU32 nBpp;
     union {
 #if defined(BL_GL_BACKEND)
-        struct _GL {
+        struct _GLTBO {
             GLuint nHandle;
             GLuint nRTHandle;
             GLenum eInternalFmt;
@@ -147,13 +147,13 @@ typedef struct _TextureBuffer {
             GLenum eFormat;
         } sGL;
 #elif defined(BL_VK_BACKEND)
-        struct _VK {
+        struct _VKTBO {
         } sVK;
 #elif defined(BL_MTL_BACKEND)
-        struct _MTL{
+        struct _MTLTBO {
         } sMTL;
 #elif defined(BL_DX_BACKEND)
-        struct _DX{
+        struct _DXTBO {
 			ID3D12Resource* pHandle;
         } sDX;
 #endif
@@ -171,19 +171,19 @@ typedef struct _FrameBuffer {
     BLU32 nHeight;
     union {
 #if defined(BL_GL_BACKEND)
-        struct _GL {
+        struct _GLFBO {
             GLuint nHandle;
             GLuint nResolveHandle;
             GLint nPrevHandle;
         } sGL;
 #elif defined(BL_VK_BACKEND)
-        struct _VK {
+        struct _VKFBO {
         } sVK;
 #elif defined(BL_MTL_BACKEND)
-        struct _MTL{
+        struct _MTLFBO {
         } sMTL;
 #elif defined(BL_DX_BACKEND)
-        struct _DX{
+        struct _DXFBO {
         } sDX;
 #endif
     } uData;
@@ -199,20 +199,20 @@ typedef struct _GeometryBuffer {
     BLEnum aInsSem[4];
     union {
 #if defined(BL_GL_BACKEND)
-        struct _GL {
+        struct _GLGBO {
             GLuint nVBHandle;
             GLuint nIBHandle;
             GLuint nVAHandle;
             GLuint nInsHandle[4];
         } sGL;
 #elif defined(BL_VK_BACKEND)
-        struct _VK {
+        struct _VKGBO {
         } sVK;
 #elif defined(BL_MTL_BACKEND)
-        struct _MTL{
+        struct _MTLGBO {
         } sMTL;
 #elif defined(BL_DX_BACKEND)
-        struct _DX{
+        struct _DXGBO {
         } sDX;
 #endif
     } uData;
@@ -226,18 +226,18 @@ typedef struct _Technique{
         BLVoid* pVar;
 		union {
 #if defined(BL_GL_BACKEND)
-			struct _GL {
+			struct _GLTCH {
 				GLuint nIndices;
 				GLint nOffset;
 			} sGL;
 #elif defined(BL_VK_BACKEND)
-			struct _VK {
+			struct _VKTCH {
 			} sVK;
 #elif defined(BL_MTL_BACKEND)
-			struct _MTL {
+			struct _MTLTCH {
 			} sMTL;
 #elif defined(BL_DX_BACKEND)
-			struct _DX {
+			struct _DXTCH {
 			} sDX;
 #endif
 		} uData;
@@ -249,34 +249,34 @@ typedef struct _Technique{
         BLVoid* pTex;
 		union {
 #if defined(BL_GL_BACKEND)
-			struct _GL {
+			struct _GLSMP {
 				GLuint nHandle;
 			} sGL;
 #elif defined(BL_VK_BACKEND)
-			struct _VK {
+			struct _VKSMP {
 			} sVK;
 #elif defined(BL_MTL_BACKEND)
-			struct _MTL {
+			struct _MTLSMP {
 			} sMTL;
 #elif defined(BL_DX_BACKEND)
-			struct _DX {
+			struct _DXSMP {
 			} sDX;
 #endif
 		} uData;
     } aSamplerVars[8];
     union {
 #if defined(BL_GL_BACKEND)
-        struct _GL {
+        struct _GLSMPD {
             GLuint nHandle;
         } sGL;
 #elif defined(BL_VK_BACKEND)
-        struct _VK {
+        struct _VKSMPD {
         } sVK;
 #elif defined(BL_MTL_BACKEND)
-        struct _MTL{
+        struct _MTLSMPD {
         } sMTL;
 #elif defined(BL_DX_BACKEND)
-        struct _DX{
+        struct _DXSMPD {
 			ID3DBlob* pVS;
 			ID3DBlob* pPS;
 			ID3DBlob* pDS;
@@ -288,13 +288,13 @@ typedef struct _Technique{
 }_BLTechnique;
 typedef struct _CommandQueue {
 #if defined(BL_VK_BACKEND)
-	struct _VK {
+	struct _VKCMD {
 	} sVK;
 #elif defined(BL_MTL_BACKEND)
-	struct _MTL {
+	struct _MTLCMD {
 	} sMTL;
 #elif defined(BL_DX_BACKEND)
-	struct _DX {
+	struct _DXCMD {
 		ID3D12CommandQueue* pCmdQueue;
 		ID3D12Fence* pFence;
 		ID3D12GraphicsCommandList* aCmdList[256];

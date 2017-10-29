@@ -37,9 +37,9 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #elif defined(BL_PLATFORM_WEB)
-#	define BL_USE_AL_API
-#include <AL/al.h>
-#include <AL/alc.h>
+#	define BL_USE_SDL_API
+#include <SDL/SDL.h>
+#include <SDL/SDL_mixer.h>
 #elif defined(BL_PLATFORM_ANDROID)
 #   define BL_USE_SL_API
 #include <SLES/OpenSLES.h>
@@ -55,9 +55,9 @@
 #endif
 #ifdef __cplusplus
 extern "C" {
+#endif
 extern BLBool _FetchResource(const BLAnsi*, BLVoid**, BLGuid, BLBool(*)(BLVoid*, const BLAnsi*),BLBool(*)(BLVoid*), BLBool);
 extern BLBool _DiscardResource(BLGuid, BLBool(*)(BLVoid*), BLBool(*)(BLVoid*));
-#endif
 #ifdef __cplusplus
 }
 #endif
@@ -80,32 +80,62 @@ typedef struct _AudioDevice{
     BLF32 fEnvVolume;
 }_BLAudioDevice;
 typedef struct _AudioSource{
+    BLBool bLoop;
+	BLBool bValid;
+	BLBool b3d;
+	BLVec3 sPos;
+    BLGuid nID;
+#if defined(BL_USE_AL_API)
+	BLS32 nOffset;
+	BLS32 nFrequency;
+	BLU32 nChannels;
+	BLS32 nBPS;
 	MPAuDecContext* pMp3Context;
 	BLS32 nMp3Size;
 	BLS32 nMp3Read;
 	BLU8 aMp3Packet[MPAUDEC_MAX_AUDIO_FRAME_SIZE];
 	BLGuid nStream;
+	BLU8* pSoundBufA;
+	BLU8* pSoundBufB;
+	BLU8* pSoundBufC;
+    ALuint aBuffers[3];
+    ALuint nSource;
+    BLU32 nBufTurn;
+#elif defined(BL_USE_SL_API)
 	BLS32 nOffset;
 	BLS32 nFrequency;
 	BLU32 nChannels;
 	BLS32 nBPS;
-    BLBool bLoop;
-	BLBool bValid;
-	BLBool b3d;
+	MPAuDecContext* pMp3Context;
+	BLS32 nMp3Size;
+	BLS32 nMp3Read;
+	BLU8 aMp3Packet[MPAUDEC_MAX_AUDIO_FRAME_SIZE];
+	BLGuid nStream;
 	BLU8* pSoundBufA;
 	BLU8* pSoundBufB;
 	BLU8* pSoundBufC;
-	BLVec3 sPos;
-    BLGuid nID;
-    BLU32 nBufTurn;
-#if defined(BL_USE_AL_API)
-    ALuint aBuffers[3];
-    ALuint nSource;
-#elif defined(BL_USE_SL_API)
     SLObjectItf pSource;
     SLBufferQueueItf pBufferFunc;
+    BLU32 nBufTurn;
 #elif defined(BL_USE_COREAUDIO_API)
+	BLS32 nOffset;
+	BLS32 nFrequency;
+	BLU32 nChannels;
+	BLS32 nBPS;
+	MPAuDecContext* pMp3Context;
+	BLS32 nMp3Size;
+	BLS32 nMp3Read;
+	BLU8 aMp3Packet[MPAUDEC_MAX_AUDIO_FRAME_SIZE];
+	BLGuid nStream;
+	BLU8* pSoundBufA;
+	BLU8* pSoundBufB;
+	BLU8* pSoundBufC;
 	IXAudio2SourceVoice* pSource;
+    BLU32 nBufTurn;
+#elif defined(BL_USE_SDL_API)
+	Mix_Music* pMusic;
+	Mix_Chunk* pSound;
+	BLS32 nChannel;
 #endif
 }_BLAudioSource;
 typedef struct _AudioMember {
@@ -118,7 +148,6 @@ typedef struct _AudioMember {
 	BLVec3 sListenerDir;
 	BLVec3 sListenerPos;
 	BLVec3 sListenerLastPos;
-	BLU32 nRNGSeed;
 	BLU32 nPCMChannels;
 	BLU32 nPCMSampleRate;
 	BLU8* aPCMBuf[8];
@@ -139,6 +168,7 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx, BLU32* _TotalRead)
 	BLU32 _totalread = 0;
 	BLU32 _samplerate;
 	BLBool _ret = TRUE;
+#if !defined(BL_USE_SDL_API)
 	if (_Src->pMp3Context)
 	{
 		_samplerate = _Src->pMp3Context->sample_rate;
@@ -219,12 +249,14 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx, BLU32* _TotalRead)
 		}
 	}
 	*_TotalRead = _totalread;
+#endif
     return _ret;
 }
 static BLBool
 _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
+#if !defined(BL_USE_SDL_API)
 	_src->nStream = blGenStream(_Filename);
 	if (_src->nStream == INVALID_GUID)
 		return FALSE;
@@ -344,6 +376,12 @@ _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 			return FALSE;
 		}
 	}	
+#else	
+	if (!_src->b3d && _src->bLoop)
+		_src->pMusic = Mix_LoadMUS(_Filename);
+	else
+		_src->pSound = Mix_LoadWAV(_Filename);
+#endif
 	return TRUE;
 }
 static BLBool
@@ -352,12 +390,19 @@ _UnloadAudio(BLVoid* _Src)
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;	
 	blMutexLock(_PrAudioMem->pMusicMutex);
 	blMutexLock(_PrAudioMem->pSounds->pMutex);
+#if !defined(BL_USE_SDL_API)
 	if (_src->pMp3Context)
 	{
 		mpaudec_clear(_src->pMp3Context);
 		free(_src->pMp3Context);
 	}
 	blDeleteStream(_src->nStream);
+#else
+	if (_src->pMusic)
+		Mix_FreeMusic(_src->pMusic);
+	else
+		Mix_FreeChunk(_src->pSound);
+#endif
 	if (!_src->b3d && _src->bLoop)
 		_PrAudioMem->pBackMusic = NULL;
 	blMutexUnlock(_PrAudioMem->pMusicMutex);
@@ -430,10 +475,10 @@ _ALSoundSetup(BLVoid* _Src)
     }
     alSourceQueueBuffers(_src->nSource, _queuesz, _src->aBuffers);
 	alSourcePlay(_src->nSource);
-	if (_src->b3d || !_src->bLoop)
-		blListPushBack(_PrAudioMem->pSounds, _src);
-	else
+	if (!_src->b3d && _src->bLoop)
 		_PrAudioMem->pBackMusic = _src;
+	else
+		blListPushBack(_PrAudioMem->pSounds, _src);
 	_src->bValid = TRUE;
 	return TRUE;
 }
@@ -469,6 +514,7 @@ _ALUpdate(_BLAudioSource* _Src)
 {
     if (!_Src || !_Src->bValid)
         return TRUE;
+			blDebugOutput("alupdate");
     ALint _processed = 0;
     ALenum _state = 0;
 	ALint _alfmt = 0;
@@ -507,6 +553,7 @@ _ALUpdate(_BLAudioSource* _Src)
 					alBufferData(_Src->aBuffers[2], _alfmt, _Src->pSoundBufC, _totalread, _Src->nFrequency);
                 alSourceQueueBuffers(_Src->nSource, 1, &_buffer);
             }
+			blDebugOutput("process %d", _processed);
         }
     }
     alGetSourcei(_Src->nSource, AL_SOURCE_STATE, &_state);
@@ -662,10 +709,10 @@ _CASoundSetup(BLVoid* _Src)
 	}
 	_src->nBufTurn = 0;
 	_src->pSource->Start(0);
-	if (_src->b3d || !_src->bLoop)
-		blListPushBack(_PrAudioMem->pSounds, _src);
-	else
+	if (!_src->b3d && _src->bLoop)
 		_PrAudioMem->pBackMusic = _src;
+	else
+		blListPushBack(_PrAudioMem->pSounds, _src);
 	_src->bValid = TRUE;
 	return TRUE;
 }
@@ -727,6 +774,44 @@ _CAUpdate(_BLAudioSource* _Src)
 	}
 	return TRUE;
 }
+#elif defined(BL_USE_SDL_API)
+static BLBool
+_SDLSoundSetup(BLVoid* _Src)
+{
+	_BLAudioSource* _src = (_BLAudioSource*)_Src;	
+	if (!_src->b3d && _src->bLoop)
+		Mix_VolumeMusic(_PrAudioMem->pAudioDev.fMusicVolume * SDL_MIX_MAXVOLUME);
+	else
+	{
+		if (!_src->b3d)
+			Mix_VolumeChunk(_src->pSound, _PrAudioMem->pAudioDev.fSystemVolume * SDL_MIX_MAXVOLUME);
+		else
+			Mix_VolumeChunk(_src->pSound, _PrAudioMem->pAudioDev.fEnvVolume * SDL_MIX_MAXVOLUME);
+	}	
+	if (!_src->b3d && _src->bLoop)
+		_PrAudioMem->pBackMusic = _src;
+	else
+	{
+	blListPushBack(_PrAudioMem->pSounds, _src);
+	blDebugOutput("sss");
+	}
+	if (_src == _PrAudioMem->pBackMusic)
+		_src->nChannel = Mix_PlayMusic(_src->pMusic, -1);
+	else
+		_src->nChannel = Mix_PlayChannelTimed(-1, _src->pSound, _src->bLoop ? -1 : 0, -1);
+	_src->bValid = TRUE;
+	return TRUE;
+}
+static BLBool
+_SDLSoundRelease(BLVoid* _Src)
+{
+	return TRUE;
+}
+static BLBool
+_SDLUpdate(_BLAudioSource* _Src)
+{
+	return TRUE;
+}
 #endif
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 static DWORD __stdcall
@@ -770,7 +855,6 @@ _AudioThreadFunc(BLVoid* _Userdata)
 #elif defined(BL_USE_COREAUDIO_API)
 					_DiscardResource(_iter->nID, _UnloadAudio, _CASoundRelease);
 #endif
-					free(_iterator_iter);
 					blDeleteGuid(_iter->nID);
 					break;
 				}
@@ -906,6 +990,23 @@ _CADestroy()
 	_PrAudioMem->pAudioDev.pCAContext = NULL;
 	_PrAudioMem->pAudioDev.pCADevice = NULL;
 }
+#elif defined(BL_USE_SDL_API)
+static BLVoid
+_SDLInit()
+{
+	SDL_Init(SDL_INIT_AUDIO);
+	BLS32 _ret = Mix_OpenAudio(0, 0, 0, 0);
+	assert(_ret == 0);
+	_PrAudioMem->pAudioDev.fMusicVolume = _PrAudioMem->pAudioDev.fSystemVolume = _PrAudioMem->pAudioDev.fEnvVolume = 0.7f;
+	_PrAudioMem->pSounds = blGenList(TRUE);
+	blDebugOutput("Audio initialize successfully");
+}
+static BLVoid
+_SDLDestroy()
+{	
+    blDeleteList(_PrAudioMem->pSounds);
+	Mix_CloseAudio();
+}
 #endif
 BLVoid
 _AudioInit(DUK_CONTEXT* _DKC)
@@ -915,7 +1016,6 @@ _AudioInit(DUK_CONTEXT* _DKC)
 	_PrAudioMem->pBackMusic = NULL;
 	_PrAudioMem->pSounds = NULL;
 	_PrAudioMem->pMusicMutex = NULL;
-	_PrAudioMem->nRNGSeed = 22222;
 	_PrAudioMem->nPCMChannels = -1;
 	_PrAudioMem->nPCMSampleRate = -1;
 	_PrAudioMem->nPCMBufTurn = 0;
@@ -927,9 +1027,12 @@ _AudioInit(DUK_CONTEXT* _DKC)
 	_PrAudioMem->pPCMStream = -1;
 #elif defined(BL_USE_SL_API)
     _SLInit();
+	_PrAudioMem->pPCMStream = NULL;
 #elif defined(BL_USE_COREAUDIO_API)
     _CAInit();
 	_PrAudioMem->pPCMStream = NULL;
+#elif defined(BL_USE_SDL_API)
+	_SDLInit();
 #endif
 }
 BLVoid
@@ -1007,6 +1110,17 @@ _AudioStep(BLU32 _Delta)
 #endif
 			_PrAudioMem->sListenerLastPos = _PrAudioMem->sListenerPos;
 		}
+		else
+		{
+#if defined(BL_USE_SDL_API)
+			if (!Mix_Playing(_iter->nChannel))
+			{
+				blListErase(_PrAudioMem->pSounds, _iterator_iter);
+				_DiscardResource(_iter->nID, _UnloadAudio, _SDLSoundRelease);
+				blDeleteGuid(_iter->nID);				
+			}
+#endif
+		}
     }
     blMutexUnlock(_PrAudioMem->pSounds->pMutex);
 }
@@ -1025,6 +1139,10 @@ _AudioDestroy()
 	if (_PrAudioMem->pBackMusic)
 		_DiscardResource(_PrAudioMem->pBackMusic->nID, _UnloadAudio, _CASoundRelease);
     _CADestroy();
+#elif defined(BL_USE_SDL_API)
+	if (_PrAudioMem->pBackMusic)
+		_DiscardResource(_PrAudioMem->pBackMusic->nID, _UnloadAudio, _SDLSoundRelease);
+    _SDLDestroy();
 #endif
 	if (_PrAudioMem->pBackMusic)
 	{
@@ -1050,6 +1168,8 @@ blMusicVolume(IN BLF32 _Vol)
     (*_func)->SetVolumeLevel(_func, _Vol);
 #elif defined(BL_USE_COREAUDIO_API)
 	_PrAudioMem->pBackMusic->pSource->SetVolume(_Vol);
+#elif defined(BL_USE_SDL_API)
+	Mix_VolumeMusic(_Vol * 128);
 #endif
     blMutexUnlock(_PrAudioMem->pMusicMutex);
 }
@@ -1070,6 +1190,8 @@ blEnvironmentVolume(IN BLF32 _Vol)
             (*_func)->SetVolumeLevel(_func, _Vol);
 #elif defined(BL_USE_COREAUDIO_API)
 			_iter->pSource->SetVolume(_Vol);
+#elif defined(BL_USE_SDL_API)
+			Mix_VolumeChunk(_iter->pSound, _Vol * 128);
 #endif
         }
     }
@@ -1092,6 +1214,8 @@ blSystemVolume(IN BLF32 _Vol)
             (*_func)->SetVolumeLevel(_func, _Vol);
 #elif defined(BL_USE_COREAUDIO_API)
 			_iter->pSource->SetVolume(_Vol);
+#elif defined(BL_USE_SDL_API)
+			Mix_VolumeChunk(_iter->pSound, _Vol * 128);
 #endif
         }
     }
@@ -1148,13 +1272,19 @@ blGenAudio(IN BLAnsi* _Filename, IN BLBool _Loop, IN BLBool _3D, IN BLF32 _Xpos,
 	_sound->sPos.fZ = _Zpos;
 	_sound->nID = blGenGuid(_sound, blHashString((const BLUtf8*)_Filename));
 	_sound->bValid = FALSE;
-	_sound->pMp3Context = NULL;
 #if defined(BL_USE_AL_API)
+	_sound->pMp3Context = NULL;
 	_FetchResource(_Filename, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _ALSoundSetup, TRUE);
 #elif defined(BL_USE_SL_API)
+	_sound->pMp3Context = NULL;
 	_FetchResource(_Filename, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _SLSoundSetup, TRUE);
 #elif defined(BL_USE_COREAUDIO_API)
+	_sound->pMp3Context = NULL;
 	_FetchResource(_Filename, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _CASoundSetup, TRUE);
+#elif defined(BL_USE_SDL_API)
+	_sound->pSound = NULL;
+	_sound->pMusic = NULL;
+	_FetchResource(_Filename, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _SDLSoundSetup, TRUE);
 #endif
 	return _sound->nID;
 }
@@ -1222,6 +1352,9 @@ blDeleteAudio(IN BLGuid _ID)
 BLVoid
 blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 {
+#if defined(BL_USE_SDL_API)
+	return;
+#endif
 	if (_Channels == 0xFFFFFFFF && _SamplesPerSec == 0xFFFFFFFF)
 	{
 		_GbTVMode = FALSE;
@@ -1339,6 +1472,9 @@ blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 BLVoid
 blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 {
+#if defined(BL_USE_SDL_API)
+	return;
+#endif
 	if (_PrAudioMem->nPCMFill >= 65536)
 	{
 #if defined(BL_USE_COREAUDIO_API)

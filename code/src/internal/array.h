@@ -65,14 +65,15 @@ BLVoid blArrayPopFront(
 BLVoid blArrayPopBack(
 	INOUT BLArray* _Arr);
 
-BLVoid blArrayErase(
+BLU32 blArrayErase(
 	INOUT BLArray* _Arr, 
 	IN BLU32 _Idx);
 
 #define FOREACH_ARRAY(type, var , container) type (var) = container->nSize ? (*(type*)(container->pData)) : NULL;\
 	BLU32(_iterator##var) = 0;\
+	BLU32 _container##size = container->nSize; \
 	for (; (_iterator##var) < (container->nSize);\
-         (var) = *(type*)(container->pData + (++_iterator##var >= container->nSize ? 0 : _iterator##var)))
+         (var) = *(type*)(container->pData + (((_container##size == container->nSize) ? ++_iterator##var : _iterator##var) >= container->nSize ? 0 : _iterator##var)), _container##size = container->nSize)
 #ifdef __cplusplus
 }
 #endif

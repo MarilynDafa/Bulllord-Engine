@@ -59,8 +59,7 @@ BL_API BLVoid blBeginDownload();
 
 BL_API BLVoid blProgressQuery(
 	OUT BLU32* _Curtask, 
-	OUT BLU32* _Downloaded, 
-	OUT BLU32* _Total, 
+	OUT BLU32* _Progress,
 	OUT BLU32 _Finish[64]);
     
 #ifdef __cplusplus

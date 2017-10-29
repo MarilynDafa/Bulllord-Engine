@@ -73,7 +73,7 @@ typedef struct _BpkArchive{
 }_BLBpkArchive;
 typedef struct _ResNode {
 	BLVoid* pRes;
-	BLAnsi nFilename[260];
+	BLAnsi aFilename[260];
 	BLBool(*fLoad)(BLVoid*, const BLAnsi*);
 	BLBool(*fSetup)(BLVoid*);
 	BLGuid nGuid;
@@ -120,38 +120,34 @@ _ProcessDmlRow(BLVoid* _Db, BLS32 _Count, BLAnsi** _Values, BLAnsi** _Columns)
     return 0;
 }
 #if defined(BL_PLATFORM_WEB)
-BLVoid 
+static BLVoid 
 _OnWGetLoaded(const BLAnsi* _Filename)
 {
-	blDebugOutput("download file %s", _Filename);
 	FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
 	{
-		blDebugOutput("%s -> %s", _iter->nFilename, _Filename);
-		if (!strcmp(_iter->nFilename, _Filename + 1))
+		if (!strcmp(_iter->aFilename, _Filename + 1))
 		{
-			blDebugOutput("beginsize %d", _PrStreamIOMem->pLoadingQueue->nSize);
-			BLBool _ret = _iter->fLoad(_iter->pRes, _iter->nFilename);
+			BLBool _ret = _iter->fLoad(_iter->pRes, _iter->aFilename);
 			if (_ret)
 			{
 				blListPushBack(_PrStreamIOMem->pSetupQueue, _iter);
-				//blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
+				_iterator_iter = blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
 			}
 			else
 			{
-				//blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
+				_iterator_iter = blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
 				free(_iter);
 			}			
-			blDebugOutput("end %d", _PrStreamIOMem->pLoadingQueue->nSize);
 		}
 	}
 }
-BLVoid
+static BLVoid
 _OnWGetError(const BLAnsi* _Filename)
 {
 	blDebugOutput("%s wget error", _Filename);
 	FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
 	{
-		if (!strcmp(_iter->nFilename, _Filename + 1))
+		if (!strcmp(_iter->aFilename, _Filename + 1))
 		{			
 			blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
 			free(_iter);
@@ -198,19 +194,15 @@ _FetchResource(const BLAnsi* _Filename, BLVoid** _Res, BLGuid _ID, BLBool(*_Load
 		else
 		{
 #if defined(BL_PLATFORM_WEB)
-			_Load(*_Res, _Filename);
-			_Setup(*_Res);
-			return TRUE;
 			BLAnsi _tmp[260] = { 0 };
 			strcpy(_tmp, blWorkingDir());
 			strcat(_tmp, _Filename);
-			blDebugOutput("loadfile : %s", _tmp);
 			if (access(_tmp, 0) == -1)
 			{
 				BLBool _needwget = TRUE;
 				FOREACH_LIST(_BLResNode*, _iter, _PrStreamIOMem->pLoadingQueue)
 				{
-					if (!strcmp(_Filename, _Filename))
+					if (!strcmp(_iter->aFilename, _Filename))
 					{
 						_needwget = FALSE;
 						break;
@@ -221,8 +213,8 @@ _FetchResource(const BLAnsi* _Filename, BLVoid** _Res, BLGuid _ID, BLBool(*_Load
 			}
 #endif
 			_node = (_BLResNode*)malloc(sizeof(_BLResNode));
-			memset(_node->nFilename, 0, sizeof(_node->nFilename));
-			strcpy(_node->nFilename, _Filename);
+			memset(_node->aFilename, 0, sizeof(_node->aFilename));
+			strcpy(_node->aFilename, _Filename);
             _node->pRes = _Res ? *_Res : NULL;
 			_node->fSetup = _Setup;
 			_node->fLoad = _Load;
@@ -288,7 +280,7 @@ _LoadThreadFunc(BLVoid* _Userdata)
 		{
 			blMutexLock(_PrStreamIOMem->pLoadingQueue->pMutex);
 			_BLResNode* _res = (_BLResNode*)blListFrontElement(_PrStreamIOMem->pLoadingQueue);
-			BLBool _ret = _res->fLoad(_res->pRes, _res->nFilename);
+			BLBool _ret = _res->fLoad(_res->pRes, _res->aFilename);
 			blListPopFront(_PrStreamIOMem->pLoadingQueue);
 			blMutexUnlock(_PrStreamIOMem->pLoadingQueue->pMutex);
 			if (_ret)
