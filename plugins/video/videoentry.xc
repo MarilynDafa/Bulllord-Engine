@@ -18,18 +18,21 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
+#if !defined(EMSCRIPTEN)
+#	include "yuv2rgb.h"
+#	include "vorbis/codec.h"
+#	include "vpx/vpx_decoder.h"
+#	include "vpx/vp8dx.h"
+#	include "webm/mkvparser/mkvparser.h"
+#	include "opus/include/opus.h"
+#	include "audio.h"
+#	include "streamio.h"
+#	include "utils.h"
+#	include "system.h"
+#	include "gpu.h"
+#endif
 #include "videoentry.h"
-#include "yuv2rgb.h"
-#include "vorbis/codec.h"
-#include "vpx/vpx_decoder.h"
-#include "vpx/vp8dx.h"
-#include "webm/mkvparser/mkvparser.h"
-#include "audio.h"
-#include "streamio.h"
-#include "utils.h"
-#include "system.h"
-#include "gpu.h"
-#include "opus/include/opus.h"
+#if !defined(BL_PLATFORM_WEB)
 class MkvReader : public mkvparser::IMkvReader
 {
 public:
@@ -650,9 +653,12 @@ _DecodeThreadFunc(BLVoid* _Userdata)
 	return (BLVoid*)0xDEAD;
 #endif
 }
+#endif
 BLVoid
 blVideoOpenEXT()
 {
+#if defined(EMSCRIPTEN)
+#else
 	_PrVideoMem = (_BLVideoMemberExt*)malloc(sizeof(_BLVideoMemberExt));
 	_PrVideoMem->bAudioSetParams = TRUE;
 	_PrVideoMem->bVideoSetParams = TRUE;
@@ -712,10 +718,12 @@ blVideoOpenEXT()
 #else
 	pthread_mutex_init(&(_PrVideoMem->sHandle), NULL);
 #endif
+#endif
 }
 BLVoid
 blVideoCloseEXT()
 {
+#if !defined(EMSCRIPTEN)
 #if defined(WIN32)
 	DeleteCriticalSection(&(_PrVideoMem->sHandle));
 #else
@@ -732,10 +740,12 @@ blVideoCloseEXT()
 		blDeleteGeometryBuffer(_PrVideoMem->nGeo);
 	blDeleteTechnique(_PrVideoMem->nTech);
 	free(_PrVideoMem->pImgDataCache);
+#endif
 }
 BLBool
 blVideoPlayEXT(IN BLAnsi* _Filename)
 {
+#if defined(EMSCRIPTEN)
 	BLF64 _framedelta = 0.0;
 	BLU32 _width, _height, _dwidth, _dheight;
 	BLF32 _rx, _ry;
@@ -837,5 +847,6 @@ videoend:
 #endif	
 	for (struct _BLRGBFrameList::_ListNode* _iter = _PrVideoMem->pImgDataCache->pFirst; _iter; _iter = _iter->pNext)	
 		free(_iter->pData);
+#endif
 	return TRUE;
 }

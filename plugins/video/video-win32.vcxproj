@@ -102,7 +102,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_IX86;_DEBUG;_WINDOWS;_USRDLL;VIDEOWIN32_EXPORTS;%(PreprocessorDefinitions);%(PreprocessorDefinitions);%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_IX86;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -134,7 +134,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_IX86;NDEBUG;_WINDOWS;_USRDLL;VIDEOWIN32_EXPORTS;%(PreprocessorDefinitions);%(PreprocessorDefinitions);%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_IX86;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
