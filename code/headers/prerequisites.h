@@ -264,6 +264,12 @@ typedef unsigned long long BLGuid;
 #			define BL_API __declspec(dllimport)
 #		endif
 #	endif
+#elif  defined(EMSCRIPTEN)
+#	ifdef BL_EXPORT
+#		define BL_API EMSCRIPTEN_KEEPALIVE 
+#	else
+#		define BL_API
+#	endif
 #else
 #	ifdef BL_EXPORT
 #		define BL_API __attribute__ ((visibility("default")))

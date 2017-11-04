@@ -98,6 +98,7 @@ typedef struct _StreamIOMember {
 	BLList* pSetupQueue;
 }_BLStreamIOMember;
 static _BLStreamIOMember* _PrStreamIOMem = NULL;
+extern BLBool _FontFace(const BLAnsi* _Filename);
 static BLS32
 _ProcessDdlRow(BLVoid* _Db, BLS32 _Count, BLAnsi** _Values, BLAnsi** _Columns)
 {
@@ -1520,5 +1521,29 @@ blSqlRetrieveRow()
     }
     else
         return FALSE;
+}
+BLVoid 
+blPreload(IN BLAnsi* _Filenames)
+{
+	BLU32 _filenum = 0;
+	if (_Filenames)
+	{
+		BLAnsi* _tmp;
+		BLAnsi* _tag = (BLAnsi*)alloca(strlen(_Filenames) + 1);
+		memset(_tag, 0, strlen(_Filenames) + 1);
+		strcpy(_tag, _Filenames);
+		_tmp = strtok((BLAnsi*)_tag, ",");
+		while (_tmp)
+		{
+			if (blUtf8Equal(blFileSuffixUtf8(_tmp), (BLUtf8*)"ttf"))
+				_FontFace(_tmp);
+			else if (blUtf8Equal(blFileSuffixUtf8(_tmp), (BLUtf8*)"ttc"))
+				_FontFace(_tmp);
+			else if (blUtf8Equal(blFileSuffixUtf8(_tmp), (BLUtf8*)"fnt"))
+				_FontFace(_tmp);
+			_tmp = strtok(NULL, ",");
+			_filenum++;
+		}
+	}
 }
 

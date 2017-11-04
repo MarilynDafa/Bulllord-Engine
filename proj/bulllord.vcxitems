@@ -1538,6 +1538,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <CompileAs>CompileAsCpp</CompileAs>
       <ExcludedFromBuild>false</ExcludedFromBuild>
+      <FileType>Document</FileType>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

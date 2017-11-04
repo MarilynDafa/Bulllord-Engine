@@ -521,63 +521,7 @@ typedef struct _UIMember {
 static _BLUIMember* _PrUIMem = NULL;
 extern BLBool _FetchResource(const BLAnsi*, BLVoid**, BLGuid, BLBool(*)(BLVoid*, const BLAnsi*), BLBool(*)(BLVoid*), BLBool);
 extern BLBool _DiscardResource(BLGuid, BLBool(*)(BLVoid*), BLBool(*)(BLVoid*));
-static _BLWidget*
-_WidgetQuery(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren_)
-{
-	_BLWidget* _ret = NULL;
-	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
-	{
-		if (URIPART_INTERNAL(_iter->nID) == _HashName)
-			return _iter;
-		if (_SearchChildren_)
-			_ret = _WidgetQuery(_iter, _HashName, TRUE);
-		if (_ret)
-			return _ret;
-	}
-	return _ret;
-}
-static _BLWidget*
-_WidgetLocate(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
-{
-	_BLWidget* _target = NULL;
-	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
-	{
-		if (_iter->bVisible &&
-			_iter->eType != BL_UT_PRIMITIVE &&
-			_iter->eType != BL_UT_PROGRESS &&
-			!(_iter->eType == BL_UT_PANEL && _iter->uExtension.sPanel.bBasePlate))
-		{
-			_target = _WidgetLocate(_iter, _XPos, _YPos);
-			if (_target && _target->sDimension.fX > 0.f && _target->sDimension.fY > 0.f)
-				return _target;
-		}
-	}
-	if (_XPos >= _Node->sAbsRegion.sLT.fX && _XPos <= _Node->sAbsRegion.sRB.fX && _YPos >= _Node->sAbsRegion.sLT.fY && _YPos <= _Node->sAbsRegion.sRB.fY)
-		_target = _Node;
-	return _target;
-}
-static BLVoid
-_WidgetScissorRect(_BLWidget* _Node, BLRect* _Rect)
-{
-	if (!_Node->pParent || _Node->pParent == _PrUIMem->pRoot)
-	{
-		_Rect->sLT.fX = 0.f;
-		_Rect->sLT.fY = 0.f;
-		_Rect->sRB.fX = (BLF32)_PrUIMem->nFboWidth;
-		_Rect->sRB.fY = (BLF32)_PrUIMem->nFboHeight;
-		return;
-	}
-	if (_Node->bCliped)
-		*_Rect = _Node->pParent->sAbsRegion;
-	else
-	{
-		_BLWidget* _node = _Node->pParent;
-		while (!_node->bAbsScissor && _node != _PrUIMem->pRoot)
-			_node = _node->pParent;
-		*_Rect = _node->sAbsRegion;
-	}
-}
-static _BLFont*
+BLBool
 _FontFace(const BLAnsi* _Filename)
 {
 	BLGuid _font = blGenStream(_Filename);
@@ -625,7 +569,7 @@ _FontFace(const BLAnsi* _Filename)
 						blDeleteStream(_image);
 						ezxml_free(_doc);
 						blDeleteStream(_font);
-						return NULL;
+						return FALSE;
 					}
 					BLU8 _tgaheader[12];
 					blStreamRead(_image, 12 * sizeof(BLU8), _tgaheader);
@@ -698,7 +642,7 @@ _FontFace(const BLAnsi* _Filename)
 		{
 			free(_ret);
 			blDeleteStream(_font);
-			return NULL;
+			return FALSE;
 		}
 		FT_Select_Charmap(_ret->pFtFace, FT_ENCODING_UNICODE);
 		if (!_ret->pFtFace->charmap)
@@ -707,11 +651,73 @@ _FontFace(const BLAnsi* _Filename)
 			_ret->pFtFace = NULL;
 			free(_ret);
 			blDeleteStream(_font);
-			return NULL;
+			return FALSE;
 		}
 		_ret->nFTStream = _font;
 	}
+	if (_ret)
+	{
+		blArrayPushBack(_PrUIMem->pFonts, _ret);
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+static _BLWidget*
+_WidgetQuery(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren_)
+{
+	_BLWidget* _ret = NULL;
+	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
+	{
+		if (URIPART_INTERNAL(_iter->nID) == _HashName)
+			return _iter;
+		if (_SearchChildren_)
+			_ret = _WidgetQuery(_iter, _HashName, TRUE);
+		if (_ret)
+			return _ret;
+	}
 	return _ret;
+}
+static _BLWidget*
+_WidgetLocate(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
+{
+	_BLWidget* _target = NULL;
+	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
+	{
+		if (_iter->bVisible &&
+			_iter->eType != BL_UT_PRIMITIVE &&
+			_iter->eType != BL_UT_PROGRESS &&
+			!(_iter->eType == BL_UT_PANEL && _iter->uExtension.sPanel.bBasePlate))
+		{
+			_target = _WidgetLocate(_iter, _XPos, _YPos);
+			if (_target && _target->sDimension.fX > 0.f && _target->sDimension.fY > 0.f)
+				return _target;
+		}
+	}
+	if (_XPos >= _Node->sAbsRegion.sLT.fX && _XPos <= _Node->sAbsRegion.sRB.fX && _YPos >= _Node->sAbsRegion.sLT.fY && _YPos <= _Node->sAbsRegion.sRB.fY)
+		_target = _Node;
+	return _target;
+}
+static BLVoid
+_WidgetScissorRect(_BLWidget* _Node, BLRect* _Rect)
+{
+	if (!_Node->pParent || _Node->pParent == _PrUIMem->pRoot)
+	{
+		_Rect->sLT.fX = 0.f;
+		_Rect->sLT.fY = 0.f;
+		_Rect->sRB.fX = (BLF32)_PrUIMem->nFboWidth;
+		_Rect->sRB.fY = (BLF32)_PrUIMem->nFboHeight;
+		return;
+	}
+	if (_Node->bCliped)
+		*_Rect = _Node->pParent->sAbsRegion;
+	else
+	{
+		_BLWidget* _node = _Node->pParent;
+		while (!_node->bAbsScissor && _node != _PrUIMem->pRoot)
+			_node = _node->pParent;
+		*_Rect = _node->sAbsRegion;
+	}
 }
 static _BLGlyph*
 _FontGlyph(_BLFont* _Font, BLU32 _Char, BLU32 _FontHeight)
@@ -1647,13 +1653,11 @@ _LabelParse(_BLWidget* _Node)
 							sprintf(_texfilettf, "content/%s.ttf", _Node->uExtension.sLabel.aCurFontSource);
 							sprintf(_texfilettc, "content/%s.ttc", _Node->uExtension.sLabel.aCurFontSource);
 							sprintf(_texfilefnt, "content/%s.fnt", _Node->uExtension.sLabel.aCurFontSource);
-							_ft = _FontFace(_texfilettf);
-							if (!_ft)
-								_ft = _FontFace(_texfilettc);
-							if (!_ft)
-								_ft = _FontFace(_texfilefnt);
-							if (_ft)
-								blArrayPushBack(_PrUIMem->pFonts, _ft);
+							if (!_FontFace(_texfilettf))
+							{
+								if (!_FontFace(_texfilettc))
+									_FontFace(_texfilefnt);
+							}
 						}
 						_Node->uExtension.sLabel.nCurFontHeight = blUtf16ToUInteger(*(BLUtf16**)(_tokenparams->pData + 1));
 						_Node->uExtension.sLabel.nCurFontFlag = blUtf16ToUInteger(*(BLUtf16**)(_tokenparams->pData + 2));
@@ -3145,14 +3149,11 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 	blMutexUnlock(_PrUIMem->pFonts->pMutex);
 	if (_loadfont)
 	{
-		blDebugOutput("need font");
-		_BLFont* _newfont = _FontFace(_texfilettf);
-		if (!_newfont)
-			_newfont = _FontFace(_texfilettc);
-		if (!_newfont)
-			_newfont = _FontFace(_texfilefnt);
-		if (_newfont)
-			blArrayPushBack(_PrUIMem->pFonts, _newfont);
+		if (!_FontFace(_texfilettf))
+		{
+			if (!_FontFace(_texfilettc))
+				_FontFace(_texfilefnt);
+		}
 	}
 	return TRUE;
 }
@@ -6844,7 +6845,7 @@ _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 		_curline = _ml ? _Node->uExtension.sText.pSplitText[_idx] : (BLUtf16*)_text;
 		_startpos = _ml ? _Node->uExtension.sText.aSplitPositions[_idx] : 0;
 		BLU32 _txtcolor = (_Node->uExtension.sText.nState == 0) ? _PrUIMem->nTextDisableColor : _Node->uExtension.sText.nTxtColor;
-		_WriteText(_curline, _Node->uExtension.sText.aFontSource, _Node->uExtension.sText.nFontHeight, _Node->uExtension.sText.eTxtAlignmentH, _Node->uExtension.sText.eTxtAlignmentV, TRUE, &_Node->uExtension.sText.sCurRect, &_area, _txtcolor, _gray, _flag, _Node->uExtension.sText.bPassword);
+		BLRect _txtrect = _Node->uExtension.sText.sCurRect;		
 		if (_focus && _Node->uExtension.sText.nSelectBegin != _Node->uExtension.sText.nSelectEnd && _idx >= _hlinestart && _idx < _hlinestart + _hlinecount)
 		{
 			BLF32 _mbegin = 0.f, _mend = 0.f, _outy;
@@ -6942,6 +6943,7 @@ _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 			blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 		}
+		_WriteText(_curline, _Node->uExtension.sText.aFontSource, _Node->uExtension.sText.nFontHeight, _Node->uExtension.sText.eTxtAlignmentH, _Node->uExtension.sText.eTxtAlignmentV, TRUE, &_txtrect, &_area, _txtcolor, _gray, _flag, _Node->uExtension.sText.bPassword);
 	}
 	_curline = (BLUtf16*)_text;
 	if (_Node->uExtension.sText.bCaretState && _Node->uExtension.sText.bShowCaret)

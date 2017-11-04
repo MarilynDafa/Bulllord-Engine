@@ -1,4 +1,4 @@
-﻿/*
+/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
 
@@ -3187,14 +3187,6 @@ _ErrorOutput(BLS32 _Error, const BLAnsi* _Msg)
 	fprintf(stderr, "%s\n", _Msg);
 }
 static BLVoid 
-_KeyProc(GLFWwindow* _Window, BLS32 _Key, BLS32 _Scancode, BLS32 _Action, BLS32 _Mods)
-{
-}
-static BLVoid 
-_TextProc(GLFWwindow* _Window, BLU32 _Codepoint)
-{
-}
-static BLVoid 
 _CursorPosProc(GLFWwindow* _Window, BLF64 _X, BLF64 _Y)
 {
 	_PrSystemMem->nMouseX = (BLU32)(BLS32)_X;
@@ -3202,17 +3194,10 @@ _CursorPosProc(GLFWwindow* _Window, BLF64 _X, BLF64 _Y)
 	blInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_MOVE, NULL, INVALID_GUID);
 }
 static BLVoid 
-_CursorEnterProc(GLFWwindow* _Window, BLS32 _Entered)
+_KeyProc(GLFWwindow* _Window, BLS32 _Key, BLS32 _Scancode, BLS32 _Action, BLS32 _Mods)
 {
-	if (_Entered)
-	{
-		if (_UseCustomCursor())
-			glfwSetInputMode(_Window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		else
-			glfwSetInputMode(_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	}
-	else
-		glfwSetInputMode(_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	BLEnum _scancode = SCANCODE_INTERNAL[_Scancode];
+	blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, _Action ? TRUE : FALSE), BL_ET_KEY, NULL, INVALID_GUID);
 }
 static BLVoid 
 _MouseProc(GLFWwindow* _Window, BLS32 _Button, BLS32 _Action, BLS32 _Mods)
@@ -3225,14 +3210,41 @@ _MouseProc(GLFWwindow* _Window, BLS32 _Button, BLS32 _Action, BLS32 _Mods)
 static BLVoid 
 _ScrollProc(GLFWwindow* _Window, BLF64 _XOffset, BLF64 _YOffset)
 {
+	BLS16 _val = (BLS16)_YOffset / -100;
+	if (_val > 0)
+		blInvokeEvent(BL_ET_MOUSE, MAKEU32(1, _val), BL_ME_WHEEL, NULL, INVALID_GUID);
+	else
+		blInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL, INVALID_GUID);
+}
+static EM_BOOL 
+_FullscreenProc(BLS32 _EventType, const BLVoid* _Reserved, BLVoid* _UserData)
+{
+	BLS32 _Width, _Height;
+    emscripten_get_canvas_element_size(NULL, &_Width, &_Height);
+	_PrSystemMem->sBoostParam.nScreenWidth = _Width;
+	_PrSystemMem->sBoostParam.nScreenHeight = _Height;
+	blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);	
+	return 0;
 }
 BLVoid
 _EnterFullscreen()
 {
+	EmscriptenFullscreenStrategy _s;
+	memset(&_s, 0, sizeof(_s));
+	_s.scaleMode = EMSCRIPTEN_FULLSCREEN_SCALE_STRETCH;
+	_s.canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_STDDEF;
+	_s.filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT;
+	_s.canvasResizedCallback = _FullscreenProc;
+	emscripten_enter_soft_fullscreen(0, &_s);
 }
 BLVoid
 _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 {
+	emscripten_exit_soft_fullscreen();
+    emscripten_set_canvas_element_size(NULL, _Width, _Height);
+	_PrSystemMem->sBoostParam.nScreenWidth = _Width;
+	_PrSystemMem->sBoostParam.nScreenHeight = _Height;
+	blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
 }
 BLVoid
 _ShowWindow()
@@ -3249,15 +3261,9 @@ _ShowWindow()
 		glfwTerminate();
 		emscripten_force_exit(EXIT_FAILURE);
 	}
+	_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _width, _height, !_PrSystemMem->sBoostParam.bProfiler);
 	if (_PrSystemMem->sBoostParam.bFullscreen)
 		_EnterFullscreen();
-	_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _width, _height, !_PrSystemMem->sBoostParam.bProfiler);
-	glfwSetKeyCallback(_PrSystemMem->pWindow, _KeyProc);
-	glfwSetCharCallback(_PrSystemMem->pWindow, _TextProc);
-	glfwSetCursorPosCallback(_PrSystemMem->pWindow, _CursorPosProc);
-	glfwSetCursorEnterCallback(_PrSystemMem->pWindow, _CursorEnterProc);
-	glfwSetMouseButtonCallback(_PrSystemMem->pWindow, _MouseProc);
-	glfwSetScrollCallback(_PrSystemMem->pWindow, _ScrollProc);
 }
 BLVoid
 _PollMsg()
@@ -3467,6 +3473,12 @@ _SystemStep()
 	{
 		_SystemInit();
 		_PrSystemMem->bNeedInit = FALSE;
+		glfwSetCursorPosCallback(_PrSystemMem->pWindow, _CursorPosProc);
+		glfwSetMouseButtonCallback(_PrSystemMem->pWindow, _MouseProc);
+		glfwSetKeyCallback(_PrSystemMem->pWindow, _KeyProc);
+		glfwSetScrollCallback(_PrSystemMem->pWindow, _ScrollProc);		
+		if (_UseCustomCursor())
+			emscripten_hide_mouse();
 	}
 	else
 #endif
@@ -3501,7 +3513,9 @@ _SystemStep()
 		_UIStep(_delta, TRUE);
 		_SpriteStep(_delta, FALSE);
 		_UIStep(_delta, FALSE);
+#if !defined(BL_PLATFORM_WEB)
 		_SpriteStep(_delta, TRUE);
+#endif
 		_StreamIOStep(_delta);
 		_PrSystemMem->pStepFunc(_delta);
 		if (_GbSystemRunning == 1)
@@ -4616,6 +4630,191 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
 	if (!_busy)
 		pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #elif defined(BL_PLATFORM_WEB)
+	EM_ASM_ARGS({
+		var _glcanvas = document.getElementById('canvas');				
+		var _input = document.createElement('input');
+		var _absx = _glcanvas.getBoundingClientRect().left + document.body.scrollLeft; 
+		var _absy = _glcanvas.getBoundingClientRect().top + document.body.scrollTop; 
+		var _lock = false;
+		_input.type = 'text';
+		_input.id = 'BLIMEDummyBox';
+		_input.style.position = 'fixed';
+		_input.style.left = (_absx + $0) + 'px';
+		_input.style.top = (_absy + $1) + 'px';
+        _input.style.width = '0%';
+        _input.style.height = '0%';
+        _input.style.color = '#000000';
+        _input.style.border = 0;
+        _input.style.background = 'transparent';
+		if ($2 == 0)
+			_input.type = 'text';
+		else if ($2 == 1)
+			_input.type = 'tel';
+		else
+			_input.type = 'url';
+		document.body.appendChild(_input);
+		_input.addEventListener('compositionstart', function () {
+			_lock = true;
+        }, false);
+		_input.addEventListener('compositionend', function () {
+			_lock = false;
+			_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_input.value), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+			_input.value = null;
+        }, false);
+		_input.addEventListener('keyup', function (e) {
+			if (_lock === true) return;
+			if (e.keyCode === 13 || e.keyCode === 108)
+				_blInvokeEvent(3, 2621441, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 46)
+				_blInvokeEvent(3, 4980737, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 8)
+				_blInvokeEvent(3, 2752513, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 37)
+				_blInvokeEvent(3, 5242881, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 39)
+				_blInvokeEvent(3, 5177345, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 38)
+				_blInvokeEvent(3, 5373953, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 40)
+				_blInvokeEvent(3, 5308417, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 36)
+				_blInvokeEvent(3, 4849665, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 35)
+				_blInvokeEvent(3, 5046273, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 65 && e.ctrlKey == 1)
+				_blInvokeEvent(3, 7798785, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 88 && e.ctrlKey == 1)
+				_blInvokeEvent(3, 8060929, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 67 && e.ctrlKey == 1)
+				_blInvokeEvent(3, 8126465, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else if (e.keyCode === 86 && e.ctrlKey == 1)
+				_blInvokeEvent(3, 8192001, 0, 0, 0xFFFFFFFFFFFFFFFF);
+			else
+			{
+				var _utf8str;
+				if (e.keyCode >= 96 && e.keyCode <= 107)
+				{
+					_utf8str = String.fromCharCode(e.keyCode);
+					_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);	
+				}
+				else if (e.keyCode >= 109 && e.keyCode <= 111)
+				{
+					_utf8str = String.fromCharCode(e.keyCode);
+					_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);	
+				}
+				else if (e.keyCode >= 65 && e.keyCode <= 90)
+				{
+					_utf8str = e.shiftKey ? String.fromCharCode(e.keyCode) : String.fromCharCode(e.keyCode).toLowerCase();
+					_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);	
+				}
+				else if (e.keyCode == 32)
+				{
+					_utf8str = String.fromCharCode(e.keyCode);
+					_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);	
+				}
+				else
+				{
+					switch (e.keyCode)
+					{
+					case 48:
+						_utf8str = e.shiftKey ? ')' : '0';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 49:
+						_utf8str = e.shiftKey ? '!' : '1';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 50:
+						_utf8str = e.shiftKey ? '@' : '2';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 51:
+						_utf8str = e.shiftKey ? '#' : '3';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 52:
+						_utf8str = e.shiftKey ? '$' : '4';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 53:
+						_utf8str = e.shiftKey ? '%' : '5';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 54:
+						_utf8str = e.shiftKey ? '^' : '6';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 55:
+						_utf8str = e.shiftKey ? '&' : '7';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 56:
+						_utf8str = e.shiftKey ? '*' : '8';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 57:
+						_utf8str = e.shiftKey ? '(' : '9';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 186:
+						_utf8str = e.shiftKey ? ':' : ';';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 187:
+						_utf8str = e.shiftKey ? '+' : '=';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 188:
+						_utf8str = e.shiftKey ? '<' : ',';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 189:
+						_utf8str = e.shiftKey ? '_' : '-';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 190:
+						_utf8str = e.shiftKey ? '>' : '.';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 191:
+						_utf8str = e.shiftKey ? '?' : '/';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 192:
+						_utf8str = e.shiftKey ? '~' : '`';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 219:
+						_utf8str = e.shiftKey ? '{' : '[';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 220:
+						_utf8str = e.shiftKey ? '|' : String.fromCharCode(92);
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 221:
+						_utf8str = e.shiftKey ? '}' : ']';
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					case 222:
+						_utf8str = e.shiftKey ? '"' : "'";
+						_blInvokeEvent(3, 0, 0, allocate(intArrayFromString(_utf8str), 'i8', ALLOC_NORMAL), 0xFFFFFFFFFFFFFFFF);
+						break;
+					default:
+						if (e.preventDefault)
+							e.preventDefault();
+						else
+							e.returnValue = false;
+						break;
+					}
+				}
+			}				
+        }, false);
+		_input.addEventListener('blur', function () {
+			document.body.removeChild(this);
+        }, false);
+		_input.focus();
+	},_Xpos, _Ypos, _Type);
 #endif
 }
 BLVoid
@@ -4667,6 +4866,13 @@ blDetachIME(IN BLEnum _Type)
 	if (!_busy)
 		pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #elif defined(BL_PLATFORM_WEB)
+	EM_ASM(
+		var _glcanvas = document.getElementById('canvas');
+		var _input = document.getElementById('input');
+		if (_input != null)
+			document.body.removeChild(_input);
+		_glcanvas.focus();
+	);
 #endif
 }
 BLVoid
@@ -4706,6 +4912,8 @@ blSubscribeEvent(IN BLEnum _Type, IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, 
 BLVoid
 blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _Pparam, IN BLGuid _ID)
 {
+	if (_Pparam)
+		blDebugOutput("%s", (char*)_Pparam);
 #ifdef BL_PLATFORM_ANDROID
 	BLS32 _busy;
 	_busy = pthread_mutex_trylock(&_PrSystemMem->sMutex);

@@ -747,10 +747,10 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
