@@ -64,6 +64,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
     <ClangPath>$(VCClangBinDir)</ClangPath>
+    <OutDir>../bin/web</OutDir>
+    <IntDir>$(Configuration)\web\$(Platform)</IntDir>
+    <TargetName>libBulllord</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <IntDir>$(Configuration)\web\$(Platform)</IntDir>
@@ -117,25 +120,28 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;ASSERTIONS=1;SAFE_HEAP=1;EMCC_DEBUG=1;DEBUG;EMTERPRETIFY_ASYNC=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;DISABLE_EXCEPTION_CATCHING;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;ASSERTIONS=1;SAFE_HEAP=1;EMCC_DEBUG=1;DEBUG;EMTERPRETIFY_ASYNC=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
       <AdditionalOptions>-g -fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
       <VerboseOutput>NoVerboseOutput</VerboseOutput>
+      <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s USE_PTHREADS=0 -s -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=268435456 -s DEMANGLE_SUPPORT=1 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=268435456 -s MAIN_MODULE=1 -s BINARYEN_ASYNC_COMPILATION=1 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;DISABLE_EXCEPTION_CATCHING;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
       <AdditionalOptions>-fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
+      <OptimizationLevel>O2</OptimizationLevel>
+      <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s WASM=1 -s USE_PTHREADS=0 -s -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s USE_PTHREADS=0 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=268435456 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s WASM=1 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=268435456  -s BINARYEN_ASYNC_COMPILATION=1 -s OUTLINING_LIMIT=20000 -s MAIN_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

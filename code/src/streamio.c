@@ -443,7 +443,7 @@ blGenStream(IN BLAnsi* _Filename)
 			_file = (_BLBpkFileEntry*)blDictElement(_iter->pFiles, _id);
 			if (_file)
 			{
-				BLU32 _sz;
+				mz_ulong _sz;
 				BLS32 _uncmpsz;
 				BLU8* _cdata;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -484,7 +484,7 @@ blGenStream(IN BLAnsi* _Filename)
 				_ret->nLen = _uncmpsz;
 				_ret->pPos = (BLU8*)_ret->pBuffer;
 				_ret->pEnd = _ret->pPos + _ret->nLen;
-				_sz = _uncmpsz;
+				_sz = (mz_ulong)_uncmpsz;
 				mz_uncompress((BLU8*)_ret->pBuffer, &_sz, _cdata, _file->nLength);
 				free(_cdata);
 				return blGenGuid(_ret, _id);
@@ -1535,11 +1535,11 @@ blPreload(IN BLAnsi* _Filenames)
 		_tmp = strtok((BLAnsi*)_tag, ",");
 		while (_tmp)
 		{
-			if (blUtf8Equal(blFileSuffixUtf8(_tmp), (BLUtf8*)"ttf"))
+			if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_tmp), (const BLUtf8*)"ttf"))
 				_FontFace(_tmp);
-			else if (blUtf8Equal(blFileSuffixUtf8(_tmp), (BLUtf8*)"ttc"))
+			else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_tmp), (const BLUtf8*)"ttc"))
 				_FontFace(_tmp);
-			else if (blUtf8Equal(blFileSuffixUtf8(_tmp), (BLUtf8*)"fnt"))
+			else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_tmp), (const BLUtf8*)"fnt"))
 				_FontFace(_tmp);
 			_tmp = strtok(NULL, ",");
 			_filenum++;

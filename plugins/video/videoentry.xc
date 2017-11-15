@@ -657,8 +657,7 @@ _DecodeThreadFunc(BLVoid* _Userdata)
 BLVoid
 blVideoOpenEXT()
 {
-#if defined(EMSCRIPTEN)
-#else
+#if !defined(EMSCRIPTEN)
 	_PrVideoMem = (_BLVideoMemberExt*)malloc(sizeof(_BLVideoMemberExt));
 	_PrVideoMem->bAudioSetParams = TRUE;
 	_PrVideoMem->bVideoSetParams = TRUE;
@@ -746,6 +745,49 @@ BLBool
 blVideoPlayEXT(IN BLAnsi* _Filename)
 {
 #if defined(EMSCRIPTEN)
+	EM_ASM_ARGS({
+		var _url = Pointer_stringify($0);
+		var _glcanvas = document.getElementById('canvas');				
+		var _video = document.createElement('video');
+		var _absx = _glcanvas.getBoundingClientRect().left + document.body.scrollLeft; 
+		var _absy = _glcanvas.getBoundingClientRect().top + document.body.scrollTop; 
+		var _width = _glcanvas.getBoundingClientRect().right - _glcanvas.getBoundingClientRect().left;
+		var _height = _glcanvas.getBoundingClientRect().bottom - _glcanvas.getBoundingClientRect().top;
+		_video.setAttribute('width', _width + 'px');
+		_video.setAttribute('height', '100%');
+		_video.setAttribute('autoplay', 'yes');
+		_video.setAttribute('src', _url);
+		_video.setAttribute('type', 'video/webm');
+		_video.style.position = 'fixed';
+		_video.style.left = _absx + 'px';
+		_video.style.top = '0px';
+		var _videobg = document.createElement('videobackground');	
+		_videobg.setAttribute('id', 'videobackground');	
+        _videobg.style.background = '#000000';
+		_videobg.style.position = 'fixed';
+		_videobg.style.left = _absx + 'px';
+		_videobg.style.top = _absy + 'px';
+        _videobg.style.width = _width + 'px';
+        _videobg.style.height = _height + 'px';
+		_videobg.appendChild(_video);
+		document.body.appendChild(_videobg);
+		_video.focus();
+		_video.addEventListener('ended', function () {			
+			var _glcanvas = document.getElementById('canvas');
+			var _videobg = document.getElementById('videobackground');
+			if (_videobg != null)
+				document.body.removeChild(_videobg);
+			_glcanvas.focus();
+        }, true);
+		_video.addEventListener('click', function() {
+			var _glcanvas = document.getElementById('canvas');
+			var _videobg = document.getElementById('videobackground');
+			if (_videobg != null)
+				document.body.removeChild(_videobg);
+			_glcanvas.focus();
+		}, false);
+	},_Filename);
+#else
 	BLF64 _framedelta = 0.0;
 	BLU32 _width, _height, _dwidth, _dheight;
 	BLF32 _rx, _ry;

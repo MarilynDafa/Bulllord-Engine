@@ -119,7 +119,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;ASSERTIONS=1;SAFE_HEAP=1;EMCC_DEBUG=1;DEBUG;EMTERPRETIFY_ASYNC=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;EMSCRIPTEN;DUK_F_X86;ASSERTIONS=1;SAFE_HEAP=1;EMCC_DEBUG=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
       <AdditionalOptions>-g -fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
@@ -131,7 +131,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;EMTERPRETIFY_ASYNC=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;EMSCRIPTEN;DUK_F_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
       <AdditionalOptions>-fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>

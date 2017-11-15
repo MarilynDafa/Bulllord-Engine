@@ -4424,11 +4424,12 @@ blOpenPlugin(IN BLAnsi* _Basename)
     strcat(_path, "lib");
     strcat(_path, _Basename);
     strcat(_path, "Plugin.dylib");
-#elif defined(BL_PLATFORM_WEB)
-	strcpy(_path, blWorkingDir());
+#elif defined(BL_PLATFORM_WEB)	
+    strcpy(_path, blWorkingDir());
 	strcat(_path, "lib");
 	strcat(_path, _Basename);
 	strcat(_path, "Plugin.js");
+	emscripten_wget(_path, _path);
 #endif
 #if defined(BL_PLATFORM_WIN32)
     WCHAR _wfilename[260] = { 0 };
@@ -4447,6 +4448,7 @@ blOpenPlugin(IN BLAnsi* _Basename)
 #elif defined(BL_PLATFORM_IOS)
 	_PrSystemMem->aPlugins[_idx].pHandle = dlopen(_path, RTLD_LAZY | RTLD_GLOBAL);
 #elif defined(BL_PLATFORM_WEB)
+	_PrSystemMem->aPlugins[_idx].pHandle = dlopen(_path, RTLD_LAZY | RTLD_GLOBAL);	
 #endif
 	memset(_path, 0, sizeof(_path));
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -4501,6 +4503,7 @@ blClosePlugin(IN BLAnsi* _Basename)
 #elif defined(BL_PLATFORM_IOS)
     dlclose(_PrSystemMem->aPlugins[_idx].pHandle);
 #elif defined(BL_PLATFORM_WEB)
+    dlclose(_PrSystemMem->aPlugins[_idx].pHandle);
 #endif
 	_PrSystemMem->aPlugins[_idx].nHash = 0;
     return TRUE;
@@ -4531,6 +4534,7 @@ blPluginProcAddress(IN BLAnsi* _Basename, IN BLAnsi* _Function)
 #elif defined(BL_PLATFORM_IOS)
 	_ret = dlsym(_PrSystemMem->aPlugins[_idx].pHandle, _Function);
 #elif defined(BL_PLATFORM_WEB)
+	_ret = dlsym(_PrSystemMem->aPlugins[_idx].pHandle, _Function);
 #endif
     return _ret;
 }
@@ -5336,7 +5340,11 @@ blSystemScriptRun(IN BLAnsi* _Encryptkey)
 	_PrSystemMem->pStepFunc = NULL;
 	_PrSystemMem->pEndFunc = NULL;
 	_PrSystemMem->pEvents = NULL;
+#if defined(BL_PLATFORM_WEB)
+	_PrSystemMem->pDukContext = NULL;
+#else
 	_PrSystemMem->pDukContext = duk_create_heap_default();
+#endif
 	memset(_PrSystemMem->aWorkDir, 0, sizeof(_PrSystemMem->aWorkDir));
 	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
 	memset(_PrSystemMem->aEncryptkey, 0, sizeof(_PrSystemMem->aEncryptkey));
