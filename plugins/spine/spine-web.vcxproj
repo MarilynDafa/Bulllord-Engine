@@ -40,11 +40,11 @@
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
     <PlatformToolset>emcc</PlatformToolset>
-    <ConfigurationType>JSApplication</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <PlatformToolset>emcc</PlatformToolset>
-    <ConfigurationType>JSApplication</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -126,7 +126,8 @@
       <VerboseOutput>NoVerboseOutput</VerboseOutput>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s USE_PTHREADS=0 -s -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s SIDE_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>..\..\bin\web\libBulllord.bc</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
@@ -137,7 +138,8 @@
       <AdditionalOptions>-fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s WASM=1 -s USE_PTHREADS=0 -s -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s USE_PTHREADS=0 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=67108864 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s SIDE_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>..\..\bin\web\libBulllord.bc</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
