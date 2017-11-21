@@ -127,7 +127,8 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>-s SIDE_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>..\..\bin\web\libBulllord.bc</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
@@ -139,7 +140,8 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>-s SIDE_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>..\..\bin\web\libBulllord.bc</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

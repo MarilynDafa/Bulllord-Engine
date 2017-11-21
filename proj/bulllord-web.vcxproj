@@ -18,9 +18,6 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{660E83C1-82AC-487C-BF5E-CFB6B82196BC}</ProjectGuid>
     <RootNamespace>hello_world_c</RootNamespace>
@@ -67,12 +64,14 @@
     <OutDir>../bin/web</OutDir>
     <IntDir>$(Configuration)\web\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
+    <TargetExt>.bc</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <IntDir>$(Configuration)\web\$(Platform)</IntDir>
     <OutDir>../bin/web</OutDir>
     <TargetName>libBulllord</TargetName>
     <ClangPath>$(VCClangBinDir)</ClangPath>
+    <TargetExt>.bc</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>../bin/web</OutDir>
@@ -126,9 +125,11 @@
       <AdditionalOptions>-g -fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
       <VerboseOutput>NoVerboseOutput</VerboseOutput>
       <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
+      <OptimizationLevel>O0</OptimizationLevel>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=268435456 -s MAIN_MODULE=1 -s BINARYEN_ASYNC_COMPILATION=1 %(AdditionalOptions)</AdditionalOptions>
+      <LinkerOptimizationLevel>O0</LinkerOptimizationLevel>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s MAIN_MODULE=1 -s BINARYEN_ASYNC_COMPILATION=1 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
@@ -141,8 +142,7 @@
       <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s WASM=1 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s TOTAL_MEMORY=268435456  -s BINARYEN_ASYNC_COMPILATION=1 -s OUTLINING_LIMIT=20000 -s MAIN_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt) $(OutDir)$(TargetName).bc</OutputFile>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s MAIN_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
