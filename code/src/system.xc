@@ -3423,6 +3423,8 @@ _PollEvent()
 						_fidx++;
 					}
 				}
+                if (_PrSystemMem->pEvents[_idx].uEvent.sSys.pPParam)
+                    free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sSys.pPParam);
             } break;
 			case BL_ET_SPRITE:
 			{
@@ -5038,7 +5040,17 @@ blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _P
         _PrSystemMem->pEvents[_PrSystemMem->nEventIdx].eType = _etype;
         _PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.nSParam = _Sparam;
 		_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.nUParam = _Uparam;
-		_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.pPParam = (BLVoid*)_Pparam;
+		_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.pPParam = NULL;
+		if (_Pparam)
+        {
+            const BLUtf8* _tmp = (const BLUtf8*)_Pparam;
+            BLU32 _cnt = 0;
+            while (*_tmp++)
+                _cnt++;
+			_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.pPParam = (BLUtf8*)malloc((1 + _cnt)*sizeof(BLUtf8));
+            memcpy(_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.pPParam, _Pparam, _cnt*sizeof(BLUtf8));
+			_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.pPParam[_cnt] = 0;
+        }
     }
 	_PrSystemMem->nEventIdx++;
 #ifdef BL_PLATFORM_ANDROID

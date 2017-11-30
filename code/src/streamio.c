@@ -96,9 +96,12 @@ typedef struct _StreamIOMember {
 	BLThread* pLoadThread;
 	BLList* pLoadingQueue;
 	BLList* pSetupQueue;
+	BLList* pPreloadQueue;
+	BLU32 nPreloadNum;
 }_BLStreamIOMember;
 static _BLStreamIOMember* _PrStreamIOMem = NULL;
 extern BLBool _FontFace(const BLAnsi* _Filename);
+extern BLBool _UIHeadCache(const BLAnsi* _Filename);
 static BLS32
 _ProcessDdlRow(BLVoid* _Db, BLS32 _Count, BLAnsi** _Values, BLAnsi** _Columns)
 {
@@ -311,6 +314,8 @@ _StreamIOInit(DUK_CONTEXT* _DKC, BLVoid* _AssetMgr)
 	_PrStreamIOMem->pArchives = blGenArray(FALSE);
 	_PrStreamIOMem->pLoadingQueue = blGenList(TRUE);
 	_PrStreamIOMem->pSetupQueue = blGenList(TRUE);
+	_PrStreamIOMem->pPreloadQueue = blGenList(TRUE);
+	_PrStreamIOMem->nPreloadNum = 0;
 #if !defined(BL_PLATFORM_WEB)
 	_PrStreamIOMem->pLoadThread = blGenThread(_LoadThreadFunc, NULL, NULL);
 	blThreadRun(_PrStreamIOMem->pLoadThread);
@@ -372,6 +377,29 @@ _StreamIOInit(DUK_CONTEXT* _DKC, BLVoid* _AssetMgr)
 BLVoid
 _StreamIOStep(BLU32 _Delta)
 {
+	if (_PrStreamIOMem->pPreloadQueue->nSize)
+	{
+		BLAnsi* _node = (BLAnsi*)blListFrontElement(_PrStreamIOMem->pPreloadQueue);
+#if defined(BL_PLATFORM_WEB)
+		BLAnsi _absfile[260] = { 0 };
+		strcpy(_absfile, blWorkingDir());
+		strcat(_absfile, _node);
+		if (access(_absfile, 0) == -1)
+			emscripten_wget(_absfile, _absfile);
+#endif
+		if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_tmp), (const BLUtf8*)"ttf"))
+			_FontFace(_tmp);
+		else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_tmp), (const BLUtf8*)"ttc"))
+			_FontFace(_tmp);
+		else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_tmp), (const BLUtf8*)"fnt"))
+			_FontFace(_tmp);
+		else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_tmp), (const BLUtf8*)"bui"))
+			_UIHeadCache(_tmp);
+		blInvokeEvent(BL_ET_SYSTEM, BL_SE_PRELOAD, (_PrStreamIOMem->nPreloadNum - _PrStreamIOMem->pPreloadQueue->nSize - 1) * 100 / _PrStreamIOMem->nPreloadNum, _node, INVALID_GUID);
+		blListErase(_PrStreamIOMem->pPreloadQueue, _iterator_iter);
+		free(_node);
+		break;
+	}
 	_BLResNode* _res;
 	blMutexLock(_PrStreamIOMem->pSetupQueue->pMutex);
 	if (_PrStreamIOMem->pSetupQueue->nSize)
@@ -414,6 +442,7 @@ _StreamIODestroy()
 			free(_iter);
 		}
 	}
+	blDeleteList(_PrStreamIOMem->pPreloadQueue);
 	blDeleteList(_PrStreamIOMem->pSetupQueue);
 	blDeleteList(_PrStreamIOMem->pLoadingQueue);
 	blDeleteArray(_PrStreamIOMem->pArchives);
@@ -1525,6 +1554,11 @@ blSqlRetrieveRow()
 BLVoid 
 blPreload(IN BLAnsi* _Filenames)
 {
+	FOREACH_LIST(BLAnsi*, _iter, _PrStreamIOMem->pPreloadQueue)
+	{
+		free(_iter);
+		blListErase(_PrStreamIOMem->pPreloadQueue, _iterator_iter);
+	}
 	BLU32 _filenum = 0;
 	if (_Filenames)
 	{
@@ -1535,15 +1569,12 @@ blPreload(IN BLAnsi* _Filenames)
 		_tmp = strtok((BLAnsi*)_tag, ",");
 		while (_tmp)
 		{
-			if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_tmp), (const BLUtf8*)"ttf"))
-				_FontFace(_tmp);
-			else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_tmp), (const BLUtf8*)"ttc"))
-				_FontFace(_tmp);
-			else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_tmp), (const BLUtf8*)"fnt"))
-				_FontFace(_tmp);
+			BLAnsi* _node = (BLAnsi*)malloc(strlen(_tmp) + 1);
+			memset(_node, 0, strlen(_tmp) + 1);
+			blListPushBack(_PrStreamIOMem->pPreloadQueue, _node);
 			_tmp = strtok(NULL, ",");
-			_filenum++;
 		}
 	}
+	nPreloadNum = _PrStreamIOMem->pPreloadQueue->nSize;
 }
 

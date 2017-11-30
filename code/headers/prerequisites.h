@@ -94,7 +94,7 @@
 #	include <netinet/tcp.h>
 #	include <arpa/inet.h>
 #   include <mach/mach_time.h>
-#	include <libkern/OSAtomic.h>
+#   include <stdatomic.h>
 #   include <CoreFoundation/CoreFoundation.h>
 #   define BL_GL_BACKEND
 #   define BL_MTL_BACKEND
@@ -145,7 +145,7 @@
 #	include <netinet/tcp.h>
 #	include <arpa/inet.h>
 #   include <mach/mach_time.h>
-#	include <libkern/OSAtomic.h>
+#   include <stdatomic.h>
 #   define BL_GL_BACKEND
 #   define BL_MTL_BACKEND
 #elif defined(BL_PLATFORM_ANDROID)
@@ -369,6 +369,7 @@ typedef unsigned long long BLGuid;
  /* _SYSTEM_EVENT */
 #define BL_SE_TIMER			1
 #define BL_SE_RESOLUTION    2
+#define BL_SE_PRELOAD		3
 
 /* _MOUSE_EVENT */
 #define BL_ME_LDOWN		0

@@ -663,6 +663,100 @@ _FontFace(const BLAnsi* _Filename)
 	else
 		return FALSE;
 }
+BLBool
+_UIHeadCache(const BLAnsi* _Filename)
+{
+	BLGuid _layout = blGenStream(_Filename);
+	BLU32 _tmplen = (BLU32)strlen(_Filename);
+	BLAnsi _pixdir[260] = { 0 };
+	strcpy(_pixdir, _Filename);
+	for (BLS32 _idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+	{
+		if (_pixdir[_idx] == '/' || _pixdir[_idx] == '\\')
+			break;
+		else
+			_pixdir[_idx] = 0;
+	}
+	if (_layout == INVALID_GUID)
+	{
+		blDebugOutput("cache ui layout failed>%s", _Filename);
+		return FALSE;
+	}
+	ezxml_t _doc = ezxml_parse_str(blStreamData(_layout), blStreamLength(_layout));
+	ezxml_t _element = ezxml_child(_doc, "Element");
+	BLU32 _idx = 0;
+	BLAnsi* _tmp;
+	do {
+		const BLAnsi* _type = ezxml_attr(_element, "Type");
+		_element = ezxml_child(_element, "Base");
+		_element = _element->sibling;
+		if (strcmp(ezxml_name(_element), "Ext"))
+			continue;
+		const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
+		if (_pixmap)
+		{
+			BLGuid* _streamhead = NULL;
+			BLU32 _pixkey = blHashString((const BLUtf8*)_pixmap);
+			_streamhead = blDictElement(_PrUIMem->pPixmapsCache, _pixkey);
+			if (!_streamhead)
+			{
+				BLAnsi _texfile[260] = { 0 };
+				sprintf(_texfile, "%s%s.bmg", _pixdir, _pixmap);
+				BLGuid _stream = blGenStream(_texfile);
+				BLU8 _identifier[12];
+				blStreamRead(_stream, sizeof(_identifier), _identifier);
+				if (_identifier[0] != 0xDD ||
+					_identifier[1] != 0xDD ||
+					_identifier[2] != 0xDD ||
+					_identifier[3] != 0xEE ||
+					_identifier[4] != 0xEE ||
+					_identifier[5] != 0xEE ||
+					_identifier[6] != 0xAA ||
+					_identifier[7] != 0xAA ||
+					_identifier[8] != 0xAA ||
+					_identifier[9] != 0xDD ||
+					_identifier[10] != 0xDD ||
+					_identifier[11] != 0xDD)
+				{
+					blDeleteStream(_stream);
+					break;
+				}
+				BLU32 _width, _height, _depth;
+				blStreamRead(_stream, sizeof(BLU32), &_width);
+				blStreamRead(_stream, sizeof(BLU32), &_height);
+				blStreamRead(_stream, sizeof(BLU32), &_depth);
+				BLU32 _array, _faces, _mipmap;
+				blStreamRead(_stream, sizeof(BLU32), &_array);
+				blStreamRead(_stream, sizeof(BLU32), &_faces);
+				blStreamRead(_stream, sizeof(BLU32), &_mipmap);
+				BLU32 _fourcc, _channels, _offset;
+				blStreamRead(_stream, sizeof(BLU32), &_fourcc);
+				blStreamRead(_stream, sizeof(BLU32), &_channels);
+				blStreamRead(_stream, sizeof(BLU32), &_offset);
+				BLGuid _tmp = blGenStream(NULL);
+				blStreamWrite(_tmp, _offset, blStreamData(_stream));
+				*_streamhead = _tmp;
+				blDictInsert(_PrUIMem->pPixmapsCache, _pixkey, _streamhead);
+				blDeleteStream(_stream);
+			}
+		}
+		if (_element->sibling)
+			_element = _element->sibling;
+		else
+		{
+			do {
+				_element = _element->parent;
+				if (!_element)
+					break;
+			} while (!_element->next);
+			_element = _element ? _element->next : NULL;
+		}
+	} while (_element);
+	ezxml_free(_doc);
+	blDeleteStream(_layout);
+	_PrUIMem->bDirty = TRUE;
+	return TRUE;
+}
 static _BLWidget*
 _WidgetQuery(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren_)
 {
