@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C7E3C2211ED8E8B800B60781"
-               BuildableName = "blSpine.dylib"
+               BuildableName = "libblSpine.dylib"
                BlueprintName = "spine-ios"
                ReferencedContainer = "container:spine-ios.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C7E3C2211ED8E8B800B60781"
-            BuildableName = "blSpine.dylib"
+            BuildableName = "libblSpine.dylib"
             BlueprintName = "spine-ios"
             ReferencedContainer = "container:spine-ios.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C7E3C2211ED8E8B800B60781"
-            BuildableName = "blSpine.dylib"
+            BuildableName = "libblSpine.dylib"
             BlueprintName = "spine-ios"
             ReferencedContainer = "container:spine-ios.xcodeproj">
          </BuildableReference>

@@ -25,13 +25,6 @@
    </Group>
    <Group
       location = "container:"
-      name = "sample">
-      <FileRef
-         location = "group:../samples/demo/demo.xcodeproj">
-      </FileRef>
-   </Group>
-   <Group
-      location = "container:"
       name = "IOS">
       <FileRef
          location = "group:bulllord-ios.xcodeproj">

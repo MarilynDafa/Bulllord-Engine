@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C7E3C2011ED8DFD500B60781"
-               BuildableName = "blTMX.dylib"
+               BuildableName = "liblibTMXPlugin.dylib"
                BlueprintName = "tmx-ios"
                ReferencedContainer = "container:tmx-ios.xcodeproj">
             </BuildableReference>
@@ -46,7 +46,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C7E3C2011ED8DFD500B60781"
-            BuildableName = "blTMX.dylib"
+            BuildableName = "liblibTMXPlugin.dylib"
             BlueprintName = "tmx-ios"
             ReferencedContainer = "container:tmx-ios.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "C7E3C2011ED8DFD500B60781"
-            BuildableName = "blTMX.dylib"
+            BuildableName = "liblibTMXPlugin.dylib"
             BlueprintName = "tmx-ios"
             ReferencedContainer = "container:tmx-ios.xcodeproj">
          </BuildableReference>

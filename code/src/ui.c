@@ -579,7 +579,7 @@ _FontFace(const BLAnsi* _Filename)
 					BLU8 _bpp, _attrib;
 					blStreamRead(_image, sizeof(BLU8), &_bpp);
 					blStreamRead(_image, sizeof(BLU8), &_attrib);
-					BLEnum _fmt;
+					BLEnum _fmt = BL_TF_UNKNOWN;
 					if (_bpp == 8)
 						_fmt = BL_TF_R8;
 					else if (_bpp == 32)
@@ -2518,7 +2518,7 @@ static BLBool
 _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 {
 	_BLWidget* _src = (_BLWidget*)_Src;
-	BLGuid _stream;
+	BLGuid _stream = INVALID_GUID;
 	BLGuid* _streamhead = NULL;
 	BLU32 _pixkey = 0;
 	blMutexLock(_PrUIMem->pPixmapsCache->pMutex);
@@ -2618,7 +2618,6 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 		blStreamRead(_stream, sizeof(BLU32), &_offset);
 		while (blStreamTell(_stream) < _offset)
 		{
-			static int i = 0;
 			BLS32 _ltx, _lty, _rbx, _rby, _offsetx, _offsety;
 			BLU32 _taglen;
 			blStreamRead(_stream, sizeof(BLU32), &_taglen);
@@ -9967,7 +9966,7 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 					_wid->uExtension.sTable.bDragging = FALSE;
 					_wid->uExtension.sTable.bSelecting = FALSE;
 					BLU32 _oldsel = _wid->uExtension.sTable.nSelectedCell;
-					BLS32 _selrow, _selcol = 0;
+					BLS32 _selrow = 0, _selcol = 0;
 					BLRect _sarea;
 					_WidgetScissorRect(_wid, &_sarea);
 					BLRect _drawarea = blRectIntersects(&_wid->sAbsRegion, &_sarea);

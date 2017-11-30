@@ -67,13 +67,15 @@
 		C7C76A9F1F3688B900EB0AEE /* fttype1.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A9D1F3688B900EB0AEE /* fttype1.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7C76AA01F3688B900EB0AEE /* ftwinfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A9E1F3688B900EB0AEE /* ftwinfnt.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7C76AA21F3688D200EB0AEE /* autofit.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76AA11F3688D200EB0AEE /* autofit.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7C76D621F369E4B00EB0AEE /* ftbbox.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D601F369E4B00EB0AEE /* ftbbox.c */; };
-		C7C76D631F369E4B00EB0AEE /* ftsystem.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D611F369E4B00EB0AEE /* ftsystem.c */; };
-		C7D0262C1F47839C00E35DB0 /* miniz_tdef.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D026291F47839C00E35DB0 /* miniz_tdef.c */; };
-		C7D0262D1F47839C00E35DB0 /* miniz_tinfl.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0262A1F47839C00E35DB0 /* miniz_tinfl.c */; };
-		C7D0262E1F47839C00E35DB0 /* miniz.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0262B1F47839C00E35DB0 /* miniz.c */; };
+		C7C76D621F369E4B00EB0AEE /* ftbbox.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D601F369E4B00EB0AEE /* ftbbox.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76D631F369E4B00EB0AEE /* ftsystem.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D611F369E4B00EB0AEE /* ftsystem.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7D0262C1F47839C00E35DB0 /* miniz_tdef.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D026291F47839C00E35DB0 /* miniz_tdef.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7D0262D1F47839C00E35DB0 /* miniz_tinfl.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0262A1F47839C00E35DB0 /* miniz_tinfl.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7D0262E1F47839C00E35DB0 /* miniz.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0262B1F47839C00E35DB0 /* miniz.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7D026351F4783A700E35DB0 /* bits.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D026331F4783A700E35DB0 /* bits.c */; };
-		C7D026361F4783A700E35DB0 /* mpaudec.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D026341F4783A700E35DB0 /* mpaudec.c */; };
+		C7D026361F4783A700E35DB0 /* mpaudec.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D026341F4783A700E35DB0 /* mpaudec.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7DC03601FC7288A0033DB27 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7DC035F1FC7288A0033DB27 /* QuartzCore.framework */; };
+		C7DC03621FCC50310033DB27 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7DC03611FCC50310033DB27 /* Metal.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -192,6 +194,8 @@
 		C7D026321F4783A700E35DB0 /* mpegaudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mpegaudio.h; path = ../code/externals/mpaudec/mpegaudio.h; sourceTree = "<group>"; };
 		C7D026331F4783A700E35DB0 /* bits.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = bits.c; path = ../code/externals/mpaudec/bits.c; sourceTree = "<group>"; };
 		C7D026341F4783A700E35DB0 /* mpaudec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mpaudec.c; path = ../code/externals/mpaudec/mpaudec.c; sourceTree = "<group>"; };
+		C7DC035F1FC7288A0033DB27 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		C7DC03611FCC50310033DB27 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -199,6 +203,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C7DC03621FCC50310033DB27 /* Metal.framework in Frameworks */,
+				C7DC03601FC7288A0033DB27 /* QuartzCore.framework in Frameworks */,
 				370F86781F79F97600A517D0 /* OpenGLES.framework in Frameworks */,
 				370F86761F79F96B00A517D0 /* Foundation.framework in Frameworks */,
 				C75E46E01E617DD900091110 /* UIKit.framework in Frameworks */,
@@ -366,6 +372,8 @@
 		C75E46DC1E617DD200091110 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C7DC03611FCC50310033DB27 /* Metal.framework */,
+				C7DC035F1FC7288A0033DB27 /* QuartzCore.framework */,
 				370F86771F79F97600A517D0 /* OpenGLES.framework */,
 				370F86751F79F96B00A517D0 /* Foundation.framework */,
 				C75E46DF1E617DD900091110 /* UIKit.framework */,
@@ -469,7 +477,7 @@
 				TargetAttributes = {
 					C73218941D9D2E9500E58DD8 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = SK9226BSS3;
+						DevelopmentTeam = WBVB8Y39E6;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -623,19 +631,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					../code/externals/freetype2/include,
-					../code/externals/ogg/include,
-					../code/externals/opus/include,
-					../code/externals/opus/silk/float,
-					../code/externals/opus/silk/fixed,
-					../code/externals/opus/celt,
-					../code/externals/opus/silk,
-					../code/externals/opus,
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					../code/externals/zstd/common,
-					../code/externals/zstd/compress,
-					../code/externals/zstd/decompress,
-					../code/externals/zstd/dictBuilder,
-					../code/externals/zstd,
 				);
 				INSTALL_PATH = "@executable_path/";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
@@ -701,19 +697,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					../code/externals/freetype2/include,
-					../code/externals/ogg/include,
-					../code/externals/opus/include,
-					../code/externals/opus/silk/float,
-					../code/externals/opus/silk/fixed,
-					../code/externals/opus/celt,
-					../code/externals/opus/silk,
-					../code/externals/opus,
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					../code/externals/zstd/common,
-					../code/externals/zstd/compress,
-					../code/externals/zstd/decompress,
-					../code/externals/zstd/dictBuilder,
-					../code/externals/zstd,
 				);
 				INSTALL_PATH = "@executable_path/";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
@@ -732,7 +716,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CONFIGURATION_BUILD_DIR = ../bin/ios;
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				DEVELOPMENT_TEAM = SK9226BSS3;
+				DEVELOPMENT_TEAM = WBVB8Y39E6;
 				EXECUTABLE_EXTENSION = dylib;
 				EXECUTABLE_PREFIX = lib;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -756,19 +740,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					../code/externals/freetype2/include,
-					../code/externals/ogg/include,
-					../code/externals/opus/include,
-					../code/externals/opus/silk/float,
-					../code/externals/opus/silk/fixed,
-					../code/externals/opus/celt,
-					../code/externals/opus/silk,
-					../code/externals/opus,
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					../code/externals/zstd/common,
-					../code/externals/zstd/compress,
-					../code/externals/zstd/decompress,
-					../code/externals/zstd/dictBuilder,
-					../code/externals/zstd,
 				);
 				INSTALL_OWNER = trix;
 				INSTALL_PATH = "@executable_path/";
@@ -787,10 +759,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CONFIGURATION_BUILD_DIR = ../bin/ios;
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				DEVELOPMENT_TEAM = SK9226BSS3;
+				DEVELOPMENT_TEAM = WBVB8Y39E6;
 				EXECUTABLE_EXTENSION = dylib;
 				EXECUTABLE_PREFIX = lib;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -813,19 +786,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					../code/externals/freetype2/include,
-					../code/externals/ogg/include,
-					../code/externals/opus/include,
-					../code/externals/opus/silk/float,
-					../code/externals/opus/silk/fixed,
-					../code/externals/opus/celt,
-					../code/externals/opus/silk,
-					../code/externals/opus,
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					../code/externals/zstd/common,
-					../code/externals/zstd/compress,
-					../code/externals/zstd/decompress,
-					../code/externals/zstd/dictBuilder,
-					../code/externals/zstd,
 				);
 				INSTALL_OWNER = trix;
 				INSTALL_PATH = "@executable_path/";

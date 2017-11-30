@@ -514,7 +514,6 @@ _ALUpdate(_BLAudioSource* _Src)
 {
     if (!_Src || !_Src->bValid)
         return TRUE;
-			blDebugOutput("alupdate");
     ALint _processed = 0;
     ALenum _state = 0;
 	ALint _alfmt = 0;
@@ -553,7 +552,6 @@ _ALUpdate(_BLAudioSource* _Src)
 					alBufferData(_Src->aBuffers[2], _alfmt, _Src->pSoundBufC, _totalread, _Src->nFrequency);
                 alSourceQueueBuffers(_Src->nSource, 1, &_buffer);
             }
-			blDebugOutput("process %d", _processed);
         }
     }
     alGetSourcei(_Src->nSource, AL_SOURCE_STATE, &_state);

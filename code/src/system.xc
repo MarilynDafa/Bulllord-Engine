@@ -34,6 +34,11 @@
 #   import <Cocoa/Cocoa.h>
 #elif defined BL_PLATFORM_IOS
 #   import <UIKit/UIKit.h>
+#   import <QuartzCore/CAEAGLLayer.h>
+#   import <Metal/Metal.h>
+#   if (TARGET_IPHONE_SIMULATOR == 0)
+#   import <QuartzCore/CAMetalLayer.h>
+#   endif
 #elif defined BL_PLATFORM_LINUX
 #   include <X11/cursorfont.h>
 #elif defined BL_PLATFORM_ANDROID
@@ -86,7 +91,7 @@ extern BLVoid _GpuIntervention(DUK_CONTEXT*, NSView*, BLU32, BLU32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_IOS)
-extern BLVoid _GpuIntervention(DUK_CONTEXT*, UIView*, BLU32, BLU32, BLF32, BLBool);
+extern BLVoid _GpuIntervention(DUK_CONTEXT*, CALayer*, BLU32, BLU32, BLF32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_LINUX)
@@ -254,6 +259,7 @@ typedef struct _SystemMember {
     UIView* pCtlView;
     BLS32 nKeyboardHeight;
     BLU32 nRetinaScale;
+    BLBool bInitState;
 #elif defined(BL_PLATFORM_WEB)
 	GLFWwindow* pWindow;
 	BLU32 nMouseX;
@@ -2782,6 +2788,55 @@ _CloseWindow()
     }
 }
 @end
+@interface IOSGLESView : IOSView
+- (instancetype)initWithFrame:(CGRect)_Frame scale:(CGFloat)_Scale;
+@end
+@implementation IOSGLESView {}
++ (Class)layerClass
+{
+    return [CAEAGLLayer class];
+}
+- (instancetype)initWithFrame:(CGRect)_Frame scale:(CGFloat)_Scale
+{
+    if ((self = [super initWithFrame:_Frame]))
+    {
+        CAEAGLLayer* _eagllayer = (CAEAGLLayer*)self.layer;
+        _eagllayer.opaque = YES;
+        _eagllayer.drawableProperties = @{
+                                         kEAGLDrawablePropertyRetainedBacking:@(YES),
+                                         kEAGLDrawablePropertyColorFormat:kEAGLColorFormatRGBA8
+                                         };
+        self.contentScaleFactor = _Scale;
+    }
+    return self;
+}
+- (void)layoutSubviews {
+    [super layoutSubviews];
+}
+@end
+@interface IOSMETALView : IOSView
+- (instancetype)initWithFrame:(CGRect)_Frame scale:(CGFloat)_Scale;
+@end
+@implementation IOSMETALView {}
++ (Class)layerClass
+{
+#if TARGET_IPHONE_SIMULATOR
+    return [CAEAGLLayer class];
+#else
+    return [CAMetalLayer class];
+#endif
+}
+- (instancetype)initWithFrame:(CGRect)_Frame scale:(CGFloat)_Scale
+{
+    if ((self = [super initWithFrame:_Frame]))
+    {
+        self.contentScaleFactor = _Scale;
+        //self.tag = tag;
+        [self updateDrawableSize];
+    }
+    return self;
+}
+@end
 @interface IOSLaunchController : UIViewController
 - (instancetype)init;
 - (BLVoid)loadView;
@@ -2929,24 +2984,15 @@ _CloseWindow()
 - (BLVoid)updateKeyboard;
 @end
 @implementation IOSController{
-    dispatch_source_t _timer;
 }
 - (instancetype)initWithNil
 {
     [super initWithNibName:nil bundle:nil];
     [self initKeyboard];
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0);
-    _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
-    dispatch_source_set_timer(_timer, DISPATCH_TIME_NOW, 0.0001 * NSEC_PER_SEC, 0.0001 * NSEC_PER_SEC);
-    dispatch_source_set_event_handler(_timer, ^{
-        _SystemStep();
-    });
-    dispatch_resume(_timer);
     return self;
 }
 - (BLVoid)dealloc
 {
-    dispatch_source_cancel(_timer);
     [self deinitKeyboard];
     [super dealloc];
 }
@@ -2978,8 +3024,8 @@ _CloseWindow()
 - (BLVoid)viewDidLayoutSubviews
 {
     const CGSize _size = self.view.bounds.size;
-    _PrSystemMem->sBoostParam.nScreenWidth = _size.width * 2;
-    _PrSystemMem->sBoostParam.nScreenHeight = _size.height * 2;
+    _PrSystemMem->sBoostParam.nScreenWidth = _size.width * _PrSystemMem->nRetinaScale;
+    _PrSystemMem->sBoostParam.nScreenHeight = _size.height * _PrSystemMem->nRetinaScale;
 }
 - (BLVoid)doLoop:(CADisplayLink*)_Sender
 {
@@ -3068,10 +3114,16 @@ _CloseWindow()
 }
 @end
 @interface IOSDelegate : UIResponder <UIApplicationDelegate>
++ (id)sharedAppDelegate;
 + (NSString*)getAppDelegateClassName;
+- (void)hideLaunchScreen;
 @end
 @implementation IOSDelegate{
     UIWindow* _launch;
+}
++ (id)sharedAppDelegate
+{
+    return [UIApplication sharedApplication].delegate;
 }
 + (NSString*)getAppDelegateClassName
 {
@@ -3079,12 +3131,16 @@ _CloseWindow()
 }
 - (BLVoid)hideLaunchScreen
 {
+    UIWindow* _window = _launch;
+    if (!_window || _window.hidden)
+        return;
     _launch = nil;
-    [UIView animateWithDuration:0.0 animations:^
+    [UIView animateWithDuration:0.2 animations:^
     {
-        _launch.alpha = 0.0;
+        _window.alpha = 0.0;
     } completion:^(BOOL _Finished) {
-        _launch.hidden = YES;
+        _window.hidden = YES;
+        [_window removeFromSuperview];
     }];
 }
 - (BLVoid)postFinishLaunch
@@ -3106,33 +3162,31 @@ _CloseWindow()
     _PrSystemMem->sBoostParam.bFullscreen = TRUE;
     _PrSystemMem->sBoostParam.nScreenWidth = _frame.size.width * _PrSystemMem->nRetinaScale;
     _PrSystemMem->sBoostParam.nScreenHeight = _frame.size.height * _PrSystemMem->nRetinaScale;
-    _PrSystemMem->pWindow = [[IOSWindow alloc] initWithFrame:_frame];
     IOSController* _controller = [[IOSController alloc] initWithNil];
-    _PrSystemMem->pCtlView = [[IOSView alloc] initWithFrame:_frame];
+    _PrSystemMem->pWindow = [[IOSWindow alloc] initWithFrame : _frame];
+    [_PrSystemMem->pWindow makeKeyAndVisible];
+    _PrSystemMem->pCtlView = [[IOSGLESView alloc] initWithFrame : _frame scale : _PrSystemMem->nRetinaScale];
+    _GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pCtlView.layer, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, _PrSystemMem->nRetinaScale, !_PrSystemMem->sBoostParam.bProfiler);
     [_controller.view removeFromSuperview];
     [_controller setView:_PrSystemMem->pCtlView];
     _PrSystemMem->pWindow.rootViewController = nil;
     _PrSystemMem->pWindow.rootViewController = _controller;
     [_PrSystemMem->pWindow layoutIfNeeded];
-    [_PrSystemMem->pWindow makeKeyAndVisible];
-    _GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pCtlView, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, _PrSystemMem->nRetinaScale, !_PrSystemMem->sBoostParam.bProfiler);
+    _AudioInit(_PrSystemMem->pDukContext);
+    _UIInit(_PrSystemMem->pDukContext, _PrSystemMem->sBoostParam.bProfiler);
+    _SpriteInit(_PrSystemMem->pDukContext);
     _GbSystemRunning = TRUE;
     _PrSystemMem->pBeginFunc();
-    if (_launch)
-    {
-        _launch.hidden = YES;
-        _launch = nil;
-    }
+    do {
+        _SystemStep();
+    } while (_GbSystemRunning);
+    _SystemDestroy();
 }
 - (BOOL)application:(UIApplication*)_App didFinishLaunchingWithOptions:(NSDictionary*)_Opt
 {
     [UIApplication sharedApplication].statusBarHidden = YES;
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
-    id _data = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSHighResolutionCapable"];
-    if(_data && [_data boolValue])
-        _PrSystemMem->nRetinaScale = [[UIScreen mainScreen] scale];
-    else
-        _PrSystemMem->nRetinaScale = 1;
+    _PrSystemMem->nRetinaScale = [[UIScreen mainScreen] scale];
     UIViewController* _launchcontroller = [[IOSLaunchController alloc] init];
     if (_launchcontroller.view)
     {
@@ -3482,7 +3536,7 @@ _SystemStep()
 	}
 	else
 #endif
-	{
+    {
 		blFrameBufferClear(TRUE, TRUE, TRUE);
 		BLU32 _now = blTickCounts();
 		BLU32 _delta = _now - _PrSystemMem->nSysTime;
@@ -3513,9 +3567,7 @@ _SystemStep()
 		_UIStep(_delta, TRUE);
 		_SpriteStep(_delta, FALSE);
 		_UIStep(_delta, FALSE);
-#if !defined(BL_PLATFORM_WEB)
 		_SpriteStep(_delta, TRUE);
-#endif
 		_StreamIOStep(_delta);
 		_PrSystemMem->pStepFunc(_delta);
 		if (_GbSystemRunning == 1)
@@ -3710,8 +3762,8 @@ blUserFolderDir()
         mkdir(_PrSystemMem->aUserDir, 0755);
 		strcat(_PrSystemMem->aUserDir, "/");
 		BLAnsi _bsfolder[260] = { 0 };
-		strcpy_s(_bsfolder, _PrSystemMem->aUserDir);
-		strcat_s(_bsfolder, "bshaders");
+		strcpy(_bsfolder, _PrSystemMem->aUserDir);
+		strcat(_bsfolder, "bshaders");
         mkdir(_bsfolder, 0755);
     }
     return _PrSystemMem->aUserDir;
@@ -3722,8 +3774,8 @@ blUserFolderDir()
 		mkdir(_PrSystemMem->aUserDir, 0755);
 		strcat(_PrSystemMem->aUserDir, "/");
 		BLAnsi _bsfolder[260] = { 0 };
-		strcpy_s(_bsfolder, _PrSystemMem->aUserDir);
-		strcat_s(_bsfolder, "bshaders");
+		strcpy(_bsfolder, _PrSystemMem->aUserDir);
+		strcat(_bsfolder, "bshaders");
         mkdir(_bsfolder, 0755);
 	}
 	return _PrSystemMem->aUserDir;
@@ -3739,8 +3791,8 @@ blUserFolderDir()
         mkdir(_PrSystemMem->aUserDir, 0755);
 		strcat(_PrSystemMem->aUserDir, "/");
 		BLAnsi _bsfolder[260] = { 0 };
-		strcpy_s(_bsfolder, _PrSystemMem->aUserDir);
-		strcat_s(_bsfolder, "bshaders");
+		strcpy(_bsfolder, _PrSystemMem->aUserDir);
+		strcat(_bsfolder, "bshaders");
         mkdir(_bsfolder, 0755);
     }
     return _PrSystemMem->aUserDir;
@@ -3756,8 +3808,8 @@ blUserFolderDir()
         mkdir(_PrSystemMem->aUserDir, 0755);
 		strcat(_PrSystemMem->aUserDir, "/");
 		BLAnsi _bsfolder[260] = { 0 };
-		strcpy_s(_bsfolder, _PrSystemMem->aUserDir);
-		strcat_s(_bsfolder, "bshaders");
+		strcpy(_bsfolder, _PrSystemMem->aUserDir);
+		strcat(_bsfolder, "bshaders");
         mkdir(_bsfolder, 0755);
     }
     return _PrSystemMem->aUserDir;
@@ -4369,7 +4421,7 @@ blOpenURL(IN BLUtf8* _Url)
 #elif defined(BL_PLATFORM_IOS)
     NSString* _str = [NSString stringWithCString : (const BLAnsi*)_absurl encoding : NSUTF8StringEncoding];
     NSURL* _url = [NSURL URLWithString : _str];
-    [[UIApplication sharedApplication] openURL:_url];
+    [[UIApplication sharedApplication] openURL:_url options:@{} completionHandler : nil];
 #elif defined(BL_PLATFORM_WEB)
 	EM_ASM_ARGS({ var _url = Pointer_stringify($0); window.open(_url, 'newwindow'); }, (const BLAnsi*)_absurl);
 #endif
@@ -4619,6 +4671,12 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
         [_PrSystemMem->pWindow makeFirstResponder: _PrSystemMem->pTICcxt];
     }
 #elif defined(BL_PLATFORM_IOS)
+    if (_Type == KEYBOARD_TEXT_INTERNAL)
+        _PrSystemMem->pTICcxt.keyboardType = UIKeyboardTypeDefault;
+    else if (_Type == KEYBOARD_NUMERIC_INTERNAL)
+        _PrSystemMem->pTICcxt.keyboardType = UIKeyboardTypeDecimalPad;
+    else
+        _PrSystemMem->pTICcxt.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
     [_PrSystemMem->pTICcxt becomeFirstResponder];
 #elif defined(BL_PLATFORM_ANDROID)
 	BLS32 _busy;
@@ -5198,6 +5256,7 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
     _PrSystemMem->pTICcxt = nil;
     _PrSystemMem->nKeyboardHeight = 0;
     _PrSystemMem->pCtlView = nil;
+    _PrSystemMem->bInitState = FALSE;
 #elif defined(BL_PLATFORM_WEB)
 	_PrSystemMem->pWindow = NULL;
 	_PrSystemMem->bNeedInit = TRUE;
@@ -5274,6 +5333,8 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
         _SystemStep();
     } while (_GbSystemRunning);
     _SystemDestroy();
+#elif defined(BL_PLATFORM_IOS)
+    _SystemInit();
 #elif defined(BL_PLATFORM_WEB)
 	emscripten_set_main_loop(_SystemStep, 0, 1);
 	_SystemDestroy();

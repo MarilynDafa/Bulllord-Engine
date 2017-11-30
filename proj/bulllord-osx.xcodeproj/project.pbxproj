@@ -10,7 +10,7 @@
 		370F867F1F7A06D500A517D0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 370F867E1F7A06D500A517D0 /* Foundation.framework */; };
 		C75E46D91E617D8200091110 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75E46D81E617D8200091110 /* OpenAL.framework */; };
 		C75E46DB1E617DA800091110 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75E46DA1E617DA800091110 /* Cocoa.framework */; };
-		C779656D1F37921200D047BC /* zutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C779656C1F37921200D047BC /* zutil.c */; };
+		C779656D1F37921200D047BC /* zutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C779656C1F37921200D047BC /* zutil.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C77965701F37923700D047BC /* zlib.h in Headers */ = {isa = PBXBuildFile; fileRef = C779656E1F37923700D047BC /* zlib.h */; };
 		C77965711F37923700D047BC /* zutil.h in Headers */ = {isa = PBXBuildFile; fileRef = C779656F1F37923700D047BC /* zutil.h */; };
 		C7C769811F365C6900EB0AEE /* audio.h in Headers */ = {isa = PBXBuildFile; fileRef = C7C769781F365C6900EB0AEE /* audio.h */; };
@@ -59,58 +59,58 @@
 		C7C76D5B1F36979200EB0AEE /* audio.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D4D1F36978A00EB0AEE /* audio.xc */; };
 		C7C76D5C1F36979A00EB0AEE /* gpu.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D4E1F36978A00EB0AEE /* gpu.xc */; };
 		C7C76D5F1F369AC000EB0AEE /* system.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D5E1F369AB700EB0AEE /* system.xc */; };
-		C7C76DCD1F37895500EB0AEE /* bdf.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A491F36636200EB0AEE /* bdf.c */; };
-		C7C76DCE1F37895500EB0AEE /* cff.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A471F36634500EB0AEE /* cff.c */; };
-		C7C76DCF1F37895500EB0AEE /* ftcache.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A451F36633400EB0AEE /* ftcache.c */; };
-		C7C76DD01F37895500EB0AEE /* autofit.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A431F36631600EB0AEE /* autofit.c */; };
-		C7C76DD11F37895500EB0AEE /* ftbase.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A3F1F3662F300EB0AEE /* ftbase.c */; };
-		C7C76DD21F37895500EB0AEE /* ftbitmap.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A401F3662F300EB0AEE /* ftbitmap.c */; };
-		C7C76DD31F37895500EB0AEE /* ftdebug.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A391F36629C00EB0AEE /* ftdebug.c */; };
-		C7C76DD41F37895500EB0AEE /* ftfstype.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A3A1F36629C00EB0AEE /* ftfstype.c */; };
-		C7C76DD51F37895500EB0AEE /* ftgasp.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A3B1F36629C00EB0AEE /* ftgasp.c */; };
-		C7C76DD61F37895500EB0AEE /* ftglyph.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A371F36627B00EB0AEE /* ftglyph.c */; };
-		C7C76DD71F37895500EB0AEE /* ftgzip.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A351F36623B00EB0AEE /* ftgzip.c */; };
-		C7C76DD81F37895500EB0AEE /* ftlzw.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A331F36622700EB0AEE /* ftlzw.c */; };
-		C7C76DD91F37895500EB0AEE /* ftinit.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A2D1F36620A00EB0AEE /* ftinit.c */; };
-		C7C76DDA1F37895500EB0AEE /* ftstroke.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A2E1F36620A00EB0AEE /* ftstroke.c */; };
-		C7C76DDB1F37895500EB0AEE /* ftsystem.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A2F1F36620A00EB0AEE /* ftsystem.c */; };
-		C7C76DDC1F37895500EB0AEE /* smooth.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A2B1F3661D300EB0AEE /* smooth.c */; };
-		C7C76DDD1F37895500EB0AEE /* ftbbox.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A151F3661A600EB0AEE /* ftbbox.c */; };
-		C7C76DDE1F37895500EB0AEE /* ftfntfmt.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A161F3661A600EB0AEE /* ftfntfmt.c */; };
-		C7C76DDF1F37895500EB0AEE /* ftgxval.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A171F3661A600EB0AEE /* ftgxval.c */; };
-		C7C76DE01F37895500EB0AEE /* ftlcdfil.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A181F3661A600EB0AEE /* ftlcdfil.c */; };
-		C7C76DE11F37895500EB0AEE /* ftmm.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A191F3661A600EB0AEE /* ftmm.c */; };
-		C7C76DE21F37895500EB0AEE /* ftotval.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1A1F3661A600EB0AEE /* ftotval.c */; };
-		C7C76DE31F37895500EB0AEE /* ftpatent.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1B1F3661A600EB0AEE /* ftpatent.c */; };
-		C7C76DE41F37895500EB0AEE /* ftpfr.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1C1F3661A600EB0AEE /* ftpfr.c */; };
-		C7C76DE51F37895500EB0AEE /* ftsynth.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1D1F3661A600EB0AEE /* ftsynth.c */; };
-		C7C76DE61F37895500EB0AEE /* fttype1.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1E1F3661A600EB0AEE /* fttype1.c */; };
-		C7C76DE71F37895500EB0AEE /* ftwinfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1F1F3661A600EB0AEE /* ftwinfnt.c */; };
-		C7C76DE81F37895500EB0AEE /* pfr.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A131F36612100EB0AEE /* pfr.c */; };
-		C7C76DE91F37895500EB0AEE /* pcf.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A111F36610900EB0AEE /* pcf.c */; };
-		C7C76DEA1F37895500EB0AEE /* psaux.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A0F1F3660F500EB0AEE /* psaux.c */; };
-		C7C76DEB1F37895500EB0AEE /* pshinter.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A0D1F3660DE00EB0AEE /* pshinter.c */; };
-		C7C76DEC1F37895500EB0AEE /* psmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A0B1F3660C700EB0AEE /* psmodule.c */; };
-		C7C76DED1F37895500EB0AEE /* raster.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A091F3660A300EB0AEE /* raster.c */; };
-		C7C76DEE1F37895500EB0AEE /* sfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A071F36608500EB0AEE /* sfnt.c */; };
-		C7C76DEF1F37895500EB0AEE /* truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A051F36606900EB0AEE /* truetype.c */; };
-		C7C76DF01F37895500EB0AEE /* type1.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A031F36604A00EB0AEE /* type1.c */; };
-		C7C76DF11F37895500EB0AEE /* type1cid.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A011F36602F00EB0AEE /* type1cid.c */; };
-		C7C76DF21F37895500EB0AEE /* type42.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769FF1F36600900EB0AEE /* type42.c */; };
-		C7C76DF31F37895500EB0AEE /* winfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769FD1F365FEB00EB0AEE /* winfnt.c */; };
+		C7C76DCD1F37895500EB0AEE /* bdf.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A491F36636200EB0AEE /* bdf.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DCE1F37895500EB0AEE /* cff.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A471F36634500EB0AEE /* cff.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DCF1F37895500EB0AEE /* ftcache.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A451F36633400EB0AEE /* ftcache.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DD01F37895500EB0AEE /* autofit.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A431F36631600EB0AEE /* autofit.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DD11F37895500EB0AEE /* ftbase.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A3F1F3662F300EB0AEE /* ftbase.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DD21F37895500EB0AEE /* ftbitmap.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A401F3662F300EB0AEE /* ftbitmap.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DD31F37895500EB0AEE /* ftdebug.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A391F36629C00EB0AEE /* ftdebug.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DD41F37895500EB0AEE /* ftfstype.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A3A1F36629C00EB0AEE /* ftfstype.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DD51F37895500EB0AEE /* ftgasp.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A3B1F36629C00EB0AEE /* ftgasp.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DD61F37895500EB0AEE /* ftglyph.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A371F36627B00EB0AEE /* ftglyph.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DD71F37895500EB0AEE /* ftgzip.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A351F36623B00EB0AEE /* ftgzip.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DD81F37895500EB0AEE /* ftlzw.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A331F36622700EB0AEE /* ftlzw.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DD91F37895500EB0AEE /* ftinit.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A2D1F36620A00EB0AEE /* ftinit.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DDA1F37895500EB0AEE /* ftstroke.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A2E1F36620A00EB0AEE /* ftstroke.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DDB1F37895500EB0AEE /* ftsystem.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A2F1F36620A00EB0AEE /* ftsystem.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DDC1F37895500EB0AEE /* smooth.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A2B1F3661D300EB0AEE /* smooth.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DDD1F37895500EB0AEE /* ftbbox.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A151F3661A600EB0AEE /* ftbbox.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DDE1F37895500EB0AEE /* ftfntfmt.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A161F3661A600EB0AEE /* ftfntfmt.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DDF1F37895500EB0AEE /* ftgxval.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A171F3661A600EB0AEE /* ftgxval.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DE01F37895500EB0AEE /* ftlcdfil.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A181F3661A600EB0AEE /* ftlcdfil.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DE11F37895500EB0AEE /* ftmm.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A191F3661A600EB0AEE /* ftmm.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DE21F37895500EB0AEE /* ftotval.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1A1F3661A600EB0AEE /* ftotval.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DE31F37895500EB0AEE /* ftpatent.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1B1F3661A600EB0AEE /* ftpatent.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DE41F37895500EB0AEE /* ftpfr.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1C1F3661A600EB0AEE /* ftpfr.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DE51F37895500EB0AEE /* ftsynth.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1D1F3661A600EB0AEE /* ftsynth.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DE61F37895500EB0AEE /* fttype1.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1E1F3661A600EB0AEE /* fttype1.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DE71F37895500EB0AEE /* ftwinfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A1F1F3661A600EB0AEE /* ftwinfnt.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DE81F37895500EB0AEE /* pfr.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A131F36612100EB0AEE /* pfr.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DE91F37895500EB0AEE /* pcf.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A111F36610900EB0AEE /* pcf.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DEA1F37895500EB0AEE /* psaux.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A0F1F3660F500EB0AEE /* psaux.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DEB1F37895500EB0AEE /* pshinter.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A0D1F3660DE00EB0AEE /* pshinter.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DEC1F37895500EB0AEE /* psmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A0B1F3660C700EB0AEE /* psmodule.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DED1F37895500EB0AEE /* raster.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A091F3660A300EB0AEE /* raster.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DEE1F37895500EB0AEE /* sfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A071F36608500EB0AEE /* sfnt.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DEF1F37895500EB0AEE /* truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A051F36606900EB0AEE /* truetype.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DF01F37895500EB0AEE /* type1.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A031F36604A00EB0AEE /* type1.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DF11F37895500EB0AEE /* type1cid.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A011F36602F00EB0AEE /* type1cid.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DF21F37895500EB0AEE /* type42.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769FF1F36600900EB0AEE /* type42.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7C76DF31F37895500EB0AEE /* winfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769FD1F365FEB00EB0AEE /* winfnt.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7D026111F47838400E35DB0 /* internal.h in Headers */ = {isa = PBXBuildFile; fileRef = C7D0260B1F47838400E35DB0 /* internal.h */; };
 		C7D026121F47838400E35DB0 /* mpaudec.h in Headers */ = {isa = PBXBuildFile; fileRef = C7D0260C1F47838400E35DB0 /* mpaudec.h */; };
 		C7D026131F47838400E35DB0 /* mpaudectab.h in Headers */ = {isa = PBXBuildFile; fileRef = C7D0260D1F47838400E35DB0 /* mpaudectab.h */; };
 		C7D026141F47838400E35DB0 /* mpegaudio.h in Headers */ = {isa = PBXBuildFile; fileRef = C7D0260E1F47838400E35DB0 /* mpegaudio.h */; };
-		C7D026151F47838400E35DB0 /* bits.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0260F1F47838400E35DB0 /* bits.c */; };
-		C7D026161F47838400E35DB0 /* mpaudec.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D026101F47838400E35DB0 /* mpaudec.c */; };
+		C7D026151F47838400E35DB0 /* bits.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0260F1F47838400E35DB0 /* bits.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7D026161F47838400E35DB0 /* mpaudec.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D026101F47838400E35DB0 /* mpaudec.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7D0261E1F47838F00E35DB0 /* miniz_common.h in Headers */ = {isa = PBXBuildFile; fileRef = C7D026171F47838F00E35DB0 /* miniz_common.h */; };
 		C7D0261F1F47838F00E35DB0 /* miniz_tdef.h in Headers */ = {isa = PBXBuildFile; fileRef = C7D026181F47838F00E35DB0 /* miniz_tdef.h */; };
 		C7D026201F47838F00E35DB0 /* miniz_tinfl.h in Headers */ = {isa = PBXBuildFile; fileRef = C7D026191F47838F00E35DB0 /* miniz_tinfl.h */; };
 		C7D026211F47838F00E35DB0 /* miniz.h in Headers */ = {isa = PBXBuildFile; fileRef = C7D0261A1F47838F00E35DB0 /* miniz.h */; };
-		C7D026221F47838F00E35DB0 /* miniz_tdef.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0261B1F47838F00E35DB0 /* miniz_tdef.c */; };
-		C7D026231F47838F00E35DB0 /* miniz_tinfl.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0261C1F47838F00E35DB0 /* miniz_tinfl.c */; };
-		C7D026241F47838F00E35DB0 /* miniz.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0261D1F47838F00E35DB0 /* miniz.c */; };
+		C7D026221F47838F00E35DB0 /* miniz_tdef.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0261B1F47838F00E35DB0 /* miniz_tdef.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7D026231F47838F00E35DB0 /* miniz_tinfl.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0261C1F47838F00E35DB0 /* miniz_tinfl.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7D026241F47838F00E35DB0 /* miniz.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0261D1F47838F00E35DB0 /* miniz.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -717,17 +717,6 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					../code/externals/freetype2/include,
-					../code/externals/ogg/include,
-					../code/externals/opus/include,
-					../code/externals/opus/silk/float,
-					../code/externals/opus/silk/fixed,
-					../code/externals/opus/celt,
-					../code/externals/opus/silk,
-					../code/externals/opus,
-					../code/externals/zstd/dictBuilder,
-					../code/externals/zstd/common,
-					../code/externals/zstd/decompress,
-					../code/externals/zstd/compress,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -796,17 +785,6 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					../code/externals/freetype2/include,
-					../code/externals/ogg/include,
-					../code/externals/opus/include,
-					../code/externals/opus/silk/float,
-					../code/externals/opus/silk/fixed,
-					../code/externals/opus/celt,
-					../code/externals/opus/silk,
-					../code/externals/opus,
-					../code/externals/zstd/dictBuilder,
-					../code/externals/zstd/common,
-					../code/externals/zstd/decompress,
-					../code/externals/zstd/compress,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -853,18 +831,6 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					../code/externals/freetype2/include,
-					../code/externals/ogg/include,
-					../code/externals/opus/include,
-					../code/externals/opus/silk/float,
-					../code/externals/opus/silk/fixed,
-					../code/externals/opus/celt,
-					../code/externals/opus/silk,
-					../code/externals/opus,
-					../code/externals/zstd/dictBuilder,
-					../code/externals/zstd/common,
-					../code/externals/zstd/decompress,
-					../code/externals/zstd/compress,
-					../code/externals/zstd,
 				);
 				INSTALL_OWNER = trix;
 				MACH_O_TYPE = mh_dylib;
@@ -907,18 +873,6 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					../code/externals/freetype2/include,
-					../code/externals/ogg/include,
-					../code/externals/opus/include,
-					../code/externals/opus/silk/float,
-					../code/externals/opus/silk/fixed,
-					../code/externals/opus/celt,
-					../code/externals/opus/silk,
-					../code/externals/opus,
-					../code/externals/zstd/dictBuilder,
-					../code/externals/zstd/common,
-					../code/externals/zstd/decompress,
-					../code/externals/zstd/compress,
-					../code/externals/zstd,
 				);
 				INSTALL_OWNER = trix;
 				MACH_O_TYPE = mh_dylib;

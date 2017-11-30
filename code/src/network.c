@@ -76,7 +76,7 @@ typedef struct _NetworkMember {
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	volatile LONG nCurDownSize;
 #elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
-	volatile int32_t nCurDownSize;
+	volatile atomic_int nCurDownSize;
 #elif defined(BL_PLATFORM_LINUX)
 	volatile int32_t nCurDownSize;
 #else
@@ -624,7 +624,7 @@ reconnect:
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 		InterlockedExchangeAdd(&_PrNetworkMem->nCurDownSize, (LONG)_filesz);
 #elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
-		OSAtomicAdd32Barrier(_filesz, &_PrNetworkMem->nCurDownSize);
+		atomic_fetch_add(&_PrNetworkMem->nCurDownSize, _filesz);
 #elif defined(BL_PLATFORM_LINUX)
 		__sync_fetch_and_add(&_PrNetworkMem->nCurDownSize, _filesz);
 #elif defined(BL_PLATFORM_ANDROID)
@@ -717,7 +717,7 @@ reconnect:
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 			InterlockedExchangeAdd(&_PrNetworkMem->nCurDownSize, -(LONG)(_filesz));
 #elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
-			OSAtomicAdd32Barrier(-(int32_t)(_filesz), &_PrNetworkMem->nCurDownSize);
+            atomic_fetch_sub(&_PrNetworkMem->nCurDownSize, _filesz);
 #elif defined(BL_PLATFORM_LINUX)
 			__sync_fetch_and_sub(&_PrNetworkMem->nCurDownSize, _filesz);
 #elif defined(BL_PLATFORM_ANDROID)
@@ -758,7 +758,7 @@ reconnect:
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 		InterlockedExchangeAdd(&_PrNetworkMem->nCurDownSize, (LONG)_len);
 #elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
-		OSAtomicAdd32Barrier(_len, &_PrNetworkMem->nCurDownSize);
+        atomic_fetch_add(&_PrNetworkMem->nCurDownSize, _len);
 #elif defined(BL_PLATFORM_LINUX)
 		__sync_fetch_and_add(&_PrNetworkMem->nCurDownSize, _len);
 #elif defined(BL_PLATFORM_ANDROID)
@@ -2284,7 +2284,6 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 		return FALSE;
 	*_Taskid = -1;
 	BLU32 _idx;
-	BLBool _ispath = (_Localpath[strlen(_Localpath) - 1] == '/' || _Localpath[strlen(_Localpath) - 1] == '\\');
 	BLU32 _sz = (BLU32)strlen(_Host);
 	BLAnsi* _remoteurl = (BLAnsi*)malloc(_sz + 1);
 	strcpy(_remoteurl, _Host);

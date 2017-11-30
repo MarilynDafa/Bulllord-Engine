@@ -334,7 +334,6 @@ typedef struct _GpuMember {
     NSOpenGLContext* pGLC;
 #elif defined(BL_PLATFORM_IOS)
     EAGLContext* pGLC;
-    CAEAGLLayer* pLayer;
     GLuint nBackFB;
     GLuint nBackRB;
     GLuint nDepthRB;
@@ -2270,7 +2269,7 @@ _GpuIntervention(DUK_CONTEXT* _DKC, NSView* _View, BLU32 _Width, BLU32 _Height, 
     {
         _PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
         CGDisplayCount _numdisplays = 0;
-        CGDirectDisplayID* _displays, _maindis;
+        CGDirectDisplayID* _displays, _maindis = 0;
         if (kCGErrorSuccess != CGGetOnlineDisplayList(0, NULL, &_numdisplays))
         {
             blDebugOutput("OSX display not found");
@@ -2406,7 +2405,7 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_IOS)
 BLVoid
-_GpuIntervention(DUK_CONTEXT* _DKC, UIView* _View, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)
+_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)
 {
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
     _PrGpuMem->pDukContext = _DKC;
@@ -2434,14 +2433,18 @@ _GpuIntervention(DUK_CONTEXT* _DKC, UIView* _View, BLU32 _Width, BLU32 _Height, 
         _PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
         _PrGpuMem->sHardwareCaps.nApiVersion = 300;
         _PrGpuMem->pGLC = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
-        [EAGLContext setCurrentContext:_PrGpuMem->pGLC];
-        _PrGpuMem->pLayer = (CAEAGLLayer*)_View.layer;
-        _PrGpuMem->pLayer.opaque = YES;
-        _PrGpuMem->pLayer.drawableProperties = @{kEAGLDrawablePropertyRetainedBacking:@(YES), kEAGLDrawablePropertyColorFormat:kEAGLColorFormatRGBA8};
-        _View.contentScaleFactor = _Scale;
-        [_PrGpuMem->pGLC renderbufferStorage:GL_RENDERBUFFER fromDrawable:_PrGpuMem->pLayer];
+        if (![EAGLContext setCurrentContext:_PrGpuMem->pGLC])
+        {
+            blDebugOutput("OpenGLES set context failed");
+            return;
+        }
         glGenRenderbuffers(1, &_PrGpuMem->nBackRB);
         glBindRenderbuffer(GL_RENDERBUFFER, _PrGpuMem->nBackRB);
+        if (![_PrGpuMem->pGLC renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer*)_Layer])
+        {
+            blDebugOutput("OpenGLES set RenderBufferStorage faield");
+            return;
+        }
         glGenFramebuffers(1, &_PrGpuMem->nBackFB);
         glBindFramebuffer(GL_FRAMEBUFFER, _PrGpuMem->nBackFB);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _PrGpuMem->nBackRB);
@@ -2456,7 +2459,6 @@ _GpuIntervention(DUK_CONTEXT* _DKC, UIView* _View, BLU32 _Width, BLU32 _Height, 
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _PrGpuMem->nDepthRB);
         assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
         glBindRenderbuffer(GL_RENDERBUFFER, _PrGpuMem->nBackRB);
-        //eglSwapInterval(_PrGpuMem->pEglDisplay, _Vsync ? 1 : 0);
         _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValidGL(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
         _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
         _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
@@ -2481,19 +2483,17 @@ _GpuIntervention(DUK_CONTEXT* _DKC, UIView* _View, BLU32 _Width, BLU32 _Height, 
 BLVoid
 _GpuSwapBuffer()
 {
-    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
     {
     }
     else
-    {
         [_PrGpuMem->pGLC presentRenderbuffer:GL_RENDERBUFFER];
-    }
 }
 BLVoid
 _GpuAnitIntervention()
 {
 	_FreeUBO(_PrGpuMem->pUBO);
-	if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+	if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
 	{
 	}
 	else
@@ -3231,7 +3231,11 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
             GL_CHECK_INTERNAL(glGenRenderbuffers(1, &_tex->uData.sGL.nRTHandle));
             GL_CHECK_INTERNAL(glBindRenderbuffer(GL_RENDERBUFFER, _tex->uData.sGL.nRTHandle));
             GL_CHECK_INTERNAL(glRenderbufferStorage(GL_RENDERBUFFER, _rtfmt, _Width, _Height));
+#if defined(BL_PLATFORM_IOS)
+            GL_CHECK_INTERNAL(glBindRenderbuffer(GL_RENDERBUFFER, _PrGpuMem->nBackRB));
+#else
             GL_CHECK_INTERNAL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+#endif
         }
         GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
