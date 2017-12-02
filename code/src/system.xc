@@ -5049,7 +5049,7 @@ blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _P
                 _cnt++;
 			_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.pPParam = (BLUtf8*)malloc((1 + _cnt)*sizeof(BLUtf8));
             memcpy(_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.pPParam, _Pparam, _cnt*sizeof(BLUtf8));
-			_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.pPParam[_cnt] = 0;
+			((BLU8*)_PrSystemMem->pEvents[_PrSystemMem->nEventIdx].uEvent.sSys.pPParam)[_cnt] = 0;
         }
     }
 	_PrSystemMem->nEventIdx++;

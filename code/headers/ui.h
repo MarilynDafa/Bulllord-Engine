@@ -64,6 +64,26 @@ BL_API BLVoid blUIGetPosition(
 	OUT BLS32* _XPos,
 	OUT BLS32* _YPos);
 
+BL_API BLVoid blUIPivot(
+	IN BLGuid _ID,
+	IN BLF32 _PivotX,
+	IN BLF32 _PivotY);
+
+BL_API BLVoid blUIGetPivot(
+	IN BLGuid _ID,
+	OUT BLF32* _PivotX,
+	OUT BLF32* _PivotY);
+
+BL_API BLVoid blUIScale(
+	IN BLGuid _ID,
+	IN BLF32 _ScaleX,
+	IN BLF32 _ScaleY);
+
+BL_API BLVoid blUIGetScale(
+	IN BLGuid _ID,
+	OUT BLF32* _ScaleX,
+	OUT BLF32* _ScaleY);
+
 BL_API BLVoid blUISize(
 	IN BLGuid _ID,
 	IN BLU32 _Width,

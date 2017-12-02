@@ -107,7 +107,8 @@ BL_API const BLVoid* blSqlValueAsBinary(
 BL_API BLBool blSqlRetrieveRow();
 
 BL_API BLVoid blPreload(
-	IN BLAnsi* _Filenames);
+	IN BLAnsi* _Filenames, 
+	IN BLBool _Flush);
 
 #ifdef __cplusplus
 }

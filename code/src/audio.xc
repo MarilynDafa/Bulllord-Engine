@@ -415,12 +415,9 @@ _ALSoundSetup(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
     ALsizei _queuesz = 0;
-	_src->pSoundBufA = (BLU8*)malloc(65536);
-	_src->pSoundBufB = (BLU8*)malloc(65536);
-	_src->pSoundBufC = (BLU8*)malloc(65536);
-    memset(_src->pSoundBufA, 0, 65536);
-    memset(_src->pSoundBufB, 0, 65536);
-    memset(_src->pSoundBufC, 0, 65536);
+	_src->pSoundBufA = (BLU8*)calloc(1, 65536);
+	_src->pSoundBufB = (BLU8*)calloc(1, 65536);
+	_src->pSoundBufC = (BLU8*)calloc(1, 65536);
     alGetError();
     alGenSources(1, &_src->nSource);
     alGenBuffers(3, _src->aBuffers);
@@ -565,12 +562,9 @@ static BLBool
 _SLSoundSetup(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
-	_src->pSoundBufA = (BLU8*)malloc(65536);
-	_src->pSoundBufB = (BLU8*)malloc(65536);
-	_src->pSoundBufC = (BLU8*)malloc(65536);
-    memset(_src->pSoundBufA, 0, 65536);
-    memset(_src->pSoundBufB, 0, 65536);
-    memset(_src->pSoundBufC, 0, 65536);
+	_src->pSoundBufA = (BLU8*)calloc(1, 65536);
+	_src->pSoundBufB = (BLU8*)calloc(1, 65536);
+	_src->pSoundBufC = (BLU8*)calloc(1, 65536);
 	_src->nBufTurn = 0;
     SLDataLocator_BufferQueue _bufq = {SL_DATALOCATOR_BUFFERQUEUE, 3};
     SLDataFormat_PCM _pcm;
@@ -681,12 +675,9 @@ static BLBool
 _CASoundSetup(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
-	_src->pSoundBufA = (BLU8*)malloc(65536);
-	_src->pSoundBufB = (BLU8*)malloc(65536);
-	_src->pSoundBufC = (BLU8*)malloc(65536);
-	memset(_src->pSoundBufA, 0, 65536);
-	memset(_src->pSoundBufB, 0, 65536);
-	memset(_src->pSoundBufC, 0, 65536);
+	_src->pSoundBufA = (BLU8*)calloc(1, 65536);
+	_src->pSoundBufB = (BLU8*)calloc(1, 65536);
+	_src->pSoundBufC = (BLU8*)calloc(1, 65536);
 	WAVEFORMATEX _pwfx;
 	_pwfx.wFormatTag = WAVE_FORMAT_PCM;
 	_pwfx.nChannels = _src->nChannels;

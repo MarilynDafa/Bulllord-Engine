@@ -158,6 +158,7 @@ typedef struct _Widget {
 	BLArray* pChildren;
 	BLDictionary* pTagSheet;
 	BLVec2 sPosition;
+	BLVec2 sPivot;
 	BLVec2 sDimension;
 	BLRect sAbsRegion;
 	BLEnum eReferenceH;
@@ -662,100 +663,6 @@ _FontFace(const BLAnsi* _Filename)
 	}
 	else
 		return FALSE;
-}
-BLBool
-_UIHeadCache(const BLAnsi* _Filename)
-{
-	BLGuid _layout = blGenStream(_Filename);
-	BLU32 _tmplen = (BLU32)strlen(_Filename);
-	BLAnsi _pixdir[260] = { 0 };
-	strcpy(_pixdir, _Filename);
-	for (BLS32 _idx = (BLS32)_tmplen; _idx >= 0; --_idx)
-	{
-		if (_pixdir[_idx] == '/' || _pixdir[_idx] == '\\')
-			break;
-		else
-			_pixdir[_idx] = 0;
-	}
-	if (_layout == INVALID_GUID)
-	{
-		blDebugOutput("cache ui layout failed>%s", _Filename);
-		return FALSE;
-	}
-	ezxml_t _doc = ezxml_parse_str(blStreamData(_layout), blStreamLength(_layout));
-	ezxml_t _element = ezxml_child(_doc, "Element");
-	BLU32 _idx = 0;
-	BLAnsi* _tmp;
-	do {
-		const BLAnsi* _type = ezxml_attr(_element, "Type");
-		_element = ezxml_child(_element, "Base");
-		_element = _element->sibling;
-		if (strcmp(ezxml_name(_element), "Ext"))
-			continue;
-		const BLAnsi* _pixmap = ezxml_attr(_element, "Pixmap");
-		if (_pixmap)
-		{
-			BLGuid* _streamhead = NULL;
-			BLU32 _pixkey = blHashString((const BLUtf8*)_pixmap);
-			_streamhead = blDictElement(_PrUIMem->pPixmapsCache, _pixkey);
-			if (!_streamhead)
-			{
-				BLAnsi _texfile[260] = { 0 };
-				sprintf(_texfile, "%s%s.bmg", _pixdir, _pixmap);
-				BLGuid _stream = blGenStream(_texfile);
-				BLU8 _identifier[12];
-				blStreamRead(_stream, sizeof(_identifier), _identifier);
-				if (_identifier[0] != 0xDD ||
-					_identifier[1] != 0xDD ||
-					_identifier[2] != 0xDD ||
-					_identifier[3] != 0xEE ||
-					_identifier[4] != 0xEE ||
-					_identifier[5] != 0xEE ||
-					_identifier[6] != 0xAA ||
-					_identifier[7] != 0xAA ||
-					_identifier[8] != 0xAA ||
-					_identifier[9] != 0xDD ||
-					_identifier[10] != 0xDD ||
-					_identifier[11] != 0xDD)
-				{
-					blDeleteStream(_stream);
-					break;
-				}
-				BLU32 _width, _height, _depth;
-				blStreamRead(_stream, sizeof(BLU32), &_width);
-				blStreamRead(_stream, sizeof(BLU32), &_height);
-				blStreamRead(_stream, sizeof(BLU32), &_depth);
-				BLU32 _array, _faces, _mipmap;
-				blStreamRead(_stream, sizeof(BLU32), &_array);
-				blStreamRead(_stream, sizeof(BLU32), &_faces);
-				blStreamRead(_stream, sizeof(BLU32), &_mipmap);
-				BLU32 _fourcc, _channels, _offset;
-				blStreamRead(_stream, sizeof(BLU32), &_fourcc);
-				blStreamRead(_stream, sizeof(BLU32), &_channels);
-				blStreamRead(_stream, sizeof(BLU32), &_offset);
-				BLGuid _tmp = blGenStream(NULL);
-				blStreamWrite(_tmp, _offset, blStreamData(_stream));
-				*_streamhead = _tmp;
-				blDictInsert(_PrUIMem->pPixmapsCache, _pixkey, _streamhead);
-				blDeleteStream(_stream);
-			}
-		}
-		if (_element->sibling)
-			_element = _element->sibling;
-		else
-		{
-			do {
-				_element = _element->parent;
-				if (!_element)
-					break;
-			} while (!_element->next);
-			_element = _element ? _element->next : NULL;
-		}
-	} while (_element);
-	ezxml_free(_doc);
-	blDeleteStream(_layout);
-	_PrUIMem->bDirty = TRUE;
-	return TRUE;
 }
 static _BLWidget*
 _WidgetQuery(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren_)
@@ -9115,57 +9022,57 @@ _DrawPrimitive(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _
 	blDeleteGeometryBuffer(_geo);
 }
 static BLVoid
-_DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
+_DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _XScale, BLF32 _YScale)
 {
 	BLF32 _x, _y, _w, _h;
 	if (_Node->pParent)
 	{
-		BLF32 _pw = _Node->pParent->sDimension.fX > 0.f ? _Node->pParent->sDimension.fX : _PrUIMem->nFboWidth;
-		BLF32 _ph = _Node->pParent->sDimension.fY > 0.f ? _Node->pParent->sDimension.fY : _PrUIMem->nFboHeight;
+		BLF32 _pw = _Node->pParent->sDimension.fX > 0.f ? _Node->pParent->sDimension.fX * _Node->fScaleX * _XScale : _PrUIMem->nFboWidth;
+		BLF32 _ph = _Node->pParent->sDimension.fY > 0.f ? _Node->pParent->sDimension.fY * _Node->fScaleY * _YScale : _PrUIMem->nFboHeight;
 		if (_Node->eReferenceH == BL_UA_LEFT && _Node->eReferenceV == BL_UA_TOP)
 		{
-			_x = _Node->sPosition.fX + _Node->fOffsetX - 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + _Node->fOffsetY - 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX - 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY - 0.5f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_LEFT && _Node->eReferenceV == BL_UA_VCENTER)
 		{
-			_x = _Node->sPosition.fX + _Node->fOffsetX - 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + _Node->fOffsetY + 0.0f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX - 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.0f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_LEFT && _Node->eReferenceV == BL_UA_BOTTOM)
 		{
-			_x = _Node->sPosition.fX + _Node->fOffsetX - 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + _Node->fOffsetY + 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX - 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.5f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_HCENTER && _Node->eReferenceV == BL_UA_TOP)
 		{
-			_x = _Node->sPosition.fX + _Node->fOffsetX + 0.0f * _pw + _XPos;
-			_y = _Node->sPosition.fY + _Node->fOffsetY - 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.0f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY - 0.5f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_HCENTER && _Node->eReferenceV == BL_UA_VCENTER)
 		{
-			_x = _Node->sPosition.fX + _Node->fOffsetX + 0.0f * _pw + _XPos;
-			_y = _Node->sPosition.fY + _Node->fOffsetY + 0.0f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.0f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.0f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_HCENTER && _Node->eReferenceV == BL_UA_BOTTOM)
 		{
-			_x = _Node->sPosition.fX + _Node->fOffsetX + 0.0f * _pw + _XPos;
-			_y = _Node->sPosition.fY + _Node->fOffsetY + 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.0f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.5f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_RIGHT && _Node->eReferenceV == BL_UA_TOP)
 		{
-			_x = _Node->sPosition.fX + _Node->fOffsetX + 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + _Node->fOffsetY - 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY - 0.5f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_RIGHT && _Node->eReferenceV == BL_UA_VCENTER)
 		{
-			_x = _Node->sPosition.fX + _Node->fOffsetX + 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + _Node->fOffsetY + 0.0f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.0f * _ph + _YPos;
 		}
 		else
 		{
-			_x = _Node->sPosition.fX + _Node->fOffsetX + 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + _Node->fOffsetY + 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.5f * _ph + _YPos;
 		}
 		if (_Node->ePolicy == BL_UP_FIXED)
 		{
@@ -9191,31 +9098,31 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 		{
 		case BL_UT_PANEL:
 			if (!_Node->uExtension.sPanel.bBasePlate)
-				_DrawPanel(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+				_DrawPanel(_Node, _x, _y, _w * _Node->fScaleX * _XScale, _h * _Node->fScaleY * _YScale);
 			break;
 		case BL_UT_LABEL:
-			_DrawLabel(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+			_DrawLabel(_Node, _x, _y, _w * _Node->fScaleX * _XScale, _h * _Node->fScaleY * _YScale);
 			break;
 		case BL_UT_BUTTON:
-			_DrawButton(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+			_DrawButton(_Node, _x, _y, _w * _Node->fScaleX * _XScale, _h * _Node->fScaleY * _YScale);
 			break;
 		case BL_UT_CHECK:
-			_DrawCheck(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+			_DrawCheck(_Node, _x, _y, _w * _Node->fScaleX * _XScale, _h * _Node->fScaleY * _YScale);
 			break;
 		case BL_UT_SLIDER:
-			_DrawSlider(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+			_DrawSlider(_Node, _x, _y, _w * _Node->fScaleX * _XScale, _h * _Node->fScaleY * _YScale);
 			break;
 		case BL_UT_TEXT:
-			_DrawText(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+			_DrawText(_Node, _x, _y, _w * _Node->fScaleX * _XScale, _h * _Node->fScaleY * _YScale);
 			break;
 		case BL_UT_PROGRESS:
-			_DrawProgress(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+			_DrawProgress(_Node, _x, _y, _w * _Node->fScaleX * _XScale, _h * _Node->fScaleY * _YScale);
 			break;
 		case BL_UT_DIAL:
-			_DrawDial(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+			_DrawDial(_Node, _x, _y, _w * _Node->fScaleX * _XScale, _h * _Node->fScaleY * _YScale);
 			break;
 		case BL_UT_TABLE:
-			_DrawTable(_Node, _x, _y, _w * _Node->fScaleX, _h * _Node->fScaleY);
+			_DrawTable(_Node, _x, _y, _w * _Node->fScaleX * _XScale, _h * _Node->fScaleY * _YScale);
 			break;
 		default:
 			_DrawPrimitive(_Node, _x, _y, _w, _h);
@@ -9237,7 +9144,7 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 	}
 	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
 	{
-		_DrawWidget(_iter, _x, _y);
+		_DrawWidget(_iter, _x, _y, _Node->fScaleX * _XScale, _Node->fScaleY * _YScale);
 	}
 }
 static const BLBool
@@ -11118,6 +11025,10 @@ _UIInit(DUK_CONTEXT* _DKC, BLBool _Profiler)
     _PrUIMem->pRoot->sDimension.fY = -1.f;
 	_PrUIMem->pRoot->sPosition.fX = 0.f;
 	_PrUIMem->pRoot->sPosition.fY = 0.f;
+	_PrUIMem->pRoot->sPivot.fX = 0.5f;
+	_PrUIMem->pRoot->sPivot.fY = 0.5f;
+	_PrUIMem->pRoot->fScaleX = 1.f;
+	_PrUIMem->pRoot->fScaleY = 1.f;
 	_PrUIMem->pRoot->bPenetration = TRUE;
 	_PrUIMem->pRoot->pParent = NULL;
 	_PrUIMem->pRoot->eReferenceH = BL_UA_HCENTER;
@@ -11558,7 +11469,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 			BLF32 _screensz[2] = { 2.f / (BLF32)_PrUIMem->nFboWidth, 2.f / (BLF32)_PrUIMem->nFboHeight };
 			blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 			blFrameBufferClear(TRUE, FALSE, FALSE);
-			_DrawWidget(_PrUIMem->pRoot, 0.f, 0.f);
+			_DrawWidget(_PrUIMem->pRoot, 0.f, 0.f, 1.f, 1.f);
 			blFrameBufferResolve(_PrUIMem->nFBO);
 			blBindFrameBuffer(_PrUIMem->nFBO, FALSE);
 			_PrUIMem->bDirty = FALSE;
@@ -12442,6 +12353,8 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 	_BLWidget* _widget = (_BLWidget*)malloc(sizeof(_BLWidget));
 	_widget->sDimension.fX = (BLF32)_Width;
 	_widget->sDimension.fY = (BLF32)_Height;	
+	_widget->sPivot.fX = 0.5f;
+	_widget->sPivot.fY = 0.5f;
 	_widget->pParent = NULL;
 	_widget->eType = _Type;
 	_widget->nFrameNum = 0xFFFFFFFF;
@@ -12846,6 +12759,42 @@ blUIGetPosition(IN BLGuid _ID, OUT BLS32* _XPos, OUT BLS32* _YPos)
 	*_XPos = (BLS32)((_widget->sAbsRegion.sLT.fX + _widget->sAbsRegion.sRB.fX) * 0.5f);
 	*_YPos = (BLS32)((_widget->sAbsRegion.sLT.fY + _widget->sAbsRegion.sRB.fY) * 0.5f);
 }
+BLVoid 
+blUIScale(IN BLGuid _ID, IN BLF32 _ScaleX, IN BLF32 _ScaleY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	_widget->fScaleX = _ScaleX;
+	_widget->fScaleY = _ScaleY;
+}
+BLVoid 
+blUIGetScale(IN BLGuid _ID, OUT BLF32* _ScaleX, OUT BLF32* _ScaleY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	*_ScaleX = _widget->fScaleX;
+	*_ScaleY = _widget->fScaleY;
+}
+BLVoid 
+blUIPivot(IN BLGuid _ID, IN BLF32 _PivotX, IN BLF32 _PivotY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	_widget->sPivot.fX = blScalarClamp(_PivotX, 0.f, 1.f);
+	_widget->sPivot.fY = blScalarClamp(_PivotY, 0.f, 1.f);
+}
+BLVoid 
+blUIGetPivot(IN BLGuid _ID, OUT BLF32* _PivotX, OUT BLF32* _PivotY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	*_PivotX = _widget->sPivot.fX;
+	*_PivotY = _widget->sPivot.fY;
+}
 BLVoid
 blUISize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
 {
@@ -13139,10 +13088,29 @@ blUIPanelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	if (_widget->eType != BL_UT_PANEL)
 		return;
-	memset(_widget->uExtension.sPanel.aPixmap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sPanel.aPixmap, _Pixmap);
+	memset(_widget->uExtension.sPanel.aPixmap, 0, sizeof(BLAnsi) * 128);	
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	BLU32 _pixlen = strlen(_Pixmap);
+	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
+	{
+		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
+		BLS32 _idx = 0;
+		for (_idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+		{
+			if (_Pixmap[_idx] == '/' || _Pixmap[_idx] == '\\')
+			{
+				++_idx;
+				break;
+			}
+		}
+		strncpy(_widget->uExtension.sPanel.aPixmap, _Pixmap + _idx, _tmplen - _idx - 4);
+		strcpy(_texfile, _Pixmap);
+	}
+	else
+	{
+		strcpy(_widget->uExtension.sPanel.aPixmap, _Pixmap);
+		sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	}	
 	_FetchResource(_texfile, (BLVoid**)&_widget, _widget->nID, _LoadUI, _UISetup, strlen(_Pixmap) != 0 ? TRUE : FALSE);
 	_PrUIMem->bDirty = TRUE;
 }
@@ -13275,9 +13243,28 @@ blUIButtonPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_BUTTON)
 		return;
 	memset(_widget->uExtension.sButton.aPixmap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sButton.aPixmap, _Pixmap);
     BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	BLU32 _pixlen = strlen(_Pixmap);
+	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
+	{
+		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
+		BLS32 _idx = 0;
+		for (_idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+		{
+			if (_Pixmap[_idx] == '/' || _Pixmap[_idx] == '\\')
+			{
+				++_idx;
+				break;
+			}
+		}
+		strncpy(_widget->uExtension.sButton.aPixmap, _Pixmap + _idx, _tmplen - _idx - 4);
+		strcpy(_texfile, _Pixmap);
+	}
+	else
+	{
+		strcpy(_widget->uExtension.sButton.aPixmap, _Pixmap);
+		sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	}
 	_FetchResource(_texfile, (BLVoid**)&_widget, _widget->nID, _LoadUI, _UISetup, strlen(_Pixmap) != 0 ? TRUE : FALSE);
 	_PrUIMem->bDirty = TRUE;
 }
@@ -13465,9 +13452,28 @@ blUILabelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_LABEL)
 		return;
 	memset(_widget->uExtension.sLabel.aPixmap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sLabel.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	BLU32 _pixlen = strlen(_Pixmap);
+	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
+	{
+		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
+		BLS32 _idx = 0;
+		for (_idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+		{
+			if (_Pixmap[_idx] == '/' || _Pixmap[_idx] == '\\')
+			{
+				++_idx;
+				break;
+			}
+		}
+		strncpy(_widget->uExtension.sLabel.aPixmap, _Pixmap + _idx, _tmplen - _idx - 4);
+		strcpy(_texfile, _Pixmap);
+	}
+	else
+	{
+		strcpy(_widget->uExtension.sLabel.aPixmap, _Pixmap);
+		sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	}
 	_FetchResource(_texfile, (BLVoid**)&_widget, _widget->nID, _LoadUI, _UISetup, strlen(_Pixmap) != 0 ? TRUE : FALSE);
 	_PrUIMem->bDirty = TRUE;
 }
@@ -13602,9 +13608,28 @@ blUICheckPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_CHECK)
 		return;
 	memset(_widget->uExtension.sCheck.aPixmap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sCheck.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	BLU32 _pixlen = strlen(_Pixmap);
+	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
+	{
+		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
+		BLS32 _idx = 0;
+		for (_idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+		{
+			if (_Pixmap[_idx] == '/' || _Pixmap[_idx] == '\\')
+			{
+				++_idx;
+				break;
+			}
+		}
+		strncpy(_widget->uExtension.sCheck.aPixmap, _Pixmap + _idx, _tmplen - _idx - 4);
+		strcpy(_texfile, _Pixmap);
+	}
+	else
+	{
+		strcpy(_widget->uExtension.sCheck.aPixmap, _Pixmap);
+		sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	}
 	_FetchResource(_texfile, (BLVoid**)&_widget, _widget->nID, _LoadUI, _UISetup, strlen(_Pixmap) != 0 ? TRUE : FALSE);
 	_PrUIMem->bDirty = TRUE;
 }
@@ -13791,9 +13816,28 @@ blUITextPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_TEXT)
 		return;
 	memset(_widget->uExtension.sText.aPixmap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sText.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	BLU32 _pixlen = strlen(_Pixmap);
+	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
+	{
+		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
+		BLS32 _idx = 0;
+		for (_idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+		{
+			if (_Pixmap[_idx] == '/' || _Pixmap[_idx] == '\\')
+			{
+				++_idx;
+				break;
+			}
+		}
+		strncpy(_widget->uExtension.sText.aPixmap, _Pixmap + _idx, _tmplen - _idx - 4);
+		strcpy(_texfile, _Pixmap);
+	}
+	else
+	{
+		strcpy(_widget->uExtension.sText.aPixmap, _Pixmap);
+		sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	}
 	_FetchResource(_texfile, (BLVoid**)&_widget, _widget->nID, _LoadUI, _UISetup, strlen(_Pixmap) != 0 ? TRUE : FALSE);
 	_PrUIMem->bDirty = TRUE;
 }
@@ -14054,9 +14098,28 @@ blUIProgressPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_PROGRESS)
 		return;
 	memset(_widget->uExtension.sProgress.aPixmap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sProgress.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	BLU32 _pixlen = strlen(_Pixmap);
+	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
+	{
+		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
+		BLS32 _idx = 0;
+		for (_idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+		{
+			if (_Pixmap[_idx] == '/' || _Pixmap[_idx] == '\\')
+			{
+				++_idx;
+				break;
+			}
+		}
+		strncpy(_widget->uExtension.sProgress.aPixmap, _Pixmap + _idx, _tmplen - _idx - 4);
+		strcpy(_texfile, _Pixmap);
+	}
+	else
+	{
+		strcpy(_widget->uExtension.sProgress.aPixmap, _Pixmap);
+		sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	}
 	_FetchResource(_texfile, (BLVoid**)&_widget, _widget->nID, _LoadUI, _UISetup, strlen(_Pixmap) != 0 ? TRUE : FALSE);
 	_PrUIMem->bDirty = TRUE;
 }
@@ -14216,9 +14279,28 @@ blUISliderPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_SLIDER)
 		return;
 	memset(_widget->uExtension.sSlider.aPixmap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sSlider.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	BLU32 _pixlen = strlen(_Pixmap);
+	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
+	{
+		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
+		BLS32 _idx = 0;
+		for (_idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+		{
+			if (_Pixmap[_idx] == '/' || _Pixmap[_idx] == '\\')
+			{
+				++_idx;
+				break;
+			}
+		}
+		strncpy(_widget->uExtension.sSlider.aPixmap, _Pixmap + _idx, _tmplen - _idx - 4);
+		strcpy(_texfile, _Pixmap);
+	}
+	else
+	{
+		strcpy(_widget->uExtension.sSlider.aPixmap, _Pixmap);
+		sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	}
 	_FetchResource(_texfile, (BLVoid**)&_widget, _widget->nID, _LoadUI, _UISetup, strlen(_Pixmap) != 0 ? TRUE : FALSE);
 	_PrUIMem->bDirty = TRUE;
 }
@@ -14398,9 +14480,28 @@ blUITablePixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_TABLE)
 		return;
 	memset(_widget->uExtension.sTable.aPixmap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sTable.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	BLU32 _pixlen = strlen(_Pixmap);
+	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
+	{
+		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
+		BLS32 _idx = 0;
+		for (_idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+		{
+			if (_Pixmap[_idx] == '/' || _Pixmap[_idx] == '\\')
+			{
+				++_idx;
+				break;
+			}
+		}
+		strncpy(_widget->uExtension.sTable.aPixmap, _Pixmap + _idx, _tmplen - _idx - 4);
+		strcpy(_texfile, _Pixmap);
+	}
+	else
+	{
+		strcpy(_widget->uExtension.sTable.aPixmap, _Pixmap);
+		sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	}
 	_FetchResource(_texfile, (BLVoid**)&_widget, _widget->nID, _LoadUI, _UISetup, strlen(_Pixmap) != 0 ? TRUE : FALSE);
 	_PrUIMem->bDirty = TRUE;
 }
@@ -14682,9 +14783,28 @@ blUIDialPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_DIAL)
 		return;
 	memset(_widget->uExtension.sDial.aPixmap, 0, sizeof(BLAnsi) * 128);
-	strcpy(_widget->uExtension.sDial.aPixmap, _Pixmap);
 	BLAnsi _texfile[260] = { 0 };
-	sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	BLU32 _pixlen = strlen(_Pixmap);
+	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
+	{
+		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
+		BLS32 _idx = 0;
+		for (_idx = (BLS32)_tmplen; _idx >= 0; --_idx)
+		{
+			if (_Pixmap[_idx] == '/' || _Pixmap[_idx] == '\\')
+			{
+				++_idx;
+				break;
+			}
+		}
+		strncpy(_widget->uExtension.sDial.aPixmap, _Pixmap + _idx, _tmplen - _idx - 4);
+		strcpy(_texfile, _Pixmap);
+	}
+	else
+	{
+		strcpy(_widget->uExtension.sDial.aPixmap, _Pixmap);
+		sprintf(_texfile, "%s%s.bmg", _widget->aDir, _Pixmap);
+	}
 	_FetchResource(_texfile, (BLVoid**)&_widget, _widget->nID, _LoadUI, _UISetup, strlen(_Pixmap) != 0 ? TRUE : FALSE);
 	_PrUIMem->bDirty = TRUE;
 }
