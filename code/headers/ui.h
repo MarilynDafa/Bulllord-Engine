@@ -224,6 +224,17 @@ BL_API BLVoid blUIPanelFlip(
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
 
+BL_API BLVoid blUIPanelLayout(
+	IN BLGuid _ID,
+	IN BLBool _GeometricScale,
+	IN BLU32 _PaddingTop,
+	IN BLU32 _PaddingLeft,
+	IN BLU32 _PaddingBottom,
+	IN BLU32 _PaddingRight,
+	IN BLU32 _GapH,
+	IN BLU32 _GapV,
+	IN BLU32 _Columns);
+
 BL_API BLVoid blUIButtonPixmap(
 	IN BLGuid _ID,
 	IN BLAnsi* _Pixmap);

@@ -679,6 +679,16 @@ _WidgetQuery(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren_)
 	}
 	return _ret;
 }
+static BLBool
+_WidgetValid(_BLWidget* _Node)
+{
+	BLBool _ret = _Node->bValid;
+	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
+	{
+		_ret &= _WidgetValid(_iter);
+	}
+	return _ret;
+}
 static _BLWidget*
 _WidgetLocate(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 {
@@ -9144,7 +9154,8 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _XScale, BLF32 _YS
 	}
 	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
 	{
-		_DrawWidget(_iter, _x, _y, _Node->fScaleX * _XScale, _Node->fScaleY * _YScale);
+		if (_WidgetValid(_iter))
+			_DrawWidget(_iter, _x, _y, _Node->fScaleX * _XScale, _Node->fScaleY * _YScale);
 	}
 }
 static const BLBool
@@ -11029,6 +11040,7 @@ _UIInit(DUK_CONTEXT* _DKC, BLBool _Profiler)
 	_PrUIMem->pRoot->sPivot.fY = 0.5f;
 	_PrUIMem->pRoot->fScaleX = 1.f;
 	_PrUIMem->pRoot->fScaleY = 1.f;
+	_PrUIMem->pRoot->bValid = TRUE;
 	_PrUIMem->pRoot->bPenetration = TRUE;
 	_PrUIMem->pRoot->pParent = NULL;
 	_PrUIMem->pRoot->eReferenceH = BL_UA_HCENTER;
@@ -12700,7 +12712,7 @@ blUIAttach(IN BLGuid _Parent, IN BLGuid _Child)
 		if (_ret)
 			blArrayErase(_child->pParent->pChildren, _idx);
 	}
-	blArrayPushFront(_parent->pChildren, _child);
+	blArrayPushBack(_parent->pChildren, _child);
 	_child->pParent = _parent;
 	return TRUE;
 }
@@ -13233,6 +13245,53 @@ blUIPanelFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_widget->uExtension.sPanel.bFlipX = _FlipX;
 	_widget->uExtension.sPanel.bFlipY = _FlipY;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUIPanelLayout(IN BLGuid _ID, IN BLBool _GeometricScale, IN BLU32 _PaddingTop, IN BLU32 _PaddingLeft, IN BLU32 _PaddingBottom, IN BLU32 _PaddingRight, IN BLU32 _GapH, IN BLU32 _GapV, IN BLU32 _Columns)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PANEL)
+		return;
+	if (!_Columns)
+		return;
+	if (!_widget->pChildren->nSize)
+		return;
+	BLU32 _width = (BLU32)_widget->sDimension.fX;
+	_width = _width - _PaddingLeft - _PaddingRight;
+	BLU32 _cellw = (_width - (_Columns - 1) * _GapH) / _Columns;
+	BLU32 _height = (BLU32)_widget->sDimension.fY;
+	_height = _height - _PaddingTop - _PaddingBottom;
+	BLU32 _cellh = 0;
+	if (_GeometricScale)
+	{
+		_BLWidget* _first = blArrayFrontElement(_widget->pChildren);
+		_cellh = (BLU32)(_cellw * _first->sDimension.fY / _first->sDimension.fX);
+	}
+	else
+	{
+		BLU32 _rows = (BLU32)ceilf(_widget->pChildren->nSize / (BLF32)_Columns);
+		_cellh = (_height - (_rows - 1) * _GapV) / _rows;
+	}
+	BLU32 _row = 0;
+	BLU32 _col = 0;
+	FOREACH_ARRAY(_BLWidget*, _iter, _widget->pChildren)
+	{
+		_iter->eReferenceH = BL_UA_HCENTER;
+		_iter->eReferenceV = BL_UA_VCENTER;
+		_iter->sDimension.fX = (BLF32)_cellw;
+		_iter->sDimension.fY = (BLF32)_cellh;
+		_iter->sPosition.fX = _PaddingLeft + _col * (_cellw + _GapH) + _cellw * _iter->sPivot.fX - _widget->sDimension.fX * 0.5f;
+		_iter->sPosition.fY = _PaddingTop + _row * (_cellh + _GapV) + _cellh * _iter->sPivot.fY - _widget->sDimension.fY * 0.5f;
+		if (_col == _Columns - 1)
+		{
+			_row++;
+			_col = 0;
+		}
+		else
+			_col++;
+	}
 }
 BLVoid
 blUIButtonPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
