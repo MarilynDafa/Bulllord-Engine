@@ -41,21 +41,39 @@ BL_API BLVoid blSendNetMsg(
 	IN BLBool _Autocompress,
 	IN BLEnum _Nettype);
 
-BL_API BLBool blHttpBlockRequest(
+BL_API BLBool blRSASign(
+	IN BLAnsi* _Input,
+	IN BLAnsi* _PrivateKey,
+	IN BLU32 _Version,
+	OUT BLAnsi _Output[1025]);
+
+BL_API BLBool blRSAVerify(
+	IN BLAnsi* _Input,
+	IN BLAnsi* _PublicKey,
+	IN BLU32 _Version);
+
+BL_API BLBool blRSAEncrypt(
+	IN BLAnsi* _Input,
+	IN BLAnsi* _PublicKey,
+	OUT BLAnsi _Output[1025]);
+
+BL_API BLBool blRSADecrypt(
+	IN BLAnsi* _Input,
+	IN BLAnsi* _PrivateKey,
+	OUT BLAnsi _Output[1025]);
+
+BL_API BLBool blHTTPRequest(
 	IN BLAnsi* _Url,
-	IN BLAnsi** _Argv,
-	IN BLU32 _Argc,
-	IN BLAnsi* _Encryptkey,
+	IN BLAnsi* _Param,
 	IN BLBool _Get,
-	OUT BLAnsi _Response[1025]
-);
+	OUT BLAnsi _Response[1025]);
 
 BL_API BLBool blAddDownloadList(
 	IN BLAnsi* _Host,
 	IN BLAnsi* _Localpath, 
 	OUT BLU32* _Taskid);
 
-BL_API BLVoid blBeginDownload();
+BL_API BLVoid blDownload();
 
 BL_API BLVoid blProgressQuery(
 	OUT BLU32* _Curtask, 

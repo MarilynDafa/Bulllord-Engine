@@ -19,9 +19,6 @@
     <Filter Include="externals\vulkan">
       <UniqueIdentifier>{618d9fcd-ce81-4381-85d0-bca19ca56720}</UniqueIdentifier>
     </Filter>
-    <Filter Include="externals\xxtea">
-      <UniqueIdentifier>{cba0d61b-8185-4ca2-8fe3-05aee3480b75}</UniqueIdentifier>
-    </Filter>
     <Filter Include="externals\fastlz">
       <UniqueIdentifier>{6db37f11-f736-4836-adb3-8c1b58dbeeff}</UniqueIdentifier>
     </Filter>
@@ -48,6 +45,9 @@
     </Filter>
     <Filter Include="externals\miniz">
       <UniqueIdentifier>{7f82e891-c144-4ead-b9cd-b90ef7e98a40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\mbedtls">
+      <UniqueIdentifier>{4c17356e-8a7f-4604-8687-6b4665e4a6b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -170,9 +170,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3secure.c">
       <Filter>externals\sqlite3</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\xxtea\xxtea.c">
-      <Filter>externals\xxtea</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\fastlz\fastlz.c">
       <Filter>externals\fastlz</Filter>
@@ -753,6 +750,225 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\aes.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\aesni.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\arc4.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\aria.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\asn1parse.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\asn1write.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\base64.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\bignum.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\blowfish.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\camellia.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ccm.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\certs.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\cipher.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\cipher_wrap.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\cmac.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ctr_drbg.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\debug.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\des.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\dhm.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ecdh.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ecdsa.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ecjpake.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ecp.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ecp_curves.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\entropy.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\entropy_poll.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\error.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\gcm.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\havege.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\hmac_drbg.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\md.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\md_wrap.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\md2.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\md4.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\md5.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\memory_buffer_alloc.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\net_sockets.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\oid.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\padlock.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pem.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pk.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pk_wrap.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pkcs5.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pkcs11.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pkcs12.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pkparse.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pkwrite.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\platform.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\platform_util.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ripemd160.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\rsa.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\rsa_internal.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\sha1.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\sha256.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\sha512.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_cache.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_ciphersuites.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_cli.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_cookie.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_srv.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_ticket.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_tls.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\threading.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\timing.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\version.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\version_features.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509_create.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509_crl.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509_crt.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509_csr.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509write_crt.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509write_csr.c">
+      <Filter>externals\mbedtls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h">
@@ -781,9 +997,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\gl\wglext.h">
       <Filter>externals\gl</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\xxtea\xxtea.h">
-      <Filter>externals\xxtea</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\fastlz\fastlz.h">
       <Filter>externals\fastlz</Filter>
@@ -1621,6 +1834,225 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\internal.h">
       <Filter>externals\mpaudec</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\aes.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\aesni.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\arc4.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\aria.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\asn1.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\asn1write.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\base64.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\bignum.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\blowfish.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\bn_mul.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\camellia.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ccm.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\certs.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\check_config.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\cipher.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\cipher_internal.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\cmac.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\compat-1.3.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\config.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ctr_drbg.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\debug.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\des.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\dhm.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ecdh.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ecdsa.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ecjpake.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ecp.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ecp_internal.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\entropy.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\entropy_poll.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\error.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\gcm.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\havege.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\hmac_drbg.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\md.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\md_internal.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\md2.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\md4.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\md5.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\memory_buffer_alloc.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\net.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\net_sockets.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\oid.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\padlock.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pem.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pk.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pk_internal.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pkcs5.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pkcs11.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\pkcs12.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\platform.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\platform_time.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\platform_util.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ripemd160.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\rsa.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\rsa_internal.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\sha1.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\sha256.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\sha512.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_cache.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_ciphersuites.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_cookie.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_internal.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\ssl_ticket.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\threading.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\timing.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\version.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509_crl.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509_crt.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\x509_csr.h">
+      <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Bulllord-Engine\proj\..\code\externals\mbedtls\xtea.h">
+      <Filter>externals\mbedtls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

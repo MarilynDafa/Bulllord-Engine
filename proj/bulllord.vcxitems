@@ -707,6 +707,79 @@
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aes.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aesni.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\arc4.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aria.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\asn1parse.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\asn1write.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\base64.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\bignum.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\blowfish.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\camellia.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ccm.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\certs.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cipher.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cipher_wrap.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cmac.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ctr_drbg.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\debug.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\des.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\dhm.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecdh.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecdsa.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecjpake.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecp.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecp_curves.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\entropy.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\entropy_poll.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\error.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\gcm.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\havege.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\hmac_drbg.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md2.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md4.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md5.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md_wrap.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\memory_buffer_alloc.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\net_sockets.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\oid.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\padlock.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pem.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pk.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs11.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs12.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs5.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkparse.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkwrite.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pk_wrap.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\platform.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\platform_util.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ripemd160.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\rsa.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\rsa_internal.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha1.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha256.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha512.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_cache.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_ciphersuites.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_cli.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_cookie.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_srv.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_ticket.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_tls.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\threading.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\timing.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\version.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\version_features.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509write_crt.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509write_csr.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_create.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_crl.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_crt.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_csr.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz.c">
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <CompileAs>CompileAsC</CompileAs>
@@ -762,10 +835,6 @@
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\xml\ezxml.c">
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\xxtea\xxtea.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
@@ -1490,6 +1559,79 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\gl\glcorearb.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\gl\glxext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\gl\wglext.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aes.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aesni.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\arc4.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aria.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\asn1.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\asn1write.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\base64.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\bignum.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\blowfish.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\bn_mul.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\camellia.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ccm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\certs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\check_config.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cipher.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cipher_internal.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cmac.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\compat-1.3.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\config.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ctr_drbg.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\debug.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\des.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\dhm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecdh.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecdsa.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecjpake.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecp.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecp_internal.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\entropy.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\entropy_poll.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\error.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\gcm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\havege.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\hmac_drbg.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md2.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md4.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md5.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md_internal.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\memory_buffer_alloc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\net.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\net_sockets.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\oid.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\padlock.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pem.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pk.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs11.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs12.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs5.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pk_internal.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\platform.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\platform_time.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\platform_util.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ripemd160.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\rsa.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\rsa_internal.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha1.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha256.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha512.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_cache.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_ciphersuites.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_cookie.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_internal.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_ticket.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\threading.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\timing.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\version.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_crl.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_crt.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_csr.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\xtea.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_common.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tdef.h" />
@@ -1517,7 +1659,6 @@
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\xml\ezxml.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\xxtea\xxtea.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\audio.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\gpu.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\network.h" />

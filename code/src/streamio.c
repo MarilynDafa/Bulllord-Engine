@@ -1422,6 +1422,8 @@ blGenSql(IN BLAnsi* _Dbname, IN BLAnsi* _Dbpwd, IN BLBool _Inmem)
         sqlite3* _memdb;
         BLAnsi _sql[512] = {0};
         sqlite3_open(":memory:", &_memdb);
+        if(_Dbpwd)
+			sqlite3_key(_memdb , _Dbpwd , (BLS32)strlen(_Dbpwd));
         sqlite3_exec(_db, "BEGIN", NULL, NULL, NULL);
         sqlite3_exec(_db, "SELECT sql FROM sqlite_master WHERE sql NOT NULL", _ProcessDdlRow, _memdb, NULL);
         sqlite3_exec(_db, "COMMIT", NULL, NULL, NULL);

@@ -25,8 +25,12 @@
 #include "internal/array.h"
 #include "internal/internal.h"
 #include "../externals/fastlz/fastlz.h"
-#include "../externals/xxtea/xxtea.h"
 #include "../externals/duktape/duktape.h"
+#include "../externals/mbedtls/rsa.h"
+#include "../externals/mbedtls/md.h"
+#include "../externals/mbedtls/pk.h"
+#include "../externals/mbedtls/entropy.h"
+#include "../externals/mbedtls/ctr_drbg.h"
 #pragma pack(1)
 typedef struct _NetMsg {
 	BLU32 nID;
@@ -1972,8 +1976,186 @@ blSendNetMsg(IN BLU32 _MsgID, IN BLVoid* _Msgbuf, IN BLU32 _Msgsz, IN BLBool _Cr
 #endif
 	}
 }
-BLBool
-blHttpBlockRequest(IN BLAnsi* _Url, IN BLAnsi** _Argv, IN BLU32 _Argc, IN BLAnsi* _Encryptkey, IN BLBool _Get, OUT BLAnsi _Response[1025])
+BLBool 
+blRSASign(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, IN BLU32 _Version, OUT BLAnsi _Output[1025])
+{
+	mbedtls_pk_context _ctx;
+	mbedtls_pk_init(&_ctx);
+	if (mbedtls_pk_parse_key(&_ctx, _PrivateKey, strlen(_PrivateKey) + 1, 0, 0))
+	{
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	mbedtls_entropy_context _entropy;
+	mbedtls_entropy_init(&_entropy);
+	mbedtls_ctr_drbg_context _ctrdrbg;
+	mbedtls_ctr_drbg_init(&_ctrdrbg);
+	const BLAnsi* _pers = "bulllord_pk_sign";
+	if (mbedtls_ctr_drbg_seed(&_ctrdrbg, mbedtls_entropy_func, &_entropy, (const BLU8*)_pers, strlen(_pers)))
+	{
+		mbedtls_ctr_drbg_free(&_ctrdrbg);
+		mbedtls_entropy_free(&_entropy);
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	BLU8 _hash[32] = { 0 };
+	mbedtls_md_type_t _type = _Version ? MBEDTLS_MD_SHA256 : MBEDTLS_MD_SHA1;
+	if (mbedtls_md(mbedtls_md_info_from_type(_type), _Input, strlen(_Input), _hash))
+	{
+		mbedtls_ctr_drbg_free(&_ctrdrbg);
+		mbedtls_entropy_free(&_entropy);
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	BLU8 _buf[1024] = { 0 };
+	size_t _olen;
+	if (mbedtls_pk_sign(&_ctx, _type, _hash, 0, _buf, &_olen, mbedtls_ctr_drbg_random, &_ctrdrbg))
+	{
+		mbedtls_ctr_drbg_free(&_ctrdrbg);
+		mbedtls_entropy_free(&_entropy);
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	memset(_Output, 0, sizeof(_Output));
+	const BLAnsi* _base64 = blGenBase64Encoder(_buf, _olen);
+	strcpy(_Output, _base64);
+	blDeleteBase64Encoder((BLAnsi*)_base64);
+	mbedtls_ctr_drbg_free(&_ctrdrbg);
+	mbedtls_entropy_free(&_entropy);
+	mbedtls_pk_free(&_ctx);
+	return TRUE;
+}
+BLBool 
+blRSAVerify(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, IN BLU32 _Version)
+{
+	mbedtls_pk_context _ctx;
+	mbedtls_pk_init(&_ctx);
+	if (mbedtls_pk_parse_public_key(&_ctx, _PublicKey, strlen(_PublicKey) + 1))
+	{
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	mbedtls_entropy_context _entropy;
+	mbedtls_entropy_init(&_entropy);
+	mbedtls_ctr_drbg_context _ctrdrbg;
+	mbedtls_ctr_drbg_init(&_ctrdrbg);
+	const BLAnsi* _pers = "bulllord_pk_verify";
+	if (mbedtls_ctr_drbg_seed(&_ctrdrbg, mbedtls_entropy_func, &_entropy, (const BLU8*)_pers, strlen(_pers)))
+	{
+		mbedtls_ctr_drbg_free(&_ctrdrbg);
+		mbedtls_entropy_free(&_entropy);
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	BLU8 _hash[32] = { 0 };
+	mbedtls_md_type_t _type = _Version ? MBEDTLS_MD_SHA256 : MBEDTLS_MD_SHA1;
+	if (mbedtls_md(mbedtls_md_info_from_type(_type), _Input, strlen(_Input), _hash))
+	{
+		mbedtls_ctr_drbg_free(&_ctrdrbg);
+		mbedtls_entropy_free(&_entropy);
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	BLU32 _bufsz;
+	const BLU8* _buf = blGenBase64Decoder(_Input, &_bufsz);
+	if (mbedtls_pk_verify(&_ctx, _type, _hash, 0, _buf, _bufsz))
+	{
+		blDeleteBase64Decoder((BLU8*)_buf);
+		mbedtls_ctr_drbg_free(&_ctrdrbg);
+		mbedtls_entropy_free(&_entropy);
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	blDeleteBase64Decoder((BLU8*)_buf);
+	mbedtls_ctr_drbg_free(&_ctrdrbg);
+	mbedtls_entropy_free(&_entropy);
+	mbedtls_pk_free(&_ctx);
+	return TRUE;
+}
+BLBool 
+blRSAEncrypt(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, OUT BLAnsi _Output[1025])
+{
+	mbedtls_pk_context _ctx;
+	mbedtls_pk_init(&_ctx);
+	if (mbedtls_pk_parse_public_key(&_ctx, _PublicKey, strlen(_PublicKey) + 1))
+	{
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	mbedtls_entropy_context _entropy;
+	mbedtls_entropy_init(&_entropy);
+	mbedtls_ctr_drbg_context _ctrdrbg;
+	mbedtls_ctr_drbg_init(&_ctrdrbg);
+	const BLAnsi* _pers = "bulllord_pk_encrypt";
+	if (mbedtls_ctr_drbg_seed(&_ctrdrbg, mbedtls_entropy_func, &_entropy, (const BLU8*)_pers, strlen(_pers)))
+	{
+		mbedtls_ctr_drbg_free(&_ctrdrbg);
+		mbedtls_entropy_free(&_entropy);
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	BLU8 _buf[1024] = { 0 };
+	size_t _olen;
+	if (mbedtls_pk_encrypt(&_ctx, _Input, strlen(_Input), _buf, &_olen, sizeof(_buf), mbedtls_ctr_drbg_random, &_ctrdrbg))
+	{
+		mbedtls_ctr_drbg_free(&_ctrdrbg);
+		mbedtls_entropy_free(&_entropy);
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	memset(_Output, 0, sizeof(_Output));
+	const BLAnsi* _base64 = blGenBase64Encoder(_buf, _olen);
+	strcpy(_Output, _base64);
+	blDeleteBase64Encoder((BLAnsi*)_base64);
+	mbedtls_ctr_drbg_free(&_ctrdrbg);
+	mbedtls_entropy_free(&_entropy);
+	mbedtls_pk_free(&_ctx);
+	return TRUE;
+}
+BLBool 
+blRSADecrypt(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, OUT BLAnsi _Output[1025])
+{
+	mbedtls_pk_context _ctx;
+	mbedtls_pk_init(&_ctx);
+	if (mbedtls_pk_parse_key(&_ctx, _PrivateKey, strlen(_PrivateKey) + 1, 0, 0))
+	{
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	mbedtls_entropy_context _entropy;
+	mbedtls_entropy_init(&_entropy);
+	mbedtls_ctr_drbg_context _ctrdrbg;
+	mbedtls_ctr_drbg_init(&_ctrdrbg);
+	const BLAnsi* _pers = "bulllord_pk_decrypt";
+	if (mbedtls_ctr_drbg_seed(&_ctrdrbg, mbedtls_entropy_func, &_entropy, (const BLU8*)_pers, strlen(_pers)))
+	{
+		mbedtls_ctr_drbg_free(&_ctrdrbg);
+		mbedtls_entropy_free(&_entropy);
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	BLU32 _bufsz;
+	const BLU8* _buf = blGenBase64Decoder(_Input, &_bufsz);
+	BLAnsi _result[1024] = { 0 };
+	size_t _olen;
+	if (mbedtls_pk_decrypt(&_ctx, _buf, _bufsz, _result, &_olen, sizeof(_result), mbedtls_ctr_drbg_random, &_ctrdrbg))
+	{
+		blDeleteBase64Decoder((BLU8*)_buf);
+		mbedtls_ctr_drbg_free(&_ctrdrbg);
+		mbedtls_entropy_free(&_entropy);
+		mbedtls_pk_free(&_ctx);
+		return FALSE;
+	}
+	blDeleteBase64Decoder((BLU8*)_buf);
+	mbedtls_ctr_drbg_free(&_ctrdrbg);
+	mbedtls_entropy_free(&_entropy);
+	mbedtls_pk_free(&_ctx);
+	memset(_Output, 0, sizeof(_Output));
+	memcpy(_Output, _result, _olen);
+	return TRUE;
+}
+BLBool 
+blHTTPRequest(IN BLAnsi* _Url, IN BLAnsi* _Param, IN BLBool _Get, OUT BLAnsi _Response[1025])
 {
 	if (strlen(_Url) >= 1024)
 		return FALSE;
@@ -1987,7 +2169,6 @@ blHttpBlockRequest(IN BLAnsi* _Url, IN BLAnsi** _Argv, IN BLU32 _Argc, IN BLAnsi
 	struct sockaddr_in6 _sin6;
 	struct addrinfo _hint, *_servaddr, *_iter;
 	BLAnsi _host[1024] = { 0 };
-	BLAnsi _Param[1024] = { 0 };
 	BLAnsi* _tmp;
 	BLSocket _sok = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
 	memset(&_hint, 0, sizeof(_hint));
@@ -2060,51 +2241,7 @@ blHttpBlockRequest(IN BLAnsi* _Url, IN BLAnsi** _Argv, IN BLU32 _Argc, IN BLAnsi
 		}
 	}
 success:
-	memset(_Response, 0, 1025 * sizeof(BLAnsi));
-	if (_Encryptkey)
-	{
-		for (_idx = 0; _idx < (BLS32)_Argc; ++_idx)
-		{
-			if (_idx == 0)
-				strcpy(_Param, _Argv[_idx]);
-			else if (_idx == (BLS32)_Argc - 1)
-				break;
-			else
-			{
-				if (_idx % 2 == 0)
-					strcat(_Param, _Argv[_idx]);
-				else
-				{
-					xxtea_long _enlen;
-					BLU8* _blob = xxtea_encrypt((BLUtf8*)_Argv[_idx], (xxtea_long)strlen(_Argv[_idx]), (BLUtf8*)_Encryptkey, (xxtea_long)strlen(_Encryptkey), &_enlen);
-					BLAnsi* _b64 = (BLAnsi*)blGenBase64Encoder(_blob, _enlen);
-					strcat(_Param, _b64);
-					blDeleteBase64Encoder(_b64);
-					free(_blob);
-				}
-			}
-			if (_idx % 2 == 0)
-				strcat(_Param, "=");
-			else
-				strcat(_Param, "&");
-		}
-	}
-	else
-	{
-		for (_idx = 0; _idx < (BLS32)_Argc; ++_idx)
-		{
-			if (_idx == 0)
-				strcpy(_Param, _Argv[_idx]);
-			else if (_idx == (BLS32)_Argc - 1)
-				break;
-			else
-				strcat(_Param, _Argv[_idx]);
-			if (_idx % 2 == 0)
-				strcat(_Param, "=");
-			else
-				strcat(_Param, "&");
-		}
-	}
+	memset(_Response, 0, 1025 * sizeof(BLAnsi));	
 	if (_Get)
 		sprintf(_Response, "GET %s?%s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", _Url, _Param, _host);
 	else
@@ -2247,17 +2384,6 @@ success:
 			}
 		}
 		_Response[_idx] = 0;
-	}
-	if (_Encryptkey)
-	{
-		BLU32 _blobsz;
-		xxtea_long _delen;
-		BLU8* _blob = (BLU8*)blGenBase64Decoder(_Response, &_blobsz);
-		memset(_Response, 0, 1025 * sizeof(BLAnsi));
-		BLAnsi* _destr = (BLAnsi*)xxtea_decrypt(_blob, _blobsz, (BLUtf8*)_Encryptkey, (xxtea_long)strlen(_Encryptkey), &_delen);
-		memcpy(_Response, _destr, _delen);
-		blDeleteBase64Decoder(_blob);
-		free(_destr);
 	}
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	if (_sok)
@@ -2470,7 +2596,7 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 	return TRUE;
 }
 BLVoid
-blBeginDownload()
+blDownload()
 {
 #if defined(BL_PLATFORM_WEB)
 	const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
