@@ -80,19 +80,19 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\bin\win32\$(Platform)</OutDir>
+    <OutDir>..\..\bin\win32</OutDir>
     <IntDir>$(Configuration)\win32\$(Platform)</IntDir>
     <TargetName>libTMXPlugin</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\bin\win32\$(Platform)</OutDir>
+    <OutDir>..\..\bin\win32</OutDir>
     <IntDir>$(Configuration)\win32\$(Platform)</IntDir>
     <TargetName>libTMXPlugin</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\bin\win32\$(Platform)</OutDir>
+    <OutDir>..\..\bin\win32</OutDir>
     <IntDir>$(Configuration)\win32\$(Platform)</IntDir>
     <TargetName>libTMXPlugin</TargetName>
   </PropertyGroup>
