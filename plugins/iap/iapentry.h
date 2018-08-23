@@ -41,17 +41,21 @@ extern "C" {
 BL_API BLVoid blIAPOpenEXT();
 
 BL_API BLVoid blIAPCloseEXT();
-
-BL_API BLVoid blPurchaseEXT(
+    
+BL_API BLVoid blRegistProductsEXT(
 	IN BLEnum _Channel,
-	IN BLAnsi* _ProductID,
-	IN BLVoid(*_Subscriber)(BLEnum, BLAnsi*));
+	IN BLAnsi* _Products,
+	IN BLAnsi* _GoogleLicense);
 
-BL_API BLBool blVerifyEXT();
+BL_API BLBool blPurchaseEXT(
+	IN BLAnsi* _ProductID,
+	IN BLVoid(*_Subscriber)(BLEnum, BLAnsi*, BLAnsi*));
+
+BL_API BLVoid blValidationEXT(
+	IN BLVoid(*_Subscriber)(BLBool));
 
 BL_API BLVoid blCheckUnfulfilledEXT(
-	IN BLEnum _Channel,
-	IN BLVoid(*_Subscriber)(BLAnsi*, BLAnsi*));
+	IN BLVoid(*_Subscriber)(BLAnsi*, BLAnsi*, BLAnsi*));
 #ifdef __cplusplus
 }
 #endif

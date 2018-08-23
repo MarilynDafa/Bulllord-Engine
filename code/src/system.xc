@@ -1796,13 +1796,13 @@ _CloseWindow()
 }
 #elif defined(BL_PLATFORM_ANDROID)
 extern "C" {
-	JNIEXPORT BLVoid JNICALL Java_org_bulllord_app_BLActivity_textChanged(JNIEnv* _Env, jclass, jstring _Text)
+	JNIEXPORT BLVoid JNICALL Java_org_bulllord_lib_BLActivity_textChanged(JNIEnv* _Env, jclass, jstring _Text)
 	{
 		const BLUtf8* _utf8str = (const BLUtf8*)_Env->GetStringUTFChars(_Text, NULL);
 		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str, INVALID_GUID);
 		_Env->ReleaseStringUTFChars(_Text, (const BLAnsi*)_utf8str);
 	}
-	JNIEXPORT BLVoid JNICALL Java_org_bulllord_app_BLActivity_activityReady(JNIEnv* _Env, jclass, jobject _Activity)
+	JNIEXPORT BLVoid JNICALL Java_org_bulllord_lib_BLActivity_activityReady(JNIEnv* _Env, jclass, jobject _Activity)
 	{
 		_PrSystemMem->pBLJava = _Activity;
 		JNIEnv* _env = _PrSystemMem->pActivity->env;
@@ -1839,37 +1839,9 @@ _WndProc(BLS32 _Msg, BLVoid* _Userdata)
 			jclass _acticls = _env->GetObjectClass(_PrSystemMem->pActivity->clazz);
 			jmethodID _getmid = _env->GetMethodID(_acticls, "getWindow", "()Landroid/view/Window;");
 			jobject _wndobj = _env->CallObjectMethod(_PrSystemMem->pActivity->clazz, _getmid);
-			jclass _wndcls = _env->FindClass("android/view/Window");
-			jmethodID _decormid = _env->GetMethodID(_wndcls, "getDecorView", "()Landroid/view/View;");
-			jobject _decorobj = _env->CallObjectMethod(_wndobj, _decormid);
-			jclass _viewcls = _env->FindClass("android/view/View");
-			jint _flags = 0;
-			if (_sdkver >= 14)
-			{
-				jfieldID _profilefield = _env->GetStaticFieldID(_viewcls, "SYSTEM_UI_FLAG_LOW_PROFILE", "I");
-				jint _profile = _env->GetStaticIntField(_viewcls, _profilefield);
-				_flags |= _profile;
-			}
-			if (_sdkver >= 16)
-			{
-				jfieldID _fullscreenfield = _env->GetStaticFieldID(_viewcls, "SYSTEM_UI_FLAG_FULLSCREEN", "I");
-				jint _fullscreen = _env->GetStaticIntField(_viewcls, _fullscreenfield);
-				_flags |= _fullscreen;
-			}
-			if (_sdkver >= 19)
-			{
-				jfieldID _immersivefield = _env->GetStaticFieldID(_viewcls, "SYSTEM_UI_FLAG_IMMERSIVE_STICKY", "I");
-				jint _immersive = _env->GetStaticIntField(_viewcls, _immersivefield);
-				_flags |= _immersive;
-			}
-			jmethodID _sysmid = _env->GetMethodID(_viewcls, "setSystemUiVisibility", "(I)V");
-			_env->CallVoidMethod(_decorobj, _sysmid, _flags);
 			_env->DeleteLocalRef(_vercls);
 			_env->DeleteLocalRef(_acticls);
 			_env->DeleteLocalRef(_wndobj);
-			_env->DeleteLocalRef(_wndcls);
-			_env->DeleteLocalRef(_decorobj);
-			_env->DeleteLocalRef(_viewcls);
 		}
 		break;
 	case 6:
@@ -1945,8 +1917,6 @@ _ShowWindow()
 	jmethodID _getviewmid = _env->GetMethodID(_wndcls, "getDecorView", "()Landroid/view/View;");
 	jobject _viewobj = _env->CallObjectMethod(_wndobj, _getviewmid);
 	jclass _viewcls = _env->FindClass("android/view/View");
-	jmethodID _getvismid = _env->GetMethodID(_viewcls, "setSystemUiVisibility", "(I)V");
-	_env->CallVoidMethod(_viewobj, _getvismid, (0x00000800 | 0x00000004 | 0x00000002));
 	jmethodID _getmgrmid = _env->GetMethodID(_acticls, "getWindowManager", "()Landroid/view/WindowManager;");
 	jobject _mgrobj = _env->CallObjectMethod(_actiobj, _getmgrmid);
 	jclass _mgrcls = _env->FindClass("android/view/WindowManager");
@@ -3637,6 +3607,47 @@ blPlatformIdentity()
 	return BL_PLATFORM_WEB;
 #else
     return -1;
+#endif
+}
+BLVoid* blPlatformPayload(IN BLEnum _Type)
+{
+#if defined(BL_PLATFORM_WIN32)
+	if (_Type == BL_PT_HANDLE)
+		return (BLVoid*)&_PrSystemMem->nHwnd;
+	else
+		return NULL;
+#elif defined(BL_PLATFORM_UWP)
+	return NULL;
+#elif defined(BL_PLATFORM_LINUX)
+	if (_Type == BL_PT_HANDLE)
+		return (BLVoid*)_PrSystemMem->pDisplay;
+	else if (_Type == BL_PT_WINDOW)
+		return (BLVoid*)&_PrSystemMem->nWindow;
+	else
+		return NULL;
+#elif defined(BL_PLATFORM_ANDROID)
+	if (_Type == BL_PT_HANDLE)
+		return (BLVoid*)&_PrSystemMem->pBLJava;
+	else if (_Type == BL_PT_WINDOW)
+		return (BLVoid*)_PrSystemMem->pActivity;
+	else if (_Type == BL_PT_UTIL)
+		return (BLVoid*)&_PrSystemMem->sMutex;
+	else
+		return NULL;
+#elif defined(BL_PLATFORM_OSX)
+	if (_Type == BL_PT_WINDOW)
+		return (BLVoid*)_PrSystemMem->pWindow;
+	else
+		return NULL;
+#elif defined(BL_PLATFORM_IOS)
+	if (_Type == BL_PT_WINDOW)
+		return (BLVoid*)_PrSystemMem->pWindow;
+	else
+		return NULL;
+#elif defined(BL_PLATFORM_WEB)
+	return NULL;
+#else
+    return NULL;
 #endif
 }
 BLU32

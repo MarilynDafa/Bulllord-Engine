@@ -58,6 +58,15 @@ extern "C" {
 */
     
 BL_API BLEnum blPlatformIdentity();
+/**
+Win32 type == BL_PT_HANDLE return HWND*
+Linux type == BL_PT_HANDLE return Display* type == BL_PT_WINDOW return Window*
+Android type type == BL_PT_HANDLE return jobject* type == BL_PT_WINDOW return ANativeActivity* type == BL_PT_UTIL return pthread_mutex_t
+OSX type == BL_PT_WINDOW return NSWindow*
+iOS type == BL_PT_WINDOW return UIWindow*
+*/
+BL_API BLVoid* blPlatformPayload(
+	IN BLEnum _Type);
     
 BL_API BLU32 blTickCounts();
 

@@ -357,6 +357,11 @@ typedef unsigned long long BLGuid;
 #define HIGU16(val) ((BLU16)((((BLU32)(val)) >> 16) & 0xFFFF))     ///<Get High 16bit part from a 32bit unsigned int
 #define MAKEU32(high, low) ((BLU32)(((BLU16)(((BLU32)(low)) & 0xFFFF)) | ((BLU32)((BLU16)(((BLU32)(high)) & 0xFFFF))) << 16))       ///<Combine two short into a 32bit unsigned int
 
+ /* _PAYLOAD_TYPE */
+#define BL_PT_HANDLE	0
+#define BL_PT_WINDOW	1
+#define BL_PT_UTIL		2
+
  /* _EVENT_TYPE */
 #define BL_ET_SYSTEM	0
 #define BL_ET_NET		1
