@@ -42,7 +42,6 @@ public class BLActivity extends NativeActivity {
 			switch (pKeyCode) 
 			{
 				case KeyEvent.KEYCODE_BACK:
-				case KeyEvent.KEYCODE_ENTER:
 					hideTextInput();
 					return true;
 				default:
@@ -50,32 +49,39 @@ public class BLActivity extends NativeActivity {
 			}
 		}
     }	
-	protected static BLActivity mActivity;
-    protected static BLText mInput;
+	protected BLActivity mActivity;
+    protected BLText mInput;
 	protected int mKeyMode;
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);	
-		mActivity = (BLActivity)this;
-		mActivity.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								mInput = new BLText((Context)mActivity);
-								ViewGroup.LayoutParams param = new ViewGroup.LayoutParams(0, 0);
-								mActivity.addContentView(mInput, param);
-								mInput.setVisibility(View.GONE);
-								InputMethodManager imm = (InputMethodManager)mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-								imm.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
-							}
-						});
-		mActivity.getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener(){
+		mActivity = (BLActivity)this;	
+		getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener(){
 			@Override
 			public void onGlobalLayout(){
-				View view = mActivity.getWindow().getDecorView();
-				view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE|View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+				View view = getWindow().getDecorView();
+				int visibility = 0;
+				if (Build.VERSION.SDK_INT >= 14)
+					visibility |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
+				if (Build.VERSION.SDK_INT >= 16)
+					visibility |= View.SYSTEM_UI_FLAG_FULLSCREEN;
+				if (Build.VERSION.SDK_INT >= 19)
+					visibility |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+				view.setSystemUiVisibility(visibility);
 			}
 		});
-		activityReady(mActivity);
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				mInput = new BLText((Context)mActivity);
+				ViewGroup.LayoutParams param = new ViewGroup.LayoutParams(0, 0);
+				mActivity.addContentView(mInput, param);
+				mInput.setVisibility(View.GONE);
+				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
+				activityReady(mActivity);
+			}
+		});
 	}	
 	public void showTextInput(int keymode) {
 		 mKeyMode = keymode;
