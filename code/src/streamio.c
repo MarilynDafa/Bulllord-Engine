@@ -1562,7 +1562,6 @@ blPreload(IN BLAnsi* _Filenames, IN BLBool _Flush)
 		free(_iter);
 		blListErase(_PrStreamIOMem->pPreloadQueue, _iterator_iter);
 	}
-	BLU32 _filenum = 0;
 	if (_Filenames)
 	{
 		BLAnsi* _tmp;

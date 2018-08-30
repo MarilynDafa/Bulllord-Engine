@@ -109,9 +109,9 @@ public class BLActivity extends NativeActivity implements BLGoogleIAB.IBillingHa
 		mIabAvailable = true;
 	}
 	@Override
-	public void onProductPurchased(String productId, BLTransactionDetails details) 
+	public void onProductPurchased(String productId, String response, String signature) 
 	{
-		productPurchased(0, details.mPurchaseInfo.mResponseData, details.mPurchaseInfo.mSignature);
+		productPurchased(0, response, signature);
 	}
 	@Override
 	public void onBillingError(int errorCode, Throwable error) 

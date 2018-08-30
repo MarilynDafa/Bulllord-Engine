@@ -63,13 +63,13 @@ typedef struct _IAPMember {
     BLVoid(*pValidationSubscriber)(BLBool);
     SKPaymentTransaction* pUnVerified;
 #elif defined BL_PLATFORM_ANDROID
-	jobject* pJavaVM;
-	pthread_mutex_t* pMutex;
-	ANativeActivity* pActivity;
+	jobject* pActivity;
+	JavaVM* pVM;
+	JNIEnv* pEnv;
+	JNIEnv* pLocalEnv;
 	BLVoid(*pPurchaseSubscriber)(BLEnum, BLAnsi*, BLAnsi*);
 	BLVoid(*pValidationSubscriber)(BLBool);
 	BLVoid(*pCheckSubscriber)(BLAnsi*, BLAnsi*, BLAnsi*);
-	JNIEnv* pLocalEnv;
 #endif
 
 }_BLIAPMemberExt;
@@ -373,8 +373,10 @@ static _BLIAPMemberExt* _PrIapMem = NULL;
 }
 @end
 #elif defined(BL_PLATFORM_ANDROID)
+#ifdef __cplusplus
 extern "C" {
-BLVoid Jni_productPurchased(JNIEnv* _Env, jclass, jint _Code, jstring _Recept, jstring _Signature)
+#endif
+BLVoid Jni_productPurchased(JNIEnv* _Env, jobject, jint _Code, jstring _Recept, jstring _Signature)
 {
 	_PrIapMem->pLocalEnv = _Env;
 	const BLUtf8* _recept8 = (const BLUtf8*)_Env->GetStringUTFChars(_Recept, NULL);
@@ -391,7 +393,7 @@ BLVoid Jni_productPurchased(JNIEnv* _Env, jclass, jint _Code, jstring _Recept, j
 	_PrIapMem->pPurchaseSubscriber = NULL;
 	_PrIapMem->pLocalEnv = NULL;
 }
-BLVoid Jni_validationResult(JNIEnv* _Env, jclass, jint _Code)
+BLVoid Jni_validationResult(JNIEnv* _Env, jobject, jint _Code)
 {
 	_PrIapMem->pLocalEnv = _Env;
 	if (_PrIapMem->pValidationSubscriber)
@@ -401,15 +403,17 @@ BLVoid Jni_validationResult(JNIEnv* _Env, jclass, jint _Code)
 		else
 			_PrIapMem->pValidationSubscriber(FALSE);
 	}
+	memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
 	_PrIapMem->pValidationSubscriber = NULL;
 	_PrIapMem->pLocalEnv = NULL;
 }
-BLVoid Jni_checkUnfulfilled(JNIEnv* _Env, jclass, jstring _ProductID, jstring _Recept, jstring _Signature)
+BLVoid Jni_checkUnfulfilled(JNIEnv* _Env, jobject, jstring _ProductID, jstring _Recept, jstring _Signature)
 {
 	_PrIapMem->pLocalEnv = _Env;
 	const BLUtf8* _pid8 = (const BLUtf8*)_Env->GetStringUTFChars(_ProductID, NULL);
 	const BLUtf8* _recept8 = (const BLUtf8*)_Env->GetStringUTFChars(_Recept, NULL);
 	const BLUtf8* _signature8 = (const BLUtf8*)_Env->GetStringUTFChars(_Signature, NULL);
+    strcpy(_PrIapMem->aProductID, (const BLAnsi*)_pid8);
 	_PrIapMem->pCheckSubscriber((BLAnsi*)_pid8, (BLAnsi*)_recept8, (BLAnsi*)_signature8);
 	_Env->ReleaseStringUTFChars(_ProductID, (const BLAnsi*)_pid8);
 	_Env->ReleaseStringUTFChars(_Signature, (const BLAnsi*)_signature8);
@@ -422,34 +426,66 @@ static JNINativeMethod gMethods[] = {
 	{"validationResult", "(I)V", (void*)Jni_validationResult},
 	{"checkUnfulfilled", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", (void*)Jni_checkUnfulfilled}
 };
+#ifdef __cplusplus
 }
 #endif
+#endif
 BLVoid
-blIAPOpenEXT()
+blIAPOpenEXT(IN BLAnsi* _Version, ...)
 {
     _PrIapMem = (_BLIAPMemberExt*)malloc(sizeof(_BLIAPMemberExt));
 	memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+	va_list _argp; 
+	BLS32 _argno = 0; 
+	BLVoid* _para; 
+	va_start(_argp, _Version); 
+	while (1) 
+	{ 
+		_para = va_arg(_argp, void*); 
+		_argno++;
+#if defined(BL_PLATFORM_WIN32)
+		if (_argno == 1);
+		else break;
+#elif defined(BL_PLATFORM_UWP)
+		break;
+#elif defined(BL_PLATFORM_LINUX)
+		if (_argno == 1);
+		else if (_argno == 2);
+		else break;
+#elif defined(BL_PLATFORM_ANDROID)
+		if (_argno == 1)
+			_PrIapMem->pVM = (JavaVM*)_para;
+		else if(_argno == 2)
+			_PrIapMem->pEnv = (JNIEnv*)_para;
+		else if (_argno == 3)
+			_PrIapMem->pActivity = (jobject*)_para;
+		else break;
+#elif defined(BL_PLATFORM_OSX)
+		if (_argno == 1);
+		else break;
+#elif defined(BL_PLATFORM_IOS)
+		if (_argno == 1);
+		else break;
+#elif defined(BL_PLATFORM_WEB)
+		if (_argno == 1);
+		else break;
+#endif
+	}
+	va_end(_argp); 
 #if defined(BL_PLATFORM_IOS) || defined(BL_PLATFORM_OSX)
     _PrIapMem->pPurchaseSubscriber = NULL;
     _PrIapMem->pValidationSubscriber = NULL;
     _PrIapMem->pUnVerified = NULL;
 #elif defined(BL_PLATFORM_ANDROID)
-	_PrIapMem->pJavaVM = (jobject*)blPlatformPayload(BL_PT_HANDLE);
-	_PrIapMem->pActivity = (ANativeActivity*)blPlatformPayload(BL_PT_WINDOW);
-	_PrIapMem->pMutex = (pthread_mutex_t*)blPlatformPayload(BL_PT_UTIL);
 	_PrIapMem->pPurchaseSubscriber = NULL;
 	_PrIapMem->pValidationSubscriber = NULL;
 	_PrIapMem->pCheckSubscriber = NULL;
-	BLS32 _busy;
-	_busy = pthread_mutex_trylock(_PrIapMem->pMutex);
-	JNIEnv* _env = _PrIapMem->pActivity->env;
-	_PrIapMem->pActivity->vm->AttachCurrentThread(&_env, NULL);
-	jclass _blcls = _env->GetObjectClass(*_PrIapMem->pJavaVM);
+	JNIEnv* _env = _PrIapMem->pEnv;
+	_PrIapMem->pVM->AttachCurrentThread(&_env, NULL);
+	jclass _blcls = _env->GetObjectClass(*_PrIapMem->pActivity);
 	_env->RegisterNatives(_blcls, gMethods, sizeof(gMethods) / sizeof(gMethods[0]));
 	_env->DeleteLocalRef(_blcls);
-	_PrIapMem->pActivity->vm->DetachCurrentThread();
-	if (!_busy)
-		pthread_mutex_unlock(_PrIapMem->pMutex);
+	_PrIapMem->pVM->DetachCurrentThread();
 	_PrIapMem->pLocalEnv = NULL;
 #endif
 }
@@ -553,30 +589,24 @@ blRegistProductsEXT(IN BLEnum _Channel, IN BLAnsi* _Products, IN BLAnsi* _Google
 #elif defined(BL_PLATFORM_ANDROID)
 	if (_PrIapMem->eChannel == BL_PC_GOOGLE)	
 	{
-		BLS32 _busy;
 		BLBool _attached = FALSE;
-		JNIEnv* _env = _PrIapMem->pActivity->env;		
+		JNIEnv* _env = _PrIapMem->pEnv;		
 		if (_PrIapMem->pLocalEnv)
 			_env = _PrIapMem->pLocalEnv;
 		else
 		{
-			_busy = pthread_mutex_trylock(_PrIapMem->pMutex);
-			_PrIapMem->pActivity->vm->AttachCurrentThread(&_env, NULL);
+			_PrIapMem->pVM->AttachCurrentThread(&_env, NULL);
 			_PrIapMem->pLocalEnv = _env;
 			_attached = TRUE;
 		}
-		jclass _blcls = _env->GetObjectClass(*_PrIapMem->pJavaVM);
+		jclass _blcls = _env->GetObjectClass(*_PrIapMem->pActivity);
 		jmethodID _mid = _env->GetMethodID(_blcls, "setSignature", "(Ljava/lang/String;)V");
 		jstring _license = _env->NewStringUTF((const BLAnsi*)_GoogleLicense);
-		_env->CallVoidMethod(*_PrIapMem->pJavaVM, _mid, _license);
+		_env->CallVoidMethod(*_PrIapMem->pActivity, _mid, _license);
 		_env->DeleteLocalRef(_blcls);
 		_env->DeleteLocalRef(_license);
 		if (_attached)
-		{
-			_PrIapMem->pActivity->vm->DetachCurrentThread();
-			if (!_busy)
-				pthread_mutex_unlock(_PrIapMem->pMutex);
-		}
+			_PrIapMem->pVM->DetachCurrentThread();
 		_PrIapMem->pLocalEnv = NULL;
 	}
 #endif
@@ -671,30 +701,24 @@ blPurchaseEXT(IN BLAnsi* _ProductID, IN BLVoid(*_Subscriber)(BLEnum, BLAnsi*, BL
 	if (_PrIapMem->eChannel == BL_PC_GOOGLE)
 	{
 		_PrIapMem->pPurchaseSubscriber = (BLVoid(*)(BLEnum, BLAnsi*, BLAnsi*))_Subscriber;
-		BLS32 _busy = 0;
 		BLBool _attached = FALSE;
-		JNIEnv* _env = _PrIapMem->pActivity->env;
+		JNIEnv* _env = _PrIapMem->pEnv;
 		if (_PrIapMem->pLocalEnv)
 			_env = _PrIapMem->pLocalEnv;
 		else
 		{
-			_busy = pthread_mutex_trylock(_PrIapMem->pMutex);
-			_PrIapMem->pActivity->vm->AttachCurrentThread(&_env, NULL);
+			_PrIapMem->pVM->AttachCurrentThread(&_env, NULL);
 			_PrIapMem->pLocalEnv = _env;
 			_attached = TRUE;
 		}
-		jclass _blcls = _env->GetObjectClass(*_PrIapMem->pJavaVM);
+		jclass _blcls = _env->GetObjectClass(*_PrIapMem->pActivity);
 		jmethodID _mid = _env->GetMethodID(_blcls, "purchase", "(Ljava/lang/String;)V");
 		jstring _productid = _env->NewStringUTF((const BLAnsi*)_ProductID);
-		_env->CallVoidMethod(*_PrIapMem->pJavaVM, _mid, _productid);
+		_env->CallVoidMethod(*_PrIapMem->pActivity, _mid, _productid);
 		_env->DeleteLocalRef(_blcls);
 		_env->DeleteLocalRef(_productid);
 		if (_attached)
-		{
-			_PrIapMem->pActivity->vm->DetachCurrentThread();
-			if (!_busy)
-				pthread_mutex_unlock(_PrIapMem->pMutex);
-		}
+			_PrIapMem->pVM->DetachCurrentThread();
 		_PrIapMem->pLocalEnv = NULL;
 	}
 #elif defined BL_PLATFORM_WEB
@@ -750,28 +774,22 @@ blValidationEXT(IN BLVoid(*_Subscriber)(BLBool))
 	if (_PrIapMem->eChannel == BL_PC_GOOGLE)
 	{
 		_PrIapMem->pValidationSubscriber = (BLVoid(*)(BLBool))_Subscriber;
-		BLS32 _busy = 0;
 		BLBool _attached = FALSE;
-		JNIEnv* _env = _PrIapMem->pActivity->env;
+		JNIEnv* _env = _PrIapMem->pEnv;
 		if (_PrIapMem->pLocalEnv)
 			_env = _PrIapMem->pLocalEnv;
 		else
 		{
-			_busy = pthread_mutex_trylock(_PrIapMem->pMutex);
-			_PrIapMem->pActivity->vm->AttachCurrentThread(&_env, NULL);
+			_PrIapMem->pVM->AttachCurrentThread(&_env, NULL);
 			_PrIapMem->pLocalEnv = _env;
 			_attached = TRUE;
 		}
-		jclass _blcls = _env->GetObjectClass(*_PrIapMem->pJavaVM);
+		jclass _blcls = _env->GetObjectClass(*_PrIapMem->pActivity);
 		jmethodID _mid = _env->GetMethodID(_blcls, "validation", "()V");
-		_env->CallVoidMethod(*_PrIapMem->pJavaVM, _mid);
+		_env->CallVoidMethod(*_PrIapMem->pActivity, _mid);
 		_env->DeleteLocalRef(_blcls);
 		if (_attached)
-		{
-			_PrIapMem->pActivity->vm->DetachCurrentThread();
-			if (!_busy)
-				pthread_mutex_unlock(_PrIapMem->pMutex);
-		}
+			_PrIapMem->pVM->DetachCurrentThread();
 		_PrIapMem->pLocalEnv = NULL;
 	}
 	else
@@ -924,28 +942,22 @@ blCheckUnfulfilledEXT(IN BLVoid(*_Subscriber)(BLAnsi*, BLAnsi*, BLAnsi*))
 	if (_PrIapMem->eChannel == BL_PC_GOOGLE)
 	{
 		_PrIapMem->pCheckSubscriber = (BLVoid(*)(BLAnsi*, BLAnsi*, BLAnsi*))_Subscriber;
-		BLS32 _busy = 0;
 		BLBool _attached = FALSE;
-		JNIEnv* _env = _PrIapMem->pActivity->env;
+		JNIEnv* _env = _PrIapMem->pEnv;
 		if (_PrIapMem->pLocalEnv)
 			_env = _PrIapMem->pLocalEnv;
 		else
 		{
-			_busy = pthread_mutex_trylock(_PrIapMem->pMutex);
-			_PrIapMem->pActivity->vm->AttachCurrentThread(&_env, NULL);
+			_PrIapMem->pVM->AttachCurrentThread(&_env, NULL);
 			_PrIapMem->pLocalEnv = _env;
 			_attached = TRUE;
 		}
-		jclass _blcls = _env->GetObjectClass(*_PrIapMem->pJavaVM);
+		jclass _blcls = _env->GetObjectClass(*_PrIapMem->pActivity);
 		jmethodID _mid = _env->GetMethodID(_blcls, "checkUnfulfilled", "()V");
-		_env->CallVoidMethod(*_PrIapMem->pJavaVM, _mid);
+		_env->CallVoidMethod(*_PrIapMem->pActivity, _mid);
 		_env->DeleteLocalRef(_blcls);
 		if (_attached)
-		{
-			_PrIapMem->pActivity->vm->DetachCurrentThread();
-			if (!_busy)
-				pthread_mutex_unlock(_PrIapMem->pMutex);
-		}
+			_PrIapMem->pVM->DetachCurrentThread();
 		_PrIapMem->pLocalEnv = NULL;
 	}
 	else

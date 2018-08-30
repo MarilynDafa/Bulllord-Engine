@@ -1230,7 +1230,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 							blStreamRead(_stream, sizeof(BLU32), &_offset);
 							blStreamSeek(_stream, _offset);
 							BLU32 _imagesz;
-							BLEnum _format;
+							BLEnum _format = BL_TF_RGBA8;
 							switch (_fourcc)
 							{
 							case FOURCC_INTERNAL('B', 'M', 'G', 'T'):

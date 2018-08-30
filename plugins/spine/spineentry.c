@@ -521,7 +521,7 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 	free(_gbdata);
 }
 BLVoid 
-blSpineOpenEXT()
+blSpineOpenEXT(IN BLAnsi* _Version, ...)
 {
 	_PrSpineMem = (_BLSpineMemberExt*)malloc(sizeof(_BLSpineMemberExt));
 	_PrSpineMem->nTech = blGainTechnique(blHashString((const BLUtf8*)"shaders/2D.bsl"));

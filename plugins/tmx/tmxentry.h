@@ -24,7 +24,9 @@ misrepresented as being the original software.
 #ifdef __cplusplus
 extern "C" {
 #endif
-BL_API BLVoid blTMXOpenEXT();
+BL_API BLVoid blTMXOpenEXT(
+	IN BLAnsi* _Version,
+	...);
 
 BL_API BLVoid blTMXCloseEXT();
 

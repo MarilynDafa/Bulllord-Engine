@@ -87,7 +87,7 @@ blRectContains(IN BLRect* _Rc, IN BLVec2* _Pt)
 BLRect
 blRectClip(IN BLRect* _R1, IN BLRect* _R2)
 {
-    BLRect _ret = { 0 };
+	BLRect _ret = { {0.f, 0.f}, {0.f, 0.f} };
 	if (_R2->sRB.fX < _R1->sRB.fX)
 		_ret.sRB.fX = _R2->sRB.fX;
 	if (_R2->sRB.fY < _R1->sRB.fY)

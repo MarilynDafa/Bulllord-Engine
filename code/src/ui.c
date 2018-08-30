@@ -1754,7 +1754,7 @@ _LabelParse(_BLWidget* _Node)
 						BLEnum _type = BL_TT_2D;
 						blStreamSeek(_stream, _offset);
 						BLU32 _imagesz;
-						BLEnum _format;
+						BLEnum _format = BL_TF_ASTC;
 						switch (_fourcc)
 						{
 						case FOURCC_INTERNAL('B', 'M', 'G', 'T'): blStreamRead(_stream, sizeof(BLU32), &_imagesz); _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8; break;
@@ -3537,7 +3537,7 @@ _DrawPanel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 {
 	if (!_Node->bValid || !_Node->bVisible)
 		return;
-	BLRect _scissorrect = { 0 };
+	BLRect _scissorrect = { {0.f, 0.f}, {0.f, 0.f} };
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
 	BLF32 _stencil = 1.f;
@@ -3998,7 +3998,7 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 {
 	if (!_Node->bValid || !_Node->bVisible)
 		return;
-	BLRect _scissorrect = { 0 };
+	BLRect _scissorrect = { {0.f, 0.f}, {0.f, 0.f} };
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _stencil = 1.f;
@@ -4739,7 +4739,7 @@ _DrawButton(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Hei
 {
 	if (!_Node->bValid || !_Node->bVisible)
 		return;
-	BLRect _scissorrect = { 0 };
+	BLRect _scissorrect = { {0.f, 0.f}, {0.f, 0.f} };
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
 	BLF32 _stencil = 1.f;
@@ -5291,7 +5291,7 @@ _DrawCheck(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 {
 	if (!_Node->bValid || !_Node->bVisible)
 		return;
-	BLRect _scissorrect = { 0 };
+	BLRect _scissorrect = { {0.f, 0.f}, {0.f, 0.f} };
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
 	BLF32 _stencil = 1.f;
@@ -5805,7 +5805,7 @@ _DrawSlider(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Hei
 {
 	if (!_Node->bValid || !_Node->bVisible)
 		return;
-	BLRect _scissorrect = { 0 };
+	BLRect _scissorrect = { {0.f, 0.f}, {0.f, 0.f} };
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
 	BLF32 _stencil = 1.f;
@@ -6345,7 +6345,7 @@ _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 {
 	if (!_Node->bVisible)
 		return;
-	BLRect _scissorrect = { 0 };
+	BLRect _scissorrect = { {0.f, 0.f}, {0.f, 0.f} };
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _stencil = 1.f;
@@ -7039,7 +7039,7 @@ _DrawProgress(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _H
 {
 	if (!_Node->bValid || !_Node->bVisible)
 		return;
-	BLRect _scissorrect = { 0 };
+	BLRect _scissorrect = { {0.f, 0.f}, {0.f, 0.f} };
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
 	BLF32 _stencil = 1.f;
@@ -7558,7 +7558,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 	if (!_Node->bValid || !_Node->bVisible)
 		return;
 	_TableMake(_Node);
-	BLRect _scissorrect = { 0 };
+	BLRect _scissorrect = { {0.f, 0.f}, {0.f, 0.f} };
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _offsetx = 0.f, _offsety = 0.f;
 	BLF32 _stencil = 1.f;
@@ -8009,20 +8009,20 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 			blDeleteGeometryBuffer(_geo);
 		}
 	}
-	BLRect _scrolledclient = { 0 };
+	BLRect _scrolledclient = { {0.f, 0.f}, {0.f, 0.f} };
 	_scrolledclient.sLT.fX = _XPos - _Width * 0.5f;
 	_scrolledclient.sLT.fY = _YPos - _Height * 0.5f + 1;
 	_scrolledclient.sRB.fY = _YPos - _Height * 0.5f + 1 + _Node->uExtension.sTable.nTotalHeight;
 	_scrolledclient.sRB.fX = _XPos - _Width * 0.5f + _Node->uExtension.sTable.nTotalWidth;
 	_scrolledclient.sLT.fY -= _Node->uExtension.sTable.nScroll;
 	_scrolledclient.sRB.fY -= _Node->uExtension.sTable.nScroll;
-	BLRect _rowr = { 0 };
+	BLRect _rowr = { {0.f, 0.f}, {0.f, 0.f} };
 	_rowr.sLT.fX = _scrolledclient.sLT.fX;
 	_rowr.sLT.fY = _scrolledclient.sLT.fY;
 	_rowr.sRB.fX = _scrolledclient.sRB.fX;
 	_rowr.sRB.fY = _scrolledclient.sRB.fY;
 	_rowr.sRB.fY = _rowr.sLT.fY + _Node->uExtension.sTable.nRowHeight;
-	BLRect _clientc = { 0 };
+	BLRect _clientc = { {0.f, 0.f}, {0.f, 0.f} };
 	_clientc.sLT.fX = _XPos - _Width * 0.5f;
 	_clientc.sLT.fY = _YPos - _Height * 0.5f;
 	_clientc.sRB.fX = _XPos + _Width * 0.5f;
@@ -8181,7 +8181,7 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 							BLEnum _type = BL_TT_2D;
 							blStreamSeek(_stream, _offset);
 							BLU32 _imagesz;
-							BLEnum _format;
+							BLEnum _format = BL_TF_BC1;
 							switch (_fourcc)
 							{
 							case FOURCC_INTERNAL('B', 'M', 'G', 'T'): blStreamRead(_stream, sizeof(BLU32), &_imagesz); _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8; break;
@@ -8287,7 +8287,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 {
 	if (!_Node->bValid || !_Node->bVisible)
 		return;
-	BLRect _scissorrect = { 0 };
+	BLRect _scissorrect = { {0.f, 0.f}, {0.f, 0.f} };
 	BLF32 _gray = _Node->fAlpha;
 	BLF32 _stencil = 1.f;
 	if (_Node->uExtension.sDial.aCommonMap[0] && strcmp(_Node->uExtension.sDial.aCommonMap, "Nil"))
@@ -11532,11 +11532,11 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 			memset(_fps, 0, sizeof(_fps));
 			sprintf(_fps, "FPS:%d", 1000 / (_Delta ? _Delta : 1));
 			const BLUtf16* _labelfps = blGenUtf16Str((const BLUtf8*)_fps);
-			BLRect _area = { 0 };
+			BLRect _area = { {0.f, 0.f}, {0.f, 0.f} };
 			_area.sLT.fX = _area.sLT.fY = 10;
 			_area.sRB.fX = 120;
 			_area.sRB.fY = 40;
-			BLRect _carea = { 0 };
+			BLRect _carea = { {0.f, 0.f}, {0.f, 0.f} };
 			BLU32 _color = (1000 / (_Delta ? _Delta : 1) <= 30) ? 0xFF0000FF : 0xFFFFFFFF;
 			_WriteText(_labelfps, "default", 24, BL_UA_LEFT, BL_UA_TOP, FALSE, &_area, &_carea, _color, 1.f, 0, FALSE);
 			blDeleteUtf16Str((BLUtf16*)_labelfps);
@@ -11547,11 +11547,11 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 			if (_fps[0])
 			{
 				const BLUtf16* _labelfps = blGenUtf16Str((const BLUtf8*)_fps);
-				BLRect _area = { 0 };
+				BLRect _area = { {0.f, 0.f}, {0.f, 0.f} };
 				_area.sLT.fX = _area.sLT.fY = 10;
 				_area.sRB.fX = 120;
 				_area.sRB.fY = 40;
-				BLRect _carea = { 0 };
+				BLRect _carea = { {0.f, 0.f}, {0.f, 0.f} };
 				BLU32 _color = (1000 / (_Delta ? _Delta : 1) <= 30) ? 0xFF0000FF : 0xFFFFFFFF;
 				_WriteText(_labelfps, "default", 24, BL_UA_LEFT, BL_UA_TOP, FALSE, &_area, &_carea, _color, 1.f, 0, FALSE);
 				blDeleteUtf16Str((BLUtf16*)_labelfps);

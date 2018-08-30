@@ -655,7 +655,7 @@ _DecodeThreadFunc(BLVoid* _Userdata)
 }
 #endif
 BLVoid
-blVideoOpenEXT()
+blVideoOpenEXT(IN BLAnsi* _Version, ...)
 {
 #if !defined(EMSCRIPTEN)
 	_PrVideoMem = (_BLVideoMemberExt*)malloc(sizeof(_BLVideoMemberExt));

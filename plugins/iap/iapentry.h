@@ -38,7 +38,9 @@ extern "C" {
 #define BL_PC_APPSTORE				2
 #define BL_PC_MSSTORE				3
 
-BL_API BLVoid blIAPOpenEXT();
+BL_API BLVoid blIAPOpenEXT(
+	IN BLAnsi* _Version,
+	...);
 
 BL_API BLVoid blIAPCloseEXT();
     

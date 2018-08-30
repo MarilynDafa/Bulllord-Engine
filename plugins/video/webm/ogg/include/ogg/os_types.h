@@ -155,25 +155,4 @@
 #endif
 
 
-#if defined BL_API
-#	undef BL_API
-#endif
-#if defined(_MSC_VER)
-#	if defined(VLD_FORCE_ENABLE)
-#		define BL_API extern
-#	else
-#		ifdef BL_EXPORT
-#			define BL_API __declspec(dllexport)
-#		else
-#			define BL_API __declspec(dllimport)
-#		endif
-#	endif
-#else
-#	ifdef PLUGIN_EXPORT
-#       define BL_API __attribute__ ((visibility("default")))
-#	else
-#		define BL_API
-#	endif
-#endif
-
 #endif  /* _OS_TYPES_H */

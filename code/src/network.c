@@ -1981,7 +1981,7 @@ blRSASign(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, IN BLU32 _Version, OUT BLAn
 {
 	mbedtls_pk_context _ctx;
 	mbedtls_pk_init(&_ctx);
-	if (mbedtls_pk_parse_key(&_ctx, _PrivateKey, strlen(_PrivateKey) + 1, 0, 0))
+	if (mbedtls_pk_parse_key(&_ctx, (const BLU8*)_PrivateKey, strlen(_PrivateKey) + 1, 0, 0))
 	{
 		mbedtls_pk_free(&_ctx);
 		return FALSE;
@@ -2000,7 +2000,7 @@ blRSASign(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, IN BLU32 _Version, OUT BLAn
 	}
 	BLU8 _hash[32] = { 0 };
 	mbedtls_md_type_t _type = _Version ? MBEDTLS_MD_SHA256 : MBEDTLS_MD_SHA1;
-	if (mbedtls_md(mbedtls_md_info_from_type(_type), _Input, strlen(_Input), _hash))
+	if (mbedtls_md(mbedtls_md_info_from_type(_type), (const BLU8*)_Input, strlen(_Input), _hash))
 	{
 		mbedtls_ctr_drbg_free(&_ctrdrbg);
 		mbedtls_entropy_free(&_entropy);
@@ -2016,7 +2016,7 @@ blRSASign(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, IN BLU32 _Version, OUT BLAn
 		mbedtls_pk_free(&_ctx);
 		return FALSE;
 	}
-	memset(_Output, 0, sizeof(_Output));
+	memset(_Output, 0, 1025 * sizeof(BLAnsi));
 	const BLAnsi* _base64 = blGenBase64Encoder(_buf, _olen);
 	strcpy(_Output, _base64);
 	blDeleteBase64Encoder((BLAnsi*)_base64);
@@ -2030,7 +2030,7 @@ blRSAVerify(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, IN BLU32 _Version)
 {
 	mbedtls_pk_context _ctx;
 	mbedtls_pk_init(&_ctx);
-	if (mbedtls_pk_parse_public_key(&_ctx, _PublicKey, strlen(_PublicKey) + 1))
+	if (mbedtls_pk_parse_public_key(&_ctx, (const BLU8*)_PublicKey, strlen(_PublicKey) + 1))
 	{
 		mbedtls_pk_free(&_ctx);
 		return FALSE;
@@ -2049,7 +2049,7 @@ blRSAVerify(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, IN BLU32 _Version)
 	}
 	BLU8 _hash[32] = { 0 };
 	mbedtls_md_type_t _type = _Version ? MBEDTLS_MD_SHA256 : MBEDTLS_MD_SHA1;
-	if (mbedtls_md(mbedtls_md_info_from_type(_type), _Input, strlen(_Input), _hash))
+	if (mbedtls_md(mbedtls_md_info_from_type(_type), (const BLU8*)_Input, strlen(_Input), _hash))
 	{
 		mbedtls_ctr_drbg_free(&_ctrdrbg);
 		mbedtls_entropy_free(&_entropy);
@@ -2077,7 +2077,7 @@ blRSAEncrypt(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, OUT BLAnsi _Output[1025])
 {
 	mbedtls_pk_context _ctx;
 	mbedtls_pk_init(&_ctx);
-	if (mbedtls_pk_parse_public_key(&_ctx, _PublicKey, strlen(_PublicKey) + 1))
+	if (mbedtls_pk_parse_public_key(&_ctx, (const BLU8*)_PublicKey, strlen(_PublicKey) + 1))
 	{
 		mbedtls_pk_free(&_ctx);
 		return FALSE;
@@ -2096,14 +2096,14 @@ blRSAEncrypt(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, OUT BLAnsi _Output[1025])
 	}
 	BLU8 _buf[1024] = { 0 };
 	size_t _olen;
-	if (mbedtls_pk_encrypt(&_ctx, _Input, strlen(_Input), _buf, &_olen, sizeof(_buf), mbedtls_ctr_drbg_random, &_ctrdrbg))
+	if (mbedtls_pk_encrypt(&_ctx, (const BLU8*)_Input, strlen(_Input), _buf, &_olen, sizeof(_buf), mbedtls_ctr_drbg_random, &_ctrdrbg))
 	{
 		mbedtls_ctr_drbg_free(&_ctrdrbg);
 		mbedtls_entropy_free(&_entropy);
 		mbedtls_pk_free(&_ctx);
 		return FALSE;
 	}
-	memset(_Output, 0, sizeof(_Output));
+	memset(_Output, 0, sizeof(BLAnsi) * 1025);
 	const BLAnsi* _base64 = blGenBase64Encoder(_buf, _olen);
 	strcpy(_Output, _base64);
 	blDeleteBase64Encoder((BLAnsi*)_base64);
@@ -2117,7 +2117,7 @@ blRSADecrypt(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, OUT BLAnsi _Output[1025]
 {
 	mbedtls_pk_context _ctx;
 	mbedtls_pk_init(&_ctx);
-	if (mbedtls_pk_parse_key(&_ctx, _PrivateKey, strlen(_PrivateKey) + 1, 0, 0))
+	if (mbedtls_pk_parse_key(&_ctx, (const BLU8*)_PrivateKey, strlen(_PrivateKey) + 1, 0, 0))
 	{
 		mbedtls_pk_free(&_ctx);
 		return FALSE;
@@ -2138,7 +2138,7 @@ blRSADecrypt(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, OUT BLAnsi _Output[1025]
 	const BLU8* _buf = blGenBase64Decoder(_Input, &_bufsz);
 	BLAnsi _result[1024] = { 0 };
 	size_t _olen;
-	if (mbedtls_pk_decrypt(&_ctx, _buf, _bufsz, _result, &_olen, sizeof(_result), mbedtls_ctr_drbg_random, &_ctrdrbg))
+	if (mbedtls_pk_decrypt(&_ctx, _buf, _bufsz, (BLU8*)_result, &_olen, sizeof(_result), mbedtls_ctr_drbg_random, &_ctrdrbg))
 	{
 		blDeleteBase64Decoder((BLU8*)_buf);
 		mbedtls_ctr_drbg_free(&_ctrdrbg);
@@ -2150,7 +2150,7 @@ blRSADecrypt(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, OUT BLAnsi _Output[1025]
 	mbedtls_ctr_drbg_free(&_ctrdrbg);
 	mbedtls_entropy_free(&_entropy);
 	mbedtls_pk_free(&_ctx);
-	memset(_Output, 0, sizeof(_Output));
+	memset(_Output, 0, 1025 * sizeof(BLAnsi));
 	memcpy(_Output, _result, _olen);
 	return TRUE;
 }

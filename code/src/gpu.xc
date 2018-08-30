@@ -3184,7 +3184,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
         GLenum _ifmt, _fmt, _type, _sfmt, _rtfmt;
         _FillTextureFormatGL(_Format, &_ifmt, &_fmt, &_type, &_sfmt, &_rtfmt);
         GL_CHECK_INTERNAL(glGenTextures(1, &_tex->uData.sGL.nHandle));
-        GLenum _target;
+        GLenum _target = GL_TEXTURE_2D;
         switch (_Target)
         {
             case BL_TT_1D: _target = GL_TEXTURE_2D; break;
@@ -3871,9 +3871,9 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
         BLU32 _used[16] = { 0 };
         for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
         {
-            BLU32 _gtsize;
-            GLint _numele;
-            GLenum _gtype;
+            BLU32 _gtsize = 4;
+            GLint _numele = 4;
+            GLenum _gtype = GL_BYTE;
             switch(_decls[_idx])
             {
                 case BL_VD_BOOLX1: _numele = 1; _gtype = GL_BYTE; _gtsize = 1 * 1; break;
@@ -4067,7 +4067,7 @@ blGeometryBufferInstance(IN BLGuid _GBO, IN BLEnum* _Semantic, IN BLEnum* _Decl,
         {
             GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nInsHandle[_idx]));
             BLU32 _vbsz = 0, _numele = 0;
-            GLenum _type;
+            GLenum _type = GL_BYTE;
             switch(_Decl[_idx])
             {
                 case BL_VD_BOOLX1: _numele = 1; _type = GL_BYTE; _vbsz = 1 * 1; break;

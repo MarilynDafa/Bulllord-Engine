@@ -1796,13 +1796,13 @@ _CloseWindow()
 }
 #elif defined(BL_PLATFORM_ANDROID)
 extern "C" {
-	JNIEXPORT BLVoid JNICALL Java_org_bulllord_lib_BLActivity_textChanged(JNIEnv* _Env, jclass, jstring _Text)
+	JNIEXPORT BLVoid JNICALL Java_org_bulllord_lib_BLActivity_textChanged(JNIEnv* _Env, jobject, jstring _Text)
 	{
 		const BLUtf8* _utf8str = (const BLUtf8*)_Env->GetStringUTFChars(_Text, NULL);
 		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str, INVALID_GUID);
 		_Env->ReleaseStringUTFChars(_Text, (const BLAnsi*)_utf8str);
 	}
-	JNIEXPORT BLVoid JNICALL Java_org_bulllord_lib_BLActivity_activityReady(JNIEnv* _Env, jclass, jobject _Activity)
+	JNIEXPORT BLVoid JNICALL Java_org_bulllord_lib_BLActivity_activityReady(JNIEnv* _Env, jobject, jobject _Activity)
 	{
 		_PrSystemMem->pBLJava = _Activity;
 		JNIEnv* _env = _PrSystemMem->pActivity->env;
@@ -1832,14 +1832,10 @@ _WndProc(BLS32 _Msg, BLVoid* _Userdata)
 				pthread_cond_wait(&_PrSystemMem->sCond, &_PrSystemMem->sMutex);
 			pthread_mutex_unlock(&_PrSystemMem->sMutex);
 			JNIEnv* _env = _PrSystemMem->pActivity->env;
-			jclass _vercls = _env->FindClass("android/os/Build$VERSION");
-			jfieldID _idfield = _env->GetStaticFieldID(_vercls, "SDK_INT", "I");
-			jint _sdkver = _env->GetStaticIntField(_vercls, _idfield);
 			ANativeActivity_setWindowFlags(_PrSystemMem->pActivity, AWINDOW_FLAG_FULLSCREEN, AWINDOW_FLAG_FULLSCREEN);
 			jclass _acticls = _env->GetObjectClass(_PrSystemMem->pActivity->clazz);
 			jmethodID _getmid = _env->GetMethodID(_acticls, "getWindow", "()Landroid/view/Window;");
 			jobject _wndobj = _env->CallObjectMethod(_PrSystemMem->pActivity->clazz, _getmid);
-			_env->DeleteLocalRef(_vercls);
 			_env->DeleteLocalRef(_acticls);
 			_env->DeleteLocalRef(_wndobj);
 		}
@@ -1916,7 +1912,6 @@ _ShowWindow()
 	jclass _wndcls = _env->FindClass("android/view/Window");
 	jmethodID _getviewmid = _env->GetMethodID(_wndcls, "getDecorView", "()Landroid/view/View;");
 	jobject _viewobj = _env->CallObjectMethod(_wndobj, _getviewmid);
-	jclass _viewcls = _env->FindClass("android/view/View");
 	jmethodID _getmgrmid = _env->GetMethodID(_acticls, "getWindowManager", "()Landroid/view/WindowManager;");
 	jobject _mgrobj = _env->CallObjectMethod(_actiobj, _getmgrmid);
 	jclass _mgrcls = _env->FindClass("android/view/WindowManager");
@@ -3609,47 +3604,6 @@ blPlatformIdentity()
     return -1;
 #endif
 }
-BLVoid* blPlatformPayload(IN BLEnum _Type)
-{
-#if defined(BL_PLATFORM_WIN32)
-	if (_Type == BL_PT_HANDLE)
-		return (BLVoid*)&_PrSystemMem->nHwnd;
-	else
-		return NULL;
-#elif defined(BL_PLATFORM_UWP)
-	return NULL;
-#elif defined(BL_PLATFORM_LINUX)
-	if (_Type == BL_PT_HANDLE)
-		return (BLVoid*)_PrSystemMem->pDisplay;
-	else if (_Type == BL_PT_WINDOW)
-		return (BLVoid*)&_PrSystemMem->nWindow;
-	else
-		return NULL;
-#elif defined(BL_PLATFORM_ANDROID)
-	if (_Type == BL_PT_HANDLE)
-		return (BLVoid*)&_PrSystemMem->pBLJava;
-	else if (_Type == BL_PT_WINDOW)
-		return (BLVoid*)_PrSystemMem->pActivity;
-	else if (_Type == BL_PT_UTIL)
-		return (BLVoid*)&_PrSystemMem->sMutex;
-	else
-		return NULL;
-#elif defined(BL_PLATFORM_OSX)
-	if (_Type == BL_PT_WINDOW)
-		return (BLVoid*)_PrSystemMem->pWindow;
-	else
-		return NULL;
-#elif defined(BL_PLATFORM_IOS)
-	if (_Type == BL_PT_WINDOW)
-		return (BLVoid*)_PrSystemMem->pWindow;
-	else
-		return NULL;
-#elif defined(BL_PLATFORM_WEB)
-	return NULL;
-#else
-    return NULL;
-#endif
-}
 BLU32
 blTickCounts()
 {
@@ -4525,9 +4479,23 @@ blOpenPlugin(IN BLAnsi* _Basename)
 	strcat(_path, _Basename);
 	strcat(_path, "OpenEXT");
 #endif
-	BLVoid(*_open)(BLVoid);
-	_open = (BLVoid(*)(BLVoid))blPluginProcAddress(_Basename, _path);
-	_open();
+	BLVoid(*_open)(IN BLAnsi*, ...);
+	_open = (BLVoid(*)(IN BLAnsi*, ...))blPluginProcAddress(_Basename, _path);	
+#if defined(BL_PLATFORM_WIN32)
+	_open(BL_SDK_VERSION, &_PrSystemMem->nHwnd);
+#elif defined(BL_PLATFORM_UWP)
+	_open(BL_SDK_VERSION);
+#elif defined(BL_PLATFORM_LINUX)
+	_open(BL_SDK_VERSION, _PrSystemMem->pDisplay, &_PrSystemMem->nWindow);
+#elif defined(BL_PLATFORM_ANDROID)
+	_open(BL_SDK_VERSION, _PrSystemMem->pActivity->vm, _PrSystemMem->pActivity->env, &_PrSystemMem->pBLJava);
+#elif defined(BL_PLATFORM_OSX)
+	_open(BL_SDK_VERSION, _PrSystemMem->pWindow);
+#elif defined(BL_PLATFORM_IOS)
+	_open(BL_SDK_VERSION, _PrSystemMem->pWindow);
+#elif defined(BL_PLATFORM_WEB)
+	_open(BL_SDK_VERSION, _PrSystemMem->pWindow);
+#endif
     return TRUE;
 }
 BLBool

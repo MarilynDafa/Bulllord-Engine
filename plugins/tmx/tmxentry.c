@@ -71,7 +71,7 @@ typedef struct _TMXMember {
 }_BLTMXMemberExt;
 static _BLTMXMemberExt* _PrTmxMem = NULL;
 BLVoid 
-blTMXOpenEXT()
+blTMXOpenEXT(IN BLAnsi* _Version, ...)
 {
 	_PrTmxMem = (_BLTMXMemberExt*)malloc(sizeof(_BLTMXMemberExt));
 	_PrTmxMem->pTilesets = NULL;
