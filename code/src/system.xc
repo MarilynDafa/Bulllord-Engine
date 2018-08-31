@@ -20,7 +20,7 @@
  */
 #include "../headers/system.h"
 #include "../headers/audio.h"
-#include "../headers/utils.h"
+#include "../headers/util.h"
 #include "../headers/streamio.h"
 #include "../headers/gpu.h"
 #include "internal/internal.h"

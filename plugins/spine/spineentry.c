@@ -24,7 +24,7 @@ misrepresented as being the original software.
 #include "spine.h"
 #include "system.h"
 #include "streamio.h"
-#include "utils.h"
+#include "util.h"
 #include "sprite.h"
 #include "gpu.h"
 typedef struct _TexCacheData {

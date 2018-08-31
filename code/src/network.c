@@ -19,7 +19,7 @@
  3. This notice may not be removed or altered from any source distribution.
  */
 #include "../headers/network.h"
-#include "../headers/utils.h"
+#include "../headers/util.h"
 #include "../headers/system.h"
 #include "internal/list.h"
 #include "internal/array.h"

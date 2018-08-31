@@ -27,7 +27,7 @@ misrepresented as being the original software.
 #	include "opus/include/opus.h"
 #	include "audio.h"
 #	include "streamio.h"
-#	include "utils.h"
+#	include "util.h"
 #	include "system.h"
 #	include "gpu.h"
 #endif

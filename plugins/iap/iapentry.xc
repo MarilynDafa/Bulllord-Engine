@@ -25,7 +25,7 @@ misrepresented as being the original software.
 #include <ppl.h>
 #include <ppltasks.h>
 #include "xml/ezxml.h"
-#include "utils.h"
+#include "util.h"
 #elif defined BL_PLATFORM_OSX
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>

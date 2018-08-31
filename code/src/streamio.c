@@ -20,7 +20,7 @@
  */
 #include "../headers/streamio.h"
 #include "../headers/system.h"
-#include "../headers/utils.h"
+#include "../headers/util.h"
 #include "../externals/miniz/miniz.h"
 #include "../externals/sqlite3/sqlite3.h"
 #include "internal/dictionary.h"

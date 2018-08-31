@@ -18,7 +18,7 @@
  misrepresented as being the original software.
  3. This notice may not be removed or altered from any source distribution.
  */
-#include "../headers/utils.h"
+#include "../headers/util.h"
 #include "../headers/gpu.h"
 #include "../headers/system.h"
 #include "../headers/streamio.h"

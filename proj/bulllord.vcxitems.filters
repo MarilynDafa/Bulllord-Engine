@@ -49,6 +49,18 @@
     <Filter Include="externals\mbedtls">
       <UniqueIdentifier>{4c17356e-8a7f-4604-8687-6b4665e4a6b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="externals\webp">
+      <UniqueIdentifier>{6bfee6a6-f2c7-4726-b3ae-59bddcf1f0f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\webp\dec">
+      <UniqueIdentifier>{656f0808-a409-4b8c-a405-5e5503d15dbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\webp\utils">
+      <UniqueIdentifier>{686fe70f-0263-4d41-9bd6-2a45d01fb022}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\webp\dsp">
+      <UniqueIdentifier>{f67a3122-eccc-4b60-a63c-09910304d73a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\autofit.c">
@@ -180,21 +192,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.c">
       <Filter>externals\duktape</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\array.c">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\dictionary.c">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\internal.c">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\list.c">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\mathematics.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\network.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -204,13 +201,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\streamio.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\thread.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\ui.c">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\utils.c">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afpic.c">
@@ -969,6 +960,196 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509write_csr.c">
       <Filter>externals\mbedtls</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\alpha_dec.c">
+      <Filter>externals\webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\buffer_dec.c">
+      <Filter>externals\webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\frame_dec.c">
+      <Filter>externals\webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\idec_dec.c">
+      <Filter>externals\webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\io_dec.c">
+      <Filter>externals\webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\quant_dec.c">
+      <Filter>externals\webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\tree_dec.c">
+      <Filter>externals\webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8_dec.c">
+      <Filter>externals\webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8l_dec.c">
+      <Filter>externals\webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\webp_dec.c">
+      <Filter>externals\webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\cost.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\cpu.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_clip_tables.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\filters.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\rescaler.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\ssim.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing_sse41.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing_neon.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\thread.c">
+      <Filter>src\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\array.c">
+      <Filter>src\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\dictionary.c">
+      <Filter>src\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\internal.c">
+      <Filter>src\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\mathematics.c">
+      <Filter>src\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\list.c">
+      <Filter>src\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\quant_levels_dec_utils.c">
+      <Filter>externals\webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\utils.c">
+      <Filter>externals\webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\rescaler_utils.c">
+      <Filter>externals\webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\thread_utils.c">
+      <Filter>externals\webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\bit_reader_utils.c">
+      <Filter>externals\webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\random_utils.c">
+      <Filter>externals\webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\color_cache_utils.c">
+      <Filter>externals\webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\huffman_utils.c">
+      <Filter>externals\webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\cost_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\filters_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\rescaler_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_sse41.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_neon.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_sse41.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc_neon.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc_sse41.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\filters_neon.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc_neon.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc_sse41.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_neon.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\rescaler_neon.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\ssim_sse2.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling_neon.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling_sse41.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_neon.c">
+      <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h">
@@ -1050,9 +1231,6 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\ui.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\utils.h">
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afpic.h">
@@ -2053,6 +2231,79 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_csr.h">
       <Filter>externals\mbedtls</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\alphai_dec.h">
+      <Filter>externals\webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\common_dec.h">
+      <Filter>externals\webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8_dec.h">
+      <Filter>externals\webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8i_dec.h">
+      <Filter>externals\webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8li_dec.h">
+      <Filter>externals\webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\webpi_dec.h">
+      <Filter>externals\webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dsp.h">
+      <Filter>externals\webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless.h">
+      <Filter>externals\webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_common.h">
+      <Filter>externals\webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\mips_macro.h">
+      <Filter>externals\webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\msa_macro.h">
+      <Filter>externals\webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\neon.h">
+      <Filter>externals\webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv.h">
+      <Filter>externals\webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\utils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\quant_levels_dec_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\rescaler_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\thread_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\bit_reader_inl_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\bit_reader_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\random_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\color_cache_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\huffman_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\common_sse2.h">
+      <Filter>externals\webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\common_sse41.h">
+      <Filter>externals\webp\dsp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

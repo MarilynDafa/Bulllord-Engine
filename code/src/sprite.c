@@ -21,7 +21,7 @@
 #include "../headers/sprite.h"
 #include "../headers/gpu.h"
 #include "../headers/system.h"
-#include "../headers/utils.h"
+#include "../headers/util.h"
 #include "../headers/ui.h"
 #include "../headers/streamio.h"
 #include "internal/dictionary.h"

@@ -21,7 +21,7 @@
 #include "../headers/ui.h"
 #include "../headers/system.h"
 #include "../headers/streamio.h"
-#include "../headers/utils.h"
+#include "../headers/util.h"
 #include "../headers/gpu.h"
 #include "internal/mathematics.h"
 #include "internal/array.h"

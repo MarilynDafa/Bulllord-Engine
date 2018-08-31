@@ -20,7 +20,7 @@ misrepresented as being the original software.
 */
 #include "tmxentry.h"
 #include "AStar.h"
-#include "utils.h"
+#include "util.h"
 #include "sprite.h"
 #include "streamio.h"
 #include "xml/ezxml.h"
