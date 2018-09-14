@@ -2040,7 +2040,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\streamio.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\system.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\ui.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\utils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\util.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\array.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\dictionary.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\internal.h" />

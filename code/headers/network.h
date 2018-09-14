@@ -33,12 +33,10 @@ BL_API BLVoid blConnect(
 BL_API BLVoid blDisconnect();
     
 BL_API BLVoid blSendNetMsg(
-	IN BLU32 _MsgID, 
-	IN BLVoid* _Msgbuf,
-	IN BLU32 _Msgsz, 
+	IN BLU32 _ID,
+	IN BLAnsi* _JsonData,
 	IN BLBool _Critical,
 	IN BLBool _Overwrite,
-	IN BLBool _Autocompress,
 	IN BLEnum _Nettype);
 
 BL_API BLBool blRSASign(

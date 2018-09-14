@@ -1053,7 +1053,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\list.c">
       <Filter>src\internal</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\quant_levels_dec_utils.c">
       <Filter>externals\webp\utils</Filter>
     </ClCompile>
@@ -1149,6 +1148,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_neon.c">
       <Filter>externals\webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2271,7 +2273,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv.h">
       <Filter>externals\webp\dsp</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\utils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\quant_levels_dec_utils.h">
       <Filter>externals\webp\utils</Filter>
     </ClInclude>
@@ -2304,6 +2305,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\common_sse41.h">
       <Filter>externals\webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\util.h">
+      <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

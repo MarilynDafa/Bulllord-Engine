@@ -51,17 +51,19 @@ typedef struct _IAPMember {
 	BLAnsi aProductID[128];
     BLEnum eChannel;
 #if defined BL_PLATFORM_OSX
-    NSDictionary* pErrors;
+	NSDictionary* pErrors;
     NSMutableArray* pProducts;
+    SKPaymentTransaction* pUnVerified;
     BLVoid(*pPurchaseSubscriber)(BLEnum, BLAnsi*, BLAnsi*);
     BLVoid(*pValidationSubscriber)(BLBool);
-    SKPaymentTransaction* pUnVerified;
+    BLVoid(*pCheckSubscriber)(BLAnsi*, BLAnsi*, BLAnsi*);
 #elif defined BL_PLATFORM_IOS
-    NSDictionary* pErrors;
+	NSDictionary* pErrors;
     NSMutableArray* pProducts;
+    SKPaymentTransaction* pUnVerified;
     BLVoid(*pPurchaseSubscriber)(BLEnum, BLAnsi*, BLAnsi*);
     BLVoid(*pValidationSubscriber)(BLBool);
-    SKPaymentTransaction* pUnVerified;
+    BLVoid(*pCheckSubscriber)(BLAnsi*, BLAnsi*, BLAnsi*);
 #elif defined BL_PLATFORM_ANDROID
 	jobject* pActivity;
 	JavaVM* pVM;
@@ -76,15 +78,13 @@ typedef struct _IAPMember {
 static _BLIAPMemberExt* _PrIapMem = NULL;
 #if defined(BL_PLATFORM_IOS) || defined(BL_PLATFORM_OSX)
 @interface AppStore : NSObject
-@property NSArray* _availableproducts;
+@property(nonatomic,copy) NSArray* _availableproducts;
 + (AppStore*)getInstance;
 - (void)initiatePaymentRequestForProductWithIdentifier:(NSString*)_ProductID;
 - (void)startProductRequest;
-- (void)restorePurchases;
 - (void)refreshAppStoreReceipt;
 @end
 @interface AppStore () <SKProductsRequestDelegate, SKPaymentTransactionObserver>
-@property NSMutableDictionary* _purchaserecord;
 @end
 @implementation AppStore
 + (void)initialize
@@ -100,24 +100,13 @@ static _BLIAPMemberExt* _PrIapMem = NULL;
 }
 + (AppStore*)getInstance
 {
-    static AppStore* _shared;
+    static AppStore* _shared = NULL;
     if (!_shared)
     {
         static dispatch_once_t _oncepredicate;
         dispatch_once(&_oncepredicate, ^{
             _shared = [[super allocWithZone:nil] init];
             [[SKPaymentQueue defaultQueue] addTransactionObserver:_shared];
-            [_shared restorePurchaseRecord];
-#if defined(BL_PLATFORM_IOS)
-            [[NSNotificationCenter defaultCenter] addObserver:_shared
-                                                     selector:@selector(savePurchaseRecord)
-                                                         name:UIApplicationDidEnterBackgroundNotification object:nil];
-#else
-            [[NSNotificationCenter defaultCenter] addObserver:_shared
-                                                     selector:@selector(savePurchaseRecord)
-                                                         name:NSApplicationDidResignActiveNotification object:nil];
-#endif
-            [_shared startValidatingReceiptsAndUpdateLocalStore];
         });
     }
     return _shared;
@@ -137,9 +126,8 @@ static _BLIAPMemberExt* _PrIapMem = NULL;
     if (![SKPaymentQueue canMakePayments])
     {
 #if defined(BL_PLATFORM_IOS)
-        UIAlertController*_controller = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"In App Purchasing Disabled", @"")
-                                                                            message:NSLocalizedString(@"Check your parental control settings and try again later", @"") preferredStyle:UIAlertControllerStyleAlert];
-        
+        UIAlertController*_controller = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"In App Purchasing Disabled", @"") message:NSLocalizedString(@"Check your parental control settings and try again later", @"") preferredStyle:UIAlertControllerStyleAlert];
+
         [[UIApplication sharedApplication].keyWindow.rootViewController
         presentViewController:_controller animated:YES completion:nil];
 #else
@@ -150,7 +138,7 @@ static _BLIAPMemberExt* _PrIapMem = NULL;
 #endif
         return;
     }
-    
+
     [self._availableproducts enumerateObjectsUsingBlock:^(SKProduct* _ThisProduct, NSUInteger _Idx, BOOL* _Stop)
      {
         if ([_ThisProduct.productIdentifier isEqualToString:_ProductID]) {
@@ -159,27 +147,6 @@ static _BLIAPMemberExt* _PrIapMem = NULL;
             [[SKPaymentQueue defaultQueue] addPayment:payment];
         }
     }];
-}
-- (NSString*)purchaseRecordFilePath
-{
-    NSString* _documentdirectory = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
-    return [_documentdirectory stringByAppendingPathComponent:@"purchaserecord.plist"];
-}
-- (void)restorePurchaseRecord
-{
-    self._purchaserecord = (NSMutableDictionary*)[[NSKeyedUnarchiver unarchiveObjectWithFile:[self purchaseRecordFilePath]] mutableCopy];
-    if (self._purchaserecord == nil)
-        self._purchaserecord = [NSMutableDictionary dictionary];
-}
-- (void)savePurchaseRecord
-{
-    NSError* _error = nil;
-    NSData* _data = [NSKeyedArchiver archivedDataWithRootObject:self._purchaserecord];
-#if defined(BL_PLATFORM_IOS)
-    [_data writeToFile:[self purchaseRecordFilePath] options:NSDataWritingAtomic | NSDataWritingFileProtectionComplete error:&_error];
-#else
-    [_data writeToFile:[self purchaseRecordFilePath] options:NSDataWritingAtomic error:&_error];
-#endif
 }
 - (void)startProductRequest
 {
@@ -190,20 +157,6 @@ static _BLIAPMemberExt* _PrIapMem = NULL;
 - (void)productsRequest:(SKProductsRequest*)_Request didReceiveResponse:(SKProductsResponse*)_Response
 {
     self._availableproducts = _Response.products;
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.productsavailable"
-                                                        object:self._availableproducts];
-}
-- (void)restorePurchases
-{
-    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
-}
-- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError*)_Error
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.failedrestoringpurchases" object:_Error];
-}
-- (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue*)_Queue
-{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.restoredpurchases" object:nil];
 }
 - (void)refreshAppStoreReceipt
 {
@@ -220,7 +173,8 @@ static _BLIAPMemberExt* _PrIapMem = NULL;
         {
             NSLog(@"App receipt exists. Preparing to validate and update local stores.");
             [self startValidatingReceiptsAndUpdateLocalStore];
-        } else
+        }
+		else
         {
             NSLog(@"Receipt request completed but there is no receipt. The user may have refused to login, or the reciept is missing.");
         }
@@ -236,42 +190,6 @@ static _BLIAPMemberExt* _PrIapMem = NULL;
         }
         else
         {
-            __block BOOL _purchaserecorddirty = NO;
-            [_Receipts enumerateObjectsUsingBlock:^(NSDictionary* _ReceiptDictionary, NSUInteger _Idx, BOOL* _Stop) {
-                NSString* _productid = _ReceiptDictionary[@"product_id"];
-                NSNumber* _expiresdatems = _ReceiptDictionary[@"expires_date_ms"];
-                if (_expiresdatems)
-                {
-                    NSNumber* _prevstoredexpiresdatems = self._purchaserecord[_productid];
-                    if (!_prevstoredexpiresdatems || [_prevstoredexpiresdatems isKindOfClass:NSNull.class])
-                    {
-                        self._purchaserecord[_productid] = _expiresdatems;
-                        _purchaserecorddirty = YES;
-                    }
-                    else
-                    {
-                        if ([_expiresdatems doubleValue] > [_prevstoredexpiresdatems doubleValue])
-                        {
-                            self._purchaserecord[_productid] = _expiresdatems;
-                            _purchaserecorddirty = YES;
-                        }
-                    }
-                }
-            }];
-            if (_purchaserecorddirty)
-                [self savePurchaseRecord];
-            [self._purchaserecord enumerateKeysAndObjectsUsingBlock:^(NSString* _ProductId, NSNumber* _ExpiresDateMs, BOOL* _Stop)
-            {
-                if (![_ExpiresDateMs isKindOfClass: [NSNull class]])
-                {
-                    if ([[NSDate date] timeIntervalSince1970] > [_ExpiresDateMs doubleValue])
-                    {
-                        [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.subscriptionexpired" object:_ProductId];
-                    }
-                }
-            }];
-            if (_PrIapMem->pUnVerified)
-                [[SKPaymentQueue defaultQueue] finishTransaction:_PrIapMem->pUnVerified];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.validatedreceipts" object:nil];
         }
     }];
@@ -313,23 +231,18 @@ static _BLIAPMemberExt* _PrIapMem = NULL;
             if (_jsonresponse[@"receipt"] != [NSNull null])
             {
                 NSString* _originalappversion = _jsonresponse[@"receipt"][@"original_application_version"];
-                if (nil != _originalappversion)
-                {
-                    [self._purchaserecord setObject:_originalappversion forKey:@"SKOrigBundleRef"];
-                    [self savePurchaseRecord];
-                }
-                else
+                if (nil == _originalappversion)
                     _CompletionHandler(nil, nil);
             }
             else
                 _CompletionHandler(nil, nil);
             if (_status != 0)
-                _CompletionHandler(nil, [NSError errorWithDomain:@"com.mugunthkumar.mkstorekit" code:_status
-                                                        userInfo:@{NSLocalizedDescriptionKey : _PrIapMem->pErrors[@(_status)]}]);
+                _CompletionHandler(nil, [NSError errorWithDomain:@"com.mugunthkumar.mkstorekit" code:_status userInfo:@{NSLocalizedDescriptionKey : _PrIapMem->pErrors[@(_status)]}]);
             else
             {
                 NSMutableArray* _receipts = [_jsonresponse[@"latest_receipt_info"] mutableCopy];
-                if (_jsonresponse[@"receipt"] != [NSNull null]) {
+                if (_jsonresponse[@"receipt"] != [NSNull null])
+				{
                     NSArray* _inappreceipts = _jsonresponse[@"receipt"][@"in_app"];
                     [_receipts addObjectsFromArray:_inappreceipts];
                     _CompletionHandler(_receipts, nil);
@@ -347,25 +260,61 @@ static _BLIAPMemberExt* _PrIapMem = NULL;
     for (SKPaymentTransaction* _transaction in _Transactions)
     {
         switch (_transaction.transactionState) {
-                
+
             case SKPaymentTransactionStatePurchasing:
                 break;
             case SKPaymentTransactionStateDeferred:
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.productspurchasedeferred"
-                                                                    object:_transaction.payment.productIdentifier];
+                if (_PrIapMem->pPurchaseSubscriber)
+                {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.productspurchasedeferred" object:_transaction.payment.productIdentifier];
+                }
+                else if (_PrIapMem->pCheckSubscriber)
+                {
+                    memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                    _PrIapMem->pCheckSubscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], NULL, NULL);
+                    _PrIapMem->pCheckSubscriber = NULL;
+                }
                 break;
             case SKPaymentTransactionStateFailed:
-                [_Queue finishTransaction:_transaction];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.productspurchasefailed"
-                                                                    object:_transaction.payment.productIdentifier];
+                if (_PrIapMem->pPurchaseSubscriber)
+                {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.productspurchasefailed" object:_transaction.payment.productIdentifier];
+                }
+                else if (_PrIapMem->pCheckSubscriber)
+                {
+                    memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                    _PrIapMem->pCheckSubscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], NULL, NULL);
+                    _PrIapMem->pCheckSubscriber = NULL;
+                }
                 break;
             case SKPaymentTransactionStatePurchased:
             case SKPaymentTransactionStateRestored:
             {
                 _PrIapMem->pUnVerified = _transaction;
-                [self savePurchaseRecord];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.productspurchased"
-                                                                    object:_transaction.payment.productIdentifier];
+                if (_PrIapMem->pPurchaseSubscriber)
+                {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"com.mugunthkumar.mkstorekit.productspurchased" object:_transaction.payment.productIdentifier];
+                }
+                else if (_PrIapMem->pCheckSubscriber)
+                {
+                    NSData* _requestdata = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
+                    NSError* _error;
+                    NSDictionary* _requestcontents = @{@"receipt-data": [_requestdata base64EncodedStringWithOptions:0]};
+                    NSData* _receipt = [NSJSONSerialization dataWithJSONObject:_requestcontents options:0 error:&_error];
+                    if (!_requestdata)
+                    {
+                        memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                        _PrIapMem->pCheckSubscriber(NULL, NULL, NULL);
+                    }
+                    else
+                    {
+                        NSString* _receiptstr  =[[NSString alloc] initWithData:_receipt encoding:NSUTF8StringEncoding];
+                        memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                        strcpy(_PrIapMem->aProductID, (BLAnsi*)[_transaction.payment.productIdentifier UTF8String]);
+                        _PrIapMem->pCheckSubscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], (BLAnsi*)[_receiptstr UTF8String], NULL);
+                    }
+                    _PrIapMem->pCheckSubscriber = NULL;
+                }
             }
                 break;
         }
@@ -386,7 +335,10 @@ BLVoid Jni_productPurchased(JNIEnv* _Env, jobject, jint _Code, jstring _Recept, 
 		if (_Code == 0)
 			_PrIapMem->pPurchaseSubscriber(BL_PE_SUCCEEDED, (BLAnsi*)_recept8, (BLAnsi*)_signature8);
 		else
+		{
 			_PrIapMem->pPurchaseSubscriber(BL_PE_NOTPURCHASED, NULL, NULL);
+			memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+		}
 	}
 	_Env->ReleaseStringUTFChars(_Signature, (const BLAnsi*)_signature8);
 	_Env->ReleaseStringUTFChars(_Recept, (const BLAnsi*)_recept8);
@@ -475,6 +427,7 @@ blIAPOpenEXT(IN BLAnsi* _Version, ...)
 #if defined(BL_PLATFORM_IOS) || defined(BL_PLATFORM_OSX)
     _PrIapMem->pPurchaseSubscriber = NULL;
     _PrIapMem->pValidationSubscriber = NULL;
+    _PrIapMem->pCheckSubscriber = NULL;
     _PrIapMem->pUnVerified = NULL;
 #elif defined(BL_PLATFORM_ANDROID)
 	_PrIapMem->pPurchaseSubscriber = NULL;
@@ -503,88 +456,90 @@ blRegistProductsEXT(IN BLEnum _Channel, IN BLAnsi* _Products, IN BLAnsi* _Google
 	{
 	}
 	else
-	{
-		_PrIapMem->pProducts = [NSMutableArray array];
-		BLAnsi* _tmp;
-		BLAnsi* _products = (BLAnsi*)alloca(strlen(_Products) + 1);
-		memset(_products, 0, strlen(_Products) + 1);
-		strcpy(_products, _Products);
-		_tmp = strtok((BLAnsi*)_products, ",");
-		while (_tmp)
-		{
-			[_PrIapMem->pProducts addObject : [NSString stringWithUTF8String : _tmp]];
-			_tmp = strtok(NULL, ",");
-		}
-		[[AppStore getInstance] startProductRequest];
-		[[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.productspurchased"
-			object:nil
-			queue : [[NSOperationQueue alloc] init]
-			usingBlock : ^ (NSNotification* _Note)
-		{
-			NSData* _requestdata = [NSData dataWithContentsOfURL : [[NSBundle mainBundle] appStoreReceiptURL]];
-			NSError* _error;
-			NSDictionary* _requestcontents = @{@"receipt-data": [_requestdata base64EncodedStringWithOptions:0]};
-				NSData* _receipt = [NSJSONSerialization dataWithJSONObject : _requestcontents
-				options : 0
-				error : &_error];
-			if (!_requestdata && _PrIapMem->pPurchaseSubscriber)
-				_PrIapMem->pPurchaseSubscriber(BL_PE_UNKNOW, NULL, NULL);
-			else
-			{
-				NSString* _receiptstr = [[NSString alloc] initWithData:_receipt encoding : NSUTF8StringEncoding];
-				if (_PrIapMem->pPurchaseSubscriber)
-					_PrIapMem->pPurchaseSubscriber(BL_PE_SUCCEEDED, (BLAnsi*)[_receiptstr UTF8String], NULL);
-			}
-		}];
-		[[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.productspurchasefailed"
-			object:nil
-			queue : [[NSOperationQueue alloc] init]
-			usingBlock : ^ (NSNotification* _Note)
-		{
-			if (_PrIapMem->pPurchaseSubscriber)
-				_PrIapMem->pPurchaseSubscriber(BL_PE_NOTPURCHASED, NULL, NULL);
-		}];
-		[[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.productspurchasedeferred"
-			object:nil
-			queue : [[NSOperationQueue alloc] init]
-			usingBlock : ^ (NSNotification* _Note)
-		{
-			if (_PrIapMem->pPurchaseSubscriber)
-				_PrIapMem->pPurchaseSubscriber(BL_PE_NOTFULFILLED, NULL, NULL);
-		}];
-		[[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.failedvalidatingreceipts"
-			object:nil
-			queue : [[NSOperationQueue alloc] init]
-			usingBlock : ^ (NSNotification* _Note)
-		{
-			if (_PrIapMem->pValidationSubscriber)
-			{
-				_PrIapMem->pValidationSubscriber(FALSE);
-				memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
-			}
-		}];
-		[[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.subscriptionexpired"
-			object:nil
-			queue : [[NSOperationQueue alloc] init]
-			usingBlock : ^ (NSNotification* _Note)
-		{
-			if (_PrIapMem->pValidationSubscriber)
-			{
-				_PrIapMem->pValidationSubscriber(FALSE);
-				memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
-			}
-		}];
-		[[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.validatedreceipts"
-			object:nil
-			queue : [[NSOperationQueue alloc] init]
-			usingBlock : ^ (NSNotification* _Note)
-		{
-			if (_PrIapMem->pValidationSubscriber)
-			{
-				_PrIapMem->pValidationSubscriber(TRUE);
-				memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
-			}
-		}];
+    {
+        @autoreleasepool {
+            _PrIapMem->pProducts = [NSMutableArray array];
+            BLAnsi* _tmp;
+            BLAnsi* _products = (BLAnsi*)alloca(strlen(_Products) + 1);
+            memset(_products, 0, strlen(_Products) + 1);
+            strcpy(_products, _Products);
+            _tmp = strtok((BLAnsi*)_products, ",");
+            while (_tmp)
+            {
+                [_PrIapMem->pProducts addObject : [NSString stringWithUTF8String : _tmp]];
+                _tmp = strtok(NULL, ",");
+            }
+            [[AppStore getInstance] startProductRequest];
+            [[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.productspurchased" object:nil queue : [[NSOperationQueue alloc] init] usingBlock : ^ (NSNotification* _Note)
+             {
+                 NSData* _requestdata = [NSData dataWithContentsOfURL : [[NSBundle mainBundle] appStoreReceiptURL]];
+                 NSError* _error;
+                 NSDictionary* _requestcontents = @{@"receipt-data": [_requestdata base64EncodedStringWithOptions:0]};
+                 NSData* _receipt = [NSJSONSerialization dataWithJSONObject : _requestcontents options : 0 error : &_error];
+                 if (!_requestdata && _PrIapMem->pPurchaseSubscriber)
+                 {
+                     _PrIapMem->pPurchaseSubscriber(BL_PE_UNKNOW, NULL, NULL);
+                     _PrIapMem->pPurchaseSubscriber = NULL;
+                 }
+                 else
+                 {
+                     NSString* _receiptstr = [[NSString alloc] initWithData:_receipt encoding : NSUTF8StringEncoding];
+                     if (_PrIapMem->pPurchaseSubscriber)
+                         _PrIapMem->pPurchaseSubscriber(BL_PE_SUCCEEDED, (BLAnsi*)[_receiptstr UTF8String], NULL);
+                     _PrIapMem->pPurchaseSubscriber = NULL;
+                 }
+             }];
+            [[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.productspurchasefailed" object:nil queue : [[NSOperationQueue alloc] init] usingBlock : ^ (NSNotification* _Note)
+             {
+                 if (_PrIapMem->pPurchaseSubscriber)
+                     _PrIapMem->pPurchaseSubscriber(BL_PE_NOTPURCHASED, NULL, NULL);
+                 memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                 _PrIapMem->pPurchaseSubscriber = NULL;
+             }];
+            [[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.productspurchasedeferred" object:nil queue : [[NSOperationQueue alloc] init] usingBlock : ^ (NSNotification* _Note)
+             {
+                 if (_PrIapMem->pPurchaseSubscriber)
+                     _PrIapMem->pPurchaseSubscriber(BL_PE_NOTFULFILLED, NULL, NULL);
+                 memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                 _PrIapMem->pPurchaseSubscriber = NULL;
+             }];
+            [[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.failedvalidatingreceipts" object:nil queue : [[NSOperationQueue alloc] init] usingBlock : ^ (NSNotification* _Note)
+             {
+                 if (_PrIapMem->pValidationSubscriber)
+                 {
+                     _PrIapMem->pValidationSubscriber(FALSE);
+                     if (_PrIapMem->pUnVerified)
+                         [[SKPaymentQueue defaultQueue] finishTransaction:_PrIapMem->pUnVerified];
+                     _PrIapMem->pUnVerified = NULL;
+                     memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                     _PrIapMem->pValidationSubscriber = NULL;
+                 }
+             }];
+            [[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.subscriptionexpired" object:nil queue : [[NSOperationQueue alloc] init] usingBlock : ^ (NSNotification* _Note)
+             {
+                 if (_PrIapMem->pValidationSubscriber)
+                 {
+                     _PrIapMem->pValidationSubscriber(FALSE);
+                     if (_PrIapMem->pUnVerified)
+                         [[SKPaymentQueue defaultQueue] finishTransaction:_PrIapMem->pUnVerified];
+                     _PrIapMem->pUnVerified = NULL;
+                     memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                     _PrIapMem->pValidationSubscriber = NULL;
+                 }
+             }];
+            [[NSNotificationCenter defaultCenter] addObserverForName:@"com.mugunthkumar.mkstorekit.validatedreceipts" object:nil queue : [[NSOperationQueue alloc] init] usingBlock : ^ (NSNotification* _Note)
+             {
+                 if (_PrIapMem->pValidationSubscriber)
+                 {
+                     _PrIapMem->pValidationSubscriber(TRUE);
+                     if (_PrIapMem->pUnVerified)
+                         [[SKPaymentQueue defaultQueue] finishTransaction:_PrIapMem->pUnVerified];
+                     _PrIapMem->pUnVerified = NULL;
+                     memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                     _PrIapMem->pValidationSubscriber = NULL;
+                 }
+             }];
+        }
 	}
 #elif defined(BL_PLATFORM_ANDROID)
 	if (_PrIapMem->eChannel == BL_PC_GOOGLE)	
@@ -677,24 +632,28 @@ blPurchaseEXT(IN BLAnsi* _ProductID, IN BLVoid(*_Subscriber)(BLEnum, BLAnsi*, BL
 		}));
 	}	
 #elif defined BL_PLATFORM_OSX
-    if (_PrIapMem->eChannel == BL_PC_SELF)
+	if (_PrIapMem->eChannel == BL_PC_SELF)
     {
     }
     else
     {
-        _PrIapMem->pPurchaseSubscriber = (BLVoid(*)(BLEnum, BLAnsi*))_Subscriber;
-        NSString* _productid = [NSString stringWithUTF8String:_ProductID];
-        [[AppStore getInstance] initiatePaymentRequestForProductWithIdentifier:_productid];
+        @autoreleasepool {
+            _PrIapMem->pPurchaseSubscriber = (BLVoid(*)(BLEnum, BLAnsi*))_Subscriber;
+            NSString* _productid = [NSString stringWithUTF8String:_ProductID];
+            [[AppStore getInstance] initiatePaymentRequestForProductWithIdentifier:_productid];
+        }
     }
 #elif defined BL_PLATFORM_IOS
-    if (_PrIapMem->eChannel == BL_PC_SELF)
+	if (_PrIapMem->eChannel == BL_PC_SELF)
     {
     }
     else
     {
-        _PrIapMem->pPurchaseSubscriber = (BLVoid(*)(BLEnum, BLAnsi*))_Subscriber;
-        NSString* _productid = [NSString stringWithUTF8String:_ProductID];
-        [[AppStore getInstance] initiatePaymentRequestForProductWithIdentifier:_productid];
+        @autoreleasepool {
+            _PrIapMem->pPurchaseSubscriber = (BLVoid(*)(BLEnum, BLAnsi*, BLAnsi*))_Subscriber;
+            NSString* _productid = [NSString stringWithUTF8String:_ProductID];
+            [[AppStore getInstance] initiatePaymentRequestForProductWithIdentifier:_productid];
+        }
     }
 #elif defined BL_PLATFORM_LINUX
 #elif defined BL_PLATFORM_ANDROID
@@ -750,18 +709,22 @@ blValidationEXT(IN BLVoid(*_Subscriber)(BLBool))
 	{
 	}
 	else
-	{
-		_PrIapMem->pValidationSubscriber = (BLVoid(*)(BLBool))_Subscriber;
-		[[AppStore getInstance] startValidatingReceiptsAndUpdateLocalStore];
+    {
+        @autoreleasepool {
+            _PrIapMem->pValidationSubscriber = (BLVoid(*)(BLBool))_Subscriber;
+            [[AppStore getInstance] startValidatingReceiptsAndUpdateLocalStore];
+        }
 	}
 #elif defined BL_PLATFORM_IOS
 	if (_PrIapMem->eChannel == BL_PC_SELF)
 	{
 	}
 	else
-	{
-		_PrIapMem->pValidationSubscriber = (BLVoid(*)(BLBool))_Subscriber;
-		[[AppStore getInstance] startValidatingReceiptsAndUpdateLocalStore];
+    {
+        @autoreleasepool {
+            _PrIapMem->pValidationSubscriber = (BLVoid(*)(BLBool))_Subscriber;
+            [[AppStore getInstance] startValidatingReceiptsAndUpdateLocalStore];
+        }
 	}
 #elif defined BL_PLATFORM_LINUX
 	if (_PrIapMem->eChannel == BL_PC_SELF)
@@ -863,77 +826,79 @@ blCheckUnfulfilledEXT(IN BLVoid(*_Subscriber)(BLAnsi*, BLAnsi*, BLAnsi*))
     }
     else
     {
-        NSArray* _transactions = [SKPaymentQueue defaultQueue].transactions;
-        if (_transactions.count > 0)
-        {
-            SKPaymentTransaction* _transaction = [_transactions firstObject];
-            if (_transaction.transactionState == SKPaymentTransactionStatePurchased || _transaction.transactionState == SKPaymentTransactionStateRestored)
+        _PrIapMem->pCheckSubscriber = (BLVoid(*)(BLAnsi*, BLAnsi*, BLAnsi*))_Subscriber;
+        @autoreleasepool {
+            NSArray* _transactions = [SKPaymentQueue defaultQueue].transactions;
+            if (_transactions.count > 0)
             {
-                _PrIapMem->pUnVerified = _transaction;
-                [[AppStore getInstance] savePurchaseRecord];
-                NSData* _requestdata = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
-                NSError* _error;
-                NSDictionary* _requestcontents = @{@"receipt-data": [_requestdata base64EncodedStringWithOptions:0]};
-                NSData* _receipt = [NSJSONSerialization dataWithJSONObject:_requestcontents
-                                                                   options:0
-                                                                     error:&_error];
-                if (!_requestdata)
+                SKPaymentTransaction* _transaction = [_transactions firstObject];
+                if (_transaction.transactionState == SKPaymentTransactionStatePurchased || _transaction.transactionState == SKPaymentTransactionStateRestored)
                 {
-					memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
-					_Subscriber(NULL, NULL);
-				}
+                    _PrIapMem->pUnVerified = _transaction;
+                    NSData* _requestdata = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
+                    NSError* _error;
+                    NSDictionary* _requestcontents = @{@"receipt-data": [_requestdata base64EncodedStringWithOptions:0]};
+                    NSData* _receipt = [NSJSONSerialization dataWithJSONObject:_requestcontents options:0 error:&_error];
+                    if (!_requestdata)
+                    {
+                        memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                        _Subscriber(NULL, NULL, NULL);
+                    }
+                    else
+                    {
+                        NSString* _receiptstr  =[[NSString alloc] initWithData:_receipt encoding:NSUTF8StringEncoding];
+                        memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                        strcpy(_PrIapMem->aProductID, (BLAnsi*)[_transaction.payment.productIdentifier UTF8String]);
+                        _Subscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], (BLAnsi*)[_receiptstr UTF8String], NULL);
+                        memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                    }
+                }
                 else
                 {
-                    NSString* _receiptstr  =[[NSString alloc] initWithData:_receipt encoding:NSUTF8StringEncoding];
-					memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));					
-					strcpy(_PrIapMem->aProductID, (BLAnsi*)[_transaction.payment.productIdentifier UTF8String]);
-                    _Subscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], (BLAnsi*)[_receiptstr UTF8String]);
+                    memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                    _Subscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], NULL, NULL);
                 }
-            }
-            else
-            {
-				memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
-                _Subscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], NULL);
             }
         }
     }
 #elif defined BL_PLATFORM_IOS
-    if (_PrIapMem->eChannel == BL_PC_SELF)
+	if (_PrIapMem->eChannel == BL_PC_SELF)
     {
     }
     else
     {
-        NSArray* _transactions = [SKPaymentQueue defaultQueue].transactions;
-        if (_transactions.count > 0)
-        {
-            SKPaymentTransaction* _transaction = [_transactions firstObject];
-            if (_transaction.transactionState == SKPaymentTransactionStatePurchased || _transaction.transactionState == SKPaymentTransactionStateRestored)
+        _PrIapMem->pCheckSubscriber = (BLVoid(*)(BLAnsi*, BLAnsi*, BLAnsi*))_Subscriber;
+        @autoreleasepool {
+            NSArray* _transactions = [SKPaymentQueue defaultQueue].transactions;
+            if (_transactions.count > 0)
             {
-                _PrIapMem->pUnVerified = _transaction;
-                [[AppStore getInstance] savePurchaseRecord];
-                NSData* _requestdata = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
-                NSError* _error;
-                NSDictionary* _requestcontents = @{@"receipt-data": [_requestdata base64EncodedStringWithOptions:0]};
-                NSData* _receipt = [NSJSONSerialization dataWithJSONObject:_requestcontents
-                                                               options:0
-                                                                 error:&_error];
-                 if (!_requestdata)
+                SKPaymentTransaction* _transaction = [_transactions firstObject];
+                if (_transaction.transactionState == SKPaymentTransactionStatePurchased || _transaction.transactionState == SKPaymentTransactionStateRestored)
                 {
-					memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
-					_Subscriber(NULL, NULL);
-				}
+                    _PrIapMem->pUnVerified = _transaction;
+                    NSData* _requestdata = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
+                    NSError* _error;
+                    NSDictionary* _requestcontents = @{@"receipt-data": [_requestdata base64EncodedStringWithOptions:0]};
+                    NSData* _receipt = [NSJSONSerialization dataWithJSONObject:_requestcontents options:0 error:&_error];
+                    if (!_requestdata)
+                    {
+                        memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                        _Subscriber(NULL, NULL, NULL);
+                    }
+                    else
+                    {
+                        NSString* _receiptstr  =[[NSString alloc] initWithData:_receipt encoding:NSUTF8StringEncoding];
+                        memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                        strcpy(_PrIapMem->aProductID, (BLAnsi*)[_transaction.payment.productIdentifier UTF8String]);
+                        _Subscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], (BLAnsi*)[_receiptstr UTF8String], NULL);
+                        memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                    }
+                }
                 else
                 {
-                    NSString* _receiptstr  =[[NSString alloc] initWithData:_receipt encoding:NSUTF8StringEncoding];
-					memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));					
-					strcpy(_PrIapMem->aProductID, (BLAnsi*)[_transaction.payment.productIdentifier UTF8String]);
-                    _Subscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], (BLAnsi*)[_receiptstr UTF8String]);
+                    memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
+                    _Subscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], NULL, NULL);
                 }
-            }
-            else
-            {
-				memset(_PrIapMem->aProductID, 0, sizeof(_PrIapMem->aProductID));
-                _Subscriber((BLAnsi*)[_transaction.payment.productIdentifier UTF8String], NULL);
             }
         }
     }
