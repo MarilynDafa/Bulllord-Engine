@@ -1,0 +1,8 @@
+<root>
+<zone name="一区" version="2.0.5" ip="47.74.187.72" port="4304">
+<server name="龙争虎斗" namedest="龙争虎斗" merge="0" num="1服" status="1"/>
+</zone>
+<recomment zoneName="一区" serverName="龙争虎斗"/>
+<database ip="47.74.187.72" port="4304"/>
+<tip text="欢迎回到天龍破，祝游戏愉快！！！"/>
+</root>
