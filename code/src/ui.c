@@ -1758,15 +1758,9 @@ _LabelParse(_BLWidget* _Node)
 						switch (_fourcc)
 						{
 						case FOURCC_INTERNAL('B', 'M', 'G', 'T'): blStreamRead(_stream, sizeof(BLU32), &_imagesz); _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8; break;
-						case FOURCC_INTERNAL('S', '3', 'T', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_BC1; break;
-						case FOURCC_INTERNAL('S', '3', 'T', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_BC1A1; break;
-						case FOURCC_INTERNAL('S', '3', 'T', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_BC3; break;
 						case FOURCC_INTERNAL('A', 'S', 'T', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
 						case FOURCC_INTERNAL('A', 'S', 'T', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
 						case FOURCC_INTERNAL('A', 'S', 'T', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
-						case FOURCC_INTERNAL('E', 'T', 'C', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_ETC2; break;
-						case FOURCC_INTERNAL('E', 'T', 'C', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_ETC2A1; break;
-						case FOURCC_INTERNAL('E', 'T', 'C', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ETC2A; break;
 						default:assert(0); break;
 						}
 						BLU8* _texdata;
@@ -2943,18 +2937,6 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 				blStreamRead(_stream, sizeof(BLU32), &_imagesz);
 				_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
 				break;
-			case FOURCC_INTERNAL('S', '3', 'T', '1'):
-				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-				_format = BL_TF_BC1;
-				break;
-			case FOURCC_INTERNAL('S', '3', 'T', '2'):
-				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-				_format = BL_TF_BC1A1;
-				break;
-			case FOURCC_INTERNAL('S', '3', 'T', '3'):
-				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-				_format = BL_TF_BC3;
-				break;
 			case FOURCC_INTERNAL('A', 'S', 'T', '1'):
 				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
 				_format = BL_TF_ASTC;
@@ -2966,18 +2948,6 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 			case FOURCC_INTERNAL('A', 'S', 'T', '3'):
 				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
 				_format = BL_TF_ASTC;
-				break;
-			case FOURCC_INTERNAL('E', 'T', 'C', '1'):
-				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-				_format = BL_TF_ETC2;
-				break;
-			case FOURCC_INTERNAL('E', 'T', 'C', '2'):
-				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-				_format = BL_TF_ETC2A1;
-				break;
-			case FOURCC_INTERNAL('E', 'T', 'C', '3'):
-				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-				_format = BL_TF_ETC2A;
 				break;
 			default:assert(0); break;
 			}
@@ -8181,19 +8151,13 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 							BLEnum _type = BL_TT_2D;
 							blStreamSeek(_stream, _offset);
 							BLU32 _imagesz;
-							BLEnum _format = BL_TF_BC1;
+							BLEnum _format = BL_TF_RGBA8;
 							switch (_fourcc)
 							{
 							case FOURCC_INTERNAL('B', 'M', 'G', 'T'): blStreamRead(_stream, sizeof(BLU32), &_imagesz); _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8; break;
-							case FOURCC_INTERNAL('S', '3', 'T', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_BC1; break;
-							case FOURCC_INTERNAL('S', '3', 'T', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_BC1A1; break;
-							case FOURCC_INTERNAL('S', '3', 'T', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_BC3; break;
 							case FOURCC_INTERNAL('A', 'S', 'T', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
 							case FOURCC_INTERNAL('A', 'S', 'T', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
 							case FOURCC_INTERNAL('A', 'S', 'T', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
-							case FOURCC_INTERNAL('E', 'T', 'C', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_ETC2; break;
-							case FOURCC_INTERNAL('E', 'T', 'C', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8; _format = BL_TF_ETC2A1; break;
-							case FOURCC_INTERNAL('E', 'T', 'C', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ETC2A; break;
 							default:assert(0); break;
 							}
 							BLU8* _texdata;

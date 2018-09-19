@@ -701,50 +701,42 @@ typedef unsigned long long BLGuid;
 #define BL_TT_ARRAYCUBE     6
 
 /* _TEXTURE_FORMAT */
-#define BL_TF_BC1		0		//Color(No Alpha) | Normal(Low)
-#define BL_TF_BC1A1     1       //Cutout Color
-#define BL_TF_BC3		2		//Color(Mid)
-#define BL_TF_ETC2		3		//Color(No Alpha) | Normal(Low)
-#define BL_TF_ETC2A1	4		//Cutout Color | Normal(Low)
-#define BL_TF_ETC2A		5		//Color(Mid)
-#define BL_TF_ASTC      6       //All
-#define BL_TF_BC5       7       //Normal(High)
-#define BL_TF_ETC2RG    8       //Normal(High)
-#define BL_TF_UNKNOWN	9
-#define BL_TF_R8		10
-#define BL_TF_R8I		11
-#define BL_TF_R8U		12
-#define BL_TF_R8S		13
-#define BL_TF_R32I		14
-#define BL_TF_R32U		15
-#define BL_TF_R32F		16	//depth
-#define BL_TF_RG8		17
-#define BL_TF_RG8I		18
-#define BL_TF_RG8U		19
-#define BL_TF_RG8S		20
-#define BL_TF_RG32I		21
-#define BL_TF_RG32U		22
-#define BL_TF_RG32F		23	//Noise
-#define BL_TF_RGB8		24
-#define BL_TF_RGB8I		25
-#define BL_TF_RGB8U		26
-#define BL_TF_RGB8S		27
-#define BL_TF_R11G11B10F	28	//Lighting accumulate
-#define BL_TF_RGB9E5F	29	//hdr
-#define BL_TF_BGRA8		30
-#define BL_TF_RGBA8		31
-#define BL_TF_RGBA8I	32
-#define BL_TF_RGBA8U	33
-#define BL_TF_RGBA8S	34
-#define BL_TF_RGBA32I	35
-#define BL_TF_RGBA32U	36
-#define BL_TF_RGBA32F	37
-#define BL_TF_RGB10A2	38	//Lighting accumulate
-#define BL_TF_DS_UNKNOWN	39
-#define BL_TF_D16		40
-#define BL_TF_D32		41
-#define BL_TF_D24S8		42
-#define BL_TF_COUNT		43
+#define BL_TF_ASTC      1
+#define BL_TF_UNKNOWN	2
+#define BL_TF_R8		3
+#define BL_TF_R8I		4
+#define BL_TF_R8U		5
+#define BL_TF_R8S		6
+#define BL_TF_R32I		7
+#define BL_TF_R32U		8
+#define BL_TF_R32F		9	//depth
+#define BL_TF_RG8		10
+#define BL_TF_RG8I		11
+#define BL_TF_RG8U		12
+#define BL_TF_RG8S		13
+#define BL_TF_RG32I		14
+#define BL_TF_RG32U		15
+#define BL_TF_RG32F		16	//Noise
+#define BL_TF_RGB8		17
+#define BL_TF_RGB8I		18
+#define BL_TF_RGB8U		19
+#define BL_TF_RGB8S		20
+#define BL_TF_R11G11B10F	21	//Lighting accumulate
+#define BL_TF_RGB9E5F	22	//hdr
+#define BL_TF_BGRA8		23
+#define BL_TF_RGBA8		24
+#define BL_TF_RGBA8I	25
+#define BL_TF_RGBA8U	26
+#define BL_TF_RGBA8S	27
+#define BL_TF_RGBA32I	28
+#define BL_TF_RGBA32U	29
+#define BL_TF_RGBA32F	30
+#define BL_TF_RGB10A2	31	//Lighting accumulate
+#define BL_TF_DS_UNKNOWN	32
+#define BL_TF_D16		33
+#define BL_TF_D32		34
+#define BL_TF_D24S8		35
+#define BL_TF_COUNT		36
 
 /* _CUBE_TEXTURE_FACE */
 #define BL_CTF_IGNORE		-1

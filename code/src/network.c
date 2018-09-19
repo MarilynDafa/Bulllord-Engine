@@ -1,4 +1,4 @@
-﻿/*
+/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
 
@@ -36,6 +36,7 @@ typedef struct _NetMsg {
 	BLU32 nID;
 	BLVoid* pBuf;
 	BLU32 nLength;
+	BLU32 nComLen;
 	BLEnum eNetType;
 }_BLNetMsg;
 typedef struct _HttpJob {
@@ -85,12 +86,145 @@ typedef struct _NetworkMember {
 #else
 	volatile int32_t nCurDownSize;
 #endif
-	BLBool bIpv6;
+	BLBool bClientIpv6;
+    BLBool bTcpServerIpv6;
+    BLBool bUdpServerIpv6;
+    BLBool bHttpServerIpv6;
 	BLBool bConnected;
 	BLSocket sTcpSocket;
 	BLSocket sUdpSocket;
 }_BLNetworkMember;
 static _BLNetworkMember* _PrNetworkMem = NULL;
+static BLVoid
+_FillAddr(const BLAnsi* _Host, BLU16 _Port, struct sockaddr_in* _Out, struct sockaddr_in6* _Out6, BLEnum _Type)
+{
+    if (_Out6 && !_Out)
+    {
+        if (!_PrNetworkMem->bTcpServerIpv6 && _Type == BL_NT_TCP)
+        {
+            struct addrinfo _hints;
+            struct addrinfo* _res;
+            memset(&_hints, 0, sizeof(_hints));
+            _hints.ai_family = PF_UNSPEC;
+            _hints.ai_socktype = SOCK_STREAM;
+            _hints.ai_flags = AI_DEFAULT;
+            BLS32 _rlt = getaddrinfo("ipv4only.arpa", NULL, &_hints, &_res);
+            if (_rlt == 0)
+            {
+                for (struct addrinfo* _temp = _res; _temp; _temp = _temp->ai_next)
+                {
+                    if(_temp->ai_family == AF_INET6)
+                    {
+                        memcpy(_Out6, (struct sockaddr_in6*)_temp->ai_addr, sizeof(struct sockaddr_in6));
+                        in_addr_t _ipv4 = inet_addr(_Host);
+                        memcpy(_Out6->sin6_addr.s6_addr + 12, &_ipv4, sizeof(in_addr_t));
+                        _Out6->sin6_port = htons(_Port);
+                        break;
+                    }
+                }
+            }
+            freeaddrinfo(_res);
+        }
+        else if (_PrNetworkMem->bTcpServerIpv6 && _Type == BL_NT_TCP)
+        {
+            _Out6->sin6_family = PF_INET6;
+            inet_pton(PF_INET6, _Host, (BLVoid*)&_Out6->sin6_addr);
+            _Out6->sin6_port = htons(_Port);
+        }
+        else if (!_PrNetworkMem->bUdpServerIpv6 && _Type == BL_NT_UDP)
+        {
+            struct addrinfo _hints;
+            struct addrinfo* _res;
+            memset(&_hints, 0, sizeof(_hints));
+            _hints.ai_family = PF_UNSPEC;
+            _hints.ai_socktype = SOCK_DGRAM;
+            _hints.ai_flags = AI_DEFAULT;
+            BLS32 _rlt = getaddrinfo("ipv4only.arpa", NULL, &_hints, &_res);
+            if (_rlt == 0)
+            {
+                for (struct addrinfo* _temp = _res; _temp; _temp = _temp->ai_next)
+                {
+                    if(_temp->ai_family == AF_INET6)
+                    {
+                        memcpy(_Out6, (struct sockaddr_in6*)_temp->ai_addr, sizeof(struct sockaddr_in6));
+                        in_addr_t _ipv4 = inet_addr(_Host);
+                        memcpy(_Out6->sin6_addr.s6_addr + 12, &_ipv4, sizeof(in_addr_t));
+                        _Out6->sin6_port = htons(_Port);
+                        break;
+                    }
+                }
+            }
+            freeaddrinfo(_res);
+        }
+        else if (_PrNetworkMem->bUdpServerIpv6 && _Type == BL_NT_UDP)
+        {
+            _Out6->sin6_family = PF_INET6;
+            inet_pton(PF_INET6, _Host, (BLVoid*)&_Out6->sin6_addr);
+            _Out6->sin6_port = htons(_Port);
+        }
+        else if (!_PrNetworkMem->bHttpServerIpv6 && _Type == BL_NT_HTTP)
+        {
+            struct addrinfo _hints;
+            struct addrinfo* _res;
+            memset(&_hints, 0, sizeof(_hints));
+            _hints.ai_family = PF_UNSPEC;
+            _hints.ai_socktype = SOCK_STREAM;
+            _hints.ai_flags = AI_DEFAULT;
+            BLS32 _rlt = getaddrinfo("ipv4only.arpa", NULL, &_hints, &_res);
+            if (_rlt == 0)
+            {
+                for (struct addrinfo* _temp = _res; _temp; _temp = _temp->ai_next)
+                {
+                    if(_temp->ai_family == AF_INET6)
+                    {
+                        memcpy(_Out6, (struct sockaddr_in6*)_temp->ai_addr, sizeof(struct sockaddr_in6));
+                        in_addr_t _ipv4 = inet_addr(_Host);
+                        memcpy(_Out6->sin6_addr.s6_addr + 12, &_ipv4, sizeof(in_addr_t));
+                        _Out6->sin6_port = htons(_Port);
+                        break;
+                    }
+                }
+            }
+            freeaddrinfo(_res);
+        }
+        else if (_PrNetworkMem->bHttpServerIpv6 && _Type == BL_NT_HTTP)
+        {
+            _Out6->sin6_family = PF_INET6;
+            inet_pton(PF_INET6, _Host, (BLVoid*)&_Out6->sin6_addr);
+            _Out6->sin6_port = htons(_Port);
+        }
+    }
+    else if (!_Out6 && _Out)
+    {
+        if (!_PrNetworkMem->bTcpServerIpv6 && _Type == BL_NT_TCP)
+        {
+            inet_pton(PF_INET, _Host, (BLVoid*)&_Out->sin_addr);
+            _Out->sin_family = PF_INET;
+            _Out->sin_port = htons(_Port);
+        }
+        else if (_PrNetworkMem->bTcpServerIpv6 && _Type == BL_NT_TCP)
+        {
+        }
+        else if (!_PrNetworkMem->bUdpServerIpv6 && _Type == BL_NT_UDP)
+        {
+            inet_pton(PF_INET, _Host, (BLVoid*)&_Out->sin_addr);
+            _Out->sin_family = PF_INET;
+            _Out->sin_port = htons(_Port);
+        }
+        else if (_PrNetworkMem->bUdpServerIpv6 && _Type == BL_NT_UDP)
+        {
+        }
+        else if (!_PrNetworkMem->bHttpServerIpv6 && _Type == BL_NT_HTTP)
+        {
+            inet_pton(PF_INET, _Host, (BLVoid*)&_Out->sin_addr);
+            _Out->sin_family = PF_INET;
+            _Out->sin_port = htons(_Port);
+        }
+        else if (_PrNetworkMem->bHttpServerIpv6 && _Type == BL_NT_HTTP)
+        {
+        }
+    }
+}
 static BLS32
 _GetError()
 {
@@ -145,9 +279,12 @@ _Send(BLSocket _Sock, _BLNetMsg* _Msg, const BLAnsi* _Header)
 	else
 	{
 		BLS32 _nreturn = 0;
+		BLU32 _headsz = sizeof(BLU32), _sz;
+		BLAnsi* _header = (BLAnsi*)&_Msg->nComLen;
+		BLU8* _data;
 		if (_Header)
 		{
-			BLS32 _sz = (BLS32)strlen(_Header);
+			_sz = (BLU32)strlen(_Header);
 			while (_sz > 0)
 			{
 				_nreturn = (BLS32)send(_Sock, _Header, _sz, 0);
@@ -165,8 +302,6 @@ _Send(BLSocket _Sock, _BLNetMsg* _Msg, const BLAnsi* _Header)
 				}
 			}
 		}
-		BLAnsi* _header = (BLAnsi*)&_Msg->nLength;
-		BLS32 _headsz = sizeof(BLU32);
 		while (_headsz > 0)
 		{
 			_nreturn = (BLS32)send(_Sock, _header, _headsz, 0);
@@ -183,31 +318,13 @@ _Send(BLSocket _Sock, _BLNetMsg* _Msg, const BLAnsi* _Header)
 				_headsz -= _nreturn;
 			}
 		}
-		_header = (BLAnsi*)&_Msg->nID;
-		_headsz = sizeof(BLU32);
-		while (_headsz > 0)
-		{
-			_nreturn = (BLS32)send(_Sock, _header, _headsz, 0);
-			if (-1 == _nreturn)
-			{
-				if (_GetError() == 0xEA)
-					_Select(_Sock, FALSE);
-				else
-					return FALSE;
-			}
-			else
-			{
-				_header += _nreturn;
-				_headsz -= _nreturn;
-			}
-		}
-		_headsz = _Msg->nLength;
-		BLU8* _data = (BLU8*)_Msg->pBuf;
-		while (_headsz > 0)
+		_sz = _Msg->nComLen;
+		_data = (BLU8*)_Msg->pBuf;
+		while (_sz > 0)
 		{
 			if (!_data)
 				break;
-			_nreturn = (BLS32)send(_Sock, (BLAnsi*)_data, _headsz, 0);
+			_nreturn = (BLS32)send(_Sock, (BLAnsi*)_data, _sz, 0);
 			if (-1 == _nreturn)
 			{
 				if (_GetError() == 0xEA)
@@ -218,7 +335,7 @@ _Send(BLSocket _Sock, _BLNetMsg* _Msg, const BLAnsi* _Header)
 			else
 			{
 				_data += _nreturn;
-				_headsz -= _nreturn;
+				_sz -= _nreturn;
 			}
 		}
 	}
@@ -557,13 +674,13 @@ _DownloadWorkerThreadFunc(BLVoid* _Userdata)
 	FILE* _fp;
 #endif
 reconnect:
-	_httpsok = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
+	_httpsok = socket(_PrNetworkMem->bClientIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
 	memset(&_hint, 0, sizeof(_hint));
 	_hint.ai_family = PF_UNSPEC;
 	_hint.ai_socktype = SOCK_STREAM;
 	if (getaddrinfo(_sect->pHost, "http", &_hint, &_servaddr))
         goto failed;
-    if (_PrNetworkMem->bIpv6)
+    if (_PrNetworkMem->bClientIpv6)
     {
         for (_iter = _servaddr; _iter != NULL; _iter = _iter->ai_next)
         {
@@ -574,7 +691,7 @@ reconnect:
     else
         _sin = *(struct sockaddr_in*)_servaddr->ai_addr;
 	freeaddrinfo(_servaddr);
-	if (!_PrNetworkMem->bIpv6)
+	if (!_PrNetworkMem->bClientIpv6)
 	{
 		_sin.sin_port = htons(_sect->nPort);
 		if (connect(_httpsok, (struct sockaddr*)&_sin, sizeof(_sin)) < 0)
@@ -893,25 +1010,51 @@ _NetSocketRecvThreadFunc(BLVoid* _Userdata)
 		_bufin = _Recv(_PrNetworkMem->sTcpSocket, &_msgsz);
 		if (_bufin)
 		{
-			BLU8* _buflzo = (BLU8*)alloca(_msgsz * 4);
-			BLU32 _sz = fastlz_decompress((BLU8*)_bufin, _msgsz, _buflzo, _msgsz * 4);
-			if (_sz)
+			BLU32 _osz = *(BLU32*)_bufin;
+			if (_osz == _msgsz)
 			{
-				BLAnsi* _rp = (BLAnsi*)_buflzo;
-				while (_rp < (BLAnsi*)_buflzo + _sz)
+				BLAnsi* _rp = _bufin + sizeof(unsigned int);
+				BLU32 _packsz = 0;
+				while (_rp < _bufin + sizeof(unsigned int) + _msgsz)
 				{
 					BLU32* _rc = (BLU32*)_rp;
 					_BLNetMsg* _ele = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
 					_ele->nID = *_rc;
 					_rc++;
-					_ele->nLength = *_rc;
+					_packsz = _ele->nLength = *_rc;
 					_rc++;
 					_ele->pBuf = malloc(_ele->nLength);
 					memcpy(_ele->pBuf, (BLU8*)_rc, _ele->nLength);
 					blMutexLock(_PrNetworkMem->pRevList->pMutex);
 					blListPushBack(_PrNetworkMem->pRevList, _ele);
 					blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
-					_rp += _ele->nLength + 2 * sizeof(BLU32);
+					_rp += _packsz;
+				}
+			}
+			else
+			{
+				BLU8* _buflzo = (BLU8*)malloc(_osz);
+				BLU32 _sz = fastlz_decompress((BLU8*)_bufin + sizeof(unsigned int), _msgsz, _buflzo, _osz);
+				if (_sz)
+				{
+					BLAnsi* _rp = (BLAnsi*)_buflzo;
+					BLU32 _packsz = 0;
+					while (_rp < (BLAnsi*)_buflzo + _osz)
+					{
+						BLU32* _rc = (BLU32*)_rp;
+						_BLNetMsg* _ele = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
+						_ele->nID = *_rc;
+						_rc++;
+						_packsz = _ele->nLength = *_rc;
+						_rc++;
+						_ele->pBuf = malloc(_ele->nLength);
+						memcpy(_ele->pBuf, (BLU8*)_rc, _ele->nLength);
+						blMutexLock(_PrNetworkMem->pRevList->pMutex);
+						blListPushBack(_PrNetworkMem->pRevList, _ele);
+						blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
+						_rp += _packsz;
+					}
+					free(_buflzo);
 				}
 			}
 			free(_bufin);
@@ -935,14 +1078,12 @@ _NetSocketConnThreadFunc(BLVoid* _Userdata)
 #endif
 {
 	BLU32 _n;
-	if (_PrNetworkMem->bIpv6)
-	{
-		struct sockaddr_in6 _address;
-		blYield();
-		inet_pton(PF_INET6, _Userdata ? _PrNetworkMem->aHostUDP : _PrNetworkMem->aHostTCP, (BLVoid*)&_address.sin6_addr);
-		_address.sin6_family = PF_INET6;
-		_address.sin6_port = htons(_Userdata ? _PrNetworkMem->nPortUDP : _PrNetworkMem->nPortTCP);
-		if (connect(_Userdata ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
+	if (_PrNetworkMem->bClientIpv6)
+    {
+        blYield();
+        struct sockaddr_in6 _address;
+        _FillAddr(_Userdata ? _PrNetworkMem->aHostUDP : _PrNetworkMem->aHostTCP, _Userdata ? _PrNetworkMem->nPortUDP : _PrNetworkMem->nPortTCP, NULL, &_address, _Userdata ? BL_NT_UDP : BL_NT_TCP);
+		if (connect(_Userdata ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, (struct sockaddr*)(&_address), sizeof(_address)) < 0)
 		{
 			if (0xEA == _GetError())
 			{
@@ -956,13 +1097,11 @@ _NetSocketConnThreadFunc(BLVoid* _Userdata)
 		}
 	}
 	else
-	{
+    {
+        blYield();
 		struct sockaddr_in _address;
-		blYield();
-		inet_pton(PF_INET, _Userdata ? _PrNetworkMem->aHostUDP : _PrNetworkMem->aHostTCP, (BLVoid*)&_address.sin_addr);
-		_address.sin_family = PF_INET;
-		_address.sin_port = htons(_Userdata ? _PrNetworkMem->nPortUDP : _PrNetworkMem->nPortTCP);
-		if (connect(_Userdata ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
+        _FillAddr(_Userdata ? _PrNetworkMem->aHostUDP : _PrNetworkMem->aHostTCP, _Userdata ? _PrNetworkMem->nPortUDP : _PrNetworkMem->nPortTCP, &_address, NULL, _Userdata ? BL_NT_UDP : BL_NT_TCP);
+        if (connect(_Userdata ? _PrNetworkMem->sUdpSocket : _PrNetworkMem->sTcpSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
 		{
 			if (0xEA == _GetError())
 			{
@@ -1008,13 +1147,11 @@ _NetHTTPWorkThreadFunc(BLVoid* _Userdata)
 	_BLHttpJob* _job = (_BLHttpJob*)_Userdata;
 	_BLNetMsg* _msg = _job->pMsg;
 	BLU32 _msgsz = 0;
-	if (_PrNetworkMem->bIpv6)
+	if (_PrNetworkMem->bClientIpv6)
 	{
 		struct sockaddr_in6 _address;
 		blYield();
-		inet_pton(PF_INET6, _PrNetworkMem->aHostHTTP, (BLVoid*)&_address.sin6_addr);
-		_address.sin6_family = PF_INET6;
-		_address.sin6_port = htons(_PrNetworkMem->nPortHTTP);
+        _FillAddr(_PrNetworkMem->aHostHTTP, _PrNetworkMem->nPortHTTP, NULL, &_address, BL_NT_HTTP);
 		if (connect(((_BLHttpJob*)_Userdata)->sSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
 		{
 			if (0xEA == _GetError())
@@ -1033,9 +1170,7 @@ _NetHTTPWorkThreadFunc(BLVoid* _Userdata)
 	{
 		struct sockaddr_in _address;
 		blYield();
-		inet_pton(PF_INET, _PrNetworkMem->aHostHTTP, (BLVoid*)&_address.sin_addr);
-		_address.sin_family = PF_INET;
-		_address.sin_port = htons(_PrNetworkMem->nPortHTTP);
+        _FillAddr(_PrNetworkMem->aHostHTTP, _PrNetworkMem->nPortHTTP, &_address, NULL, BL_NT_HTTP);
 		if (connect(((_BLHttpJob*)_Userdata)->sSocket, (struct sockaddr*)&(_address), sizeof(_address)) < 0)
 		{
 			if (0xEA == _GetError())
@@ -1051,19 +1186,19 @@ _NetHTTPWorkThreadFunc(BLVoid* _Userdata)
 		}
 	}
 beginwork:
-	sprintf(_httpheader, "POST / HTTP/1.1\r\nHost: %s:%d\r\nAccept: */*\r\nConnection: close\r\nContent-Length: %zu\r\n\r\n", _PrNetworkMem->aHostHTTP, _PrNetworkMem->nPortHTTP, _msg->nLength + 2 * sizeof(BLU32));
+	sprintf(_httpheader, "POST /%d HTTP/1.1\r\nHost: %s:%d\r\nAccept: */*\r\nConnection: close\r\nContent-Length: %zu\r\n\r\n", _msg->nID, _PrNetworkMem->aHostHTTP, _PrNetworkMem->nPortHTTP, _msg->nComLen + sizeof(BLU32));
 	_Send(((_BLHttpJob*)_Userdata)->sSocket, _msg, _httpheader);
 	blYield();
 #if !defined(BL_PLATFORM_WEB)
 	_bufin = _Recv(((_BLHttpJob*)_Userdata)->sSocket, &_msgsz);
 	if (_bufin)
 	{
-		BLU8* _buflzo = (BLU8*)alloca(_msgsz * 4);
-		BLU32 _sz = fastlz_decompress((BLU8*)_bufin, _msgsz, _buflzo, _msgsz * 4);
-		if (_sz)
+		BLU32 _osz = *(BLU32*)_bufin;
+		if (_osz == _msgsz)
 		{
-			BLAnsi* _rp = (BLAnsi*)_buflzo;
-			while (_rp < (BLAnsi*)_buflzo + _sz)
+			BLAnsi* _rp = _bufin + sizeof(unsigned int);
+			BLU32 _packsz = 0;
+			while (_rp < _bufin + sizeof(unsigned int) + _msgsz)
 			{
 				BLU32* _rc = (BLU32*)_rp;
 				_BLNetMsg* _ele = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
@@ -1076,7 +1211,33 @@ beginwork:
 				blMutexLock(_PrNetworkMem->pRevList->pMutex);
 				blListPushBack(_PrNetworkMem->pRevList, _ele);
 				blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
-				_rp += _ele->nLength + 2 * sizeof(BLU32);
+				_rp += _packsz;
+			}
+		}
+		else
+		{
+			BLU8* _buflzo = (BLU8*)malloc(_osz);
+			BLU32 _sz = fastlz_decompress((BLU8*)_bufin + sizeof(unsigned int), _msgsz, _buflzo, _osz);
+			if (_sz)
+			{
+				BLAnsi* _rp = (BLAnsi*)_buflzo;
+				BLU32 _packsz = 0;
+				while (_rp < (BLAnsi*)_buflzo + _osz)
+				{
+					BLU32* _rc = (BLU32*)_rp;
+					_BLNetMsg* _ele = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
+					_ele->nID = *_rc;
+					_rc++;
+					_packsz = _ele->nLength = *_rc;
+					_rc++;
+					_ele->pBuf = malloc(_ele->nLength);
+					memcpy(_ele->pBuf, (BLU8*)_rc, _ele->nLength);
+					blMutexLock(_PrNetworkMem->pRevList->pMutex);
+					blListPushBack(_PrNetworkMem->pRevList, _ele);
+					blMutexUnlock(_PrNetworkMem->pRevList->pMutex);
+					_rp += _packsz;
+				}
+				free(_buflzo);
 			}
 		}
 		free(_bufin);
@@ -1107,7 +1268,6 @@ _NetDownMainThread(BLVoid* _Userdata)
 		BLU32 _n = 0, _filesz;
 		struct sockaddr_in _sin;
 		struct sockaddr_in6 _sin6;
-		struct addrinfo _hint, *_servaddr, *_iter;
 		BLAnsi _host[1024] = { 0 };
 		BLAnsi _path[1024] = { 0 };
 		BLAnsi _file[1024] = { 0 };
@@ -1153,26 +1313,13 @@ redirect:
 		strncpy(_file, _url + _idx + 1, strlen(_url) - _idx - 1);
 		strcpy(_writefile, _localfile);
 		strcat(_writefile, _file);
-        _httpsok = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
-		memset(&_hint, 0, sizeof(_hint));
-		_hint.ai_family = PF_UNSPEC;
-		_hint.ai_socktype = SOCK_STREAM;
-		if (getaddrinfo(_host, "http", &_hint, &_servaddr))
-            goto failed;
-        if (_PrNetworkMem->bIpv6)
-        {
-            for (_iter = _servaddr; _iter != NULL; _iter = _iter->ai_next)
-            {
-                if (_iter->ai_family == PF_INET6)
-                    _sin6 = *(struct sockaddr_in6*)_iter->ai_addr;
-            }
-        }
+        _httpsok = socket(_PrNetworkMem->bClientIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
+        if (_PrNetworkMem->bClientIpv6)
+            _FillAddr(_host, _port, NULL, &_sin6, BL_NT_HTTP);
         else
-            _sin = *(struct sockaddr_in*)_servaddr->ai_addr;
-		freeaddrinfo(_servaddr);
-		if (!_PrNetworkMem->bIpv6)
+            _FillAddr(_host, _port, &_sin, NULL, BL_NT_HTTP);
+		if (!_PrNetworkMem->bClientIpv6)
 		{
-			_sin.sin_port = htons(_port);
 			if (connect(_httpsok, (struct sockaddr*)&_sin, sizeof(_sin)) < 0)
 			{
 				if (0xEA == _GetError())
@@ -1188,7 +1335,6 @@ redirect:
 		}
 		else
 		{
-			_sin6.sin6_port = htons(_port);
 			if (connect(_httpsok, (struct sockaddr*)&_sin6, sizeof(_sin6)) < 0)
 			{
 				if (0xEA == _GetError())
@@ -1464,7 +1610,10 @@ _NetworkInit(DUK_CONTEXT* _DKC)
 #else
 	_PrNetworkMem->nCurDownSize = 0;
 #endif
-	_PrNetworkMem->bIpv6 = FALSE;
+    _PrNetworkMem->bClientIpv6 = FALSE;
+    _PrNetworkMem->bTcpServerIpv6 = FALSE;
+    _PrNetworkMem->bUdpServerIpv6 = FALSE;
+    _PrNetworkMem->bHttpServerIpv6 = FALSE;
 	_PrNetworkMem->bConnected = FALSE;
 	_PrNetworkMem->sTcpSocket = INVALID_SOCKET_INTERNAL;
 	_PrNetworkMem->sUdpSocket = INVALID_SOCKET_INTERNAL;
@@ -1488,7 +1637,7 @@ _NetworkInit(DUK_CONTEXT* _DKC)
 			switch (_curr->ai_family)
 			{
 			case AF_INET6:
-				_PrNetworkMem->bIpv6 = TRUE;
+				_PrNetworkMem->bClientIpv6 = TRUE;
 				break;
 			default:
 				break;
@@ -1635,7 +1784,6 @@ _NetworkStep(BLU32 _Delta)
 				BLVoid* _buf = malloc(_iter->nLength);
 				memcpy(_buf, _iter->pBuf, _iter->nLength);
 				blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
-				free(_iter->pBuf);
 				free(_iter);
 			}
 		}
@@ -1704,13 +1852,55 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 {
 	if (_Type == BL_NT_UDP)
 	{
+        struct addrinfo _hints;
+        memset(&_hints, 0, sizeof(_hints));
+        _hints.ai_family = PF_UNSPEC;
+        _hints.ai_socktype = SOCK_DGRAM;
+        _hints.ai_flags = AI_DEFAULT;
+        struct addrinfo* _answer;
+        getaddrinfo(_Host, NULL, &_hints, &_answer);
+        for (struct addrinfo* _curr = _answer; _curr != NULL; _curr = _curr->ai_next)
+        {
+            switch (_curr->ai_family)
+            {
+                case AF_UNSPEC:
+                    break;
+                case AF_INET:
+                    break;
+                case AF_INET6:
+                    _PrNetworkMem->bUdpServerIpv6 = TRUE;
+                    break;
+            }
+        }
+        freeaddrinfo(_answer);
 		memset(_PrNetworkMem->aHostUDP, 0, sizeof(_PrNetworkMem->aHostUDP));
 		strcpy(_PrNetworkMem->aHostUDP, _Host);
 		_PrNetworkMem->nPortUDP = _Port;
-		_PrNetworkMem->sUdpSocket = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		_PrNetworkMem->sUdpSocket = socket(_PrNetworkMem->bClientIpv6 ? PF_INET6 : PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	}
 	else if (_Type == BL_NT_TCP)
 	{
+        struct addrinfo _hints;
+        memset(&_hints, 0, sizeof(_hints));
+        _hints.ai_family = PF_UNSPEC;
+        _hints.ai_socktype = SOCK_STREAM;
+        _hints.ai_flags = AI_DEFAULT;
+        struct addrinfo* _answer;
+        getaddrinfo(_Host, NULL, &_hints, &_answer);
+        for (struct addrinfo* _curr = _answer; _curr != NULL; _curr = _curr->ai_next)
+        {
+            switch (_curr->ai_family)
+            {
+                case AF_UNSPEC:
+                    break;
+                case AF_INET:
+                    break;
+                case AF_INET6:
+                    _PrNetworkMem->bTcpServerIpv6 = TRUE;
+                    break;
+            }
+        }
+        freeaddrinfo(_answer);
 		memset(_PrNetworkMem->aHostTCP, 0, sizeof(_PrNetworkMem->aHostTCP));
 		strcpy(_PrNetworkMem->aHostTCP, _Host);
 		_PrNetworkMem->nPortTCP = _Port;
@@ -1719,7 +1909,7 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 		u_long _nonblocking = 1;
 #endif
-		_PrNetworkMem->sTcpSocket = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, IPPROTO_TCP);
+		_PrNetworkMem->sTcpSocket = socket(_PrNetworkMem->bClientIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, IPPROTO_TCP);
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 		ioctlsocket(_PrNetworkMem->sTcpSocket, FIONBIO, &_nonblocking);
 #else
@@ -1740,6 +1930,27 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 	}
 	else
 	{
+        struct addrinfo _hints;
+        memset(&_hints, 0, sizeof(_hints));
+        _hints.ai_family = PF_UNSPEC;
+        _hints.ai_socktype = SOCK_STREAM;
+        _hints.ai_flags = AI_DEFAULT;
+        struct addrinfo* _answer;
+        getaddrinfo(_Host, NULL, &_hints, &_answer);
+        for (struct addrinfo* _curr = _answer; _curr != NULL; _curr = _curr->ai_next)
+        {
+            switch (_curr->ai_family)
+            {
+                case AF_UNSPEC:
+                    break;
+                case AF_INET:
+                    break;
+                case AF_INET6:
+                    _PrNetworkMem->bHttpServerIpv6 = TRUE;
+                    break;
+            }
+        }
+        freeaddrinfo(_answer);
 		memset(_PrNetworkMem->aHostHTTP, 0, sizeof(_PrNetworkMem->aHostHTTP));
 		strcpy(_PrNetworkMem->aHostHTTP, _Host);
 		_PrNetworkMem->nPortHTTP = _Port;
@@ -1810,19 +2021,12 @@ blDisconnect()
 	}
 }
 BLVoid
-blSendNetMsg(IN BLU32 _ID, IN BLAnsi* _JsonData, IN BLBool _Critical, IN BLBool _Overwrite, IN BLEnum _Nettype)
+blSendNetMsg(IN BLU32 _MsgID, IN BLVoid* _Msgbuf, IN BLU32 _Msgsz, IN BLBool _Critical, IN BLBool _Overwrite, IN BLBool _Autocompress, IN BLEnum _Nettype)
 {
 	_BLNetMsg* _msg = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
-	_msg->nID = _ID;
+	_msg->nLength = _Msgsz;
+	_msg->nID = _MsgID;
 	_msg->eNetType = _Nettype;
-	_msg->nLength = strlen(_JsonData);
-	BLU8* _stream;
-	BLU32 _sz;
-	_stream = (BLU8*)alloca(((_msg->nLength + (BLU32)(_msg->nLength * 0.06)) > 66) ? (_msg->nLength + (BLU32)(_msg->nLength * 0.06)) : 66);
-	_sz = fastlz_compress(_JsonData, _msg->nLength, _stream);
-	_msg->pBuf = malloc(_sz);
-	memcpy(_msg->pBuf, _stream, _sz);
-	_msg->nLength = _sz;
 	if (_Critical || _Nettype == BL_NT_HTTP)
 	{
 		if (_Overwrite && _Nettype != BL_NT_HTTP)
@@ -1841,6 +2045,31 @@ blSendNetMsg(IN BLU32 _ID, IN BLAnsi* _JsonData, IN BLBool _Critical, IN BLBool 
 				}
 			}
 			blMutexUnlock(_PrNetworkMem->pCriList->pMutex);
+		}
+		if (_msg->nLength <= 16 || !_Autocompress)
+		{
+			_msg->nComLen = _msg->nLength;
+			_msg->pBuf = malloc(_msg->nLength);
+			memcpy(_msg->pBuf, _Msgbuf, _msg->nLength);
+		}
+		else
+		{
+			BLU8* _stream;
+			BLU32 _sz;
+			_stream = (BLU8*)alloca(((_msg->nLength + (BLU32)(_msg->nLength * 0.06)) > 66) ? (_msg->nLength + (BLU32)(_msg->nLength * 0.06)) : 66);
+			_sz = fastlz_compress((BLU8*)_Msgbuf, _msg->nLength, _stream);
+			if (_sz >= _msg->nLength)
+			{
+				_msg->nComLen = _msg->nLength;
+				_msg->pBuf = malloc(_msg->nLength);
+				memcpy(_msg->pBuf, _Msgbuf, _msg->nLength);
+			}
+			else
+			{
+				_msg->nComLen = (BLU32)_sz;
+				_msg->pBuf = malloc(_sz);
+				memcpy(_msg->pBuf, _stream, _sz);
+			}
 		}
 		if (_Nettype != BL_NT_HTTP)
 			blListPushBack(_PrNetworkMem->pCriList, _msg);
@@ -1864,6 +2093,31 @@ blSendNetMsg(IN BLU32 _ID, IN BLAnsi* _JsonData, IN BLBool _Critical, IN BLBool 
 			}
 			blMutexUnlock(_PrNetworkMem->pNorList->pMutex);
 		}
+		if (_msg->nLength <= 16 || !_Autocompress)
+		{
+			_msg->nComLen = _msg->nLength;
+			_msg->pBuf = malloc(_msg->nLength);
+			memcpy(_msg->pBuf, _Msgbuf, _msg->nLength);
+		}
+		else
+		{
+			BLU8* _stream;
+			BLU32 _sz;
+			_stream = (BLU8*)alloca(((_msg->nLength + (BLU32)(_msg->nLength * 0.06)) > 66) ? (_msg->nLength + (BLU32)(_msg->nLength * 0.06)) : 66);
+			_sz = fastlz_compress((BLU8*)_Msgbuf, _msg->nLength, _stream);
+			if (_sz >= _msg->nLength)
+			{
+				_msg->nComLen = _msg->nLength;
+				_msg->pBuf = malloc(_msg->nLength);
+				memcpy(_msg->pBuf, _Msgbuf, _msg->nLength);
+			}
+			else
+			{
+				_msg->nComLen = (BLU32)_sz;
+				_msg->pBuf = malloc(_sz);
+				memcpy(_msg->pBuf, _stream, _sz);
+			}
+		}
 		blListPushBack(_PrNetworkMem->pNorList, _msg);
 	}
 	if (_Nettype == BL_NT_HTTP)
@@ -1874,7 +2128,7 @@ blSendNetMsg(IN BLU32 _ID, IN BLAnsi* _JsonData, IN BLBool _Critical, IN BLBool 
 		u_long _nonblocking = 1;
 #endif
 		_BLHttpJob* _job = (_BLHttpJob*)malloc(sizeof(_BLHttpJob));
-		_job->sSocket = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, IPPROTO_TCP);
+		_job->sSocket = socket(_PrNetworkMem->bClientIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, IPPROTO_TCP);
 		_job->bOver = FALSE;
 		_job->pMsg = _msg;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -1939,7 +2193,7 @@ blRSASign(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, IN BLU32 _Version, OUT BLAn
 		return FALSE;
 	}
 	memset(_Output, 0, 1025 * sizeof(BLAnsi));
-	const BLAnsi* _base64 = blGenBase64Encoder(_buf, _olen);
+	const BLAnsi* _base64 = blGenBase64Encoder(_buf, (BLU32)_olen);
 	strcpy(_Output, _base64);
 	blDeleteBase64Encoder((BLAnsi*)_base64);
 	mbedtls_ctr_drbg_free(&_ctrdrbg);
@@ -2026,7 +2280,7 @@ blRSAEncrypt(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, OUT BLAnsi _Output[1025])
 		return FALSE;
 	}
 	memset(_Output, 0, sizeof(BLAnsi) * 1025);
-	const BLAnsi* _base64 = blGenBase64Encoder(_buf, _olen);
+	const BLAnsi* _base64 = blGenBase64Encoder(_buf, (BLU32)_olen);
 	strcpy(_Output, _base64);
 	blDeleteBase64Encoder((BLAnsi*)_base64);
 	mbedtls_ctr_drbg_free(&_ctrdrbg);
@@ -2092,7 +2346,7 @@ blHTTPRequest(IN BLAnsi* _Url, IN BLAnsi* _Param, IN BLBool _Get, OUT BLAnsi _Re
 	struct addrinfo _hint, *_servaddr, *_iter;
 	BLAnsi _host[1024] = { 0 };
 	BLAnsi* _tmp;
-	BLSocket _sok = socket(_PrNetworkMem->bIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
+	BLSocket _sok = socket(_PrNetworkMem->bClientIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
 	memset(&_hint, 0, sizeof(_hint));
 	_hint.ai_family = PF_UNSPEC;
 	_hint.ai_socktype = SOCK_STREAM;
@@ -2119,7 +2373,7 @@ blHTTPRequest(IN BLAnsi* _Url, IN BLAnsi* _Param, IN BLBool _Get, OUT BLAnsi _Re
 	}
 	if (getaddrinfo(_host, "http", &_hint, &_servaddr))
 		return FALSE;
-    if (_PrNetworkMem->bIpv6)
+    if (_PrNetworkMem->bClientIpv6)
     {
         for (_iter = _servaddr; _iter != NULL; _iter = _iter->ai_next)
         {
@@ -2130,7 +2384,7 @@ blHTTPRequest(IN BLAnsi* _Url, IN BLAnsi* _Param, IN BLBool _Get, OUT BLAnsi _Re
     else
         _sin = *(struct sockaddr_in*)_servaddr->ai_addr;
 	freeaddrinfo(_servaddr);
-	if (!_PrNetworkMem->bIpv6)
+	if (!_PrNetworkMem->bClientIpv6)
 	{
 		_sin.sin_port = htons(_port);
 		if (connect(_sok, (struct sockaddr*)&_sin, sizeof(_sin)) < 0)
