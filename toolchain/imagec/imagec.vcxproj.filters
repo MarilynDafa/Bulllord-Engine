@@ -1,0 +1,1063 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="webp">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="astc">
+      <UniqueIdentifier>{8c9af162-6b92-48bc-b328-38d532c5fc45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imagec">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="webp\dec">
+      <UniqueIdentifier>{b40149d1-520e-4859-9532-8c16b4572781}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="webp\dsp">
+      <UniqueIdentifier>{149d2c9d-45af-4a93-83ae-60f8fefcb78d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="webp\utils">
+      <UniqueIdentifier>{fba3667f-5b7a-48a3-9cda-0882c108b7f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="webp\webp">
+      <UniqueIdentifier>{be27cf98-628b-4116-8fd2-18b399edd4bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="webp\enc">
+      <UniqueIdentifier>{42cd65ad-a622-4e6a-952a-3eb29cd6afb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="devil">
+      <UniqueIdentifier>{2df6bdc0-04eb-4b49-948b-07d36a0e16b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="devil\il">
+      <UniqueIdentifier>{dd57b885-1f9d-481d-8fc2-494d1cc05bbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="devil\ilu">
+      <UniqueIdentifier>{5e221cf0-bc97-42e9-a9f9-1f4f237c0e40}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>imagec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dec\alpha_dec.c">
+      <Filter>webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dec\buffer_dec.c">
+      <Filter>webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dec\frame_dec.c">
+      <Filter>webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dec\idec_dec.c">
+      <Filter>webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dec\io_dec.c">
+      <Filter>webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dec\quant_dec.c">
+      <Filter>webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dec\tree_dec.c">
+      <Filter>webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dec\vp8_dec.c">
+      <Filter>webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dec\vp8l_dec.c">
+      <Filter>webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dec\webp_dec.c">
+      <Filter>webp\dec</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\alpha_processing.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\alpha_processing_mips_dsp_r2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\alpha_processing_neon.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\alpha_processing_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\alpha_processing_sse41.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\cost.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\cost_mips_dsp_r2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\cost_mips32.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\cost_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\cpu.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\dec.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\dec_clip_tables.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\dec_mips_dsp_r2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\dec_mips32.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\dec_msa.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\dec_neon.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\dec_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\dec_sse41.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\enc.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\enc_avx2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\enc_mips_dsp_r2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\enc_mips32.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\enc_msa.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\enc_neon.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\enc_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\enc_sse41.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\filters.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\filters_mips_dsp_r2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\filters_msa.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\filters_neon.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\filters_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_enc.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_enc_mips_dsp_r2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_enc_mips32.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_enc_msa.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_enc_neon.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_enc_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_enc_sse41.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_mips_dsp_r2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_msa.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_neon.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\lossless_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\rescaler.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\rescaler_mips_dsp_r2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\rescaler_mips32.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\rescaler_msa.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\rescaler_neon.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\rescaler_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\ssim.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\ssim_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\upsampling.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\upsampling_mips_dsp_r2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\upsampling_msa.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\upsampling_neon.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\upsampling_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\upsampling_sse41.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\yuv.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\yuv_mips_dsp_r2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\yuv_mips32.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\yuv_neon.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\yuv_sse2.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dsp\yuv_sse41.c">
+      <Filter>webp\dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\bit_reader_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\bit_writer_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\color_cache_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\filters_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\huffman_encode_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\huffman_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\quant_levels_dec_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\quant_levels_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\random_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\rescaler_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\thread_utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\utils.c">
+      <Filter>webp\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.c">
+      <Filter>imagec</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_averages_and_directions.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_block_sizes2.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_color_quantize.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_color_unquantize.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_compress_symbolic.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_compute_variance.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_decompress_symbolic.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_encoding_choice_error.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_find_best_partitioning.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_ideal_endpoints_and_weights.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_image_load_store.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_integer_sequence.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_kmeans_partitioning.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_ktx_dds.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_partition_tables.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_percentile_tables.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_pick_best_endpoint_format.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_quantization.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_stb_tga.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_symbolic_physical.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_weight_align.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\astc_weight_quant_xfer_tables.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\mathlib.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="astc\softfloat.cpp">
+      <Filter>astc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\alpha_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\analysis_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\backward_references_cost_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\backward_references_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\config_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\cost_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\filter_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\frame_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\histogram_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\iterator_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\near_lossless_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\picture_csp_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\picture_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\picture_psnr_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\picture_rescale_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\picture_tools_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\predictor_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\quant_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\syntax_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\token_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\tree_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\vp8l_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enc\webp_enc.c">
+      <Filter>webp\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_alloc.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_error.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_filter.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_filter_rcg.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_internal.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_manip.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_mipmap.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_noise.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_region.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_rotate.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_scale.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_scale2d.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_scale3d.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_scaling.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_states.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-ILU\src\ilu_utilities.c">
+      <Filter>devil\ilu</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\altivec_common.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\altivec_typeconversion.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_alloc.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_bits.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_blp.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_bmp.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_convbuff.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_convert.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_cut.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_dcx.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_dds.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_dds-save.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_devil.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_dicom.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_doom.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_dpx.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_endian.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_error.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_exr.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_exr.cpp">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_fastconv.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_files.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_fits.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_ftx.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_gif.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_hdr.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_header.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_icns.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_icon.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_iff.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_ilbm.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_internal.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_io.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_iwi.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_jp2.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_jpeg.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_ktx.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_lif.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_main.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_manip.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_mdl.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_mng.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_mp3.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_neuquant.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_nvidia.cpp">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_pal.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_pcd.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_pcx.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_pic.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_pix.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_png.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_pnm.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_profiles.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_psd.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_psp.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_pxr.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_quantizer.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_raw.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_rawdata.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_register.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_rle.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_rot.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_sgi.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_size.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_squish.cpp">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_stack.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_states.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_sun.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_targa.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_texture.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_tiff.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_tpl.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_utility.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_utx.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_utx.cpp">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_vtf.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_wal.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_wbmp.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_wdp.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+    <ClCompile Include="devil\src-IL\src\il_xpm.c">
+      <Filter>devil\il</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stb_image.h">
+      <Filter>imagec</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dec\alphai_dec.h">
+      <Filter>webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dec\common_dec.h">
+      <Filter>webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dec\vp8_dec.h">
+      <Filter>webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dec\vp8i_dec.h">
+      <Filter>webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dec\vp8li_dec.h">
+      <Filter>webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dec\webpi_dec.h">
+      <Filter>webp\dec</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dsp\common_sse2.h">
+      <Filter>webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dsp\common_sse41.h">
+      <Filter>webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dsp\dsp.h">
+      <Filter>webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dsp\lossless.h">
+      <Filter>webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dsp\lossless_common.h">
+      <Filter>webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dsp\mips_macro.h">
+      <Filter>webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dsp\msa_macro.h">
+      <Filter>webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dsp\neon.h">
+      <Filter>webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dsp\yuv.h">
+      <Filter>webp\dsp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\bit_reader_inl_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\bit_reader_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\bit_writer_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\color_cache_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\endian_inl_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\filters_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\huffman_encode_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\huffman_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\quant_levels_dec_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\quant_levels_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\random_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\rescaler_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\thread_utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\utils.h">
+      <Filter>webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\webp\config.h">
+      <Filter>webp\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\webp\decode.h">
+      <Filter>webp\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\webp\demux.h">
+      <Filter>webp\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\webp\encode.h">
+      <Filter>webp\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\webp\format_constants.h">
+      <Filter>webp\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\webp\mux.h">
+      <Filter>webp\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\webp\mux_types.h">
+      <Filter>webp\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\webp\types.h">
+      <Filter>webp\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="astc\astc_codec_internals.h">
+      <Filter>astc</Filter>
+    </ClInclude>
+    <ClInclude Include="astc\mathlib.h">
+      <Filter>astc</Filter>
+    </ClInclude>
+    <ClInclude Include="astc\softfloat.h">
+      <Filter>astc</Filter>
+    </ClInclude>
+    <ClInclude Include="astc\vectypes.h">
+      <Filter>astc</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image_write.h">
+      <Filter>imagec</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enc\backward_references_enc.h">
+      <Filter>webp\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enc\cost_enc.h">
+      <Filter>webp\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enc\histogram_enc.h">
+      <Filter>webp\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enc\vp8i_enc.h">
+      <Filter>webp\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enc\vp8li_enc.h">
+      <Filter>webp\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\IL\config.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\IL\devil_cpp_wrapper.hpp">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\IL\devil_internal_exports.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\IL\il.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\IL\il_wrap.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\IL\ilu.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\IL\ilu_region.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\IL\ilut.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\IL\ilut_config.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_alloc.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_filter.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_internal.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_region.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_states.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_error\ilu_err-arabic.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_error\ilu_err-dutch.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_error\ilu_err-english.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_error\ilu_err-french.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_error\ilu_err-german.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_error\ilu_err-italian.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_error\ilu_err-japanese.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-ILU\include\ilu_error\ilu_err-spanish.h">
+      <Filter>devil\ilu</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\altivec_common.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\altivec_typeconversion.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_alloc.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_bits.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_bmp.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_dcx.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_dds.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_doompal.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_dpx.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_endian.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_exr.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_files.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_gif.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_hdr.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_icns.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_icon.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_internal.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_jp2.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_jpeg.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_lif.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_manip.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_mdl.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_pal.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_pcx.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_pic.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_pnm.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_psd.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_psp.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_q2pal.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_register.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_rle.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_sgi.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_stack.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_states.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_targa.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_utx.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_vtf.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+    <ClInclude Include="devil\src-IL\include\il_wdp.h">
+      <Filter>devil\il</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="devil\IL\DevIL.i">
+      <Filter>devil\il</Filter>
+    </None>
+  </ItemGroup>
+</Project>
