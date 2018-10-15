@@ -5332,53 +5332,6 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 #endif
 }
 BLVoid
-blSystemEmbedRun(IN BLS32 _Handle, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))
-{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_OSX)
-	_PrSystemMem = (_BLSystemMember*)malloc(sizeof(_BLSystemMember));
-	memset(_PrSystemMem->pSubscriber, 0, sizeof(_PrSystemMem->pSubscriber));
-	_PrSystemMem->pBeginFunc = NULL;
-	_PrSystemMem->pStepFunc = NULL;
-	_PrSystemMem->pEndFunc = NULL;
-	_PrSystemMem->pEvents = NULL;
-	memset(_PrSystemMem->aWorkDir, 0, sizeof(_PrSystemMem->aWorkDir));
-	memset(_PrSystemMem->aUserDir, 0, sizeof(_PrSystemMem->aUserDir));
-	memset(_PrSystemMem->aEncryptkey, 0, sizeof(_PrSystemMem->aEncryptkey));
-	_PrSystemMem->nEventsSz = 0;
-	_PrSystemMem->nEventIdx = 0;
-	_PrSystemMem->nSysTime = 0;
-	_PrSystemMem->nOrientation = SCREEN_LANDSCAPE_INTERNAL;
-	for (BLU32 _idx = 0; _idx < 64; ++_idx)
-		_PrSystemMem->aPlugins[_idx].nHash = 0;
-#if defined(BL_PLATFORM_WIN32)
-    _PrSystemMem->bCtrlPressed = FALSE;
-#elif defined(BL_PLATFORM_LINUX)
-    _PrSystemMem->pDisplay = NULL;
-    _PrSystemMem->pIME = NULL;
-    _PrSystemMem->pIC = NULL;
-    _PrSystemMem->pLib = NULL;
-    _PrSystemMem->bCtrlPressed = FALSE;
-	_PrSystemMem->bEWMHSupported = FALSE;
-#elif defined(BL_PLATFORM_OSX)
-    _PrSystemMem->pPool = nil;
-    _PrSystemMem->pWindow = nil;
-    _PrSystemMem->pDelegate = nil;
-    _PrSystemMem->pTICcxt = nil;
-    _PrSystemMem->bCtrlPressed = FALSE;
-#endif
-	for (BLU32 _idx = 0; _idx < 8; ++_idx)
-		_PrSystemMem->aTimers[_idx].nId = -1;
-	_PrSystemMem->pBeginFunc = _Begin;
-	_PrSystemMem->pStepFunc = _Step;
-	_PrSystemMem->pEndFunc = _End;
-	_SystemInit();
-	do {
-		_SystemStep();
-	} while (_GbSystemRunning);
-	_SystemDestroy();
-#endif
-}
-BLVoid
 blSystemScriptRun(IN BLAnsi* _Encryptkey)
 {
 #if defined(BL_PLATFORM_UWP)

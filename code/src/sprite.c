@@ -29,6 +29,7 @@
 #include "internal/internal.h"
 #include "internal/mathematics.h"
 #include "../externals/duktape/duktape.h"
+#include "../externals/webp/src/webp/decode.h"
 typedef struct _SpriteAction{
     struct _SpriteAction* pNext;
     struct _SpriteAction* pNeighbor;
@@ -552,15 +553,7 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 			blStreamRead(_stream, sizeof(BLU32), &_imagesz);
 			_node->eTexFormat = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
 			break;
-		case FOURCC_INTERNAL('A', 'S', 'T', '1'):
-			_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-			_node->eTexFormat = BL_TF_ASTC;
-			break;
-		case FOURCC_INTERNAL('A', 'S', 'T', '2'):
-			_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-			_node->eTexFormat = BL_TF_ASTC;
-			break;
-		case FOURCC_INTERNAL('A', 'S', 'T', '3'):
+		case FOURCC_INTERNAL('A', 'S', 'T', 'C'):
 			_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
 			_node->eTexFormat = BL_TF_ASTC;
 			break;
@@ -570,10 +563,11 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 		{
 			BLU8* _data = (BLU8*)malloc(_imagesz);
 			blStreamRead(_stream, _imagesz, _data);
-			BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
-			blRLEDecode(_data, _width * _height * _channels, _data2);
+			if (_channels == 3)
+				_node->pTexData = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
+			else
+				_node->pTexData = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
 			free(_data);
-			_node->pTexData = _data2;
 		}
 		else
 		{
@@ -1232,10 +1226,11 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 							{
 								BLU8* _data = (BLU8*)malloc(_imagesz);
 								blStreamRead(_stream, _imagesz, _data);
-								BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
-								blRLEDecode(_data, _width * _height * _channels, _data2);
+								if (_channels == 4)
+									_texdata = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+								else
+									_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
 								free(_data);
-								_texdata = _data2;
 							}
 							else
 							{

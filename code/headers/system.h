@@ -168,12 +168,6 @@ BL_API BLVoid blSystemRun(
 	IN BLVoid(*_Step)(BLU32),
 	IN BLVoid(*_End)(BLVoid));
 
-BL_API BLVoid blSystemEmbedRun(
-	IN BLS32 _Handle,
-	IN BLVoid(*_Begin)(BLVoid),
-	IN BLVoid(*_Step)(BLU32),
-	IN BLVoid(*_End)(BLVoid));
-
 BL_API BLVoid blSystemScriptRun(
 	IN BLAnsi* _Encryptkey);
 #ifdef __cplusplus

@@ -156,41 +156,9 @@ _spAtlasPage_createTexture(spAtlasPage* _Self, const BLAnsi* _Filename)
 		blStreamRead(_stream, sizeof(BLU32), &_imagesz);
 		_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
 		break;
-	case (('S' << 0) + ('3' << 8) + ('T' << 16) + ('1' << 24)):
-		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-		_format = BL_TF_BC1;
-		break;
-	case (('S' << 0) + ('3' << 8) + ('T' << 16) + ('2' << 24)):
-		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-		_format = BL_TF_BC1A1;
-		break;
-	case (('S' << 0) + ('3' << 8) + ('T' << 16) + ('3' << 24)):
-		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-		_format = BL_TF_BC3;
-		break;
-	case (('A' << 0) + ('S' << 8) + ('T' << 16) + ('1' << 24)):
+	case (('A' << 0) + ('S' << 8) + ('T' << 16) + ('C' << 24)):
 		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
 		_format = BL_TF_ASTC;
-		break;
-	case (('A' << 0) + ('S' << 8) + ('T' << 16) + ('2' << 24)):
-		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-		_format = BL_TF_ASTC;
-		break;
-	case (('A' << 0) + ('S' << 8) + ('T' << 16) + ('3' << 24)):
-		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-		_format = BL_TF_ASTC;
-		break;
-	case (('E' << 0) + ('T' << 8) + ('C' << 16) + ('1' << 24)):
-		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-		_format = BL_TF_ETC2;
-		break;
-	case (('E' << 0) + ('T' << 8) + ('C' << 16) + ('2' << 24)):
-		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 8;
-		_format = BL_TF_ETC2A1;
-		break;
-	case (('E' << 0) + ('T' << 8) + ('C' << 16) + ('3' << 24)):
-		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-		_format = BL_TF_ETC2A;
 		break;
 	default:assert(0); break;
 	}
@@ -198,10 +166,11 @@ _spAtlasPage_createTexture(spAtlasPage* _Self, const BLAnsi* _Filename)
 	{
 		BLU8* _data = (BLU8*)malloc(_imagesz);
 		blStreamRead(_stream, _imagesz, _data);
-		BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
-		blRLEDecode(_data, _width * _height * _channels, _data2);
+		if (_channels == 4)
+			_texdata = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+		else
+			_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
 		free(_data);
-		_texdata = _data2;
 	}
 	else
 	{

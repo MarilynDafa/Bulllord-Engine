@@ -1177,33 +1177,3 @@ blDeColor4F(IN BLU32 _Clr, OUT BLF32 _Clrf[4])
 	_Clrf[1] = _inv * _g;
 	_Clrf[0] = _inv * _r;
 }
-BLVoid
-blRLEDecode(IN BLU8* _Src, IN BLU32 _Dstlen, INOUT BLU8* _Dst)
-{
-	BLU8 *_ip = (BLU8*)_Src, *_op = _Dst;
-	BLU32 _idx;
-	BLS32 _c, _pc = -1;
-	BLS32 _t[256] = { 0 };
-	BLS32 _run = 0;
-	for (_idx = 0; _idx < 32; ++_idx)
-	{
-		BLU32 _jdx;
-		_c = *_ip++;
-		for (_jdx = 0; _jdx < 8; ++_jdx)
-			_t[_idx * 8 + _jdx] = (_c >> _jdx) & 1;
-	}
-	while (_op < _Dst + _Dstlen)
-	{
-		_c = *_ip++;
-		if (_t[_c])
-		{
-			for (_run = 0; (_pc = *_ip++) == 255; _run += 255);
-			_run += _pc + 1;
-			for (; _run > 0; --_run)
-				*_op++ = _c;
-		}
-		else
-			*(_op++) = _c;
-	}
-}
-

@@ -1126,63 +1126,291 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\userauth.c">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\alpha_dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\buffer_dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\frame_dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\idec_dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\io_dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\quant_dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\tree_dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8l_dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8_dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\webp_dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing_neon.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing_sse41.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\cost.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\cost_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\cpu.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_clip_tables.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_neon.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_sse41.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc_neon.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc_sse41.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\filters.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\filters_neon.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\filters_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc_neon.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc_sse41.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_neon.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\rescaler.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\rescaler_neon.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\rescaler_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\ssim.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\ssim_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling_neon.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling_sse41.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_neon.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_sse2.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_sse41.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\bit_reader_utils.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\color_cache_utils.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\huffman_utils.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\quant_levels_dec_utils.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\random_utils.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\rescaler_utils.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\thread_utils.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\utils.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\alpha_dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\buffer_dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\frame_dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\idec_dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\io_dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\quant_dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\tree_dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8l_dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8_dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\webp_dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing_neon.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\alpha_processing_sse41.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\cost.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\cost_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\cpu.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_clip_tables.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_neon.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\dec_sse41.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc_neon.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\enc_sse41.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\filters.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\filters_neon.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\filters_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc_neon.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_enc_sse41.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_neon.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\lossless_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\rescaler.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\rescaler_neon.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\rescaler_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\ssim.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\ssim_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling_neon.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\upsampling_sse41.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_neon.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_sse2.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_sse41.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\bit_reader_utils.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\color_cache_utils.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\huffman_utils.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\quant_levels_dec_utils.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\random_utils.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\rescaler_utils.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\thread_utils.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\utils.c">
+      <CompileAs>CompileAsC</CompileAs>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <ExcludedFromBuild>false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\xml\ezxml.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
@@ -2031,6 +2259,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\rescaler_utils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\thread_utils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\utils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\config.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\decode.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\demux.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\encode.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\format_constants.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\mux.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\mux_types.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\types.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\xml\ezxml.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\audio.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\gpu.h" />

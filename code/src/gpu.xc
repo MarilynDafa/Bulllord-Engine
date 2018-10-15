@@ -807,26 +807,12 @@ static BLBool
 _TextureFormatValidGL(GLenum _InternalFmt, GLenum _Fmt, GLenum _Type, BLU32 _Bpp)
 {
     BLBool _compressed = FALSE;
-    if (_InternalFmt == GL_COMPRESSED_RGB_S3TC_DXT1_EXT ||
-        _InternalFmt == GL_COMPRESSED_SRGB_S3TC_DXT1_EXT ||
-        _InternalFmt == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT ||
-        _InternalFmt == GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT ||
-        _InternalFmt == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT ||
-        _InternalFmt == GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT ||
-        _InternalFmt == GL_COMPRESSED_RGB8_ETC2 ||
-        _InternalFmt == GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2 ||
-        _InternalFmt == GL_COMPRESSED_RGBA8_ETC2_EAC ||
-        _InternalFmt == GL_COMPRESSED_SRGB8_ETC2 ||
-        _InternalFmt == GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2 ||
-        _InternalFmt == GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC ||
-        _InternalFmt == GL_COMPRESSED_RGBA_ASTC_4x4_KHR ||
-        _InternalFmt == GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR ||
-        _InternalFmt == GL_COMPRESSED_RG_RGTC2 ||
-        _InternalFmt == GL_COMPRESSED_RG11_EAC)
+    if (_InternalFmt == GL_COMPRESSED_RGBA_ASTC_4x4_KHR ||
+        _InternalFmt == GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR)
         _compressed = TRUE;
 	GLuint _id;
-	GL_CHECK_INTERNAL(glGenTextures(1, &_id));
-	GL_CHECK_INTERNAL(glBindTexture(GL_TEXTURE_2D, _id));
+	glGenTextures(1, &_id);
+	glBindTexture(GL_TEXTURE_2D, _id);
 	GLsizei _size = (16 * 16 * _Bpp) / 8;
 	BLVoid* _ptr;
 	union {	BLVoid* ptr; BLU32 addr; } _un;
@@ -852,66 +838,10 @@ _FillTextureFormatGL(BLEnum _BLFmt, GLenum* _IFmt, GLenum* _Fmt, GLenum* _Type, 
 {
     switch (_BLFmt)
     {
-        case BL_TF_BC1:
-            *_IFmt = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-            *_SrgbFmt = GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
-            *_Fmt = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-            *_Type = GL_ZERO;
-            *_RtFmt = GL_ZERO;
-            break;
-        case BL_TF_BC1A1:
-            *_IFmt = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-            *_SrgbFmt = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT;
-            *_Fmt = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-            *_Type = GL_ZERO;
-            *_RtFmt = GL_ZERO;
-            break;
-        case BL_TF_BC3:
-            *_IFmt = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-            *_SrgbFmt = GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
-            *_Fmt = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-            *_Type = GL_ZERO;
-            *_RtFmt = GL_ZERO;
-            break;
-        case BL_TF_ETC2:
-            *_IFmt = GL_COMPRESSED_RGB8_ETC2;
-            *_SrgbFmt = GL_COMPRESSED_SRGB8_ETC2;
-            *_Fmt = GL_COMPRESSED_RGB8_ETC2;
-            *_Type = GL_ZERO;
-            *_RtFmt = GL_ZERO;
-            break;
-        case BL_TF_ETC2A1:
-            *_IFmt = GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
-            *_SrgbFmt = GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2;
-            *_Fmt = GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
-            *_Type = GL_ZERO;
-            *_RtFmt = GL_ZERO;
-            break;
-        case BL_TF_ETC2A:
-            *_IFmt = GL_COMPRESSED_RGBA8_ETC2_EAC;
-            *_SrgbFmt = GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC;
-            *_Fmt = GL_COMPRESSED_RGBA8_ETC2_EAC;
-            *_Type = GL_ZERO;
-            *_RtFmt = GL_ZERO;
-            break;
         case BL_TF_ASTC:
             *_IFmt = GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
             *_SrgbFmt = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR;
             *_Fmt = GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
-            *_Type = GL_ZERO;
-            *_RtFmt = GL_ZERO;
-            break;
-        case BL_TF_BC5:
-            *_IFmt = GL_COMPRESSED_RG_RGTC2;
-            *_SrgbFmt = GL_COMPRESSED_RG_RGTC2;
-            *_Fmt = GL_COMPRESSED_RG_RGTC2;
-            *_Type = GL_ZERO;
-            *_RtFmt = GL_ZERO;
-            break;
-        case BL_TF_ETC2RG:
-            *_IFmt = GL_COMPRESSED_RG11_EAC;
-            *_SrgbFmt = GL_COMPRESSED_RG11_EAC;
-            *_Fmt = GL_COMPRESSED_RG11_EAC;
             *_Type = GL_ZERO;
             *_RtFmt = GL_ZERO;
             break;
@@ -1163,49 +1093,9 @@ _FillTextureFormatDX(BLEnum _BLFmt, DXGI_FORMAT* _IFmt, DXGI_FORMAT* _SrgbFmt, D
 {
 	switch (_BLFmt)
 	{
-	case BL_TF_BC1:
-		*_IFmt = DXGI_FORMAT_BC1_UNORM;
-		*_SrgbFmt = DXGI_FORMAT_BC1_UNORM_SRGB;
-		*_RtFmt = DXGI_FORMAT_UNKNOWN;
-		break;
-	case BL_TF_BC1A1:
-		*_IFmt = DXGI_FORMAT_BC1_UNORM;
-		*_SrgbFmt = DXGI_FORMAT_BC1_UNORM_SRGB;
-		*_RtFmt = DXGI_FORMAT_UNKNOWN;
-		break;
-	case BL_TF_BC3:
-		*_IFmt = DXGI_FORMAT_BC3_UNORM;
-		*_SrgbFmt = DXGI_FORMAT_BC3_UNORM_SRGB;
-		*_RtFmt = DXGI_FORMAT_UNKNOWN;
-		break;
-	case BL_TF_ETC2:
-		*_IFmt = DXGI_FORMAT_UNKNOWN;
-		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
-		*_RtFmt = DXGI_FORMAT_UNKNOWN;
-		break;
-	case BL_TF_ETC2A1:
-		*_IFmt = DXGI_FORMAT_UNKNOWN;
-		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
-		*_RtFmt = DXGI_FORMAT_UNKNOWN;
-		break;
-	case BL_TF_ETC2A:
-		*_IFmt = DXGI_FORMAT_UNKNOWN;
-		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
-		*_RtFmt = DXGI_FORMAT_UNKNOWN;
-		break;
 	case BL_TF_ASTC:
-		*_IFmt = DXGI_FORMAT_UNKNOWN;
-		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
-		*_RtFmt = DXGI_FORMAT_UNKNOWN;
-		break;
-	case BL_TF_BC5:
-		*_IFmt = DXGI_FORMAT_BC5_UNORM;
-		*_SrgbFmt = DXGI_FORMAT_BC5_UNORM;
-		*_RtFmt = DXGI_FORMAT_UNKNOWN;
-		break;
-	case BL_TF_ETC2RG:
-		*_IFmt = DXGI_FORMAT_UNKNOWN;
-		*_SrgbFmt = DXGI_FORMAT_UNKNOWN;
+		*_IFmt = DXGI_FORMAT_ASTC_4X4_UNORM;
+		*_SrgbFmt = DXGI_FORMAT_ASTC_4X4_UNORM_SRGB;
 		*_RtFmt = DXGI_FORMAT_UNKNOWN;
 		break;
 	case BL_TF_R8:
@@ -1384,23 +1274,7 @@ _TextureSize(BLEnum _BLFmt, BLU32 _Width, BLU32 _Height, BLU32 _Depth)
 {
 	switch (_BLFmt)
 	{
-	case BL_TF_BC1:
-		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
-	case BL_TF_BC1A1:
-		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
-	case BL_TF_BC3:
-		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
-	case BL_TF_ETC2:
-		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
-	case BL_TF_ETC2A1:
-		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 8;
-	case BL_TF_ETC2A:
-		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
 	case BL_TF_ASTC:
-		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
-	case BL_TF_BC5:
-		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
-	case BL_TF_ETC2RG:
 		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
 	case BL_TF_R8:
 		return _Width * _Height * _Depth * 1;
@@ -1618,15 +1492,7 @@ _GpuIntervention(DUK_CONTEXT* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLB
 			wglSwapIntervalEXT(1);
 		else if (!_PrGpuMem->bVsync)
 			wglSwapIntervalEXT(0);
-		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValidGL(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) && _TextureFormatValidGL(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
-		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1A1] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) && _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
-		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) && _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
-		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) && _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
-		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) && _TextureFormatValidGL(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
-		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValidGL(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) && _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
 		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) && _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
-		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValidGL(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
-		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValidGL(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
 		GLint _extensions = 0;
 		GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
 		for (GLint _idx = 0; _idx < _extensions; ++_idx)
@@ -1716,15 +1582,7 @@ _GpuIntervention(DUK_CONTEXT* _DKC, Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
 		_PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
 	_PrGpuMem->sHardwareCaps.eApiType = BL_DX_API;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = TRUE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1A1] = TRUE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = TRUE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = FALSE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = FALSE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = FALSE;
 	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = FALSE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = TRUE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = FALSE;
 	IDXGIFactory5* _factory;
 	UINT _dxgifactoryflags = 0;
 #if defined(_DEBUG)
@@ -1982,14 +1840,7 @@ _GpuIntervention(DUK_CONTEXT* _DKC, Display* _Display, Window _Window, BLU32 _Wi
 		_PrGpuMem->pDisplay = _Display;
 		_PrGpuMem->nWindow = _Window;
         XSetErrorHandler(_err);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValidGL(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValidGL(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
         _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValidGL(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValidGL(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
         GLint _extensions = 0;
 		GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
 		for (GLint _idx = 0; _idx < _extensions; ++_idx)
@@ -2164,15 +2015,8 @@ _GpuIntervention(DUK_CONTEXT* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
 			return;
 		}
         eglSwapInterval(_PrGpuMem->pEglDisplay, _Vsync ? 1 : 0);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValidGL(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValidGL(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
         _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValidGL(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValidGL(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
-		GLint _extensions = 0;
+        GLint _extensions = 0;
 		GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
 		for (GLint _idx = 0; _idx < _extensions; ++_idx)
 		{
@@ -2332,15 +2176,7 @@ _GpuIntervention(DUK_CONTEXT* _DKC, NSView* _View, BLU32 _Width, BLU32 _Height, 
         [_PrGpuMem->pGLC makeCurrentContext];
         GLint _sync = _Vsync ? 1 : 0;
         [_PrGpuMem->pGLC setValues:&_sync forParameter:NSOpenGLCPSwapInterval];
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValidGL(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) && _TextureFormatValidGL(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1A1] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) && _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) && _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) && _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) && _TextureFormatValidGL(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValidGL(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) && _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
         _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) && _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValidGL(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValidGL(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
         GLint _extensions = 0;
         GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
         for (GLint _idx = 0; _idx < _extensions; ++_idx)
@@ -2459,14 +2295,7 @@ _GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _PrGpuMem->nDepthRB);
         assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
         glBindRenderbuffer(GL_RENDERBUFFER, _PrGpuMem->nBackRB);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = _TextureFormatValidGL(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ETC2, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = _TextureFormatValidGL(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2, GL_ZERO, GL_ZERO, 4);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = _TextureFormatValidGL(GL_COMPRESSED_RGBA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, GL_ZERO, GL_ZERO, 8);
         _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = _TextureFormatValidGL(GL_COMPRESSED_RGBA_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8) & _TextureFormatValidGL(GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = _TextureFormatValidGL(GL_COMPRESSED_RG_RGTC2, GL_ZERO, GL_ZERO, 8);
-        _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = _TextureFormatValidGL(GL_COMPRESSED_RG11_EAC, GL_ZERO, GL_ZERO, 8);
         GLint _extensions = 0;
         GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
         for (GLint _idx = 0; _idx < _extensions; ++_idx)
@@ -2554,14 +2383,7 @@ _GpuIntervention(DUK_CONTEXT* _DKC, GLFWwindow* _Window, BLU32 _Width, BLU32 _He
 	_PrGpuMem->pWindow = _Window;
 	glfwMakeContextCurrent(_Window);
 	_PrGpuMem->sHardwareCaps.nApiVersion = 300;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC1] = FALSE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC3] = FALSE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2] = FALSE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A1] = FALSE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2A] = FALSE;
 	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = FALSE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_BC5] = FALSE;
-	_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ETC2RG] = FALSE;
 	GLint _extensions = 0;
 	GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
 	for (GLint _idx = 0; _idx < _extensions; ++_idx)
@@ -2570,6 +2392,10 @@ _GpuIntervention(DUK_CONTEXT* _DKC, GLFWwindow* _Window, BLU32 _Width, BLU32 _He
 		if (!strcmp(_name, "GL_EXT_texture_filter_anisotropic"))
 		{
 			GL_CHECK_INTERNAL(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &_PrGpuMem->sHardwareCaps.fMaxAnisotropy));
+		}
+		else if (!strcmp(_name, "WEBGL_compressed_texture_astc"))
+		{
+			_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = TRUE;
 		}
 	}
 	_PipelineStateDefaultGL(_Width, _Height);

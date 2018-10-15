@@ -163,11 +163,6 @@ BL_API BLVoid blDeColor4B(
 BL_API BLVoid blDeColor4F(
 	IN BLU32 _Clr, 
 	OUT BLF32 _Clrf[4]);
-
-BL_API BLVoid blRLEDecode(
-	IN BLU8* _Src,
-	IN BLU32 _Dstlen,
-	INOUT BLU8* _Dst);
 #ifdef __cplusplus
 }
 #endif

@@ -31,6 +31,7 @@
 #include "../externals/xml/ezxml.h"
 #include "../externals/miniz/miniz.h"
 #include "../externals/duktape/duktape.h"
+#include "../externals/webp/src/webp/decode.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
 typedef struct _Glyph{
@@ -1768,10 +1769,11 @@ _LabelParse(_BLWidget* _Node)
 						{
 							BLU8* _data = (BLU8*)malloc(_imagesz);
 							blStreamRead(_stream, _imagesz, _data);
-							BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
-							blRLEDecode(_data, _width * _height * _channels, _data2);
+							if (_channels == 4)
+								_texdata = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+							else
+								_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
 							free(_data);
-							_texdata = _data2;
 						}
 						else
 						{
@@ -2937,15 +2939,7 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 				blStreamRead(_stream, sizeof(BLU32), &_imagesz);
 				_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
 				break;
-			case FOURCC_INTERNAL('A', 'S', 'T', '1'):
-				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-				_format = BL_TF_ASTC;
-				break;
-			case FOURCC_INTERNAL('A', 'S', 'T', '2'):
-				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-				_format = BL_TF_ASTC;
-				break;
-			case FOURCC_INTERNAL('A', 'S', 'T', '3'):
+			case FOURCC_INTERNAL('A', 'S', 'T', 'C'):
 				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
 				_format = BL_TF_ASTC;
 				break;
@@ -2955,10 +2949,11 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 			{
 				BLU8* _data = (BLU8*)malloc(_imagesz);
 				blStreamRead(_stream, _imagesz, _data);
-				BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
-				blRLEDecode(_data, _width * _height * _channels, _data2);
+				if (_channels == 4)
+					_texdata = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+				else
+					_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
 				free(_data);
-				_texdata = _data2;
 			}
 			else
 			{
@@ -8165,10 +8160,11 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 							{
 								BLU8* _data = (BLU8*)malloc(_imagesz);
 								blStreamRead(_stream, _imagesz, _data);
-								BLU8* _data2 = (BLU8*)malloc(_width * _height * _channels);
-								blRLEDecode(_data, _width * _height * _channels, _data2);
+								if (_channels == 4)
+									_texdata = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+								else
+									_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
 								free(_data);
-								_texdata = _data2;
 							}
 							else
 							{

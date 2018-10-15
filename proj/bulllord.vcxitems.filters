@@ -738,9 +738,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aes.c">
       <Filter>externals\mbedtls</Filter>
     </ClCompile>
@@ -1150,6 +1147,9 @@
       <Filter>externals\webp\dsp</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2308,6 +2308,30 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\util.h">
       <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\config.h">
+      <Filter>externals\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\decode.h">
+      <Filter>externals\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\demux.h">
+      <Filter>externals\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\encode.h">
+      <Filter>externals\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\format_constants.h">
+      <Filter>externals\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\mux.h">
+      <Filter>externals\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\mux_types.h">
+      <Filter>externals\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\types.h">
+      <Filter>externals\webp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
