@@ -49,3 +49,5 @@ code/externals/opus/celt/dump_modes/Makefile
 *.prefs
 *.exe
 *.unsuccessfulbuild
+*.d
+*.class
