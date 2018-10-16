@@ -347,6 +347,7 @@ typedef struct _GpuMember {
 	EGLContext pEglContext;
 	EGLSurface pEglSurface;
 	EGLConfig pEglConfig;
+	BLBool bAEPSupport;
 #elif defined(BL_PLATFORM_WEB)
 	GLFWwindow* pWindow;
 #endif
@@ -1908,7 +1909,7 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_ANDROID)
 BLVoid
-_GpuIntervention(DUK_CONTEXT* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync, BLBool _Backend)
+_GpuIntervention(DUK_CONTEXT* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync, BLBool _Backend, BLBool _AEP)
 {
 	if (_Backend)
 	{
@@ -1952,6 +1953,7 @@ _GpuIntervention(DUK_CONTEXT* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
 	{
 		_PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
 		_PrGpuMem->sHardwareCaps.nApiVersion = 310;
+		_PrGpuMem->bAEPSupport = _AEP;
 		EGLint _configattrs[] =
 		{
 			EGL_SAMPLE_BUFFERS,     0,

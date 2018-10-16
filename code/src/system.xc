@@ -99,7 +99,7 @@ extern BLVoid _GpuIntervention(DUK_CONTEXT*, Display*, Window, BLU32, BLU32, GLX
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_ANDROID)
-extern BLVoid _GpuIntervention(DUK_CONTEXT*, ANativeWindow*, BLU32, BLU32, BLBool, BLBool);
+extern BLVoid _GpuIntervention(DUK_CONTEXT*, ANativeWindow*, BLU32, BLU32, BLBool, BLBool, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_WEB)
@@ -245,6 +245,7 @@ typedef struct _SystemMember {
 	BLS32 nMsgWrite;
 	BLBool bAvtivityFocus;
 	BLBool bBackendState;
+	BLBool bAEPSupport;
 #elif defined(BL_PLATFORM_OSX)
 	NSAutoreleasePool* pPool;
     NSWindow* pWindow;
@@ -1802,9 +1803,10 @@ extern "C" {
 		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str, INVALID_GUID);
 		_Env->ReleaseStringUTFChars(_Text, (const BLAnsi*)_utf8str);
 	}
-	JNIEXPORT BLVoid JNICALL Java_org_bulllord_lib_BLActivity_activityReady(JNIEnv* _Env, jobject, jobject _Activity)
+	JNIEXPORT BLVoid JNICALL Java_org_bulllord_lib_BLActivity_activityReady(JNIEnv* _Env, jobject, jobject _Activity, jint _Aep)
 	{
 		_PrSystemMem->pBLJava = _Activity;
+		_PrSystemMem->bAEPSupport = (_Aep == 1) ? TRUE : FALSE;
 		JNIEnv* _env = _PrSystemMem->pActivity->env;
 		_PrSystemMem->pBLJava = _env->NewGlobalRef(_PrSystemMem->pBLJava);
 	}
@@ -1948,7 +1950,7 @@ _ShowWindow()
 	_PrSystemMem->pActivity->vm->DetachCurrentThread();
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
 	while (!_PrSystemMem->pWindow);
-	_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler, FALSE);
+	_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler, FALSE, _PrSystemMem->bAEPSupport);
 }
 BLVoid
 _PollMsg()
@@ -3524,7 +3526,7 @@ _SystemStep()
 #if defined(BL_PLATFORM_ANDROID)
 		if (_PrSystemMem->bBackendState)
 		{
-			_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler, TRUE);
+			_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler, TRUE, _PrSystemMem->bAEPSupport);
 			_PrSystemMem->bBackendState = FALSE;
 		}
 #endif

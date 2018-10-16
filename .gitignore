@@ -40,3 +40,12 @@ code/externals/opus/celt/dump_modes/Makefile
 *.pri
 *.o-3bff322a
 *.sqlite
+*.lastbuildstate
+*.tree
+*.snap
+*.unsuccessfulbuild
+*.o-0e616288
+*.index
+*.prefs
+*.exe
+*.unsuccessfulbuild

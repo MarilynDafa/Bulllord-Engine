@@ -55,33 +55,32 @@ public class BLActivity extends NativeActivity {
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);	
-		mActivity = (BLActivity)this;	
-		getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener(){
-			@Override
-			public void onGlobalLayout(){
-				View view = getWindow().getDecorView();
-				int visibility = 0;
-				if (Build.VERSION.SDK_INT >= 14)
-					visibility |= View.SYSTEM_UI_FLAG_LOW_PROFILE;
-				if (Build.VERSION.SDK_INT >= 16)
-					visibility |= View.SYSTEM_UI_FLAG_FULLSCREEN;
-				if (Build.VERSION.SDK_INT >= 19)
-					visibility |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-				view.setSystemUiVisibility(visibility);
-			}
-		});
-		runOnUiThread(new Runnable() {
+		mActivity = (BLActivity)this;
+		mActivity.runOnUiThread(new Runnable()
+		{
 			@Override
 			public void run() {
 				mInput = new BLText((Context)mActivity);
 				ViewGroup.LayoutParams param = new ViewGroup.LayoutParams(0, 0);
 				mActivity.addContentView(mInput, param);
 				mInput.setVisibility(View.GONE);
-				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+				InputMethodManager imm = (InputMethodManager)mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(mInput.getWindowToken(), 0);
-				activityReady(mActivity);
 			}
 		});
+		mActivity.getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener()
+		{
+			@Override
+			public void onGlobalLayout()
+			{				
+				View view = mActivity.getWindow().getDecorView();
+				view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE|View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+ 			}
+		});
+		if (getPackageManager().hasSystemFeature("android.hardware.opengles.aep"))
+			activityReady(mActivity, 1);
+		else
+			activityReady(mActivity, 0);
 	}	
 	public void showTextInput(int keymode) {
 		 mKeyMode = keymode;

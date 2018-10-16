@@ -94,7 +94,10 @@ public class BLActivity extends NativeActivity implements BLGoogleIAB.IBillingHa
  			}
 		});
 		mIab = new BLGoogleIAB(this, this);
-		activityReady(mActivity);
+		if (getPackageManager().hasSystemFeature("android.hardware.opengles.aep"))
+			activityReady(mActivity, 1);
+		else
+			activityReady(mActivity, 0);
 	}	
 	@Override
     protected void onDestroy()
