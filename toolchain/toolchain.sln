@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imagec", "imagec\imagec.vcxproj", "{B53E511F-D676-47D5-820C-DEA11915EFE4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bpack", "bpack\bpack.vcxproj", "{D976E07F-4E50-4426-ABBD-20497FCEF33B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,13 +23,21 @@ Global
 		{B53E511F-D676-47D5-820C-DEA11915EFE4}.Release|x64.Build.0 = Release|x64
 		{B53E511F-D676-47D5-820C-DEA11915EFE4}.Release|x86.ActiveCfg = Release|Win32
 		{B53E511F-D676-47D5-820C-DEA11915EFE4}.Release|x86.Build.0 = Release|Win32
+		{D976E07F-4E50-4426-ABBD-20497FCEF33B}.Debug|x64.ActiveCfg = Debug|x64
+		{D976E07F-4E50-4426-ABBD-20497FCEF33B}.Debug|x64.Build.0 = Debug|x64
+		{D976E07F-4E50-4426-ABBD-20497FCEF33B}.Debug|x86.ActiveCfg = Debug|Win32
+		{D976E07F-4E50-4426-ABBD-20497FCEF33B}.Debug|x86.Build.0 = Debug|Win32
+		{D976E07F-4E50-4426-ABBD-20497FCEF33B}.Release|x64.ActiveCfg = Release|x64
+		{D976E07F-4E50-4426-ABBD-20497FCEF33B}.Release|x64.Build.0 = Release|x64
+		{D976E07F-4E50-4426-ABBD-20497FCEF33B}.Release|x86.ActiveCfg = Release|Win32
+		{D976E07F-4E50-4426-ABBD-20497FCEF33B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		Qt5Version = $(DefaultQtVersion)
 		SolutionGuid = {6FAEB73C-3E59-4520-8EB5-EEBC8DAD5AA1}
+		Qt5Version = $(DefaultQtVersion)
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
