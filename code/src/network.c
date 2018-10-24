@@ -2032,7 +2032,7 @@ blSendNetMsg(IN BLU32 _ID, IN BLAnsi* _JsonData, IN BLBool _Critical, IN BLBool 
 	_BLNetMsg* _msg = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
 	_msg->nID = _ID;
 	_msg->eNetType = _Nettype;
-	_msg->nLength = strlen(_JsonData);
+	_msg->nLength = (BLU32)strlen(_JsonData);
 	BLU8* _stream;
 	BLU32 _sz;
 	_stream = (BLU8*)alloca(((_msg->nLength + (BLU32)(_msg->nLength * 0.06)) > 66) ? (_msg->nLength + (BLU32)(_msg->nLength * 0.06)) : 66);

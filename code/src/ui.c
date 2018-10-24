@@ -1,4 +1,4 @@
-﻿/*
+/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
 
@@ -13062,7 +13062,7 @@ blUIPanelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sPanel.aPixmap, 0, sizeof(BLAnsi) * 128);	
 	BLAnsi _texfile[260] = { 0 };
-	BLU32 _pixlen = strlen(_Pixmap);
+	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
 	{
 		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
@@ -13263,7 +13263,7 @@ blUIButtonPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sButton.aPixmap, 0, sizeof(BLAnsi) * 128);
     BLAnsi _texfile[260] = { 0 };
-	BLU32 _pixlen = strlen(_Pixmap);
+	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
 	{
 		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
@@ -13472,7 +13472,7 @@ blUILabelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sLabel.aPixmap, 0, sizeof(BLAnsi) * 128);
 	BLAnsi _texfile[260] = { 0 };
-	BLU32 _pixlen = strlen(_Pixmap);
+	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
 	{
 		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
@@ -13628,7 +13628,7 @@ blUICheckPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sCheck.aPixmap, 0, sizeof(BLAnsi) * 128);
 	BLAnsi _texfile[260] = { 0 };
-	BLU32 _pixlen = strlen(_Pixmap);
+	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
 	{
 		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
@@ -13836,7 +13836,7 @@ blUITextPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sText.aPixmap, 0, sizeof(BLAnsi) * 128);
 	BLAnsi _texfile[260] = { 0 };
-	BLU32 _pixlen = strlen(_Pixmap);
+	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
 	{
 		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
@@ -14118,7 +14118,7 @@ blUIProgressPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sProgress.aPixmap, 0, sizeof(BLAnsi) * 128);
 	BLAnsi _texfile[260] = { 0 };
-	BLU32 _pixlen = strlen(_Pixmap);
+	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
 	{
 		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
@@ -14299,7 +14299,7 @@ blUISliderPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sSlider.aPixmap, 0, sizeof(BLAnsi) * 128);
 	BLAnsi _texfile[260] = { 0 };
-	BLU32 _pixlen = strlen(_Pixmap);
+	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
 	{
 		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
@@ -14500,7 +14500,7 @@ blUITablePixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sTable.aPixmap, 0, sizeof(BLAnsi) * 128);
 	BLAnsi _texfile[260] = { 0 };
-	BLU32 _pixlen = strlen(_Pixmap);
+	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
 	{
 		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
@@ -14803,7 +14803,7 @@ blUIDialPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	memset(_widget->uExtension.sDial.aPixmap, 0, sizeof(BLAnsi) * 128);
 	BLAnsi _texfile[260] = { 0 };
-	BLU32 _pixlen = strlen(_Pixmap);
+	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
 	{
 		BLU32 _tmplen = (BLU32)strlen(_Pixmap);
