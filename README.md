@@ -60,7 +60,13 @@ Supported compilers:
  * iOS </br> 
     OS: OSX</br>IDE: xcode  </br>
  * Web </br> 
-    OS: Windows 10 PC and emscripten installed  </br>
+    OS: Windows 10 PC and emsdk installed  </br>
+    	git clone https://github.com/juj/emsdk.git </br>
+	cd emsdk </br>
+	emsdk install --build=Release sdk-incoming-64bit binaryen-master-64bit --vs2017 </br>
+	emsdk activate --global --build=Release sdk-incoming-64bit binaryen-master-64bit </br>
+	git clone https://github.com/juj/vs-tool </br>
+	Copy the folders Emscripten to C:/Program Files (x86)/MSBuild/Microsoft.Cpp/v4.0/Platforms </br>
     IDE: visual studio 2017    </br>
 	Tips: Only support WebGL2, please use firefox or chrome</br>
  
