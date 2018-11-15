@@ -22,7 +22,6 @@
 #include "../headers/system.h"
 #include "../headers/util.h"
 #include "../externals/miniz/miniz.h"
-#include "../externals/sqlite3/sqlite3.h"
 #include "internal/dictionary.h"
 #include "internal/array.h"
 #include "internal/list.h"
@@ -30,6 +29,8 @@
 #include "internal/internal.h"
 #if defined BL_PLATFORM_ANDROID
 #	include <android/asset_manager.h>
+#elif defined(BL_PLATFORM_WEB)
+#	include <emscripten/fetch.h>
 #endif
 #include "../externals/duktape/duktape.h"
 #pragma pack(1)
@@ -89,8 +90,6 @@ typedef struct _StreamIOMember {
 	DUK_CONTEXT* pDukContext;
 	BLVoid* pAndroidAM;
 	BLArray* pArchives;
-	sqlite3* pSqlDB;
-	sqlite3_stmt* pSqlVM;
 	BLS32 nSqlRef;
 	BLBool bSqlFinish;
 	BLThread* pLoadThread;
@@ -101,28 +100,16 @@ typedef struct _StreamIOMember {
 }_BLStreamIOMember;
 static _BLStreamIOMember* _PrStreamIOMem = NULL;
 extern BLBool _FontFace(const BLAnsi* _Filename);
-static BLS32
-_ProcessDdlRow(BLVoid* _Db, BLS32 _Count, BLAnsi** _Values, BLAnsi** _Columns)
-{
-    if (_Count != 1)
-        return -1;
-    if (sqlite3_exec((sqlite3*)(_Db), _Values[0], NULL, NULL, NULL) != SQLITE_OK)
-        return -1;
-    return 0;
-}
-static BLS32
-_ProcessDmlRow(BLVoid* _Db, BLS32 _Count, BLAnsi** _Values, BLAnsi** _Columns)
-{
-	BLAnsi* _stmt;
-    if (_Count != 1)
-        return -1;
-    _stmt = sqlite3_mprintf("INSERT INTO main.%q SELECT * FROM origin.%q", _Values[0], _Columns[0]);
-    if (sqlite3_exec((sqlite3*)(_Db), _stmt, 0, 0, 0) != SQLITE_OK)
-        return -1;
-    sqlite3_free(_stmt);
-    return 0;
-}
 #if defined(BL_PLATFORM_WEB)
+BLVoid
+_WriteSuccess(emscripten_fetch_t* _Fetch)
+{
+	emscripten_fetch_close(_Fetch);
+}
+BLVoid _WriteFailure(emscripten_fetch_t* _Fetch)
+{
+	emscripten_fetch_close(_Fetch);
+}
 static BLVoid 
 _OnWGetLoaded(const BLAnsi* _Filename)
 {
@@ -935,6 +922,17 @@ blFileWrite(IN BLAnsi* _Filename, IN BLU32 _Count, IN BLU8* _Data)
 		CloseHandle(_fp);
 		return TRUE;
 	}
+#elif defined(BL_PLATFORM_WEB)
+	emscripten_fetch_attr_t _attr;
+	emscripten_fetch_attr_init(&_attr);
+	strcpy(_attr.requestMethod, "EM_IDB_STORE");
+	_attr.attributes = EMSCRIPTEN_FETCH_REPLACE | EMSCRIPTEN_FETCH_PERSIST_FILE;
+	_attr.requestData = _Data;
+	_attr.requestDataSize = _Count;
+	_attr.onsuccess = _WriteSuccess;
+	_attr.onerror = _WriteFailure;
+	emscripten_fetch(&_attr, _path);
+	return TRUE;
 #else
 	FILE* _fp = fopen(_path , "wb");
     if (FILE_INVALID_INTERNAL(_fp))
@@ -967,6 +965,14 @@ blFileDelete(IN BLAnsi* _Filename)
 		return FALSE;
 	else
 		return TRUE;
+#elif defined(BL_PLATFORM_WEB)
+	emscripten_fetch_attr_t _attr;
+	emscripten_fetch_attr_init(&_attr);
+	strcpy(_attr.requestMethod, "EM_IDB_DELETE");
+	_attr.onsuccess = _WriteSuccess;
+	_attr.onerror = _WriteFailure;
+	emscripten_fetch(&_attr, _tmpname);
+	return TRUE;
 #else
 	if (remove(_tmpname))
 		return FALSE;
@@ -1377,182 +1383,6 @@ blArchiveQuery(IN BLAnsi* _Archive, OUT BLU32* _Version)
     }
 	_Version = NULL;
     return FALSE;
-}
-BLBool
-blGenSql(IN BLAnsi* _Dbname, IN BLAnsi* _Dbpwd, IN BLBool _Inmem)
-{
-	BLS32 _ret , _i;
-    sqlite3* _db;
-    BLAnsi _tmpname[260];
-    BLAnsi _path[260] = {0};
-	_PrStreamIOMem->nSqlRef = 0;
-    strcpy(_tmpname , _Dbname);
-    for (_i = 0 ; _i < (BLS32)strlen(_tmpname) ; ++_i)
-    {
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-        if(_tmpname[_i] == '/')
-            _tmpname[_i] = '\\';
-#else
-        if(_tmpname[_i] == '\\')
-            _tmpname[_i] = '/';
-#endif
-    }
-    strcpy(_path , blWorkingDir());
-    strcat(_path , _tmpname);
-    _ret = sqlite3_open(_path, &_db);
-    if (_ret != SQLITE_OK)
-    {
-        if(_db)
-            sqlite3_close(_db);
-        memset(_path , 0 , sizeof(_path));
-        strcpy(_path , blUserFolderDir());
-        strcat(_path , _tmpname);
-        _ret = sqlite3_open(_path, &_db);
-        if(_ret != SQLITE_OK)
-        {
-            if(_db)
-                sqlite3_close(_db);
-            return FALSE;
-        }
-    }
-    if (_Dbpwd)
-        sqlite3_key(_db , _Dbpwd , (BLS32)strlen(_Dbpwd));
-    if (_Inmem)
-    {
-        sqlite3* _memdb;
-        BLAnsi _sql[512] = {0};
-        sqlite3_open(":memory:", &_memdb);
-        if(_Dbpwd)
-			sqlite3_key(_memdb , _Dbpwd , (BLS32)strlen(_Dbpwd));
-        sqlite3_exec(_db, "BEGIN", NULL, NULL, NULL);
-        sqlite3_exec(_db, "SELECT sql FROM sqlite_master WHERE sql NOT NULL", _ProcessDdlRow, _memdb, NULL);
-        sqlite3_exec(_db, "COMMIT", NULL, NULL, NULL);
-        sqlite3_close(_db);
-        strcpy(_sql , "ATTACH DATABASE '");
-        strcat(_sql , _Dbname);
-        strcat(_sql , "' as origin");
-        if(sqlite3_exec(_memdb, _sql, NULL, NULL, NULL) != SQLITE_OK)
-            return FALSE;
-        if(_Dbpwd)
-			sqlite3_key(_memdb , _Dbpwd , (BLS32)strlen(_Dbpwd));
-        sqlite3_exec(_memdb, "BEGIN", NULL, NULL, NULL);
-        sqlite3_exec(_memdb, "SELECT name FROM origin.sqlite_master WHERE type='table'", &_ProcessDmlRow, _memdb, NULL);
-        sqlite3_exec(_memdb, "COMMIT", NULL, NULL, NULL);
-		_PrStreamIOMem->pSqlDB = _memdb;
-    }
-    else
-		_PrStreamIOMem->pSqlDB = _db;
-    return TRUE;
-}
-BLVoid
-blDeleteSql()
-{
-    sqlite3_close(_PrStreamIOMem->pSqlDB);
-}
-BLBool
-blSqlCmdBegin(IN BLAnsi* _Cmd)
-{
-    BLS32 _result = SQLITE_ERROR , _i;
-    const BLAnsi* _tail = NULL;
-    BLAnsi _tmp[256] = {0};
-    strcpy(_tmp, _Cmd);
-    strcat(_tmp , ";");
-    for (_i = 0; _i < 1000; _i++)
-    {
-        _result = sqlite3_prepare(_PrStreamIOMem->pSqlDB , _tmp, (BLS32)strlen(_tmp) , &_PrStreamIOMem->pSqlVM, (const BLAnsi**)&_tail);
-        if (_result != SQLITE_BUSY)
-            break;
-        blYield();
-    }
-    if (_result != SQLITE_OK)
-        return FALSE;
-	_PrStreamIOMem->nSqlRef++;
-    assert(_PrStreamIOMem->nSqlRef<=2);
-    return TRUE;
-}
-BLVoid
-blSqlCmdEnd()
-{
-	_PrStreamIOMem->nSqlRef--;
-    if (!_PrStreamIOMem->nSqlRef)
-    {
-        sqlite3_reset(_PrStreamIOMem->pSqlVM);
-        sqlite3_finalize(_PrStreamIOMem->pSqlVM);
-    }
-}
-BLS64
-blSqlValueAsInteger(IN BLAnsi* _Name)
-{
-    BLS32 _count = sqlite3_column_count(_PrStreamIOMem->pSqlVM);
-    BLAnsi* _colname = NULL;
-    BLS32 _index;
-    for (_index = 0; _index < _count; _index++)
-    {
-        _colname = (BLAnsi*)sqlite3_column_name(_PrStreamIOMem->pSqlVM, _index);
-        if(!strcpy(_colname , _Name))
-            break;
-    }
-    return sqlite3_column_int64(_PrStreamIOMem->pSqlVM, _index);
-}
-BLF64
-blSqlValueAsNumber(IN BLAnsi* _Name)
-{
-    BLS32 _count = sqlite3_column_count(_PrStreamIOMem->pSqlVM);
-    BLAnsi* _colname = NULL;
-    BLS32 _index;
-    for (_index = 0; _index < _count; _index++)
-    {
-        _colname = (BLAnsi*)sqlite3_column_name(_PrStreamIOMem->pSqlVM, _index);
-        if(!strcpy(_colname , _Name))
-            break;
-    }
-    return sqlite3_column_double(_PrStreamIOMem->pSqlVM, _index);
-}
-const BLUtf8*
-blSqlValueAsString(IN BLAnsi* _Name)
-{
-    BLS32 _count = sqlite3_column_count(_PrStreamIOMem->pSqlVM);
-    BLAnsi* _colname = NULL;
-    BLS32 _index;
-    for (_index = 0; _index < _count; _index++)
-    {
-        _colname = (BLAnsi*)sqlite3_column_name(_PrStreamIOMem->pSqlVM, _index);
-        if(!strcpy(_colname , _Name))
-            break;
-    }
-    return sqlite3_column_text(_PrStreamIOMem->pSqlVM, _index);
-}
-const BLVoid*
-blSqlValueAsBinary(IN BLAnsi* _Name)
-{
-	BLS32 _count = sqlite3_column_count(_PrStreamIOMem->pSqlVM);
-	BLAnsi* _colname = NULL;
-	BLS32 _index;
-	for (_index = 0; _index < _count; _index++)
-	{
-		_colname = (BLAnsi*)sqlite3_column_name(_PrStreamIOMem->pSqlVM, _index);
-		if(!strcpy(_colname , _Name))
-			break;
-	}
-	return sqlite3_column_blob(_PrStreamIOMem->pSqlVM, _index);
-}
-BLBool
-blSqlRetrieveRow()
-{
-    if (!_PrStreamIOMem->bSqlFinish)
-    {
-        switch(sqlite3_step(_PrStreamIOMem->pSqlVM))
-        {
-        case SQLITE_BUSY: return FALSE;
-        case SQLITE_ROW: return TRUE;
-        case SQLITE_DONE: _PrStreamIOMem->bSqlFinish = TRUE; return FALSE;
-        case SQLITE_ERROR: _PrStreamIOMem->bSqlFinish = TRUE; sqlite3_reset(_PrStreamIOMem->pSqlVM); return FALSE;
-        case SQLITE_MISUSE: _PrStreamIOMem->bSqlFinish = TRUE; return FALSE;
-        default: _PrStreamIOMem->bSqlFinish = TRUE; return FALSE;
-        }
-    }
-    else
-        return FALSE;
 }
 BLVoid 
 blPreload(IN BLAnsi* _Filenames, IN BLBool _Flush)

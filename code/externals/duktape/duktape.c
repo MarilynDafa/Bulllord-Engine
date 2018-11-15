@@ -157,6 +157,7 @@
  *  Source files should not include individual header files, as they
  *  have not been designed to be individually included.
  */
+#ifndef EMSCRIPTEN
 
 #if !defined(DUK_INTERNAL_H_INCLUDED)
 #define DUK_INTERNAL_H_INCLUDED
@@ -96799,3 +96800,4 @@ DUK_INTERNAL duk_double_t duk_util_tinyrandom_get_double(duk_hthread *thr) {
 #undef DUK__RANDOM_XOROSHIRO128PLUS
 #undef DUK__RND_BIT
 #undef DUK__UPDATE_RND
+#endif

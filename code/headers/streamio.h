@@ -79,32 +79,6 @@ BL_API BLBool blArchivePatch(
 BL_API BLBool blArchiveQuery(
 	IN BLAnsi* _Archive,
 	OUT BLU32* _Version);
-    
-BL_API BLBool blGenSql(
-	IN BLAnsi* _Dbname,
-	IN BLAnsi* _Dbpwd,
-	IN BLBool _Inmem);
-    
-BL_API BLVoid blDeleteSql();
-    
-BL_API BLBool blSqlCmdBegin(
-	IN BLAnsi* _Cmd);
-    
-BL_API BLVoid blSqlCmdEnd();
-    
-BL_API BLS64 blSqlValueAsInteger(
-	IN BLAnsi* _Name);
-    
-BL_API BLF64 blSqlValueAsNumber(
-	IN BLAnsi* _Name);
-    
-BL_API const BLUtf8* blSqlValueAsString(
-	IN BLAnsi* _Name);
-
-BL_API const BLVoid* blSqlValueAsBinary(
-	IN BLAnsi* _Name);
-    
-BL_API BLBool blSqlRetrieveRow();
 
 BL_API BLVoid blPreload(
 	IN BLAnsi* _Filenames, 

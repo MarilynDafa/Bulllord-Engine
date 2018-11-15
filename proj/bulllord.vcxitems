@@ -1097,35 +1097,6 @@
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\codec.c">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\codecext.c">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\extensionfunctions.c">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\rijndael.c">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sha2.c">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\shell.c">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3.c">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3secure.c">
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-      <ExcludedFromBuild>false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\userauth.c">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\alpha_dec.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
@@ -2217,24 +2188,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudec.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudectab.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpegaudio.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\codec.h">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\rijndael.h">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sha2.h">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3.h">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3ext.h">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3userauth.h">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\alphai_dec.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\common_dec.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8i_dec.h" />

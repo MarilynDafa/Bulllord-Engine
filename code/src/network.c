@@ -31,6 +31,9 @@
 #include "../externals/mbedtls/pk.h"
 #include "../externals/mbedtls/entropy.h"
 #include "../externals/mbedtls/ctr_drbg.h"
+#ifdef EMSCRIPTEN
+#	include <emscripten/fetch.h>
+#endif
 #pragma pack(1)
 typedef struct _NetMsg {
 	BLU32 nID;
@@ -108,6 +111,8 @@ _FillAddr(const BLAnsi* _Host, BLU16 _Port, struct sockaddr_in* _Out, struct soc
             _hints.ai_socktype = SOCK_STREAM;
 #if defined(WIN32)
 			_hints.ai_flags = AI_NUMERICHOST;
+#elif defined(EMSCRIPTEN)
+			_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
             _hints.ai_flags = AI_DEFAULT;
 #endif
@@ -149,6 +154,8 @@ _FillAddr(const BLAnsi* _Host, BLU16 _Port, struct sockaddr_in* _Out, struct soc
             _hints.ai_socktype = SOCK_DGRAM;
 #if defined(WIN32)
 			_hints.ai_flags = AI_NUMERICHOST;
+#elif defined(EMSCRIPTEN)
+			_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
 			_hints.ai_flags = AI_DEFAULT;
 #endif
@@ -189,6 +196,8 @@ _FillAddr(const BLAnsi* _Host, BLU16 _Port, struct sockaddr_in* _Out, struct soc
             _hints.ai_socktype = SOCK_STREAM;
 #if defined(WIN32)
 			_hints.ai_flags = AI_NUMERICHOST;
+#elif defined(EMSCRIPTEN)
+			_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
 			_hints.ai_flags = AI_DEFAULT;
 #endif
@@ -442,8 +451,9 @@ _Recv(BLSocket _Sock, BLU32* _Msgsz)
 }
 #if defined(BL_PLATFORM_WEB)
 static BLVoid
-_OnWGetLoaded(BLU32 _Dummy, BLVoid* _Param, const BLAnsi* _Filename)
+_OnFetchSucceeded(emscripten_fetch_t* _Fetch)
 {
+	emscripten_fetch_close(_Fetch);
 	const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
 	const BLAnsi* _local = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList);
 	free(_url);
@@ -459,11 +469,12 @@ _OnWGetLoaded(BLU32 _Dummy, BLVoid* _Param, const BLAnsi* _Filename)
 		}
 	}
 	if (_PrNetworkMem->pDownList->nSize)
-		blBeginDownload();
+		blDownload();
 }
 static BLVoid
-_OnWGetError(BLU32 _Dummy, BLVoid* _Param, BLS32 _Dummy2)
+_OnFetchFailed(emscripten_fetch_t* _Fetch)
 {
+	emscripten_fetch_close(_Fetch);
 	if (_PrNetworkMem->pDownList->nSize)
 	{
 		const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
@@ -473,13 +484,15 @@ _OnWGetError(BLU32 _Dummy, BLVoid* _Param, BLS32 _Dummy2)
 		blArrayPopFront(_PrNetworkMem->pDownList);
 		blArrayPopFront(_PrNetworkMem->pLocalList);
 		if (_PrNetworkMem->pDownList->nSize)
-			blBeginDownload();
+			blDownload();
 	}
 }
 static BLVoid
-_OnWGetProg(BLU32 _Dummy, BLVoid* _Param, BLS32 _Prog)
+_OnFetchProg(emscripten_fetch_t* _Fetch)
 {
-	_PrNetworkMem->nCurDownSize = _Prog;
+	_PrNetworkMem->nCurDownSize = _Fetch->dataOffset;
+	_PrNetworkMem->nCurDownTotal = _Fetch->totalBytes;
+	printf("Downloading %s.. %.2f%% complete.\n", _Fetch->url, _Fetch->dataOffset * 100.0 / _Fetch->totalBytes);
 }
 static BLVoid
 _OnWebSocketError(BLS32 _Fd, BLS32 _Err, const BLAnsi* _Msg, BLVoid* _UserData)
@@ -545,7 +558,7 @@ _OnWebSocketMsg(BLS32 _Fd, BLVoid* _UserData)
 		free(_bufin);
 	}
 }
-#endif
+#else
 static BLU32
 _HttpDownloadRequest(BLSocket _Sock, const BLAnsi* _Host, const BLAnsi* _Addr, const BLAnsi* _Filename, BLU32 _Pos, BLU32 _End, BLAnsi _Redirect[1024])
 {
@@ -996,6 +1009,333 @@ failed:
 }
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 static DWORD __stdcall
+_NetDownMainThread(BLVoid* _Userdata)
+#else
+static BLVoid*
+_NetDownMainThread(BLVoid* _Userdata)
+#endif
+{
+	while (_PrNetworkMem->pDownList->nSize > 0)
+	{
+		blMutexLock(_PrNetworkMem->pDownList->pMutex);
+		blMutexLock(_PrNetworkMem->pLocalList->pMutex);
+		BLU16 _port = 80;
+		BLS32 _idx = 0;
+		BLU32 _n = 0, _filesz;
+		struct sockaddr_in _sin;
+		struct sockaddr_in6 _sin6;
+		BLAnsi _host[1024] = { 0 };
+		BLAnsi _path[1024] = { 0 };
+		BLAnsi _file[1024] = { 0 };
+		BLAnsi _writefile[260] = { 0 };
+		BLAnsi _redirect[1024] = { 0 };
+		BLSocket _httpsok = INVALID_SOCKET_INTERNAL;
+		BLS32 _nodelay = 1, _reuse = 1;
+		BLU32 _sectsz;
+	redirect:
+		_port = 80;
+		_idx = 0;
+		_n = 0;
+		memset(_host, 0, sizeof(_host));
+		memset(_path, 0, sizeof(_path));
+		memset(_file, 0, sizeof(_file));
+		memset(_writefile, 0, sizeof(_writefile));
+		const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
+		const BLAnsi* _localfile = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList);
+		if (strncmp(_url, "http://", 7) != 0)
+			goto failed;
+		for (_idx = 7; _idx < (BLS32)strlen(_url) - 7; ++_idx)
+		{
+			if (_url[_idx] == '/')
+				break;
+			else
+				_host[_idx - 7] = _url[_idx];
+		}
+		for (_idx = 0; _idx < (BLS32)strlen(_host); ++_idx)
+		{
+			if (_host[_idx] == ':')
+			{
+				_port = atoi(_host + _idx + 1);
+				_host[_idx] = 0;
+				break;
+			}
+		}
+		for (_idx = (BLS32)strlen(_url) - 1; _idx >= 0; --_idx)
+		{
+			if (_url[_idx] == '/')
+				break;
+		}
+		strncpy(_path, _url, _idx + 1);
+		strncpy(_file, _url + _idx + 1, strlen(_url) - _idx - 1);
+		strcpy(_writefile, _localfile);
+		strcat(_writefile, _file);
+		_httpsok = socket(_PrNetworkMem->bClientIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
+		if (_PrNetworkMem->bClientIpv6)
+			_FillAddr(_host, _port, NULL, &_sin6, BL_NT_HTTP);
+		else
+			_FillAddr(_host, _port, &_sin, NULL, BL_NT_HTTP);
+		if (!_PrNetworkMem->bClientIpv6)
+		{
+			if (connect(_httpsok, (struct sockaddr*)&_sin, sizeof(_sin)) < 0)
+			{
+				if (0xEA == _GetError())
+				{
+					for (_n = 0; _n < 64; ++_n)
+					{
+						if (_Select(_httpsok, FALSE))
+							goto success;
+					}
+				}
+				goto failed;
+			}
+		}
+		else
+		{
+			if (connect(_httpsok, (struct sockaddr*)&_sin6, sizeof(_sin6)) < 0)
+			{
+				if (0xEA == _GetError())
+				{
+					for (_n = 0; _n < 64; ++_n)
+					{
+						if (_Select(_httpsok, FALSE))
+							goto success;
+					}
+				}
+				goto failed;
+			}
+		}
+		_nodelay = 1;
+		_reuse = 1;
+		setsockopt(_httpsok, IPPROTO_TCP, TCP_NODELAY, (BLAnsi*)&_nodelay, sizeof(_nodelay));
+		setsockopt(_httpsok, SOL_SOCKET, SO_REUSEADDR, (BLAnsi*)&_reuse, sizeof(_reuse));
+		struct linger _lin;
+		_lin.l_linger = 0;
+		_lin.l_onoff = 1;
+		setsockopt(_httpsok, SOL_SOCKET, SO_LINGER, (BLAnsi*)&_lin, sizeof(_lin));
+	success:
+		_filesz = _HttpDownloadRequest(_httpsok, _host, _path, _file, 0, -1, _redirect);
+		if ((BLU32)-1 == _filesz)
+			goto failed;
+		else if (0 == _filesz)
+		{
+			BLAnsi* _retmp = (BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
+			free(_retmp);
+			blArrayPopFront(_PrNetworkMem->pDownList);
+			_retmp = (BLAnsi*)malloc(strlen(_redirect) + 1);
+			strcpy(_retmp, _redirect);
+			blArrayPushFront(_PrNetworkMem->pDownList, _retmp);
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+			closesocket(_httpsok);
+#else
+			close(_httpsok);
+#endif
+			goto redirect;
+		}
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+		closesocket(_httpsok);
+#else
+		close(_httpsok);
+#endif
+		_httpsok = 0;
+		_BLHttpSect _sects[3];
+		_sectsz = _filesz / 3;
+		for (_idx = 0; _idx < 3; ++_idx)
+		{
+			_sects[_idx].pHost = (BLAnsi*)malloc(strlen(_host) + 1);
+			strcpy(_sects[_idx].pHost, _host);
+			_sects[_idx].pHost[strlen(_host)] = 0;
+			_sects[_idx].nPort = _port;
+			_sects[_idx].pPath = (BLAnsi*)malloc(strlen(_path) + 1);
+			strcpy(_sects[_idx].pPath, _path);
+			_sects[_idx].pPath[strlen(_path)] = 0;
+			_sects[_idx].pRemoteName = (BLAnsi*)malloc(strlen(_file) + 1);
+			strcpy(_sects[_idx].pRemoteName, _file);
+			_sects[_idx].pRemoteName[strlen(_file)] = 0;
+			_sects[_idx].pLocalName = (BLAnsi*)malloc(strlen(_localfile) + strlen(_file) + 3);
+			sprintf(_sects[_idx].pLocalName, "%s%s_%d", _localfile, _file, _idx);
+			if (_idx < 2)
+			{
+				_sects[_idx].nStart = _idx * _sectsz;
+				_sects[_idx].nEnd = (_idx + 1) * _sectsz;
+			}
+			else
+			{
+				_sects[_idx].nStart = _idx * _sectsz;
+				_sects[_idx].nEnd = _filesz;
+			}
+			_sects[_idx].nState = 0;
+		}
+		_PrNetworkMem->nCurDownTotal = _filesz;
+		_PrNetworkMem->nCurDownSize = 0;
+		_PrNetworkMem->_PrCurDownHash = blHashString((const BLUtf8*)_url);
+		BLThread* _workthread[3];
+		for (_idx = 0; _idx < 3; ++_idx)
+		{
+			_workthread[_idx] = blGenThread(_DownloadWorkerThreadFunc, NULL, &_sects[_idx]);
+			blThreadRun(_workthread[_idx]);
+		}
+		while (TRUE)
+		{
+			if (_sects[0].nState == 0xFFFFFFFF && _sects[1].nState == 0xFFFFFFFF && _sects[2].nState == 0xFFFFFFFF)
+			{
+				blDeleteThread(_workthread[0]);
+				blDeleteThread(_workthread[1]);
+				blDeleteThread(_workthread[2]);
+				break;
+			}
+			else if (_sects[0].nState == 1 || _sects[1].nState == 1 || _sects[2].nState == 1)
+			{
+				blDeleteThread(_workthread[0]);
+				blDeleteThread(_workthread[1]);
+				blDeleteThread(_workthread[2]);
+				for (_idx = 0; _idx < 3; ++_idx)
+				{
+					free(_sects[_idx].pHost);
+					free(_sects[_idx].pPath);
+					free(_sects[_idx].pRemoteName);
+					free(_sects[_idx].pLocalName);
+				}
+				goto failed;
+			}
+			else
+				blYield();
+		}
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+		HANDLE _fp, _fpread;
+#ifdef WINAPI_FAMILY
+		WCHAR _wfilename[260] = { 0 };
+		MultiByteToWideChar(CP_UTF8, 0, _writefile, -1, _wfilename, sizeof(_wfilename));
+		_fp = CreateFile2(_wfilename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, CREATE_ALWAYS, NULL);
+#else
+		_fp = CreateFileA(_writefile, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+#endif
+		for (_idx = 0; _idx < 3; ++_idx)
+		{
+			BLU32 _pos = _sects[_idx].nStart;
+			LARGE_INTEGER _li;
+			_li.HighPart = 0;
+			_li.LowPart = _pos;
+			SetFilePointerEx(_fp, _li, NULL, FILE_BEGIN);
+#ifdef WINAPI_FAMILY
+			memset(_wfilename, 0, sizeof(_wfilename));
+			MultiByteToWideChar(CP_UTF8, 0, _sects[_idx].pLocalName, -1, _wfilename, sizeof(_wfilename));
+			_fpread = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
+#else
+			_fpread = CreateFileA(_sects[_idx].pLocalName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+#endif
+			BLU8 _c;
+			do
+			{
+				ReadFile(_fpread, &_c, sizeof(BLU8), NULL, NULL);
+				WriteFile(_fp, &_c, sizeof(BLU8), NULL, NULL);
+				_pos++;
+				if (_pos == _sects[_idx].nEnd)
+					break;
+			} while (1);
+			CloseHandle(_fpread);
+		}
+		LARGE_INTEGER _li;
+		GetFileSizeEx(_fp, &_li);
+		if (_li.LowPart != _PrNetworkMem->nCurDownTotal)
+			DeleteFileA(_writefile);
+		else
+		{
+			for (_idx = 0; _idx < 3; ++_idx)
+				DeleteFileA(_sects[_idx].pLocalName);
+		}
+		CloseHandle(_fp);
+#else
+		FILE* _fp, *_fpread;
+		_fp = fopen(_writefile, "wb");
+		for (_idx = 0; _idx < 3; ++_idx)
+		{
+			BLU32 _pos = _sects[_idx].nStart;
+			fseek(_fp, _pos, SEEK_SET);
+			_fpread = fopen(_sects[_idx].pLocalName, "rb");
+			BLS32 _c;
+			while ((_c = fgetc(_fpread)) != EOF)
+			{
+				fputc(_c, _fp);
+				_pos++;
+				if (_pos == _sects[_idx].nEnd)
+					break;
+			}
+			fclose(_fpread);
+		}
+		if ((BLU32)ftell(_fp) != _PrNetworkMem->nCurDownTotal)
+			remove(_writefile);
+		else
+		{
+			for (_idx = 0; _idx < 3; ++_idx)
+				remove(_sects[_idx].pLocalName);
+		}
+		fclose(_fp);
+#endif
+		for (_idx = 0; _idx < 3; ++_idx)
+		{
+			free(_sects[_idx].pHost);
+			free(_sects[_idx].pPath);
+			free(_sects[_idx].pRemoteName);
+			free(_sects[_idx].pLocalName);
+		}
+	failed:
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+		if (_httpsok != INVALID_SOCKET_INTERNAL)
+			closesocket(_httpsok);
+#else
+		if (_httpsok != INVALID_SOCKET_INTERNAL)
+			close(_httpsok);
+#endif
+		BLAnsi _filetmp[260] = { 0 };
+		for (_idx = (BLS32)strlen((const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList)) - 1; _idx >= 0; --_idx)
+		{
+			if (((BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList))[_idx] == '/')
+			{
+				strcpy(_filetmp, (BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList) + _idx + 1);
+				break;
+			}
+		}
+		BLAnsi _pathtmp[260] = { 0 };
+		strcpy(_pathtmp, (BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList));
+		strcat(_pathtmp, _filetmp);
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+		WIN32_FILE_ATTRIBUTE_DATA _wfad;
+		if (GetFileAttributesExA(_pathtmp, GetFileExInfoStandard, &_wfad))
+#else
+		if (access(_pathtmp, 0) != -1)
+#endif
+		{
+			for (_idx = 0; _idx < 64; ++_idx)
+			{
+				if (_PrNetworkMem->nFinish[_idx] == 0)
+				{
+					_PrNetworkMem->nFinish[_idx] = _PrNetworkMem->_PrCurDownHash;
+					break;
+				}
+			}
+		}
+		BLAnsi* _tmp;
+		_tmp = (BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
+		free(_tmp);
+		blArrayPopFront(_PrNetworkMem->pDownList);
+		_tmp = (BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList);
+		free(_tmp);
+		blArrayPopFront(_PrNetworkMem->pLocalList);
+		blMutexUnlock(_PrNetworkMem->pLocalList->pMutex);
+		blMutexUnlock(_PrNetworkMem->pDownList->pMutex);
+		_PrNetworkMem->nCurDownTotal = 0;
+		_PrNetworkMem->nCurDownSize = 0;
+	}
+	_PrNetworkMem->_PrCurDownHash = -1;
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+	return 0xdead;
+#else
+	return (BLVoid*)0xdead;
+#endif
+}
+#endif
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+static DWORD __stdcall
 _NetSocketSendThreadFunc(BLVoid* _Userdata)
 #else
 static BLVoid*
@@ -1237,332 +1577,6 @@ beginwork:
 #endif
 end:
 	((_BLHttpJob*)_Userdata)->bOver = TRUE;
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-	return 0xdead;
-#else
-	return (BLVoid*)0xdead;
-#endif
-}
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-static DWORD __stdcall
-_NetDownMainThread(BLVoid* _Userdata)
-#else
-static BLVoid*
-_NetDownMainThread(BLVoid* _Userdata)
-#endif
-{
-	while (_PrNetworkMem->pDownList->nSize > 0)
-	{
-		blMutexLock(_PrNetworkMem->pDownList->pMutex);
-		blMutexLock(_PrNetworkMem->pLocalList->pMutex);
-		BLU16 _port = 80;
-		BLS32 _idx = 0;
-		BLU32 _n = 0, _filesz;
-		struct sockaddr_in _sin;
-		struct sockaddr_in6 _sin6;
-		BLAnsi _host[1024] = { 0 };
-		BLAnsi _path[1024] = { 0 };
-		BLAnsi _file[1024] = { 0 };
-		BLAnsi _writefile[260] = { 0 };
-		BLAnsi _redirect[1024] = { 0 };
-        BLSocket _httpsok = INVALID_SOCKET_INTERNAL;
-		BLS32 _nodelay = 1, _reuse = 1;
-		BLU32 _sectsz;
-redirect:
-		_port = 80;
-		_idx = 0;
-		_n = 0;
-		memset(_host, 0, sizeof(_host));
-		memset(_path, 0, sizeof(_path));
-		memset(_file, 0, sizeof(_file));
-		memset(_writefile, 0, sizeof(_writefile));
-		const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
-		const BLAnsi* _localfile = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList);
-		if (strncmp(_url, "http://", 7) != 0)
-			goto failed;
-		for (_idx = 7; _idx < (BLS32)strlen(_url) - 7; ++_idx)
-		{
-			if (_url[_idx] == '/')
-				break;
-			else
-				_host[_idx - 7] = _url[_idx];
-		}
-		for (_idx = 0; _idx < (BLS32)strlen(_host); ++_idx)
-		{
-			if (_host[_idx] == ':')
-			{
-				_port = atoi(_host + _idx + 1);
-				_host[_idx] = 0;
-				break;
-			}
-		}
-		for (_idx = (BLS32)strlen(_url) - 1; _idx >= 0; --_idx)
-		{
-			if (_url[_idx] == '/')
-				break;
-		}
-		strncpy(_path, _url, _idx + 1);
-		strncpy(_file, _url + _idx + 1, strlen(_url) - _idx - 1);
-		strcpy(_writefile, _localfile);
-		strcat(_writefile, _file);
-        _httpsok = socket(_PrNetworkMem->bClientIpv6 ? PF_INET6 : PF_INET, SOCK_STREAM, 0);
-        if (_PrNetworkMem->bClientIpv6)
-            _FillAddr(_host, _port, NULL, &_sin6, BL_NT_HTTP);
-        else
-            _FillAddr(_host, _port, &_sin, NULL, BL_NT_HTTP);
-		if (!_PrNetworkMem->bClientIpv6)
-		{
-			if (connect(_httpsok, (struct sockaddr*)&_sin, sizeof(_sin)) < 0)
-			{
-				if (0xEA == _GetError())
-				{
-					for (_n = 0; _n < 64; ++_n)
-					{
-						if (_Select(_httpsok, FALSE))
-							goto success;
-					}
-				}
-				goto failed;
-			}
-		}
-		else
-		{
-			if (connect(_httpsok, (struct sockaddr*)&_sin6, sizeof(_sin6)) < 0)
-			{
-				if (0xEA == _GetError())
-				{
-					for (_n = 0; _n < 64; ++_n)
-					{
-						if (_Select(_httpsok, FALSE))
-							goto success;
-					}
-				}
-				goto failed;
-			}
-		}
-		_nodelay = 1;
-		_reuse = 1;
-		setsockopt(_httpsok, IPPROTO_TCP, TCP_NODELAY, (BLAnsi*)&_nodelay, sizeof(_nodelay));
-		setsockopt(_httpsok, SOL_SOCKET, SO_REUSEADDR, (BLAnsi*)&_reuse, sizeof(_reuse));
-		struct linger _lin;
-		_lin.l_linger = 0;
-		_lin.l_onoff = 1;
-		setsockopt(_httpsok, SOL_SOCKET, SO_LINGER, (BLAnsi*)&_lin, sizeof(_lin));
-success:
-		_filesz = _HttpDownloadRequest(_httpsok, _host, _path, _file, 0, -1, _redirect);
-		if ((BLU32)-1 == _filesz)
-			goto failed;
-		else if (0 == _filesz)
-		{
-			BLAnsi* _retmp = (BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
-			free(_retmp);
-			blArrayPopFront(_PrNetworkMem->pDownList);
-			_retmp = (BLAnsi*)malloc(strlen(_redirect) + 1);
-			strcpy(_retmp, _redirect);
-			blArrayPushFront(_PrNetworkMem->pDownList, _retmp);
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-			closesocket(_httpsok);
-#else
-			close(_httpsok);
-#endif
-			goto redirect;
-		}
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		closesocket(_httpsok);
-#else
-		close(_httpsok);
-#endif
-		_httpsok = 0;
-		_BLHttpSect _sects[3];
-		_sectsz = _filesz / 3;
-		for (_idx = 0; _idx < 3; ++_idx)
-		{
-			_sects[_idx].pHost = (BLAnsi*)malloc(strlen(_host) + 1);
-			strcpy(_sects[_idx].pHost, _host);
-			_sects[_idx].pHost[strlen(_host)] = 0;
-			_sects[_idx].nPort = _port;
-			_sects[_idx].pPath = (BLAnsi*)malloc(strlen(_path) + 1);
-			strcpy(_sects[_idx].pPath, _path);
-			_sects[_idx].pPath[strlen(_path)] = 0;
-			_sects[_idx].pRemoteName = (BLAnsi*)malloc(strlen(_file) + 1);
-			strcpy(_sects[_idx].pRemoteName, _file);
-			_sects[_idx].pRemoteName[strlen(_file)] = 0;
-			_sects[_idx].pLocalName = (BLAnsi*)malloc(strlen(_localfile) + strlen(_file) + 3);
-			sprintf(_sects[_idx].pLocalName, "%s%s_%d", _localfile, _file, _idx);
-			if (_idx < 2)
-			{
-				_sects[_idx].nStart = _idx * _sectsz;
-				_sects[_idx].nEnd = (_idx + 1) * _sectsz;
-			}
-			else
-			{
-				_sects[_idx].nStart = _idx * _sectsz;
-				_sects[_idx].nEnd = _filesz;
-			}
-			_sects[_idx].nState = 0;
-		}
-		_PrNetworkMem->nCurDownTotal = _filesz;
-		_PrNetworkMem->nCurDownSize = 0;
-		_PrNetworkMem->_PrCurDownHash = blHashString((const BLUtf8*)_url);
-		BLThread* _workthread[3];
-		for (_idx = 0; _idx < 3; ++_idx)
-		{
-			_workthread[_idx] = blGenThread(_DownloadWorkerThreadFunc, NULL, &_sects[_idx]);
-			blThreadRun(_workthread[_idx]);
-		}
-		while (TRUE)
-		{
-			if (_sects[0].nState == 0xFFFFFFFF && _sects[1].nState == 0xFFFFFFFF && _sects[2].nState == 0xFFFFFFFF)
-			{
-				blDeleteThread(_workthread[0]);
-				blDeleteThread(_workthread[1]);
-				blDeleteThread(_workthread[2]);
-				break;
-			}
-			else if (_sects[0].nState == 1 || _sects[1].nState == 1 || _sects[2].nState == 1)
-			{
-				blDeleteThread(_workthread[0]);
-				blDeleteThread(_workthread[1]);
-				blDeleteThread(_workthread[2]);
-				for (_idx = 0; _idx < 3; ++_idx)
-				{
-					free(_sects[_idx].pHost);
-					free(_sects[_idx].pPath);
-					free(_sects[_idx].pRemoteName);
-					free(_sects[_idx].pLocalName);
-				}
-				goto failed;
-			}
-			else
-				blYield();
-		}
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		HANDLE _fp, _fpread;
-#ifdef WINAPI_FAMILY
-		WCHAR _wfilename[260] = { 0 };
-		MultiByteToWideChar(CP_UTF8, 0, _writefile, -1, _wfilename, sizeof(_wfilename));
-		_fp = CreateFile2(_wfilename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, CREATE_ALWAYS, NULL);
-#else
-		_fp = CreateFileA(_writefile, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-#endif
-		for (_idx = 0; _idx < 3; ++_idx)
-		{
-			BLU32 _pos = _sects[_idx].nStart;
-			LARGE_INTEGER _li;
-			_li.HighPart = 0;
-			_li.LowPart = _pos;
-			SetFilePointerEx(_fp, _li, NULL, FILE_BEGIN);
-#ifdef WINAPI_FAMILY
-			memset(_wfilename, 0, sizeof(_wfilename));
-			MultiByteToWideChar(CP_UTF8, 0, _sects[_idx].pLocalName, -1, _wfilename, sizeof(_wfilename));
-			_fpread = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
-#else
-			_fpread = CreateFileA(_sects[_idx].pLocalName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-#endif
-			BLU8 _c;
-			do
-			{
-				ReadFile(_fpread, &_c, sizeof(BLU8), NULL, NULL);
-				WriteFile(_fp, &_c, sizeof(BLU8), NULL, NULL);
-				_pos++;
-				if (_pos == _sects[_idx].nEnd)
-					break;
-			} while (1);
-			CloseHandle(_fpread);
-		}
-		LARGE_INTEGER _li;
-		GetFileSizeEx(_fp, &_li);
-		if (_li.LowPart != _PrNetworkMem->nCurDownTotal)
-			DeleteFileA(_writefile);
-		else
-		{
-			for (_idx = 0; _idx < 3; ++_idx)
-				DeleteFileA(_sects[_idx].pLocalName);
-		}
-		CloseHandle(_fp);
-#else
-		FILE* _fp, *_fpread;
-		_fp = fopen(_writefile, "wb");
-		for (_idx = 0; _idx < 3; ++_idx)
-		{
-			BLU32 _pos = _sects[_idx].nStart;
-			fseek(_fp, _pos, SEEK_SET);
-			_fpread = fopen(_sects[_idx].pLocalName, "rb");
-			BLS32 _c;
-			while ((_c = fgetc(_fpread)) != EOF)
-			{
-				fputc(_c, _fp);
-				_pos++;
-				if (_pos == _sects[_idx].nEnd)
-					break;
-			}
-			fclose(_fpread);
-		}
-		if ((BLU32)ftell(_fp) != _PrNetworkMem->nCurDownTotal)
-			remove(_writefile);
-		else
-		{
-			for (_idx = 0; _idx < 3; ++_idx)
-				remove(_sects[_idx].pLocalName);
-		}
-		fclose(_fp);
-#endif
-		for (_idx = 0; _idx < 3; ++_idx)
-		{
-			free(_sects[_idx].pHost);
-			free(_sects[_idx].pPath);
-			free(_sects[_idx].pRemoteName);
-			free(_sects[_idx].pLocalName);
-		}
-failed:
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		if (_httpsok != INVALID_SOCKET_INTERNAL)
-			closesocket(_httpsok);
-#else
-		if (_httpsok != INVALID_SOCKET_INTERNAL)
-			close(_httpsok);
-#endif
-		BLAnsi _filetmp[260] = { 0 };
-		for (_idx = (BLS32)strlen((const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList)) - 1; _idx >= 0; --_idx)
-		{
-			if (((BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList))[_idx] == '/')
-			{
-				strcpy(_filetmp, (BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList) + _idx + 1);
-				break;
-			}
-		}
-		BLAnsi _pathtmp[260] = { 0 };
-		strcpy(_pathtmp, (BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList));
-		strcat(_pathtmp, _filetmp);
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		WIN32_FILE_ATTRIBUTE_DATA _wfad;
-		if (GetFileAttributesExA(_pathtmp, GetFileExInfoStandard, &_wfad))
-#else
-		if (access(_pathtmp, 0) != -1)
-#endif
-		{
-			for (_idx = 0; _idx < 64; ++_idx)
-			{
-				if (_PrNetworkMem->nFinish[_idx] == 0)
-				{
-					_PrNetworkMem->nFinish[_idx] = _PrNetworkMem->_PrCurDownHash;
-					break;
-				}
-			}
-		}
-		BLAnsi* _tmp;
-		_tmp = (BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
-		free(_tmp);
-		blArrayPopFront(_PrNetworkMem->pDownList);
-		_tmp = (BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList);
-		free(_tmp);
-		blArrayPopFront(_PrNetworkMem->pLocalList);
-		blMutexUnlock(_PrNetworkMem->pLocalList->pMutex);
-		blMutexUnlock(_PrNetworkMem->pDownList->pMutex);
-		_PrNetworkMem->nCurDownTotal = 0;
-		_PrNetworkMem->nCurDownSize = 0;
-	}
-	_PrNetworkMem->_PrCurDownHash = -1;
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	return 0xdead;
 #else
@@ -1852,6 +1866,8 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
         _hints.ai_socktype = SOCK_DGRAM;
 #if defined(WIN32)
 		_hints.ai_flags = AI_NUMERICHOST;
+#elif defined(EMSCRIPTEN)
+		_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
 		_hints.ai_flags = AI_DEFAULT;
 #endif
@@ -1884,6 +1900,8 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
         _hints.ai_socktype = SOCK_STREAM;
 #if defined(WIN32)
 		_hints.ai_flags = AI_NUMERICHOST;
+#elif defined(EMSCRIPTEN)
+		_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
 		_hints.ai_flags = AI_DEFAULT;
 #endif
@@ -1938,6 +1956,8 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
         _hints.ai_socktype = SOCK_STREAM;
 #if defined(WIN32)
 		_hints.ai_flags = AI_NUMERICHOST;
+#elif defined(EMSCRIPTEN)
+		_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
 		_hints.ai_flags = AI_DEFAULT;
 #endif
@@ -2742,8 +2762,16 @@ blDownload()
 	const BLAnsi* _local = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList);
 	_PrNetworkMem->_PrCurDownHash = blHashString((const BLUtf8*)_url);
 	_PrNetworkMem->nCurDownSize = 0;
-	_PrNetworkMem->nCurDownTotal = 1;
-	emscripten_async_wget2(_url, _local, "GET", NULL, NULL, _OnWGetLoaded, _OnWGetError, _OnWGetProg);
+	_PrNetworkMem->nCurDownTotal = 0;
+	emscripten_fetch_attr_t _attr;
+	emscripten_fetch_attr_init(&_attr);
+	strcpy(_attr.requestMethod, "GET");
+	_attr.attributes = EMSCRIPTEN_FETCH_PERSIST_FILE;
+	_attr.destinationPath = _local;
+	_attr.onsuccess = _OnFetchSucceeded;
+	_attr.onerror = _OnFetchFailed;
+	_attr.onprogress = _OnFetchProg;
+	emscripten_fetch(&_attr, _url);
 #else
 	_PrNetworkMem->pDownMain = blGenThread(_NetDownMainThread, NULL, NULL);
 	blThreadRun(_PrNetworkMem->pDownMain);

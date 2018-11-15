@@ -3785,9 +3785,9 @@ blUserFolderDir()
 #elif defined(BL_PLATFORM_WEB)	
 	if (!_PrSystemMem->aUserDir[0])
 	{
-		_PrSystemMem->aUserDir[0] = '/';
+		strcpy(_PrSystemMem->aUserDir, "/bulllord/");
 	}
-	return _PrSystemMem->aWorkDir;
+	return _PrSystemMem->aUserDir;
 #endif
 }
 const BLAnsi*
@@ -3889,7 +3889,6 @@ blWorkingDir()
 	{
 		_PrSystemMem->aWorkDir[0] = '/';
 	}
-	return _PrSystemMem->aWorkDir;
 #endif
 	return _PrSystemMem->aWorkDir;
 }

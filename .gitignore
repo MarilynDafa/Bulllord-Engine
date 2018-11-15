@@ -51,3 +51,7 @@ code/externals/opus/celt/dump_modes/Makefile
 *.unsuccessfulbuild
 *.d
 *.class
+*.hlsl
+*.keystore
+*.aidl
+*.unsuccessfulbuild

@@ -10,9 +10,6 @@
     <Filter Include="externals\freetype2\FT_MODULES">
       <UniqueIdentifier>{c436037d-c25c-446a-950d-2ef73c158221}</UniqueIdentifier>
     </Filter>
-    <Filter Include="externals\sqlite3">
-      <UniqueIdentifier>{c12450f1-b629-4e6b-bbf5-1b877b13afdf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="externals\gl">
       <UniqueIdentifier>{4b19de35-f38e-4300-829d-a491b5c3a23b}</UniqueIdentifier>
     </Filter>
@@ -179,9 +176,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\winfonts\winfnt.c">
       <Filter>externals\freetype2\FT_MODULES</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3secure.c">
-      <Filter>externals\sqlite3</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\fastlz\fastlz.c">
       <Filter>externals\fastlz</Filter>
@@ -671,30 +665,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\type42\t42parse.c">
       <Filter>externals\freetype2\dummy</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\codec.c">
-      <Filter>externals\sqlite3</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\codecext.c">
-      <Filter>externals\sqlite3</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\extensionfunctions.c">
-      <Filter>externals\sqlite3</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\rijndael.c">
-      <Filter>externals\sqlite3</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sha2.c">
-      <Filter>externals\sqlite3</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\shell.c">
-      <Filter>externals\sqlite3</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3.c">
-      <Filter>externals\sqlite3</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\userauth.c">
-      <Filter>externals\sqlite3</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\base\ftapi.c">
       <Filter>externals\freetype2\dummy</Filter>
@@ -1963,24 +1933,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\winfonts\winfnt.h">
       <Filter>externals\freetype2\dummy</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\codec.h">
-      <Filter>externals\sqlite3</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\rijndael.h">
-      <Filter>externals\sqlite3</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sha2.h">
-      <Filter>externals\sqlite3</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3.h">
-      <Filter>externals\sqlite3</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3ext.h">
-      <Filter>externals\sqlite3</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\sqlite3\sqlite3userauth.h">
-      <Filter>externals\sqlite3</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\afangles.h">
       <Filter>externals\freetype2\dummy</Filter>

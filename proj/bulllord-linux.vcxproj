@@ -121,7 +121,7 @@
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals/cbor;/root/projects/bulllord/externals/webp;/root/projects/bulllord/externals;/root/projects/bulllord/externals/freetype2/include;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <CLanguageStandard>gnu11</CLanguageStandard>
@@ -137,7 +137,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals/cbor;/root/projects/bulllord/externals/webp;/root/projects/bulllord/externals;/root/projects/bulllord/externals/freetype2/include;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <CLanguageStandard>gnu11</CLanguageStandard>
@@ -153,7 +153,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;_M_IX86;__OPTIMIZE__;__linux__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;_M_IX86;__OPTIMIZE__;__linux__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals/cbor;/root/projects/bulllord/externals/webp;/root/projects/bulllord/externals;/root/projects/bulllord/externals/freetype2/include;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <CLanguageStandard>gnu11</CLanguageStandard>
@@ -170,7 +170,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;_M_IX86;__OPTIMIZE__;__linux__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;_M_IX86;__OPTIMIZE__;__linux__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals/cbor;/root/projects/bulllord/externals/webp;/root/projects/bulllord/externals;/root/projects/bulllord/externals/freetype2/include;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <CLanguageStandard>gnu11</CLanguageStandard>
@@ -187,7 +187,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals/cbor;/root/projects/bulllord/externals/webp;/root/projects/bulllord/externals;/root/projects/bulllord/externals/freetype2/include;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <CLanguageStandard>gnu11</CLanguageStandard>
@@ -204,7 +204,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;__linux__;__OPTIMIZE__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32</AdditionalOptions>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals/cbor;/root/projects/bulllord/externals/webp;/root/projects/bulllord/externals;/root/projects/bulllord/externals/freetype2/include;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <CLanguageStandard>gnu11</CLanguageStandard>

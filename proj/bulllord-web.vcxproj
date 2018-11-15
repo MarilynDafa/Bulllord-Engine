@@ -40,11 +40,11 @@
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
     <PlatformToolset>emcc</PlatformToolset>
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <PlatformToolset>emcc</PlatformToolset>
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -60,7 +60,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
-    <ClangPath>$(VCClangBinDir)</ClangPath>
+    <ClangPath>$(CLANG_BIN)</ClangPath>
     <OutDir>../bin/web</OutDir>
     <IntDir>$(Configuration)\web\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
@@ -70,7 +70,7 @@
     <IntDir>$(Configuration)\web\$(Platform)</IntDir>
     <OutDir>../bin/web</OutDir>
     <TargetName>libBulllord</TargetName>
-    <ClangPath>$(VCClangBinDir)</ClangPath>
+    <ClangPath>$(CLANG_BIN)</ClangPath>
     <TargetExt>.bc</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -119,30 +119,31 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;DISABLE_EXCEPTION_CATCHING;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;ASSERTIONS=1;SAFE_HEAP=1;EMCC_DEBUG=1;DEBUG;EMTERPRETIFY_ASYNC=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
-      <AdditionalOptions>-g -fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;EMCC_DEBUG=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\webp;..\code\externals;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <LanguageStandardMode>LanguageStandardGnu99</LanguageStandardMode>
+      <AdditionalOptions>-g -fno-exceptions -xc %(AdditionalOptions)</AdditionalOptions>
       <VerboseOutput>NoVerboseOutput</VerboseOutput>
       <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
       <OptimizationLevel>O0</OptimizationLevel>
     </ClCompile>
     <Link>
-      <LinkerOptimizationLevel>O0</LinkerOptimizationLevel>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s MAIN_MODULE=1 -s BINARYEN_ASYNC_COMPILATION=1 %(AdditionalOptions)</AdditionalOptions>
+      <LinkerOptimizationLevel>O3</LinkerOptimizationLevel>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s MAIN_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
+      <OutputFile>../bin/web/libBulllord$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;DISABLE_EXCEPTION_CATCHING;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
-      <AdditionalOptions>-fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
-      <OptimizationLevel>O2</OptimizationLevel>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\webp;..\code\externals;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <LanguageStandardMode>LanguageStandardGnu99</LanguageStandardMode>
+      <AdditionalOptions>-xc -fno-exceptions %(AdditionalOptions)</AdditionalOptions>
+      <OptimizationLevel>O3</OptimizationLevel>
       <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s FORCE_FILESYSTEM=1 -s MAIN_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s NO_EXIT_RUNTIME=1 -s MAIN_MODULE=2 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

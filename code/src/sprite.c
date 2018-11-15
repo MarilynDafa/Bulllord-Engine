@@ -555,7 +555,7 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 			break;
 		case FOURCC_INTERNAL('A', 'S', 'T', 'C'):
 			_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-			_node->eTexFormat = BL_TF_ASTC;
+			_node->eTexFormat = BL_TF_ASTC;			
 			break;
 		default:assert(0); break;
 		}

@@ -125,6 +125,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iap (Windows XP)", "..\plug
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample", "..\samples\sample\sample.vcxproj", "{F63CAC8E-F5C9-4488-BF40-741BEEAE9B6B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "video (Web)", "..\samples\index\index.vcxproj", "{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\plugins\iap\iap.vcxitems*{022b313b-109c-4d0d-a0f4-3ba9ea5ba07c}*SharedItemsImports = 4
@@ -680,6 +682,24 @@ Global
 		{F63CAC8E-F5C9-4488-BF40-741BEEAE9B6B}.Release|x64.Build.0 = Release|x64
 		{F63CAC8E-F5C9-4488-BF40-741BEEAE9B6B}.Release|x86.ActiveCfg = Release|Win32
 		{F63CAC8E-F5C9-4488-BF40-741BEEAE9B6B}.Release|x86.Build.0 = Release|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Debug|ARM.ActiveCfg = Debug|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Debug|Emscripten.ActiveCfg = Debug|Emscripten
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Debug|Emscripten.Build.0 = Debug|Emscripten
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Debug|Win32.Build.0 = Debug|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Debug|x64.ActiveCfg = Debug|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Debug|x86.ActiveCfg = Debug|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Debug|x86.Build.0 = Debug|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Release|ARM.ActiveCfg = Release|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Release|ARM64.ActiveCfg = Release|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Release|Emscripten.ActiveCfg = Release|Emscripten
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Release|Emscripten.Build.0 = Release|Emscripten
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Release|Win32.ActiveCfg = Release|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Release|Win32.Build.0 = Release|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Release|x64.ActiveCfg = Release|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Release|x86.ActiveCfg = Release|Win32
+		{81B25D3B-D3C9-41A4-AC1C-AC73C596D4CC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

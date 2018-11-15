@@ -3067,6 +3067,8 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
         }
         GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         GL_CHECK_INTERNAL(glTexParameteri(_target, GL_TEXTURE_MAX_LEVEL, _Mipmap - 1));
 		BLU32 _faces = (_target == GL_TEXTURE_CUBE_MAP) || (_target == GL_TEXTURE_CUBE_MAP_ARRAY) ? 6 : 1;
 		for (BLU32 _aidx = 0; _aidx < _Layer; ++_aidx)
