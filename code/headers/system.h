@@ -84,7 +84,8 @@ QUALITY
 */
 BL_API BLBool blEnvVariable(
 	IN BLUtf8* _Section,
-	INOUT BLUtf8 _Value[256]);
+	INOUT BLUtf8 _Value[256],
+	IN BLBool _Set);
 
 BL_API BLVoid blOpenURL(
 	IN BLUtf8* _Url);

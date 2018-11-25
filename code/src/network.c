@@ -451,15 +451,10 @@ _Recv(BLSocket _Sock, BLU32* _Msgsz)
 }
 #if defined(BL_PLATFORM_WEB)
 static BLVoid
-_OnFetchSucceeded(emscripten_fetch_t* _Fetch)
+_OnWGetLoaded(BLU32 _Dummy, BLVoid* _User, BLVoid* _Data, BLU32 _DataSz)
 {
-	emscripten_fetch_close(_Fetch);
 	const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
 	const BLAnsi* _local = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pLocalList);
-	free(_url);
-	free(_local);
-	blArrayPopFront(_PrNetworkMem->pDownList);
-	blArrayPopFront(_PrNetworkMem->pLocalList);
 	for (BLU32 _idx = 0; _idx < 64; ++_idx)
 	{
 		if (_PrNetworkMem->nFinish[_idx] == 0)
@@ -468,13 +463,18 @@ _OnFetchSucceeded(emscripten_fetch_t* _Fetch)
 			break;
 		}
 	}
+	BLS32 _error;
+	emscripten_idb_store("/emscriptenfs", _local, _Data, _DataSz, &_error);
+	free(_url);
+	free(_local);
+	blArrayPopFront(_PrNetworkMem->pDownList);
+	blArrayPopFront(_PrNetworkMem->pLocalList);
 	if (_PrNetworkMem->pDownList->nSize)
 		blDownload();
 }
 static BLVoid
-_OnFetchFailed(emscripten_fetch_t* _Fetch)
+_OnWGetError(BLU32 _Dummy, BLVoid* _User, BLS32 _Error, const BLAnsi* _Stats)
 {
-	emscripten_fetch_close(_Fetch);
 	if (_PrNetworkMem->pDownList->nSize)
 	{
 		const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
@@ -488,11 +488,10 @@ _OnFetchFailed(emscripten_fetch_t* _Fetch)
 	}
 }
 static BLVoid
-_OnFetchProg(emscripten_fetch_t* _Fetch)
+_OnWGetProg(BLU32 _Dummy, BLVoid* _User, BLS32 _Down, BLS32 _Total)
 {
-	_PrNetworkMem->nCurDownSize = _Fetch->dataOffset;
-	_PrNetworkMem->nCurDownTotal = _Fetch->totalBytes;
-	printf("Downloading %s.. %.2f%% complete.\n", _Fetch->url, _Fetch->dataOffset * 100.0 / _Fetch->totalBytes);
+	_PrNetworkMem->nCurDownSize = _Down;
+	_PrNetworkMem->nCurDownTotal = _Total;
 }
 static BLVoid
 _OnWebSocketError(BLS32 _Fd, BLS32 _Err, const BLAnsi* _Msg, BLVoid* _UserData)
@@ -2763,15 +2762,7 @@ blDownload()
 	_PrNetworkMem->_PrCurDownHash = blHashString((const BLUtf8*)_url);
 	_PrNetworkMem->nCurDownSize = 0;
 	_PrNetworkMem->nCurDownTotal = 0;
-	emscripten_fetch_attr_t _attr;
-	emscripten_fetch_attr_init(&_attr);
-	strcpy(_attr.requestMethod, "GET");
-	_attr.attributes = EMSCRIPTEN_FETCH_PERSIST_FILE;
-	_attr.destinationPath = _local;
-	_attr.onsuccess = _OnFetchSucceeded;
-	_attr.onerror = _OnFetchFailed;
-	_attr.onprogress = _OnFetchProg;
-	emscripten_fetch(&_attr, _url);
+	emscripten_async_wget2_data(_url, "GET", NULL, NULL, 1, _OnWGetLoaded, _OnWGetError, _OnWGetProg);
 #else
 	_PrNetworkMem->pDownMain = blGenThread(_NetDownMainThread, NULL, NULL);
 	blThreadRun(_PrNetworkMem->pDownMain);

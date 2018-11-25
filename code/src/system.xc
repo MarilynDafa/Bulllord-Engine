@@ -47,7 +47,6 @@
 #	include <android/looper.h>
 #   include <android/asset_manager.h>
 #	include <android/window.h>
-#else
 #endif
 
 #ifdef __cplusplus
@@ -3550,19 +3549,19 @@ _SystemDestroy()
 		_GbTVMode = FALSE;
 	BLAnsi _tmp[256] = { 0 };
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenWidth);
-	blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp);
+	blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenHeight);
-	blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp);
+	blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	if (_PrSystemMem->sBoostParam.bFullscreen)
 		strcpy(_tmp, "true");
 	else
 		strcpy(_tmp, "false");
-	blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp);
+	blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.eQuality);
-	blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp);
+	blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, TRUE);
 	_PrSystemMem->pEndFunc();
     _NetworkDestroy();
     _SpriteDestroy();
@@ -4093,51 +4092,8 @@ blQuitEvent()
 	return _quit;
 }
 BLBool
-blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
+blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 {
-	BLBool _set = (_Value[0] == 0) ? FALSE : TRUE;
-#if defined(BL_PLATFORM_WEB)
-	if (_set)
-	{
-		BLAnsi* _tmpval = (BLAnsi*)malloc(256);
-		memset(_tmpval, 0, 256);
-		strcpy(_tmpval, (const BLAnsi*)_Value);
-		EM_ASM_ARGS({
-			try {
-				var _key = Pointer_stringify($0);
-				var _value = Pointer_stringify($1);
-				window.localStorage.setItem(_key, _value);
-			}
-			catch (e) {
-				console.log(e);
-			}
-		}, (const BLAnsi*)_Section, (const BLAnsi*)_tmpval);
-		free(_tmpval);
-	}
-	else
-	{
-		BLAnsi* _tempv = (BLAnsi*)EM_ASM_INT({
-			try {
-				var _key = Pointer_stringify($0);
-				var _val = window.localStorage.getItem(_key);
-				var _length = lengthBytesUTF8(_val) + 1;
-				var _ret = _malloc(_length);
-				stringToUTF8(_val, _ret, _length + 1);
-				return _ret;
-			}
-			catch (e) {
-				console.log(e);
-				return 0;
-			}
-		}, (const BLAnsi*)_Section);
-		if (_tempv)
-		{
-			memset(_Value, 0, 256);
-			strcpy((BLAnsi*)_Value, _tempv);
-			free(_tempv);
-		}
-	}
-#else
 	BLAnsi _path[260] = { 0 };
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	HANDLE _fp;
@@ -4145,6 +4101,12 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
     strcpy_s(_path, 260, blUserFolderDir());
     strcat_s(_path, 260, "EnvStringOptions");
 	BLBool _fileexist = GetFileAttributesExA(_path, GetFileExInfoStandard, &_wfad) ? TRUE : FALSE;
+#elif defined(BL_PLATFORM_WEB)
+    strcpy(_path, blUserFolderDir());
+    strcat(_path, "EnvStringOptions");
+	BLS32 _error, _exists;
+	emscripten_idb_exists("/emscriptenfs", _path, &_exists, &_error);
+	BLBool _fileexist = _exists ? TRUE : FALSE;
 #else
     FILE* _fp;
     strcpy(_path, blUserFolderDir());
@@ -4155,9 +4117,9 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 	BLUtf8* _tmpstr = NULL;
 	BLU32 _vallen = blUtf8Length(_Value);
 	BLU32 _id = blHashString(_Section);
-	if (!_set && !_fileexist)
-		return FALSE;
-	else if (_set && !_fileexist)
+	if (!_Set && !_fileexist)
+		return FALSE;		
+	else if (_Set && !_fileexist)
 	{
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
@@ -4167,6 +4129,7 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 #else
 		_fp = CreateFileA(_path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
+#elif defined(BL_PLATFORM_WEB)
 #else
 		_fp = fopen(_path, "wb");
 #endif
@@ -4195,7 +4158,7 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 				BLU32 _sid, _strsz;
 				if (!ReadFile(_fp, &_sid, sizeof(BLU32), NULL, NULL))
 					break;
-				if (_sid == 0xFFFFFFFF)
+				if (_sid == 0xDEAD)
 					break;
 				if (!ReadFile(_fp, &_strsz, sizeof(BLU32), NULL, NULL))
 					break;
@@ -4213,6 +4176,36 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 			_tmpdic = blGenDict(FALSE);
 	}
 	CloseHandle(_fp);
+#elif defined(BL_PLATFORM_WEB)
+	else
+	{
+		BLVoid* _outbuf;
+		BLS32 _filesz;
+		emscripten_idb_load("/emscriptenfs", _path, &_outbuf, &_filesz, &_error);
+		if (_filesz != 0)
+		{
+			_tmpdic = blGenDict(FALSE);
+			BLU32 _offset = 0;
+			do
+			{
+				BLU32 _strsz, _sid;
+				memcpy(&_sid, (BLU8*)_outbuf + _offset, sizeof(BLU32));
+				_offset += sizeof(BLU32);
+				if (_sid == 0xDEAD)
+					break;
+				memcpy(&_strsz, (BLU8*)_outbuf + _offset, sizeof(BLU32));
+				_offset += sizeof(BLU32);
+				_tmpstr = (BLUtf8*)malloc(_strsz + 1);
+				memcpy(_tmpstr, (BLU8*)_outbuf + _offset, sizeof(BLUtf8) * _strsz);				
+				_offset += sizeof(BLUtf8) * _strsz;
+				_tmpstr[_strsz] = 0;
+				blDictInsert(_tmpdic, _sid, _tmpstr);
+			} while (1);
+		}
+		else
+			_tmpdic = blGenDict(FALSE);
+		free(_outbuf);
+	}
 #else
 	else
 	{
@@ -4227,7 +4220,7 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 				BLU32 _strsz, _sid;
 				if (!fread(&_sid, sizeof(BLU32), 1, _fp))
 					break;
-				if (_sid == 0xFFFFFFFF)
+				if (_sid == 0xDEAD)
 					break;
 				if (!fread(&_strsz, sizeof(BLU32), 1, _fp))
 					break;
@@ -4246,7 +4239,7 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 	}
 	fclose(_fp);
 #endif
-	if (!_set)
+	if (!_Set)
 	{
 		memset(_Value, 0, sizeof(BLUtf8) * 256);
 		BLUtf8* _str = (BLUtf8*)blDictElement(_tmpdic, _id);
@@ -4297,9 +4290,47 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 			WriteFile(_fp, &_sz, sizeof(BLU32), NULL, NULL);
 			WriteFile(_fp, _iter, _sz, NULL, NULL);
 		}
-		_sz = 0xFFFFFFFF;
+		_sz = 0xDEAD;
 		WriteFile(_fp, &_sz, sizeof(BLU32), NULL, NULL);
 		CloseHandle(_fp);
+#elif defined(BL_PLATFORM_WEB)
+		BLU32 _cap = 1024;
+		BLU8* _buf = malloc(_cap);
+		BLU32 _sztmp = 0;
+		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
+		{
+			if (_sztmp + 16 > _cap)
+			{
+				_cap *= 2;
+				_buf = (BLU8*)realloc(_buf, _cap);
+			}
+			memcpy(_buf + _sztmp, &_iteratorkey, sizeof(BLU32));
+			_sztmp += sizeof(BLU32);			
+			if (_sztmp + 16 > _cap)
+			{
+				_cap *= 2;
+				_buf = (BLU8*)realloc(_buf, _cap);
+			}
+			BLU32 _strlen = (BLU32)strlen((const BLAnsi*)_iter);
+			memcpy(_buf + _sztmp, &_strlen, sizeof(BLU32));
+			_sztmp += sizeof(BLU32);
+			if (_sztmp + 16 > _cap)
+			{
+				_cap *= 2;
+				_buf = (BLU8*)realloc(_buf, _cap);
+			}
+			memcpy(_buf + _sztmp, _iter, sizeof(BLUtf8) * _strlen);
+			_sztmp += sizeof(BLUtf8) * _strlen;
+			if (_sztmp + 16 > _cap)
+			{
+				_cap *= 2;
+				_buf = (BLU8*)realloc(_buf, _cap);
+			}
+		}
+		BLU32 _tem = 0xDEAD;
+		memcpy(_buf + _sztmp, &_tem, sizeof(BLU32));
+		_sztmp += sizeof(BLU32);
+		emscripten_idb_store("/emscriptenfs", _path, (BLVoid*)_buf, _sztmp, &_error);
 #else
 		_fp = fopen(_path, "wb");
 		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
@@ -4309,7 +4340,7 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 			fwrite(&_sz, sizeof(BLU32), 1, _fp);
 			fwrite(_iter, sizeof(BLUtf8), _sz, _fp);
 		}
-		_sz = 0xFFFFFFFF;
+		_sz = 0xDEAD;
 		fwrite(&_sz, sizeof(BLU32), 1, _fp);
 		fclose(_fp);
 #endif
@@ -4319,7 +4350,6 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256])
 		free(_iter);
 	}
 	blDeleteDict(_tmpdic);
-#endif
 	return TRUE;
 }
 BLVoid
@@ -4956,8 +4986,6 @@ blSubscribeEvent(IN BLEnum _Type, IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, 
 BLVoid
 blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _Pparam, IN BLGuid _ID)
 {
-	if (_Pparam)
-		blDebugOutput("%s", (char*)_Pparam);
 #ifdef BL_PLATFORM_ANDROID
 	BLS32 _busy;
 	_busy = pthread_mutex_trylock(&_PrSystemMem->sMutex);
@@ -5117,19 +5145,19 @@ blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
         _ExitFullscreen(_Width, _Height);
 	BLAnsi _tmp[256] = { 0 };
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenWidth);
-	blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp);
+	blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenHeight);
-	blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp);
+	blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	if (_PrSystemMem->sBoostParam.bFullscreen)
 		strcpy(_tmp, "true");
 	else
 		strcpy(_tmp, "false");
-	blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp);
+	blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.eQuality);
-	blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp);
+	blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, TRUE);
 #endif
 }
 BLVoid
@@ -5266,22 +5294,22 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 	if (_Width + _Height == 0)
 	{
 		BLAnsi _tmp[256] = { 0 };
-		if (blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp))
+		if (blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, FALSE))
 			_PrSystemMem->sBoostParam.nScreenWidth = (BLU32)strtoul(_tmp, NULL, 10);
 		else
 			_PrSystemMem->sBoostParam.nScreenWidth = 0;
 		memset(_tmp, 0, sizeof(_tmp));
-		if (blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp))
+		if (blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, FALSE))
 			_PrSystemMem->sBoostParam.nScreenHeight = (BLU32)strtoul(_tmp, NULL, 10);
 		else
 			_PrSystemMem->sBoostParam.nScreenHeight = 0;
 		memset(_tmp, 0, sizeof(_tmp));
-		if (blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp))
+		if (blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, FALSE))
 			_PrSystemMem->sBoostParam.bFullscreen = strcmp(_tmp, "true") ? FALSE : TRUE;
 		else
 			_PrSystemMem->sBoostParam.bFullscreen = FALSE;
 		memset(_tmp, 0, sizeof(_tmp));
-		if (blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp))
+		if (blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, FALSE))
 			_PrSystemMem->sBoostParam.eQuality = (BLU32)strtoul(_tmp, NULL, 10);
 		else
 			_PrSystemMem->sBoostParam.eQuality = BL_RQ_NORMAL;
@@ -5362,22 +5390,22 @@ blSystemScriptRun(IN BLAnsi* _Encryptkey)
 	for (BLU32 _idx = 0; _idx < 64; ++_idx)
 		_PrSystemMem->aPlugins[_idx].nHash = 0;
 	BLAnsi _tmp[256] = { 0 };
-	if (blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp))
+	if (blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, FALSE))
 		_PrSystemMem->sBoostParam.nScreenWidth = (BLU32)strtoul(_tmp, NULL, 10);
 	else
 		_PrSystemMem->sBoostParam.nScreenWidth = 0;
 	memset(_tmp, 0, sizeof(_tmp));
-	if (blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp))
+	if (blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, FALSE))
 		_PrSystemMem->sBoostParam.nScreenHeight = (BLU32)strtoul(_tmp, NULL, 10);
 	else
 		_PrSystemMem->sBoostParam.nScreenHeight = 0;
 	memset(_tmp, 0, sizeof(_tmp));
-	if (blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp))
+	if (blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, FALSE))
 		_PrSystemMem->sBoostParam.bFullscreen = strcmp(_tmp, "true") ? FALSE : TRUE;
 	else
 		_PrSystemMem->sBoostParam.bFullscreen = FALSE;
 	memset(_tmp, 0, sizeof(_tmp));
-	if (blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp))
+	if (blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, FALSE))
 		_PrSystemMem->sBoostParam.eQuality = (BLU32)strtoul(_tmp, NULL, 10);
 	else
 		_PrSystemMem->sBoostParam.eQuality = BL_RQ_NORMAL;

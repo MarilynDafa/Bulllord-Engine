@@ -29,8 +29,6 @@
 #include "internal/internal.h"
 #if defined BL_PLATFORM_ANDROID
 #	include <android/asset_manager.h>
-#elif defined(BL_PLATFORM_WEB)
-#	include <emscripten/fetch.h>
 #endif
 #include "../externals/duktape/duktape.h"
 #pragma pack(1)
@@ -101,15 +99,6 @@ typedef struct _StreamIOMember {
 static _BLStreamIOMember* _PrStreamIOMem = NULL;
 extern BLBool _FontFace(const BLAnsi* _Filename);
 #if defined(BL_PLATFORM_WEB)
-BLVoid
-_WriteSuccess(emscripten_fetch_t* _Fetch)
-{
-	emscripten_fetch_close(_Fetch);
-}
-BLVoid _WriteFailure(emscripten_fetch_t* _Fetch)
-{
-	emscripten_fetch_close(_Fetch);
-}
 static BLVoid 
 _OnWGetLoaded(const BLAnsi* _Filename)
 {
@@ -649,25 +638,55 @@ blGenStream(IN BLAnsi* _Filename)
 		}
 		else
 		{
-			emscripten_wget(_path, _path);
-			FILE* _fp = fopen(_path, "rb");
-			if (FILE_INVALID_INTERNAL(_fp))
+			memset(_path, 0, sizeof(_path));
+			strcpy(_path, blUserFolderDir());
+			strcat(_path, _Filename);
+			_tmplen = (BLU32)strlen(_path);
+			for (_i = 0; _i < _tmplen; ++_i)
 			{
-				BLU32 _datasz;
-				fseek(_fp, 0, SEEK_END);
-				_datasz = (BLU32)ftell(_fp);
-				fseek(_fp, 0, SEEK_SET);
+				if (_path[_i] == '\\')
+					_path[_i] = '/';
+			}
+			BLVoid* _outbuf;
+			BLS32 _outsz, _error, _exists;
+			emscripten_idb_exists("/emscriptenfs", _path, &_exists, &_error);
+			if (_exists)
+			{
+				emscripten_idb_load("/emscriptenfs", _path, &_outbuf, &_outsz, &_error);
 				_ret = (_BLStream*)malloc(sizeof(_BLStream));
-				_ret->pBuffer = malloc(_datasz);
-				fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp);
-				_ret->nLen = _datasz;
+				_ret->pBuffer = malloc(_outsz);
+				memcpy(_ret->pBuffer, _outbuf, _outsz);
+				_ret->nLen = _outsz;
 				_ret->pPos = (BLU8*)_ret->pBuffer;
 				_ret->pEnd = _ret->pPos + _ret->nLen;
-				fclose(_fp);
+				free(_outbuf);
 				return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
 			}
 			else
-				return INVALID_GUID;
+			{
+				memset(_path, 0, sizeof(_path));
+				strcpy(_path, blWorkingDir());
+				strcat(_path, _Filename);
+				emscripten_wget(_path, _path);
+				FILE* _fp = fopen(_path, "rb");
+				if (FILE_INVALID_INTERNAL(_fp))
+				{
+					BLU32 _datasz;
+					fseek(_fp, 0, SEEK_END);
+					_datasz = (BLU32)ftell(_fp);
+					fseek(_fp, 0, SEEK_SET);
+					_ret = (_BLStream*)malloc(sizeof(_BLStream));
+					_ret->pBuffer = malloc(_datasz);
+					fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp);
+					_ret->nLen = _datasz;
+					_ret->pPos = (BLU8*)_ret->pBuffer;
+					_ret->pEnd = _ret->pPos + _ret->nLen;
+					fclose(_fp);
+					return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
+				}
+				else
+					return INVALID_GUID;
+			}
 		}
 #else
 		FILE* _fp = fopen(_path, "rb");
@@ -923,15 +942,8 @@ blFileWrite(IN BLAnsi* _Filename, IN BLU32 _Count, IN BLU8* _Data)
 		return TRUE;
 	}
 #elif defined(BL_PLATFORM_WEB)
-	emscripten_fetch_attr_t _attr;
-	emscripten_fetch_attr_init(&_attr);
-	strcpy(_attr.requestMethod, "EM_IDB_STORE");
-	_attr.attributes = EMSCRIPTEN_FETCH_REPLACE | EMSCRIPTEN_FETCH_PERSIST_FILE;
-	_attr.requestData = _Data;
-	_attr.requestDataSize = _Count;
-	_attr.onsuccess = _WriteSuccess;
-	_attr.onerror = _WriteFailure;
-	emscripten_fetch(&_attr, _path);
+	BLS32 _error;
+	emscripten_idb_store("/emscriptenfs", _path, _Data, _Count, &_error);
 	return TRUE;
 #else
 	FILE* _fp = fopen(_path , "wb");
@@ -966,12 +978,8 @@ blFileDelete(IN BLAnsi* _Filename)
 	else
 		return TRUE;
 #elif defined(BL_PLATFORM_WEB)
-	emscripten_fetch_attr_t _attr;
-	emscripten_fetch_attr_init(&_attr);
-	strcpy(_attr.requestMethod, "EM_IDB_DELETE");
-	_attr.onsuccess = _WriteSuccess;
-	_attr.onerror = _WriteFailure;
-	emscripten_fetch(&_attr, _tmpname);
+	BLS32 _error;
+	emscripten_idb_delete("/emscriptenfs", _tmpname, &_error);
 	return TRUE;
 #else
 	if (remove(_tmpname))
