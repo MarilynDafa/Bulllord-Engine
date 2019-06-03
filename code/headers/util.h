@@ -48,6 +48,9 @@ BL_API BLVoid blDebugOutput(
 
 BL_API const BLAnsi* blMD5String(
 	IN BLAnsi* _Str);
+    
+BL_API const BLAnsi* blMd5File(
+    IN BLAnsi* _Filename);
 
 BL_API BLS32 blNatCompare(
 	IN BLAnsi* _StrA,

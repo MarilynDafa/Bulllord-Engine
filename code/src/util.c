@@ -19,6 +19,7 @@
  3. This notice may not be removed or altered from any source distribution.
  */
 #include "../headers/util.h"
+#include "../headers/system.h"
 #include "internal/thread.h"
 #include "internal/internal.h"
 #include "../externals/duktape/duktape.h"
@@ -355,6 +356,149 @@ blMD5String(IN BLAnsi* _Str)
 	for (_i = 0; _i<16; _i++)
 		sprintf(_PrUtilMem->aMd5Buf, "%s%02x", _PrUtilMem->aMd5Buf, _digest[_i]);
 	return _PrUtilMem->aMd5Buf;
+}
+const BLAnsi*
+blMd5File(IN BLAnsi* _Filename)
+{
+    if (!_Filename)
+        return NULL;
+    BLU32 _i, _j;
+    BLU32 _index = 0;
+    BLU32 _padlen;
+    BLU8 _bits[8];
+    BLU8 _data[1024];
+    _PrUtilMem->sContext.aCount[0] = _PrUtilMem->sContext.aCount[1] = 0;
+    _PrUtilMem->sContext.aState[0] = 0x67452301;
+    _PrUtilMem->sContext.aState[1] = 0xefcdab89;
+    _PrUtilMem->sContext.aState[2] = 0x98badcfe;
+    _PrUtilMem->sContext.aState[3] = 0x10325476;
+    BLAnsi _path[260] = { 0 };
+    strcpy(_path, blUserFolderDir());
+    strcat(_path, _Filename);
+    BLU32 _tmplen = (BLU32)strlen(_path);
+    for (_i = 0; _i < _tmplen; ++_i)
+    {
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+        if (_path[_i] == '/')
+            _path[_i] = '\\';
+#else
+        if (_path[_i] == '\\')
+            _path[_i] = '/';
+#endif
+    }
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+#ifdef WINAPI_FAMILY
+    WCHAR _wfilename[260] = { 0 };
+    MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
+    HANDLE _fp = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
+#else
+    HANDLE _fp = CreateFileA(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+#endif
+    if (FILE_INVALID_INTERNAL(_fp))
+    {
+        while (1)
+        {
+            DWORD _readsz;
+            ReadFile(_fp, _data, 1024, &_readsz, NULL);
+            _MD5Update(_data, _readsz);
+            if (_readsz < 1024)
+                break;
+        }
+        CloseHandle(_fp);
+        goto md5final;
+    }
+    else
+        return NULL;
+#elif defined(BL_PLATFORM_WEB)
+    FILE* _fp = fopen(_path, "rb");
+    if (FILE_INVALID_INTERNAL(_fp))
+    {
+        while (1)
+        {
+            BLU32 _readsz = fread(_data, 1, 1024, _fp);
+            _MD5Update(_data, _readsz);
+            if (_readsz < 1024)
+                break;
+        }
+        fclose(_fp);
+        goto md5final;
+    }
+    else
+    {
+        BLVoid* _outbuf;
+        BLS32 _outsz, _error, _exists;
+        emscripten_idb_exists("/emscriptenfs", _path, &_exists, &_error);
+        if (_exists)
+        {
+            emscripten_idb_load("/emscriptenfs", _path, &_outbuf, &_outsz, &_error);
+            BLU32 _offset = 0;
+            while (_outsz)
+            {
+                BLU32 _readsz;
+                if (_outsz > 1024)
+                {
+                    _readsz = 1024;
+                    _outsz -= 1024
+                }
+                else
+                {
+                    _readsz = _outsz;
+                    _outsz = 0;
+                }
+                memecpy(_data, (BLU8*)_outbuf + _offset, _readsz);
+                _offset += _readsz;
+                _MD5Update(_data, _readsz);
+            }
+            free(_outbuf);
+            goto md5final;
+        }
+        else
+            return NULL;
+    }
+#else
+    FILE* _fp = fopen(_path, "rb");
+    if (FILE_INVALID_INTERNAL(_fp))
+    {
+        while (1)
+        {
+            BLU32 _readsz = fread(_data, 1, 1024, _fp);
+            _MD5Update(_data, _readsz);
+            if (_readsz < 1024)
+                break;
+        }
+        fclose(_fp);
+        goto md5final;
+    }
+    else
+        return NULL;
+#endif
+md5final:
+    for (_i = 0, _j = 0; _j < 8; _i++, _j += 4)
+    {
+        _bits[_j] = (BLU8)(_PrUtilMem->sContext.aCount[_i] & 0xff);
+        _bits[_j + 1] = (BLU8)((_PrUtilMem->sContext.aCount[_i] >> 8) & 0xff);
+        _bits[_j + 2] = (BLU8)((_PrUtilMem->sContext.aCount[_i] >> 16) & 0xff);
+        _bits[_j + 3] = (BLU8)((_PrUtilMem->sContext.aCount[_i] >> 24) & 0xff);
+    }
+    _index = (BLU32)((_PrUtilMem->sContext.aCount[0] >> 3) & 0x3f);
+    _padlen = (_index < 56) ? (56 - _index) : (120 - _index);
+    BLU8 _padding[64] = { 0 };
+    _padding[0] = 0x80;
+    _MD5Update(_padding, _padlen);
+    _MD5Update(_bits, 8);
+    BLU8 _digest[16];
+    for (_i = 0, _j = 0; _j < 16; _i++, _j += 4)
+    {
+        _digest[_j] = (BLU8)(_PrUtilMem->sContext.aState[_i] & 0xff);
+        _digest[_j + 1] = (BLU8)((_PrUtilMem->sContext.aState[_i] >> 8) & 0xff);
+        _digest[_j + 2] = (BLU8)((_PrUtilMem->sContext.aState[_i] >> 16) & 0xff);
+        _digest[_j + 3] = (BLU8)((_PrUtilMem->sContext.aState[_i] >> 24) & 0xff);
+    }
+    memset(&_PrUtilMem->sContext, 0, sizeof(_BLCtx));
+    memset(_PrUtilMem->aMd5Buf, 0, sizeof(_PrUtilMem->aMd5Buf));
+    for (_i = 0; _i<16; _i++)
+        sprintf(_PrUtilMem->aMd5Buf, "%s%02x", _PrUtilMem->aMd5Buf, _digest[_i]);
+    return _PrUtilMem->aMd5Buf;
 }
 BLS32
 blNatCompare(IN BLAnsi* _StrA, IN BLAnsi* _StrB)

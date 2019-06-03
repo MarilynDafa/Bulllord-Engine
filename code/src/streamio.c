@@ -1,4 +1,4 @@
-﻿/*
+/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
 
@@ -582,7 +582,7 @@ blGenStream(IN BLAnsi* _Filename)
 			_datasz = (BLU32)AAsset_getLength(_fp);
 			_ret = (_BLStream*)malloc(sizeof(_BLStream));
 			_ret->pBuffer = malloc(_datasz);
-			AAsset_read(_fp, _ret->pBuffer, _datasz);
+            memcpy(_ret->pBuffer, AAsset_getBuffer(_fp), _datasz);
 			_ret->nLen = _datasz;
 			_ret->pPos = (BLU8*)_ret->pBuffer;
 			_ret->pEnd = _ret->pPos + _ret->nLen;
