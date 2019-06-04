@@ -1,4 +1,4 @@
-﻿/*
+/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
 
@@ -30,6 +30,7 @@
 #include "internal/mathematics.h"
 #include "../externals/duktape/duktape.h"
 #include "../externals/webp/src/webp/decode.h"
+#include "../externals/astc/astc_codec_internals.h"
 typedef struct _SpriteAction{
     struct _SpriteAction* pNext;
     struct _SpriteAction* pNeighbor;
@@ -497,6 +498,8 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 			blDeleteStream(_stream);
 			return FALSE;
 		}
+        BLBool _texsupport[BL_TF_COUNT];
+        blHardwareCapsQuery(NULL, NULL, NULL, NULL, NULL, _texsupport);
 		BLU32 _width, _height, _depth;
 		blStreamRead(_stream, sizeof(BLU32), &_width);
 		blStreamRead(_stream, sizeof(BLU32), &_height);
@@ -548,15 +551,27 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 		blStreamSeek(_stream, _offset);
 		BLU32 _imagesz;
 		switch (_fourcc)
-		{
+        {
+        case FOURCC_INTERNAL('M', 'O', 'N', 'O'):
+            _imagesz = _width * _height;
+            _node->eTexFormat = BL_TF_R8;
+            break;
 		case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
 			blStreamRead(_stream, sizeof(BLU32), &_imagesz);
 			_node->eTexFormat = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
 			break;
 		case FOURCC_INTERNAL('A', 'S', 'T', 'C'):
-			_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-			_node->eTexFormat = BL_TF_ASTC;			
-			break;
+            if (_texsupport[BL_TF_ASTC] == 1)
+            {
+                _node->eTexFormat = BL_TF_ASTC;
+                _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+            }
+            else
+            {
+                _node->eTexFormat = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+                _imagesz = _width * _height * _channels;
+            }
+            break;
 		default:assert(0); break;
 		}
 		if (_fourcc == FOURCC_INTERNAL('B', 'M', 'G', 'T'))
@@ -569,11 +584,31 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 				_node->pTexData = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
 			free(_data);
 		}
+        else if (_fourcc == FOURCC_INTERNAL('M', 'O', 'N', 'O'))
+        {
+            BLU8* _data = (BLU8*)malloc(_imagesz);
+            blStreamRead(_stream, _imagesz, _data);
+            _node->pTexData = _data;
+        }
 		else
 		{
-			BLU8* _data = (BLU8*)malloc(_imagesz);
-			blStreamRead(_stream, _imagesz, _data);
-			_node->pTexData = _data;
+            if (_texsupport[BL_TF_ASTC] == 1)
+            {
+                BLU8* _data = (BLU8*)malloc(_imagesz);
+                blStreamRead(_stream, _imagesz, _data);
+                _node->pTexData = _data;
+            }
+            else if (_texsupport[BL_TF_ASTC] == 2)
+            {
+                BLU8* _data = (BLU8*)malloc(_imagesz);
+                BLU8* _cdata = (BLU8*)malloc(((_width + 3) / 4) * ((_height + 3) / 4) * 16);
+                const BLAnsi* _argv[] = { "astcdec", "-d", "in.astc", "out.tga" };
+                astcmain(4, _argv, _cdata, _data, _width, _height, _channels);
+                free(_cdata);
+                _node->pTexData = _data;
+            }
+            else
+                _node->pTexData = NULL;
 		}
 		blDeleteStream(_stream);
 		return TRUE;
@@ -1105,7 +1140,9 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 {
 	BLU32 _screenwidth, _screenheight;
 	BLF32 _rx, _ry;
+    BLBool _texsupport[BL_TF_COUNT];
 	blWindowQuery(&_screenwidth, &_screenheight, &_PrSpriteMem->nFboWidth, &_PrSpriteMem->nFboHeight, &_rx, &_ry);
+    blHardwareCapsQuery(NULL, NULL, NULL, NULL, NULL, _texsupport);
 	BLU8 _blendfactor[4] = { 0 };
 	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, FALSE);
 	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
@@ -1202,22 +1239,26 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 							BLU32 _imagesz;
 							BLEnum _format = BL_TF_RGBA8;
 							switch (_fourcc)
-							{
+                            {
+                            case FOURCC_INTERNAL('M', 'O', 'N', 'O'):
+                                _imagesz = _width * _height;
+                                _format = BL_TF_R8;
+                                break;
 							case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
 								blStreamRead(_stream, sizeof(BLU32), &_imagesz);
 								_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
 								break;
-							case FOURCC_INTERNAL('A', 'S', 'T', '1'):
-								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-								_format = BL_TF_ASTC;
-								break;
-							case FOURCC_INTERNAL('A', 'S', 'T', '2'):
-								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-								_format = BL_TF_ASTC;
-								break;
-							case FOURCC_INTERNAL('A', 'S', 'T', '3'):
-								_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-								_format = BL_TF_ASTC;
+							case FOURCC_INTERNAL('A', 'S', 'T', 'C'):
+                                if (_texsupport[BL_TF_ASTC] == 1)
+                                {
+                                    _format = BL_TF_ASTC;
+                                    _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+                                }
+                                else
+                                {
+                                    _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+                                    _imagesz = _width * _height * _channels;
+                                }
 								break;
 							default:assert(0); break;
 							}
@@ -1232,11 +1273,31 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 									_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
 								free(_data);
 							}
+                            else if (_fourcc == FOURCC_INTERNAL('M', 'O', 'N', 'O'))
+                            {
+                                BLU8* _data = (BLU8*)malloc(_imagesz);
+                                blStreamRead(_stream, _imagesz, _data);
+                                _texdata = _data;
+                            }
 							else
 							{
-								BLU8* _data = (BLU8*)malloc(_imagesz);
-								blStreamRead(_stream, _imagesz, _data);
-								_texdata = _data;
+                                if (_texsupport[BL_TF_ASTC] == 1)
+                                {
+                                    BLU8* _data = (BLU8*)malloc(_imagesz);
+                                    blStreamRead(_stream, _imagesz, _data);
+                                    _texdata = _data;
+                                }
+                                else if (_texsupport[BL_TF_ASTC] == 2)
+                                {
+                                    BLU8* _data = (BLU8*)malloc(_imagesz);
+                                    BLU8* _cdata = (BLU8*)malloc(((_width + 3) / 4) * ((_height + 3) / 4) * 16);
+                                    const BLAnsi* _argv[] = { "astcdec", "-d", "in.astc", "out.tga" };
+                                    astcmain(4, _argv, _cdata, _data, _width, _height, _channels);
+                                    free(_cdata);
+                                    _texdata = _data;
+                                }
+                                else
+                                    _texdata = NULL;
 							}
 							_layertex = blGenTexture(blHashString((const BLUtf8*)_tile->aFilename), BL_TT_2D, _format, FALSE, TRUE, FALSE, 1, 1, _width, _height, 1, _texdata);
 							free(_texdata);

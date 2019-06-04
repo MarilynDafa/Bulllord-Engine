@@ -45,7 +45,7 @@ typedef struct tinfl_decompressor_tag tinfl_decompressor;
 /* non-C language bindings to tinfl_ API don't need to worry about */
 /* structure size and allocation mechanism. */
 
-tinfl_decompressor *tinfl_decompressor_alloc();
+tinfl_decompressor *tinfl_decompressor_alloc(void);
 void tinfl_decompressor_free(tinfl_decompressor *pDecomp);
 
 /* Max size of LZ dictionary. */

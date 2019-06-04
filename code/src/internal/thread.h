@@ -56,7 +56,7 @@ typedef struct _Thread{
 	BLBool bRunning;
 }BLThread;
 
-blMutex* blGenMutex();
+blMutex* blGenMutex(void);
 
 BLVoid blDeleteMutex(
 	INOUT blMutex* _Mu);
@@ -84,7 +84,7 @@ BLVoid blThreadRun(
 BLVoid blDeleteThread(
 	INOUT BLThread* _Tr);
 
-BLVoid blYield();
+BLVoid blYield(void);
 
 #ifdef __cplusplus
 }

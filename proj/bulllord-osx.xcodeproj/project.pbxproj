@@ -219,6 +219,21 @@
 		C779656D1F37921200D047BC /* zutil.c in Sources */ = {isa = PBXBuildFile; fileRef = C779656C1F37921200D047BC /* zutil.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C77965701F37923700D047BC /* zlib.h in Headers */ = {isa = PBXBuildFile; fileRef = C779656E1F37923700D047BC /* zlib.h */; };
 		C77965711F37923700D047BC /* zutil.h in Headers */ = {isa = PBXBuildFile; fileRef = C779656F1F37923700D047BC /* zutil.h */; };
+		C7ABA4C222A58969003EDE15 /* softfloat.h in Headers */ = {isa = PBXBuildFile; fileRef = C7ABA4C022A58969003EDE15 /* softfloat.h */; };
+		C7ABA4C322A58969003EDE15 /* softfloat.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4C122A58969003EDE15 /* softfloat.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA4C922A58A43003EDE15 /* astc_codec_internals.h in Headers */ = {isa = PBXBuildFile; fileRef = C7ABA4C822A58A43003EDE15 /* astc_codec_internals.h */; };
+		C7ABA4CD22A58AFB003EDE15 /* astc_decompress_symbolic.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4CC22A58AFA003EDE15 /* astc_decompress_symbolic.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA4DD22A5945B003EDE15 /* astc_partition_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4DC22A5945B003EDE15 /* astc_partition_tables.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA4E622A59BBD003EDE15 /* astc_block_sizes2.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4E422A59BBD003EDE15 /* astc_block_sizes2.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA4E722A59BBD003EDE15 /* astc_image_load_store.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4E522A59BBD003EDE15 /* astc_image_load_store.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA4E922A5A044003EDE15 /* astc_integer_sequence.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4E822A5A043003EDE15 /* astc_integer_sequence.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA4ED22A5A164003EDE15 /* astc_percentile_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4EC22A5A164003EDE15 /* astc_percentile_tables.c */; };
+		C7ABA4F322A5A3D5003EDE15 /* astc_weight_quant_xfer_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4F222A5A3D5003EDE15 /* astc_weight_quant_xfer_tables.c */; };
+		C7ABA4F522A5A439003EDE15 /* astc_color_unquantize.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4F422A5A438003EDE15 /* astc_color_unquantize.c */; };
+		C7ABA4FB22A5A76A003EDE15 /* astc_quantization.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4FA22A5A76A003EDE15 /* astc_quantization.c */; };
+		C7ABA4FD22A7007B003EDE15 /* astc_toplevel.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4FC22A7007B003EDE15 /* astc_toplevel.c */; };
+		C7ABA50322A706BD003EDE15 /* astc_symbolic_physical.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA50222A706BD003EDE15 /* astc_symbolic_physical.c */; };
+		C7ABA50522A70700003EDE15 /* astc_weight_align.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA50422A70700003EDE15 /* astc_weight_align.c */; };
 		C7C769811F365C6900EB0AEE /* audio.h in Headers */ = {isa = PBXBuildFile; fileRef = C7C769781F365C6900EB0AEE /* audio.h */; };
 		C7C769821F365C6900EB0AEE /* gpu.h in Headers */ = {isa = PBXBuildFile; fileRef = C7C769791F365C6900EB0AEE /* gpu.h */; };
 		C7C769831F365C6900EB0AEE /* network.h in Headers */ = {isa = PBXBuildFile; fileRef = C7C7697A1F365C6900EB0AEE /* network.h */; };
@@ -234,7 +249,6 @@
 		C7C769D01F365DB800EB0AEE /* fastlz.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769CE1F365DB800EB0AEE /* fastlz.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7C769DA1F365DF600EB0AEE /* ezxml.h in Headers */ = {isa = PBXBuildFile; fileRef = C7C769D81F365DF600EB0AEE /* ezxml.h */; };
 		C7C769DB1F365DF600EB0AEE /* ezxml.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769D91F365DF600EB0AEE /* ezxml.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7C769E71F365E9100EB0AEE /* sqlite3secure.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769E61F365E9100EB0AEE /* sqlite3secure.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7C769EB1F365EC100EB0AEE /* glcorearb.h in Headers */ = {isa = PBXBuildFile; fileRef = C7C769EA1F365EC100EB0AEE /* glcorearb.h */; };
 		C7C76A501F36637F00EB0AEE /* ftconfig.h in Headers */ = {isa = PBXBuildFile; fileRef = C7C76A4B1F36637F00EB0AEE /* ftconfig.h */; };
 		C7C76A511F36637F00EB0AEE /* ftheader.h in Headers */ = {isa = PBXBuildFile; fileRef = C7C76A4C1F36637F00EB0AEE /* ftheader.h */; };
@@ -314,6 +328,16 @@
 		C7D026231F47838F00E35DB0 /* miniz_tinfl.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0261C1F47838F00E35DB0 /* miniz_tinfl.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7D026241F47838F00E35DB0 /* miniz.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D0261D1F47838F00E35DB0 /* miniz.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C7ABA4AD22A561A3003EDE15 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C7ABA4A922A561A2003EDE15 /* test.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = C7ABA49522A561A2003EDE15;
+			remoteInfo = test;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		370F867E1F7A06D500A517D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -529,6 +553,22 @@
 		C779656C1F37921200D047BC /* zutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zutil.c; path = ../code/externals/freetype2/src/gzip/zutil.c; sourceTree = "<group>"; };
 		C779656E1F37923700D047BC /* zlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zlib.h; path = ../code/externals/freetype2/src/gzip/zlib.h; sourceTree = "<group>"; };
 		C779656F1F37923700D047BC /* zutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zutil.h; path = ../code/externals/freetype2/src/gzip/zutil.h; sourceTree = "<group>"; };
+		C7ABA4A922A561A2003EDE15 /* test.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = test.xcodeproj; path = test/test.xcodeproj; sourceTree = "<group>"; };
+		C7ABA4C022A58969003EDE15 /* softfloat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = softfloat.h; path = ../code/externals/astc/softfloat.h; sourceTree = "<group>"; };
+		C7ABA4C122A58969003EDE15 /* softfloat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = softfloat.c; path = ../code/externals/astc/softfloat.c; sourceTree = "<group>"; };
+		C7ABA4C822A58A43003EDE15 /* astc_codec_internals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = astc_codec_internals.h; path = ../code/externals/astc/astc_codec_internals.h; sourceTree = "<group>"; };
+		C7ABA4CC22A58AFA003EDE15 /* astc_decompress_symbolic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_decompress_symbolic.c; path = ../code/externals/astc/astc_decompress_symbolic.c; sourceTree = "<group>"; };
+		C7ABA4DC22A5945B003EDE15 /* astc_partition_tables.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_partition_tables.c; path = ../code/externals/astc/astc_partition_tables.c; sourceTree = "<group>"; };
+		C7ABA4E422A59BBD003EDE15 /* astc_block_sizes2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_block_sizes2.c; path = ../code/externals/astc/astc_block_sizes2.c; sourceTree = "<group>"; };
+		C7ABA4E522A59BBD003EDE15 /* astc_image_load_store.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_image_load_store.c; path = ../code/externals/astc/astc_image_load_store.c; sourceTree = "<group>"; };
+		C7ABA4E822A5A043003EDE15 /* astc_integer_sequence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_integer_sequence.c; path = ../code/externals/astc/astc_integer_sequence.c; sourceTree = "<group>"; };
+		C7ABA4EC22A5A164003EDE15 /* astc_percentile_tables.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_percentile_tables.c; path = ../code/externals/astc/astc_percentile_tables.c; sourceTree = "<group>"; };
+		C7ABA4F222A5A3D5003EDE15 /* astc_weight_quant_xfer_tables.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_weight_quant_xfer_tables.c; path = ../code/externals/astc/astc_weight_quant_xfer_tables.c; sourceTree = "<group>"; };
+		C7ABA4F422A5A438003EDE15 /* astc_color_unquantize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_color_unquantize.c; path = ../code/externals/astc/astc_color_unquantize.c; sourceTree = "<group>"; };
+		C7ABA4FA22A5A76A003EDE15 /* astc_quantization.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_quantization.c; path = ../code/externals/astc/astc_quantization.c; sourceTree = "<group>"; };
+		C7ABA4FC22A7007B003EDE15 /* astc_toplevel.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = astc_toplevel.c; path = ../code/externals/astc/astc_toplevel.c; sourceTree = "<group>"; };
+		C7ABA50222A706BD003EDE15 /* astc_symbolic_physical.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_symbolic_physical.c; path = ../code/externals/astc/astc_symbolic_physical.c; sourceTree = "<group>"; };
+		C7ABA50422A70700003EDE15 /* astc_weight_align.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = astc_weight_align.c; path = ../code/externals/astc/astc_weight_align.c; sourceTree = "<group>"; };
 		C7C769781F365C6900EB0AEE /* audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = audio.h; path = ../code/headers/audio.h; sourceTree = "<group>"; };
 		C7C769791F365C6900EB0AEE /* gpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gpu.h; path = ../code/headers/gpu.h; sourceTree = "<group>"; };
 		C7C7697A1F365C6900EB0AEE /* network.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = network.h; path = ../code/headers/network.h; sourceTree = "<group>"; };
@@ -544,7 +584,6 @@
 		C7C769CE1F365DB800EB0AEE /* fastlz.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fastlz.c; path = ../code/externals/fastlz/fastlz.c; sourceTree = "<group>"; };
 		C7C769D81F365DF600EB0AEE /* ezxml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ezxml.h; path = ../code/externals/xml/ezxml.h; sourceTree = "<group>"; };
 		C7C769D91F365DF600EB0AEE /* ezxml.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ezxml.c; path = ../code/externals/xml/ezxml.c; sourceTree = "<group>"; };
-		C7C769E61F365E9100EB0AEE /* sqlite3secure.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sqlite3secure.c; path = ../code/externals/sqlite3/sqlite3secure.c; sourceTree = "<group>"; };
 		C7C769EA1F365EC100EB0AEE /* glcorearb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glcorearb.h; path = ../code/externals/gl/glcorearb.h; sourceTree = "<group>"; };
 		C7C769FD1F365FEB00EB0AEE /* winfnt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = winfnt.c; path = ../code/externals/freetype2/src/winfonts/winfnt.c; sourceTree = "<group>"; };
 		C7C769FF1F36600900EB0AEE /* type42.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = type42.c; path = ../code/externals/freetype2/src/type42/type42.c; sourceTree = "<group>"; };
@@ -642,6 +681,7 @@
 		C73213AA1D9D2D8B00E58DD8 = {
 			isa = PBXGroup;
 			children = (
+				C7ABA4A922A561A2003EDE15 /* test.xcodeproj */,
 				C73216D61D9D2E4200E58DD8 /* externals */,
 				C73216EC1D9D2E4200E58DD8 /* src */,
 				C73216F61D9D2E4200E58DD8 /* headers */,
@@ -656,14 +696,6 @@
 				C73213B31D9D2D8B00E58DD8 /* libBulllord.dylib */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		C73216A41D9D2E4200E58DD8 /* sqlite3 */ = {
-			isa = PBXGroup;
-			children = (
-				C7C769E61F365E9100EB0AEE /* sqlite3secure.c */,
-			);
-			name = sqlite3;
 			sourceTree = "<group>";
 		};
 		C73216CA1D9D2E4200E58DD8 /* freetype2 */ = {
@@ -724,6 +756,7 @@
 		C73216D61D9D2E4200E58DD8 /* externals */ = {
 			isa = PBXGroup;
 			children = (
+				C7ABA4BB22A588C6003EDE15 /* astc */,
 				C753436C2180EA98003A789A /* webp */,
 				C75340362180E718003A789A /* mbedtls */,
 				C7D025EE1F47830400E35DB0 /* miniz */,
@@ -732,7 +765,6 @@
 				C7C769D71F365DEC00EB0AEE /* xml */,
 				C7E3BE2A1ED6740C00B60781 /* duktape */,
 				C7BECAC71E26824F002588BC /* fastlz */,
-				C73216A41D9D2E4200E58DD8 /* sqlite3 */,
 				C73216CA1D9D2E4200E58DD8 /* freetype2 */,
 			);
 			name = externals;
@@ -1041,6 +1073,36 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		C7ABA4AA22A561A2003EDE15 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C7ABA4AE22A561A3003EDE15 /* test.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C7ABA4BB22A588C6003EDE15 /* astc */ = {
+			isa = PBXGroup;
+			children = (
+				C7ABA50422A70700003EDE15 /* astc_weight_align.c */,
+				C7ABA50222A706BD003EDE15 /* astc_symbolic_physical.c */,
+				C7ABA4FA22A5A76A003EDE15 /* astc_quantization.c */,
+				C7ABA4F422A5A438003EDE15 /* astc_color_unquantize.c */,
+				C7ABA4F222A5A3D5003EDE15 /* astc_weight_quant_xfer_tables.c */,
+				C7ABA4EC22A5A164003EDE15 /* astc_percentile_tables.c */,
+				C7ABA4E822A5A043003EDE15 /* astc_integer_sequence.c */,
+				C7ABA4E422A59BBD003EDE15 /* astc_block_sizes2.c */,
+				C7ABA4E522A59BBD003EDE15 /* astc_image_load_store.c */,
+				C7ABA4DC22A5945B003EDE15 /* astc_partition_tables.c */,
+				C7ABA4CC22A58AFA003EDE15 /* astc_decompress_symbolic.c */,
+				C7ABA4C822A58A43003EDE15 /* astc_codec_internals.h */,
+				C7ABA4C122A58969003EDE15 /* softfloat.c */,
+				C7ABA4C022A58969003EDE15 /* softfloat.h */,
+				C7ABA4FC22A7007B003EDE15 /* astc_toplevel.c */,
+			);
+			name = astc;
+			sourceTree = "<group>";
+		};
 		C7BECAC71E26824F002588BC /* fastlz */ = {
 			isa = PBXGroup;
 			children = (
@@ -1114,6 +1176,7 @@
 				C75343512180EA1D003A789A /* md4.h in Headers */,
 				C753432C2180EA1D003A789A /* blowfish.h in Headers */,
 				C753434F2180EA1D003A789A /* pkcs5.h in Headers */,
+				C7ABA4C222A58969003EDE15 /* softfloat.h in Headers */,
 				C75342EB2180EA1C003A789A /* net.h in Headers */,
 				C753435C2180EA1D003A789A /* hmac_drbg.h in Headers */,
 				C7C76D3D1F36977600EB0AEE /* dictionary.h in Headers */,
@@ -1148,6 +1211,7 @@
 				C75342F52180EA1C003A789A /* havege.h in Headers */,
 				C7C76D3C1F36977600EB0AEE /* array.h in Headers */,
 				C753436A2180EA1D003A789A /* debug.h in Headers */,
+				C7ABA4C922A58A43003EDE15 /* astc_codec_internals.h in Headers */,
 				C75343642180EA1D003A789A /* pem.h in Headers */,
 				C75342F92180EA1D003A789A /* entropy.h in Headers */,
 				C75342F42180EA1C003A789A /* sha256.h in Headers */,
@@ -1268,12 +1332,28 @@
 			mainGroup = C73213AA1D9D2D8B00E58DD8;
 			productRefGroup = C73213B41D9D2D8B00E58DD8 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = C7ABA4AA22A561A2003EDE15 /* Products */;
+					ProjectRef = C7ABA4A922A561A2003EDE15 /* test.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				C73213B21D9D2D8B00E58DD8 /* bulllord */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		C7ABA4AE22A561A3003EDE15 /* test.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = test.app;
+			remoteRef = C7ABA4AD22A561A3003EDE15 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		C7C76D641F377BAE00EB0AEE /* ShellScript */ = {
@@ -1303,6 +1383,8 @@
 				C753431D2180EA1D003A789A /* ecp_curves.c in Sources */,
 				C7C76DE71F37895500EB0AEE /* ftwinfnt.c in Sources */,
 				C75344542180ED56003A789A /* thread_utils.c in Sources */,
+				C7ABA4CD22A58AFB003EDE15 /* astc_decompress_symbolic.c in Sources */,
+				C7ABA4ED22A5A164003EDE15 /* astc_percentile_tables.c in Sources */,
 				C75342E62180EA1C003A789A /* ssl_ticket.c in Sources */,
 				C75343D32180EC32003A789A /* filters.c in Sources */,
 				C75343E32180EC32003A789A /* rescaler_neon.c in Sources */,
@@ -1343,6 +1425,7 @@
 				C7D026221F47838F00E35DB0 /* miniz_tdef.c in Sources */,
 				C7C76D591F36978A00EB0AEE /* ui.c in Sources */,
 				C753434D2180EA1D003A789A /* ecdsa.c in Sources */,
+				C7ABA4FB22A5A76A003EDE15 /* astc_quantization.c in Sources */,
 				C7C76DCF1F37895500EB0AEE /* ftcache.c in Sources */,
 				C7C76DDC1F37895500EB0AEE /* smooth.c in Sources */,
 				C7C76D501F36978A00EB0AEE /* array.c in Sources */,
@@ -1360,17 +1443,20 @@
 				C75343612180EA1D003A789A /* ecjpake.c in Sources */,
 				C75343102180EA1D003A789A /* ecdh.c in Sources */,
 				C7D026231F47838F00E35DB0 /* miniz_tinfl.c in Sources */,
+				C7ABA4E922A5A044003EDE15 /* astc_integer_sequence.c in Sources */,
 				C7C76DD11F37895500EB0AEE /* ftbase.c in Sources */,
 				C75343952180EB72003A789A /* frame_dec.c in Sources */,
 				C75342FB2180EA1D003A789A /* pkcs11.c in Sources */,
 				C7C76DE11F37895500EB0AEE /* ftmm.c in Sources */,
 				C75343252180EA1D003A789A /* version.c in Sources */,
+				C7ABA4F522A5A439003EDE15 /* astc_color_unquantize.c in Sources */,
 				C7C76DD81F37895500EB0AEE /* ftlzw.c in Sources */,
 				C7C769DB1F365DF600EB0AEE /* ezxml.c in Sources */,
 				C75343C62180EC32003A789A /* alpha_processing_sse41.c in Sources */,
 				C75343412180EA1D003A789A /* des.c in Sources */,
 				C75343E62180EC32003A789A /* dec_clip_tables.c in Sources */,
 				C75342E12180EA1C003A789A /* platform.c in Sources */,
+				C7ABA50322A706BD003EDE15 /* astc_symbolic_physical.c in Sources */,
 				C75343E72180EC32003A789A /* enc_neon.c in Sources */,
 				C75343D52180EC32003A789A /* rescaler_sse2.c in Sources */,
 				C753439B2180EB72003A789A /* io_dec.c in Sources */,
@@ -1400,6 +1486,7 @@
 				C75343C52180EC32003A789A /* upsampling_sse41.c in Sources */,
 				C75342FD2180EA1D003A789A /* pem.c in Sources */,
 				C75342E82180EA1C003A789A /* threading.c in Sources */,
+				C7ABA50522A70700003EDE15 /* astc_weight_align.c in Sources */,
 				C7C76DE61F37895500EB0AEE /* fttype1.c in Sources */,
 				C753431C2180EA1D003A789A /* error.c in Sources */,
 				C75343C82180EC32003A789A /* rescaler.c in Sources */,
@@ -1412,6 +1499,7 @@
 				C75343D72180EC32003A789A /* enc_sse41.c in Sources */,
 				C7C76DDB1F37895500EB0AEE /* ftsystem.c in Sources */,
 				C753444F2180ED56003A789A /* random_utils.c in Sources */,
+				C7ABA4F322A5A3D5003EDE15 /* astc_weight_quant_xfer_tables.c in Sources */,
 				C75343972180EB72003A789A /* vp8_dec.c in Sources */,
 				C75344552180ED56003A789A /* huffman_utils.c in Sources */,
 				C75343052180EA1D003A789A /* md4.c in Sources */,
@@ -1425,6 +1513,7 @@
 				C75343E92180EC32003A789A /* enc_sse2.c in Sources */,
 				C7C76DD51F37895500EB0AEE /* ftgasp.c in Sources */,
 				C75343242180EA1D003A789A /* version_features.c in Sources */,
+				C7ABA4E722A59BBD003EDE15 /* astc_image_load_store.c in Sources */,
 				C75344512180ED56003A789A /* utils.c in Sources */,
 				C7C76DE31F37895500EB0AEE /* ftpatent.c in Sources */,
 				C7C76DE81F37895500EB0AEE /* pfr.c in Sources */,
@@ -1438,9 +1527,11 @@
 				C75342FE2180EA1D003A789A /* memory_buffer_alloc.c in Sources */,
 				C75343532180EA1D003A789A /* camellia.c in Sources */,
 				C75343C42180EC32003A789A /* ssim_sse2.c in Sources */,
+				C7ABA4FD22A7007B003EDE15 /* astc_toplevel.c in Sources */,
 				C753432B2180EA1D003A789A /* aesni.c in Sources */,
 				C7C76DE01F37895500EB0AEE /* ftlcdfil.c in Sources */,
 				C75342ED2180EA1C003A789A /* x509_create.c in Sources */,
+				C7ABA4DD22A5945B003EDE15 /* astc_partition_tables.c in Sources */,
 				C75343D42180EC32003A789A /* lossless_sse2.c in Sources */,
 				C753434A2180EA1D003A789A /* x509write_crt.c in Sources */,
 				C75343932180EB72003A789A /* vp8l_dec.c in Sources */,
@@ -1456,6 +1547,7 @@
 				C7C76DF01F37895500EB0AEE /* type1.c in Sources */,
 				C75343C92180EC32003A789A /* alpha_processing_sse2.c in Sources */,
 				C75343DC2180EC32003A789A /* upsampling_neon.c in Sources */,
+				C7ABA4C322A58969003EDE15 /* softfloat.c in Sources */,
 				C7C76DDE1F37895500EB0AEE /* ftfntfmt.c in Sources */,
 				C75343C72180EC32003A789A /* filters_sse2.c in Sources */,
 				C75342F32180EA1C003A789A /* pkparse.c in Sources */,
@@ -1466,7 +1558,6 @@
 				C7C76DD01F37895500EB0AEE /* autofit.c in Sources */,
 				C75343962180EB72003A789A /* idec_dec.c in Sources */,
 				C75343122180EA1D003A789A /* asn1write.c in Sources */,
-				C7C769E71F365E9100EB0AEE /* sqlite3secure.c in Sources */,
 				C75343182180EA1D003A789A /* entropy.c in Sources */,
 				C7C76D571F36978A00EB0AEE /* streamio.c in Sources */,
 				C7C76DD91F37895500EB0AEE /* ftinit.c in Sources */,
@@ -1480,6 +1571,7 @@
 				C7C76DCE1F37895500EB0AEE /* cff.c in Sources */,
 				C75343922180EB72003A789A /* quant_dec.c in Sources */,
 				C75342E02180EA1C003A789A /* cipher_wrap.c in Sources */,
+				C7ABA4E622A59BBD003EDE15 /* astc_block_sizes2.c in Sources */,
 				C75344502180ED56003A789A /* rescaler_utils.c in Sources */,
 				C7C76D5B1F36979200EB0AEE /* audio.xc in Sources */,
 				C7C76DEF1F37895500EB0AEE /* truetype.c in Sources */,

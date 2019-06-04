@@ -1,4 +1,4 @@
-﻿/*
+/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
 
@@ -830,7 +830,13 @@ _TextureFormatValidGL(GLenum _InternalFmt, GLenum _Fmt, GLenum _Type, BLU32 _Bpp
 		glTexImage2D(GL_TEXTURE_2D, 0, _InternalFmt, 16, 16, 0, _Fmt, _Type, _ptr);
 	glDeleteTextures(1, &_id);
 	if (glGetError())
-		return FALSE;
+    {
+#if defined(BL_PLATFORM_WEB)
+        return FALSE;
+#else
+        return 2;
+#endif
+    }
 	else
 		return TRUE;
 }
@@ -2483,11 +2489,16 @@ blVSync(IN BLBool _On)
 BLVoid 
 blHardwareCapsQuery(OUT BLEnum* _Api, OUT BLBool* _CSSupport, OUT BLBool* _GSSupport, OUT BLBool* _TSSupport, OUT BLBool* _FloatRTSupport, OUT BLBool _TexSupport[BL_TF_COUNT])
 {
-	*_Api = _PrGpuMem->sHardwareCaps.eApiType;
-	*_CSSupport = _PrGpuMem->sHardwareCaps.bCSSupport;
-	*_GSSupport = _PrGpuMem->sHardwareCaps.bGSSupport;
-	*_TSSupport = _PrGpuMem->sHardwareCaps.bTSSupport;
-	*_FloatRTSupport = _PrGpuMem->sHardwareCaps.bFloatRTSupport;
+    if (_Api)
+        *_Api = _PrGpuMem->sHardwareCaps.eApiType;
+    if (_CSSupport)
+        *_CSSupport = _PrGpuMem->sHardwareCaps.bCSSupport;
+    if (_GSSupport)
+        *_GSSupport = _PrGpuMem->sHardwareCaps.bGSSupport;
+    if (_TSSupport)
+        *_TSSupport = _PrGpuMem->sHardwareCaps.bTSSupport;
+    if (_FloatRTSupport)
+        *_FloatRTSupport = _PrGpuMem->sHardwareCaps.bFloatRTSupport;
 	for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
 		_TexSupport[_idx] = _PrGpuMem->sHardwareCaps.aTexFormats[_idx];
 }

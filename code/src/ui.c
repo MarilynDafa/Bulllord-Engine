@@ -32,6 +32,7 @@
 #include "../externals/miniz/miniz.h"
 #include "../externals/duktape/duktape.h"
 #include "../externals/webp/src/webp/decode.h"
+#include "../externals/astc/astc_codec_internals.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
 typedef struct _Glyph{
@@ -1740,6 +1741,8 @@ _LabelParse(_BLWidget* _Node)
 							blDeleteStream(_stream);
 							continue;
 						}
+                        BLBool _texsupport[BL_TF_COUNT];
+                        blHardwareCapsQuery(NULL, NULL, NULL, NULL, NULL, _texsupport);
 						BLU32 _width, _height, _depth;
 						blStreamRead(_stream, sizeof(BLU32), &_width);
 						blStreamRead(_stream, sizeof(BLU32), &_height);
@@ -1758,11 +1761,27 @@ _LabelParse(_BLWidget* _Node)
 						BLEnum _format = BL_TF_ASTC;
 						switch (_fourcc)
 						{
-						case FOURCC_INTERNAL('B', 'M', 'G', 'T'): blStreamRead(_stream, sizeof(BLU32), &_imagesz); _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8; break;
-						case FOURCC_INTERNAL('A', 'S', 'T', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
-						case FOURCC_INTERNAL('A', 'S', 'T', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
-						case FOURCC_INTERNAL('A', 'S', 'T', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
-						default:assert(0); break;
+                        case FOURCC_INTERNAL('M', 'O', 'N', 'O'):
+                            _imagesz = _width * _height;
+                            _format = BL_TF_R8;
+                            break;
+                        case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
+                            blStreamRead(_stream, sizeof(BLU32), &_imagesz);
+                            _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+                            break;
+                        case FOURCC_INTERNAL('A', 'S', 'T', 'C'):
+                            if (_texsupport[BL_TF_ASTC] == 1)
+                            {
+                                _format = BL_TF_ASTC;
+                                _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+                            }
+                            else
+                            {
+                                _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+                                _imagesz = _width * _height * _channels;
+                            }
+                            break;
+                        default:assert(0); break;
 						}
 						BLU8* _texdata;
 						if (_fourcc == FOURCC_INTERNAL('B', 'M', 'G', 'T'))
@@ -1775,11 +1794,31 @@ _LabelParse(_BLWidget* _Node)
 								_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
 							free(_data);
 						}
+                        else if (_fourcc == FOURCC_INTERNAL('M', 'O', 'N', 'O'))
+                        {
+                            BLU8* _data = (BLU8*)malloc(_imagesz);
+                            blStreamRead(_stream, _imagesz, _data);
+                            _texdata = _data;
+                        }
 						else
 						{
-							BLU8* _data = (BLU8*)malloc(_imagesz);
-							blStreamRead(_stream, _imagesz, _data);
-							_texdata = _data;
+                            if (_texsupport[BL_TF_ASTC] == 1)
+                            {
+                                BLU8* _data = (BLU8*)malloc(_imagesz);
+                                blStreamRead(_stream, _imagesz, _data);
+                                _texdata = _data;
+                            }
+                            else if (_texsupport[BL_TF_ASTC] == 2)
+                            {
+                                BLU8* _data = (BLU8*)malloc(_imagesz);
+                                BLU8* _cdata = (BLU8*)malloc(((_width + 3) / 4) * ((_height + 3) / 4) * 16);
+                                const BLAnsi* _argv[] = { "astcdec", "-d", "in.astc", "out.tga" };
+                                astcmain(4, _argv, _cdata, _data, _width, _height, _channels);
+                                free(_cdata);
+                                _texdata = _data;
+                            }
+                            else
+                                _texdata = NULL;
 						}
 						blDeleteStream(_stream);
 						BLGuid _tex = blGenTexture(blHashString((const BLUtf8*)_dir), _type, _format, FALSE, TRUE, FALSE, 1, 1, _width, _height, _depth, _texdata);
@@ -2611,6 +2650,8 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 			blDeleteStream(_stream);
 			return FALSE;
 		}
+        BLBool _texsupport[BL_TF_COUNT];
+        blHardwareCapsQuery(NULL, NULL, NULL, NULL, NULL, _texsupport);
 		BLU32 _width, _height, _depth;
 		blStreamRead(_stream, sizeof(BLU32), &_width);
 		blStreamRead(_stream, sizeof(BLU32), &_height);
@@ -2934,14 +2975,26 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 			blStreamSeek(_stream, _offset);
 			BLU32 _imagesz;
 			switch (_fourcc)
-			{
+            {
+            case FOURCC_INTERNAL('M', 'O', 'N', 'O'):
+                _imagesz = _width * _height;
+                _format = BL_TF_R8;
+                break;
 			case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
 				blStreamRead(_stream, sizeof(BLU32), &_imagesz);
 				_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
 				break;
 			case FOURCC_INTERNAL('A', 'S', 'T', 'C'):
-				_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-				_format = BL_TF_ASTC;
+                if (_texsupport[BL_TF_ASTC] == 1)
+                {
+                    _format = BL_TF_ASTC;
+                    _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+                }
+                else
+                {
+                    _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+                    _imagesz = _width * _height * _channels;
+                }
 				break;
 			default:assert(0); break;
 			}
@@ -2954,12 +3007,32 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 				else
 					_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
 				free(_data);
-			}
+            }
+            else if (_fourcc == FOURCC_INTERNAL('M', 'O', 'N', 'O'))
+            {
+                BLU8* _data = (BLU8*)malloc(_imagesz);
+                blStreamRead(_stream, _imagesz, _data);
+                _texdata = _data;
+            }
 			else
 			{
-				BLU8* _data = (BLU8*)malloc(_imagesz);
-				blStreamRead(_stream, _imagesz, _data);
-				_texdata = _data;
+                if (_texsupport[BL_TF_ASTC] == 1)
+                {
+                    BLU8* _data = (BLU8*)malloc(_imagesz);
+                    blStreamRead(_stream, _imagesz, _data);
+                    _texdata = _data;
+                }
+                else if (_texsupport[BL_TF_ASTC] == 2)
+                {
+                    BLU8* _data = (BLU8*)malloc(_imagesz);
+                    BLU8* _cdata = (BLU8*)malloc(((_width + 3) / 4) * ((_height + 3) / 4) * 16);
+                    const BLAnsi* _argv[] = { "astcdec", "-d", "in.astc", "out.tga" };
+                    astcmain(4, _argv, _cdata, _data, _width, _height, _channels);
+                    free(_cdata);
+                    _texdata = _data;
+                }
+                else
+                    _texdata = NULL;
 			}
 			blMutexLock(_PrUIMem->pPixmapsCache->pMutex);
 			_streamhead = (BLGuid*)malloc(sizeof(BLGuid));
@@ -8131,6 +8204,8 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 								blDeleteStream(_stream);
 								continue;
 							}
+                            BLBool _texsupport[BL_TF_COUNT];
+                            blHardwareCapsQuery(NULL, NULL, NULL, NULL, NULL, _texsupport);
 							BLU32 _width, _height, _depth;
 							blStreamRead(_stream, sizeof(BLU32), &_width);
 							blStreamRead(_stream, sizeof(BLU32), &_height);
@@ -8149,10 +8224,26 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 							BLEnum _format = BL_TF_RGBA8;
 							switch (_fourcc)
 							{
-							case FOURCC_INTERNAL('B', 'M', 'G', 'T'): blStreamRead(_stream, sizeof(BLU32), &_imagesz); _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8; break;
-							case FOURCC_INTERNAL('A', 'S', 'T', '1'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
-							case FOURCC_INTERNAL('A', 'S', 'T', '2'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
-							case FOURCC_INTERNAL('A', 'S', 'T', '3'): _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16; _format = BL_TF_ASTC; break;
+							case FOURCC_INTERNAL('B', 'M', 'G', 'T'):
+                                blStreamRead(_stream, sizeof(BLU32), &_imagesz);
+                                _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+                                break;
+							case FOURCC_INTERNAL('A', 'S', 'T', 'C'):
+                                if (_texsupport[BL_TF_ASTC] == 1)
+                                {
+                                    _format = BL_TF_ASTC;
+                                    _imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+                                }
+                                else
+                                {
+                                    _format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+                                    _imagesz = _width * _height * _channels;
+                                }
+                                break;
+							case FOURCC_INTERNAL('M', 'O', 'N', 'O'):
+                                _imagesz = _width * _height;
+                                _format = BL_TF_R8;
+                                break;
 							default:assert(0); break;
 							}
 							BLU8* _texdata;
@@ -8165,12 +8256,32 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 								else
 									_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
 								free(_data);
-							}
+                            }
+                            else if (_fourcc == FOURCC_INTERNAL('M', 'O', 'N', 'O'))
+                            {
+                                BLU8* _data = (BLU8*)malloc(_imagesz);
+                                blStreamRead(_stream, _imagesz, _data);
+                                _texdata = _data;
+                            }
 							else
 							{
-								BLU8* _data = (BLU8*)malloc(_imagesz);
-								blStreamRead(_stream, _imagesz, _data);
-								_texdata = _data;
+                                if (_texsupport[BL_TF_ASTC] == 1)
+                                {
+                                    BLU8* _data = (BLU8*)malloc(_imagesz);
+                                    blStreamRead(_stream, _imagesz, _data);
+                                    _texdata = _data;
+                                }
+                                else if(_texsupport[BL_TF_ASTC] == 2)
+                                {
+                                    BLU8* _data = (BLU8*)malloc(_imagesz);
+                                    BLU8* _cdata = (BLU8*)malloc(((_width + 3) / 4) * ((_height + 3) / 4) * 16);
+                                    const BLAnsi* _argv[] = { "astcdec", "-d", "in.astc", "out.tga" };
+                                    astcmain(4, _argv, _cdata, _data, _width, _height, _channels);
+                                    free(_cdata);
+                                    _texdata = _data;
+                                }
+                                else
+                                    _texdata = NULL;
 							}
 							blDeleteStream(_stream);
 							BLGuid _tex = blGenTexture(blHashString((const BLUtf8*)_dir), _type, _format, FALSE, TRUE, FALSE, 1, 1, _width, _height, _depth, _texdata);
