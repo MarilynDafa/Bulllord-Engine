@@ -149,12 +149,12 @@
 		C7ABA4E122A595F4003EDE15 /* astc_block_sizes2.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4E022A595F4003EDE15 /* astc_block_sizes2.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7ABA4E322A59BB1003EDE15 /* astc_image_load_store.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4E222A59BB1003EDE15 /* astc_image_load_store.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7ABA4EB22A5A04E003EDE15 /* astc_integer_sequence.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4EA22A5A04E003EDE15 /* astc_integer_sequence.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7ABA4EF22A5A174003EDE15 /* astc_percentile_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4EE22A5A174003EDE15 /* astc_percentile_tables.c */; };
-		C7ABA4F122A5A3CA003EDE15 /* astc_weight_quant_xfer_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4F022A5A3CA003EDE15 /* astc_weight_quant_xfer_tables.c */; };
-		C7ABA4F722A5A443003EDE15 /* astc_color_unquantize.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4F622A5A443003EDE15 /* astc_color_unquantize.c */; };
-		C7ABA4F922A5A74C003EDE15 /* astc_quantization.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4F822A5A74C003EDE15 /* astc_quantization.c */; };
-		C7ABA4FF22A7008B003EDE15 /* astc_toplevel.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4FE22A7008B003EDE15 /* astc_toplevel.c */; };
-		C7ABA50122A706B2003EDE15 /* astc_symbolic_physical.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA50022A706B1003EDE15 /* astc_symbolic_physical.c */; };
+		C7ABA4EF22A5A174003EDE15 /* astc_percentile_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4EE22A5A174003EDE15 /* astc_percentile_tables.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA4F122A5A3CA003EDE15 /* astc_weight_quant_xfer_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4F022A5A3CA003EDE15 /* astc_weight_quant_xfer_tables.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA4F722A5A443003EDE15 /* astc_color_unquantize.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4F622A5A443003EDE15 /* astc_color_unquantize.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA4F922A5A74C003EDE15 /* astc_quantization.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4F822A5A74C003EDE15 /* astc_quantization.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA4FF22A7008B003EDE15 /* astc_toplevel.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA4FE22A7008B003EDE15 /* astc_toplevel.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		C7ABA50122A706B2003EDE15 /* astc_symbolic_physical.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA50022A706B1003EDE15 /* astc_symbolic_physical.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7ABA50722A70710003EDE15 /* astc_weight_align.c in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA50622A70710003EDE15 /* astc_weight_align.c */; };
 		C7C769A11F365C8200EB0AEE /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769931F365C8200EB0AEE /* array.c */; };
 		C7C769A21F365C8200EB0AEE /* dictionary.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769941F365C8200EB0AEE /* dictionary.c */; };

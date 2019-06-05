@@ -73,7 +73,9 @@ BL_API BLBool blClipboardCopy(
 
 BL_API const BLUtf8* blClipboardPaste();
 
-BL_API BLBool blQuitEvent();
+BL_API BLBool blPeekEvent(
+    IN BLBool _LClick,
+    IN BLEnum _Key);
 
 /**
 in-build vars

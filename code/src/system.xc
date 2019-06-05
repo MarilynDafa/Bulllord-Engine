@@ -2797,8 +2797,6 @@ _CloseWindow()
     if ((self = [super initWithFrame:_Frame]))
     {
         self.contentScaleFactor = _Scale;
-        //self.tag = tag;
-        [self updateDrawableSize];
     }
     return self;
 }
@@ -4051,9 +4049,9 @@ blClipboardPaste()
 	return _PrSystemMem->aClipboard;
 }
 BLBool
-blQuitEvent()
+blPeekEvent(IN BLBool _LClick, IN BLEnum _Key)
 {
-	BLBool _quit = FALSE;
+	BLBool _triggered = FALSE;
 	_PollMsg();
 #ifdef BL_PLATFORM_ANDROID
 	BLS32 _busy;
@@ -4071,12 +4069,12 @@ blQuitEvent()
             case BL_ET_MOUSE:
 			{
 				if (BL_ME_LDOWN == _PrSystemMem->pEvents[_idx].uEvent.sMouse.eEvent)
-					_quit = TRUE;
+					_triggered = _LClick;
             } break;
             case BL_ET_KEY:
 			{
-				if (_PrSystemMem->pEvents[_idx].uEvent.sKey.eCode == BL_KC_ESCAPE || _PrSystemMem->pEvents[_idx].uEvent.sKey.eCode == BL_KC_EXIT)
-					_quit = TRUE;
+				if (_PrSystemMem->pEvents[_idx].uEvent.sKey.eCode == _Key)
+					_triggered = TRUE;
                 if (_PrSystemMem->pEvents[_idx].uEvent.sKey.pString)
                     free((BLVoid*)_PrSystemMem->pEvents[_idx].uEvent.sKey.pString);
             } break;
@@ -4089,7 +4087,7 @@ blQuitEvent()
 	if (!_busy)
 		pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #endif
-	return _quit;
+	return _triggered;
 }
 BLBool
 blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)

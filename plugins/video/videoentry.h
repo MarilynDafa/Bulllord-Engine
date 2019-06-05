@@ -31,7 +31,9 @@ BL_API BLVoid blVideoOpenEXT(
 BL_API BLVoid blVideoCloseEXT();
 
 BL_API BLBool blVideoPlayEXT(
-	IN BLAnsi* _Filename);
+	IN BLAnsi* _Filename,
+    IN BLBool _LClickInterrupt,
+    IN BLEnum _KeyInterrupt);
 #ifdef __cplusplus
 }
 #endif

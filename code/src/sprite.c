@@ -579,9 +579,9 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 			BLU8* _data = (BLU8*)malloc(_imagesz);
 			blStreamRead(_stream, _imagesz, _data);
 			if (_channels == 3)
-				_node->pTexData = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
+				_node->pTexData = WebPDecodeRGB(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 			else
-				_node->pTexData = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+				_node->pTexData = WebPDecodeRGBA(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 			free(_data);
 		}
         else if (_fourcc == FOURCC_INTERNAL('M', 'O', 'N', 'O'))
@@ -1268,9 +1268,9 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 								BLU8* _data = (BLU8*)malloc(_imagesz);
 								blStreamRead(_stream, _imagesz, _data);
 								if (_channels == 4)
-									_texdata = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+									_texdata = WebPDecodeRGBA(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 								else
-									_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
+									_texdata = WebPDecodeRGB(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 								free(_data);
 							}
                             else if (_fourcc == FOURCC_INTERNAL('M', 'O', 'N', 'O'))

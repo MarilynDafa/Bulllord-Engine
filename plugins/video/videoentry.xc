@@ -145,6 +145,8 @@ typedef struct _VideoMemberExt {
 	BLGuid nGeo;
 	BLGuid nTech;
 	BLF64 fTime;
+    BLBool bClickInterrupt;
+    BLEnum eKeyInterrupt;
 }_BLVideoMemberExt;
 static _BLVideoMemberExt* _PrVideoMem = NULL;
 static _BLOpusVorbisDecoderExt*
@@ -637,7 +639,7 @@ _DecodeThreadFunc(BLVoid* _Userdata)
 			BLF64 _mintime = _audioframe.fTime < _videoframe.fTime ? _audioframe.fTime : _videoframe.fTime;
 			blTickDelay((BLU32)((_mintime - _lasttime) * 500));
 			_lasttime = _mintime;
-		} while (!blQuitEvent());
+		} while (!blPeekEvent(_PrVideoMem->bClickInterrupt, _PrVideoMem->eKeyInterrupt));
 		free(_pcm);
 		_PrVideoMem->fTime = 0.0;
 		if (_videoframe.pBuffer)
@@ -672,6 +674,8 @@ blVideoOpenEXT(IN BLAnsi* _Version, ...)
 	_PrVideoMem->pImgDataCache = (_BLRGBFrameList*)malloc(sizeof(_BLRGBFrameList));
 	_PrVideoMem->pImgDataCache->nSize = 0;
 	_PrVideoMem->pImgDataCache->pFirst = _PrVideoMem->pImgDataCache->pLast = NULL;
+    _PrVideoMem->bClickInterrupt = FALSE;
+    _PrVideoMem->eKeyInterrupt = BL_KC_UNKNOWN;
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	_PrVideoMem->nTech = blGainTechnique(blHashString((const BLUtf8*)"shaders/2D.bsl"));
@@ -742,7 +746,7 @@ blVideoCloseEXT()
 #endif
 }
 BLBool
-blVideoPlayEXT(IN BLAnsi* _Filename)
+blVideoPlayEXT(IN BLAnsi* _Filename, IN BLBool _LClickInterrupt, IN BLEnum _KeyInterrupt)
 {
 #if defined(EMSCRIPTEN)
 	EM_ASM_ARGS({
@@ -805,6 +809,8 @@ blVideoPlayEXT(IN BLAnsi* _Filename)
 		blTickDelay(5);
 	if (_PrVideoMem->nVideoWidth == 0 || _PrVideoMem->nVideoHeight == 0)
 		return FALSE;
+    _PrVideoMem->bClickInterrupt = _LClickInterrupt;
+    _PrVideoMem->eKeyInterrupt = _KeyInterrupt;
 	_PrVideoMem->fTime = 0.0;
 	_PrVideoMem->nTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, (BLU32)_PrVideoMem->nVideoWidth, (BLU32)_PrVideoMem->nVideoHeight, 1, NULL);
 	blTextureFilter(_PrVideoMem->nTex, BL_TF_LINEAR, BL_TF_LINEAR, BL_TW_CLAMP, BL_TW_CLAMP, FALSE);

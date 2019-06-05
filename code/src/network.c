@@ -779,7 +779,8 @@ reconnect:
 			goto failed;
 		}
     }
-    _nodelay = 1, _reuse = 1;
+    _nodelay = 1;
+    _reuse = 1;
     setsockopt(_httpsok, IPPROTO_TCP, TCP_NODELAY, (BLAnsi*)&_nodelay, sizeof(_nodelay));
     setsockopt(_httpsok, SOL_SOCKET, SO_REUSEADDR, (BLAnsi*)&_reuse, sizeof(_reuse));
     struct linger _lin;

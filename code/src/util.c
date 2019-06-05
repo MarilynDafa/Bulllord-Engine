@@ -461,7 +461,7 @@ blMd5File(IN BLAnsi* _Filename)
     {
         while (1)
         {
-            BLU32 _readsz = fread(_data, 1, 1024, _fp);
+            BLU32 _readsz = (BLU32)fread(_data, 1, 1024, _fp);
             _MD5Update(_data, _readsz);
             if (_readsz < 1024)
                 break;
@@ -649,7 +649,10 @@ blUtf8Equal(IN BLUtf8* _Str1, IN BLUtf8* _Str2)
 	BLUtf8* _dst = (BLUtf8*)_Str2;
 	BLS32 _ret = 0;
 	while (!(_ret = (BLS32)(*_src - *_dst)) && *_dst)
-		++_src, ++_dst;
+    {
+        ++_src;
+        ++_dst;
+    }
 	if (_ret < 0)
 		return FALSE;
 	else if (_ret > 0)
@@ -665,7 +668,10 @@ blUtf16Equal(IN BLUtf16* _Str1, IN BLUtf16* _Str2)
 	BLUtf16* _dst = (BLUtf16*)_Str2;
 	BLS32 _ret = 0;
 	while (!(_ret = (BLS32)(*_src - *_dst)) && *_dst)
-		++_src, ++_dst;
+    {
+        ++_src;
+        ++_dst;
+    }
 	if (_ret < 0)
 		return FALSE;
 	else if (_ret > 0)

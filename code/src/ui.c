@@ -1789,9 +1789,9 @@ _LabelParse(_BLWidget* _Node)
 							BLU8* _data = (BLU8*)malloc(_imagesz);
 							blStreamRead(_stream, _imagesz, _data);
 							if (_channels == 4)
-								_texdata = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+								_texdata = WebPDecodeRGBA(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 							else
-								_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
+								_texdata = WebPDecodeRGB(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 							free(_data);
 						}
                         else if (_fourcc == FOURCC_INTERNAL('M', 'O', 'N', 'O'))
@@ -3003,9 +3003,9 @@ _LoadUI(BLVoid* _Src, const BLAnsi* _Filename)
 				BLU8* _data = (BLU8*)malloc(_imagesz);
 				blStreamRead(_stream, _imagesz, _data);
 				if (_channels == 4)
-					_texdata = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+					_texdata = WebPDecodeRGBA(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 				else
-					_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
+					_texdata = WebPDecodeRGB(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 				free(_data);
             }
             else if (_fourcc == FOURCC_INTERNAL('M', 'O', 'N', 'O'))
@@ -8252,9 +8252,9 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 								BLU8* _data = (BLU8*)malloc(_imagesz);
 								blStreamRead(_stream, _imagesz, _data);
 								if (_channels == 4)
-									_texdata = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+									_texdata = WebPDecodeRGBA(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 								else
-									_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
+									_texdata = WebPDecodeRGB(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 								free(_data);
                             }
                             else if (_fourcc == FOURCC_INTERNAL('M', 'O', 'N', 'O'))
