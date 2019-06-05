@@ -3,92 +3,76 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 48;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C7E3C2361ED8EB6400B60781 /* tmxentry.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2351ED8EB6400B60781 /* tmxentry.h */; };
-		C7E3C2381ED8EB6E00B60781 /* tmxentry.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C2371ED8EB6E00B60781 /* tmxentry.c */; };
-		C7E3C23D1ED8EB7A00B60781 /* AStar.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C2391ED8EB7A00B60781 /* AStar.h */; };
-		C7E3C23E1ED8EB7A00B60781 /* IndexPriorityQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = C7E3C23A1ED8EB7A00B60781 /* IndexPriorityQueue.h */; };
-		C7E3C23F1ED8EB7A00B60781 /* AStar.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C23B1ED8EB7A00B60781 /* AStar.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C2401ED8EB7A00B60781 /* IndexPriorityQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = C7E3C23C1ED8EB7A00B60781 /* IndexPriorityQueue.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		C7E3C2771ED8EE2200B60781 /* libbulllord.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C7E3C2761ED8EE2200B60781 /* libbulllord.dylib */; };
+		C7ABA53C22A84BAF003EDE15 /* iapentry.h in Headers */ = {isa = PBXBuildFile; fileRef = C7ABA53B22A84BAF003EDE15 /* iapentry.h */; };
+		C7ABA54022A84BFA003EDE15 /* iapentry.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA53A22A84BA9003EDE15 /* iapentry.xc */; };
+		C7ABA54822A84D11003EDE15 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7ABA54722A84D11003EDE15 /* StoreKit.framework */; };
+		C7ABA54A22A84D3F003EDE15 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7ABA54922A84D3F003EDE15 /* AppKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C7E3C1F21ED8DF7D00B60781 /* libTMXPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libTMXPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		C7E3C2351ED8EB6400B60781 /* tmxentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tmxentry.h; sourceTree = "<group>"; };
-		C7E3C2371ED8EB6E00B60781 /* tmxentry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tmxentry.c; sourceTree = "<group>"; };
-		C7E3C2391ED8EB7A00B60781 /* AStar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AStar.h; sourceTree = "<group>"; };
-		C7E3C23A1ED8EB7A00B60781 /* IndexPriorityQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IndexPriorityQueue.h; sourceTree = "<group>"; };
-		C7E3C23B1ED8EB7A00B60781 /* AStar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = AStar.c; sourceTree = "<group>"; };
-		C7E3C23C1ED8EB7A00B60781 /* IndexPriorityQueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = IndexPriorityQueue.c; sourceTree = "<group>"; };
-		C7E3C2761ED8EE2200B60781 /* libbulllord.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbulllord.dylib; path = ../../bin/osx/libbulllord.dylib; sourceTree = "<group>"; };
+		C7ABA51A22A846EC003EDE15 /* liblibIAPPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblibIAPPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7ABA53A22A84BA9003EDE15 /* iapentry.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = iapentry.xc; sourceTree = "<group>"; };
+		C7ABA53B22A84BAF003EDE15 /* iapentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iapentry.h; sourceTree = "<group>"; };
+		C7ABA54722A84D11003EDE15 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		C7ABA54922A84D3F003EDE15 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		C7E3C1EF1ED8DF7D00B60781 /* Frameworks */ = {
+		C7ABA51722A846EC003EDE15 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C7E3C2771ED8EE2200B60781 /* libbulllord.dylib in Frameworks */,
+				C7ABA54A22A84D3F003EDE15 /* AppKit.framework in Frameworks */,
+				C7ABA54822A84D11003EDE15 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		C7E3C1E91ED8DF7D00B60781 = {
+		C7ABA51122A846EB003EDE15 = {
 			isa = PBXGroup;
 			children = (
-				C7E3C2341ED8EB2100B60781 /* src */,
-				C7E3C2331ED8EB1A00B60781 /* headers */,
-				C7E3C2321ED8EB0F00B60781 /* externals */,
-				C7E3C1F31ED8DF7D00B60781 /* Products */,
-				C7E3C2751ED8EE1F00B60781 /* Frameworks */,
+				C7ABA53722A84B90003EDE15 /* headers */,
+				C7ABA53622A84B8A003EDE15 /* src */,
+				C7ABA51B22A846EC003EDE15 /* Products */,
+				C7ABA54622A84D10003EDE15 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
-		C7E3C1F31ED8DF7D00B60781 /* Products */ = {
+		C7ABA51B22A846EC003EDE15 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7E3C1F21ED8DF7D00B60781 /* libTMXPlugin.dylib */,
+				C7ABA51A22A846EC003EDE15 /* liblibIAPPlugin.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C7E3C2321ED8EB0F00B60781 /* externals */ = {
+		C7ABA53622A84B8A003EDE15 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				C7E3C2391ED8EB7A00B60781 /* AStar.h */,
-				C7E3C23A1ED8EB7A00B60781 /* IndexPriorityQueue.h */,
-				C7E3C23B1ED8EB7A00B60781 /* AStar.c */,
-				C7E3C23C1ED8EB7A00B60781 /* IndexPriorityQueue.c */,
-			);
-			name = externals;
-			sourceTree = "<group>";
-		};
-		C7E3C2331ED8EB1A00B60781 /* headers */ = {
-			isa = PBXGroup;
-			children = (
-				C7E3C2351ED8EB6400B60781 /* tmxentry.h */,
-			);
-			name = headers;
-			sourceTree = "<group>";
-		};
-		C7E3C2341ED8EB2100B60781 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				C7E3C2371ED8EB6E00B60781 /* tmxentry.c */,
+				C7ABA53A22A84BA9003EDE15 /* iapentry.xc */,
 			);
 			name = src;
 			sourceTree = "<group>";
 		};
-		C7E3C2751ED8EE1F00B60781 /* Frameworks */ = {
+		C7ABA53722A84B90003EDE15 /* headers */ = {
 			isa = PBXGroup;
 			children = (
-				C7E3C2761ED8EE2200B60781 /* libbulllord.dylib */,
+				C7ABA53B22A84BAF003EDE15 /* iapentry.h */,
+			);
+			name = headers;
+			sourceTree = "<group>";
+		};
+		C7ABA54622A84D10003EDE15 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C7ABA54922A84D3F003EDE15 /* AppKit.framework */,
+				C7ABA54722A84D11003EDE15 /* StoreKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -96,87 +80,84 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		C7E3C1F01ED8DF7D00B60781 /* Headers */ = {
+		C7ABA51822A846EC003EDE15 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C7E3C23D1ED8EB7A00B60781 /* AStar.h in Headers */,
-				C7E3C23E1ED8EB7A00B60781 /* IndexPriorityQueue.h in Headers */,
-				C7E3C2361ED8EB6400B60781 /* tmxentry.h in Headers */,
+				C7ABA53C22A84BAF003EDE15 /* iapentry.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		C7E3C1F11ED8DF7D00B60781 /* tmx-osx */ = {
+		C7ABA51922A846EC003EDE15 /* iap-osx */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C7E3C1F61ED8DF7D00B60781 /* Build configuration list for PBXNativeTarget "tmx-osx" */;
+			buildConfigurationList = C7ABA51E22A846EC003EDE15 /* Build configuration list for PBXNativeTarget "iap-osx" */;
 			buildPhases = (
-				C7E3C1EE1ED8DF7D00B60781 /* Sources */,
-				C7E3C1EF1ED8DF7D00B60781 /* Frameworks */,
-				C7E3C1F01ED8DF7D00B60781 /* Headers */,
+				C7ABA51622A846EC003EDE15 /* Sources */,
+				C7ABA51722A846EC003EDE15 /* Frameworks */,
+				C7ABA51822A846EC003EDE15 /* Headers */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "tmx-osx";
-			productName = "tmx-osx";
-			productReference = C7E3C1F21ED8DF7D00B60781 /* libTMXPlugin.dylib */;
+			name = "iap-osx";
+			productName = "iap-osx";
+			productReference = C7ABA51A22A846EC003EDE15 /* liblibIAPPlugin.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		C7E3C1EA1ED8DF7D00B60781 /* Project object */ = {
+		C7ABA51222A846EB003EDE15 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = trix;
 				TargetAttributes = {
-					C7E3C1F11ED8DF7D00B60781 = {
-						CreatedOnToolsVersion = 8.2.1;
+					C7ABA51922A846EC003EDE15 = {
+						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = C7E3C1ED1ED8DF7D00B60781 /* Build configuration list for PBXProject "tmx-osx" */;
-			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			buildConfigurationList = C7ABA51522A846EB003EDE15 /* Build configuration list for PBXProject "iap-osx" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = C7E3C1E91ED8DF7D00B60781;
-			productRefGroup = C7E3C1F31ED8DF7D00B60781 /* Products */;
+			mainGroup = C7ABA51122A846EB003EDE15;
+			productRefGroup = C7ABA51B22A846EC003EDE15 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C7E3C1F11ED8DF7D00B60781 /* tmx-osx */,
+				C7ABA51922A846EC003EDE15 /* iap-osx */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C7E3C1EE1ED8DF7D00B60781 /* Sources */ = {
+		C7ABA51622A846EC003EDE15 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C7E3C2401ED8EB7A00B60781 /* IndexPriorityQueue.c in Sources */,
-				C7E3C2381ED8EB6E00B60781 /* tmxentry.c in Sources */,
-				C7E3C23F1ED8EB7A00B60781 /* AStar.c in Sources */,
+				C7ABA54022A84BFA003EDE15 /* iapentry.xc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		C7E3C1F41ED8DF7D00B60781 /* Debug */ = {
+		C7ABA51C22A846EC003EDE15 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -197,6 +178,7 @@
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -210,10 +192,10 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = BL_EXPORT;
-				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
-					BL_EXPORT,
+				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
+					"$(inherited)",
+					BL_EXPORT,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -222,23 +204,24 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					../../code/externals,
 					../../code/headers,
+					../../code/externals,
 				);
 				LIBRARY_SEARCH_PATHS = ../../bin/osx;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = libTMXPlugin;
+				PRODUCT_NAME = libIAPPlugin;
 				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
-		C7E3C1F51ED8DF7D00B60781 /* Release */ = {
+		C7ABA51D22A846EC003EDE15 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -259,6 +242,7 @@
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -278,69 +262,61 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					../../code/externals,
 					../../code/headers,
+					../../code/externals,
 				);
 				LIBRARY_SEARCH_PATHS = ../../bin/osx;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = libTMXPlugin;
+				PRODUCT_NAME = libIAPPlugin;
 				SDKROOT = macosx;
 			};
 			name = Release;
 		};
-		C7E3C1F71ED8DF7D00B60781 /* Debug */ = {
+		C7ABA51F22A846EC003EDE15 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CONFIGURATION_BUILD_DIR = ../../bin/osx;
+				CODE_SIGN_STYLE = Automatic;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = "";
-				HEADER_SEARCH_PATHS = (
-					../../code/externals,
-					../../code/headers,
-				);
-				PRODUCT_NAME = libTMXPlugin;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = libIAPPlugin;
 			};
 			name = Debug;
 		};
-		C7E3C1F81ED8DF7D00B60781 /* Release */ = {
+		C7ABA52022A846EC003EDE15 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CONFIGURATION_BUILD_DIR = ../../bin/osx;
+				CODE_SIGN_STYLE = Automatic;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = "";
-				HEADER_SEARCH_PATHS = (
-					../../code/externals,
-					../../code/headers,
-				);
-				PRODUCT_NAME = libTMXPlugin;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = libIAPPlugin;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C7E3C1ED1ED8DF7D00B60781 /* Build configuration list for PBXProject "tmx-osx" */ = {
+		C7ABA51522A846EB003EDE15 /* Build configuration list for PBXProject "iap-osx" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C7E3C1F41ED8DF7D00B60781 /* Debug */,
-				C7E3C1F51ED8DF7D00B60781 /* Release */,
+				C7ABA51C22A846EC003EDE15 /* Debug */,
+				C7ABA51D22A846EC003EDE15 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C7E3C1F61ED8DF7D00B60781 /* Build configuration list for PBXNativeTarget "tmx-osx" */ = {
+		C7ABA51E22A846EC003EDE15 /* Build configuration list for PBXNativeTarget "iap-osx" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C7E3C1F71ED8DF7D00B60781 /* Debug */,
-				C7E3C1F81ED8DF7D00B60781 /* Release */,
+				C7ABA51F22A846EC003EDE15 /* Debug */,
+				C7ABA52022A846EC003EDE15 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = C7E3C1EA1ED8DF7D00B60781 /* Project object */;
+	rootObject = C7ABA51222A846EB003EDE15 /* Project object */;
 }

@@ -638,7 +638,7 @@ blPurchaseEXT(IN BLAnsi* _ProductID, IN BLVoid(*_Subscriber)(BLEnum, BLAnsi*, BL
     else
     {
         @autoreleasepool {
-            _PrIapMem->pPurchaseSubscriber = (BLVoid(*)(BLEnum, BLAnsi*))_Subscriber;
+            _PrIapMem->pPurchaseSubscriber = (BLVoid(*)(BLEnum, BLAnsi*, BLAnsi*))_Subscriber;
             NSString* _productid = [NSString stringWithUTF8String:_ProductID];
             [[AppStore getInstance] initiatePaymentRequestForProductWithIdentifier:_productid];
         }
