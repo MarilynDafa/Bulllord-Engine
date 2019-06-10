@@ -644,6 +644,14 @@ typedef unsigned long long BLGuid;
 #define BL_CM_CW        1
 #define BL_CM_CCW       2
 
+/* _FILL_MODE */
+#define BL_FM_SOLID     0
+#define BL_FM_WIREFRAME 1
+
+/* _FRONT_FACE */
+#define BL_FF_CCW       0
+#define BL_FF_CW        1
+
 /* _COMPARISON_FUNC */
 #define BL_CF_NEVER           0
 #define BL_CF_LESS            1
@@ -685,6 +693,25 @@ typedef unsigned long long BLGuid;
 #define BL_BO_REVSUBTRACT       2
 #define BL_BO_MIN               3
 #define BL_BO_MAX               4
+
+/* _BLEND_TARGETS */
+#define BL_BT_TARGET_0          0x1
+#define BL_BT_TARGET_1          0x2
+#define BL_BT_TARGET_2          0x4
+#define BL_BT_TARGET_3          0x8
+#define BL_BT_TARGET_4          0x10
+#define BL_BT_TARGET_5          0x20
+#define BL_BT_TARGET_6          0x40
+#define BL_BT_TARGET_7          0x80
+#define BL_BT_TARGET_ALL        0xFF
+
+/* _BLEND_MASK */
+#define BL_BM_NONE              0x0
+#define BL_BM_RED               0x1
+#define BL_BM_GREEN             0x2
+#define BL_BM_BLUE              0x4
+#define BL_BM_ALPHA             0x8
+#define BL_BM_ALL               BL_BM_RED | BL_BM_GREEN | BL_BM_BLUE | BL_BM_ALPHA
 
 /* _INDEXBUFFER_FORMAT*/
 #define BL_IF_INVALID       0

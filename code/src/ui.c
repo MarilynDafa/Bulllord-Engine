@@ -11465,9 +11465,22 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 	BLU32 _width, _height;
 	BLF32 _rx, _ry;
 	blWindowQuery(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
-	BLU8 _blendfactor[4] = { 0 };
 	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, FALSE);
-	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
+    BLEnum _srcblendfactor[8];
+    _srcblendfactor[0] = BL_BF_SRCALPHA;
+    BLEnum _destblendfactor[8];
+    _destblendfactor[0] = BL_BF_INVSRCALPHA;
+    BLEnum _srcblendalphafactor[8];
+    _srcblendalphafactor[0] = BL_BF_INVDESTALPHA;
+    BLEnum _destblendalphafactor[8];
+    _destblendalphafactor[0] = BL_BF_ONE;
+    BLEnum _blendop[8];
+    _blendop[0] = BL_BO_ADD;
+    BLEnum _blendopalpha[8];
+    _blendopalpha[0] = BL_BO_ADD;
+    BLEnum _blendmask[8];
+    _blendmask[0] = BL_BM_ALL;
+	blBlendState(FALSE, TRUE, FALSE, BL_BT_TARGET_ALL, _srcblendfactor, _destblendfactor, _srcblendalphafactor, _destblendalphafactor, _blendop, _blendopalpha, _blendmask, FALSE);
 	if (_Baseplate)
 	{
 		_BLWidget* _node = _PrUIMem->pBasePlate;

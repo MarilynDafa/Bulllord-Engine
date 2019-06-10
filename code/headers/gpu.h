@@ -92,24 +92,40 @@ BL_API BLVoid blDepthStencilState(
      Default Value
      _AlphaToCoverage FALSE
      _Blend FALSE
+     _IndependentBlend FALSE
+     _RenderTargetMask BL_BT_TARGET_ALL
      _SrcBlendFactor BL_BF_ONE
      _DestBlendFactor BL_BF_ZERO
      _SrcBlendAlphaFactor BL_BF_ONE
      _DestBlendAlphaFactor BL_BF_ZERO
      _BlendOp BL_BO_ADD
      _BlendOpAlpha BL_BO_ADD
+     _BlendMask BL_BM_ALL
+     _BlendMask 0
      */
 BL_API BLVoid blBlendState(
     IN BLBool _AlphaToCoverage,
     IN BLBool _Blend,
-    IN BLEnum _SrcBlendFactor,
-    IN BLEnum _DestBlendFactor,
-    IN BLEnum _SrcBlendAlphaFactor,
-    IN BLEnum _DestBlendAlphaFactor,
-    IN BLEnum _BlendOp,
-    IN BLEnum _BlendOpAlpha,
-    IN BLU8 _BlendFactor[4],
+    IN BLBool _IndependentBlend,
+    IN BLEnum _RenderTargetMask,
+    IN BLEnum _SrcBlendFactor[8],
+    IN BLEnum _DestBlendFactor[8],
+    IN BLEnum _SrcBlendAlphaFactor[8],
+    IN BLEnum _DestBlendAlphaFactor[8],
+    IN BLEnum _BlendOp[8],
+    IN BLEnum _BlendOpAlpha[8],
+    IN BLEnum _BlendMask[8],
 	IN BLBool _Force);
+
+BL_API BLGuid blGenFence();
+    
+BL_API BLVoid blDeleteFence(
+    IN BLGuid _Fence);
+    
+BL_API BLGuid blGenSemaphore();
+    
+BL_API BLVoid blDeleteSemaphore(
+    IN BLGuid _Semaphore);
     
 BL_API BLGuid blGenFrameBuffer();
 
