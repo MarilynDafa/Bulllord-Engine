@@ -106,15 +106,13 @@ BL_API BLVoid blDepthStencilState(
 BL_API BLVoid blBlendState(
     IN BLBool _AlphaToCoverage,
     IN BLBool _Blend,
-    IN BLBool _IndependentBlend,
-    IN BLEnum _RenderTargetMask,
-    IN BLEnum _SrcBlendFactor[8],
-    IN BLEnum _DestBlendFactor[8],
-    IN BLEnum _SrcBlendAlphaFactor[8],
-    IN BLEnum _DestBlendAlphaFactor[8],
-    IN BLEnum _BlendOp[8],
-    IN BLEnum _BlendOpAlpha[8],
-    IN BLEnum _BlendMask[8],
+    IN BLEnum _SrcBlendFactor,
+    IN BLEnum _DestBlendFactor,
+    IN BLEnum _SrcBlendAlphaFactor,
+    IN BLEnum _DestBlendAlphaFactor,
+    IN BLEnum _BlendOp,
+    IN BLEnum _BlendOpAlpha,
+    IN BLEnum _BlendMask,
 	IN BLBool _Force);
 
 BL_API BLGuid blGenFence();
@@ -122,10 +120,26 @@ BL_API BLGuid blGenFence();
 BL_API BLVoid blDeleteFence(
     IN BLGuid _Fence);
     
+BL_API BLVoid blFenceStatus(
+    IN BLGuid _Fence,
+    OUT BLBool* _Complete);
+    
+BL_API BLVoid blFenceWait(
+    IN BLGuid _Fence);
+    
 BL_API BLGuid blGenSemaphore();
     
 BL_API BLVoid blDeleteSemaphore(
     IN BLGuid _Semaphore);
+    
+BL_API BLGuid blGenCmdQueue(
+    IN BLEnum _Flag,
+    IN BLEnum _Priority,
+    IN BLEnum _Type,
+    IN BLU32 _NodeIndex);
+    
+BL_API BLVoid blDeleteCmdQueue(
+    IN BLGuid _Queue);
     
 BL_API BLGuid blGenFrameBuffer();
 
@@ -147,7 +161,6 @@ BL_API BLVoid blFrameBufferResolve(
 BL_API BLU32 blFrameBufferAttach(
     IN BLGuid _FBO,
 	IN BLGuid _Tex,
-    IN BLS32 _Level,
     IN BLEnum _CFace);
 
 BL_API BLVoid blFrameBufferDetach(

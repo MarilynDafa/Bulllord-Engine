@@ -11087,7 +11087,7 @@ _SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, B
 		BLF32 _rx, _ry;
 		blWindowQuery(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
 		_PrUIMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrUIMem->nFboWidth, _PrUIMem->nFboHeight, 1, NULL);
-		blFrameBufferAttach(_PrUIMem->nFBO, _PrUIMem->nFBOTex, 0, BL_CTF_IGNORE);
+		blFrameBufferAttach(_PrUIMem->nFBO, _PrUIMem->nFBOTex, BL_CTF_IGNORE);
 		_PrUIMem->bDirty = TRUE;
 	}
 	return FALSE;
@@ -11138,7 +11138,7 @@ _UIInit(DUK_CONTEXT* _DKC, BLBool _Profiler)
 	BLF32 _rx, _ry;
     blWindowQuery(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
 	_PrUIMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrUIMem->nFboWidth, _PrUIMem->nFboHeight, 1, NULL);
-	blFrameBufferAttach(_PrUIMem->nFBO, _PrUIMem->nFBOTex, 0, BL_CTF_IGNORE);
+	blFrameBufferAttach(_PrUIMem->nFBO, _PrUIMem->nFBOTex, BL_CTF_IGNORE);
 	blSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	blSubscribeEvent(BL_ET_KEY, _KeyboardSubscriber);
 	blSubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
@@ -11466,21 +11466,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 	BLF32 _rx, _ry;
 	blWindowQuery(&_width, &_height, &_PrUIMem->nFboWidth, &_PrUIMem->nFboHeight, &_rx, &_ry);
 	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, FALSE);
-    BLEnum _srcblendfactor[8];
-    _srcblendfactor[0] = BL_BF_SRCALPHA;
-    BLEnum _destblendfactor[8];
-    _destblendfactor[0] = BL_BF_INVSRCALPHA;
-    BLEnum _srcblendalphafactor[8];
-    _srcblendalphafactor[0] = BL_BF_INVDESTALPHA;
-    BLEnum _destblendalphafactor[8];
-    _destblendalphafactor[0] = BL_BF_ONE;
-    BLEnum _blendop[8];
-    _blendop[0] = BL_BO_ADD;
-    BLEnum _blendopalpha[8];
-    _blendopalpha[0] = BL_BO_ADD;
-    BLEnum _blendmask[8];
-    _blendmask[0] = BL_BM_ALL;
-	blBlendState(FALSE, TRUE, FALSE, BL_BT_TARGET_ALL, _srcblendfactor, _destblendfactor, _srcblendalphafactor, _destblendalphafactor, _blendop, _blendopalpha, _blendmask, FALSE);
+	blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, BL_BM_ALL, FALSE);
 	if (_Baseplate)
 	{
 		_BLWidget* _node = _PrUIMem->pBasePlate;

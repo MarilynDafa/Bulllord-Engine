@@ -83,21 +83,32 @@ typedef struct _PipelineState{
     BLEnum eBackStencilDepthFailOp;
     BLEnum eBackStencilPassOp;
     BLEnum eBackStencilCompFunc;
-    BLEnum aSrcBlendFactor[8];
-    BLEnum aDestBlendFactor[8];
-    BLEnum aSrcBlendAlphaFactor[8];
-    BLEnum aDestBlendAlphaFactor[8];
-    BLEnum aBlendOp[8];
-    BLEnum aBlendOpAlpha[8];
-    BLEnum aBlendMasks[8];
-    BLEnum eRenderTargetMask;
+    BLEnum eSrcBlendFactor;
+    BLEnum eDestBlendFactor;
+    BLEnum eSrcBlendAlphaFactor;
+    BLEnum eDestBlendAlphaFactor;
+    BLEnum eBlendOp;
+    BLEnum eBlendOpAlpha;
+    BLEnum eBlendMasks;
     BLBool bAlphaToCoverage;
-    BLBool bIndependentBlend;
     BLBool bBlend;
     BLBool bRasterStateDirty;
     BLBool bDSStateDirty;
     BLBool bBlendStateDirty;
 }_BLPipelineState;
+typedef struct _Fence {
+    union {
+#if defined(BL_GL_BACKEND)
+        GLsync sHandle;
+#elif defined(BL_VK_BACKEND)
+
+#elif defined(BL_MTL_BACKEND)
+
+#elif defined(BL_DX_BACKEND)
+
+#endif
+    } uData;
+}_BLFence;
 typedef struct _UniformBuffer {
 	union {
 #if defined(BL_GL_BACKEND)
@@ -152,7 +163,6 @@ typedef struct _TextureBuffer {
 typedef struct _FrameBuffer {
     struct _Attachment{
         _BLTextureBuffer* pAttachments;
-        BLU32 nMip;
         BLU32 nFace;
     } aAttachments[8];
     _BLTextureBuffer* pDSAttachment;
@@ -277,6 +287,10 @@ typedef struct _Technique{
     } uData;
 }_BLTechnique;
 typedef struct _CommandQueue {
+    BLEnum eFlag;
+    BLEnum ePriority;
+    BLEnum eType;
+    BLU32 nNodeIndex;
 #if defined(BL_VK_BACKEND)
 	struct _VKCMD {
 	} sVK;
@@ -386,20 +400,18 @@ _PipelineStateDefaultGL(BLU32 _Width, BLU32 _Height)
     _PrGpuMem->sPipelineState.eBackStencilPassOp = BL_SO_KEEP;
     GL_CHECK_INTERNAL(glDisable(GL_BLEND));
     _PrGpuMem->sPipelineState.bBlend = FALSE;
-    _PrGpuMem->sPipelineState.bIndependentBlend = FALSE;
     GL_CHECK_INTERNAL(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
     _PrGpuMem->sPipelineState.bAlphaToCoverage = FALSE;
     GL_CHECK_INTERNAL(glBlendEquationSeparate(GL_FUNC_ADD , GL_FUNC_ADD));
     GL_CHECK_INTERNAL(glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO));
     GL_CHECK_INTERNAL(glBlendColor(0.f, 0.f, 0.f, 0.f));
-    _PrGpuMem->sPipelineState.aBlendMasks[0] = BL_BM_ALL;
-    _PrGpuMem->sPipelineState.aBlendOp[0] = BL_BO_ADD;
-    _PrGpuMem->sPipelineState.aBlendOpAlpha[0] = BL_BO_ADD;
-    _PrGpuMem->sPipelineState.aSrcBlendFactor[0] = BL_BF_ONE;
-    _PrGpuMem->sPipelineState.aSrcBlendAlphaFactor[0] = BL_BF_ONE;
-    _PrGpuMem->sPipelineState.aDestBlendFactor[0] = BL_BF_ZERO;
-    _PrGpuMem->sPipelineState.aDestBlendAlphaFactor[0] = BL_BF_ZERO;
-    _PrGpuMem->sPipelineState.eRenderTargetMask = BL_BT_TARGET_ALL;
+    _PrGpuMem->sPipelineState.eBlendMasks = BL_BM_ALL;
+    _PrGpuMem->sPipelineState.eBlendOp = BL_BO_ADD;
+    _PrGpuMem->sPipelineState.eBlendOpAlpha = BL_BO_ADD;
+    _PrGpuMem->sPipelineState.eSrcBlendFactor = BL_BF_ONE;
+    _PrGpuMem->sPipelineState.eSrcBlendAlphaFactor = BL_BF_ONE;
+    _PrGpuMem->sPipelineState.eDestBlendFactor = BL_BF_ZERO;
+    _PrGpuMem->sPipelineState.eDestBlendAlphaFactor = BL_BF_ZERO;
     _PrGpuMem->sPipelineState.bRasterStateDirty = FALSE;
     _PrGpuMem->sPipelineState.bDSStateDirty = FALSE;
     _PrGpuMem->sPipelineState.bBlendStateDirty = FALSE;
@@ -707,7 +719,7 @@ _PipelineStateRefreshGL()
             GL_CHECK_INTERNAL(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
         }
         GLenum _es, _eas;
-        switch (_PrGpuMem->sPipelineState.aBlendOp[0])
+        switch (_PrGpuMem->sPipelineState.eBlendOp)
         {
             case BL_BO_ADD: _es = GL_FUNC_ADD; break;
             case BL_BO_SUBTRACT: _es = GL_FUNC_SUBTRACT; break;
@@ -715,7 +727,7 @@ _PipelineStateRefreshGL()
             case BL_BO_MIN: _es = GL_MIN; break;
             default: _es = GL_MAX; break;
         }
-        switch (_PrGpuMem->sPipelineState.aBlendOpAlpha[0])
+        switch (_PrGpuMem->sPipelineState.eBlendOpAlpha)
         {
             case BL_BO_ADD: _eas = GL_FUNC_ADD; break;
             case BL_BO_SUBTRACT: _eas = GL_FUNC_SUBTRACT; break;
@@ -724,7 +736,7 @@ _PipelineStateRefreshGL()
             default: _eas = GL_MAX; break;
         }
         GLenum _srgb, _drgb, _srgba, _drgba;
-        switch (_PrGpuMem->sPipelineState.aSrcBlendFactor[0])
+        switch (_PrGpuMem->sPipelineState.eSrcBlendFactor)
         {
             case BL_BF_ZERO: _srgb = GL_ZERO; break;
             case BL_BF_ONE: _srgb = GL_ONE; break;
@@ -740,7 +752,7 @@ _PipelineStateRefreshGL()
             case BL_BF_FACTOR: _srgb = GL_CONSTANT_COLOR; break;
             default: _srgb = GL_ONE_MINUS_CONSTANT_COLOR; break;
         }
-        switch (_PrGpuMem->sPipelineState.aDestBlendFactor[0])
+        switch (_PrGpuMem->sPipelineState.eDestBlendFactor)
         {
             case BL_BF_ZERO: _drgb = GL_ZERO; break;
             case BL_BF_ONE: _drgb = GL_ONE; break;
@@ -756,7 +768,7 @@ _PipelineStateRefreshGL()
             case BL_BF_FACTOR: _drgb = GL_CONSTANT_COLOR; break;
             default: _drgb = GL_ONE_MINUS_CONSTANT_COLOR; break;
         }
-        switch (_PrGpuMem->sPipelineState.aSrcBlendAlphaFactor[0])
+        switch (_PrGpuMem->sPipelineState.eSrcBlendAlphaFactor)
         {
             case BL_BF_ZERO: _srgba = GL_ZERO; break;
             case BL_BF_ONE: _srgba = GL_ONE; break;
@@ -772,7 +784,7 @@ _PipelineStateRefreshGL()
             case BL_BF_FACTOR: _srgba = GL_CONSTANT_COLOR; break;
             default: _srgba = GL_ONE_MINUS_CONSTANT_COLOR; break;
         }
-        switch (_PrGpuMem->sPipelineState.aDestBlendAlphaFactor[0])
+        switch (_PrGpuMem->sPipelineState.eDestBlendAlphaFactor)
         {
             case BL_BF_ZERO: _drgba = GL_ZERO; break;
             case BL_BF_ONE: _drgba = GL_ONE; break;
@@ -2582,46 +2594,40 @@ blDepthStencilState(IN BLBool _Depth, IN BLBool _Mask, IN BLEnum _DepthCompFunc,
 	}
 }
 BLVoid
-blBlendState(IN BLBool _AlphaToCoverage, IN BLBool _Blend, IN BLBool _IndependentBlend, IN BLEnum _RenderTargetMask, IN BLEnum _SrcBlendFactor[8], IN BLEnum _DestBlendFactor[8], IN BLEnum _SrcBlendAlphaFactor[8], IN BLEnum _DestBlendAlphaFactor[8], IN BLEnum _BlendOp[8], IN BLEnum _BlendOpAlpha[8], IN BLEnum _BlendMask[8], IN BLBool _Force)
+blBlendState(IN BLBool _AlphaToCoverage, IN BLBool _Blend, IN BLEnum _SrcBlendFactor, IN BLEnum _DestBlendFactor, IN BLEnum _SrcBlendAlphaFactor, IN BLEnum _DestBlendAlphaFactor, IN BLEnum _BlendOp, IN BLEnum _BlendOpAlpha, IN BLEnum _BlendMask, IN BLBool _Force)
 {
     if (_PrGpuMem->sPipelineState.bAlphaToCoverage != _AlphaToCoverage ||
         _PrGpuMem->sPipelineState.bBlend != _Blend ||
-        _PrGpuMem->sPipelineState.bIndependentBlend != _IndependentBlend ||
-        _PrGpuMem->sPipelineState.eRenderTargetMask != _RenderTargetMask ||
-        memcmp(_PrGpuMem->sPipelineState.aSrcBlendFactor, _SrcBlendFactor, 8 * sizeof(BLEnum)) ||
-        memcmp(_PrGpuMem->sPipelineState.aDestBlendFactor, _DestBlendFactor, 8 * sizeof(BLEnum)) ||
-        memcmp(_PrGpuMem->sPipelineState.aSrcBlendAlphaFactor, _SrcBlendAlphaFactor, 8 * sizeof(BLEnum)) ||
-        memcmp(_PrGpuMem->sPipelineState.aDestBlendAlphaFactor, _DestBlendAlphaFactor, 8 * sizeof(BLEnum)) ||
-        memcmp(_PrGpuMem->sPipelineState.aBlendOp, _BlendOp, 8 * sizeof(BLEnum)) ||
-        memcmp(_PrGpuMem->sPipelineState.aBlendOpAlpha, _BlendOpAlpha, 8 * sizeof(BLEnum))||
-        memcmp(_PrGpuMem->sPipelineState.aBlendMasks, _BlendMask, 8 * sizeof(BLEnum)))
+        _PrGpuMem->sPipelineState.eSrcBlendFactor != _SrcBlendFactor ||
+        _PrGpuMem->sPipelineState.eDestBlendFactor != _DestBlendFactor ||
+        _PrGpuMem->sPipelineState.eSrcBlendAlphaFactor != _SrcBlendAlphaFactor ||
+        _PrGpuMem->sPipelineState.eDestBlendAlphaFactor != _DestBlendAlphaFactor ||
+        _PrGpuMem->sPipelineState.eBlendOp != _BlendOp ||
+        _PrGpuMem->sPipelineState.eBlendOpAlpha != _BlendOpAlpha ||
+        _PrGpuMem->sPipelineState.eBlendMasks != _BlendMask)
     {
         _PrGpuMem->sPipelineState.bAlphaToCoverage = _AlphaToCoverage;
         _PrGpuMem->sPipelineState.bBlend = _Blend;
-        _PrGpuMem->sPipelineState.bIndependentBlend = _IndependentBlend;
-        _PrGpuMem->sPipelineState.eRenderTargetMask = _RenderTargetMask;
-        memcpy(_PrGpuMem->sPipelineState.aSrcBlendFactor, _SrcBlendFactor, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aDestBlendFactor, _DestBlendFactor, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aSrcBlendAlphaFactor, _SrcBlendAlphaFactor, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aDestBlendAlphaFactor, _DestBlendAlphaFactor, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aBlendOp, _BlendOp, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aBlendOpAlpha, _BlendOpAlpha, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aBlendMasks, _BlendMask, 8 * sizeof(BLEnum));
+        _PrGpuMem->sPipelineState.eSrcBlendFactor = _SrcBlendFactor;
+        _PrGpuMem->sPipelineState.eDestBlendFactor = _DestBlendFactor;
+        _PrGpuMem->sPipelineState.eSrcBlendAlphaFactor = _SrcBlendAlphaFactor;
+        _PrGpuMem->sPipelineState.eDestBlendAlphaFactor = _DestBlendAlphaFactor;
+        _PrGpuMem->sPipelineState.eBlendOp = _BlendOp;
+        _PrGpuMem->sPipelineState.eBlendOpAlpha = _BlendOpAlpha;
+        _PrGpuMem->sPipelineState.eBlendMasks = _BlendMask;
         _PrGpuMem->sPipelineState.bBlendStateDirty = TRUE;
     }
 	else if (_Force)
 	{
         _PrGpuMem->sPipelineState.bAlphaToCoverage = _AlphaToCoverage;
         _PrGpuMem->sPipelineState.bBlend = _Blend;
-        _PrGpuMem->sPipelineState.bIndependentBlend = _IndependentBlend;
-        _PrGpuMem->sPipelineState.eRenderTargetMask = _RenderTargetMask;
-        memcpy(_PrGpuMem->sPipelineState.aSrcBlendFactor, _SrcBlendFactor, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aDestBlendFactor, _DestBlendFactor, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aSrcBlendAlphaFactor, _SrcBlendAlphaFactor, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aDestBlendAlphaFactor, _DestBlendAlphaFactor, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aBlendOp, _BlendOp, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aBlendOpAlpha, _BlendOpAlpha, 8 * sizeof(BLEnum));
-        memcpy(_PrGpuMem->sPipelineState.aBlendMasks, _BlendMask, 8 * sizeof(BLEnum));
+        _PrGpuMem->sPipelineState.eSrcBlendFactor = _SrcBlendFactor;
+        _PrGpuMem->sPipelineState.eDestBlendFactor = _DestBlendFactor;
+        _PrGpuMem->sPipelineState.eSrcBlendAlphaFactor = _SrcBlendAlphaFactor;
+        _PrGpuMem->sPipelineState.eDestBlendAlphaFactor = _DestBlendAlphaFactor;
+        _PrGpuMem->sPipelineState.eBlendOp = _BlendOp;
+        _PrGpuMem->sPipelineState.eBlendOpAlpha = _BlendOpAlpha;
+        _PrGpuMem->sPipelineState.eBlendMasks = _BlendMask;
 		_PrGpuMem->sPipelineState.bBlendStateDirty = TRUE;
 		_PipelineStateRefresh();
 	}
@@ -2629,9 +2635,12 @@ blBlendState(IN BLBool _AlphaToCoverage, IN BLBool _Blend, IN BLBool _Independen
 BLGuid
 blGenFence()
 {
+    _BLFence* _fence = (_BLFence*)malloc(sizeof(_BLFence));
+    memset(_fence, 0, sizeof(_BLFence));
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
+        GL_CHECK_INTERNAL(_fence->uData.sHandle = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
@@ -2646,14 +2655,70 @@ blGenFence()
     {
     }
 #endif
-    return INVALID_GUID;
+    return blGenGuid(_fence, 0xFFFFFFFF);
 }
 BLVoid
 blDeleteFence(IN BLGuid _Fence)
 {
+    _BLFence* _fence = (_BLFence*)blGuidAsPointer(_Fence);
+    if (!_fence)
+        return;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
+        glDeleteSync(_fence->uData.sHandle);
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLVoid
+blFenceStatus(IN BLGuid _Fence, OUT BLBool* _Complete)
+{
+    _BLFence* _fence = (_BLFence*)blGuidAsPointer(_Fence);
+    if (!_fence)
+        return;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        GLint _result = GL_UNSIGNALED;
+        glGetSynciv(_fence->uData.sHandle, GL_SYNC_STATUS, sizeof(GLint), NULL, &_result);
+        *_Complete = _result == GL_SIGNALED ?  TRUE : FALSE;
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLVoid
+blFenceWait(IN BLGuid _Fence)
+{
+    _BLFence* _fence = (_BLFence*)blGuidAsPointer(_Fence);
+    if (!_fence)
+        return;
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        glClientWaitSync(_fence->uData.sHandle, GL_SYNC_FLUSH_COMMANDS_BIT, 10000000);
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
@@ -2694,6 +2759,53 @@ blGenSemaphore()
 BLVoid
 blDeleteSemaphore(IN BLGuid _Semaphore)
 {
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+}
+BLGuid
+blGenCmdQueue(IN BLEnum _Flag, IN BLEnum _Priority, IN BLEnum _Type, IN BLU32 _NodeIndex)
+{
+#if defined(BL_GL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
+    {
+        return INVALID_GUID;
+    }
+#elif defined(BL_MTL_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
+    {
+    }
+#elif defined(BL_VK_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_VULKAN_API)
+    {
+    }
+#elif defined(BL_DX_BACKEND)
+    if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
+    {
+    }
+#endif
+    return INVALID_GUID;
+}
+BLVoid
+blDeleteCmdQueue(IN BLGuid _Queue)
+{
+    _BLCommandQueue* _queue = (_BLCommandQueue*)blGuidAsPointer(_Queue);
+    if (!_queue)
+        return;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -2911,7 +3023,7 @@ blFrameBufferResolve(IN BLGuid _FBO)
 #endif
 }
 BLU32
-blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _CFace)
+blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLEnum _CFace)
 {
     _BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
     if (!_fbo)
@@ -2934,8 +3046,8 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
         GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nHandle));
         if (0 == _fbo->nAttachmentIndex)
         {
-            _fbo->nWidth  = MAX_INTERNAL(_width  >> _Level, 1);
-            _fbo->nHeight = MAX_INTERNAL(_height >> _Level, 1);
+            _fbo->nWidth  = _width;
+            _fbo->nHeight = _height;
         }
         GLenum _attachment;
         if (_format < BL_TF_DS_UNKNOWN)
@@ -2943,7 +3055,6 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
             _attachment = GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentIndex;
             _fbo->aAttachments[_fbo->nAttachmentIndex].pAttachments = _tex;
             _fbo->aAttachments[_fbo->nAttachmentIndex].nFace = _CFace;
-            _fbo->aAttachments[_fbo->nAttachmentIndex].nMip = _Level;
             _fbo->nAttachmentIndex++;
         }
         else if (_format == BL_TF_D24S8)
@@ -2965,7 +3076,7 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
             GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _CFace : GL_TEXTURE_2D;
             if (_tex->eTarget == BL_TT_2D || _tex->eTarget == BL_TT_CUBE)
             {
-                GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, _attachment, _target, _tex->uData.sGL.nHandle, _Level));
+                GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, _attachment, _target, _tex->uData.sGL.nHandle, 0));
             }
         }
         if (_tex->uData.sGL.nRTHandle && _tex->uData.sGL.nHandle)
@@ -2979,7 +3090,7 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLS32 _Level, IN BLEnum _
                 if (_tex->eFormat < BL_TF_DS_UNKNOWN)
                 {
                     GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_idx].nFace : GL_TEXTURE_2D;
-                    GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, _attachment, _target, _tex->uData.sGL.nHandle, _fbo->aAttachments[_idx].nMip));
+                    GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, _attachment, _target, _tex->uData.sGL.nHandle, 0));
                 }
             }
         }
@@ -3036,13 +3147,13 @@ blFrameBufferDetach(IN BLGuid _FBO, IN BLBool _DepthStencil)
         else
         {
             GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_fbo->nAttachmentIndex].nFace : GL_TEXTURE_2D;
-            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentIndex, _target, 0, _fbo->aAttachments[_fbo->nAttachmentIndex].nMip));
+            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentIndex, _target, 0, 0));
         }
         if (_fbo->uData.sGL.nResolveHandle)
         {
             GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _fbo->uData.sGL.nResolveHandle));
             GLenum _target = (_tex->eTarget == BL_TT_CUBE) ? GL_TEXTURE_CUBE_MAP_POSITIVE_X + _fbo->aAttachments[_fbo->nAttachmentIndex].nFace : GL_TEXTURE_2D;
-            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentIndex, _target, 0, _fbo->aAttachments[_fbo->nAttachmentIndex].nMip));
+            GL_CHECK_INTERNAL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _fbo->nAttachmentIndex, _target, 0, 0));
         }
 		GL_CHECK_INTERNAL(glBindFramebuffer(GL_FRAMEBUFFER, _prev));
     }

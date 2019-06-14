@@ -272,7 +272,7 @@ _SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, B
 		_PrSpriteMem->sViewport.sRB.fX = _centerx + _PrSpriteMem->nFboWidth * 0.5f;
 		_PrSpriteMem->sViewport.sRB.fY = _centery + _PrSpriteMem->nFboHeight * 0.5f;
 		_PrSpriteMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, 1, NULL);
-		blFrameBufferAttach(_PrSpriteMem->nFBO, _PrSpriteMem->nFBOTex, 0, BL_CTF_IGNORE);
+		blFrameBufferAttach(_PrSpriteMem->nFBO, _PrSpriteMem->nFBOTex, BL_CTF_IGNORE);
 	}
 	return FALSE;
 }
@@ -1133,7 +1133,7 @@ _SpriteInit(DUK_CONTEXT* _DKC)
 	_PrSpriteMem->sViewport.sRB.fX = (BLF32)_PrSpriteMem->nFboWidth;
 	_PrSpriteMem->sViewport.sRB.fY = (BLF32)_PrSpriteMem->nFboHeight;
 	_PrSpriteMem->nFBOTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, 1, NULL);
-	blFrameBufferAttach(_PrSpriteMem->nFBO, _PrSpriteMem->nFBOTex, 0, BL_CTF_IGNORE);
+	blFrameBufferAttach(_PrSpriteMem->nFBO, _PrSpriteMem->nFBOTex, BL_CTF_IGNORE);
 }
 BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)
@@ -1144,21 +1144,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 	blWindowQuery(&_screenwidth, &_screenheight, &_PrSpriteMem->nFboWidth, &_PrSpriteMem->nFboHeight, &_rx, &_ry);
     blHardwareCapsQuery(NULL, NULL, NULL, NULL, NULL, _texsupport);
 	blDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, FALSE);
-    BLEnum _srcblendfactor[8];
-    _srcblendfactor[0] = BL_BF_SRCALPHA;
-    BLEnum _destblendfactor[8];
-    _destblendfactor[0] = BL_BF_INVSRCALPHA;
-    BLEnum _srcblendalphafactor[8];
-    _srcblendalphafactor[0] = BL_BF_INVDESTALPHA;
-    BLEnum _destblendalphafactor[8];
-    _destblendalphafactor[0] = BL_BF_ONE;
-    BLEnum _blendop[8];
-    _blendop[0] = BL_BO_ADD;
-    BLEnum _blendopalpha[8];
-    _blendopalpha[0] = BL_BO_ADD;
-    BLEnum _blendmask[8];
-    _blendmask[0] = BL_BM_ALL;
-    blBlendState(FALSE, TRUE, FALSE, BL_BT_TARGET_ALL, _srcblendfactor, _destblendfactor, _srcblendalphafactor, _destblendalphafactor, _blendop, _blendopalpha, _blendmask, FALSE);
+    blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, BL_BM_ALL, FALSE);
     if (_Cursor)
     {
 		BLF32 _screensz[] = { 2.f / (BLF32)_screenwidth, 2.f / (BLF32)_screenheight };
