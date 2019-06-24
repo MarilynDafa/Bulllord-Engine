@@ -3604,6 +3604,29 @@ blPlatformIdentity()
 #endif
 }
 BLU32
+blCPUCoresCounts()
+{
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+    SYSTEM_INFO _systemInfo;
+    GetSystemInfo(&_systemInfo);
+    return _systemInfo.dwNumberOfProcessors;
+#elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID)
+    BLU32 _ncpu;
+    _ncpu = sysconf(_SC_NPROCESSORS_ONLN);
+    return _ncpu;
+#elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
+    size_t _len;
+    BLU32 _ncpu;
+    _len = sizeof(_ncpu);
+    sysctlbyname("hw.ncpu", &_ncpu, &_len, NULL, 0);
+    return _ncpu;
+#elif defined(BL_PLATFORM_WEB)
+    return 1;
+#else
+    return 1;
+#endif
+}
+BLU32
 blTickCounts()
 {
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)

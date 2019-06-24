@@ -25,24 +25,24 @@
 extern "C" {
 #endif
 BL_API BLVoid blVSync(
-	IN BLBool _On);
+    IN BLBool _On);
 
 BL_API BLVoid blHardwareCapsQuery(
-	OUT BLEnum* _Api,
-	OUT BLBool* _CSSupport,
-	OUT BLBool* _GSSupport,
-	OUT BLBool* _TSSupport,
-	OUT BLBool* _FloatRTSupport,
+    OUT BLEnum* _Api,
+    OUT BLBool* _CSSupport,
+    OUT BLBool* _GSSupport,
+    OUT BLBool* _TSSupport,
+    OUT BLBool* _FloatRTSupport,
     OUT BLBool _TexSupport[BL_TF_COUNT]);
-    
+
 /**
-     Default Value
-     _CullMode BL_CM_CW
-     _DepthBias 0
-     _SlopeScaledDepthBias 0.f
-     _Scissor TRUE
-     */
-    
+ Default Value
+ _CullMode BL_CM_CW
+ _DepthBias 0
+ _SlopeScaledDepthBias 0.f
+ _Scissor TRUE
+ */
+
 BL_API BLVoid blRasterState(
     IN BLEnum _CullMode,
     IN BLS32 _DepthBias,
@@ -51,26 +51,26 @@ BL_API BLVoid blRasterState(
     IN BLS32 _XPos,
     IN BLS32 _YPos,
     IN BLU32 _Width,
-    IN BLU32 _Height, 
-	IN BLBool _Force);
+    IN BLU32 _Height,
+    IN BLBool _Force);
 
 /**
-     Default Value
-     _Depth TRUE
-     _Mask TRUE
-     _DepthCompFunc BL_CF_LESS
-     _Stencil FALSE
-     _StencilReadMask 0xFF
-     _StencilWriteMask 0xFF
-     _FrontStencilFailOp BL_SO_KEEP
-     _FrontStencilDepthFailOp BL_SO_KEEP
-     _FrontStencilPassOp BL_SO_KEEP
-     _FrontStencilCompFunc BL_CF_ALWAYS
-     _BackStencilFailOp BL_SO_KEEP
-     _BackStencilDepthFailOp BL_SO_KEEP
-     _BackStencilPassOp BL_SO_KEEP
-     _BackStencilCompFunc BL_CF_ALWAYS
-     */
+ Default Value
+ _Depth TRUE
+ _Mask TRUE
+ _DepthCompFunc BL_CF_LESS
+ _Stencil FALSE
+ _StencilReadMask 0xFF
+ _StencilWriteMask 0xFF
+ _FrontStencilFailOp BL_SO_KEEP
+ _FrontStencilDepthFailOp BL_SO_KEEP
+ _FrontStencilPassOp BL_SO_KEEP
+ _FrontStencilCompFunc BL_CF_ALWAYS
+ _BackStencilFailOp BL_SO_KEEP
+ _BackStencilDepthFailOp BL_SO_KEEP
+ _BackStencilPassOp BL_SO_KEEP
+ _BackStencilCompFunc BL_CF_ALWAYS
+ */
 BL_API BLVoid blDepthStencilState(
     IN BLBool _Depth,
     IN BLBool _Mask,
@@ -86,23 +86,19 @@ BL_API BLVoid blDepthStencilState(
     IN BLEnum _BackStencilDepthFailOp,
     IN BLEnum _BackStencilPassOp,
     IN BLEnum _BackStencilCompFunc,
-	IN BLBool _Force);
-    
+    IN BLBool _Force);
+
 /**
-     Default Value
-     _AlphaToCoverage FALSE
-     _Blend FALSE
-     _IndependentBlend FALSE
-     _RenderTargetMask BL_BT_TARGET_ALL
-     _SrcBlendFactor BL_BF_ONE
-     _DestBlendFactor BL_BF_ZERO
-     _SrcBlendAlphaFactor BL_BF_ONE
-     _DestBlendAlphaFactor BL_BF_ZERO
-     _BlendOp BL_BO_ADD
-     _BlendOpAlpha BL_BO_ADD
-     _BlendMask BL_BM_ALL
-     _BlendMask 0
-     */
+ Default Value
+ _AlphaToCoverage FALSE
+ _Blend FALSE
+ _SrcBlendFactor BL_BF_ONE
+ _DestBlendFactor BL_BF_ZERO
+ _SrcBlendAlphaFactor BL_BF_ONE
+ _DestBlendAlphaFactor BL_BF_ZERO
+ _BlendOp BL_BO_ADD
+ _BlendOpAlpha BL_BO_ADD
+ */
 BL_API BLVoid blBlendState(
     IN BLBool _AlphaToCoverage,
     IN BLBool _Blend,
@@ -112,55 +108,28 @@ BL_API BLVoid blBlendState(
     IN BLEnum _DestBlendAlphaFactor,
     IN BLEnum _BlendOp,
     IN BLEnum _BlendOpAlpha,
-    IN BLEnum _BlendMask,
-	IN BLBool _Force);
+    IN BLBool _Force);
 
-BL_API BLGuid blGenFence();
-    
-BL_API BLVoid blDeleteFence(
-    IN BLGuid _Fence);
-    
-BL_API BLVoid blFenceStatus(
-    IN BLGuid _Fence,
-    OUT BLBool* _Complete);
-    
-BL_API BLVoid blFenceWait(
-    IN BLGuid _Fence);
-    
-BL_API BLGuid blGenSemaphore();
-    
-BL_API BLVoid blDeleteSemaphore(
-    IN BLGuid _Semaphore);
-    
-BL_API BLGuid blGenCmdQueue(
-    IN BLEnum _Flag,
-    IN BLEnum _Priority,
-    IN BLEnum _Type,
-    IN BLU32 _NodeIndex);
-    
-BL_API BLVoid blDeleteCmdQueue(
-    IN BLGuid _Queue);
-    
 BL_API BLGuid blGenFrameBuffer();
 
 BL_API BLVoid blDeleteFrameBuffer(
-	IN BLGuid _FBO);
+    IN BLGuid _FBO);
 
 BL_API BLVoid blBindFrameBuffer(
-	IN BLGuid _FBO,
-	IN BLBool _Bind);
-    
+    IN BLGuid _FBO,
+    IN BLBool _Bind);
+
 BL_API BLVoid blFrameBufferClear(
     IN BLBool _ColorBit,
     IN BLBool _DepthBit,
     IN BLBool _StencilBit);
-    
+
 BL_API BLVoid blFrameBufferResolve(
     IN BLGuid _FBO);
-    
+
 BL_API BLU32 blFrameBufferAttach(
     IN BLGuid _FBO,
-	IN BLGuid _Tex,
+    IN BLGuid _Tex,
     IN BLEnum _CFace);
 
 BL_API BLVoid blFrameBufferDetach(
@@ -169,9 +138,9 @@ BL_API BLVoid blFrameBufferDetach(
 
 BL_API BLGuid blGenTexture(
     IN BLU32 _Hash,
-	IN BLEnum _Target,
-	IN BLEnum _Format,
-    IN BLBool _Srgb, 
+    IN BLEnum _Target,
+    IN BLEnum _Format,
+    IN BLBool _Srgb,
     IN BLBool _Immutable,
     IN BLBool _RenderTarget,
     IN BLU32 _Layer,
@@ -182,11 +151,11 @@ BL_API BLGuid blGenTexture(
     IN BLU8* _Data);
 
 BL_API BLVoid blDeleteTexture(
-	IN BLGuid _Tex);
-    
+    IN BLGuid _Tex);
+
 BL_API BLGuid blGainTexture(
     IN BLU32 _Hash);
-    
+
 BL_API BLVoid blTextureFilter(
     IN BLGuid _Tex,
     IN BLEnum _MinFilter,
@@ -196,36 +165,36 @@ BL_API BLVoid blTextureFilter(
     IN BLBool _Anisotropy);
 
 BL_API BLVoid blTextureSwizzle(
-	IN BLGuid _Tex,
-	IN BLEnum _ChannelR,
-	IN BLEnum _ChannelG,
-	IN BLEnum _ChannelB,
-	IN BLEnum _ChannelA);
+    IN BLGuid _Tex,
+    IN BLEnum _ChannelR,
+    IN BLEnum _ChannelG,
+    IN BLEnum _ChannelB,
+    IN BLEnum _ChannelA);
 
 BL_API BLVoid blTextureUpdate(
-	IN BLGuid _Tex,
+    IN BLGuid _Tex,
     IN BLU32 _Layer,
     IN BLU32 _Level,
     IN BLEnum _Face,
     IN BLU32 _XOffset,
     IN BLU32 _YOffset,
     IN BLU32 _ZOffset,
-	IN BLU32 _Width, 
-	IN BLU32 _Height, 
-	IN BLU32 _Depth,
-	IN BLVoid* _Data);
+    IN BLU32 _Width,
+    IN BLU32 _Height,
+    IN BLU32 _Depth,
+    IN BLVoid* _Data);
 
 BL_API BLVoid blTextureQuery(
-	IN BLGuid _Tex,
-	OUT BLEnum* _Target,
+    IN BLGuid _Tex,
+    OUT BLEnum* _Target,
     OUT BLEnum* _Format,
     OUT BLU32* _Layer,
     OUT BLU32* _Mipmap,
-	OUT BLU32* _Width,
-	OUT BLU32* _Height,
-	OUT BLU32* _Depth,
-	OUT BLU32* _Size);
-    
+    OUT BLU32* _Width,
+    OUT BLU32* _Height,
+    OUT BLU32* _Depth,
+    OUT BLU32* _Size);
+
 BL_API BLGuid blGenGeometryBuffer(
     IN BLU32 _Hash,
     IN BLEnum _Topology,
@@ -238,13 +207,13 @@ BL_API BLGuid blGenGeometryBuffer(
     IN BLVoid* _IBO,
     IN BLU32 _IBSz,
     IN BLEnum _IBFmt);
-    
+
 BL_API BLVoid blDeleteGeometryBuffer(
     IN BLGuid _GBO);
-    
+
 BL_API BLGuid blGainGeometryBuffer(
     IN BLU32 _Hash);
-    
+
 BL_API BLVoid blGeometryBufferUpdate(
     IN BLGuid _GBO,
     IN BLU32 _VBOffset,
@@ -253,7 +222,7 @@ BL_API BLVoid blGeometryBufferUpdate(
     IN BLU32 _IBOffset,
     IN BLU8* _IBO,
     IN BLU32 _IBSz);
-    
+
 BL_API BLVoid blGeometryBufferInstance(
     IN BLGuid _GBO,
     IN BLEnum* _Semantic,
@@ -270,26 +239,26 @@ BL_API BLVoid blGeometryInstanceUpdate(
 BL_API BLGuid blGenTechnique(
     IN BLAnsi* _Filename,
     IN BLBool _ForceCompile);
-    
+
 BL_API BLVoid blDeleteTechnique(
     IN BLGuid _Tech);
 
 BL_API BLGuid blGainTechnique(
-	IN BLU32 _Hash);
-    
+    IN BLU32 _Hash);
+
 BL_API BLVoid blTechUniform(
     IN BLGuid _Tech,
     IN BLEnum _Type,
     IN BLAnsi* _Name,
     IN BLVoid* _Data,
     IN BLU32 _DataSz);
-    
+
 BL_API BLVoid blTechSampler(
     IN BLGuid _Tech,
     IN BLAnsi* _Name,
     IN BLGuid _Tex,
     IN BLU32 _Unit);
-    
+
 BL_API BLVoid blDraw(
     IN BLGuid _Tech,
     IN BLGuid _GBO,

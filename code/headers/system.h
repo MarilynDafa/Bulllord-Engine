@@ -59,6 +59,8 @@ extern "C" {
     
 BL_API BLEnum blPlatformIdentity();
     
+BL_API BLU32 blCPUCoresCounts();
+    
 BL_API BLU32 blTickCounts();
 
 BL_API BLVoid blTickDelay(

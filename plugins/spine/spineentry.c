@@ -1,4 +1,4 @@
-﻿/*
+/*
 Bulllord Game Engine
 Copyright (C) 2010-2017 Trix
 
@@ -358,25 +358,24 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 		spAttachment* _attachment = _slot->attachment;
 		if (!_attachment)
 			continue;
-		BLU8 _blendfactor[4] = { 0 };
 		BLS32 _mode;
 		switch (_slot->data->blendMode) 
 		{
 		case SP_BLEND_MODE_ADDITIVE:
 			_mode = SP_BLEND_MODE_ADDITIVE;
-			blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_ONE, BL_BF_ONE, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
+			blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_ONE, BL_BF_ONE, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
 			break;
 		case SP_BLEND_MODE_MULTIPLY:
 			_mode = SP_BLEND_MODE_MULTIPLY;
-			blBlendState(FALSE, TRUE, BL_BF_DESTCOLOR, BL_BF_ZERO, BL_BF_DESTCOLOR, BL_BF_ZERO, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
+			blBlendState(FALSE, TRUE, BL_BF_DESTCOLOR, BL_BF_ZERO, BL_BF_DESTCOLOR, BL_BF_ZERO, BL_BO_ADD, BL_BO_ADD, FALSE);
 			break;
 		case SP_BLEND_MODE_SCREEN:
 			_mode = SP_BLEND_MODE_SCREEN;
-			blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVSRCALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
+			blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVSRCALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
 			break;
 		default:
 			_mode = 0;
-			blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, _blendfactor, FALSE);
+			blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
 		}
 		if (_PrSpineMem->nBlendMode != _mode)
 		{
