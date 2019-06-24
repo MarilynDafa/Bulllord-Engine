@@ -261,10 +261,7 @@ typedef struct _SystemMember {
     BLU32 nRetinaScale;
     BLBool bInitState;
 #elif defined(BL_PLATFORM_WEB)
-	GLFWwindow* pWindow;
-	BLU32 nMouseX;
-	BLU32 nMouseY;
-	BLBool bNeedInit;
+    BLBool bNeedInit;
 #endif
 }_BLSystemMember;
 BLBool _GbSystemRunning = FALSE;
@@ -3199,40 +3196,142 @@ _CloseWindow()
     [_PrSystemMem->pPool release];
 }
 #elif defined(BL_PLATFORM_WEB)
-static BLVoid
-_ErrorOutput(BLS32 _Error, const BLAnsi* _Msg)
+static EM_BOOL
+_SizeProc(BLS32 _EventType, const EmscriptenUiEvent* _UiEvent, BLVoid* _UserData)
 {
-	fprintf(stderr, "%s\n", _Msg);
+    BLF64 _w, _h;
+    emscripten_get_element_css_size("bulllordcanvas", &_w, &_h);
+    if (_w < 1.0)
+        _w = _UiEvent->windowInnerWidth;
+    if (_h < 1.0)
+        _h = _UiEvent->windowInnerHeight;
+    emscripten_set_canvas_element_size("bulllordcanvas", _w, _h);
+    _PrSystemMem->sBoostParam.nScreenWidth = (BLU32)_w;
+    _PrSystemMem->sBoostParam.nScreenHeight = (BLU32)_h;
+    blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
+    return TRUE;
 }
-static BLVoid 
-_CursorPosProc(GLFWwindow* _Window, BLF64 _X, BLF64 _Y)
+static EM_BOOL
+_ContextProc(BLS32 _EventType, const BLVoid* _Reserved, BLVoid* _UserData)
 {
-	_PrSystemMem->nMouseX = (BLU32)(BLS32)_X;
-	_PrSystemMem->nMouseY = (BLU32)(BLS32)_Y;
-	blInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_MOVE, NULL, INVALID_GUID);
+    switch (_EventType) {
+        case EMSCRIPTEN_EVENT_WEBGLCONTEXTLOST: _GbSystemRunning = 2; break;
+        case EMSCRIPTEN_EVENT_WEBGLCONTEXTRESTORED: _GbSystemRunning = 1; break;
+        default: break;
+    }
+    return TRUE;
 }
-static BLVoid 
-_KeyProc(GLFWwindow* _Window, BLS32 _Key, BLS32 _Scancode, BLS32 _Action, BLS32 _Mods)
+static EM_BOOL
+_KeyProc(BLS32 _EventType, const EmscriptenKeyboardEvent* _KeyEvent, BLVoid* _UserData)
 {
 	BLEnum _scancode = SCANCODE_INTERNAL[_Scancode];
-	blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, _Action ? TRUE : FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+    switch (_EventType) {
+        case EMSCRIPTEN_EVENT_KEYDOWN:
+            blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+            break;
+        case EMSCRIPTEN_EVENT_KEYUP:
+            blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+            break;
+        case EMSCRIPTEN_EVENT_KEYPRESS:
+            BLUtf8 _text[5];
+            BLU32 _codepoint = (BLU32)_KeyEvent->charCode;
+            if (_codepoint <= 0x7F)
+            {
+                _text[0] = (BLUtf8)_codepoint;
+                _text[1] = '\0';
+            }
+            else if (_codepoint <= 0x7FF)
+            {
+                _text[0] = 0xC0 | (BLUtf8)((_codepoint >> 6) & 0x1F);
+                _text[1] = 0x80 | (BLUtf8)(_codepoint & 0x3F);
+                _text[2] = '\0';
+            }
+            else if (_codepoint <= 0xFFFF)
+            {
+                _text[0] = 0xE0 | (BLUtf8)((_codepoint >> 12) & 0x0F);
+                _text[1] = 0x80 | (BLUtf8)((_codepoint >> 6) & 0x3F);
+                _text[2] = 0x80 | (BLUtf8)(_codepoint & 0x3F);
+                _text[3] = '\0';
+            }
+            else if (_codepoint <= 0x10FFFF)
+            {
+                _text[0] = 0xF0 | (BLUtf8)((_codepoint >> 18) & 0x0F);
+                _text[1] = 0x80 | (BLUtf8)((_codepoint >> 12) & 0x3F);
+                _text[2] = 0x80 | (BLUtf8)((_codepoint >> 6) & 0x3F);
+                _text[3] = 0x80 | (BLUtf8)(_codepoint & 0x3F);
+                _text[4] = '\0';
+            }
+            else
+                break;
+            blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _text, INVALID_GUID);
+            break;
+        default:
+            break;
+    }
+    return TRUE;
 }
-static BLVoid 
-_MouseProc(GLFWwindow* _Window, BLS32 _Button, BLS32 _Action, BLS32 _Mods)
+static EM_BOOL
+_TouchProc(BLS32 _EventType, const EmscriptenTouchEvent* _TouchEvent, BLVoid* _UserData)
 {
-	if (_Button == GLFW_MOUSE_BUTTON_LEFT)
-		blInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), (_Action == GLFW_PRESS) ? BL_ME_LDOWN : BL_ME_LUP, NULL, INVALID_GUID);
-	else
-		blInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), (_Action == GLFW_PRESS) ? BL_ME_RDOWN : BL_ME_RUP, NULL, INVALID_GUID);
+    for (BLS32 _i = 0; _i < _TouchEvent->numTouches; _i++)
+    {
+        const EmscriptenTouchPoint* _src = &_TouchEvent->touches[_i];
+        BLS32 _x = (BLS32)_src->targetX;
+        BLS32 _y = (BLS32)_src->targetY;
+        switch (_EventType)
+        {
+            case EMSCRIPTEN_EVENT_TOUCHSTART:
+                blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _i = 0 ? BL_ME_LDOWN : BL_ME_RDOWN , NULL, INVALID_GUID);
+                break;
+            case EMSCRIPTEN_EVENT_TOUCHEND:
+                blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _i = 0 ? BL_ME_LUP : BL_ME_RUP, NULL, INVALID_GUID);
+                break;
+            case EMSCRIPTEN_EVENT_TOUCHMOVE:
+                blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
+                break;
+            default:
+                break;
+        }
+    }
+    return TRUE;
 }
-static BLVoid 
-_ScrollProc(GLFWwindow* _Window, BLF64 _XOffset, BLF64 _YOffset)
+static EM_BOOL
+_MouseProc(BLS32 _EventType, const EmscriptenMouseEvent* _MouseEvent, BLVoid* _UserData)
 {
-	BLS16 _val = (BLS16)_YOffset / -100;
-	if (_val > 0)
-		blInvokeEvent(BL_ET_MOUSE, MAKEU32(1, _val), BL_ME_WHEEL, NULL, INVALID_GUID);
-	else
-		blInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL, INVALID_GUID);
+    BLS32 _x = (BLS32)_MouseEvent->targetX;
+    BLS32 _y = (BLS32)_MouseEvent->targetY;
+    switch (_EventType)
+    {
+        case EMSCRIPTEN_EVENT_MOUSEDOWN:
+            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _MouseEvent->mouse_button == 0 ? BL_ME_LDOWN : BL_ME_RDOWN, NULL, INVALID_GUID);
+            break;
+        case EMSCRIPTEN_EVENT_MOUSEUP:
+            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _MouseEvent->mouse_button == 0 ? BL_ME_LUP : BL_ME_RUP, NULL, INVALID_GUID);
+            break;
+        case EMSCRIPTEN_EVENT_MOUSEMOVE:
+            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
+            break;
+        case EMSCRIPTEN_EVENT_MOUSEENTER:
+        case EMSCRIPTEN_EVENT_MOUSELEAVE:
+            if (_UseCustomCursor())
+                emscripten_hide_mouse();
+            else
+                emscripten_show_mouse();
+            break;
+        default:
+            break;
+    }
+    return TRUE;
+}
+static EM_BOOL
+_ScrollProc(BLS32 _EventType, const EmscriptenWheelEvent* _WheelEvent, BLVoid* _UserData)
+{
+    BLS16 _val = (BLS16)_WheelEvent->deltaY / -100;
+    if (_val > 0)
+        blInvokeEvent(BL_ET_MOUSE, MAKEU32(1, _val), BL_ME_WHEEL, NULL, INVALID_GUID);
+    else
+        blInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL, INVALID_GUID);
+    return TRUE;
 }
 static EM_BOOL 
 _FullscreenProc(BLS32 _EventType, const BLVoid* _Reserved, BLVoid* _UserData)
@@ -3242,7 +3341,7 @@ _FullscreenProc(BLS32 _EventType, const BLVoid* _Reserved, BLVoid* _UserData)
 	_PrSystemMem->sBoostParam.nScreenWidth = _Width;
 	_PrSystemMem->sBoostParam.nScreenHeight = _Height;
 	blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);	
-	return 0;
+	return TRUE;
 }
 BLVoid
 _EnterFullscreen()
@@ -3267,32 +3366,54 @@ _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 BLVoid
 _ShowWindow()
 {
-	glfwSetErrorCallback(_ErrorOutput);
-	if (!glfwInit())
-		emscripten_force_exit(EXIT_FAILURE);
+    emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, false, _SizeProc);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	BLU32 _width = _PrSystemMem->sBoostParam.nScreenWidth;
 	BLU32 _height = _PrSystemMem->sBoostParam.nScreenHeight;
-	_PrSystemMem->pWindow = glfwCreateWindow(_width, _height, (const BLAnsi*)_PrSystemMem->sBoostParam.pAppName, NULL, NULL);
-	if (!_PrSystemMem->pWindow) {
-		glfwTerminate();
-		emscripten_force_exit(EXIT_FAILURE);
-	}
-	_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _width, _height, !_PrSystemMem->sBoostParam.bProfiler);
-	if (_PrSystemMem->sBoostParam.bFullscreen)
-		_EnterFullscreen();
+    EmscriptenWebGLContextAttributes _attrs;
+    emscripten_webgl_init_context_attributes(&_attrs);
+    _attrs.alpha = _sapp.desc.alpha;
+    _attrs.depth = TRUE;
+    _attrs.stencil = TRUE;
+    _attrs.antialias = FALSE;
+    _attrs.premultipliedAlpha = FALSE;
+    _attrs.preserveDrawingBuffer = FALSE;
+    _attrs.enableExtensionsByDefault = TRUE;
+    _attrs.majorVersion = 2;
+    EMSCRIPTEN_WEBGL_CONTEXT_HANDLE _ctx = emscripten_webgl_create_context("bulllordcanvas", &_attrs);
+    if (_ctx)
+    {
+        emscripten_set_mousedown_callback("bulllordcanvas", 0, true, _MouseProc);
+        emscripten_set_mouseup_callback("bulllordcanvas", 0, true, _MouseProc);
+        emscripten_set_mousemove_callback("bulllordcanvas", 0, true, _MouseProc);
+        emscripten_set_mouseenter_callback("bulllordcanvas", 0, true, _MouseProc);
+        emscripten_set_mouseleave_callback("bulllordcanvas", 0, true, _MouseProc);
+        emscripten_set_wheel_callback("bulllordcanvas", 0, true, _ScrollProc);
+        emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, true, _KeyProc);
+        emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, true, _KeyProc);
+        emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, true, _KeyProc);
+        emscripten_set_touchstart_callback("bulllordcanvas", 0, true, _TouchProc);
+        emscripten_set_touchmove_callback("bulllordcanvas", 0, true, _TouchProc);
+        emscripten_set_touchend_callback("bulllordcanvas", 0, true, _TouchProc);
+        emscripten_set_touchcancel_callback("bulllordcanvas", 0, true, _TouchProc);
+        emscripten_set_webglcontextlost_callback("bulllordcanvas", 0, true, _ContextProc);
+        emscripten_set_webglcontextrestored_callback("bulllordcanvas", 0, true, _ContextProc);
+        emscripten_request_animation_frame_loop("bulllordcanvas", 0);
+        emscripten_webgl_make_context_current(_ctx);
+        _GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _width, _height, !_PrSystemMem->sBoostParam.bProfiler);
+        if (_PrSystemMem->sBoostParam.bFullscreen)
+            _EnterFullscreen();
+    }
 }
 BLVoid
 _PollMsg()
 {
-	glfwPollEvents();
 }
 BLVoid
 _CloseWindow()
 {
 	_GpuAnitIntervention();
-	glfwTerminate();
 }
 #endif
 static BLVoid
@@ -3493,12 +3614,6 @@ _SystemStep()
 	{
 		_SystemInit();
 		_PrSystemMem->bNeedInit = FALSE;
-		glfwSetCursorPosCallback(_PrSystemMem->pWindow, _CursorPosProc);
-		glfwSetMouseButtonCallback(_PrSystemMem->pWindow, _MouseProc);
-		glfwSetKeyCallback(_PrSystemMem->pWindow, _KeyProc);
-		glfwSetScrollCallback(_PrSystemMem->pWindow, _ScrollProc);		
-		if (_UseCustomCursor())
-			emscripten_hide_mouse();
 	}
 	else
 #endif

@@ -1,4 +1,4 @@
-﻿/*
+/*
  Bulllord Game Engine
  Copyright (C) 2010-2017 Trix
 
@@ -37,9 +37,8 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #elif defined(BL_PLATFORM_WEB)
-#	define BL_USE_SDL_API
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
+#	define BL_USE_WEB_API
+#include <emscripten/emscripten.h>
 #elif defined(BL_PLATFORM_ANDROID)
 #   define BL_USE_SL_API
 #include <SLES/OpenSLES.h>
@@ -73,6 +72,8 @@ typedef struct _AudioDevice{
 	IXAudio2MasteringVoice* pCAContext;
 	IXAudio2* pCADevice;
 	X3DAUDIO_HANDLE pCAInstance;
+#elif defined(BL_USE_WEB_API)
+    BLU8* pBuffer;
 #endif
     BLThread* pThread;
     BLF32 fMusicVolume;
@@ -132,7 +133,7 @@ typedef struct _AudioSource{
 	BLU8* pSoundBufC;
 	IXAudio2SourceVoice* pSource;
     BLU32 nBufTurn;
-#elif defined(BL_USE_SDL_API)
+#elif defined(BL_USE_WEB_API)
 	Mix_Music* pMusic;
 	Mix_Chunk* pSound;
 	BLS32 nChannel;
@@ -168,7 +169,7 @@ _MakeStream(_BLAudioSource* _Src, BLU32 _Bufidx, BLU32* _TotalRead)
 	BLU32 _totalread = 0;
 	BLU32 _samplerate;
 	BLBool _ret = TRUE;
-#if !defined(BL_USE_SDL_API)
+#if !defined(BL_USE_WEB_API)
 	if (_Src->pMp3Context)
 	{
 		_samplerate = _Src->pMp3Context->sample_rate;
@@ -256,7 +257,7 @@ static BLBool
 _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
-#if !defined(BL_USE_SDL_API)
+#if !defined(BL_USE_WEB_API)
 	_src->nStream = blGenStream(_Filename);
 	if (_src->nStream == INVALID_GUID)
 		return FALSE;
@@ -390,7 +391,7 @@ _UnloadAudio(BLVoid* _Src)
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;	
 	blMutexLock(_PrAudioMem->pMusicMutex);
 	blMutexLock(_PrAudioMem->pSounds->pMutex);
-#if !defined(BL_USE_SDL_API)
+#if !defined(BL_USE_WEB_API)
 	if (_src->pMp3Context)
 	{
 		mpaudec_clear(_src->pMp3Context);
@@ -763,7 +764,7 @@ _CAUpdate(_BLAudioSource* _Src)
 	}
 	return TRUE;
 }
-#elif defined(BL_USE_SDL_API)
+#elif defined(BL_USE_WEB_API)
 static BLBool
 _SDLSoundSetup(BLVoid* _Src)
 {
@@ -979,22 +980,112 @@ _CADestroy()
 	_PrAudioMem->pAudioDev.pCAContext = NULL;
 	_PrAudioMem->pAudioDev.pCADevice = NULL;
 }
-#elif defined(BL_USE_SDL_API)
-static BLVoid
-_SDLInit()
+#elif defined(BL_USE_WEB_API)
+EMSCRIPTEN_KEEPALIVE BLS32 _AudioEmscPull(BLS32 _frames)
 {
-	SDL_Init(SDL_INIT_AUDIO);
-	BLS32 _ret = Mix_OpenAudio(0, 0, 0, 0);
-	assert(_ret == 0);
-	_PrAudioMem->pAudioDev.fMusicVolume = _PrAudioMem->pAudioDev.fSystemVolume = _PrAudioMem->pAudioDev.fEnvVolume = 0.7f;
-	_PrAudioMem->pSounds = blGenList(TRUE);
-	blDebugOutput("Audio initialize successfully");
+    if (_frames == _saudio.buffer_frames)
+    {
+        if (_saudio_has_callback())
+            _saudio_stream_callback((BLF32*)_saudio.backend.buffer, _frames, _saudio.num_channels);
+        else
+        {
+            const BLS32 _bytes = _frames * _saudio.bytes_per_frame;
+            if (0 == _saudio_fifo_read(&_saudio.fifo, _saudio.backend.buffer, _bytes))
+            {
+                memset(_saudio.backend.buffer, 0, _bytes);
+            }
+        }
+        return (BLS32)_saudio.backend.buffer;
+    }
+    else {
+        return 0;
+    }
+}
+EM_JS(BLS32, _AudioJSInit, (BLS32 _SampleRate, BLS32 _Channels, BLS32 _BufferSize), {
+    Module._saudio_context = null;
+    Module._saudio_node = null;
+    if (typeof AudioContext !== 'undefined') {
+        Module._saudio_context = new AudioContext({
+            sampleRate: _SampleRate,
+            latencyHint: 'interactive',
+        });
+    }
+    else if (typeof webkitAudioContext !== 'undefined') {
+        Module._saudio_context = new webkitAudioContext({
+            sampleRate: _SampleRate,
+            latencyHint: 'interactive',
+        });
+    }
+    else {
+        Module._saudio_context = null;
+    }
+    if (Module._saudio_context) {
+        console.log('sokol_audio.h: sample rate ', Module._saudio_context.sampleRate);
+        Module._saudio_node = Module._saudio_context.createScriptProcessor(_BufferSize, 0, _Channels);
+        Module._saudio_node.onaudioprocess = function pump_audio(event) {
+            var _frames = event.outputBuffer.length;
+            var _ptr = _AudioEmscPull(_frames);
+            if (_ptr) {
+                var _channels = event.outputBuffer.numberOfChannels;
+                for (var _chn = 0; _chn < _channels; _chn++) {
+                    var _chan = event.outputBuffer.getChannelData(_chn);
+                    for (var _i = 0; _i < _frames; _i++) {
+                        _chan[_i] = HEAPF32[(_ptr>>2) + ((_channels * i) + _chn)]
+                    }
+                }
+            }
+        };
+        Module._saudio_node.connect(Module._saudio_context.destination);
+        var resume_webaudio = function() {
+            if (Module._saudio_context) {
+                if (Module._saudio_context.state === 'suspended') {
+                    Module._saudio_context.resume();
+                }
+            }
+        };
+        document.addEventListener('click', resume_webaudio, {once:true});
+        document.addEventListener('touchstart', resume_webaudio, {once:true});
+        document.addEventListener('keydown', resume_webaudio, {once:true});
+        return 1;
+    }
+    else {
+        return 0;
+    }
+});
+EM_JS(BLS32, _AudioJSSampleRate, (void), {
+    if (Module._saudio_context) {
+        return Module._saudio_context.sampleRate;
+    }
+    else {
+        return 0;
+    }
+});
+EM_JS(BLS32, _AudioJSBufferFrames, (void), {
+    if (Module._saudio_node) {
+        return Module._saudio_node.bufferSize;
+    }
+    else {
+        return 0;
+    }
+});
+static BLVoid
+_WEBInit()
+{
+    if (_AudioJSInit(_saudio.sample_rate, _saudio.num_channels, _saudio.buffer_frames))
+    {
+        _saudio.bytes_per_frame = sizeof(BLF32) * _saudio.num_channels;
+        _saudio.sample_rate = _AudioJSSampleRate();
+        _saudio.buffer_frames = _AudioJSBufferFrames();
+        _saudio.backend.buffer = (BLU8*)malloc(_saudio.buffer_frames * _saudio.bytes_per_frame);
+        _PrAudioMem->pAudioDev.fMusicVolume = _PrAudioMem->pAudioDev.fSystemVolume = _PrAudioMem->pAudioDev.fEnvVolume = 0.7f;
+        _PrAudioMem->pSounds = blGenList(TRUE);
+        blDebugOutput("Audio initialize successfully");
+    }
 }
 static BLVoid
-_SDLDestroy()
+_WEBDestroy()
 {	
     blDeleteList(_PrAudioMem->pSounds);
-	Mix_CloseAudio();
 }
 #endif
 BLVoid
@@ -1020,8 +1111,8 @@ _AudioInit(DUK_CONTEXT* _DKC)
 #elif defined(BL_USE_COREAUDIO_API)
     _CAInit();
 	_PrAudioMem->pPCMStream = NULL;
-#elif defined(BL_USE_SDL_API)
-	_SDLInit();
+#elif defined(BL_USE_WEB_API)
+	_WEBInit();
 #endif
 }
 BLVoid
@@ -1101,7 +1192,7 @@ _AudioStep(BLU32 _Delta)
 		}
 		else
 		{
-#if defined(BL_USE_SDL_API)
+#if defined(BL_USE_WEB_API)
 			if (!Mix_Playing(_iter->nChannel))
 			{
 				blListErase(_PrAudioMem->pSounds, _iterator_iter);
@@ -1128,7 +1219,7 @@ _AudioDestroy()
 	if (_PrAudioMem->pBackMusic)
 		_DiscardResource(_PrAudioMem->pBackMusic->nID, _UnloadAudio, _CASoundRelease);
     _CADestroy();
-#elif defined(BL_USE_SDL_API)
+#elif defined(BL_USE_WEB_API)
 	if (_PrAudioMem->pBackMusic)
 		_DiscardResource(_PrAudioMem->pBackMusic->nID, _UnloadAudio, _SDLSoundRelease);
     _SDLDestroy();
@@ -1157,7 +1248,7 @@ blMusicVolume(IN BLF32 _Vol)
     (*_func)->SetVolumeLevel(_func, _Vol);
 #elif defined(BL_USE_COREAUDIO_API)
 	_PrAudioMem->pBackMusic->pSource->SetVolume(_Vol);
-#elif defined(BL_USE_SDL_API)
+#elif defined(BL_USE_WEB_API)
 	Mix_VolumeMusic(_Vol * 128);
 #endif
     blMutexUnlock(_PrAudioMem->pMusicMutex);
@@ -1179,7 +1270,7 @@ blEnvironmentVolume(IN BLF32 _Vol)
             (*_func)->SetVolumeLevel(_func, _Vol);
 #elif defined(BL_USE_COREAUDIO_API)
 			_iter->pSource->SetVolume(_Vol);
-#elif defined(BL_USE_SDL_API)
+#elif defined(BL_USE_WEB_API)
 			Mix_VolumeChunk(_iter->pSound, _Vol * 128);
 #endif
         }
@@ -1203,7 +1294,7 @@ blSystemVolume(IN BLF32 _Vol)
             (*_func)->SetVolumeLevel(_func, _Vol);
 #elif defined(BL_USE_COREAUDIO_API)
 			_iter->pSource->SetVolume(_Vol);
-#elif defined(BL_USE_SDL_API)
+#elif defined(BL_USE_WEB_API)
 			Mix_VolumeChunk(_iter->pSound, _Vol * 128);
 #endif
         }
@@ -1270,7 +1361,7 @@ blGenAudio(IN BLAnsi* _Filename, IN BLBool _Loop, IN BLBool _3D, IN BLF32 _Xpos,
 #elif defined(BL_USE_COREAUDIO_API)
 	_sound->pMp3Context = NULL;
 	_FetchResource(_Filename, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _CASoundSetup, TRUE);
-#elif defined(BL_USE_SDL_API)
+#elif defined(BL_USE_WEB_API)
 	_sound->pSound = NULL;
 	_sound->pMusic = NULL;
 	_FetchResource(_Filename, (BLVoid**)&_sound, _sound->nID, _LoadAudio, _SDLSoundSetup, TRUE);
@@ -1341,7 +1432,7 @@ blDeleteAudio(IN BLGuid _ID)
 BLVoid
 blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 {
-#if defined(BL_USE_SDL_API)
+#if defined(BL_USE_WEB_API)
 	return;
 #endif
 	if (_Channels == 0xFFFFFFFF && _SamplesPerSec == 0xFFFFFFFF)
@@ -1461,7 +1552,7 @@ blPCMStreamParam(IN BLU32 _Channels, IN BLU32 _SamplesPerSec)
 BLVoid
 blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 {
-#if defined(BL_USE_SDL_API)
+#if defined(BL_USE_WEB_API)
 	return;
 #endif
 	if (_PrAudioMem->nPCMFill >= 65536)
