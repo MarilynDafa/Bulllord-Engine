@@ -19,6 +19,7 @@ Supported rendering backends:
  * OpenGL ES
  * Vulkan(In Development)
  * WebGL
+ * WebGPU(In Development)
 
 Supported platforms:
 
@@ -78,7 +79,7 @@ Future work:
 Licenses:
  
  Bulllord Game Engine
- Copyright (C) 2010-2017 Trix
+ Copyright (C) 2010-2019 Trix
  
  This software is provided 'as-is', without any express or implied
  warranty.  In no event will the authors be held liable for any damages
