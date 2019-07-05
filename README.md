@@ -35,24 +35,24 @@ Supported compilers:
 
  * Clang 3.3 and above
  * GCC 4.6 and above
- * VS2015 and above
+ * VS2019 and above
  
  How to build:
  
  * Win32(windows xp compatible) </br>
     OS: Windows 10 PC</br>
-    IDE: visual studio 2017</br>
+    IDE: visual studio 2019</br>
 	Tips: Install DirectX SDK first(for xaudio module)    </br>
  * UWP </br> 
     OS: Windows 10 PC    </br>
-    IDE: visual studio 2017   </br>   
+    IDE: visual studio 2019   </br>   
  * Linux </br> 
     OS: Windows 10 PC and a linux machine additional(openssh yasm gcc-multilib:i386 glibc:i386 x11:i386 mesa3d:i386 openal:i386 installed)    </br>
-    IDE: visual studio 2017    </br>
+    IDE: visual studio 2019    </br>
 	Tips: You can install Windows 10 Ubuntu Subsystem on your Win10 PC and only support root login(a visual studio project macro bug?)</br>
  * Android  
     OS: Windows 10 PC    </br>
-    IDE: visual studio 2017   </br> 
+    IDE: visual studio 2019   </br> 
 	Tips: Java code in proj/java </br> 
  * MacOS </br> 
     OS: OSX   </br> 
@@ -68,7 +68,7 @@ Supported compilers:
 	git clone https://github.com/trippleflux/vs-tool.git </br>
 	set EMSCRIPTEN environment variable $(emsdk)\fastcomp\emscripten </br>
 	Copy the folders Emscripten to C:/Program Files (x86)/MSBuild/Microsoft.Cpp/v4.0/Platforms </br>
-    IDE: visual studio 2017    </br>
+    IDE: visual studio 2019    </br>
 	Tips: Only support WebGL2, please use firefox or chrome</br>
  
 Future work:
