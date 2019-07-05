@@ -57,3 +57,5 @@ code/externals/opus/celt/dump_modes/Makefile
 *.unsuccessfulbuild
 *.aidl
 *.unsuccessfulbuild
+*.o-43927440
+*.o-77144ac4
