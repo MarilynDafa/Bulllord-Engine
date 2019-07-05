@@ -66,7 +66,7 @@ Supported compilers:
 	emsdk install --build=Release sdk-incoming-64bit binaryen-master-64bit --vs2017 </br>
 	emsdk activate --global --build=Release sdk-incoming-64bit binaryen-master-64bit </br>
 	git clone https://github.com/trippleflux/vs-tool.git </br>
-	set EMSCRIPTEN environment variable $(emsdk)\fastcomp\emscripten
+	set EMSCRIPTEN environment variable $(emsdk)\fastcomp\emscripten </br>
 	Copy the folders Emscripten to C:/Program Files (x86)/MSBuild/Microsoft.Cpp/v4.0/Platforms </br>
     IDE: visual studio 2017    </br>
 	Tips: Only support WebGL2, please use firefox or chrome</br>
