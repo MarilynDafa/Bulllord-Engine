@@ -58,6 +58,9 @@
     <Filter Include="externals\webp\dsp">
       <UniqueIdentifier>{f67a3122-eccc-4b60-a63c-09910304d73a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="externals\astc">
+      <UniqueIdentifier>{30764a1b-1af9-4b60-9750-4a4df9f8c26b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\autofit.c">
@@ -705,9 +708,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aes.c">
       <Filter>externals\mbedtls</Filter>
     </ClCompile>
@@ -1121,6 +1121,48 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_block_sizes2.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_color_unquantize.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_decompress_symbolic.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_image_load_store.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_integer_sequence.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_partition_tables.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_percentile_tables.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_quantization.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_symbolic_physical.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_toplevel.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_weight_align.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_weight_quant_xfer_tables.c">
+      <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.c">
+      <Filter>externals\astc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2284,6 +2326,15 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\types.h">
       <Filter>externals\webp</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpu-ds.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_codec_internals.h">
+      <Filter>externals\astc</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.h">
+      <Filter>externals\astc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

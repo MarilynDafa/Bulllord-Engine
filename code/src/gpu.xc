@@ -63,7 +63,7 @@ typedef struct _GpuMember {
     EGLConfig pEglConfig;
     BLBool bAEPSupport;
 #elif defined(BL_PLATFORM_WEB)
-    GLFWwindow* pWindow;
+	EMSCRIPTEN_WEBGL_CONTEXT_HANDLE pContext;
 #endif
 }_BLGpuMember;
 static _BLGpuMember* _PrGpuMem = NULL;
@@ -2078,8 +2078,13 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_WEB)
 BLVoid
-_GpuIntervention(DUK_CONTEXT* _DKC, GLFWwindow* _Window, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(DUK_CONTEXT* _DKC, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
+	EM_ASM({
+		Array.prototype.someExtensionFromThirdParty = {};
+		Array.prototype.someExtensionFromThirdParty.length = 42;
+		Array.prototype.someExtensionFromThirdParty.something = function() { return "Surprise!"; };
+	  });
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
     _PrGpuMem->pDukContext = _DKC;
     _PrGpuMem->bVsync = _Vsync;
@@ -2097,30 +2102,43 @@ _GpuIntervention(DUK_CONTEXT* _DKC, GLFWwindow* _Window, BLU32 _Width, BLU32 _He
     for (BLU32 _idx = 0; _idx < BL_TF_COUNT; ++_idx)
         _PrGpuMem->sHardwareCaps.aTexFormats[_idx] = TRUE;
     _PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
-    _PrGpuMem->pWindow = _Window;
-    glfwMakeContextCurrent(_Window);
-    _PrGpuMem->sHardwareCaps.nApiVersion = 300;
-    _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = FALSE;
-    GLint _extensions = 0;
-    GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
-    for (GLint _idx = 0; _idx < _extensions; ++_idx)
-    {
-        const BLAnsi* _name = (const BLAnsi*)glGetStringi(GL_EXTENSIONS, _idx);
-        if (!strcmp(_name, "GL_EXT_texture_filter_anisotropic"))
-        {
-            GL_CHECK_INTERNAL(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &_PrGpuMem->sHardwareCaps.fMaxAnisotropy));
-        }
-        else if (!strcmp(_name, "WEBGL_compressed_texture_astc"))
-        {
-            _PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = TRUE;
-        }
-    }
-    _PipelineStateDefaultGL(_Width, _Height);
+    EmscriptenWebGLContextAttributes _attrs;
+    emscripten_webgl_init_context_attributes(&_attrs);
+    _attrs.majorVersion = 2;
+	_attrs.minorVersion = 0;
+	_attrs.powerPreference = EM_WEBGL_POWER_PREFERENCE_DEFAULT;
+    _PrGpuMem->pContext = emscripten_webgl_create_context("canvas", &_attrs);
+	if (_PrGpuMem->pContext)
+	{
+		memset(&_attrs, -1, sizeof(_attrs));
+		EMSCRIPTEN_RESULT _res = emscripten_webgl_get_context_attributes(_PrGpuMem->pContext, &_attrs);
+		assert(_res == EMSCRIPTEN_RESULT_SUCCESS);
+		assert(_attrs.powerPreference == EM_WEBGL_POWER_PREFERENCE_DEFAULT || _attrs.powerPreference == EM_WEBGL_POWER_PREFERENCE_LOW_POWER || _attrs.powerPreference == EM_WEBGL_POWER_PREFERENCE_HIGH_PERFORMANCE);
+		_res = emscripten_webgl_make_context_current(_PrGpuMem->pContext);
+		assert(_res == EMSCRIPTEN_RESULT_SUCCESS);
+		assert(emscripten_webgl_get_current_context() == _PrGpuMem->pContext);
+		_PrGpuMem->sHardwareCaps.nApiVersion = 300;
+		_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = FALSE;
+		GLint _extensions = 0;
+		GL_CHECK_INTERNAL(glGetIntegerv(GL_NUM_EXTENSIONS, &_extensions));
+		for (GLint _idx = 0; _idx < _extensions; ++_idx)
+		{
+			const BLAnsi* _name = (const BLAnsi*)glGetStringi(GL_EXTENSIONS, _idx);
+			if (!strcmp(_name, "GL_EXT_texture_filter_anisotropic"))
+			{
+				GL_CHECK_INTERNAL(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &_PrGpuMem->sHardwareCaps.fMaxAnisotropy));
+			}
+			else if (!strcmp(_name, "WEBGL_compressed_texture_astc"))
+			{
+				_PrGpuMem->sHardwareCaps.aTexFormats[BL_TF_ASTC] = TRUE;
+			}
+		}
+		_PipelineStateDefaultGL(_Width, _Height);
+	}
 }
 BLVoid
 _GpuSwapBuffer()
 {
-    glfwSwapBuffers(_PrGpuMem->pWindow);
 }
 BLVoid
 _GpuAnitIntervention()
@@ -2152,6 +2170,7 @@ _GpuAnitIntervention()
     blDeleteDict(_PrGpuMem->pBufferCache);
     free(_PrGpuMem->pUBO);
     free(_PrGpuMem);
+	emscripten_webgl_destroy_context(_PrGpuMem->pContext);
 }
 #else
 #   "error what's the fucking platform"

@@ -438,14 +438,14 @@ blMd5File(IN BLAnsi* _Filename)
                 if (_outsz > 1024)
                 {
                     _readsz = 1024;
-                    _outsz -= 1024
+					_outsz -= 1024;
                 }
                 else
                 {
                     _readsz = _outsz;
                     _outsz = 0;
                 }
-                memecpy(_data, (BLU8*)_outbuf + _offset, _readsz);
+                memcpy(_data, (BLU8*)_outbuf + _offset, _readsz);
                 _offset += _readsz;
                 _MD5Update(_data, _readsz);
             }

@@ -120,6 +120,7 @@ astc_codec_image *load_astc_file(const char *filename, int bitness, astc_decode_
 
 int astcmain(int argc, const char** argv, const unsigned char* _src, unsigned char* _dst, int _width, int _height, int _comp)
 {
+#ifndef EMSCRIPTEN
     prepare_angular_tables();
     build_quantization_mode_table();
     astc_decode_mode decode_mode = DECODE_HDR;
@@ -162,5 +163,9 @@ int astcmain(int argc, const char** argv, const unsigned char* _src, unsigned ch
         store_result = astc_codec_store_image(output_image, output_filename, bitness, &format_string,_src, _dst, _width, _height, _comp);
     }
     return store_result;
+#else
+	return 0;
+#endif
+
 }
 

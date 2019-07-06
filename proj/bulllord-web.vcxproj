@@ -119,7 +119,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;EMCC_DEBUG=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;EMCC_DEBUG=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\webp;..\code\externals;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>LanguageStandardGnu99</LanguageStandardMode>
       <AdditionalOptions>-g -fno-exceptions -xc %(AdditionalOptions)</AdditionalOptions>
@@ -135,7 +135,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;GLFW_INCLUDE_ES3;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\webp;..\code\externals;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>LanguageStandardGnu99</LanguageStandardMode>
       <AdditionalOptions>-xc -fno-exceptions %(AdditionalOptions)</AdditionalOptions>

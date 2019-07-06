@@ -102,7 +102,7 @@ extern BLVoid _GpuIntervention(DUK_CONTEXT*, ANativeWindow*, BLU32, BLU32, BLBoo
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_WEB)
-extern BLVoid _GpuIntervention(DUK_CONTEXT*, GLFWwindow*, BLU32, BLU32, BLBool);
+extern BLVoid _GpuIntervention(DUK_CONTEXT*, BLU32, BLU32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #else
@@ -3200,12 +3200,12 @@ static EM_BOOL
 _SizeProc(BLS32 _EventType, const EmscriptenUiEvent* _UiEvent, BLVoid* _UserData)
 {
     BLF64 _w, _h;
-    emscripten_get_element_css_size("bulllordcanvas", &_w, &_h);
+    emscripten_get_element_css_size("canvas", &_w, &_h);
     if (_w < 1.0)
         _w = _UiEvent->windowInnerWidth;
     if (_h < 1.0)
         _h = _UiEvent->windowInnerHeight;
-    emscripten_set_canvas_element_size("bulllordcanvas", _w, _h);
+    emscripten_set_canvas_element_size("canvas", _w, _h);
     _PrSystemMem->sBoostParam.nScreenWidth = (BLU32)_w;
     _PrSystemMem->sBoostParam.nScreenHeight = (BLU32)_h;
     blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
@@ -3224,7 +3224,9 @@ _ContextProc(BLS32 _EventType, const BLVoid* _Reserved, BLVoid* _UserData)
 static EM_BOOL
 _KeyProc(BLS32 _EventType, const EmscriptenKeyboardEvent* _KeyEvent, BLVoid* _UserData)
 {
-	BLEnum _scancode = SCANCODE_INTERNAL[_Scancode];
+	BLEnum _scancode = SCANCODE_INTERNAL[_KeyEvent->keyCode];
+	BLU32 _codepoint;
+	BLUtf8 _text[5];
     switch (_EventType) {
         case EMSCRIPTEN_EVENT_KEYDOWN:
             blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
@@ -3233,8 +3235,7 @@ _KeyProc(BLS32 _EventType, const EmscriptenKeyboardEvent* _KeyEvent, BLVoid* _Us
             blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
             break;
         case EMSCRIPTEN_EVENT_KEYPRESS:
-            BLUtf8 _text[5];
-            BLU32 _codepoint = (BLU32)_KeyEvent->charCode;
+            _codepoint = (BLU32)_KeyEvent->charCode;
             if (_codepoint <= 0x7F)
             {
                 _text[0] = (BLUtf8)_codepoint;
@@ -3303,10 +3304,10 @@ _MouseProc(BLS32 _EventType, const EmscriptenMouseEvent* _MouseEvent, BLVoid* _U
     switch (_EventType)
     {
         case EMSCRIPTEN_EVENT_MOUSEDOWN:
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _MouseEvent->mouse_button == 0 ? BL_ME_LDOWN : BL_ME_RDOWN, NULL, INVALID_GUID);
+            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _MouseEvent->button == 0 ? BL_ME_LDOWN : BL_ME_RDOWN, NULL, INVALID_GUID);
             break;
         case EMSCRIPTEN_EVENT_MOUSEUP:
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _MouseEvent->mouse_button == 0 ? BL_ME_LUP : BL_ME_RUP, NULL, INVALID_GUID);
+            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _MouseEvent->button == 0 ? BL_ME_LUP : BL_ME_RUP, NULL, INVALID_GUID);
             break;
         case EMSCRIPTEN_EVENT_MOUSEMOVE:
             blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
@@ -3314,9 +3315,9 @@ _MouseProc(BLS32 _EventType, const EmscriptenMouseEvent* _MouseEvent, BLVoid* _U
         case EMSCRIPTEN_EVENT_MOUSEENTER:
         case EMSCRIPTEN_EVENT_MOUSELEAVE:
             if (_UseCustomCursor())
-                emscripten_hide_mouse();
+				EM_ASM({ document.querySelector("canvas").cursor = "none"; });
             else
-                emscripten_show_mouse();
+				EM_ASM({ document.querySelector("canvas").cursor = "auto"; });
             break;
         default:
             break;
@@ -3366,45 +3367,27 @@ _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 BLVoid
 _ShowWindow()
 {
-    emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, false, _SizeProc);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, FALSE, _SizeProc);
 	BLU32 _width = _PrSystemMem->sBoostParam.nScreenWidth;
 	BLU32 _height = _PrSystemMem->sBoostParam.nScreenHeight;
-    EmscriptenWebGLContextAttributes _attrs;
-    emscripten_webgl_init_context_attributes(&_attrs);
-    _attrs.alpha = _sapp.desc.alpha;
-    _attrs.depth = TRUE;
-    _attrs.stencil = TRUE;
-    _attrs.antialias = FALSE;
-    _attrs.premultipliedAlpha = FALSE;
-    _attrs.preserveDrawingBuffer = FALSE;
-    _attrs.enableExtensionsByDefault = TRUE;
-    _attrs.majorVersion = 2;
-    EMSCRIPTEN_WEBGL_CONTEXT_HANDLE _ctx = emscripten_webgl_create_context("bulllordcanvas", &_attrs);
-    if (_ctx)
-    {
-        emscripten_set_mousedown_callback("bulllordcanvas", 0, true, _MouseProc);
-        emscripten_set_mouseup_callback("bulllordcanvas", 0, true, _MouseProc);
-        emscripten_set_mousemove_callback("bulllordcanvas", 0, true, _MouseProc);
-        emscripten_set_mouseenter_callback("bulllordcanvas", 0, true, _MouseProc);
-        emscripten_set_mouseleave_callback("bulllordcanvas", 0, true, _MouseProc);
-        emscripten_set_wheel_callback("bulllordcanvas", 0, true, _ScrollProc);
-        emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, true, _KeyProc);
-        emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, true, _KeyProc);
-        emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, true, _KeyProc);
-        emscripten_set_touchstart_callback("bulllordcanvas", 0, true, _TouchProc);
-        emscripten_set_touchmove_callback("bulllordcanvas", 0, true, _TouchProc);
-        emscripten_set_touchend_callback("bulllordcanvas", 0, true, _TouchProc);
-        emscripten_set_touchcancel_callback("bulllordcanvas", 0, true, _TouchProc);
-        emscripten_set_webglcontextlost_callback("bulllordcanvas", 0, true, _ContextProc);
-        emscripten_set_webglcontextrestored_callback("bulllordcanvas", 0, true, _ContextProc);
-        emscripten_request_animation_frame_loop("bulllordcanvas", 0);
-        emscripten_webgl_make_context_current(_ctx);
-        _GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _width, _height, !_PrSystemMem->sBoostParam.bProfiler);
-        if (_PrSystemMem->sBoostParam.bFullscreen)
-            _EnterFullscreen();
-    }
+    _GpuIntervention(_PrSystemMem->pDukContext, _width, _height, !_PrSystemMem->sBoostParam.bProfiler);
+    emscripten_set_mousedown_callback("canvas", 0, TRUE, _MouseProc);
+    emscripten_set_mouseup_callback("canvas", 0, TRUE, _MouseProc);
+    emscripten_set_mousemove_callback("canvas", 0, TRUE, _MouseProc);
+    emscripten_set_mouseenter_callback("canvas", 0, TRUE, _MouseProc);
+    emscripten_set_mouseleave_callback("canvas", 0, TRUE, _MouseProc);
+    emscripten_set_wheel_callback("canvas", 0, TRUE, _ScrollProc);
+    emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _KeyProc);
+    emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _KeyProc);
+    emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _KeyProc);
+    emscripten_set_touchstart_callback("canvas", 0, TRUE, _TouchProc);
+    emscripten_set_touchmove_callback("canvas", 0, TRUE, _TouchProc);
+    emscripten_set_touchend_callback("canvas", 0, TRUE, _TouchProc);
+    emscripten_set_touchcancel_callback("canvas", 0, TRUE, _TouchProc);
+    emscripten_set_webglcontextlost_callback("canvas", 0, TRUE, _ContextProc);
+    emscripten_set_webglcontextrestored_callback("canvas", 0, TRUE, _ContextProc);
+    if (_PrSystemMem->sBoostParam.bFullscreen)
+        _EnterFullscreen();
 }
 BLVoid
 _PollMsg()
@@ -3618,6 +3601,7 @@ _SystemStep()
 	else
 #endif
     {
+	blDebugOutput("update");
 		blFrameBufferClear(TRUE, TRUE, TRUE);
 		BLU32 _now = blTickCounts();
 		BLU32 _delta = _now - _PrSystemMem->nSysTime;
@@ -4661,7 +4645,7 @@ blOpenPlugin(IN BLAnsi* _Basename)
 #elif defined(BL_PLATFORM_IOS)
 	_open(BL_SDK_VERSION, _PrSystemMem->pWindow);
 #elif defined(BL_PLATFORM_WEB)
-	_open(BL_SDK_VERSION, _PrSystemMem->pWindow);
+	_open(BL_SDK_VERSION, NULL);
 #endif
     return TRUE;
 }
@@ -4841,7 +4825,7 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
 		pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #elif defined(BL_PLATFORM_WEB)
 	EM_ASM_ARGS({
-		var _glcanvas = document.getElementById('canvas');				
+		var _glcanvas = document.querySelector('canvas');				
 		var _input = document.createElement('input');
 		var _absx = _glcanvas.getBoundingClientRect().left + document.body.scrollLeft; 
 		var _absy = _glcanvas.getBoundingClientRect().top + document.body.scrollTop; 
@@ -5077,8 +5061,8 @@ blDetachIME(IN BLEnum _Type)
 		pthread_mutex_unlock(&_PrSystemMem->sMutex);
 #elif defined(BL_PLATFORM_WEB)
 	EM_ASM(
-		var _glcanvas = document.getElementById('canvas');
-		var _input = document.getElementById('input');
+		var _glcanvas = document.querySelector('canvas');
+		var _input = document.querySelector('input');
 		if (_input != null)
 			document.body.removeChild(_input);
 		_glcanvas.focus();
@@ -5108,7 +5092,10 @@ blCursorVisiblity(IN BLBool _Show)
 		Windows::UI::Core::CoreWindow::GetForCurrentThread()->PointerCursor = nullptr;
 #	endif
 #elif defined(BL_PLATFORM_WEB)
-	glfwSetInputMode(_PrSystemMem->pWindow, GLFW_CURSOR, _Show ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+    if (_Show)
+		EM_ASM({ document.querySelector("canvas").cursor = "none"; });
+    else
+		EM_ASM({ document.querySelector("canvas").cursor = "auto"; });
 #endif
 }
 BLVoid
@@ -5414,7 +5401,6 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
     _PrSystemMem->pCtlView = nil;
     _PrSystemMem->bInitState = FALSE;
 #elif defined(BL_PLATFORM_WEB)
-	_PrSystemMem->pWindow = NULL;
 	_PrSystemMem->bNeedInit = TRUE;
 #endif
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
@@ -5572,7 +5558,6 @@ blSystemScriptRun(IN BLAnsi* _Encryptkey)
 	_PrSystemMem->nKeyboardHeight = 0;
 	_PrSystemMem->pCtlView = nil;
 #elif defined(BL_PLATFORM_WEB)
-	_PrSystemMem->pWindow = NULL;
 	_PrSystemMem->bNeedInit = TRUE;
 #endif
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)

@@ -19,7 +19,6 @@
  * Modified heavily by Matt Campbell <mattcampbell@pobox.com> for the
  * stand-alone mpaudec library.  Based on mpegaudiodec.c from libavcodec.
  */
-#ifndef EMSCRIPTEN
 #include "internal.h"
 #include "mpegaudio.h"
 
@@ -2492,4 +2491,3 @@ void mpaudec_cleanup()
 		free_vlc(&huff_quad_vlc[i]);
 	}
 }
-#endif

@@ -19,7 +19,6 @@
  * Modified by Matt Campbell <mattcampbell@pobox.com> for the stand-alone
  * mpaudec library.  Based on common.c from libavcodec.
  */
-#ifndef EMSCRIPTEN
 
 #include "internal.h"
 
@@ -272,4 +271,3 @@ int get_vlc(GetBitContext *s, const VLC *vlc)
     skip_bits(s, n);
     return code;
 }
-#endif

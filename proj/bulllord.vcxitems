@@ -14,6 +14,19 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_block_sizes2.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_color_unquantize.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_decompress_symbolic.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_image_load_store.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_integer_sequence.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_partition_tables.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_percentile_tables.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_quantization.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_symbolic_physical.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_toplevel.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_weight_align.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_weight_quant_xfer_tables.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.c">
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <CompileAs>CompileAsC</CompileAs>
@@ -1447,6 +1460,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_codec_internals.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duk_config.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\fastlz\fastlz.h" />
@@ -2232,6 +2247,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\util.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\array.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\dictionary.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpu-ds.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\internal.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\list.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\mathematics.h" />
@@ -2248,6 +2264,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
       <CompileAs>CompileAsCpp</CompileAs>
       <ExcludedFromBuild>false</ExcludedFromBuild>
+      <FileType>Document</FileType>
     </ClCompile>
   </ItemGroup>
 </Project>

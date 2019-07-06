@@ -751,7 +751,9 @@ blVideoPlayEXT(IN BLAnsi* _Filename, IN BLBool _LClickInterrupt, IN BLEnum _KeyI
 #if defined(EMSCRIPTEN)
 	EM_ASM_ARGS({
 		var _url = Pointer_stringify($0);
-		var _glcanvas = document.getElementById('canvas');				
+		var _click = Pointer_stringify($1);
+		var _key = Pointer_stringify($2);
+		var _glcanvas = document.querySelector('canvas');				
 		var _video = document.createElement('video');
 		var _absx = _glcanvas.getBoundingClientRect().left + document.body.scrollLeft; 
 		var _absy = _glcanvas.getBoundingClientRect().top + document.body.scrollTop; 
@@ -777,19 +779,32 @@ blVideoPlayEXT(IN BLAnsi* _Filename, IN BLBool _LClickInterrupt, IN BLEnum _KeyI
 		document.body.appendChild(_videobg);
 		_video.focus();
 		_video.addEventListener('ended', function () {			
-			var _glcanvas = document.getElementById('canvas');
-			var _videobg = document.getElementById('videobackground');
+			var _glcanvas = document.querySelector('canvas');
+			var _videobg = document.querySelector('videobackground');
 			if (_videobg != null)
 				document.body.removeChild(_videobg);
 			_glcanvas.focus();
         }, true);
-		_video.addEventListener('click', function() {
-			var _glcanvas = document.getElementById('canvas');
-			var _videobg = document.getElementById('videobackground');
-			if (_videobg != null)
-				document.body.removeChild(_videobg);
-			_glcanvas.focus();
-		}, false);
+		if (_click)
+		{
+			_video.addEventListener('click', function() {
+				var _glcanvas = document.querySelector('canvas');
+				var _videobg = document.querySelector('videobackground');
+				if (_videobg != null)
+					document.body.removeChild(_videobg);
+				_glcanvas.focus();
+			}, false);
+		}
+		if (_key)
+		{
+			_video.addEventListener('keydown', function() {
+				var _glcanvas = document.querySelector('canvas');
+				var _videobg = document.querySelector('videobackground');
+				if (_videobg != null)
+					document.body.removeChild(_videobg);
+				_glcanvas.focus();
+			}, false);
+		}
 	},_Filename);
 #else
 	BLF64 _framedelta = 0.0;
