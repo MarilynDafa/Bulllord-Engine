@@ -1082,6 +1082,7 @@ _WEBInit()
         _PrAudioMem->pSounds = blGenList(TRUE);
         blDebugOutput("Audio initialize successfully");
     }*/
+	blDebugOutput("Audio initialize successfully");
 }
 static BLVoid
 _WEBDestroy()

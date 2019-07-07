@@ -647,46 +647,28 @@ blGenStream(IN BLAnsi* _Filename)
 				if (_path[_i] == '\\')
 					_path[_i] = '/';
 			}
-			BLVoid* _outbuf;
-			BLS32 _outsz, _error, _exists;
-			emscripten_idb_exists("/emscriptenfs", _path, &_exists, &_error);
-			if (_exists)
+			memset(_path, 0, sizeof(_path));
+			strcpy(_path, blWorkingDir());
+			strcat(_path, _Filename);
+			emscripten_wget(_path, _path);
+			FILE* _fp = fopen(_path, "rb");
+			if (FILE_INVALID_INTERNAL(_fp))
 			{
-				emscripten_idb_load("/emscriptenfs", _path, &_outbuf, &_outsz, &_error);
+				BLU32 _datasz;
+				fseek(_fp, 0, SEEK_END);
+				_datasz = (BLU32)ftell(_fp);
+				fseek(_fp, 0, SEEK_SET);
 				_ret = (_BLStream*)malloc(sizeof(_BLStream));
-				_ret->pBuffer = malloc(_outsz);
-				memcpy(_ret->pBuffer, _outbuf, _outsz);
-				_ret->nLen = _outsz;
+				_ret->pBuffer = malloc(_datasz);
+				fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp);
+				_ret->nLen = _datasz;
 				_ret->pPos = (BLU8*)_ret->pBuffer;
 				_ret->pEnd = _ret->pPos + _ret->nLen;
-				free(_outbuf);
+				fclose(_fp);
 				return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
 			}
 			else
-			{
-				memset(_path, 0, sizeof(_path));
-				strcpy(_path, blWorkingDir());
-				strcat(_path, _Filename);
-				emscripten_wget(_path, _path);
-				FILE* _fp = fopen(_path, "rb");
-				if (FILE_INVALID_INTERNAL(_fp))
-				{
-					BLU32 _datasz;
-					fseek(_fp, 0, SEEK_END);
-					_datasz = (BLU32)ftell(_fp);
-					fseek(_fp, 0, SEEK_SET);
-					_ret = (_BLStream*)malloc(sizeof(_BLStream));
-					_ret->pBuffer = malloc(_datasz);
-					fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp);
-					_ret->nLen = _datasz;
-					_ret->pPos = (BLU8*)_ret->pBuffer;
-					_ret->pEnd = _ret->pPos + _ret->nLen;
-					fclose(_fp);
-					return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
-				}
-				else
-					return INVALID_GUID;
-			}
+				return INVALID_GUID;
 		}
 #else
 		FILE* _fp = fopen(_path, "rb");

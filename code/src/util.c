@@ -424,37 +424,7 @@ blMd5File(IN BLAnsi* _Filename)
         goto md5final;
     }
     else
-    {
-        BLVoid* _outbuf;
-        BLS32 _outsz, _error, _exists;
-        emscripten_idb_exists("/emscriptenfs", _path, &_exists, &_error);
-        if (_exists)
-        {
-            emscripten_idb_load("/emscriptenfs", _path, &_outbuf, &_outsz, &_error);
-            BLU32 _offset = 0;
-            while (_outsz)
-            {
-                BLU32 _readsz;
-                if (_outsz > 1024)
-                {
-                    _readsz = 1024;
-					_outsz -= 1024;
-                }
-                else
-                {
-                    _readsz = _outsz;
-                    _outsz = 0;
-                }
-                memcpy(_data, (BLU8*)_outbuf + _offset, _readsz);
-                _offset += _readsz;
-                _MD5Update(_data, _readsz);
-            }
-            free(_outbuf);
-            goto md5final;
-        }
-        else
-            return NULL;
-    }
+        return NULL;
 #else
     FILE* _fp = fopen(_path, "rb");
     if (FILE_INVALID_INTERNAL(_fp))

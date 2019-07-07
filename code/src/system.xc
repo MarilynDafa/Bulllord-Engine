@@ -75,29 +75,34 @@ extern BLVoid _AudioInit(DUK_CONTEXT*);
 extern BLVoid _AudioStep(BLU32);
 extern BLVoid _AudioDestroy();
 extern BLVoid _SystemInit();
-extern BLVoid _SystemStep();
 extern BLVoid _SystemDestroy();
 #if defined(BL_PLATFORM_WIN32)
+extern BLVoid _SystemStep();
 extern BLVoid _GpuIntervention(DUK_CONTEXT*, HWND, BLU32, BLU32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention(HWND);
 #elif defined(BL_PLATFORM_UWP)
+extern BLVoid _SystemStep();
 extern BLVoid _GpuIntervention(DUK_CONTEXT*, Windows::UI::Core::CoreWindow^, BLU32, BLU32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_OSX)
+extern BLVoid _SystemStep();
 extern BLVoid _GpuIntervention(DUK_CONTEXT*, NSView*, BLU32, BLU32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_IOS)
+extern BLVoid _SystemStep();
 extern BLVoid _GpuIntervention(DUK_CONTEXT*, CALayer*, BLU32, BLU32, BLF32, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_LINUX)
+extern BLVoid _SystemStep();
 extern BLVoid _GpuIntervention(DUK_CONTEXT*, Display*, Window, BLU32, BLU32, GLXFBConfig, BLVoid*, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
 #elif defined(BL_PLATFORM_ANDROID)
+extern BLVoid _SystemStep();
 extern BLVoid _GpuIntervention(DUK_CONTEXT*, ANativeWindow*, BLU32, BLU32, BLBool, BLBool, BLBool);
 extern BLVoid _GpuSwapBuffer();
 extern BLVoid _GpuAnitIntervention();
@@ -260,8 +265,6 @@ typedef struct _SystemMember {
     BLS32 nKeyboardHeight;
     BLU32 nRetinaScale;
     BLBool bInitState;
-#elif defined(BL_PLATFORM_WEB)
-    BLBool bNeedInit;
 #endif
 }_BLSystemMember;
 BLBool _GbSystemRunning = FALSE;
@@ -3197,21 +3200,6 @@ _CloseWindow()
 }
 #elif defined(BL_PLATFORM_WEB)
 static EM_BOOL
-_SizeProc(BLS32 _EventType, const EmscriptenUiEvent* _UiEvent, BLVoid* _UserData)
-{
-    BLF64 _w, _h;
-    emscripten_get_element_css_size("canvas", &_w, &_h);
-    if (_w < 1.0)
-        _w = _UiEvent->windowInnerWidth;
-    if (_h < 1.0)
-        _h = _UiEvent->windowInnerHeight;
-    emscripten_set_canvas_element_size("canvas", _w, _h);
-    _PrSystemMem->sBoostParam.nScreenWidth = (BLU32)_w;
-    _PrSystemMem->sBoostParam.nScreenHeight = (BLU32)_h;
-    blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
-    return TRUE;
-}
-static EM_BOOL
 _ContextProc(BLS32 _EventType, const BLVoid* _Reserved, BLVoid* _UserData)
 {
     switch (_EventType) {
@@ -3367,9 +3355,9 @@ _ExitFullscreen(BLU32 _Width, BLU32 _Height)
 BLVoid
 _ShowWindow()
 {
-    emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, FALSE, _SizeProc);
 	BLU32 _width = _PrSystemMem->sBoostParam.nScreenWidth;
 	BLU32 _height = _PrSystemMem->sBoostParam.nScreenHeight;
+	emscripten_set_canvas_element_size("canvas", _width, _height);
     _GpuIntervention(_PrSystemMem->pDukContext, _width, _height, !_PrSystemMem->sBoostParam.bProfiler);
     emscripten_set_mousedown_callback("canvas", 0, TRUE, _MouseProc);
     emscripten_set_mouseup_callback("canvas", 0, TRUE, _MouseProc);
@@ -3589,55 +3577,52 @@ _SystemInit()
 	_PrSystemMem->pBeginFunc();
 #endif
 }
+#ifdef EMSCRIPTEN
+static EM_BOOL 
+_SystemStep(BLF64 _Time, BLVoid* _UserData)
+#else
 BLVoid
 _SystemStep()
-{
-#if defined(BL_PLATFORM_WEB)
-	if (_PrSystemMem->bNeedInit)
-	{
-		_SystemInit();
-		_PrSystemMem->bNeedInit = FALSE;
-	}
-	else
 #endif
-    {
-	blDebugOutput("update");
-		blFrameBufferClear(TRUE, TRUE, TRUE);
-		BLU32 _now = blTickCounts();
-		BLU32 _delta = _now - _PrSystemMem->nSysTime;
-		_PrSystemMem->nSysTime = _now;
-		for (BLU32 _idx = 0 ; _idx < 8; ++_idx)
+{
+	blFrameBufferClear(TRUE, TRUE, TRUE);
+	BLU32 _now = blTickCounts();
+	BLU32 _delta = _now - _PrSystemMem->nSysTime;
+	_PrSystemMem->nSysTime = _now;
+	for (BLU32 _idx = 0 ; _idx < 8; ++_idx)
+	{
+		if (_PrSystemMem->aTimers[_idx].nId != -1)
 		{
-			if (_PrSystemMem->aTimers[_idx].nId != -1)
+			if (_PrSystemMem->nSysTime - _PrSystemMem->aTimers[_idx].nLastTime >= (BLU32)_PrSystemMem->aTimers[_idx].fElapse * 1000)
 			{
-				if (_PrSystemMem->nSysTime - _PrSystemMem->aTimers[_idx].nLastTime >= (BLU32)_PrSystemMem->aTimers[_idx].fElapse * 1000)
-				{
-					blInvokeEvent(BL_ET_SYSTEM, BL_SE_TIMER, _PrSystemMem->aTimers[_idx].nId, NULL, INVALID_GUID);
-					_PrSystemMem->aTimers[_idx].nLastTime = _PrSystemMem->nSysTime;
-				}
+				blInvokeEvent(BL_ET_SYSTEM, BL_SE_TIMER, _PrSystemMem->aTimers[_idx].nId, NULL, INVALID_GUID);
+				_PrSystemMem->aTimers[_idx].nLastTime = _PrSystemMem->nSysTime;
 			}
 		}
-		_PollMsg();
-		_PollEvent();
-#if defined(BL_PLATFORM_ANDROID)
-		if (_PrSystemMem->bBackendState)
-		{
-			_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler, TRUE, _PrSystemMem->bAEPSupport);
-			_PrSystemMem->bBackendState = FALSE;
-		}
-#endif
-		_UtilsStep(_delta);
-		_AudioStep(_delta);
-		_NetworkStep(_delta);
-		_UIStep(_delta, TRUE);
-		_SpriteStep(_delta, FALSE);
-		_UIStep(_delta, FALSE);
-		_SpriteStep(_delta, TRUE);
-		_StreamIOStep(_delta);
-		_PrSystemMem->pStepFunc(_delta);
-		if (_GbSystemRunning == 1)
-			_GpuSwapBuffer();
 	}
+	_PollMsg();
+	_PollEvent();
+#if defined(BL_PLATFORM_ANDROID)
+	if (_PrSystemMem->bBackendState)
+	{
+		_GpuIntervention(_PrSystemMem->pDukContext, _PrSystemMem->pWindow, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, !_PrSystemMem->sBoostParam.bProfiler, TRUE, _PrSystemMem->bAEPSupport);
+		_PrSystemMem->bBackendState = FALSE;
+	}
+#endif
+	_UtilsStep(_delta);
+	_AudioStep(_delta);
+	_NetworkStep(_delta);
+	_UIStep(_delta, TRUE);
+	_SpriteStep(_delta, FALSE);
+	_UIStep(_delta, FALSE);
+	_SpriteStep(_delta, TRUE);
+	_StreamIOStep(_delta);
+	_PrSystemMem->pStepFunc(_delta);
+	if (_GbSystemRunning == 1)
+		_GpuSwapBuffer();
+#ifdef EMSCRIPTEN
+	return TRUE;
+#endif
 }
 BLVoid
 _SystemDestroy()
@@ -3904,7 +3889,7 @@ blUserFolderDir()
 #elif defined(BL_PLATFORM_WEB)	
 	if (!_PrSystemMem->aUserDir[0])
 	{
-		strcpy(_PrSystemMem->aUserDir, "/bulllord/");
+		strcpy(_PrSystemMem->aUserDir, "/remote/");
 	}
 	return _PrSystemMem->aUserDir;
 #endif
@@ -4221,12 +4206,6 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
     strcpy_s(_path, 260, blUserFolderDir());
     strcat_s(_path, 260, "EnvStringOptions");
 	BLBool _fileexist = GetFileAttributesExA(_path, GetFileExInfoStandard, &_wfad) ? TRUE : FALSE;
-#elif defined(BL_PLATFORM_WEB)
-    strcpy(_path, blUserFolderDir());
-    strcat(_path, "EnvStringOptions");
-	BLS32 _error, _exists;
-	emscripten_idb_exists("/emscriptenfs", _path, &_exists, &_error);
-	BLBool _fileexist = _exists ? TRUE : FALSE;
 #else
     FILE* _fp;
     strcpy(_path, blUserFolderDir());
@@ -4296,36 +4275,6 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 			_tmpdic = blGenDict(FALSE);
 	}
 	CloseHandle(_fp);
-#elif defined(BL_PLATFORM_WEB)
-	else
-	{
-		BLVoid* _outbuf;
-		BLS32 _filesz;
-		emscripten_idb_load("/emscriptenfs", _path, &_outbuf, &_filesz, &_error);
-		if (_filesz != 0)
-		{
-			_tmpdic = blGenDict(FALSE);
-			BLU32 _offset = 0;
-			do
-			{
-				BLU32 _strsz, _sid;
-				memcpy(&_sid, (BLU8*)_outbuf + _offset, sizeof(BLU32));
-				_offset += sizeof(BLU32);
-				if (_sid == 0xDEAD)
-					break;
-				memcpy(&_strsz, (BLU8*)_outbuf + _offset, sizeof(BLU32));
-				_offset += sizeof(BLU32);
-				_tmpstr = (BLUtf8*)malloc(_strsz + 1);
-				memcpy(_tmpstr, (BLU8*)_outbuf + _offset, sizeof(BLUtf8) * _strsz);				
-				_offset += sizeof(BLUtf8) * _strsz;
-				_tmpstr[_strsz] = 0;
-				blDictInsert(_tmpdic, _sid, _tmpstr);
-			} while (1);
-		}
-		else
-			_tmpdic = blGenDict(FALSE);
-		free(_outbuf);
-	}
 #else
 	else
 	{
@@ -4413,44 +4362,6 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 		_sz = 0xDEAD;
 		WriteFile(_fp, &_sz, sizeof(BLU32), NULL, NULL);
 		CloseHandle(_fp);
-#elif defined(BL_PLATFORM_WEB)
-		BLU32 _cap = 1024;
-		BLU8* _buf = malloc(_cap);
-		BLU32 _sztmp = 0;
-		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
-		{
-			if (_sztmp + 16 > _cap)
-			{
-				_cap *= 2;
-				_buf = (BLU8*)realloc(_buf, _cap);
-			}
-			memcpy(_buf + _sztmp, &_iteratorkey, sizeof(BLU32));
-			_sztmp += sizeof(BLU32);			
-			if (_sztmp + 16 > _cap)
-			{
-				_cap *= 2;
-				_buf = (BLU8*)realloc(_buf, _cap);
-			}
-			BLU32 _strlen = (BLU32)strlen((const BLAnsi*)_iter);
-			memcpy(_buf + _sztmp, &_strlen, sizeof(BLU32));
-			_sztmp += sizeof(BLU32);
-			if (_sztmp + 16 > _cap)
-			{
-				_cap *= 2;
-				_buf = (BLU8*)realloc(_buf, _cap);
-			}
-			memcpy(_buf + _sztmp, _iter, sizeof(BLUtf8) * _strlen);
-			_sztmp += sizeof(BLUtf8) * _strlen;
-			if (_sztmp + 16 > _cap)
-			{
-				_cap *= 2;
-				_buf = (BLU8*)realloc(_buf, _cap);
-			}
-		}
-		BLU32 _tem = 0xDEAD;
-		memcpy(_buf + _sztmp, &_tem, sizeof(BLU32));
-		_sztmp += sizeof(BLU32);
-		emscripten_idb_store("/emscriptenfs", _path, (BLVoid*)_buf, _sztmp, &_error);
 #else
 		_fp = fopen(_path, "wb");
 		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
@@ -5400,8 +5311,6 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
     _PrSystemMem->nKeyboardHeight = 0;
     _PrSystemMem->pCtlView = nil;
     _PrSystemMem->bInitState = FALSE;
-#elif defined(BL_PLATFORM_WEB)
-	_PrSystemMem->bNeedInit = TRUE;
 #endif
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 		_PrSystemMem->aTimers[_idx].nId = -1;
@@ -5478,8 +5387,8 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 #elif defined(BL_PLATFORM_IOS)
     _SystemInit();
 #elif defined(BL_PLATFORM_WEB)
-	emscripten_set_main_loop(_SystemStep, 0, 1);
-	_SystemDestroy();
+	_SystemInit();
+	emscripten_request_animation_frame_loop(_SystemStep, 0);
 #endif
 }
 BLVoid
@@ -5557,8 +5466,6 @@ blSystemScriptRun(IN BLAnsi* _Encryptkey)
 	_PrSystemMem->pTICcxt = nil;
 	_PrSystemMem->nKeyboardHeight = 0;
 	_PrSystemMem->pCtlView = nil;
-#elif defined(BL_PLATFORM_WEB)
-	_PrSystemMem->bNeedInit = TRUE;
 #endif
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 		_PrSystemMem->aTimers[_idx].nId = -1;
@@ -5570,7 +5477,7 @@ blSystemScriptRun(IN BLAnsi* _Encryptkey)
 	} while (_GbSystemRunning);
 	_SystemDestroy();
 #elif defined(BL_PLATFORM_WEB)
-	emscripten_set_main_loop(_SystemStep, 0, 1);
-	_SystemDestroy();
+	_SystemInit();
+	emscripten_request_animation_frame_loop(_SystemStep, 0);
 #endif
 }
