@@ -65,7 +65,7 @@ BL_MAINBEGIN(argc, argv)
 		480,
 		800,
 		1,
-		FALSE,
+		0,
 		1,
 		2,
 		BeginSystem, StepSystem, EndSystem);
