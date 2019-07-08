@@ -1018,7 +1018,6 @@ EM_JS(BLS32, _AudioJSInit, (BLS32 _SampleRate, BLS32 _Channels, BLS32 _BufferSiz
         Module._saudio_context = null;
     }
     if (Module._saudio_context) {
-        console.log('sokol_audio.h: sample rate ', Module._saudio_context.sampleRate);
         Module._saudio_node = Module._saudio_context.createScriptProcessor(_BufferSize, 0, _Channels);
         Module._saudio_node.onaudioprocess = function pump_audio(event) {
             var _frames = event.outputBuffer.length;
@@ -1071,22 +1070,18 @@ EM_JS(BLS32, _AudioJSBufferFrames, (void), {
 static BLVoid
 _WEBInit()
 {
-/*
-    if (_AudioJSInit(_saudio.sample_rate, _saudio.num_channels, _saudio.buffer_frames))
-    {
-        _saudio.bytes_per_frame = sizeof(BLF32) * _saudio.num_channels;
-        _saudio.sample_rate = _AudioJSSampleRate();
-        _saudio.buffer_frames = _AudioJSBufferFrames();
-        _saudio.backend.buffer = (BLU8*)malloc(_saudio.buffer_frames * _saudio.bytes_per_frame);
-        _PrAudioMem->pAudioDev.fMusicVolume = _PrAudioMem->pAudioDev.fSystemVolume = _PrAudioMem->pAudioDev.fEnvVolume = 0.7f;
-        _PrAudioMem->pSounds = blGenList(TRUE);
-        blDebugOutput("Audio initialize successfully");
-    }*/
+	_PrAudioMem->pAudioDev.fMusicVolume = _PrAudioMem->pAudioDev.fSystemVolume = _PrAudioMem->pAudioDev.fEnvVolume = 0.7f;
+    _PrAudioMem->pSounds = blGenList(TRUE);
+    _PrAudioMem->pMusicMutex = blGenMutex();
+    _PrAudioMem->pAudioDev.pThread = blGenThread(_AudioThreadFunc, NULL, NULL);
+	blThreadRun(_PrAudioMem->pAudioDev.pThread);
 	blDebugOutput("Audio initialize successfully");
 }
 static BLVoid
 _WEBDestroy()
 {	
+    blDeleteThread(_PrAudioMem->pAudioDev.pThread);
+    blDeleteMutex(_PrAudioMem->pMusicMutex);
     blDeleteList(_PrAudioMem->pSounds);
 }
 #endif
