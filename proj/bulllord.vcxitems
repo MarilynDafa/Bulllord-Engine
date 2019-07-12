@@ -1407,6 +1407,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
       <CompileAs>CompileAsCpp</CompileAs>
       <ExcludedFromBuild>false</ExcludedFromBuild>
+      <FileType>CppCode</FileType>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\dictionary.c">
       <CompileAs>CompileAsC</CompileAs>

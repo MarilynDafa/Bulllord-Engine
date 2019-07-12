@@ -705,9 +705,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tinfl.c">
       <Filter>externals\miniz</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aes.c">
       <Filter>externals\mbedtls</Filter>
     </ClCompile>
@@ -1163,6 +1160,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.c">
       <Filter>externals\astc</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
