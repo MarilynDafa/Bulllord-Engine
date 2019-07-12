@@ -21,6 +21,7 @@
  */
 
 #include "internal.h"
+#ifndef EMSCRIPTEN
 
 /**
  * init GetBitContext.
@@ -271,3 +272,4 @@ int get_vlc(GetBitContext *s, const VLC *vlc)
     skip_bits(s, n);
     return code;
 }
+#endif

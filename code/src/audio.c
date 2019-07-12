@@ -85,8 +85,8 @@ typedef struct _AudioSource {
 	BLBool bValid;
 	BLBool b3d;
 	BLVec3 sPos;
-#if defined(BL_USE_AL_API)
 	BLGuid nID;
+#if defined(BL_USE_AL_API)
 	BLS32 nOffset;
 	BLS32 nFrequency;
 	BLU32 nChannels;
@@ -103,7 +103,6 @@ typedef struct _AudioSource {
 	ALuint nSource;
 	BLU32 nBufTurn;
 #elif defined(BL_USE_SL_API)
-	BLGuid nID;
 	BLS32 nOffset;
 	BLS32 nFrequency;
 	BLU32 nChannels;
@@ -120,7 +119,6 @@ typedef struct _AudioSource {
 	SLBufferQueueItf pBufferFunc;
 	BLU32 nBufTurn;
 #elif defined(BL_USE_COREAUDIO_API)
-	BLGuid nID;
 	BLS32 nOffset;
 	BLS32 nFrequency;
 	BLU32 nChannels;
@@ -136,7 +134,18 @@ typedef struct _AudioSource {
 	IXAudio2SourceVoice* pSource;
 	BLU32 nBufTurn;
 #elif defined(BL_USE_WEB_API)
-	BLS32 nID;
+	BLS32 nOffset;
+	BLS32 nFrequency;
+	BLU32 nChannels;
+	BLS32 nBPS;
+	MPAuDecContext* pMp3Context;
+	BLS32 nMp3Size;
+	BLS32 nMp3Read;
+	BLU8 aMp3Packet[MPAUDEC_MAX_AUDIO_FRAME_SIZE];
+	BLGuid nStream;
+	BLU8* pSoundBufA;
+	BLU8* pSoundBufB;
+	BLU8* pSoundBufC;
 #endif
 }_BLAudioSource;
 typedef struct _AudioMember {
@@ -259,7 +268,6 @@ static BLBool
 _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
-#if !defined(BL_USE_WEB_API)
 	_src->nStream = blGenStream(_Filename);
 	if (_src->nStream == INVALID_GUID)
 		return FALSE;
@@ -379,14 +387,12 @@ _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 			return FALSE;
 		}
 	}
-#endif
 	return TRUE;
 }
 static BLBool
 _UnloadAudio(BLVoid* _Src)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
-#if !defined(BL_USE_WEB_API)
 	blMutexLock(_PrAudioMem->pMusicMutex);
 	blMutexLock(_PrAudioMem->pSounds->pMutex);
 	if (_src->pMp3Context)
@@ -399,7 +405,6 @@ _UnloadAudio(BLVoid* _Src)
 		_PrAudioMem->pBackMusic = NULL;
 	blMutexUnlock(_PrAudioMem->pMusicMutex);
 	blMutexUnlock(_PrAudioMem->pSounds->pMutex);
-#endif
 	return TRUE;
 }
 #if defined(BL_USE_AL_API)
@@ -760,11 +765,28 @@ _CAUpdate(_BLAudioSource* _Src)
 static BLBool
 _WEBSoundSetup(BLVoid* _Src)
 {
+	BLF32 _vol = 1.f;
+	if (!_src->b3d && _src->bLoop)
+		_vol = _PrAudioMem->pAudioDev.fMusicVolume;
+	else
+	{
+		if (!_src->b3d)
+			_vol = _PrAudioMem->pAudioDev.fSystemVolume;
+		else
+			_vol = _PrAudioMem->pAudioDev.fEnvVolume;
+	}
+	if (!_src->b3d && _src->bLoop)
+		_PrAudioMem->pBackMusic = _src;
+	else
+		blListPushBack(_PrAudioMem->pSounds, _src);
+	_src->bValid = TRUE;
 	return TRUE;
 }
 static BLBool
 _WEBSoundRelease(BLVoid* _Src)
 {
+	_BLAudioSource* _src = (_BLAudioSource*)_Src;
+	_src->bValid = FALSE;
 	return TRUE;
 }
 #define BUF_SIZE (32)
@@ -960,12 +982,11 @@ _CADestroy()
 #elif defined(BL_USE_WEB_API)
 EM_JS(BLS32, _AudioJSInit, (BLVoid), {
 	Module._device = null;
-	Module._sounds = {};
-	if (typeof AudioContext !== 'undefined')
+	if (typeof AudioContext != = 'undefined')
 	{
 		Module._device = new AudioContext;
 	}
-	else if (typeof webkitAudioContext !== 'undefined')
+	else if (typeof webkitAudioContext != = 'undefined')
 	{
 		Module._device = new webkitAudioContext;
 	}
@@ -983,7 +1004,7 @@ EM_JS(BLS32, _AudioJSInit, (BLVoid), {
 		return 0;
 	}
 });
-EM_JS(BLVoid, _AudioJSLoadNPlay, (BLS32 _ID, const BLAnsi* _Filename, BLF32 _Vol, BLBool _Loop, BLBool _3D, BLF32 _Xpos, BLF32 _Ypos, BLF32 _Zpos), {
+EM_JS(BLVoid, _AudioJSGen, (BLS32 _ID, const BLAnsi* _Filename, BLF32 _Vol, BLBool _Loop, BLBool _3D, BLF32 _Xpos, BLF32 _Ypos, BLF32 _Zpos), {
 	var _audio = { src: null, gainNode : null, bufferNode : null, loop : _Loop };
 	var _xhr = new XMLHttpRequest();
 	_xhr.responseType = 'arraybuffer';
@@ -995,6 +1016,7 @@ EM_JS(BLVoid, _AudioJSLoadNPlay, (BLS32 _ID, const BLAnsi* _Filename, BLF32 _Vol
 			_gainnode.connect(Module._panner);
 			_audio.src = b;
 			_audio.gainNode = _gainnode;
+
 			var _sound = Module._device.createBufferSource();
 			_sound.connect(_audio.gainNode);
 			_sound.buffer = _audio.src;
@@ -1002,42 +1024,28 @@ EM_JS(BLVoid, _AudioJSLoadNPlay, (BLS32 _ID, const BLAnsi* _Filename, BLF32 _Vol
 			_audio.gainNode.gain.value = _Vol;
 			_audio.bufferNode = _sound;
 			_sound.start(0);
+
 		}, function(e){
 			console.error(e);
 		});
 	};
 	_xhr.open('GET', UTF8ToString(_Filename), true);
 	_xhr.send(null);
-	Module._sounds[_ID] = _audio;
-});
-EM_JS(BLVoid, _AudioJSGain, (BLS32 _ID, BLF32 _Vol), {
-	if (Module._sounds[_ID].gainNode)
-	{
-		Module._sounds[_ID].gainNode.gain.value = _Vol;
-	}
-});
-EM_JS(BLVoid, _AudioJSStop, (BLS32 _ID), {
-	if(Module._sounds[_ID].bufferNode !== null)
-	{
-		var _node = Module._sounds[_ID].bufferNode;
-		_node.stop(Module._device.currentTime);
-	}
-});
+	});
 static BLVoid
 _WEBInit()
 {
-	_PrAudioMem->pAudioDev.fMusicVolume = _PrAudioMem->pAudioDev.fSystemVolume = _PrAudioMem->pAudioDev.fEnvVolume = 0.7f;
 	if (_AudioJSInit())
 	{
 		_PrAudioMem->nIDMaker = 0;
-		_PrAudioMem->pSounds = blGenList(FALSE);
-		blThreadRun(_PrAudioMem->pAudioDev.pThread);
 		blDebugOutput("Audio initialize successfully");
 	}
 }
 static BLVoid
 _WEBDestroy()
 {
+	blDeleteThread(_PrAudioMem->pAudioDev.pThread);
+	blDeleteMutex(_PrAudioMem->pMusicMutex);
 	blDeleteList(_PrAudioMem->pSounds);
 }
 #endif
@@ -1162,6 +1170,8 @@ _AudioDestroy()
 		_DiscardResource(_PrAudioMem->pBackMusic->nID, _UnloadAudio, _CASoundRelease);
 	_CADestroy();
 #elif defined(BL_USE_WEB_API)
+	if (_PrAudioMem->pBackMusic)
+		_DiscardResource(_PrAudioMem->pBackMusic->nID, _UnloadAudio, _WEBSoundRelease);
 	_WEBDestroy();
 #endif
 	if (_PrAudioMem->pBackMusic)
@@ -1189,7 +1199,6 @@ blMusicVolume(IN BLF32 _Vol)
 #elif defined(BL_USE_COREAUDIO_API)
 	_PrAudioMem->pBackMusic->pSource->SetVolume(_Vol);
 #elif defined(BL_USE_WEB_API)
-	_AudioJSGain(_PrAudioMem->pBackMusic->nID, _Vol);
 #endif
 	blMutexUnlock(_PrAudioMem->pMusicMutex);
 }
@@ -1211,7 +1220,6 @@ blEnvironmentVolume(IN BLF32 _Vol)
 #elif defined(BL_USE_COREAUDIO_API)
 			_iter->pSource->SetVolume(_Vol);
 #elif defined(BL_USE_WEB_API)
-			_AudioJSGain(_iter->nID, _Vol);
 #endif
 		}
 	}
@@ -1235,7 +1243,6 @@ blSystemVolume(IN BLF32 _Vol)
 #elif defined(BL_USE_COREAUDIO_API)
 			_iter->pSource->SetVolume(_Vol);
 #elif defined(BL_USE_WEB_API)
-			_AudioJSGain(_iter->nID, _Vol);
 #endif
 		}
 	}
@@ -1320,7 +1327,7 @@ blGenAudio(IN BLAnsi* _Filename, IN BLBool _Loop, IN BLBool _3D, IN BLF32 _Xpos,
 		blListPushBack(_PrAudioMem->pSounds, _sound);
 	_sound->bValid = TRUE;
 	_sound->nID = _PrAudioMem->nIDMaker++;
-	_AudioJSLoadNPlay(_sound->nID, _Filename, _vol, _Loop, _3D, _Xpos, _Ypos, _Zpos);
+	_AudioJSGen(_sound->nID, _Filename, _vol, _Loop, _3D, _Xpos, _Ypos, _Zpos);
 #endif
 	return _sound->nID;
 }
@@ -1336,16 +1343,14 @@ blDeleteAudio(IN BLGuid _ID)
 		{
 #if defined(BL_USE_AL_API)
 			_DiscardResource(_iter->nID, _UnloadAudio, _ALSoundRelease);
-			blDeleteGuid(_iter->nID);
 #elif defined(BL_USE_SL_API)
 			_DiscardResource(_iter->nID, _UnloadAudio, _SLSoundRelease);
-			blDeleteGuid(_iter->nID);
 #elif defined(BL_USE_COREAUDIO_API)
 			_DiscardResource(_iter->nID, _UnloadAudio, _CASoundRelease);
-			blDeleteGuid(_iter->nID);
 #elif defined(BL_USE_WEB_API)
-			_AudioJSStop(_iter->nID);
+			_DiscardResource(_iter->nID, _UnloadAudio, _WEBSoundRelease);
 #endif
+			blDeleteGuid(_iter->nID);
 		}
 		blClearList(_PrAudioMem->pSounds);
 		blMutexUnlock(_PrAudioMem->pSounds->pMutex);
@@ -1357,24 +1362,16 @@ blDeleteAudio(IN BLGuid _ID)
 			blMutexLock(_PrAudioMem->pMusicMutex);
 #if defined(BL_USE_AL_API)
 			_DiscardResource(_ID, _UnloadAudio, _ALSoundRelease);
-			free(_PrAudioMem->pBackMusic);
-			_PrAudioMem->pBackMusic = NULL;
-			blDeleteGuid(_ID);
 #elif defined(BL_USE_SL_API)
 			_DiscardResource(_ID, _UnloadAudio, _SLSoundRelease);
-			free(_PrAudioMem->pBackMusic);
-			_PrAudioMem->pBackMusic = NULL;
-			blDeleteGuid(_ID);
 #elif defined(BL_USE_COREAUDIO_API)
 			_DiscardResource(_ID, _UnloadAudio, _CASoundRelease);
+#elif defined(BL_USE_WEB_API)
+			_DiscardResource(_ID, _UnloadAudio, _WEBSoundRelease);
+#endif
 			free(_PrAudioMem->pBackMusic);
 			_PrAudioMem->pBackMusic = NULL;
 			blDeleteGuid(_ID);
-#elif defined(BL_USE_WEB_API)
-			_AudioJSStop(_ID);
-			free(_PrAudioMem->pBackMusic);
-			_PrAudioMem->pBackMusic = NULL;
-#endif
 			blMutexUnlock(_PrAudioMem->pMusicMutex);
 			return;
 		}
@@ -1386,20 +1383,15 @@ blDeleteAudio(IN BLGuid _ID)
 				blListErase(_PrAudioMem->pSounds, _iterator_iter);
 #if defined(BL_USE_AL_API)
 				_DiscardResource(_ID, _UnloadAudio, _ALSoundRelease);
-				free(_iterator_iter);
-				blDeleteGuid(_ID);
 #elif defined(BL_USE_SL_API)
 				_DiscardResource(_ID, _UnloadAudio, _SLSoundRelease);
-				free(_iterator_iter);
-				blDeleteGuid(_ID);
 #elif defined(BL_USE_COREAUDIO_API)
 				_DiscardResource(_ID, _UnloadAudio, _CASoundRelease);
+#elif defined(BL_USE_WEB_API)
+				_DiscardResource(_ID, _UnloadAudio, _WEBSoundRelease);
+#endif
 				free(_iterator_iter);
 				blDeleteGuid(_ID);
-#elif defined(BL_USE_WEB_API)
-				_AudioJSStop(_ID);
-				free(_iterator_iter);
-#endif
 				break;
 			}
 		}

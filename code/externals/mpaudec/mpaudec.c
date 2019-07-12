@@ -21,11 +21,10 @@
  */
 #include "internal.h"
 #include "mpegaudio.h"
-
+#ifndef EMSCRIPTEN
 #ifdef _MSC_VER
 #pragma warning(disable : 4244)
 #endif
-
 /*
  * TODO:
  *  - in low precision mode, use more 16 bit multiplies in synth filter
@@ -2491,3 +2490,4 @@ void mpaudec_cleanup()
 		free_vlc(&huff_quad_vlc[i]);
 	}
 }
+#endif
