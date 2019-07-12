@@ -93,7 +93,6 @@ typedef struct _AudioRingNode{
 #define _SAUDIO_DEFAULT_PACKET_FRAMES (128)
 #define _SAUDIO_DEFAULT_BUFFER_CHANNEL (1)
 #define _SAUDIO_DEFAULT_NUM_PACKETS ((_SAUDIO_DEFAULT_BUFFER_FRAMES/_SAUDIO_DEFAULT_PACKET_FRAMES)*4)
-#define SAUDIO_RING_MAX_SLOTS (1024)
 #endif
 typedef struct _AudioSource{
     BLBool bLoop;
@@ -184,11 +183,8 @@ typedef struct _AudioMember {
 #elif defined(BL_USE_WEB_API)
 	_BLAudioRingNode sReadQueue;
 	_BLAudioRingNode sWriteQueue;
-	BLS32 nPacketSize;
-	BLS32 nPackets;
 	BLS32 nCurPacket;
 	BLS32 nCurOffset;
-	BLS32 nBufferFrames;
 	BLU8* pBackend;
 	BLU8* pBasePtr;
 #endif
@@ -832,9 +828,9 @@ _WEBUpdate(_BLAudioSource* _Src)
 		_count = _PrAudioMem->sWriteQueue.nHead - _PrAudioMem->sWriteQueue.nTail;
 	else
 		_count = (_PrAudioMem->sWriteQueue.nHead + _PrAudioMem->sWriteQueue.nNum) - _PrAudioMem->sWriteQueue.nTail;
-	BLS32 _bytes = (_count * _PrAudioMem->nPacketSize);
+	BLS32 _bytes = (_count * _SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL);
 	if (_PrAudioMem->nCurPacket != -1)
-		_bytes += _PrAudioMem->nPacketSize - _PrAudioMem->nCurOffset;
+		_bytes += _SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL - _PrAudioMem->nCurOffset;
 	BLS32 _numframes = _bytes / (sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL);
 	for (BLS32 _i = 0; _i < _numframes; _i++) 
 	{
@@ -861,10 +857,10 @@ _WEBUpdate(_BLAudioSource* _Src)
 				if (_PrAudioMem->nCurPacket != -1)
 				{
 					BLS32 _tocopy = _allcopy;
-					const BLS32 _maxcopy = _PrAudioMem->nPacketSize - _PrAudioMem->nCurOffset;
+					const BLS32 _maxcopy = _SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL - _PrAudioMem->nCurOffset;
 					if (_tocopy > _maxcopy)
 						_tocopy = _maxcopy;
-					BLU8* _dst = _PrAudioMem->pBasePtr + _PrAudioMem->nCurPacket * _PrAudioMem->nPacketSize + _PrAudioMem->nCurOffset;
+					BLU8* _dst = _PrAudioMem->pBasePtr + _PrAudioMem->nCurPacket * _SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL + _PrAudioMem->nCurOffset;
 					memcpy(_dst, _ptr, _tocopy);
 					_ptr += _tocopy;
 					_PrAudioMem->nCurOffset += _tocopy;
@@ -875,7 +871,7 @@ _WEBUpdate(_BLAudioSource* _Src)
 					BLS32 _copied = _bytes - _allcopy;
 					return _copied;
 				}
-				if (_PrAudioMem->nCurOffset == _PrAudioMem->nPacketSize)
+				if (_PrAudioMem->nCurOffset == _SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL)
 				{
 					_PrAudioMem->sReadQueue.aQueue[_PrAudioMem->sReadQueue.nHead] = _PrAudioMem->nCurPacket;
 					BLS32 _i = _PrAudioMem->sReadQueue.nHead + 1;
@@ -1078,11 +1074,11 @@ _CADestroy()
 EMSCRIPTEN_KEEPALIVE BLS32
 _EMSCPull(BLS32 _Frames)
 {
-	if (_Frames == _PrAudioMem->nBufferFrames)
+	if (_Frames == _SAUDIO_DEFAULT_BUFFER_FRAMES)
 	{
 		const BLS32 _bytes = _Frames * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL;
 		BLS32 _copied = 0;
-		const BLS32 _needed = _bytes / _PrAudioMem->nPacketSize;
+		const BLS32 _needed = _bytes / (_SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL);
 		BLU8* _dst = _PrAudioMem->pBackend;
 		BLS32 _count;
 		if (_PrAudioMem->sReadQueue.nHead >= _PrAudioMem->sReadQueue.nTail)
@@ -1099,10 +1095,10 @@ _EMSCPull(BLS32 _Frames)
 				_PrAudioMem->sWriteQueue.aQueue[_PrAudioMem->sWriteQueue.nHead] = _index;
 				_i = _PrAudioMem->sWriteQueue.nHead + 1;
 				_PrAudioMem->sWriteQueue.nHead = (BLU16)(_i % _PrAudioMem->sWriteQueue.nNum);
-				const BLU8* _src = _PrAudioMem->pBasePtr + _index * _PrAudioMem->nPacketSize;
-				memcpy(_dst, _src, _PrAudioMem->nPacketSize);
-				_dst += _PrAudioMem->nPacketSize;
-				_copied += _PrAudioMem->nPacketSize;
+				const BLU8* _src = _PrAudioMem->pBasePtr + _index * _SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL;
+				memcpy(_dst, _src, _SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL);
+				_dst += _SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL;
+				_copied += _SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL;
 			}
 		}
 		if (0 == _copied)
@@ -1186,10 +1182,7 @@ _WEBInit()
 {
 	if (_AudioJSInit(_SAUDIO_DEFAULT_SAMPLE_RATE, _SAUDIO_DEFAULT_BUFFER_CHANNEL, _SAUDIO_DEFAULT_BUFFER_FRAMES))
 	{
-		_PrAudioMem->nBufferFrames = _AudioJSBufferFrames();
-		_PrAudioMem->pBackend = (BLU8*)malloc(_PrAudioMem->nBufferFrames * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL);
-		_PrAudioMem->nPacketSize = _SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL;
-		_PrAudioMem->nPackets = _SAUDIO_DEFAULT_NUM_PACKETS;
+		_PrAudioMem->pBackend = (BLU8*)malloc(_SAUDIO_DEFAULT_BUFFER_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL);
 		_PrAudioMem->pBasePtr = (BLU8*)malloc(_SAUDIO_DEFAULT_PACKET_FRAMES * sizeof(BLF32) * _SAUDIO_DEFAULT_BUFFER_CHANNEL * _SAUDIO_DEFAULT_NUM_PACKETS);
 		_PrAudioMem->nCurPacket = -1;
 		_PrAudioMem->nCurOffset = 0;
