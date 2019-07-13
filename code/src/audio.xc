@@ -85,8 +85,8 @@ typedef struct _AudioSource {
 	BLBool bValid;
 	BLBool b3d;
 	BLVec3 sPos;
-#if defined(BL_USE_AL_API)
 	BLGuid nID;
+#if defined(BL_USE_AL_API)
 	BLS32 nOffset;
 	BLS32 nFrequency;
 	BLU32 nChannels;
@@ -103,7 +103,6 @@ typedef struct _AudioSource {
 	ALuint nSource;
 	BLU32 nBufTurn;
 #elif defined(BL_USE_SL_API)
-	BLGuid nID;
 	BLS32 nOffset;
 	BLS32 nFrequency;
 	BLU32 nChannels;
@@ -120,7 +119,6 @@ typedef struct _AudioSource {
 	SLBufferQueueItf pBufferFunc;
 	BLU32 nBufTurn;
 #elif defined(BL_USE_COREAUDIO_API)
-	BLGuid nID;
 	BLS32 nOffset;
 	BLS32 nFrequency;
 	BLU32 nChannels;
@@ -136,7 +134,7 @@ typedef struct _AudioSource {
 	IXAudio2SourceVoice* pSource;
 	BLU32 nBufTurn;
 #elif defined(BL_USE_WEB_API)
-	BLS32 nID;
+	BLS32 nJSID;
 #endif
 }_BLAudioSource;
 typedef struct _AudioMember {
@@ -1189,7 +1187,7 @@ blMusicVolume(IN BLF32 _Vol)
 #elif defined(BL_USE_COREAUDIO_API)
 	_PrAudioMem->pBackMusic->pSource->SetVolume(_Vol);
 #elif defined(BL_USE_WEB_API)
-	_AudioJSGain(_PrAudioMem->pBackMusic->nID, _Vol);
+	_AudioJSGain(_PrAudioMem->pBackMusic->nJSID, _Vol);
 #endif
 	blMutexUnlock(_PrAudioMem->pMusicMutex);
 }
@@ -1211,7 +1209,7 @@ blEnvironmentVolume(IN BLF32 _Vol)
 #elif defined(BL_USE_COREAUDIO_API)
 			_iter->pSource->SetVolume(_Vol);
 #elif defined(BL_USE_WEB_API)
-			_AudioJSGain(_iter->nID, _Vol);
+			_AudioJSGain(_iter->nJSID, _Vol);
 #endif
 		}
 	}
@@ -1235,7 +1233,7 @@ blSystemVolume(IN BLF32 _Vol)
 #elif defined(BL_USE_COREAUDIO_API)
 			_iter->pSource->SetVolume(_Vol);
 #elif defined(BL_USE_WEB_API)
-			_AudioJSGain(_iter->nID, _Vol);
+			_AudioJSGain(_iter->nJSID, _Vol);
 #endif
 		}
 	}
@@ -1291,16 +1289,14 @@ blGenAudio(IN BLAnsi* _Filename, IN BLBool _Loop, IN BLBool _3D, IN BLF32 _Xpos,
 	_sound->sPos.fY = _Ypos;
 	_sound->sPos.fZ = _Zpos;
 	_sound->bValid = FALSE;
-#if defined(BL_USE_AL_API)
 	_sound->nID = blGenGuid(_sound, blHashString((const BLUtf8*)_Filename));
+#if defined(BL_USE_AL_API)
 	_sound->pMp3Context = NULL;
 	_FetchResource(_Filename, (BLVoid * *)& _sound, _sound->nID, _LoadAudio, _ALSoundSetup, TRUE);
 #elif defined(BL_USE_SL_API)
-	_sound->nID = blGenGuid(_sound, blHashString((const BLUtf8*)_Filename));
 	_sound->pMp3Context = NULL;
 	_FetchResource(_Filename, (BLVoid * *)& _sound, _sound->nID, _LoadAudio, _SLSoundSetup, TRUE);
 #elif defined(BL_USE_COREAUDIO_API)
-	_sound->nID = blGenGuid(_sound, blHashString((const BLUtf8*)_Filename));
 	_sound->pMp3Context = NULL;
 	_FetchResource(_Filename, (BLVoid * *)& _sound, _sound->nID, _LoadAudio, _CASoundSetup, TRUE);
 #elif defined(BL_USE_WEB_API)
@@ -1319,8 +1315,8 @@ blGenAudio(IN BLAnsi* _Filename, IN BLBool _Loop, IN BLBool _3D, IN BLF32 _Xpos,
 	else
 		blListPushBack(_PrAudioMem->pSounds, _sound);
 	_sound->bValid = TRUE;
-	_sound->nID = _PrAudioMem->nIDMaker++;
-	_AudioJSLoadNPlay(_sound->nID, _Filename, _vol, _Loop, _3D, _Xpos, _Ypos, _Zpos);
+	_sound->nJSID = _PrAudioMem->nIDMaker++;
+	_AudioJSLoadNPlay(_sound->nJSID, _Filename, _vol, _Loop, _3D, _Xpos, _Ypos, _Zpos);
 #endif
 	return _sound->nID;
 }
@@ -1344,7 +1340,8 @@ blDeleteAudio(IN BLGuid _ID)
 			_DiscardResource(_iter->nID, _UnloadAudio, _CASoundRelease);
 			blDeleteGuid(_iter->nID);
 #elif defined(BL_USE_WEB_API)
-			_AudioJSStop(_iter->nID);
+			_AudioJSStop(_iter->nJSID);
+			blDeleteGuid(_iter->nID);
 #endif
 		}
 		blClearList(_PrAudioMem->pSounds);
@@ -1371,9 +1368,10 @@ blDeleteAudio(IN BLGuid _ID)
 			_PrAudioMem->pBackMusic = NULL;
 			blDeleteGuid(_ID);
 #elif defined(BL_USE_WEB_API)
-			_AudioJSStop(_ID);
+			_AudioJSStop(_PrAudioMem->pBackMusic->nJSID);
 			free(_PrAudioMem->pBackMusic);
 			_PrAudioMem->pBackMusic = NULL;
+			blDeleteGuid(_ID);
 #endif
 			blMutexUnlock(_PrAudioMem->pMusicMutex);
 			return;
@@ -1397,8 +1395,9 @@ blDeleteAudio(IN BLGuid _ID)
 				free(_iterator_iter);
 				blDeleteGuid(_ID);
 #elif defined(BL_USE_WEB_API)
-				_AudioJSStop(_ID);
+				_AudioJSStop(_iter->nJSID);
 				free(_iterator_iter);
+				blDeleteGuid(_ID);
 #endif
 				break;
 			}
