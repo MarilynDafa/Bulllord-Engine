@@ -857,4 +857,9 @@ typedef unsigned long long BLGuid;
 #define BL_UA_BOTTOM		0x0004
 #define BL_UA_VCENTER		0x0005
 
+/* IME Type */
+#define BL_IT_TEXT			0
+#define BL_IT_NUMERIC		1
+#define BL_IT_PASSWORD		2
+
 #endif

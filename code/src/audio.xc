@@ -912,7 +912,6 @@ _CAInit()
 	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	if (FAILED(_hr = XAudio2Create(&_PrAudioMem->pAudioDev.pCADevice)))
 	{
-		assert(0);
 		_PrAudioMem->pAudioDev.pCADevice = NULL;
 		CoUninitialize();
 		blDebugOutput("Audio initialize failed");
@@ -920,7 +919,6 @@ _CAInit()
 	}
 	if (FAILED(_hr = _PrAudioMem->pAudioDev.pCADevice->CreateMasteringVoice(&_PrAudioMem->pAudioDev.pCAContext)))
 	{
-		assert(0);
 		_PrAudioMem->pAudioDev.pCADevice->Release();
 		_PrAudioMem->pAudioDev.pCADevice = NULL;
 		CoUninitialize();
@@ -1069,6 +1067,8 @@ _AudioInit(DUK_CONTEXT* _DKC)
 BLVoid
 _AudioStep(BLU32 _Delta)
 {
+	if (!_PrAudioMem->pMusicMutex || !_PrAudioMem->pSounds)
+		return;
 	blMutexLock(_PrAudioMem->pSounds->pMutex);
 	FOREACH_LIST(_BLAudioSource*, _iter, _PrAudioMem->pSounds)
 	{

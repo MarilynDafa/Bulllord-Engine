@@ -13087,11 +13087,11 @@ blUIFocus(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos)
 			_PrUIMem->pFocusWidget->uExtension.sText.nLastRecord = 0;
 			_PrUIMem->pFocusWidget->uExtension.sText.bShowCaret = FALSE;
 			if (_widget->uExtension.sText.bNumeric)
-				blDetachIME(KEYBOARD_NUMERIC_INTERNAL);
+				blDetachIME(BL_IT_NUMERIC);
 			else if (_widget->uExtension.sText.bNumeric)
-				blDetachIME(KEYBOARD_PASSWORD_INTERNAL);
+				blDetachIME(BL_IT_PASSWORD);
 			else
-				blDetachIME(KEYBOARD_TEXT_INTERNAL);
+				blDetachIME(BL_IT_TEXT);
 		}
 		else if (_PrUIMem->pFocusWidget->eType == BL_UT_TABLE)
 			_PrUIMem->pFocusWidget->uExtension.sTable.bDragging = FALSE;
@@ -13103,11 +13103,11 @@ blUIFocus(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos)
 		if (_widget->eType == BL_UT_TEXT && _widget->uExtension.sText.nState)
 		{
 			if (_widget->uExtension.sText.bNumeric)
-				blAttachIME(_XPos, _YPos + _widget->sDimension.fY * 0.5f, KEYBOARD_NUMERIC_INTERNAL);
+				blAttachIME(_XPos, _YPos + _widget->sDimension.fY * 0.5f, BL_IT_NUMERIC);
 			else if (_widget->uExtension.sText.bPassword)
-				blAttachIME(_XPos, _YPos + _widget->sDimension.fY * 0.5f, KEYBOARD_PASSWORD_INTERNAL);
+				blAttachIME(_XPos, _YPos + _widget->sDimension.fY * 0.5f, BL_IT_PASSWORD);
 			else
-				blAttachIME(_XPos, _YPos + _widget->sDimension.fY * 0.5f, KEYBOARD_TEXT_INTERNAL);
+				blAttachIME(_XPos, _YPos + _widget->sDimension.fY * 0.5f, BL_IT_TEXT);
 		}
 	}
 	_PrUIMem->pFocusWidget = _widget;

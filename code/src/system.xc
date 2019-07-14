@@ -3222,38 +3222,6 @@ _KeyProc(BLS32 _EventType, const EmscriptenKeyboardEvent* _KeyEvent, BLVoid* _Us
         case EMSCRIPTEN_EVENT_KEYUP:
             blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
             break;
-        case EMSCRIPTEN_EVENT_KEYPRESS:
-            _codepoint = (BLU32)_KeyEvent->charCode;
-            if (_codepoint <= 0x7F)
-            {
-                _text[0] = (BLUtf8)_codepoint;
-                _text[1] = '\0';
-            }
-            else if (_codepoint <= 0x7FF)
-            {
-                _text[0] = 0xC0 | (BLUtf8)((_codepoint >> 6) & 0x1F);
-                _text[1] = 0x80 | (BLUtf8)(_codepoint & 0x3F);
-                _text[2] = '\0';
-            }
-            else if (_codepoint <= 0xFFFF)
-            {
-                _text[0] = 0xE0 | (BLUtf8)((_codepoint >> 12) & 0x0F);
-                _text[1] = 0x80 | (BLUtf8)((_codepoint >> 6) & 0x3F);
-                _text[2] = 0x80 | (BLUtf8)(_codepoint & 0x3F);
-                _text[3] = '\0';
-            }
-            else if (_codepoint <= 0x10FFFF)
-            {
-                _text[0] = 0xF0 | (BLUtf8)((_codepoint >> 18) & 0x0F);
-                _text[1] = 0x80 | (BLUtf8)((_codepoint >> 12) & 0x3F);
-                _text[2] = 0x80 | (BLUtf8)((_codepoint >> 6) & 0x3F);
-                _text[3] = 0x80 | (BLUtf8)(_codepoint & 0x3F);
-                _text[4] = '\0';
-            }
-            else
-                break;
-            blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _text, INVALID_GUID);
-            break;
         default:
             break;
     }
@@ -3315,7 +3283,7 @@ _MouseProc(BLS32 _EventType, const EmscriptenMouseEvent* _MouseEvent, BLVoid* _U
 static EM_BOOL
 _ScrollProc(BLS32 _EventType, const EmscriptenWheelEvent* _WheelEvent, BLVoid* _UserData)
 {
-    BLS16 _val = (BLS16)_WheelEvent->deltaY / -100;
+    BLS16 _val = _WheelEvent->deltaY < 0 ? 1 : -1;
     if (_val > 0)
         blInvokeEvent(BL_ET_MOUSE, MAKEU32(1, _val), BL_ME_WHEEL, NULL, INVALID_GUID);
     else
@@ -4658,7 +4626,7 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
 		_y *= (BLF32)(_PrSystemMem->sBoostParam.nScreenHeight) / (BLF32)(_actualh);
 	}
 #if defined(BL_PLATFORM_WIN32)
-	if (_PrSystemMem->nIMC && _Type == KEYBOARD_TEXT_INTERNAL)
+	if (_PrSystemMem->nIMC && _Type == BL_IT_TEXT)
 	{
 		COMPOSITIONFORM _com;
 		ImmAssociateContext(_PrSystemMem->nHwnd, _PrSystemMem->nIMC);
@@ -4675,7 +4643,7 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
 	_PrSystemMem->pCTEcxt->NotifyFocusEnter();
 	_PrSystemMem->pCTEcxt->NotifyLayoutChanged();
 #	else
-	if (_Type == KEYBOARD_TEXT_INTERNAL)
+	if (_Type == BL_IT_TEXT)
 	{
 		_PrSystemMem->sIMEpos.X = _x;
 		_PrSystemMem->sIMEpos.Y = _y;
@@ -4714,9 +4682,9 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
         [_PrSystemMem->pWindow makeFirstResponder: _PrSystemMem->pTICcxt];
     }
 #elif defined(BL_PLATFORM_IOS)
-    if (_Type == KEYBOARD_TEXT_INTERNAL)
+    if (_Type == BL_IT_TEXT)
         _PrSystemMem->pTICcxt.keyboardType = UIKeyboardTypeDefault;
-    else if (_Type == KEYBOARD_NUMERIC_INTERNAL)
+    else if (_Type == BL_IT_NUMERIC)
         _PrSystemMem->pTICcxt.keyboardType = UIKeyboardTypeDecimalPad;
     else
         _PrSystemMem->pTICcxt.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
