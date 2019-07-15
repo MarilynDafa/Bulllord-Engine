@@ -32,7 +32,7 @@
 #include "../externals/miniz/miniz.h"
 #include "../externals/duktape/duktape.h"
 #include "../externals/webp/src/webp/decode.h"
-#include "../externals/astc/astc_codec_internals.h"
+#include "../externals/astc/astc.h"
 #include "ft2build.h"
 #include FT_FREETYPE_H
 typedef struct _Glyph{

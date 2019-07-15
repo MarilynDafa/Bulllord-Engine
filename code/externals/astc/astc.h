@@ -22,6 +22,7 @@ extern "C"
 #endif
 #include <stdint.h>
 #include <stdlib.h>
+#include "prerequisites.h"
 
 typedef struct _float2
 {
@@ -833,7 +834,7 @@ typedef struct _astc_header
 	uint8_t zsize[3];			// block count is inferred
 }astc_header;
     
-extern int astcmain(int, const char**, const unsigned char*, unsigned char*, int, int, int);
+BL_API int astcmain(int, const char**, const unsigned char*, unsigned char*, int, int, int);
 
 
 

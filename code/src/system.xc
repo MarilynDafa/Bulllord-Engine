@@ -4894,7 +4894,7 @@ BLVoid
 blDetachIME(IN BLEnum _Type)
 {
 #if defined(BL_PLATFORM_WIN32)
-	if (_PrSystemMem->nIMC && _Type == KEYBOARD_TEXT_INTERNAL)
+	if (_PrSystemMem->nIMC && _Type == BL_IT_TEXT)
 	{
 		ImmAssociateContext(_PrSystemMem->nHwnd, NULL);
 		ImmReleaseContext(_PrSystemMem->nHwnd, _PrSystemMem->nIMC);

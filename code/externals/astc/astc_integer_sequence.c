@@ -14,7 +14,7 @@
  */ 
 /*----------------------------------------------------------------------------*/
 #ifndef EMSCRIPTEN
-#include "astc_codec_internals.h"
+#include "astc.h"
 	// unpacked quint triplets <low,middle,high> for each packed-quint value
 static const uint8_t quints_of_integer[128][3] = {
 	{0, 0, 0},	{1, 0, 0},	{2, 0, 0},	{3, 0, 0},

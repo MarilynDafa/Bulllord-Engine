@@ -14,7 +14,7 @@
  */ 
 /*----------------------------------------------------------------------------*/ 
 
-#include "astc_codec_internals.h"
+#include "astc.h"
 
 // routine to write up to 8 bits
 static inline void write_bits(int value, int bitcount, int bitoffset, uint8_t * ptr)

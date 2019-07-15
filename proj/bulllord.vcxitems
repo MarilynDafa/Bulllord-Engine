@@ -1461,7 +1461,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_codec_internals.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duk_config.h" />

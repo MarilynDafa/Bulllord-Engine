@@ -30,7 +30,7 @@
 #include "internal/mathematics.h"
 #include "../externals/duktape/duktape.h"
 #include "../externals/webp/src/webp/decode.h"
-#include "../externals/astc/astc_codec_internals.h"
+#include "../externals/astc/astc.h"
 typedef struct _SpriteAction{
     struct _SpriteAction* pNext;
     struct _SpriteAction* pNeighbor;

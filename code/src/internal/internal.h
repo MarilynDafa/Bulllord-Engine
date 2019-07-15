@@ -2888,7 +2888,7 @@ GL_SYMBOL_INTERNAL(PFNGLTEXTUREBARRIERPROC, glTextureBarrier, lib)														
 #define DXGI_FORMAT_ASTC_12X12_UNORM_SRGB DXGI_FORMAT(187)
 #else
 #	if _DEBUG
-#		define GL_CHECK_INTERNAL(call) {call; if (glGetError()) assert(0); }
+#		define GL_CHECK_INTERNAL(call) {call; GLenum  _err = glGetError();if (GL_NO_ERROR != _err) {printf("gl error code: %d", _err); assert(0);}}
 #		define VK_CHECK_INTERNAL(call)
 #	else
 #		define GL_CHECK_INTERNAL(call) call;

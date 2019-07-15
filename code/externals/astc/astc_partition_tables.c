@@ -16,7 +16,7 @@
  */ 
 /*----------------------------------------------------------------------------*/ 
 #ifndef EMSCRIPTEN
-#include "astc_codec_internals.h"
+#include "astc.h"
 
 static partition_info **partition_tables[4096];
 

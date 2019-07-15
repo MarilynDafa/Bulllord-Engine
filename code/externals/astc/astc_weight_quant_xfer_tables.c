@@ -14,7 +14,7 @@
 /*----------------------------------------------------------------------------*/ 
 	
 #ifndef EMSCRIPTEN
-#include "astc_codec_internals.h"
+#include "astc.h"
 
 const quantization_and_transfer_table quant_and_xfer_tables[12] = {
 	// quantization method 0, range 0..1

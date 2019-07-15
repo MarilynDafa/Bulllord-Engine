@@ -13,7 +13,7 @@
  */ 
 /*----------------------------------------------------------------------------*/ 
 #ifndef EMSCRIPTEN
-#include "astc_codec_internals.h"
+#include "astc.h"
 
   void astc_codec_internal_error(const char *filename, int linenumber)
 {}

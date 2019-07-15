@@ -14,7 +14,7 @@
  */ 
 /*----------------------------------------------------------------------------*/ 
 #ifndef EMSCRIPTEN
-#include "astc_codec_internals.h"
+#include "astc.h"
 
 extern const float percentile_table_4x4[2048];
 extern const float percentile_table_4x5[2048];

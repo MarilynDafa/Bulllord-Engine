@@ -38,7 +38,7 @@
 /*----------------------------------------------------------------------------*/ 
 
 #include <math.h>
-#include "astc_codec_internals.h"
+#include "astc.h"
 #define M_PI 3.14159265358979323846
 #ifdef DEBUG_PRINT_DIAGNOSTICS
 	#include <stdio.h>

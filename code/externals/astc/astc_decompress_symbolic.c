@@ -14,7 +14,7 @@
  */ 
 /*----------------------------------------------------------------------------*/ 
 #ifndef EMSCRIPTEN
-#include "astc_codec_internals.h"
+#include "astc.h"
 
 #include "softfloat.h"
 #include <math.h>

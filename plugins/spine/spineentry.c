@@ -27,6 +27,8 @@ misrepresented as being the original software.
 #include "util.h"
 #include "sprite.h"
 #include "gpu.h"
+#include "webp/src/webp/decode.h"
+#include "astc/astc.h"
 typedef struct _TexCacheData {
 	BLU8* pData;
 	BLEnum eFormat;
@@ -102,6 +104,8 @@ _spAtlasPage_createTexture(spAtlasPage* _Self, const BLAnsi* _Filename)
 	BLGuid _stream = blGenStream(_source);
 	if (INVALID_GUID == _stream)
 		return;
+	BLBool _texsupport[BL_TF_COUNT];
+	blHardwareCapsQuery(NULL, NULL, NULL, NULL, NULL, _texsupport);
 	BLU8 _identifier[12];
 	blStreamRead(_stream, sizeof(_identifier), _identifier);
 	if (_identifier[0] != 0xDD ||
@@ -152,13 +156,24 @@ _spAtlasPage_createTexture(spAtlasPage* _Self, const BLAnsi* _Filename)
 	BLU32 _imagesz;
 	switch (_fourcc)
 	{
+	case(('M' << 0) + ('O' << 8) + ('N' << 16) + ('O' << 24)):
+		_imagesz = _width * _height;
+		break;
 	case (('B' << 0) + ('M' << 8) + ('G' << 16) + ('T' << 24)):
 		blStreamRead(_stream, sizeof(BLU32), &_imagesz);
 		_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
 		break;
 	case (('A' << 0) + ('S' << 8) + ('T' << 16) + ('C' << 24)):
-		_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
-		_format = BL_TF_ASTC;
+		if (_texsupport[BL_TF_ASTC] == 1)
+		{
+			_imagesz = ((_width + 3) / 4) * ((_height + 3) / 4) * 16;
+			_format = BL_TF_ASTC;
+		}
+		else
+		{
+			_imagesz = _width * _height * _channels;
+			_format = (_channels == 4) ? BL_TF_RGBA8 : BL_TF_RGB8;
+		}
 		break;
 	default:assert(0); break;
 	}
@@ -167,16 +182,36 @@ _spAtlasPage_createTexture(spAtlasPage* _Self, const BLAnsi* _Filename)
 		BLU8* _data = (BLU8*)malloc(_imagesz);
 		blStreamRead(_stream, _imagesz, _data);
 		if (_channels == 4)
-			_texdata = WebPDecodeRGBA(_data, _imagesz, &_width, &_height);
+			_texdata = WebPDecodeRGBA(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 		else
-			_texdata = WebPDecodeRGB(_data, _imagesz, &_width, &_height);
+			_texdata = WebPDecodeRGB(_data, _imagesz, (BLS32*)&_width, (BLS32*)&_height);
 		free(_data);
 	}
-	else
+	else if (_fourcc == (('M' << 0) + ('O' << 8) + ('N' << 16) + ('O' << 24)))
 	{
 		BLU8* _data = (BLU8*)malloc(_imagesz);
 		blStreamRead(_stream, _imagesz, _data);
 		_texdata = _data;
+	}
+	else
+	{
+		if (_texsupport[BL_TF_ASTC] == 1)
+		{
+			BLU8* _data = (BLU8*)malloc(_imagesz);
+			blStreamRead(_stream, _imagesz, _data);
+			_texdata = _data;
+		}
+		else if (_texsupport[BL_TF_ASTC] == 2)
+		{
+			BLU8* _data = (BLU8*)malloc(_imagesz);
+			BLU8* _cdata = (BLU8*)malloc(((_width + 3) / 4) * ((_height + 3) / 4) * 16);
+			const BLAnsi* _argv[] = { "astcdec", "-d", "in.astc", "out.tga" };
+			astcmain(4, _argv, _cdata, _data, _width, _height, _channels);
+			free(_cdata);
+			_texdata = _data;
+		}
+		else
+			_texdata = NULL;
 	}
 	_BLTexCacheDataExt* _tcd = (_BLTexCacheDataExt*)malloc(sizeof(_BLTexCacheDataExt));
 	_tcd->eFormat = _format;

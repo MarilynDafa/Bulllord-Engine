@@ -2330,10 +2330,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpu-ds.h">
       <Filter>src\internal</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_codec_internals.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.h">
       <Filter>externals\astc</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.h">
+    <ClInclude Include="C:\Bulllord-Engine\proj\..\code\externals\astc\astc.h">
       <Filter>externals\astc</Filter>
     </ClInclude>
   </ItemGroup>

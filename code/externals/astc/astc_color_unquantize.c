@@ -13,7 +13,7 @@
  */ 
 /*----------------------------------------------------------------------------*/ 
 	#ifndef EMSCRIPTEN
-#include "astc_codec_internals.h"
+#include "astc.h"
 
 //#include "mathlib.h"
 #include "softfloat.h"

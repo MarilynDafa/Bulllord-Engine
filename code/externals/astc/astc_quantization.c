@@ -13,7 +13,7 @@
  */ 
 /*----------------------------------------------------------------------------*/ 
 #ifndef EMSCRIPTEN
-#include "astc_codec_internals.h"
+#include "astc.h"
 
 const uint8_t color_quantization_tables[21][256] = {
 	{
