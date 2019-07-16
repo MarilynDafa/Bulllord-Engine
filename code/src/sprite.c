@@ -51,6 +51,13 @@ typedef struct _SpriteAction{
 			BLF32 fAngle;
             BLBool bClockWise;
 		}sRotate;
+		struct _Skew {
+			BLF32 fXInitSkew;
+			BLF32 fYInitSkew;
+			BLF32 fSkewX;
+			BLF32 fSkewY;
+			BLBool bReverse;
+		}sSkew;
 		struct _Scale {
 			BLF32 fXInitScale;
 			BLF32 fYInitScale;
@@ -80,6 +87,8 @@ typedef struct _SpriteRecorder {
 	BLF32 fAlphaRecord;
 	BLF32 fScaleXRecord;
 	BLF32 fScaleYRecord;
+	BLF32 fSkewXRecord;
+	BLF32 fSkewYRecord;
 	BLF32 fPosXRecord;
 	BLF32 fPosYRecord;
 } _BLSpriteRecorder;
@@ -170,6 +179,8 @@ typedef struct _SpriteNode{
     BLF32 fScaleX;
     BLF32 fScaleY;
     BLF32 fRotate;
+	BLF32 fSkewX;
+	BLF32 fSkewY;
     BLF32 fZValue;
     BLF32 fAlpha;
     BLU32 nDyeColor;
@@ -248,10 +259,10 @@ _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BL
 			if ((_a > 0 && _b > 0 && _c > 0 && _d > 0) || (_a < 0 && _b < 0 && _c < 0 && _d < 0))
 			{
 				_id = _node->nID;
+				blInvokeEvent(BL_ET_SPRITE, MAKEU32(_y + _PrSpriteMem->sViewport.sLT.fY, _x + _PrSpriteMem->sViewport.sLT.fX), _Type, NULL, _id);
 				break;
 			}
 		}
-		blInvokeEvent(BL_ET_SPRITE, MAKEU32(_y + _PrSpriteMem->sViewport.sLT.fY, _x + _PrSpriteMem->sViewport.sLT.fX), _Type, NULL, _id);
 	}
 	return TRUE;
 }
@@ -734,6 +745,28 @@ _SpriteUpdate(BLU32 _Delta)
                     }
                 }
 				break;
+				case SPACTION_SKEW_INTERNAL:
+				{
+					if (_action->uAction.sSkew.bReverse)
+					{
+						if (_action->fCurTime * 2 <= _action->fTotalTime)
+						{
+							_node->fSkewX = 2 * _action->fCurTime / _action->fTotalTime * (_action->uAction.sSkew.fSkewX - _action->uAction.sSkew.fXInitSkew) + _action->uAction.sSkew.fXInitSkew;
+							_node->fSkewY = 2 * _action->fCurTime / _action->fTotalTime * (_action->uAction.sSkew.fSkewY - _action->uAction.sSkew.fYInitSkew) + _action->uAction.sSkew.fYInitSkew;
+						}
+						else
+						{
+							_node->fSkewX = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sSkew.fXInitSkew - _action->uAction.sSkew.fSkewX) + _action->uAction.sSkew.fSkewX;
+							_node->fSkewY = (2 * _action->fCurTime - _action->fTotalTime) / _action->fTotalTime * (_action->uAction.sSkew.fYInitSkew - _action->uAction.sSkew.fSkewY) + _action->uAction.sSkew.fSkewY;
+						}
+					}
+					else
+					{
+						_node->fSkewX = _action->fCurTime / _action->fTotalTime * (_action->uAction.sSkew.fSkewX - _action->uAction.sSkew.fXInitSkew) + _action->uAction.sSkew.fXInitSkew;
+						_node->fSkewY = _action->fCurTime / _action->fTotalTime * (_action->uAction.sSkew.fSkewY - _action->uAction.sSkew.fYInitSkew) + _action->uAction.sSkew.fYInitSkew;
+					}
+				}
+				break;
 				case SPACTION_ALPHA_INTERNAL:
 				{
 					if (_action->uAction.sAlpha.bReverse)
@@ -1081,12 +1114,27 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 		BLF32 _sin = sinf(_chnode->fRotate);
 		BLF32 _pivotx = (_chnode->sPivot.fX - 0.5f) * _chnode->sSize.fX;
 		BLF32 _pivoty = (_chnode->sPivot.fY - 0.5f) * _chnode->sSize.fY;
-		_mat[0] = (_chnode->fScaleX * _cos);
-		_mat[1] = (_chnode->fScaleX * _sin);
-		_mat[2] = (-_chnode->fScaleY * _sin);
-		_mat[3] = (_chnode->fScaleY * _cos);
-		_mat[4] = ((-_pivotx * _chnode->fScaleX) * _cos) + ((_pivoty * _chnode->fScaleY) * _sin) + _chnode->sPos.fX;
-		_mat[5] = ((-_pivotx * _chnode->fScaleX) * _sin) + ((-_pivoty * _chnode->fScaleY) * _cos) + _chnode->sPos.fY;
+		BLBool _affine = blScalarApproximate(_chnode->fSkewX, 0.f) && blScalarApproximate(_chnode->fSkewY, 0.f);
+		if (_affine)
+		{
+			_mat[0] = (_chnode->fScaleX * _cos);
+			_mat[1] = (_chnode->fScaleX * _sin);
+			_mat[2] = (-_chnode->fScaleY * _sin);
+			_mat[3] = (_chnode->fScaleY * _cos);
+			_mat[4] = ((-_pivotx * _chnode->fScaleX) * _cos) + ((_pivoty * _chnode->fScaleY) * _sin) + _chnode->sPos.fX;
+			_mat[5] = ((-_pivotx * _chnode->fScaleX) * _sin) + ((-_pivoty * _chnode->fScaleY) * _cos) + _chnode->sPos.fY;
+		}
+		else
+		{
+			BLF32 _tanx = tanf(_chnode->fSkewX);
+			BLF32 _tany = tanf(_chnode->fSkewY);
+			_mat[0] = (_chnode->fScaleX * _cos) + (-_chnode->fScaleY * _sin) * _tany;
+			_mat[1] = (_chnode->fScaleX * _sin) + (_chnode->fScaleY * _cos) * _tany;
+			_mat[2] = (-_chnode->fScaleY * _sin) + (_chnode->fScaleX * _cos) * _tanx;
+			_mat[3] = (_chnode->fScaleY * _cos) + (_chnode->fScaleX * _sin) * _tanx;
+			_mat[4] = ((-_pivotx * _chnode->fScaleX) * _cos) + ((_pivoty * _chnode->fScaleY) * _sin) + _chnode->sPos.fX;
+			_mat[5] = ((-_pivotx * _chnode->fScaleX) * _sin) + ((-_pivoty * _chnode->fScaleY) * _cos) + _chnode->sPos.fY;
+		}
 		_rmat[0] = (_mat[0] * _Mat[0]) + (_mat[1] * _Mat[2]);
 		_rmat[1] = (_mat[0] * _Mat[1]) + (_mat[1] * _Mat[3]);
 		_rmat[2] = (_mat[2] * _Mat[0]) + (_mat[3] * _Mat[2]);
@@ -1377,12 +1425,27 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			BLF32 _sin = sinf(_node->fRotate);
 			BLF32 _pivotx = (_node->sPivot.fX - 0.5f) * _node->sSize.fX;
 			BLF32 _pivoty = (_node->sPivot.fY - 0.5f) * _node->sSize.fY;
-			_mat[0] = (_node->fScaleX * _cos);
-			_mat[1] = (_node->fScaleX * _sin);
-			_mat[2] = (-_node->fScaleY * _sin);
-			_mat[3] = (_node->fScaleY * _cos);
-			_mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX - _PrSpriteMem->sViewport.sLT.fX;
-			_mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY - _PrSpriteMem->sViewport.sLT.fY;
+			BLBool _affine = blScalarApproximate(_node->fSkewX, 0.f) && blScalarApproximate(_node->fSkewY, 0.f);
+			if (_affine)
+			{
+				_mat[0] = (_node->fScaleX * _cos);
+				_mat[1] = (_node->fScaleX * _sin);
+				_mat[2] = (-_node->fScaleY * _sin);
+				_mat[3] = (_node->fScaleY * _cos);
+				_mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX - _PrSpriteMem->sViewport.sLT.fX;
+				_mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY - _PrSpriteMem->sViewport.sLT.fY;
+			}
+			else
+			{
+				BLF32 _tanx = tanf(_node->fSkewX);
+				BLF32 _tany = tanf(_node->fSkewY);
+				_mat[0] = (_node->fScaleX * _cos) + (-_node->fScaleY * _sin) * _tany;
+				_mat[1] = (_node->fScaleX * _sin) + (_node->fScaleY * _cos) * _tany;
+				_mat[2] = (-_node->fScaleY * _sin) + (_node->fScaleX * _cos) * _tanx;
+				_mat[3] = (_node->fScaleY * _cos) + (_node->fScaleX * _sin) * _tanx;
+				_mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX - _PrSpriteMem->sViewport.sLT.fX;
+				_mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY - _PrSpriteMem->sViewport.sLT.fY;
+			}
 			_SpriteDraw(_Delta, _node, _mat);
 		}
 		blFrameBufferResolve(_PrSpriteMem->nFBO);
@@ -1521,6 +1584,8 @@ blGenSprite(IN BLAnsi* _Filename, IN BLAnsi* _Tag, IN BLF32 _Width, IN BLF32 _He
 		_node->fRotate = 0.f;
 		_node->fScaleX = 1.f;
 		_node->fScaleY = 1.f;
+		_node->fSkewX = 0.f;
+		_node->fSkewY = 0.f;
 		_node->fAlpha = 1.f;
 		_node->fZValue = _Zv;
 		_node->nDyeColor = 0xFFFFFFFF;
@@ -1975,7 +2040,7 @@ blSpriteScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale)
     return TRUE;
 }
 BLBool
-blSpriteRotate(IN BLGuid _ID, IN BLF32 _Rotate)
+blSpriteRotate(IN BLGuid _ID, IN BLS32 _Rotate)
 {
     if (_ID == INVALID_GUID)
         return FALSE;
@@ -1984,6 +2049,18 @@ blSpriteRotate(IN BLGuid _ID, IN BLF32 _Rotate)
         return FALSE;
     _node->fRotate += _Rotate * PI_INTERNAL / 180.0f;
     return TRUE;
+}
+BLBool
+blSpriteSkew(IN BLGuid _ID, IN BLS32 _XSkew, IN BLS32 _YSkew)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return FALSE;
+	_node->fSkewX += _XSkew * PI_INTERNAL / 180.f;
+	_node->fSkewY += _YSkew * PI_INTERNAL / 180.f;
+	return TRUE;
 }
 BLBool
 blSpriteScissor(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos, IN BLF32 _Width, IN BLF32 _Height)
@@ -2133,6 +2210,8 @@ blSpriteActionBegin(IN BLGuid _ID)
 	_PrSpriteMem->sActionRecorder.fScaleYRecord = _node->fScaleY;
 	_PrSpriteMem->sActionRecorder.fPosXRecord = _node->sPos.fX;
 	_PrSpriteMem->sActionRecorder.fPosYRecord = _node->sPos.fY;
+	_PrSpriteMem->sActionRecorder.fSkewXRecord = _node->fSkewX;
+	_PrSpriteMem->sActionRecorder.fSkewYRecord = _node->fSkewY;
     return TRUE;
 }
 BLBool
@@ -2305,7 +2384,7 @@ blSpriteActionMove(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _
 	}
 }
 BLBool
-blSpriteActionRotate(IN BLGuid _ID, IN BLF32 _Angle, IN BLBool _ClockWise, IN BLF32 _Time, IN BLBool _Loop)
+blSpriteActionRotate(IN BLGuid _ID, IN BLS32 _Angle, IN BLBool _ClockWise, IN BLF32 _Time, IN BLBool _Loop)
 {
     if (_ID == INVALID_GUID)
         return FALSE;
@@ -2409,6 +2488,64 @@ blSpriteActionScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale, IN BLBool
 		return TRUE;
 	}
 }
+BLBool 
+blSpriteActionSkew(IN BLGuid _ID, IN BLS32 _XSkew, IN BLS32 _YSkew, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return FALSE;
+	if (blScalarApproximate(_Time, 0.f))
+	{
+		_node->fSkewX = _XSkew * PI_INTERNAL / 180.f;
+		_node->fSkewY = _YSkew * PI_INTERNAL / 180.f;
+		_PrSpriteMem->sActionRecorder.fSkewXRecord = _node->fSkewX;
+		_PrSpriteMem->sActionRecorder.fSkewYRecord = _node->fSkewY;
+		return FALSE;
+	}
+	else
+	{
+		_BLSpriteAction* _act = (_BLSpriteAction*)malloc(sizeof(_BLSpriteAction));
+		_act->pNeighbor = NULL;
+		_act->pNext = NULL;
+		_act->bLoop = _Loop;
+		_act->bParallel = _PrSpriteMem->sActionRecorder.bParallelEdit;
+		_act->eActionType = SPACTION_SKEW_INTERNAL;
+		_act->fCurTime = 0.f;
+		_act->fTotalTime = _Time;
+		_act->uAction.sSkew.fXInitSkew = _PrSpriteMem->sActionRecorder.fSkewXRecord;
+		_act->uAction.sSkew.fYInitSkew = _PrSpriteMem->sActionRecorder.fSkewYRecord;
+		_act->uAction.sSkew.fSkewX = _XSkew * PI_INTERNAL / 180.f;
+		_act->uAction.sSkew.fSkewY = _YSkew * PI_INTERNAL / 180.f;
+		if (!_Reverse)
+		{
+			_PrSpriteMem->sActionRecorder.fScaleXRecord = _XSkew * PI_INTERNAL / 180.f;
+			_PrSpriteMem->sActionRecorder.fScaleYRecord = _YSkew * PI_INTERNAL / 180.f;
+		}
+		_act->uAction.sSkew.bReverse = _Reverse;
+		if (!_node->pAction)
+		{
+			_node->pAction = _act;
+			return TRUE;
+		}
+		else
+		{
+			_BLSpriteAction* _lastact = _node->pAction;
+			while (_lastact->pNext)
+				_lastact = _lastact->pNext;
+			if (_PrSpriteMem->sActionRecorder.bParallelEdit && _lastact->bParallel)
+			{
+				while (_lastact->pNeighbor)
+					_lastact = _lastact->pNeighbor;
+				_lastact->pNeighbor = _act;
+			}
+			else
+				_lastact->pNext = _act;
+		}
+		return TRUE;
+	}
+}
 BLBool
 blSpriteActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32 _Time, IN BLBool _Loop)
 {
@@ -2459,6 +2596,11 @@ blSpriteActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32
 		}
 		return TRUE;
 	}
+}
+BLBool 
+blSpriteRenderTexture(IN BLGuid _ID, IN BLGuid _Tex)
+{
+	return TRUE;
 }
 BLVoid
 blViewportQuery(OUT BLF32* _LTPosX, OUT BLF32* _LTPosY, OUT BLF32* _RBPosX, OUT BLF32* _RBPosY)

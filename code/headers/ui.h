@@ -343,6 +343,10 @@ BL_API BLVoid blUILabelFlip(
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
 
+BL_API BLVoid blUILabelTexture(
+	IN BLGuid _ID,
+	IN BLGuid _Tex);
+
 BL_API BLVoid blUICheckPixmap(
 	IN BLGuid _ID,
 	IN BLAnsi* _Pixmap);

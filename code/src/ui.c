@@ -13728,6 +13728,10 @@ blUILabelFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_widget->uExtension.sLabel.bFlipY = _FlipY;
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUILabelTexture(IN BLGuid _ID, IN BLGuid _Tex)
+{
+}
 BLVoid
 blUICheckPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 {

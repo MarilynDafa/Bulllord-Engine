@@ -2333,8 +2333,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.h">
       <Filter>externals\astc</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Bulllord-Engine\proj\..\code\externals\astc\astc.h">
-      <Filter>externals\astc</Filter>
-    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc.h" />
   </ItemGroup>
 </Project>

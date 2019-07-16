@@ -148,7 +148,12 @@ BL_API BLBool blSpriteScale(
 
 BL_API BLBool blSpriteRotate(
 	IN BLGuid _ID,
-	IN BLF32 _Rotate);
+	IN BLS32 _Rotate);
+
+BL_API BLBool blSpriteSkew(
+	IN BLGuid _ID,
+	IN BLS32 _XSkew,
+	IN BLS32 _YSkew);
     
 BL_API BLBool blSpriteScissor(
     IN BLGuid _ID,
@@ -221,7 +226,7 @@ BL_API BLBool blSpriteActionMove(
 
 BL_API BLBool blSpriteActionRotate(
 	IN BLGuid _ID,
-	IN BLF32 _Angle,
+	IN BLS32 _Angle,
     IN BLBool _ClockWise, 
 	IN BLF32 _Time,
 	IN BLBool _Loop);
@@ -234,12 +239,24 @@ BL_API BLBool blSpriteActionScale(
 	IN BLF32 _Time,
 	IN BLBool _Loop);
 
+BL_API BLBool blSpriteActionSkew(
+	IN BLGuid _ID,
+	IN BLS32 _XSkew,
+	IN BLS32 _YSkew,
+	IN BLBool _Reverse,
+	IN BLF32 _Time,
+	IN BLBool _Loop);
+
 BL_API BLBool blSpriteActionAlpha(
 	IN BLGuid _ID,
 	IN BLF32 _Alpha,
 	IN BLBool _Reverse,
 	IN BLF32 _Time,
 	IN BLBool _Loop);
+
+BL_API BLBool blSpriteRenderTexture(
+	IN BLGuid _ID,
+	IN BLGuid _Tex);
     
 BL_API BLVoid blViewportQuery(
     OUT BLF32* _LTPosX,
