@@ -697,10 +697,7 @@ _WidgetLocate(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos)
 	_BLWidget* _target = NULL;
 	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
 	{
-		if (_iter->bVisible &&
-			_iter->eType != BL_UT_PRIMITIVE &&
-			_iter->eType != BL_UT_PROGRESS &&
-			!(_iter->eType == BL_UT_PANEL && _iter->uExtension.sPanel.bBasePlate))
+		if (_iter->bVisible && _iter->eType != BL_UT_PRIMITIVE && _iter->eType != BL_UT_PROGRESS && !(_iter->eType == BL_UT_PANEL && _iter->uExtension.sPanel.bBasePlate))
 		{
 			_target = _WidgetLocate(_iter, _XPos, _YPos);
 			if (_target && _target->sDimension.fX > 0.f && _target->sDimension.fY > 0.f)
