@@ -22,9 +22,6 @@
     <Filter Include="externals\xml">
       <UniqueIdentifier>{ff4d056d-8b25-434e-a067-8bf4eb40bdd6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="externals\duktape">
-      <UniqueIdentifier>{bf01a848-05f9-4226-ab46-2e4daa8909bc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{0d54445b-998a-4bb8-8593-64dbc3e19a3c}</UniqueIdentifier>
     </Filter>
@@ -60,6 +57,9 @@
     </Filter>
     <Filter Include="externals\astc">
       <UniqueIdentifier>{30764a1b-1af9-4b60-9750-4a4df9f8c26b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\duktape">
+      <UniqueIdentifier>{6a16130e-eb55-4726-9c45-6e2d7cdd861f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -185,9 +185,6 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\xml\ezxml.c">
       <Filter>externals\xml</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.c">
-      <Filter>externals\duktape</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\network.c">
       <Filter>src</Filter>
@@ -1164,6 +1161,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\audio.xc">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.c">
+      <Filter>externals\duktape</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h">
@@ -1198,12 +1198,6 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\xml\ezxml.h">
       <Filter>externals\xml</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.h">
-      <Filter>externals\duktape</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duk_config.h">
-      <Filter>externals\duktape</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\array.h">
       <Filter>src\internal</Filter>
@@ -2334,5 +2328,11 @@
       <Filter>externals\astc</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duk_config.h">
+      <Filter>externals\duktape</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.h">
+      <Filter>externals\duktape</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

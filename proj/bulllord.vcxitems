@@ -27,11 +27,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_weight_align.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_weight_quant_xfer_tables.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\fastlz\fastlz.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
