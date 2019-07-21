@@ -259,6 +259,7 @@ typedef struct _Widget {
 			BLRect sCommonTex9;
 			BLRect sCommonTex;
 			BLRect sStencilTex;
+			BLGuid nExTex;
 			BLBool bFlipX;
             BLBool bFlipY;
 			BLF32 fPaddingX;
@@ -4041,590 +4042,605 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 	BLRect _texcoords, _texcoords9;
 	BLBool _flipx = _Node->uExtension.sLabel.bFlipX;
 	BLBool _flipy = _Node->uExtension.sLabel.bFlipY;
-	if (_Node->uExtension.sLabel.aCommonMap[0] && strcmp(_Node->uExtension.sLabel.aCommonMap, "Nil"))
+	if (_Node->uExtension.sLabel.nExTex != INVALID_GUID)
 	{
 		_WidgetScissorRect(_Node, &_scissorrect);
 		blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
-		blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sLabel.nPixmapTex, 0);
-		if (_Node->nFrameNum != 0xFFFFFFFF)
+		blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sLabel.nExTex, 0);
+		_texcoord.sLT.fX = 0.f;
+		_texcoord.sLT.fY = 0.f;
+		_texcoord.sRB.fX = 1.f;
+		_texcoord.sRB.fY = 1.f;
+		if (_flipx)
 		{
-			_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-			_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-			_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-			_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-			_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			BLF32 _tmp = _texcoord.sLT.fX;
+			_texcoord.sLT.fX = _texcoord.sRB.fX;
+			_texcoord.sRB.fX = _tmp;
 		}
-		else
-			_texcoord = _Node->uExtension.sLabel.sCommonTex;
-		_texcoord9 = _Node->uExtension.sLabel.sCommonTex9;
-		if (_Node->uExtension.sLabel.aStencilMap[0] && strcmp(_Node->uExtension.sLabel.aStencilMap, "Nil"))
+		if (_flipy)
 		{
-			_stencil = -1.f;
-			_texcoords.sLT.fX = _Node->uExtension.sLabel.sStencilTex.sLT.fX / _Node->uExtension.sLabel.nTexWidth + 0.005f;
-			_texcoords.sLT.fY = _Node->uExtension.sLabel.sStencilTex.sLT.fY / _Node->uExtension.sLabel.nTexHeight + 0.005f;
-			_texcoords.sRB.fX = _Node->uExtension.sLabel.sStencilTex.sRB.fX / _Node->uExtension.sLabel.nTexWidth - 0.005f;
-			_texcoords.sRB.fY = _Node->uExtension.sLabel.sStencilTex.sRB.fY / _Node->uExtension.sLabel.nTexHeight - 0.005f;
-			BLF32 _oriw = _Node->uExtension.sLabel.sCommonTex.sRB.fX - _Node->uExtension.sLabel.sCommonTex.sLT.fX;
-			BLF32 _orih = _Node->uExtension.sLabel.sCommonTex.sRB.fY - _Node->uExtension.sLabel.sCommonTex.sLT.fY;
-			BLF32 _dstw = _Node->uExtension.sLabel.sStencilTex.sRB.fX - _Node->uExtension.sLabel.sStencilTex.sLT.fX;
-			BLF32 _dsth = _Node->uExtension.sLabel.sStencilTex.sRB.fX - _Node->uExtension.sLabel.sStencilTex.sLT.fX;
-			BLF32 _ratioax = (_Node->uExtension.sLabel.sCommonTex9.sLT.fX - _Node->uExtension.sLabel.sCommonTex.sLT.fX) / _oriw;
-			BLF32 _ratioay = (_Node->uExtension.sLabel.sCommonTex9.sLT.fY - _Node->uExtension.sLabel.sCommonTex.sLT.fY) / _orih;
-			BLF32 _rationx = (_Node->uExtension.sLabel.sCommonTex.sRB.fX - _Node->uExtension.sLabel.sCommonTex9.sRB.fX) / _oriw;
-			BLF32 _rationy = (_Node->uExtension.sLabel.sCommonTex.sRB.fY - _Node->uExtension.sLabel.sCommonTex9.sRB.fY) / _orih;
-			_texcoords9.sLT.fX = (_Node->uExtension.sLabel.sStencilTex.sLT.fX + _ratioax * _dstw) / _Node->uExtension.sLabel.nTexWidth;
-			_texcoords9.sLT.fY = (_Node->uExtension.sLabel.sStencilTex.sLT.fY + _ratioay * _dsth) / _Node->uExtension.sLabel.nTexHeight;
-			_texcoords9.sRB.fX = (_Node->uExtension.sLabel.sStencilTex.sRB.fX - _rationx * _dstw) / _Node->uExtension.sLabel.nTexWidth;
-			_texcoords9.sRB.fY = (_Node->uExtension.sLabel.sStencilTex.sRB.fY - _rationy * _dsth) / _Node->uExtension.sLabel.nTexHeight;
+			BLF32 _tmp = _texcoord.sLT.fY;
+			_texcoord.sLT.fY = _texcoord.sRB.fY;
+			_texcoord.sRB.fY = _tmp;
 		}
-		else
-		{
-			_texcoords.sLT.fX = 1.f;
-			_texcoords.sLT.fY = 1.f;
-			_texcoords.sRB.fX = 1.f;
-			_texcoords.sRB.fY = 1.f;
-			_texcoords9.sLT.fX = 1.f;
-			_texcoords9.sLT.fY = 1.f;
-			_texcoords9.sRB.fX = 1.f;
-			_texcoords9.sRB.fY = 1.f;
-		}
-		if (blRectApproximate(&_texcoord, &_texcoord9) || _Node->nFrameNum != 0xFFFFFFFF)
-		{
-			if (_flipx)
-			{
-				BLF32 _tmp = _texcoord.sLT.fX;
-				_texcoord.sLT.fX = _texcoord.sRB.fX;
-				_texcoord.sRB.fX = _tmp;
-				_tmp = _texcoords.sLT.fX;
-				_texcoords.sLT.fX = _texcoords.sRB.fX;
-				_texcoords.sRB.fX = _tmp;
-			}
-			if (_flipy)
-			{
-				BLF32 _tmp = _texcoord.sLT.fY;
-				_texcoord.sLT.fY = _texcoord.sRB.fY;
-				_texcoord.sRB.fY = _tmp;
-				_tmp = _texcoords.sLT.fY;
-				_texcoords.sLT.fY = _texcoords.sRB.fY;
-				_texcoords.sRB.fY = _tmp;
-			}
-			BLF32 _vbo[] = {
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
-				_texcoords.sLT.fX,
-				_texcoords.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
-				_texcoords.sRB.fX,
-				_texcoords.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
-				_texcoords.sLT.fX,
-				_texcoords.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
-				_texcoords.sRB.fX,
-				_texcoords.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight
-			};
-			blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-			blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
-		}
-		else
-		{
-			BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-			BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-			BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
-			BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
-			BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
-			BLF32 _marginny = _texcoord.sRB.fY - _texcoord9.sRB.fY;
-			if (_flipx)
-			{
-				BLF32 _tmp = _texcoord.sLT.fX;
-				_texcoord.sLT.fX = _texcoord.sRB.fX;
-				_texcoord.sRB.fX = _tmp;
-				_tmp = _texcoords.sLT.fX;
-				_texcoords.sLT.fX = _texcoords.sRB.fX;
-				_texcoords.sRB.fX = _tmp;
-				_tmp = _texcoord9.sLT.fX;
-				_texcoord9.sLT.fX = _texcoord9.sRB.fX;
-				_texcoord9.sRB.fX = _tmp;
-				_tmp = _texcoords9.sLT.fX;
-				_texcoords9.sLT.fX = _texcoords9.sRB.fX;
-				_texcoords9.sRB.fX = _tmp;
-				_tmp = _marginax;
-				_marginax = _marginnx;
-				_marginnx = _tmp;
-			}
-			if (_flipy)
-			{
-				BLF32 _tmp = _texcoord.sLT.fY;
-				_texcoord.sLT.fY = _texcoord.sRB.fY;
-				_texcoord.sRB.fY = _tmp;
-				_tmp = _texcoords.sLT.fY;
-				_texcoords.sLT.fY = _texcoords.sRB.fY;
-				_texcoords.sRB.fY = _tmp;
-				_tmp = _texcoord9.sLT.fY;
-				_texcoord9.sLT.fY = _texcoord9.sRB.fY;
-				_texcoord9.sRB.fY = _tmp;
-				_tmp = _texcoords9.sLT.fY;
-				_texcoords9.sLT.fY = _texcoords9.sRB.fY;
-				_texcoords9.sRB.fY = _tmp;
-				_tmp = _marginay;
-				_marginay = _marginny;
-				_marginny = _tmp;
-			}
-			BLF32 _vob[] = {
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
-				_texcoords.sLT.fX,
-				_texcoords.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords.sLT.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
-				_texcoords.sRB.fX,
-				_texcoords.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords.sRB.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords.sLT.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords.sLT.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
-				_texcoords.sRB.fX,
-				_texcoords9.sLT.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords.sRB.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords.sLT.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
-				_texcoords.sLT.fX,
-				_texcoords.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
-				_texcoords9.sLT.fX,
-				_texcoords.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
-				_texcoords.sRB.fX,
-				_texcoords9.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
-				_texcoords9.sRB.fX,
-				_texcoords.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
-				PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
-				PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
-				_texcoords.sRB.fX,
-				_texcoords.sRB.fY,
-				1.f * _stencil,
-				1.f * _gray,
-				_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
-				_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight
-			};
-			BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
-			blDraw(_PrUIMem->nUITech, _geo, 1);
-			blDeleteGeometryBuffer(_geo);
-		}
+		BLF32 _vbo[] = {
+			PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
+			1.f,
+			1.f,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX,
+			_texcoord.sLT.fY,
+			PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
+			1.f,
+			1.f,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX,
+			_texcoord.sLT.fY,
+			PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
+			1.f,
+			1.f,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sLT.fX,
+			_texcoord.sRB.fY,
+			PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
+			PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
+			1.f,
+			1.f,
+			1.f * _stencil,
+			1.f * _gray,
+			_texcoord.sRB.fX,
+			_texcoord.sRB.fY
+		};
+		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+		blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 	}
-	_scissorrect.sLT.fX = _XPos - 0.5f * _Width;
-	_scissorrect.sLT.fY = _YPos - 0.5f * _Height + _Node->uExtension.sLabel.fPaddingY;
-	_scissorrect.sRB.fX = _XPos + 0.5f * _Width;
-	_scissorrect.sRB.fY = _YPos + 0.5f * _Height - _Node->uExtension.sLabel.fPaddingY;
-	BLS32 _y = (BLS32)(_YPos - _Height * 0.5f + _Node->uExtension.sLabel.fPaddingY - _Node->uExtension.sLabel.nScroll);
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
+	else
 	{
-		FOREACH_ARRAY(_BLRichRowCell*, _iter, _Node->uExtension.sLabel.pRowCells)
+		if (_Node->uExtension.sLabel.aCommonMap[0] && strcmp(_Node->uExtension.sLabel.aCommonMap, "Nil"))
 		{
-			if (_y <= _scissorrect.sRB.fY && _y + _iter->nHeight >= _scissorrect.sLT.fY)
+			_WidgetScissorRect(_Node, &_scissorrect);
+			blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
+			blTechSampler(_PrUIMem->nUITech, "Texture0", _Node->uExtension.sLabel.nPixmapTex, 0);
+			if (_Node->nFrameNum != 0xFFFFFFFF)
 			{
-				BLEnum _halign = _iter->eAlignmentH;
-				BLEnum _valign = _iter->eAlignmentV;
-				BLU32 _width = _iter->nWidth;
-				BLU32 _height = _iter->nHeight;
-				BLF32 _leftx = _XPos - _Width * 0.5f + _Node->uExtension.sLabel.fPaddingX + _iter->nLeftPadding;
-				BLF32 _rightx = _XPos + _Width * 0.5f - _Node->uExtension.sLabel.fPaddingX - _iter->nRightPadding;
-				BLF32 _topy = _YPos - _Height * 0.5f + _Node->uExtension.sLabel.fPaddingY;
-				BLF32 _bottomy = _YPos + _Height * 0.5f - _Node->uExtension.sLabel.fPaddingY;
-				BLS32 _x;
-				switch (_halign)
+				_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
+				_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+				_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+				_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+				_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			}
+			else
+				_texcoord = _Node->uExtension.sLabel.sCommonTex;
+			_texcoord9 = _Node->uExtension.sLabel.sCommonTex9;
+			if (_Node->uExtension.sLabel.aStencilMap[0] && strcmp(_Node->uExtension.sLabel.aStencilMap, "Nil"))
+			{
+				_stencil = -1.f;
+				_texcoords.sLT.fX = _Node->uExtension.sLabel.sStencilTex.sLT.fX / _Node->uExtension.sLabel.nTexWidth + 0.005f;
+				_texcoords.sLT.fY = _Node->uExtension.sLabel.sStencilTex.sLT.fY / _Node->uExtension.sLabel.nTexHeight + 0.005f;
+				_texcoords.sRB.fX = _Node->uExtension.sLabel.sStencilTex.sRB.fX / _Node->uExtension.sLabel.nTexWidth - 0.005f;
+				_texcoords.sRB.fY = _Node->uExtension.sLabel.sStencilTex.sRB.fY / _Node->uExtension.sLabel.nTexHeight - 0.005f;
+				BLF32 _oriw = _Node->uExtension.sLabel.sCommonTex.sRB.fX - _Node->uExtension.sLabel.sCommonTex.sLT.fX;
+				BLF32 _orih = _Node->uExtension.sLabel.sCommonTex.sRB.fY - _Node->uExtension.sLabel.sCommonTex.sLT.fY;
+				BLF32 _dstw = _Node->uExtension.sLabel.sStencilTex.sRB.fX - _Node->uExtension.sLabel.sStencilTex.sLT.fX;
+				BLF32 _dsth = _Node->uExtension.sLabel.sStencilTex.sRB.fX - _Node->uExtension.sLabel.sStencilTex.sLT.fX;
+				BLF32 _ratioax = (_Node->uExtension.sLabel.sCommonTex9.sLT.fX - _Node->uExtension.sLabel.sCommonTex.sLT.fX) / _oriw;
+				BLF32 _ratioay = (_Node->uExtension.sLabel.sCommonTex9.sLT.fY - _Node->uExtension.sLabel.sCommonTex.sLT.fY) / _orih;
+				BLF32 _rationx = (_Node->uExtension.sLabel.sCommonTex.sRB.fX - _Node->uExtension.sLabel.sCommonTex9.sRB.fX) / _oriw;
+				BLF32 _rationy = (_Node->uExtension.sLabel.sCommonTex.sRB.fY - _Node->uExtension.sLabel.sCommonTex9.sRB.fY) / _orih;
+				_texcoords9.sLT.fX = (_Node->uExtension.sLabel.sStencilTex.sLT.fX + _ratioax * _dstw) / _Node->uExtension.sLabel.nTexWidth;
+				_texcoords9.sLT.fY = (_Node->uExtension.sLabel.sStencilTex.sLT.fY + _ratioay * _dsth) / _Node->uExtension.sLabel.nTexHeight;
+				_texcoords9.sRB.fX = (_Node->uExtension.sLabel.sStencilTex.sRB.fX - _rationx * _dstw) / _Node->uExtension.sLabel.nTexWidth;
+				_texcoords9.sRB.fY = (_Node->uExtension.sLabel.sStencilTex.sRB.fY - _rationy * _dsth) / _Node->uExtension.sLabel.nTexHeight;
+			}
+			else
+			{
+				_texcoords.sLT.fX = 1.f;
+				_texcoords.sLT.fY = 1.f;
+				_texcoords.sRB.fX = 1.f;
+				_texcoords.sRB.fY = 1.f;
+				_texcoords9.sLT.fX = 1.f;
+				_texcoords9.sLT.fY = 1.f;
+				_texcoords9.sRB.fX = 1.f;
+				_texcoords9.sRB.fY = 1.f;
+			}
+			if (blRectApproximate(&_texcoord, &_texcoord9) || _Node->nFrameNum != 0xFFFFFFFF)
+			{
+				if (_flipx)
 				{
-				case BL_UA_LEFT:
-					_x = (BLS32)_leftx;
-					break;
-				case BL_UA_HCENTER:
-					_x = (BLS32)(_leftx + (_rightx - _leftx - _width) * 0.5f);
-					break;
-				case BL_UA_RIGHT:
-					_x = (BLS32)(_rightx - _width);
-					break;
-				default:
-					_x = (BLS32)_leftx;
-					break;
+					BLF32 _tmp = _texcoord.sLT.fX;
+					_texcoord.sLT.fX = _texcoord.sRB.fX;
+					_texcoord.sRB.fX = _tmp;
+					_tmp = _texcoords.sLT.fX;
+					_texcoords.sLT.fX = _texcoords.sRB.fX;
+					_texcoords.sRB.fX = _tmp;
 				}
-				if (_Node->uExtension.sLabel.pRowCells->nSize == 1)
+				if (_flipy)
 				{
-					switch (_valign)
+					BLF32 _tmp = _texcoord.sLT.fY;
+					_texcoord.sLT.fY = _texcoord.sRB.fY;
+					_texcoord.sRB.fY = _tmp;
+					_tmp = _texcoords.sLT.fY;
+					_texcoords.sLT.fY = _texcoords.sRB.fY;
+					_texcoords.sRB.fY = _tmp;
+				}
+				BLF32 _vbo[] = {
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
+					_texcoords.sLT.fX,
+					_texcoords.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
+					_texcoords.sRB.fX,
+					_texcoords.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
+					_texcoords.sLT.fX,
+					_texcoords.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
+					_texcoords.sRB.fX,
+					_texcoords.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight
+				};
+				blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+				blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
+			}
+			else
+			{
+				BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+				BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+				BLF32 _marginax = _texcoord9.sLT.fX - _texcoord.sLT.fX;
+				BLF32 _marginay = _texcoord9.sLT.fY - _texcoord.sLT.fY;
+				BLF32 _marginnx = _texcoord.sRB.fX - _texcoord9.sRB.fX;
+				BLF32 _marginny = _texcoord.sRB.fY - _texcoord9.sRB.fY;
+				if (_flipx)
+				{
+					BLF32 _tmp = _texcoord.sLT.fX;
+					_texcoord.sLT.fX = _texcoord.sRB.fX;
+					_texcoord.sRB.fX = _tmp;
+					_tmp = _texcoords.sLT.fX;
+					_texcoords.sLT.fX = _texcoords.sRB.fX;
+					_texcoords.sRB.fX = _tmp;
+					_tmp = _texcoord9.sLT.fX;
+					_texcoord9.sLT.fX = _texcoord9.sRB.fX;
+					_texcoord9.sRB.fX = _tmp;
+					_tmp = _texcoords9.sLT.fX;
+					_texcoords9.sLT.fX = _texcoords9.sRB.fX;
+					_texcoords9.sRB.fX = _tmp;
+					_tmp = _marginax;
+					_marginax = _marginnx;
+					_marginnx = _tmp;
+				}
+				if (_flipy)
+				{
+					BLF32 _tmp = _texcoord.sLT.fY;
+					_texcoord.sLT.fY = _texcoord.sRB.fY;
+					_texcoord.sRB.fY = _tmp;
+					_tmp = _texcoords.sLT.fY;
+					_texcoords.sLT.fY = _texcoords.sRB.fY;
+					_texcoords.sRB.fY = _tmp;
+					_tmp = _texcoord9.sLT.fY;
+					_texcoord9.sLT.fY = _texcoord9.sRB.fY;
+					_texcoord9.sRB.fY = _tmp;
+					_tmp = _texcoords9.sLT.fY;
+					_texcoords9.sLT.fY = _texcoords9.sRB.fY;
+					_texcoords9.sRB.fY = _tmp;
+					_tmp = _marginay;
+					_marginay = _marginny;
+					_marginny = _tmp;
+				}
+				BLF32 _vob[] = {
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
+					_texcoords.sLT.fX,
+					_texcoords.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords.sLT.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _offsety),
+					_texcoords.sRB.fX,
+					_texcoords.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords.sRB.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords.sLT.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords.sLT.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos - _Height * 0.5f + _marginay + _offsety),
+					_texcoords.sRB.fX,
+					_texcoords9.sLT.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sLT.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords.sRB.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords.sLT.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
+					_texcoords.sLT.fX,
+					_texcoords.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos - _Width * 0.5f + _marginax + _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
+					_texcoords9.sLT.fX,
+					_texcoords.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sLT.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _marginny - _offsety),
+					_texcoords.sRB.fX,
+					_texcoords9.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord9.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _marginnx - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
+					_texcoords9.sRB.fX,
+					_texcoords.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord9.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight,
+					PIXEL_ALIGNED_INTERNAL(_XPos + _Width * 0.5f - _offsetx),
+					PIXEL_ALIGNED_INTERNAL(_YPos + _Height * 0.5f - _offsety),
+					_texcoords.sRB.fX,
+					_texcoords.sRB.fY,
+					1.f * _stencil,
+					1.f * _gray,
+					_texcoord.sRB.fX / _Node->uExtension.sLabel.nTexWidth,
+					_texcoord.sRB.fY / _Node->uExtension.sLabel.nTexHeight
+				};
+				BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vob, sizeof(_vob), NULL, 0, BL_IF_INVALID);
+				blDraw(_PrUIMem->nUITech, _geo, 1);
+				blDeleteGeometryBuffer(_geo);
+			}
+		}
+		_scissorrect.sLT.fX = _XPos - 0.5f * _Width;
+		_scissorrect.sLT.fY = _YPos - 0.5f * _Height + _Node->uExtension.sLabel.fPaddingY;
+		_scissorrect.sRB.fX = _XPos + 0.5f * _Width;
+		_scissorrect.sRB.fY = _YPos + 0.5f * _Height - _Node->uExtension.sLabel.fPaddingY;
+		BLS32 _y = (BLS32)(_YPos - _Height * 0.5f + _Node->uExtension.sLabel.fPaddingY - _Node->uExtension.sLabel.nScroll);
+		blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_scissorrect.sLT.fX, (BLS32)_scissorrect.sLT.fY, (BLU32)(_scissorrect.sRB.fX - _scissorrect.sLT.fX), (BLU32)(_scissorrect.sRB.fY - _scissorrect.sLT.fY), FALSE);
+		{
+			FOREACH_ARRAY(_BLRichRowCell*, _iter, _Node->uExtension.sLabel.pRowCells)
+			{
+				if (_y <= _scissorrect.sRB.fY && _y + _iter->nHeight >= _scissorrect.sLT.fY)
+				{
+					BLEnum _halign = _iter->eAlignmentH;
+					BLEnum _valign = _iter->eAlignmentV;
+					BLU32 _width = _iter->nWidth;
+					BLU32 _height = _iter->nHeight;
+					BLF32 _leftx = _XPos - _Width * 0.5f + _Node->uExtension.sLabel.fPaddingX + _iter->nLeftPadding;
+					BLF32 _rightx = _XPos + _Width * 0.5f - _Node->uExtension.sLabel.fPaddingX - _iter->nRightPadding;
+					BLF32 _topy = _YPos - _Height * 0.5f + _Node->uExtension.sLabel.fPaddingY;
+					BLF32 _bottomy = _YPos + _Height * 0.5f - _Node->uExtension.sLabel.fPaddingY;
+					BLS32 _x;
+					switch (_halign)
 					{
-					case BL_UA_TOP:
-						_y = (BLS32)_topy;
+					case BL_UA_LEFT:
+						_x = (BLS32)_leftx;
 						break;
-					case BL_UA_VCENTER:
-						_y = (BLS32)(_topy + (_bottomy - _topy - (_Node->uExtension.sLabel.pRowCells->nSize) * _height) * 0.5f);
+					case BL_UA_HCENTER:
+						_x = (BLS32)(_leftx + (_rightx - _leftx - _width) * 0.5f);
 						break;
-					case BL_UA_BOTTOM:
-						_y = (BLS32)(_bottomy - (_Node->uExtension.sLabel.pRowCells->nSize) * _height);
+					case BL_UA_RIGHT:
+						_x = (BLS32)(_rightx - _width);
 						break;
 					default:
-						_y = (BLS32)_topy;
+						_x = (BLS32)_leftx;
 						break;
 					}
-				}
-				FOREACH_LIST(_BLRichAtomCell*, _iter2, _iter->pElements)
-				{
-					BLRect _dstrect;
-					_dstrect.sLT.fX = (BLF32)_x;
-					_dstrect.sLT.fY = (BLF32)_y;
-					_dstrect.sRB.fX = (BLF32)_x + _iter2->sDim.fX;
-					_dstrect.sRB.fY = (BLF32)_y + _iter2->sDim.fY;
-					switch (_iter2->nType)
+					if (_Node->uExtension.sLabel.pRowCells->nSize == 1)
 					{
-					case 1:
-						break;
-					case 2:
-					{
-						BLF32 _rgba[4];
-						blDeColor4F(_iter2->nColor, _rgba);
-						BLF32 _h = _dstrect.sRB.fY - _dstrect.sLT.fY;
-						BLF32 _vbo[] = {
-							PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX + _iter2->nFontHeight),
-							PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter2->nLineWidth) * 0.5f),
-							_rgba[0],
-							_rgba[1],
-							_rgba[2],
-							_rgba[3] * _gray,
-							0.f,
-							0.f,
-							PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX + _iter2->nFontHeight),
-							PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter2->nLineWidth) * 0.5f),
-							_rgba[0],
-							_rgba[1],
-							_rgba[2],
-							_rgba[3] * _gray,
-							1.f,
-							0.f,
-							PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX + _iter2->nFontHeight),
-							PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter2->nLineWidth) * 0.5f + _iter2->nLineWidth),
-							_rgba[0],
-							_rgba[1],
-							_rgba[2],
-							_rgba[3] * _gray,
-							0.f,
-							1.f,
-							PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX + _iter2->nFontHeight),
-							PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter2->nLineWidth) * 0.5f + _iter2->nLineWidth),
-							_rgba[0],
-							_rgba[1],
-							_rgba[2],
-							_rgba[3] * _gray,
-							1.f,
-							1.f
-						};
-						blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nBlankTex, 0);
-						blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-						blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
+						switch (_valign)
+						{
+						case BL_UA_TOP:
+							_y = (BLS32)_topy;
+							break;
+						case BL_UA_VCENTER:
+							_y = (BLS32)(_topy + (_bottomy - _topy - (_Node->uExtension.sLabel.pRowCells->nSize) * _height) * 0.5f);
+							break;
+						case BL_UA_BOTTOM:
+							_y = (BLS32)(_bottomy - (_Node->uExtension.sLabel.pRowCells->nSize) * _height);
+							break;
+						default:
+							_y = (BLS32)_topy;
+							break;
+						}
 					}
-					break;
-					case 3:
+					FOREACH_LIST(_BLRichAtomCell*, _iter2, _iter->pElements)
 					{
-						if (_iter2->nTexture != INVALID_GUID)
+						BLRect _dstrect;
+						_dstrect.sLT.fX = (BLF32)_x;
+						_dstrect.sLT.fY = (BLF32)_y;
+						_dstrect.sRB.fX = (BLF32)_x + _iter2->sDim.fX;
+						_dstrect.sRB.fY = (BLF32)_y + _iter2->sDim.fY;
+						switch (_iter2->nType)
+						{
+						case 1:
+							break;
+						case 2:
 						{
 							BLF32 _rgba[4];
 							blDeColor4F(_iter2->nColor, _rgba);
+							BLF32 _h = _dstrect.sRB.fY - _dstrect.sLT.fY;
 							BLF32 _vbo[] = {
-								PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX),
-								PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY),
+								PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX + _iter2->nFontHeight),
+								PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter2->nLineWidth) * 0.5f),
 								_rgba[0],
 								_rgba[1],
 								_rgba[2],
 								_rgba[3] * _gray,
 								0.f,
 								0.f,
-								PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX),
-								PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY),
+								PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX + _iter2->nFontHeight),
+								PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter2->nLineWidth) * 0.5f),
 								_rgba[0],
 								_rgba[1],
 								_rgba[2],
 								_rgba[3] * _gray,
 								1.f,
 								0.f,
-								PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX),
-								PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fY),
+								PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX + _iter2->nFontHeight),
+								PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter2->nLineWidth) * 0.5f + _iter2->nLineWidth),
 								_rgba[0],
 								_rgba[1],
 								_rgba[2],
 								_rgba[3] * _gray,
 								0.f,
 								1.f,
-								PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX),
-								PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fY),
+								PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX + _iter2->nFontHeight),
+								PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter2->nLineWidth) * 0.5f + _iter2->nLineWidth),
 								_rgba[0],
 								_rgba[1],
 								_rgba[2],
@@ -4632,96 +4648,96 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 								1.f,
 								1.f
 							};
-							blTechSampler(_PrUIMem->nUITech, "Texture0", _iter2->nTexture, 0);
+							blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nBlankTex, 0);
 							blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 							blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 						}
-					}
-					break;
-					case 4:
-						_WriteText(_iter2->pText, _iter2->aFontSource, _iter2->nFontHeight, _halign, _valign, FALSE, &_dstrect, &_scissorrect, _iter2->nColor, _gray, _iter2->nFontFlag, FALSE);
 						break;
-					default:
-						assert(0);
+						case 3:
+						{
+							if (_iter2->nTexture != INVALID_GUID)
+							{
+								BLF32 _rgba[4];
+								blDeColor4F(_iter2->nColor, _rgba);
+								BLF32 _vbo[] = {
+									PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX),
+									PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY),
+									_rgba[0],
+									_rgba[1],
+									_rgba[2],
+									_rgba[3] * _gray,
+									0.f,
+									0.f,
+									PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX),
+									PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY),
+									_rgba[0],
+									_rgba[1],
+									_rgba[2],
+									_rgba[3] * _gray,
+									1.f,
+									0.f,
+									PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX),
+									PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fY),
+									_rgba[0],
+									_rgba[1],
+									_rgba[2],
+									_rgba[3] * _gray,
+									0.f,
+									1.f,
+									PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX),
+									PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fY),
+									_rgba[0],
+									_rgba[1],
+									_rgba[2],
+									_rgba[3] * _gray,
+									1.f,
+									1.f
+								};
+								blTechSampler(_PrUIMem->nUITech, "Texture0", _iter2->nTexture, 0);
+								blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+								blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
+							}
+						}
 						break;
+						case 4:
+							_WriteText(_iter2->pText, _iter2->aFontSource, _iter2->nFontHeight, _halign, _valign, FALSE, &_dstrect, &_scissorrect, _iter2->nColor, _gray, _iter2->nFontFlag, FALSE);
+							break;
+						default:
+							assert(0);
+							break;
+						}
+						_x += (BLS32)_iter2->sDim.fX;
 					}
-					_x += (BLS32)_iter2->sDim.fX;
 				}
+				_y += _iter->nHeight;
 			}
-			_y += _iter->nHeight;
 		}
-	}
-	{
-		FOREACH_ARRAY(_BLRichAnchoredCell*, _iter3, _Node->uExtension.sLabel.pAnchoredCells)
 		{
-			_y = (BLS32)(_YPos - _Height * 0.5f - _Node->uExtension.sLabel.fPaddingY + _iter3->nBottomy - _iter3->pElement->sDim.fY);
-			BLF32 _x;
-			if (_iter3->bLeft)
-				_x = _XPos - _Width * 0.5f + _Node->uExtension.sLabel.fPaddingX;
-			else
-				_x = _XPos + _Width * 0.5f - _Node->uExtension.sLabel.fPaddingX - _iter3->pElement->sDim.fX;
-			BLRect _dstrect;
-			_dstrect.sLT.fX = (BLF32)_x;
-			_dstrect.sLT.fY = (BLF32)_y;
-			_dstrect.sRB.fX = (BLF32)_x + _iter3->pElement->sDim.fX;
-			_dstrect.sRB.fY = (BLF32)_y + _iter3->pElement->sDim.fY;
-			switch (_iter3->pElement->nType)
+			FOREACH_ARRAY(_BLRichAnchoredCell*, _iter3, _Node->uExtension.sLabel.pAnchoredCells)
 			{
-			case 1:
-				break;
-			case 2:
-			{
-				BLF32 _rgba[4];
-				blDeColor4F(_iter3->pElement->nColor, _rgba);
-				BLF32 _h = _dstrect.sRB.fY - _dstrect.sLT.fY;
-				BLF32 _vbo[] = {
-					PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX),
-					PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter3->pElement->nLineWidth) * 0.5f),
-					_rgba[0],
-					_rgba[1],
-					_rgba[2],
-					_rgba[3] * _gray,
-					0.f,
-					0.f,
-					PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX),
-					PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter3->pElement->nLineWidth) * 0.5f),
-					_rgba[0],
-					_rgba[1],
-					_rgba[2],
-					_rgba[3] * _gray,
-					1.f,
-					0.f,
-					PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX),
-					PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter3->pElement->nLineWidth) * 0.5f + _iter3->pElement->nLineWidth),
-					_rgba[0],
-					_rgba[1],
-					_rgba[2],
-					_rgba[3] * _gray,
-					0.f,
-					1.f,
-					PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX),
-					PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter3->pElement->nLineWidth) * 0.5f + _iter3->pElement->nLineWidth),
-					_rgba[0],
-					_rgba[1],
-					_rgba[2],
-					_rgba[3] * _gray,
-					1.f,
-					1.f
-				};
-				blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nBlankTex, 0);
-				blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-				blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
-			}
-			break;
-			case 3:
-			{
-				if (_iter3->pElement->nTexture != INVALID_GUID)
+				_y = (BLS32)(_YPos - _Height * 0.5f - _Node->uExtension.sLabel.fPaddingY + _iter3->nBottomy - _iter3->pElement->sDim.fY);
+				BLF32 _x;
+				if (_iter3->bLeft)
+					_x = _XPos - _Width * 0.5f + _Node->uExtension.sLabel.fPaddingX;
+				else
+					_x = _XPos + _Width * 0.5f - _Node->uExtension.sLabel.fPaddingX - _iter3->pElement->sDim.fX;
+				BLRect _dstrect;
+				_dstrect.sLT.fX = (BLF32)_x;
+				_dstrect.sLT.fY = (BLF32)_y;
+				_dstrect.sRB.fX = (BLF32)_x + _iter3->pElement->sDim.fX;
+				_dstrect.sRB.fY = (BLF32)_y + _iter3->pElement->sDim.fY;
+				switch (_iter3->pElement->nType)
+				{
+				case 1:
+					break;
+				case 2:
 				{
 					BLF32 _rgba[4];
 					blDeColor4F(_iter3->pElement->nColor, _rgba);
+					BLF32 _h = _dstrect.sRB.fY - _dstrect.sLT.fY;
 					BLF32 _vbo[] = {
 						PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX),
-						PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY),
+						PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter3->pElement->nLineWidth) * 0.5f),
 						_rgba[0],
 						_rgba[1],
 						_rgba[2],
@@ -4729,7 +4745,7 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 						0.f,
 						0.f,
 						PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX),
-						PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY),
+						PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter3->pElement->nLineWidth) * 0.5f),
 						_rgba[0],
 						_rgba[1],
 						_rgba[2],
@@ -4737,7 +4753,7 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 						1.f,
 						0.f,
 						PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX),
-						PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fY),
+						PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter3->pElement->nLineWidth) * 0.5f + _iter3->pElement->nLineWidth),
 						_rgba[0],
 						_rgba[1],
 						_rgba[2],
@@ -4745,7 +4761,7 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 						0.f,
 						1.f,
 						PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX),
-						PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fY),
+						PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY + (_h - _iter3->pElement->nLineWidth) * 0.5f + _iter3->pElement->nLineWidth),
 						_rgba[0],
 						_rgba[1],
 						_rgba[2],
@@ -4753,18 +4769,64 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 						1.f,
 						1.f
 					};
-					blTechSampler(_PrUIMem->nUITech, "Texture0", _iter3->pElement->nTexture, 0);
+					blTechSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nBlankTex, 0);
 					blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 					blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 				}
-			}
-			break;
-			case 4:
-				_WriteText(_iter3->pElement->pText, _iter3->pElement->aFontSource, _iter3->pElement->nFontHeight, BL_UA_LEFT, BL_UA_VCENTER, FALSE, &_dstrect, &_scissorrect, _iter3->pElement->nColor, _gray, _iter3->pElement->nFontFlag, FALSE);
 				break;
-			default:
-				assert(0);
+				case 3:
+				{
+					if (_iter3->pElement->nTexture != INVALID_GUID)
+					{
+						BLF32 _rgba[4];
+						blDeColor4F(_iter3->pElement->nColor, _rgba);
+						BLF32 _vbo[] = {
+							PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX),
+							PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY),
+							_rgba[0],
+							_rgba[1],
+							_rgba[2],
+							_rgba[3] * _gray,
+							0.f,
+							0.f,
+							PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX),
+							PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fY),
+							_rgba[0],
+							_rgba[1],
+							_rgba[2],
+							_rgba[3] * _gray,
+							1.f,
+							0.f,
+							PIXEL_ALIGNED_INTERNAL(_dstrect.sLT.fX),
+							PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fY),
+							_rgba[0],
+							_rgba[1],
+							_rgba[2],
+							_rgba[3] * _gray,
+							0.f,
+							1.f,
+							PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fX),
+							PIXEL_ALIGNED_INTERNAL(_dstrect.sRB.fY),
+							_rgba[0],
+							_rgba[1],
+							_rgba[2],
+							_rgba[3] * _gray,
+							1.f,
+							1.f
+						};
+						blTechSampler(_PrUIMem->nUITech, "Texture0", _iter3->pElement->nTexture, 0);
+						blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+						blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
+					}
+				}
 				break;
+				case 4:
+					_WriteText(_iter3->pElement->pText, _iter3->pElement->aFontSource, _iter3->pElement->nFontHeight, BL_UA_LEFT, BL_UA_VCENTER, FALSE, &_dstrect, &_scissorrect, _iter3->pElement->nColor, _gray, _iter3->pElement->nFontFlag, FALSE);
+					break;
+				default:
+					assert(0);
+					break;
+				}
 			}
 		}
 	}
@@ -11685,6 +11747,11 @@ blUIStyle(IN BLU32 _CaretColor, IN BLU32 _SelectRangeColor, IN BLU32 _TextDisabl
 		_PrUIMem->nTextDisableColor = _TextDisableColor;
 	}
 }
+BLVoid 
+blUIDirty()
+{
+	_PrUIMem->bDirty = TRUE;
+}
 BLGuid
 blUIFile(IN BLAnsi* _Filename)
 {
@@ -11701,7 +11768,6 @@ blUIFile(IN BLAnsi* _Filename)
 	_dummy->pChildren = blGenArray(FALSE);
 	_dummy->eType = BL_UT_PANEL;
 	_dummy->bVisible = TRUE;
-	_dummy->uExtension.sPanel.nPixmapTex = INVALID_GUID;
 	_dummy->nID = blGenGuid(_dummy, blUniqueUri());
     BLGuid _layout = blGenStream(_Filename);
 	BLU32 _tmplen = (BLU32)strlen(_Filename);
@@ -12520,6 +12586,7 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			_widget->uExtension.sLabel.pRowCells = blGenArray(FALSE);
 			_widget->uExtension.sLabel.pAnchoredCells = blGenArray(FALSE);
             _widget->uExtension.sLabel.nPixmapTex = INVALID_GUID;
+			_widget->uExtension.sLabel.nExTex = INVALID_GUID;
 			_widget->uExtension.sLabel.pTexData = NULL;
 		}
 		break;
@@ -13728,6 +13795,14 @@ blUILabelFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 BLVoid 
 blUILabelTexture(IN BLGuid _ID, IN BLGuid _Tex)
 {
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_LABEL)
+		return;
+	_widget->uExtension.sLabel.nExTex = _Tex;
+	_widget->bValid = TRUE;
+	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
 blUICheckPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)

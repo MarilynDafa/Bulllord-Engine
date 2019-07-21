@@ -254,7 +254,12 @@ BL_API BLBool blSpriteActionAlpha(
 	IN BLF32 _Time,
 	IN BLBool _Loop);
 
-BL_API BLBool blSpriteRenderTexture(
+BL_API BLGuid blGenSpriteRT(
+	IN BLGuid _ID,
+	IN BLU32 _Width,
+	IN BLU32 _Height);
+
+BL_API BLVoid blDeleteSpriteRT(
 	IN BLGuid _ID,
 	IN BLGuid _Tex);
     

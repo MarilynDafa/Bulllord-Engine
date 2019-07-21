@@ -30,6 +30,8 @@ BL_API BLVoid blUIStyle(
 	IN BLU32 _SelectRangeColor,
 	IN BLU32 _TextDisableColor);
 
+BL_API BLVoid blUIDirty();
+
 BL_API BLGuid blUIFile(
 	IN BLAnsi* _Filename);
 
