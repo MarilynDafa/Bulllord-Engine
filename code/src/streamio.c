@@ -305,58 +305,6 @@ _StreamIOInit(DUK_CONTEXT* _DKC, BLVoid* _AssetMgr)
 	_PrStreamIOMem->pLoadThread = blGenThread(_LoadThreadFunc, NULL, NULL);
 	blThreadRun(_PrStreamIOMem->pLoadThread);
 #endif
-	blArchiveRegist("localdata0079.bpk", "localdata0079");
-	blArchiveRegist("remotedata0084.bpk", "remotedata0084");
-	BLAnsi _path[260];
-	strcpy(_path, blUserFolderDir());
-	BLAnsi** _pats = NULL;
-	BLU32 _patnum = 0;
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-	WIN32_FIND_DATA _filedata;
-	HANDLE _filelist;
-	strcat(_path, "*.pat");
-	WCHAR _wpath[260] = { 0 };
-	MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wpath, sizeof(_wpath));
-	_filelist = FindFirstFileW(_wpath, &_filedata);
-	do
-	{
-		if (_filedata.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
-		{
-			_patnum++;
-			_pats = (BLAnsi**)realloc(_pats, _patnum * sizeof(BLAnsi*));
-			_pats[_patnum - 1] = (BLAnsi*)alloca(wcslen(_filedata.cFileName) + 1);
-			BLUtf8 _tmp[1024] = { 0 };
-			WideCharToMultiByte(CP_UTF8, 0, _filedata.cFileName, -1, (LPSTR)_tmp, 1024, NULL, NULL);
-			strcpy(_pats[_patnum - 1], (const BLAnsi*)_tmp);
-			_pats[_patnum - 1][wcslen(_filedata.cFileName)] = 0;
-		}
-	} while (FindNextFile(_filelist, &_filedata));
-#else
-#endif
-	for (BLU32 _idx = 0; _idx < _patnum; ++_idx)
-	{
-		for (BLU32 _jdx = 0; _idx + _jdx < _patnum - 1; ++_jdx)
-		{
-			if (blNatCompare(_pats[_jdx], _pats[_jdx + 1]) > 0)
-			{
-				BLAnsi* _temp = _pats[_jdx];
-				_pats[_jdx] = _pats[_jdx + 1];
-				_pats[_jdx + 1] = _temp;
-			}
-		}
-	}
-	for (BLU32 _idx = 0; _idx < _patnum; ++_idx)
-	{
-		memset(_path, 0, sizeof(_path));
-		strcpy(_path, blUserFolderDir());
-		strcat(_path, _pats[_idx]);
-		if (!strncmp(_pats[_idx], "local", 5))
-			blArchivePatch(_path, "localdata0079");
-		else if (!strncmp(_pats[_idx], "remot", 5))
-			blArchivePatch(_path, "remotedata0084");
-	}
-	if (_pats)
-		free(_pats);
 	blDebugOutput("IO initialize successfully");
 }
 BLVoid

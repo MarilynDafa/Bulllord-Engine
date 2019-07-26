@@ -668,14 +668,14 @@ _FontFace(const BLAnsi* _Filename)
 		return FALSE;
 }
 static _BLWidget*
-_WidgetQuery(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren_)
+_WidgetQuery(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren)
 {
 	_BLWidget* _ret = NULL;
 	FOREACH_ARRAY(_BLWidget*, _iter, _Node->pChildren)
 	{
 		if (URIPART_INTERNAL(_iter->nID) == _HashName)
 			return _iter;
-		if (_SearchChildren_)
+		if (_SearchChildren)
 			_ret = _WidgetQuery(_iter, _HashName, TRUE);
 		if (_ret)
 			return _ret;
