@@ -12848,6 +12848,7 @@ blUIAttach(IN BLGuid _Parent, IN BLGuid _Child)
 	}
 	blArrayPushBack(_parent->pChildren, _child);
 	_child->pParent = _parent;
+	_PrUIMem->bDirty = TRUE;
 	return TRUE;
 }
 BLBool 
@@ -12875,6 +12876,7 @@ blUIDetach(IN BLGuid _ID)
 	if (_ret)
 		blArrayErase(_widget->pParent->pChildren, _idx);
 	_widget->pParent = NULL;
+	_PrUIMem->bDirty = TRUE;
 	return _ret;
 }
 BLEnum
@@ -12895,6 +12897,7 @@ blUIPosition(IN BLGuid _ID, IN BLS32 _XPos, IN BLS32 _YPos)
 		return;
 	_widget->sPosition.fX = (BLF32)_XPos;
 	_widget->sPosition.fY = (BLF32)_YPos;
+	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
 blUIGetPosition(IN BLGuid _ID, OUT BLS32* _XPos, OUT BLS32* _YPos)
@@ -12913,6 +12916,7 @@ blUIScale(IN BLGuid _ID, IN BLF32 _ScaleX, IN BLF32 _ScaleY)
 		return;
 	_widget->fScaleX = _ScaleX;
 	_widget->fScaleY = _ScaleY;
+	_PrUIMem->bDirty = TRUE;
 }
 BLVoid 
 blUIGetScale(IN BLGuid _ID, OUT BLF32* _ScaleX, OUT BLF32* _ScaleY)
@@ -12931,6 +12935,7 @@ blUIPivot(IN BLGuid _ID, IN BLF32 _PivotX, IN BLF32 _PivotY)
 		return;
 	_widget->sPivot.fX = blScalarClamp(_PivotX, 0.f, 1.f);
 	_widget->sPivot.fY = blScalarClamp(_PivotY, 0.f, 1.f);
+	_PrUIMem->bDirty = TRUE;
 }
 BLVoid 
 blUIGetPivot(IN BLGuid _ID, OUT BLF32* _PivotX, OUT BLF32* _PivotY)
@@ -12942,7 +12947,7 @@ blUIGetPivot(IN BLGuid _ID, OUT BLF32* _PivotX, OUT BLF32* _PivotY)
 	*_PivotY = _widget->sPivot.fY;
 }
 BLVoid
-blUISize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
+blUIDimension(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -12956,9 +12961,10 @@ blUISize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
 		_widget->sDimension.fY = (BLF32)MIN_INTERNAL(_widget->nMaxHeight, (BLU32)_widget->sDimension.fY);
 	_widget->sDimension.fX = (BLF32)MAX_INTERNAL(MAX_INTERNAL(1, _widget->nMinWidth), (BLU32)_widget->sDimension.fX);
 	_widget->sDimension.fY = (BLF32)MAX_INTERNAL(MAX_INTERNAL(1, _widget->nMinHeight), (BLU32)_widget->sDimension.fY);
+	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIGetSize(IN BLGuid _ID, OUT BLU32* _Width, OUT BLU32* _Height)
+blUIGetDimension(IN BLGuid _ID, OUT BLU32* _Width, OUT BLU32* _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)

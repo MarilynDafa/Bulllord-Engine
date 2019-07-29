@@ -86,12 +86,12 @@ BL_API BLVoid blUIGetScale(
 	OUT BLF32* _ScaleX,
 	OUT BLF32* _ScaleY);
 
-BL_API BLVoid blUISize(
+BL_API BLVoid blUIDimension(
 	IN BLGuid _ID,
 	IN BLU32 _Width,
 	IN BLU32 _Height);
 
-BL_API BLVoid blUIGetSize(
+BL_API BLVoid blUIGetDimension(
 	IN BLGuid _ID,
 	OUT BLU32* _Width,
 	OUT BLU32* _Height);
