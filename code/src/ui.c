@@ -13315,6 +13315,16 @@ blUIPanelDragable(IN BLGuid _ID, IN BLBool _Dragable)
 	}
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUIPanelGetDragable(IN BLGuid _ID, OUT BLBool* _Dragable)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PANEL)
+		return;
+	*_Dragable = _widget->uExtension.sPanel.bDragable;
+}
 BLVoid
 blUIPanelBasePlate(IN BLGuid _ID, IN BLBool _BasePlate)
 {
@@ -13334,6 +13344,16 @@ blUIPanelBasePlate(IN BLGuid _ID, IN BLBool _BasePlate)
 	else if(!_BasePlate && _widget == _PrUIMem->pBasePlate)
 		_PrUIMem->pBasePlate = NULL;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUIPanelGetBasePlate(IN BLGuid _ID, OUT BLBool* _BasePlate)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PANEL)
+		return;
+	*_BasePlate = _widget->uExtension.sPanel.bBasePlate;
 }
 BLVoid
 blUIPanelModal(IN BLGuid _ID, IN BLBool _Modal)
@@ -13357,6 +13377,16 @@ blUIPanelModal(IN BLGuid _ID, IN BLBool _Modal)
 		_PrUIMem->pModalWidget = NULL;
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUIPanelGetModal(IN BLGuid _ID, OUT BLBool* _Modal)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PANEL)
+		return;
+	*_Modal = _widget->uExtension.sPanel.bModal;
+}
 BLVoid
 blUIPanelScrollable(IN BLGuid _ID, IN BLBool _Scrollable)
 {
@@ -13375,6 +13405,16 @@ blUIPanelScrollable(IN BLGuid _ID, IN BLBool _Scrollable)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
+blUIPanelGetScrollable(IN BLGuid _ID, OUT BLBool* _Scrollable)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PANEL)
+		return;
+	*_Scrollable = _widget->uExtension.sPanel.bScrollable;
+}
+BLVoid
 blUIPanelFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -13385,6 +13425,17 @@ blUIPanelFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_widget->uExtension.sPanel.bFlipX = _FlipX;
 	_widget->uExtension.sPanel.bFlipY = _FlipY;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUIPanelGetFlip(IN BLGuid _ID, OUT BLBool* _FlipX, OUT BLBool* _FlipY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PANEL)
+		return;
+	*_FlipX = _widget->uExtension.sPanel.bFlipX;
+	*_FlipY = _widget->uExtension.sPanel.bFlipY;
 }
 BLVoid 
 blUIPanelLayout(IN BLGuid _ID, IN BLBool _GeometricScale, IN BLU32 _PaddingTop, IN BLU32 _PaddingLeft, IN BLU32 _PaddingBottom, IN BLU32 _PaddingRight, IN BLU32 _GapH, IN BLU32 _GapV, IN BLU32 _Columns)

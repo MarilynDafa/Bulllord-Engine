@@ -209,22 +209,43 @@ BL_API BLVoid blUIPanelDragable(
 	IN BLGuid _ID,
 	IN BLBool _Dragable);
 
+BL_API BLVoid blUIPanelGetDragable(
+	IN BLGuid _ID,
+	OUT BLBool* _Dragable);
+
 BL_API BLVoid blUIPanelBasePlate(
 	IN BLGuid _ID,
 	IN BLBool _BasePlate);
+
+BL_API BLVoid blUIPanelGetBasePlate(
+	IN BLGuid _ID,
+	OUT BLBool* _BasePlate);
 
 BL_API BLVoid blUIPanelModal(
 	IN BLGuid _ID,
 	IN BLBool _Modal);
 
+BL_API BLVoid blUIPanelGetModal(
+	IN BLGuid _ID,
+	OUT BLBool* _Modal);
+
 BL_API BLVoid blUIPanelScrollable(
 	IN BLGuid _ID,
 	IN BLBool _Scrollable);
+
+BL_API BLVoid blUIPanelGetScrollable(
+	IN BLGuid _ID,
+	OUT BLBool* _Scrollable);
 
 BL_API BLVoid blUIPanelFlip(
 	IN BLGuid _ID,
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
+
+BL_API BLVoid blUIPanelGetFlip(
+	IN BLGuid _ID,
+	OUT BLBool* _FlipX,
+	OUT BLBool* _FlipY);
 
 BL_API BLVoid blUIPanelLayout(
 	IN BLGuid _ID,
