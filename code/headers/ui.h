@@ -195,7 +195,11 @@ BL_API BLVoid blUIPanelPixmap(
 
 BL_API BLVoid blUIPanelStencilMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _StencilMap);
+	IN BLAnsi* _StencilMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUIPanelCommonMap(
 	IN BLGuid _ID,
@@ -268,7 +272,11 @@ BL_API BLVoid blUIButtonPixmap(
 
 BL_API BLVoid blUIButtonStencilMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _StencilMap);
+	IN BLAnsi* _StencilMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUIButtonCommonMap(
 	IN BLGuid _ID,
@@ -349,7 +357,11 @@ BL_API BLVoid blUILabelPixmap(
 
 BL_API BLVoid blUILabelStencilMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _StencilMap);
+	IN BLAnsi* _StencilMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUILabelCommonMap(
 	IN BLGuid _ID,
@@ -400,7 +412,11 @@ BL_API BLVoid blUICheckPixmap(
 
 BL_API BLVoid blUICheckStencilMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _StencilMap);
+	IN BLAnsi* _StencilMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUICheckCommonMap(
 	IN BLGuid _ID,
@@ -476,7 +492,11 @@ BL_API BLVoid blUITextPixmap(
 
 BL_API BLVoid blUITextStencilMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _StencilMap);
+	IN BLAnsi* _StencilMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUITextCommonMap(
 	IN BLGuid _ID,
@@ -557,7 +577,11 @@ BL_API BLVoid blUIProgressPixmap(
 
 BL_API BLVoid blUIProgressStencilMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _StencilMap);
+	IN BLAnsi* _StencilMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUIProgressCommonMap(
 	IN BLGuid _ID,
@@ -573,7 +597,11 @@ BL_API BLVoid blUIProgressCommonMap(
 
 BL_API BLVoid blUIProgressFillMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _FillMap);
+	IN BLAnsi* _FillMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUIProgressPercent(
 	IN BLGuid _ID,
@@ -612,7 +640,11 @@ BL_API BLVoid blUISliderPixmap(
 
 BL_API BLVoid blUISliderStencilMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _StencilMap);
+	IN BLAnsi* _StencilMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUISliderCommonMap(
 	IN BLGuid _ID,
@@ -640,11 +672,19 @@ BL_API BLVoid blUISliderDisableMap(
 
 BL_API BLVoid blUISliderSliderCommonMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _SliderCommonMap);
+	IN BLAnsi* _SliderCommonMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUISliderSliderDisableMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _SliderDisableMap);
+	IN BLAnsi* _SliderDisableMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUISliderHorizontal(
 	IN BLGuid _ID,
@@ -686,7 +726,11 @@ BL_API BLVoid blUITablePixmap(
 
 BL_API BLVoid blUITableStencilMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _StencilMap);
+	IN BLAnsi* _StencilMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUITableCommonMap(
 	IN BLGuid _ID,
@@ -702,11 +746,19 @@ BL_API BLVoid blUITableCommonMap(
 
 BL_API BLVoid blUITableOddItemMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _OddItemMap);
+	IN BLAnsi* _OddItemMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUITableEvenItemMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _EvenItemMap);
+	IN BLAnsi* _EvenItemMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUITableMaking(
 	IN BLGuid _ID,
@@ -755,11 +807,19 @@ BL_API BLVoid blUIDialPixmap(
 
 BL_API BLVoid blUIDialStencilMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _StencilMap);
+	IN BLAnsi* _StencilMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUIDialCommonMap(
 	IN BLGuid _ID,
-	IN BLAnsi* _CommonMap);
+	IN BLAnsi* _CommonMap,
+	IN BLF32 _Left,
+	IN BLF32 _Top,
+	IN BLF32 _Right,
+	IN BLF32 _Bottom);
 
 BL_API BLVoid blUIDialAngle(
 	IN BLGuid _ID,
