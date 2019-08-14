@@ -11884,7 +11884,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIPenetration(_widguid, _penetrationvar);
 			blUIPanelFlip(_widguid, _flipxvar, _flipyvar);
 			blUIPanelStencilMap(_widguid, _stencilmap);
-			blUIPanelCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUIPanelCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3], _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
 			blUIPanelDragable(_widguid, _dragablevar);
 			blUIPanelBasePlate(_widguid, _baseplatevar);
 			blUIPanelModal(_widguid, _modalvar);
@@ -11987,10 +11987,10 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIButtonFlip(_widguid, _flipxvar, _flipyvar);
 			blUIButtonText(_widguid, (const BLUtf8*)_text, _textcolorvar, _txtha, _txtva);
             blUIButtonStencilMap(_widguid, _stencilmap);
-            blUIButtonCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
-            blUIButtonHoverMap(_widguid, _hoveredmap, _hoveredtexcoordvar[0], _hoveredtexcoordvar[1], _hoveredtexcoordvar[2], _hoveredtexcoordvar[3]);
-            blUIButtonPressMap(_widguid, _pressedmap, _pressedtexcoordvar[0], _pressedtexcoordvar[1], _pressedtexcoordvar[2], _pressedtexcoordvar[3]);
-            blUIButtonDisableMap(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
+            blUIButtonCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3], _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+            blUIButtonHoverMap(_widguid, _hoveredmap, _hoveredtexcoordvar[0], _hoveredtexcoordvar[1], _hoveredtexcoordvar[2], _hoveredtexcoordvar[3], _hoveredtexcoordvar[0], _hoveredtexcoordvar[1], _hoveredtexcoordvar[2], _hoveredtexcoordvar[3]);
+            blUIButtonPressMap(_widguid, _pressedmap, _pressedtexcoordvar[0], _pressedtexcoordvar[1], _pressedtexcoordvar[2], _pressedtexcoordvar[3], _pressedtexcoordvar[0], _pressedtexcoordvar[1], _pressedtexcoordvar[2], _pressedtexcoordvar[3]);
+            blUIButtonDisableMap(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3], _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
             blUIButtonEnable(_widguid, _enablevar);
 			blUIButtonPixmap(_widguid, _pixmap);
 			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
@@ -12031,7 +12031,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUILabelFlip(_widguid, _flipxvar, _flipyvar);
 			blUILableText(_widguid, (const BLUtf8*)_text, 0xFFFFFFFF, 0, 0, NULL, 0, FALSE, FALSE, FALSE, FALSE, TRUE);
 			blUILabelStencilMap(_widguid, _stencilmap);
-			blUILabelCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUILabelCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3], _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
 			blUILabelPadding(_widguid, _paddingvar[0], _paddingvar[1]);
 			blUILabelPixmap(_widguid, _pixmap);
 			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
@@ -12120,9 +12120,9 @@ blUIFile(IN BLAnsi* _Filename)
 			blUICheckFlip(_widguid, _flipxvar, _flipyvar);
 			blUICheckText(_widguid, (const BLUtf8*)_text, _textcolorvar, _txtha, _txtva);
 			blUICheckStencilMap(_widguid, _stencilmap);
-			blUICheckCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
-			blUICheckCheckedMap(_widguid, _checkedmap, _checkedtexcoordvar[0], _checkedtexcoordvar[1], _checkedtexcoordvar[2], _checkedtexcoordvar[3]);
-			blUICheckDisableMap(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
+			blUICheckCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3], _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUICheckCheckedMap(_widguid, _checkedmap, _checkedtexcoordvar[0], _checkedtexcoordvar[1], _checkedtexcoordvar[2], _checkedtexcoordvar[3], _checkedtexcoordvar[0], _checkedtexcoordvar[1], _checkedtexcoordvar[2], _checkedtexcoordvar[3]);
+			blUICheckDisableMap(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3], _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
 			blUICheckEnable(_widguid, _enablevar);
 			blUICheckPixmap(_widguid, _pixmap);
 			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
@@ -12212,7 +12212,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUITextPlaceholder(_widguid, (const BLUtf8*)_placeholder, _phcolorvar);
 			blUITextText(_widguid, NULL, _textcolorvar, _txtha, _txtva);
 			blUITextStencilMap(_widguid, _stencilmap);
-			blUITextCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUITextCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3], _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
 			blUITextTypography(_widguid, _autoscrollvar, _multilinevar);
 			blUITextPassword(_widguid, _passwordvar);
 			blUITextNumeric(_widguid, _numericvar, _numericrangevar[0], _numericrangevar[1]);
@@ -12275,7 +12275,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIProgressFlip(_widguid, _flipxvar, _flipyvar);
 			blUIProgressText(_widguid, (const BLUtf8*)_text, _textcolorvar);
 			blUIProgressStencilMap(_widguid, _stencilmap);
-			blUIProgressCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUIProgressCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3], _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
 			blUIProgressFillMap(_widguid, _fillmap);
 			blUIProgressPercent(_widguid, _percentvar);
 			blUIProgressBorder(_widguid, _bordevarr[0], _bordevarr[1]);
@@ -12342,8 +12342,8 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIPenetration(_widguid, _penetrationvar);
 			blUISliderFlip(_widguid, _flipxvar, _flipyvar);
 			blUISliderStencilMap(_widguid, _stencilmap);
-			blUISliderCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
-			blUISliderDisableMap(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
+			blUISliderCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3], _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUISliderDisableMap(_widguid, _disablemap, _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3], _disabletexcoordvar[0], _disabletexcoordvar[1], _disabletexcoordvar[2], _disabletexcoordvar[3]);
 			blUISliderSliderCommonMap(_widguid, _slidercommonmap);
 			blUISliderSliderDisableMap(_widguid, _slidersisablemap);
 			blUISliderHorizontal(_widguid, _orientationvar);
@@ -12398,7 +12398,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIScissor(_widguid, _clipedvar, _absvar);
 			blUIPenetration(_widguid, _penetrationvar);
 			blUITableStencilMap(_widguid, _stencilmap);
-			blUITableCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
+			blUITableCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3], _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
 			blUITableOddItemMap(_widguid, _odditemmap);
 			blUITableEvenItemMap(_widguid, _evenitemmap);
 			blUITableFont(_widguid, _fontsrc, _fontsizevar, _fontoutlinevar, _fontboldvar, _fontshadowvar, _fontitalicsvar);
@@ -12905,8 +12905,8 @@ blUIGetPosition(IN BLGuid _ID, OUT BLS32* _XPos, OUT BLS32* _YPos)
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
 		return;
-	*_XPos = (BLS32)((_widget->sAbsRegion.sLT.fX + _widget->sAbsRegion.sRB.fX) * 0.5f);
-	*_YPos = (BLS32)((_widget->sAbsRegion.sLT.fY + _widget->sAbsRegion.sRB.fY) * 0.5f);
+	*_XPos = _widget->sPosition.fX;
+	*_YPos = _widget->sPosition.fY;
 }
 BLVoid 
 blUIScale(IN BLGuid _ID, IN BLF32 _ScaleX, IN BLF32 _ScaleY)
@@ -13240,7 +13240,8 @@ blUIPanelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 		return;
 	if (_widget->eType != BL_UT_PANEL)
 		return;
-	memset(_widget->uExtension.sPanel.aPixmap, 0, sizeof(BLAnsi) * 128);	
+	memset(_widget->uExtension.sPanel.aPixmap, 0, sizeof(BLAnsi) * 128);
+	_widget->uExtension.sPanel.nPixmapTex = INVALID_GUID;
 	BLAnsi _texfile[260] = { 0 };
 	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
@@ -13279,7 +13280,7 @@ blUIPanelStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIPanelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIPanelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -13288,14 +13289,14 @@ blUIPanelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN B
 		return;
 	memset(_widget->uExtension.sPanel.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sPanel.aCommonMap, _CommonMap);
-	_widget->uExtension.sPanel.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sPanel.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sPanel.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sPanel.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sPanel.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sPanel.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sPanel.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sPanel.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sPanel.sCommonTex.sLT.fX = _Left;
+	_widget->uExtension.sPanel.sCommonTex.sLT.fY = _Top;
+	_widget->uExtension.sPanel.sCommonTex.sRB.fX = _Right;
+	_widget->uExtension.sPanel.sCommonTex.sRB.fY = _Bottom;
+	_widget->uExtension.sPanel.sCommonTex9.sLT.fX = _Left9;
+	_widget->uExtension.sPanel.sCommonTex9.sLT.fY = _Top9;
+	_widget->uExtension.sPanel.sCommonTex9.sRB.fX = _Right9;
+	_widget->uExtension.sPanel.sCommonTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -13493,6 +13494,7 @@ blUIButtonPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_BUTTON)
 		return;
 	memset(_widget->uExtension.sButton.aPixmap, 0, sizeof(BLAnsi) * 128);
+	_widget->uExtension.sButton.nPixmapTex = INVALID_GUID;
     BLAnsi _texfile[260] = { 0 };
 	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
@@ -13531,7 +13533,7 @@ blUIButtonStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIButtonCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIButtonCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -13540,18 +13542,18 @@ blUIButtonCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN 
 		return;
 	memset(_widget->uExtension.sButton.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aCommonMap, _CommonMap);
-	_widget->uExtension.sButton.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sButton.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sButton.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sButton.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sButton.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sButton.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sButton.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sButton.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sButton.sCommonTex.sLT.fX = _Left;
+	_widget->uExtension.sButton.sCommonTex.sLT.fY = _Top;
+	_widget->uExtension.sButton.sCommonTex.sRB.fX = _Right;
+	_widget->uExtension.sButton.sCommonTex.sRB.fY = _Bottom;
+	_widget->uExtension.sButton.sCommonTex9.sLT.fX = _Left9;
+	_widget->uExtension.sButton.sCommonTex9.sLT.fY = _Top9;
+	_widget->uExtension.sButton.sCommonTex9.sRB.fX = _Right9;
+	_widget->uExtension.sButton.sCommonTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIButtonHoverMap(IN BLGuid _ID, IN BLAnsi* _HoveredMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIButtonHoverMap(IN BLGuid _ID, IN BLAnsi* _HoveredMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -13560,18 +13562,18 @@ blUIButtonHoverMap(IN BLGuid _ID, IN BLAnsi* _HoveredMap, IN BLF32 _CenterX, IN 
 		return;
 	memset(_widget->uExtension.sButton.aHoveredMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aHoveredMap, _HoveredMap);
-	_widget->uExtension.sButton.sHoveredTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sButton.sHoveredTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sButton.sHoveredTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sButton.sHoveredTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sButton.sHoveredTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sButton.sHoveredTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sButton.sHoveredTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sButton.sHoveredTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sButton.sHoveredTex.sLT.fX = _Left;
+	_widget->uExtension.sButton.sHoveredTex.sLT.fY = _Top;
+	_widget->uExtension.sButton.sHoveredTex.sRB.fX = _Right;
+	_widget->uExtension.sButton.sHoveredTex.sRB.fY = _Bottom;
+	_widget->uExtension.sButton.sHoveredTex9.sLT.fX = _Left9;
+	_widget->uExtension.sButton.sHoveredTex9.sLT.fY = _Right9;
+	_widget->uExtension.sButton.sHoveredTex9.sRB.fX = _Top9;
+	_widget->uExtension.sButton.sHoveredTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIButtonPressMap(IN BLGuid _ID, IN BLAnsi* _PressedMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIButtonPressMap(IN BLGuid _ID, IN BLAnsi* _PressedMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -13580,18 +13582,18 @@ blUIButtonPressMap(IN BLGuid _ID, IN BLAnsi* _PressedMap, IN BLF32 _CenterX, IN 
 		return;
 	memset(_widget->uExtension.sButton.aPressedMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aPressedMap, _PressedMap);
-	_widget->uExtension.sButton.sPressedTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sButton.sPressedTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sButton.sPressedTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sButton.sPressedTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sButton.sPressedTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sButton.sPressedTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sButton.sPressedTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sButton.sPressedTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sButton.sPressedTex.sLT.fX = _Left;
+	_widget->uExtension.sButton.sPressedTex.sLT.fY = _Top;
+	_widget->uExtension.sButton.sPressedTex.sRB.fX = _Right;
+	_widget->uExtension.sButton.sPressedTex.sRB.fY = _Bottom;
+	_widget->uExtension.sButton.sPressedTex9.sLT.fX = _Left9;
+	_widget->uExtension.sButton.sPressedTex9.sLT.fY = _Right9;
+	_widget->uExtension.sButton.sPressedTex9.sRB.fX = _Top9;
+	_widget->uExtension.sButton.sPressedTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIButtonDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIButtonDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -13600,14 +13602,14 @@ blUIButtonDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, I
 		return;
 	memset(_widget->uExtension.sButton.aDisableMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aDisableMap, _DisableMap);
-	_widget->uExtension.sButton.sDisableTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sButton.sDisableTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sButton.sDisableTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sButton.sDisableTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sButton.sDisableTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sButton.sDisableTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sButton.sDisableTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sButton.sDisableTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sButton.sDisableTex.sLT.fX = _Left;
+	_widget->uExtension.sButton.sDisableTex.sLT.fY = _Top;
+	_widget->uExtension.sButton.sDisableTex.sRB.fX = _Right;
+	_widget->uExtension.sButton.sDisableTex.sRB.fY = _Bottom;
+	_widget->uExtension.sButton.sDisableTex9.sLT.fX = _Left9;
+	_widget->uExtension.sButton.sDisableTex9.sLT.fY = _Right9;
+	_widget->uExtension.sButton.sDisableTex9.sRB.fX = _Top9;
+	_widget->uExtension.sButton.sDisableTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -13702,6 +13704,7 @@ blUILabelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_LABEL)
 		return;
 	memset(_widget->uExtension.sLabel.aPixmap, 0, sizeof(BLAnsi) * 128);
+	_widget->uExtension.sLabel.nPixmapTex = INVALID_GUID;
 	BLAnsi _texfile[260] = { 0 };
 	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
@@ -13740,7 +13743,7 @@ blUILabelStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUILabelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUILabelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -13749,14 +13752,14 @@ blUILabelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN B
 		return;
 	memset(_widget->uExtension.sLabel.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sLabel.aCommonMap, _CommonMap);
-	_widget->uExtension.sLabel.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sLabel.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sLabel.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sLabel.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sLabel.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sLabel.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sLabel.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sLabel.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sLabel.sCommonTex.sLT.fX = _Left;
+	_widget->uExtension.sLabel.sCommonTex.sLT.fY = _Top;
+	_widget->uExtension.sLabel.sCommonTex.sRB.fX = _Right;
+	_widget->uExtension.sLabel.sCommonTex.sRB.fY = _Bottom;
+	_widget->uExtension.sLabel.sCommonTex9.sLT.fX = _Left9;
+	_widget->uExtension.sLabel.sCommonTex9.sLT.fY = _Top9;
+	_widget->uExtension.sLabel.sCommonTex9.sRB.fX = _Right9;
+	_widget->uExtension.sLabel.sCommonTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -13870,6 +13873,7 @@ blUICheckPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_CHECK)
 		return;
 	memset(_widget->uExtension.sCheck.aPixmap, 0, sizeof(BLAnsi) * 128);
+	_widget->uExtension.sCheck.nPixmapTex = INVALID_GUID;
 	BLAnsi _texfile[260] = { 0 };
 	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
@@ -13908,7 +13912,7 @@ blUICheckStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUICheckCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUICheckCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -13917,18 +13921,18 @@ blUICheckCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN B
 		return;
 	memset(_widget->uExtension.sCheck.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sCheck.aCommonMap, _CommonMap);
-	_widget->uExtension.sCheck.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sCheck.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sCheck.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sCheck.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sCheck.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sCheck.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sCheck.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sCheck.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sCheck.sCommonTex.sLT.fX = _Left;
+	_widget->uExtension.sCheck.sCommonTex.sLT.fY = _Top;
+	_widget->uExtension.sCheck.sCommonTex.sRB.fX = _Right;
+	_widget->uExtension.sCheck.sCommonTex.sRB.fY = _Bottom;
+	_widget->uExtension.sCheck.sCommonTex9.sLT.fX = _Left9;
+	_widget->uExtension.sCheck.sCommonTex9.sLT.fY = _Top9;
+	_widget->uExtension.sCheck.sCommonTex9.sRB.fX = _Right9;
+	_widget->uExtension.sCheck.sCommonTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUICheckCheckedMap(IN BLGuid _ID, IN BLAnsi* _CheckedMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUICheckCheckedMap(IN BLGuid _ID, IN BLAnsi* _CheckedMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -13937,18 +13941,18 @@ blUICheckCheckedMap(IN BLGuid _ID, IN BLAnsi* _CheckedMap, IN BLF32 _CenterX, IN
 		return;
 	memset(_widget->uExtension.sCheck.aCheckedMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sCheck.aCheckedMap, _CheckedMap);
-	_widget->uExtension.sCheck.sCheckedTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sCheck.sCheckedTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sCheck.sCheckedTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sCheck.sCheckedTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sCheck.sCheckedTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sCheck.sCheckedTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sCheck.sCheckedTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sCheck.sCheckedTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sCheck.sCheckedTex.sLT.fX = _Left;
+	_widget->uExtension.sCheck.sCheckedTex.sLT.fY = _Top;
+	_widget->uExtension.sCheck.sCheckedTex.sRB.fX = _Right;
+	_widget->uExtension.sCheck.sCheckedTex.sRB.fY = _Bottom;
+	_widget->uExtension.sCheck.sCheckedTex9.sLT.fX = _Left9;
+	_widget->uExtension.sCheck.sCheckedTex9.sLT.fY = _Top9;
+	_widget->uExtension.sCheck.sCheckedTex9.sRB.fX = _Right9;
+	_widget->uExtension.sCheck.sCheckedTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUICheckDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUICheckDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -13957,14 +13961,14 @@ blUICheckDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN
 		return;
 	memset(_widget->uExtension.sCheck.aDisableMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sCheck.aDisableMap, _DisableMap);
-	_widget->uExtension.sCheck.sDisableTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sCheck.sDisableTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sCheck.sDisableTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sCheck.sDisableTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sCheck.sDisableTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sCheck.sDisableTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sCheck.sDisableTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sCheck.sDisableTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sCheck.sDisableTex.sLT.fX = _Left;
+	_widget->uExtension.sCheck.sDisableTex.sLT.fY = _Top;
+	_widget->uExtension.sCheck.sDisableTex.sRB.fX = _Right;
+	_widget->uExtension.sCheck.sDisableTex.sRB.fY = _Bottom;
+	_widget->uExtension.sCheck.sDisableTex9.sLT.fX = _Left9;
+	_widget->uExtension.sCheck.sDisableTex9.sLT.fY = _Top9;
+	_widget->uExtension.sCheck.sDisableTex9.sRB.fX = _Right9;
+	_widget->uExtension.sCheck.sDisableTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -14078,6 +14082,7 @@ blUITextPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_TEXT)
 		return;
 	memset(_widget->uExtension.sText.aPixmap, 0, sizeof(BLAnsi) * 128);
+	_widget->uExtension.sText.nPixmapTex = INVALID_GUID;
 	BLAnsi _texfile[260] = { 0 };
 	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
@@ -14116,7 +14121,7 @@ blUITextStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUITextCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUITextCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -14125,14 +14130,14 @@ blUITextCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BL
 		return;
 	memset(_widget->uExtension.sText.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sText.aCommonMap, _CommonMap);
-	_widget->uExtension.sText.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sText.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sText.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sText.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sText.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sText.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sText.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sText.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sText.sCommonTex.sLT.fX = _Left;
+	_widget->uExtension.sText.sCommonTex.sLT.fY = _Top;
+	_widget->uExtension.sText.sCommonTex.sRB.fX = _Right;
+	_widget->uExtension.sText.sCommonTex.sRB.fY = _Bottom;
+	_widget->uExtension.sText.sCommonTex9.sLT.fX = _Left9;
+	_widget->uExtension.sText.sCommonTex9.sLT.fY = _Top9;
+	_widget->uExtension.sText.sCommonTex9.sRB.fX = _Right9;
+	_widget->uExtension.sText.sCommonTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -14360,6 +14365,7 @@ blUIProgressPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_PROGRESS)
 		return;
 	memset(_widget->uExtension.sProgress.aPixmap, 0, sizeof(BLAnsi) * 128);
+	_widget->uExtension.sProgress.nPixmapTex = INVALID_GUID;
 	BLAnsi _texfile[260] = { 0 };
 	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
@@ -14398,7 +14404,7 @@ blUIProgressStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUIProgressCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUIProgressCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -14407,14 +14413,14 @@ blUIProgressCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, I
 		return;
 	memset(_widget->uExtension.sProgress.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sProgress.aCommonMap, _CommonMap);
-	_widget->uExtension.sProgress.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sProgress.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sProgress.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sProgress.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sProgress.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sProgress.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sProgress.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sProgress.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sProgress.sCommonTex.sLT.fX = _Left;
+	_widget->uExtension.sProgress.sCommonTex.sLT.fY = _Top;
+	_widget->uExtension.sProgress.sCommonTex.sRB.fX = _Right;
+	_widget->uExtension.sProgress.sCommonTex.sRB.fY = _Bottom;
+	_widget->uExtension.sProgress.sCommonTex9.sLT.fX = _Left9;
+	_widget->uExtension.sProgress.sCommonTex9.sLT.fY = _Top9;
+	_widget->uExtension.sProgress.sCommonTex9.sRB.fX = _Right9;
+	_widget->uExtension.sProgress.sCommonTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -14541,6 +14547,7 @@ blUISliderPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_SLIDER)
 		return;
 	memset(_widget->uExtension.sSlider.aPixmap, 0, sizeof(BLAnsi) * 128);
+	_widget->uExtension.sSlider.nPixmapTex = INVALID_GUID;
 	BLAnsi _texfile[260] = { 0 };
 	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
@@ -14579,7 +14586,7 @@ blUISliderStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUISliderCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUISliderCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -14588,18 +14595,18 @@ blUISliderCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN 
 		return;
 	memset(_widget->uExtension.sSlider.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sSlider.aCommonMap, _CommonMap);
-	_widget->uExtension.sSlider.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sSlider.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sSlider.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sSlider.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sSlider.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sSlider.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sSlider.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sSlider.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sSlider.sCommonTex.sLT.fX = _Left;
+	_widget->uExtension.sSlider.sCommonTex.sLT.fY = _Top;
+	_widget->uExtension.sSlider.sCommonTex.sRB.fX = _Right;
+	_widget->uExtension.sSlider.sCommonTex.sRB.fY = _Bottom;
+	_widget->uExtension.sSlider.sCommonTex9.sLT.fX = _Left9;
+	_widget->uExtension.sSlider.sCommonTex9.sLT.fY = _Top9;
+	_widget->uExtension.sSlider.sCommonTex9.sRB.fX = _Right9;
+	_widget->uExtension.sSlider.sCommonTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUISliderDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUISliderDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -14608,14 +14615,14 @@ blUISliderDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _CenterX, I
 		return;
 	memset(_widget->uExtension.sSlider.aDisableMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sSlider.aDisableMap, _DisableMap);
-	_widget->uExtension.sSlider.sDisableTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sSlider.sDisableTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sSlider.sDisableTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sSlider.sDisableTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sSlider.sDisableTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sSlider.sDisableTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sSlider.sDisableTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sSlider.sDisableTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sSlider.sDisableTex.sLT.fX = _Left;
+	_widget->uExtension.sSlider.sDisableTex.sLT.fY = _Top;
+	_widget->uExtension.sSlider.sDisableTex.sRB.fX = _Right;
+	_widget->uExtension.sSlider.sDisableTex.sRB.fY = _Bottom;
+	_widget->uExtension.sSlider.sDisableTex9.sLT.fX = _Left9;
+	_widget->uExtension.sSlider.sDisableTex9.sLT.fY = _Top9;
+	_widget->uExtension.sSlider.sDisableTex9.sRB.fX = _Right9;
+	_widget->uExtension.sSlider.sDisableTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -14742,6 +14749,7 @@ blUITablePixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_TABLE)
 		return;
 	memset(_widget->uExtension.sTable.aPixmap, 0, sizeof(BLAnsi) * 128);
+	_widget->uExtension.sTable.nPixmapTex = INVALID_GUID;
 	BLAnsi _texfile[260] = { 0 };
 	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
@@ -14780,7 +14788,7 @@ blUITableStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUITableCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN BLF32 _CenterY, IN BLF32 _Width, IN BLF32 _Height)
+blUITableCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF32 _Top, IN BLF32 _Right, IN BLF32 _Bottom, IN BLF32 _Left9, IN BLF32 _Top9, IN BLF32 _Right9, IN BLF32 _Bottom9)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -14789,14 +14797,14 @@ blUITableCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _CenterX, IN B
 		return;
 	memset(_widget->uExtension.sTable.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sTable.aCommonMap, _CommonMap);
-	_widget->uExtension.sTable.sCommonTex.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sTable.sCommonTex.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sTable.sCommonTex.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sTable.sCommonTex.sRB.fY = _CenterY + _Height * 0.5f;
-	_widget->uExtension.sTable.sCommonTex9.sLT.fX = _CenterX - _Width * 0.5f;
-	_widget->uExtension.sTable.sCommonTex9.sLT.fY = _CenterY - _Height * 0.5f;
-	_widget->uExtension.sTable.sCommonTex9.sRB.fX = _CenterX + _Width * 0.5f;
-	_widget->uExtension.sTable.sCommonTex9.sRB.fY = _CenterY + _Height * 0.5f;
+	_widget->uExtension.sTable.sCommonTex.sLT.fX = _Left;
+	_widget->uExtension.sTable.sCommonTex.sLT.fY = _Top;
+	_widget->uExtension.sTable.sCommonTex.sRB.fX = _Right;
+	_widget->uExtension.sTable.sCommonTex.sRB.fY = _Bottom;
+	_widget->uExtension.sTable.sCommonTex9.sLT.fX = _Left9;
+	_widget->uExtension.sTable.sCommonTex9.sLT.fY = _Top9;
+	_widget->uExtension.sTable.sCommonTex9.sRB.fX = _Right9;
+	_widget->uExtension.sTable.sCommonTex9.sRB.fY = _Bottom9;
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
@@ -15045,6 +15053,7 @@ blUIDialPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
 	if (_widget->eType != BL_UT_DIAL)
 		return;
 	memset(_widget->uExtension.sDial.aPixmap, 0, sizeof(BLAnsi) * 128);
+	_widget->uExtension.sDial.nPixmapTex = INVALID_GUID;
 	BLAnsi _texfile[260] = { 0 };
 	BLU32 _pixlen = (BLU32)strlen(_Pixmap);
 	if (_Pixmap[_pixlen - 1] == 'g' && _Pixmap[_pixlen - 2] == 'm' && _Pixmap[_pixlen - 3] == 'b' && _Pixmap[_pixlen - 4] == '.')
