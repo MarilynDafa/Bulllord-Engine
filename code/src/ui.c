@@ -2525,36 +2525,54 @@ static BLBool
 _UIRelease(BLVoid* _Src)
 {
 	_BLWidget* _node = (_BLWidget*)_Src;
+	BLU32 _pixkey;
+	BLBool _discard = FALSE;
 	switch (_node->eType)
 	{
 	case BL_UT_PANEL:
-		blDeleteTexture(_node->uExtension.sPanel.nPixmapTex);
+		_pixkey = blHashString((const BLUtf8*)_node->uExtension.sPanel.aPixmap);
+		_discard = blDeleteTexture(_node->uExtension.sPanel.nPixmapTex);
 		break;
 	case BL_UT_LABEL:
-		blDeleteTexture(_node->uExtension.sLabel.nPixmapTex);
+		_pixkey = blHashString((const BLUtf8*)_node->uExtension.sLabel.aPixmap);
+		_discard = blDeleteTexture(_node->uExtension.sLabel.nPixmapTex);
 		break;
 	case BL_UT_BUTTON:
-		blDeleteTexture(_node->uExtension.sButton.nPixmapTex);
+		_pixkey = blHashString((const BLUtf8*)_node->uExtension.sButton.aPixmap);
+		_discard = blDeleteTexture(_node->uExtension.sButton.nPixmapTex);
 		break;
 	case BL_UT_CHECK:
-		blDeleteTexture(_node->uExtension.sCheck.nPixmapTex);
+		_pixkey = blHashString((const BLUtf8*)_node->uExtension.sCheck.aPixmap);
+		_discard = blDeleteTexture(_node->uExtension.sCheck.nPixmapTex);
 		break;
 	case BL_UT_SLIDER:
-		blDeleteTexture(_node->uExtension.sSlider.nPixmapTex);
+		_pixkey = blHashString((const BLUtf8*)_node->uExtension.sSlider.aPixmap);
+		_discard = blDeleteTexture(_node->uExtension.sSlider.nPixmapTex);
 		break;
 	case BL_UT_TEXT:
-		blDeleteTexture(_node->uExtension.sText.nPixmapTex);
+		_pixkey = blHashString((const BLUtf8*)_node->uExtension.sText.aPixmap);
+		_discard = blDeleteTexture(_node->uExtension.sText.nPixmapTex);
 		break;
 	case BL_UT_PROGRESS:
-		blDeleteTexture(_node->uExtension.sProgress.nPixmapTex);
+		_pixkey = blHashString((const BLUtf8*)_node->uExtension.sProgress.aPixmap);
+		_discard = blDeleteTexture(_node->uExtension.sProgress.nPixmapTex);
 		break;
 	case BL_UT_DIAL:
-		blDeleteTexture(_node->uExtension.sDial.nPixmapTex);
+		_pixkey = blHashString((const BLUtf8*)_node->uExtension.sDial.aPixmap);
+		_discard = blDeleteTexture(_node->uExtension.sDial.nPixmapTex);
 		break;
 	case BL_UT_TABLE:
-		blDeleteTexture(_node->uExtension.sTable.nPixmapTex);
+		_pixkey = blHashString((const BLUtf8*)_node->uExtension.sTable.aPixmap);
+		_discard = blDeleteTexture(_node->uExtension.sTable.nPixmapTex);
 		break;
 	default: break;
+	}
+	BLGuid* _streamhead = (BLGuid*)blDictElement(_PrUIMem->pPixmapsCache, _pixkey);
+	if (_discard && _streamhead)
+	{
+		blDeleteStream(*_streamhead);
+		free(_streamhead);
+		blDictErase(_PrUIMem->pPixmapsCache, _pixkey);
 	}
 	return TRUE;
 }

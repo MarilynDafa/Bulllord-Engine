@@ -2962,13 +2962,13 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
     _tex->nID = blGenGuid(_tex, _Hash);
     return _tex->nID;
 }
-BLVoid
+BLBool
 blDeleteTexture(IN BLGuid _Tex)
 {
     BLBool _discard = FALSE;
     _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
     if (!_tex)
-        return;
+        return FALSE;
     blMutexLock(_PrGpuMem->pTextureCache->pMutex);
     _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, URIPART_INTERNAL(_Tex));
     if (_res)
@@ -2985,7 +2985,7 @@ blDeleteTexture(IN BLGuid _Tex)
         _discard = TRUE;
     blMutexUnlock(_PrGpuMem->pTextureCache->pMutex);
     if (!_discard)
-        return;
+        return FALSE;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -3021,6 +3021,7 @@ blDeleteTexture(IN BLGuid _Tex)
 #endif
     free(_tex);
     blDeleteGuid(_Tex);
+	return TRUE;
 }
 BLGuid
 blGainTexture(IN BLU32 _Hash)
@@ -3489,13 +3490,13 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
     _geo->nID = blGenGuid(_geo, _Hash);
     return _geo->nID;
 }
-BLVoid
+BLBool
 blDeleteGeometryBuffer(IN BLGuid _GBO)
 {
     BLBool _discard = FALSE;
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
     if (!_geo)
-        return;
+        return FALSE;
     if (URIPART_INTERNAL(_geo->nID) == 0xFFFFFFFF)
         _discard = TRUE;
     else
@@ -3517,7 +3518,7 @@ blDeleteGeometryBuffer(IN BLGuid _GBO)
         blMutexUnlock(_PrGpuMem->pBufferCache->pMutex);
     }
     if (!_discard)
-        return;
+        return FALSE;
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
@@ -3559,6 +3560,7 @@ blDeleteGeometryBuffer(IN BLGuid _GBO)
 #endif
     free(_geo);
     blDeleteGuid(_GBO);
+	return TRUE;
 }
 BLGuid
 blGainGeometryBuffer(IN BLU32 _Hash)
@@ -4126,7 +4128,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
     _tech->nID = blGenGuid(_tech, _hash);
     return _tech->nID;
 }
-BLVoid
+BLBool
 blDeleteTechnique(IN BLGuid _Tech)
 {
     BLBool _discard = FALSE;
@@ -4147,7 +4149,7 @@ blDeleteTechnique(IN BLGuid _Tech)
         _discard = TRUE;
     blMutexUnlock(_PrGpuMem->pTechCache->pMutex);
     if (!_discard)
-        return;
+        return FALSE;
     for (BLU32 _idx = 0; _idx < 16; ++_idx)
     {
         if (_tech->aUniformVars[_idx].pVar)
@@ -4183,6 +4185,7 @@ blDeleteTechnique(IN BLGuid _Tech)
 #endif
     free(_tech);
     blDeleteGuid(_Tech);
+	return TRUE;
 }
 BLGuid
 blGainTechnique(IN BLU32 _Hash)

@@ -150,7 +150,7 @@ BL_API BLGuid blGenTexture(
     IN BLU32 _Depth,
     IN BLU8* _Data);
 
-BL_API BLVoid blDeleteTexture(
+BL_API BLBool blDeleteTexture(
     IN BLGuid _Tex);
 
 BL_API BLGuid blGainTexture(
@@ -208,7 +208,7 @@ BL_API BLGuid blGenGeometryBuffer(
     IN BLU32 _IBSz,
     IN BLEnum _IBFmt);
 
-BL_API BLVoid blDeleteGeometryBuffer(
+BL_API BLBool blDeleteGeometryBuffer(
     IN BLGuid _GBO);
 
 BL_API BLGuid blGainGeometryBuffer(
@@ -240,7 +240,7 @@ BL_API BLGuid blGenTechnique(
     IN BLAnsi* _Filename,
     IN BLBool _ForceCompile);
 
-BL_API BLVoid blDeleteTechnique(
+BL_API BLBool blDeleteTechnique(
     IN BLGuid _Tech);
 
 BL_API BLGuid blGainTechnique(
