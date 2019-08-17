@@ -9187,55 +9187,59 @@ _DrawWidget(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _XScale, BLF32 _YS
 	{
 		BLF32 _pw = _Node->pParent->sDimension.fX > 0.f ? _Node->pParent->sDimension.fX * _Node->fScaleX * _XScale : _PrUIMem->nFboWidth;
 		BLF32 _ph = _Node->pParent->sDimension.fY > 0.f ? _Node->pParent->sDimension.fY * _Node->fScaleY * _YScale : _PrUIMem->nFboHeight;
+		_pw = blScalarClamp(_pw, _Node->pParent->nMinWidth, (_Node->pParent->nMaxWidth == 0) ? 99999999 : _Node->pParent->nMaxWidth);
+		_pw = blScalarClamp(_pw, _Node->pParent->nMinHeight, (_Node->pParent->nMaxHeight == 0) ? 99999999 : _Node->pParent->nMaxHeight);
+		BLF32 _nw = blScalarClamp(_Node->sDimension.fX, _Node->nMinWidth, (_Node->nMaxWidth == 0) ? 99999999 : _Node->nMaxWidth);
+		BLF32 _nh = blScalarClamp(_Node->sDimension.fY, _Node->nMinHeight, (_Node->nMaxHeight == 0) ? 99999999 : _Node->nMaxHeight);
 		if (_Node->eReferenceH == BL_UA_LEFT && _Node->eReferenceV == BL_UA_TOP)
 		{
-			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX - 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY - 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _nw * _Node->fScaleX * _XScale + _Node->fOffsetX - 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _nh * _Node->fScaleY * _YScale + _Node->fOffsetY - 0.5f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_LEFT && _Node->eReferenceV == BL_UA_VCENTER)
 		{
-			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX - 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.0f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _nw * _Node->fScaleX * _XScale + _Node->fOffsetX - 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _nh * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.0f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_LEFT && _Node->eReferenceV == BL_UA_BOTTOM)
 		{
-			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX - 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _nw * _Node->fScaleX * _XScale + _Node->fOffsetX - 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _nh * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.5f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_HCENTER && _Node->eReferenceV == BL_UA_TOP)
 		{
-			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.0f * _pw + _XPos;
-			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY - 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _nw * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.0f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _nh * _Node->fScaleY * _YScale + _Node->fOffsetY - 0.5f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_HCENTER && _Node->eReferenceV == BL_UA_VCENTER)
 		{
-			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.0f * _pw + _XPos;
-			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.0f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _nw * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.0f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _nh * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.0f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_HCENTER && _Node->eReferenceV == BL_UA_BOTTOM)
 		{
-			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.0f * _pw + _XPos;
-			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _nw * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.0f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _nh * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.5f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_RIGHT && _Node->eReferenceV == BL_UA_TOP)
 		{
-			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY - 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _nw * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _nh * _Node->fScaleY * _YScale + _Node->fOffsetY - 0.5f * _ph + _YPos;
 		}
 		else if (_Node->eReferenceH == BL_UA_RIGHT && _Node->eReferenceV == BL_UA_VCENTER)
 		{
-			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.0f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _nw * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _nh * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.0f * _ph + _YPos;
 		}
 		else
 		{
-			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _Node->sDimension.fX * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.5f * _pw + _XPos;
-			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _Node->sDimension.fY * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.5f * _ph + _YPos;
+			_x = _Node->sPosition.fX + (0.5f - _Node->sPivot.fX) * _nw * _Node->fScaleX * _XScale + _Node->fOffsetX + 0.5f * _pw + _XPos;
+			_y = _Node->sPosition.fY + (0.5f - _Node->sPivot.fY) * _nh * _Node->fScaleY * _YScale + _Node->fOffsetY + 0.5f * _ph + _YPos;
 		}
 		if (_Node->ePolicy == BL_UP_FIXED)
 		{
-			_w = _Node->sDimension.fX;
-			_h = _Node->sDimension.fY;
+			_w = _nw;
+			_h = _nh;
 		}
 		else if (_Node->ePolicy == BL_UP_HMatch)
 		{
@@ -11182,6 +11186,10 @@ _UIInit(DUK_CONTEXT* _DKC, BLBool _Profiler)
     memset(_PrUIMem->pRoot, 0, sizeof(_BLWidget));
     _PrUIMem->pRoot->sDimension.fX = -1.f;
     _PrUIMem->pRoot->sDimension.fY = -1.f;
+	_PrUIMem->pRoot->nMinWidth = 1;
+	_PrUIMem->pRoot->nMinHeight = 1;
+	_PrUIMem->pRoot->nMaxWidth = 0;
+	_PrUIMem->pRoot->nMaxHeight = 0;
 	_PrUIMem->pRoot->sPosition.fX = 0.f;
 	_PrUIMem->pRoot->sPosition.fY = 0.f;
 	_PrUIMem->pRoot->sPivot.fX = 0.5f;
@@ -13036,12 +13044,6 @@ blUISizeLimit(IN BLGuid _ID, IN BLU32 _MaxWidth, IN BLU32 _MaxHeight, IN BLU32 _
 	_widget->nMinHeight = _MinHeight;
 	_widget->nMaxWidth = _MaxWidth;
 	_widget->nMaxHeight = _MaxHeight;
-	if (_MaxWidth)
-		_widget->sDimension.fX = (BLF32)MIN_INTERNAL(_MaxWidth, (BLU32)_widget->sDimension.fX);
-	if (_MaxHeight)
-		_widget->sDimension.fY = (BLF32)MIN_INTERNAL(_MaxHeight, (BLU32)_widget->sDimension.fY);
-	_widget->sDimension.fX = (BLF32)MAX_INTERNAL(MAX_INTERNAL(1, _MinWidth), (BLU32)_widget->sDimension.fX);
-	_widget->sDimension.fY = (BLF32)MAX_INTERNAL(MAX_INTERNAL(1, _MinHeight), (BLU32)_widget->sDimension.fY);
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
