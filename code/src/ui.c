@@ -15403,6 +15403,8 @@ blUIParallelEnd(IN BLGuid _ID)
 	_PrUIMem->sActionRecorder.bParallelEdit = FALSE;
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	_BLWidgetAction* _lastact = _widget->pAction;
+	if (!_lastact)
+		return FALSE;
 	while (_lastact->pNext)
 		_lastact = _lastact->pNext;
 	_lastact->bParallel = FALSE;
@@ -15711,4 +15713,443 @@ blUIActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32 _Ti
 		}
 		return TRUE;
 	}
+}
+BLBool 
+blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
+{
+	BLBool _ret = TRUE;
+	BLU32 _idx;
+	ezxml_t _doc = ezxml_parse_str((char*)_XMLScript, strlen(_XMLScript));
+	ezxml_t _element = ezxml_child(_doc, "Node");
+	struct node {
+		BLAnsi* id;
+		BLAnsi* name;
+		BLAnsi* param;
+	};
+	struct conn {
+		BLAnsi* idin;
+		BLAnsi* idout;
+		BLU32 idxin;
+		BLU32 idxout;
+	};
+	BLArray* _nodes = blGenArray(FALSE);
+	BLArray* _conns = blGenArray(FALSE);
+	do {
+		if (!strcmp(ezxml_name(_element), "Node"))
+		{
+			const BLAnsi* _id = ezxml_attr(_element, "ID");
+			const BLAnsi* _name = ezxml_attr(_element, "Name");
+			const BLAnsi* _param = ezxml_attr(_element, "Param");
+			struct node* _node = (struct node*)malloc(sizeof(struct node));
+			_node->id = (BLAnsi*)calloc(strlen(_id) + 1, 1);
+			strcpy(_node->id, _id);
+			_node->name = (BLAnsi*)calloc(strlen(_name) + 1, 1);
+			strcpy(_node->name, _name);
+			if (_param)
+			{
+				_node->param = (BLAnsi*)calloc(strlen(_param) + 1, 1);
+				strcpy(_node->param, _param);
+			}
+			else
+				_node->param = NULL;
+			blArrayPushBack(_nodes, _node);
+		}
+		else if (!strcmp(ezxml_name(_element), "Conn"))
+		{
+			const BLAnsi* _idin = ezxml_attr(_element, "IDIN");
+			const BLAnsi* _idout = ezxml_attr(_element, "IDOUT");
+			BLU32 _idxin = atoi(ezxml_attr(_element, "IDXIN"));
+			BLU32 _idxout = atoi(ezxml_attr(_element, "IDXOUT"));
+			struct conn* _conn = (struct conn*)malloc(sizeof(struct conn));
+			_conn->idin = (BLAnsi*)calloc(strlen(_idin) + 1, 1);
+			strcpy(_conn->idin, _idin);
+			_conn->idout = (BLAnsi*)calloc(strlen(_idout) + 1, 1);
+			strcpy(_conn->idout, _idout);
+			_conn->idxin = _idxin;
+			_conn->idxout = _idxout;
+			blArrayPushBack(_conns, _conn);
+		}
+		if (_element->ordered)
+			_element = _element->ordered;
+		else
+		{
+			do {
+				_element = _element->parent;
+				if (!_element)
+					break;
+			} while (!_element->next);
+			_element = _element ? _element->next : NULL;
+		}
+	} while (_element);
+	ezxml_free(_doc);
+	struct node* _cur = NULL;
+	{
+		FOREACH_ARRAY(struct node*, _niter, _nodes)
+		{
+			if (!strcmp(_niter->name, "BeginNode"))
+			{
+				_cur = _niter;
+				break;
+			}
+		}
+	}
+	blUIActionBegin(_ID);
+	while (strcmp(_cur->name, "EndNode"))
+	{
+		{
+			BLArray* _tmpconns = blGenArray(FALSE);
+			FOREACH_ARRAY(struct conn*, _citer, _conns)
+			{
+				if (!strcmp(_citer->idout, _cur->id))
+				{
+					blArrayPushBack(_tmpconns, _citer);
+				}
+			}
+			if (_tmpconns->nSize == 0)
+			{
+				_ret = FALSE;
+				blDeleteArray(_tmpconns);
+				goto cleanup;
+			}
+			else if (_tmpconns->nSize == 1)
+			{
+				struct conn* _c = (struct conn*)blArrayFrontElement(_tmpconns);
+				{
+					BLBool _find = FALSE;
+					FOREACH_ARRAY(struct node*, _niter, _nodes)
+					{
+						if (!strcmp(_c->idin, _niter->id))
+						{
+							_find = TRUE;
+							_cur = _niter;
+							break;
+						}
+					}
+					if (!_find)
+					{
+						_ret = FALSE;
+						blDeleteArray(_tmpconns);
+						goto cleanup;
+					}
+				}
+				if (!strcmp(_cur->name, "UV Action"))
+				{
+					BLAnsi* _tmp;
+					_tmp = strtok((BLAnsi*)_cur->param, ",");
+					BLAnsi* _tag;
+					BLU32 _fps;
+					BLF32 _time;
+					BLBool _loop;
+					_idx = 0;
+					while (_tmp)
+					{
+						if (_idx == 0)
+						{
+							_tag = (BLAnsi*)alloca(strlen(_tmp) + 1);
+							memset(_tag, 0, strlen(_tmp) + 1);
+							strcpy(_tag, _tmp);
+							if (!strcmp(_tag, "nil"))
+								_tag = NULL;
+						}
+						else if (_idx == 1)
+							_fps = strtol(_tmp, NULL, 10);
+						else if (_idx == 2)
+							_time = strtod(_tmp, NULL);
+						else
+							_loop = strcmp(_tmp, "true") ? FALSE : TRUE;
+						_tmp = strtok(NULL, ",");
+						++_idx;
+					}
+					blUIActionUV(_ID, _tag, _fps, _time, _loop);
+				}
+				else if (!strcmp(_cur->name, "Move Action"))
+				{
+					BLAnsi* _tmp;
+					_tmp = strtok((BLAnsi*)_cur->param, ",");
+					BLF32 _x, _y;
+					BLBool _reverse;
+					BLF32 _time;
+					BLBool _loop;
+					_idx = 0;
+					while (_tmp)
+					{
+						if (_idx == 0)
+							_x = strtod(_tmp, NULL);
+						else if (_idx == 1)
+							_y = strtod(_tmp, NULL);
+						else if (_idx == 2)
+							_reverse = strcmp(_tmp, "true") ? FALSE : TRUE;
+						else if (_idx == 3)
+							_time = strtod(_tmp, NULL);
+						else
+							_loop = strcmp(_tmp, "true") ? FALSE : TRUE;
+						_tmp = strtok(NULL, ",");
+						++_idx;
+					}
+					blUIActionMove(_ID, _x, _y, _reverse, _time, _loop);
+				}
+				else if (!strcmp(_cur->name, "Scale Action"))
+				{
+					BLAnsi* _tmp;
+					_tmp = strtok((BLAnsi*)_cur->param, ",");
+					BLF32 _x, _y;
+					BLBool _reverse;
+					BLF32 _time;
+					BLBool _loop;
+					_idx = 0;
+					while (_tmp)
+					{
+						if (_idx == 0)
+							_x = strtod(_tmp, NULL);
+						else if (_idx == 1)
+							_y = strtod(_tmp, NULL);
+						else if (_idx == 2)
+							_reverse = strcmp(_tmp, "true") ? FALSE : TRUE;
+						else if (_idx == 3)
+							_time = strtod(_tmp, NULL);
+						else
+							_loop = strcmp(_tmp, "true") ? FALSE : TRUE;
+						_tmp = strtok(NULL, ",");
+						++_idx;
+					}
+					blUIActionScale(_ID, _x, _y, _reverse, _time, _loop);
+				}
+				else if (!strcmp(_cur->name, "Rotate Action"))
+				{
+					BLAnsi* _tmp;
+					_tmp = strtok((BLAnsi*)_cur->param, ",");
+					BLF32 _angle;
+					BLBool _clockwise;
+					BLF32 _time;
+					BLBool _loop;
+					_idx = 0;
+					while (_tmp)
+					{
+						if (_idx == 0)
+							_angle = strtod(_tmp, NULL);
+						else if (_idx == 1)
+							_clockwise = strcmp(_tmp, "true") ? FALSE : TRUE;
+						else if (_idx == 2)
+							_time = strtod(_tmp, NULL);
+						else
+							_loop = strcmp(_tmp, "true") ? FALSE : TRUE;
+						_tmp = strtok(NULL, ",");
+						++_idx;
+					}
+					blUIActionRotate(_ID, _angle, _clockwise, _time, _loop);
+				}
+				else if (!strcmp(_cur->name, "Alpha Action"))
+				{
+					BLAnsi* _tmp;
+					_tmp = strtok((BLAnsi*)_cur->param, ",");
+					BLF32 _alpha;
+					BLBool _reverse;
+					BLF32 _time;
+					BLBool _loop;
+					_idx = 0;
+					while (_tmp)
+					{
+						if (_idx == 0)
+							_alpha = strtod(_tmp, NULL);
+						else if (_idx == 1)
+							_reverse = strcmp(_tmp, "true") ? FALSE : TRUE;
+						else if (_idx == 2)
+							_time = strtod(_tmp, NULL);
+						else
+							_loop = strcmp(_tmp, "true") ? FALSE : TRUE;
+						_tmp = strtok(NULL, ",");
+						++_idx;
+					}
+					blUIActionAlpha(_ID, _alpha, _reverse, _time, _loop);
+				}
+				else if (!strcmp(_cur->name, "Adapter"))
+				{
+				}
+			}
+			else
+			{
+				blUIParallelBegin(_ID);
+				FOREACH_ARRAY(struct conn*, _tciter, _tmpconns)
+				{
+					{
+						FOREACH_ARRAY(struct node*, _niter, _nodes)
+						{
+							if (!strcmp(_tciter->idin, _niter->id))
+							{
+								_cur = _niter;
+								if (!strcmp(_cur->name, "UV Action"))
+								{
+									BLAnsi* _tmp;
+									_tmp = strtok((BLAnsi*)_cur->param, ",");
+									BLAnsi* _tag;
+									BLU32 _fps;
+									BLF32 _time;
+									BLBool _loop;
+									_idx = 0;
+									while (_tmp)
+									{
+										if (_idx == 0)
+										{
+											_tag = (BLAnsi*)alloca(strlen(_tmp) + 1);
+											memset(_tag, 0, strlen(_tmp) + 1);
+											strcpy(_tag, _tmp);
+											if (!strcmp(_tag, "nil"))
+												_tag = NULL;
+										}
+										else if (_idx == 1)
+											_fps = strtol(_tmp, NULL, 10);
+										else if (_idx == 2)
+											_time = strtod(_tmp, NULL);
+										else
+											_loop = strcmp(_tmp, "true") ? FALSE : TRUE;
+										_tmp = strtok(NULL, ",");
+										++_idx;
+									}
+									blUIActionUV(_ID, _tag, _fps, _time, _loop);
+								}
+								else if (!strcmp(_cur->name, "Move Action"))
+								{
+									BLAnsi* _tmp;
+									_tmp = strtok((BLAnsi*)_cur->param, ",");
+									BLF32 _x, _y;
+									BLBool _reverse;
+									BLF32 _time;
+									BLBool _loop;
+									_idx = 0;
+									while (_tmp)
+									{
+										if (_idx == 0)
+											_x = strtod(_tmp, NULL);
+										else if (_idx == 1)
+											_y = strtod(_tmp, NULL);
+										else if (_idx == 2)
+											_reverse = strcmp(_tmp, "true") ? FALSE : TRUE;
+										else if (_idx == 3)
+											_time = strtod(_tmp, NULL);
+										else
+											_loop = strcmp(_tmp, "true") ? FALSE : TRUE;
+										_tmp = strtok(NULL, ",");
+										++_idx;
+									}
+									blUIActionMove(_ID, _x, _y, _reverse, _time, _loop);
+								}
+								else if (!strcmp(_cur->name, "Scale Action"))
+								{
+									BLAnsi* _tmp;
+									_tmp = strtok((BLAnsi*)_cur->param, ",");
+									BLF32 _x, _y;
+									BLBool _reverse;
+									BLF32 _time;
+									BLBool _loop;
+									_idx = 0;
+									while (_tmp)
+									{
+										if (_idx == 0)
+											_x = strtod(_tmp, NULL);
+										else if (_idx == 1)
+											_y = strtod(_tmp, NULL);
+										else if (_idx == 2)
+											_reverse = strcmp(_tmp, "true") ? FALSE : TRUE;
+										else if (_idx == 3)
+											_time = strtod(_tmp, NULL);
+										else
+											_loop = strcmp(_tmp, "true") ? FALSE : TRUE;
+										_tmp = strtok(NULL, ",");
+										++_idx;
+									}
+									blUIActionScale(_ID, _x, _y, _reverse, _time, _loop);
+								}
+								else if (!strcmp(_cur->name, "Rotate Action"))
+								{
+									BLAnsi* _tmp;
+									_tmp = strtok((BLAnsi*)_cur->param, ",");
+									BLF32 _angle;
+									BLBool _clockwise;
+									BLF32 _time;
+									BLBool _loop;
+									_idx = 0;
+									while (_tmp)
+									{
+										if (_idx == 0)
+											_angle = strtod(_tmp, NULL);
+										else if (_idx == 1)
+											_clockwise = strcmp(_tmp, "true") ? FALSE : TRUE;
+										else if (_idx == 2)
+											_time = strtod(_tmp, NULL);
+										else
+											_loop = strcmp(_tmp, "true") ? FALSE : TRUE;
+										_tmp = strtok(NULL, ",");
+										++_idx;
+									}
+									blUIActionRotate(_ID, _angle, _clockwise, _time, _loop);
+								}
+								else if (!strcmp(_cur->name, "Alpha Action"))
+								{
+									BLAnsi* _tmp;
+									_tmp = strtok((BLAnsi*)_cur->param, ",");
+									BLF32 _alpha;
+									BLBool _reverse;
+									BLF32 _time;
+									BLBool _loop;
+									_idx = 0;
+									while (_tmp)
+									{
+										if (_idx == 0)
+											_alpha = strtod(_tmp, NULL);
+										else if (_idx == 1)
+											_reverse = strcmp(_tmp, "true") ? FALSE : TRUE;
+										else if (_idx == 2)
+											_time = strtod(_tmp, NULL);
+										else
+											_loop = strcmp(_tmp, "true") ? FALSE : TRUE;
+										_tmp = strtok(NULL, ",");
+										++_idx;
+									}
+									blUIActionAlpha(_ID, _alpha, _reverse, _time, _loop);
+								}
+							}
+						}
+					}
+				}
+				blUIParallelEnd(_ID);
+			}
+			blDeleteArray(_tmpconns);
+		}
+	}
+	BLAnsi* _tmp;
+	_tmp = strtok((BLAnsi*)_cur->param, ",");
+	BLBool _enddel, _endloop;
+	_idx = 0;
+	while (_tmp)
+	{
+		if (_idx == 0)
+			_enddel = strcmp(_tmp, "true") ? FALSE : TRUE;
+		else
+			_endloop = strcmp(_tmp, "true") ? FALSE : TRUE;
+		_tmp = strtok(NULL, ",");
+		++_idx;
+	}
+	blUIActionEnd(_ID, _enddel, _endloop);
+cleanup:
+	{
+		FOREACH_ARRAY(struct node*, _niter, _nodes)
+		{
+			free(_niter->id);
+			free(_niter->name);
+			if (_niter->param)
+				free(_niter->param);
+			free(_niter);
+		}
+	}
+	{
+		FOREACH_ARRAY(struct conn*, _citer, _conns)
+		{
+			free(_citer->idin);
+			free(_citer->idout);
+			free(_citer);
+		}
+	}
+	blDeleteArray(_nodes);
+	blDeleteArray(_conns);
+	return _ret;
 }

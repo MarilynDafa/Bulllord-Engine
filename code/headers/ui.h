@@ -925,6 +925,10 @@ BL_API BLBool blUIActionAlpha(
 	IN BLBool _Reverse,
 	IN BLF32 _Time,
 	IN BLBool _Loop);
+
+BL_API BLBool blUIActionScript(
+	IN BLGuid _ID,
+	IN BLAnsi* _XMLScript);
 #ifdef __cplusplus
 }
 #endif
