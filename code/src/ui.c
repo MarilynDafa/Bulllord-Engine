@@ -13058,6 +13058,23 @@ blUIGetSizeLimit(IN BLGuid _ID, OUT BLU32* _MaxWidth, OUT BLU32* _MaxHeight, OUT
 	*_MaxWidth = _widget->nMaxWidth;
 	*_MaxHeight = _widget->nMaxHeight;
 }
+BLVoid 
+blUIAlpha(IN BLGuid _ID, IN BLF32 _Alpha)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	_widget->fAlpha = _Alpha;
+	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUIGetAlpha(IN BLGuid _ID, OUT BLF32* _Alpha)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	*_Alpha = _widget->fAlpha;
+}
 BLVoid
 blUIScissor(IN BLGuid _ID, IN BLBool _Cliped, IN BLBool _AbsScissor)
 {

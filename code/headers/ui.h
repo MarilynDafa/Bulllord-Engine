@@ -128,6 +128,14 @@ BL_API BLVoid blUIGetSizeLimit(
 	OUT BLU32* _MinWidth,
 	OUT BLU32* _MinHeight);
 
+BL_API BLVoid blUIAlpha(
+	IN BLGuid _ID,
+	IN BLF32 _Alpha);
+
+BL_API BLVoid blUIGetAlpha(
+	IN BLGuid _ID,
+	OUT BLF32* _Alpha);
+
 BL_API BLVoid blUIScissor(
 	IN BLGuid _ID,
 	IN BLBool _Cliped, 
