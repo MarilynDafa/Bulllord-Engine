@@ -11471,6 +11471,7 @@ _UIUpdate(_BLWidget* _Node, BLU32 _Interval)
 					{
 						if (_action->uAction.sDead.pBegin)
 						{
+							_Node->nCurFrame = 0;
 							_Node->pCurAction = _action->uAction.sDead.pBegin;
 							_Node->fAlpha = _action->uAction.sDead.fAlphaCache;
 							_Node->fScaleX = _action->uAction.sDead.fScaleXCache;
@@ -15228,15 +15229,26 @@ blUIDialClockwise(IN BLGuid _ID, IN BLBool _Clockwise)
 	_widget->uExtension.sDial.bClockWise = _Clockwise;
 	_PrUIMem->bDirty = TRUE;
 }
-BLF32
-blUIGetDialAngle(IN BLGuid _ID)
+BLVoid 
+blUIGetDialAngle(IN BLGuid _ID, OUT BLF32* _Angle)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
-		return 0.f;
+		return;
 	if (_widget->eType != BL_UT_DIAL)
-		return 0.f;
-	return _widget->uExtension.sDial.fAngle;
+		return;
+	*_Angle = _widget->uExtension.sDial.fAngle;
+}
+BLVoid 
+blUIGetDialAngleRange(IN BLGuid _ID, OUT BLS32* _StartAngle, OUT BLS32* _EndAngle)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_DIAL)
+		return;
+	*_StartAngle = _widget->uExtension.sDial.nStartAngle;
+	*_EndAngle = _widget->uExtension.sDial.nEndAngle;
 }
 BLVoid
 blUIPrimitiveFill(IN BLGuid _ID, IN BLBool _Fill)
@@ -15720,6 +15732,8 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 	BLBool _ret = TRUE;
 	BLU32 _idx;
 	ezxml_t _doc = ezxml_parse_str((char*)_XMLScript, strlen(_XMLScript));
+	if (!_doc->name)
+		return FALSE;
 	ezxml_t _element = ezxml_child(_doc, "Node");
 	struct node {
 		BLAnsi* id;

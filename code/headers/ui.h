@@ -838,8 +838,14 @@ BL_API BLVoid blUIDialClockwise(
 	IN BLGuid _ID,
 	IN BLBool _Clockwise);
 
-BL_API BLF32 blUIGetDialAngle(
-	IN BLGuid _ID);
+BL_API BLVoid blUIGetDialAngle(
+	IN BLGuid _ID,
+	OUT BLF32* _Angle);
+
+BL_API BLVoid blUIGetDialAngleRange(
+	IN BLGuid _ID,
+	OUT BLS32* _StartAngle,
+	OUT BLS32* _EndAngle);
 
 BL_API BLVoid blUIPrimitiveFill(
 	IN BLGuid _ID,
