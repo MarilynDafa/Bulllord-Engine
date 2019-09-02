@@ -15744,10 +15744,12 @@ blUIActionAlpha(IN BLGuid _ID, IN BLF32 _Alpha, IN BLBool _Reverse, IN BLF32 _Ti
 	}
 }
 BLBool 
-blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
+blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript, OUT BLF32* _TotalTime, OUT BLBool* _Loop)
 {
+
 	BLBool _ret = TRUE;
 	BLU32 _idx;
+	*_Loop = FALSE;
 	ezxml_t _doc = ezxml_parse_str((char*)_XMLScript, strlen(_XMLScript));
 	if (!_doc->name)
 		return FALSE;
@@ -15825,6 +15827,7 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 		}
 	}
 	blUIActionBegin(_ID);
+	*_TotalTime = 0;
 	while (strcmp(_cur->name, "EndNode"))
 	{
 		{
@@ -15892,6 +15895,8 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 						++_idx;
 					}
 					blUIActionUV(_ID, _tag, _fps, _time, _loop);
+					*_TotalTime += _time;
+					*_Loop = *_Loop | _loop;
 				}
 				else if (!strcmp(_cur->name, "Move Action"))
 				{
@@ -15918,6 +15923,8 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 						++_idx;
 					}
 					blUIActionMove(_ID, _x, _y, _reverse, _time, _loop);
+					*_TotalTime += _time;
+					*_Loop = *_Loop | _loop;
 				}
 				else if (!strcmp(_cur->name, "Scale Action"))
 				{
@@ -15944,6 +15951,8 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 						++_idx;
 					}
 					blUIActionScale(_ID, _x, _y, _reverse, _time, _loop);
+					*_TotalTime += _time;
+					*_Loop = *_Loop | _loop;
 				}
 				else if (!strcmp(_cur->name, "Rotate Action"))
 				{
@@ -15968,6 +15977,8 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 						++_idx;
 					}
 					blUIActionRotate(_ID, _angle, _clockwise, _time, _loop);
+					*_TotalTime += _time;
+					*_Loop = *_Loop | _loop;
 				}
 				else if (!strcmp(_cur->name, "Alpha Action"))
 				{
@@ -15992,6 +16003,8 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 						++_idx;
 					}
 					blUIActionAlpha(_ID, _alpha, _reverse, _time, _loop);
+					*_TotalTime += _time;
+					*_Loop = *_Loop | _loop;
 				}
 				else if (!strcmp(_cur->name, "Adapter"))
 				{
@@ -15999,6 +16012,7 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 			}
 			else
 			{
+				BLF32 _maxval = 0;
 				blUIParallelBegin(_ID);
 				FOREACH_ARRAY(struct conn*, _tciter, _tmpconns)
 				{
@@ -16037,6 +16051,7 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 										++_idx;
 									}
 									blUIActionUV(_ID, _tag, _fps, _time, _loop);
+									_maxval = MAX_INTERNAL(_maxval, _time);
 								}
 								else if (!strcmp(_cur->name, "Move Action"))
 								{
@@ -16063,6 +16078,7 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 										++_idx;
 									}
 									blUIActionMove(_ID, _x, _y, _reverse, _time, _loop);
+									_maxval = MAX_INTERNAL(_maxval, _time);
 								}
 								else if (!strcmp(_cur->name, "Scale Action"))
 								{
@@ -16089,6 +16105,7 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 										++_idx;
 									}
 									blUIActionScale(_ID, _x, _y, _reverse, _time, _loop);
+									_maxval = MAX_INTERNAL(_maxval, _time);
 								}
 								else if (!strcmp(_cur->name, "Rotate Action"))
 								{
@@ -16113,6 +16130,7 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 										++_idx;
 									}
 									blUIActionRotate(_ID, _angle, _clockwise, _time, _loop);
+									_maxval = MAX_INTERNAL(_maxval, _time);
 								}
 								else if (!strcmp(_cur->name, "Alpha Action"))
 								{
@@ -16137,12 +16155,14 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 										++_idx;
 									}
 									blUIActionAlpha(_ID, _alpha, _reverse, _time, _loop);
+									_maxval = MAX_INTERNAL(_maxval, _time);
 								}
 							}
 						}
 					}
 				}
 				blUIParallelEnd(_ID);
+				*_TotalTime += _maxval;
 			}
 			blDeleteArray(_tmpconns);
 		}
@@ -16161,6 +16181,7 @@ blUIActionScript(IN BLGuid _ID, IN BLAnsi* _XMLScript)
 		++_idx;
 	}
 	blUIActionEnd(_ID, _enddel, _endloop);
+	*_Loop = *_Loop | _endloop;
 cleanup:
 	{
 		FOREACH_ARRAY(struct node*, _niter, _nodes)
