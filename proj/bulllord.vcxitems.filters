@@ -2327,12 +2327,14 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.h">
       <Filter>externals\astc</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duk_config.h">
       <Filter>externals\duktape</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.h">
       <Filter>externals\duktape</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc.h">
+      <Filter>externals\astc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
