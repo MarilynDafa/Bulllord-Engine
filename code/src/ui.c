@@ -3608,10 +3608,13 @@ _DrawPanel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 		if (_Node->nFrameNum != 0xFFFFFFFF)
 		{
 			_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-			_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-			_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-			_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-			_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			if (_ss)
+			{
+				_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+				_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+				_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+				_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			}
 		}
 		else
 			_texcoord = _Node->uExtension.sPanel.sCommonTex;
@@ -4128,10 +4131,13 @@ _DrawLabel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 			if (_Node->nFrameNum != 0xFFFFFFFF)
 			{
 				_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-				_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-				_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-				_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-				_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+				if (_ss)
+				{
+					_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+					_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+					_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+					_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+				}
 			}
 			else
 				_texcoord = _Node->uExtension.sLabel.sCommonTex;
@@ -4888,10 +4894,13 @@ _DrawButton(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Hei
 			if (_Node->nFrameNum != 0xFFFFFFFF)
 			{
 				_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-				_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-				_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-				_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-				_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+				if (_ss)
+				{
+					_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+					_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+					_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+					_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+				}
 			}
 			else
 			{
@@ -4906,10 +4915,13 @@ _DrawButton(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Hei
 				if (_Node->nFrameNum != 0xFFFFFFFF)
 				{
 					_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-					_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-					_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-					_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-					_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+					if (_ss)
+					{
+						_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+						_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+						_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+						_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+					}
 				}
 				else
 				{
@@ -4929,10 +4941,13 @@ _DrawButton(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Hei
 				if (_Node->nFrameNum != 0xFFFFFFFF)
 				{
 					_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-					_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-					_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-					_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-					_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+					if (_ss)
+					{
+						_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+						_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+						_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+						_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+					}
 				}
 				else
 				{
@@ -5440,10 +5455,13 @@ _DrawCheck(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 			if (_Node->nFrameNum != 0xFFFFFFFF)
 			{
 				_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-				_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-				_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-				_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-				_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+				if (_ss)
+				{
+					_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+					_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+					_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+					_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+				}
 			}
 			else
 			{
@@ -6412,10 +6430,13 @@ _DrawSlider(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Hei
 		if (_Node->nFrameNum != 0xFFFFFFFF)
 		{
 			_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-			_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-			_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-			_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-			_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			if (_ss)
+			{
+				_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+				_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+				_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+				_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			}
 		}
 		BLF32 _vbo[] = {
 			PIXEL_ALIGNED_INTERNAL(_sx - _Node->uExtension.sSlider.sSliderSize.fX * 0.5f),
@@ -6476,10 +6497,13 @@ _DrawText(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 		if (_Node->nFrameNum != 0xFFFFFFFF)
 		{
 			_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-			_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-			_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-			_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-			_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			if (_ss)
+			{
+				_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+				_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+				_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+				_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			}
 		}
 		else
 			_texcoord = _Node->uExtension.sText.sCommonTex;
@@ -7601,10 +7625,13 @@ _DrawProgress(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _H
 		if (_Node->nFrameNum != 0xFFFFFFFF)
 		{
 			_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-			_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-			_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-			_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-			_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			if (_ss)
+			{
+				_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+				_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+				_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+				_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			}
 		}
 		else
 			_texcoord = _Node->uExtension.sProgress.sFillTex;
@@ -7689,10 +7716,13 @@ _DrawTable(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heig
 		if (_Node->nFrameNum != 0xFFFFFFFF)
 		{
 			_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-			_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-			_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-			_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-			_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			if (_ss)
+			{
+				_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+				_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+				_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+				_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+			}
 		}
 		else
 			_texcoord = _Node->uExtension.sTable.sCommonTex;
@@ -8896,10 +8926,13 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			if (_Node->nFrameNum != 0xFFFFFFFF)
 			{
 				_BLWidgetSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
-				_texcoord.sLT.fX = (BLF32)_ss->nLTx;
-				_texcoord.sLT.fY = (BLF32)_ss->nLTy;
-				_texcoord.sRB.fX = (BLF32)_ss->nRBx;
-				_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+				if (_ss)
+				{
+					_texcoord.sLT.fX = (BLF32)_ss->nLTx;
+					_texcoord.sLT.fY = (BLF32)_ss->nLTy;
+					_texcoord.sRB.fX = (BLF32)_ss->nRBx;
+					_texcoord.sRB.fY = (BLF32)_ss->nRBy;
+				}
 			}
 			else
 				_texcoord = _Node->uExtension.sDial.sCommonTex;
@@ -11471,7 +11504,6 @@ _UIUpdate(_BLWidget* _Node, BLU32 _Interval)
 					{
 						if (_action->uAction.sDead.pBegin)
 						{
-							_Node->nCurFrame = 0;
 							_Node->pCurAction = _action->uAction.sDead.pBegin;
 							_Node->fAlpha = _action->uAction.sDead.fAlphaCache;
 							_Node->fScaleX = _action->uAction.sDead.fScaleXCache;
