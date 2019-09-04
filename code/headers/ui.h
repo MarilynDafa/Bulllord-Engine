@@ -341,6 +341,12 @@ BL_API BLVoid blUIButtonText(
 	IN BLEnum _TxtAlignmentH,
 	IN BLEnum _TxtAlignmentV);
 
+BL_API BLUtf8* blUIButtonGetText(
+	IN BLGuid _ID,
+	OUT BLU32* _TxtColor,
+	OUT BLEnum* _TxtAlignmentH,
+	OUT BLEnum* _TxtAlignmentV);
+
 BL_API BLVoid blUIButtonFont(
 	IN BLGuid _ID,
 	IN BLAnsi* _Font,
@@ -350,14 +356,31 @@ BL_API BLVoid blUIButtonFont(
 	IN BLBool _Shadow,
 	IN BLBool _Italics);
 
+BL_API BLAnsi* blUIButtonGetFont(
+	IN BLGuid _ID,
+	OUT BLU32* _FontHeight,
+	OUT BLBool* _Outline,
+	OUT BLBool* _Bold, 
+	OUT BLBool* _Shadow,
+	OUT BLBool* _Italics);
+
 BL_API BLVoid blUIButtonFlip(
 	IN BLGuid _ID,
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
 
+BL_API BLVoid blUIButtonGetFlip(
+	IN BLGuid _ID,
+	OUT BLBool* _FlipX,
+	OUT BLBool* _FlipY);
+
 BL_API BLVoid blUIButtonEnable(
 	IN BLGuid _ID,
 	IN BLBool _Enable);
+
+BL_API BLVoid blUIButtonGetEnable(
+	IN BLGuid _ID,
+	OUT BLBool* _Enable);
 
 BL_API BLVoid blUILabelPixmap(
 	IN BLGuid _ID,

@@ -13709,6 +13709,19 @@ blUIButtonText(IN BLGuid _ID, IN BLUtf8* _Text,	IN BLU32 _TxtColor,	IN BLEnum _T
 	_widget->uExtension.sButton.eTxtAlignmentV = _TxtAlignmentV;
 	_PrUIMem->bDirty = TRUE;
 }
+BLUtf8* 
+blUIButtonGetText(IN BLGuid _ID, OUT BLU32* _TxtColor, OUT BLEnum* _TxtAlignmentH, OUT BLEnum* _TxtAlignmentV)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_BUTTON)
+		return NULL;
+	*_TxtColor = _widget->uExtension.sButton.nTxtColor;
+	*_TxtAlignmentH = _widget->uExtension.sButton.eTxtAlignmentH;
+	*_TxtAlignmentV = _widget->uExtension.sButton.eTxtAlignmentV;
+	return _widget->uExtension.sButton.pText;
+}
 BLVoid
 blUIButtonFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _Outline, IN BLBool _Bold, IN BLBool _Shadow, IN BLBool _Italics)
 {
@@ -13750,6 +13763,21 @@ blUIButtonFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool 
 	}
 	_PrUIMem->bDirty = TRUE;
 }
+BLAnsi* 
+blUIButtonGetFont(IN BLGuid _ID, OUT BLU32* _FontHeight, OUT BLBool* _Outline, OUT BLBool* _Bold, OUT BLBool* _Shadow, OUT BLBool* _Italics)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_BUTTON)
+		return;
+	*_FontHeight = _widget->uExtension.sButton.nFontHeight;
+	*_Outline = _widget->uExtension.sButton.bOutline;
+	*_Bold = _widget->uExtension.sButton.bBold;
+	*_Shadow = _widget->uExtension.sButton.bShadow;
+	*_Italics = _widget->uExtension.sButton.bItalics;
+	return _widget->uExtension.sButton.aFontSource;
+}
 BLVoid
 blUIButtonFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 {
@@ -13763,6 +13791,17 @@ blUIButtonFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
+blUIButtonGetFlip(IN BLGuid _ID, OUT BLBool* _FlipX, OUT BLBool* _FlipY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_BUTTON)
+		return;
+	*_FlipX = _widget->uExtension.sButton.bFlipX;
+	*_FlipY = _widget->uExtension.sButton.bFlipY;
+}
+BLVoid
 blUIButtonEnable(IN BLGuid _ID, IN BLBool _Enable)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -13772,6 +13811,16 @@ blUIButtonEnable(IN BLGuid _ID, IN BLBool _Enable)
 		return;
 	_widget->uExtension.sButton.nState = _Enable ? 1 : 0;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid
+blUIButtonGetEnable(IN BLGuid _ID, OUT BLBool* _Enable)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_BUTTON)
+		return;
+	*_Enable = _widget->uExtension.sButton.nState;
 }
 BLVoid
 blUILabelPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
