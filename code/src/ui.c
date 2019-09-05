@@ -529,6 +529,11 @@ BLBool
 _FontFace(const BLAnsi* _Filename)
 {
 	BLGuid _font = blGenStream(_Filename);
+	if (_font == INVALID_GUID)
+	{
+		blDeleteStream(_font);
+		return FALSE;
+	}
 	_BLFont* _ret = (_BLFont*)malloc(sizeof(_BLFont));
 	BLU32 _endi = 0, _starti = 0;
 	BLS32 _filelen = (BLS32)strlen(_Filename);
@@ -12658,8 +12663,11 @@ blGenUI(IN BLAnsi* _WidgetName, IN BLS32 _PosX, IN BLS32 _PosY, IN BLU32 _Width,
 			memset(_widget->uExtension.sButton.aPressedMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sButton.aDisableMap, 0, sizeof(BLAnsi) * 128);
 			memset(_widget->uExtension.sButton.aStencilMap, 0, sizeof(BLAnsi) * 128);
+			memset(_widget->uExtension.sButton.aFontSource, 0, sizeof(BLAnsi) * 32);
+			strcpy(_widget->uExtension.sButton.aFontSource, "default");
 			_widget->uExtension.sButton.eTxtAlignmentH = BL_UA_HCENTER;
 			_widget->uExtension.sButton.eTxtAlignmentV = BL_UA_VCENTER;
+			_widget->uExtension.sButton.pText = NULL;
 			_widget->uExtension.sButton.nFontHeight = 0;
 			_widget->uExtension.sButton.bOutline = FALSE;
 			_widget->uExtension.sButton.bBold = FALSE;
@@ -13698,12 +13706,15 @@ blUIButtonText(IN BLGuid _ID, IN BLUtf8* _Text,	IN BLU32 _TxtColor,	IN BLEnum _T
 		return;
 	if (_widget->eType != BL_UT_BUTTON)
 		return;
-	BLU32 _strlen = blUtf8Length(_Text) + 1;
-	if (_widget->uExtension.sButton.pText)
-		free(_widget->uExtension.sButton.pText);
-	_widget->uExtension.sButton.pText = (BLUtf8*)malloc(_strlen);
-	memset(_widget->uExtension.sButton.pText, 0, _strlen);
-	strcpy((BLAnsi*)_widget->uExtension.sButton.pText, (const BLAnsi*)_Text);
+	if (blUtf8Length(_Text))
+	{
+		BLU32 _strlen = blUtf8Length(_Text) + 1;
+		if (_widget->uExtension.sButton.pText)
+			free(_widget->uExtension.sButton.pText);
+		_widget->uExtension.sButton.pText = (BLUtf8*)malloc(_strlen);
+		memset(_widget->uExtension.sButton.pText, 0, _strlen);
+		strcpy((BLAnsi*)_widget->uExtension.sButton.pText, (const BLAnsi*)_Text);
+	}
 	_widget->uExtension.sButton.nTxtColor = _TxtColor;
 	_widget->uExtension.sButton.eTxtAlignmentH = _TxtAlignmentH;
 	_widget->uExtension.sButton.eTxtAlignmentV = _TxtAlignmentV;
