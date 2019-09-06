@@ -501,21 +501,39 @@ BL_API BLVoid blUICheckFont(
 	IN BLBool _Shadow,
 	IN BLBool _Italics);
 
+BL_API BLAnsi* blUICheckGetFont(
+	IN BLGuid _ID,
+	OUT BLU32* _FontHeight,
+	OUT BLBool* _Outline,
+	OUT BLBool* _Bold,
+	OUT BLBool* _Shadow,
+	OUT BLBool* _Italics);
+
 BL_API BLVoid blUICheckFlip(
 	IN BLGuid _ID,
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
 
+BL_API BLVoid blUICheckGetFlip(
+	IN BLGuid _ID,
+	OUT BLBool* _FlipX,
+	OUT BLBool* _FlipY);
+
 BL_API BLVoid blUICheckEnable(
 	IN BLGuid _ID,
 	IN BLBool _Enable);
+
+BL_API BLVoid blUICheckGetEnable(
+	IN BLGuid _ID,
+	OUT BLBool* _Enable);
 
 BL_API BLVoid blUICheckState(
 	IN BLGuid _ID,
 	IN BLBool _Checked);
 
-BL_API BLBool blUICheckGetState(
-	IN BLGuid _ID);
+BL_API BLVoid blUICheckGetState(
+	IN BLGuid _ID,
+	OUT BLBool* _Checked);
 
 BL_API BLVoid blUITextPixmap(
 	IN BLGuid _ID,

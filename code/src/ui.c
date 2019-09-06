@@ -14211,6 +14211,21 @@ blUICheckFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _
 	}
 	_PrUIMem->bDirty = TRUE;
 }
+BLAnsi*
+blUICheckGetFont(IN BLGuid _ID, OUT BLU32* _FontHeight, OUT BLBool* _Outline, OUT BLBool* _Bold, OUT BLBool* _Shadow, OUT BLBool* _Italics)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_CHECK)
+		return NULL;
+	*_FontHeight = _widget->uExtension.sCheck.nFontHeight;
+	*_Outline = _widget->uExtension.sCheck.bOutline;
+	*_Bold = _widget->uExtension.sCheck.bBold;
+	*_Shadow = _widget->uExtension.sCheck.bShadow;
+	*_Italics = _widget->uExtension.sCheck.bItalics;
+	return _widget->uExtension.sCheck.aFontSource;
+}
 BLVoid
 blUICheckFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 {
@@ -14224,6 +14239,17 @@ blUICheckFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
+blUICheckGetFlip(IN BLGuid _ID, OUT BLBool* _FlipX, OUT BLBool* _FlipY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_CHECK)
+		return;
+	*_FlipX = _widget->uExtension.sCheck.bFlipX;
+	*_FlipY = _widget->uExtension.sCheck.bFlipY;
+}
+BLVoid
 blUICheckEnable(IN BLGuid _ID, IN BLBool _Enable)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14235,6 +14261,16 @@ blUICheckEnable(IN BLGuid _ID, IN BLBool _Enable)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
+blUICheckGetEnable(IN BLGuid _ID, OUT BLBool* _Enable)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_CHECK)
+		return;
+	*_Enable = _widget->uExtension.sCheck.nState;
+}
+BLVoid
 blUICheckState(IN BLGuid _ID, IN BLBool _Checked)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14244,15 +14280,15 @@ blUICheckState(IN BLGuid _ID, IN BLBool _Checked)
 		return;
 	_widget->uExtension.sCheck.nState = (_Checked ? 2 : 1);
 }
-BLBool
-blUICheckGetState(IN BLGuid _ID)
+BLVoid
+blUICheckGetState(IN BLGuid _ID, OUT BLBool* _Checked)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
-		return FALSE;
+		return;
 	if (_widget->eType != BL_UT_CHECK)
-		return FALSE;
-	return (_widget->uExtension.sCheck.nState == 2) ? TRUE : FALSE;
+		return;
+	*_Checked = _widget->uExtension.sCheck.nState;
 }
 BLVoid
 blUITextPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
