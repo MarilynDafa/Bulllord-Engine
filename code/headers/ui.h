@@ -514,7 +514,7 @@ BL_API BLVoid blUICheckState(
 	IN BLGuid _ID,
 	IN BLBool _Checked);
 
-BL_API BLBool blUIGetCheckState(
+BL_API BLBool blUICheckGetState(
 	IN BLGuid _ID);
 
 BL_API BLVoid blUITextPixmap(
@@ -546,9 +546,18 @@ BL_API BLVoid blUITextTypography(
 	IN BLBool _Autoscroll,
 	IN BLBool _Multiline);
 
+BL_API BLVoid blUITextGetTypography(
+	IN BLGuid _ID,
+	OUT BLBool* _Autoscroll,
+	OUT BLBool* _Multiline);
+
 BL_API BLVoid blUITextPassword(
 	IN BLGuid _ID,
 	IN BLBool _Password);
+
+BL_API BLVoid blUITextGetPassword(
+	IN BLGuid _ID,
+	OUT BLBool* _Password);
 
 BL_API BLVoid blUITextNumeric(
 	IN BLGuid _ID,
@@ -556,19 +565,38 @@ BL_API BLVoid blUITextNumeric(
 	IN BLS32 _MinValue,
 	IN BLS32 _MaxValue);
 
+BL_API BLVoid blUITextGetNumeric(
+	IN BLGuid _ID,
+	OUT BLBool* _Numeric,
+	OUT BLS32* _MinValue,
+	OUT BLS32* _MaxValue);
+
 BL_API BLVoid blUITextPadding(
 	IN BLGuid _ID,
 	IN BLF32 _PaddingX,
 	IN BLF32 _PaddingY);
 
+BL_API BLVoid blUITextGetPadding(
+	IN BLGuid _ID,
+	OUT BLF32* _PaddingX,
+	OUT BLF32* _PaddingY);
+
 BL_API BLVoid blUITextMaxLength(
 	IN BLGuid _ID,
 	IN BLU32 _MaxLength);
+
+BL_API BLVoid blUITextGetMaxLength(
+	IN BLGuid _ID,
+	OUT BLU32* _MaxLength);
 
 BL_API BLVoid blUITextPlaceholder(
 	IN BLGuid _ID,
 	IN BLUtf8* _Placeholder,
 	IN BLU32 _PlaceholderColor);
+
+BL_API BLUtf8* blUITextGetPlaceholder(
+	IN BLGuid _ID,
+	OUT BLU32* _PlaceholderColor);
 
 BL_API BLVoid blUITextText(
 	IN BLGuid _ID,
@@ -576,6 +604,12 @@ BL_API BLVoid blUITextText(
 	IN BLU32 _TxtColor,
 	IN BLEnum _TxtAlignmentH,
 	IN BLEnum _TxtAlignmentV);
+
+BL_API BLUtf8* blUITextGetText(
+	IN BLGuid _ID,
+	OUT BLU32* _TxtColor,
+	OUT BLEnum* _TxtAlignmentH,
+	OUT BLEnum* _TxtAlignmentV);
 
 BL_API BLVoid blUITextFont(
 	IN BLGuid _ID,
@@ -586,21 +620,39 @@ BL_API BLVoid blUITextFont(
 	IN BLBool _Shadow,
 	IN BLBool _Italics);
 
+BL_API BLAnsi* blUITextGetFont(
+	IN BLGuid _ID,
+	OUT BLU32* _FontHeight,
+	OUT BLBool* _Outline,
+	OUT BLBool* _Bold,
+	OUT BLBool* _Shadow,
+	OUT BLBool* _Italics);
+
 BL_API BLVoid blUITextFlip(
 	IN BLGuid _ID,
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
 
+BL_API BLVoid blUITextGetFlip(
+	IN BLGuid _ID,
+	OUT BLBool* _FlipX,
+	OUT BLBool* _FlipY);
+
 BL_API BLVoid blUITextEnable(
 	IN BLGuid _ID,
 	IN BLBool _Enable);
+
+BL_API BLVoid blUITextGetEnable(
+	IN BLGuid _ID,
+	OUT BLBool* _Enable);
 
 BL_API BLVoid blUITextCaret(
 	IN BLGuid _ID,
 	IN BLBool _Show);
 
-BL_API const BLUtf8* blUIGetTextText(
-	IN BLGuid _ID);
+BL_API BLVoid blUITextGetCaret(
+	IN BLGuid _ID,
+	OUT BLBool* _Show);
 
 BL_API BLVoid blUIProgressPixmap(
 	IN BLGuid _ID,
@@ -813,7 +865,7 @@ BL_API BLVoid blUITableCell(
 	IN BLU32 _Row,
 	IN BLU32 _Column);
 
-BL_API const BLUtf8* blUIGetTableText(
+BL_API BLUtf8* blUIGetTableText(
 	IN BLGuid _ID,
 	IN BLU32 _Row,
 	IN BLU32 _Column);

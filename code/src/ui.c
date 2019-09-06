@@ -550,6 +550,17 @@ _FontFace(const BLAnsi* _Filename)
 	BLAnsi _basename[64] = { 0 };
 	strncpy(_basename, _Filename + _starti, _endi - _starti + 1);
 	_ret->nHashName = blHashString((const BLUtf8*)_basename);
+	{
+		FOREACH_ARRAY(_BLFont*, _pf, _PrUIMem->pFonts)
+		{
+			if (_pf->nHashName == _ret->nHashName)
+			{
+				free(_ret);
+				blDeleteStream(_font);
+				return FALSE;
+			}
+		}
+	}
 	_ret->pGlyphAtlas = blGenDict(FALSE);
 	if (!strcmp((const BLAnsi*)blFileSuffixUtf8((const BLUtf8*)_Filename), "fnt"))
 	{
@@ -3367,6 +3378,10 @@ _WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum 
 {
 	BLU32 _txtlen = blUtf16Length(_Text);
 	if (!_txtlen)
+		return;
+	if (!_Font)
+		return;
+	if (!strlen(_Font))
 		return;
 	_BLFont* _ft = NULL;
 	BLUtf16* _str = (BLUtf16*)alloca((_txtlen + 1) * sizeof(BLUtf16));
@@ -12205,6 +12220,8 @@ blUIFile(IN BLAnsi* _Filename)
             BLBool _passwordvar = strcmp(_password, "true") ? FALSE : TRUE;
             const BLAnsi* _autoscroll = ezxml_attr(_element, "Autoscroll");
             BLBool _autoscrollvar = strcmp(_autoscroll, "true") ? FALSE : TRUE;
+			const BLAnsi* _caret = ezxml_attr(_element, "Caret");
+			BLBool _caretvar = strcmp(_caret, "true") ? FALSE : TRUE;
             const BLAnsi* _multiline = ezxml_attr(_element, "Multiline");
             BLBool _multilinevar = strcmp(_multiline, "true") ? FALSE : TRUE;
             const BLAnsi* _maxlength = ezxml_attr(_element, "MaxLength");
@@ -12279,6 +12296,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUITextCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3], _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
 			blUITextTypography(_widguid, _autoscrollvar, _multilinevar);
 			blUITextPassword(_widguid, _passwordvar);
+			blUITextCaret(_widguid, _caretvar);
 			blUITextNumeric(_widguid, _numericvar, _numericrangevar[0], _numericrangevar[1]);
 			blUITextPadding(_widguid, _paddingvar[0], _paddingvar[1]);
 			blUITextMaxLength(_widguid, _maxlengthvar);
@@ -13715,6 +13733,12 @@ blUIButtonText(IN BLGuid _ID, IN BLUtf8* _Text,	IN BLU32 _TxtColor,	IN BLEnum _T
 		memset(_widget->uExtension.sButton.pText, 0, _strlen);
 		strcpy((BLAnsi*)_widget->uExtension.sButton.pText, (const BLAnsi*)_Text);
 	}
+	else
+	{
+		if (_widget->uExtension.sButton.pText)
+			free(_widget->uExtension.sButton.pText);
+		_widget->uExtension.sButton.pText = NULL;
+	}
 	_widget->uExtension.sButton.nTxtColor = _TxtColor;
 	_widget->uExtension.sButton.eTxtAlignmentH = _TxtAlignmentH;
 	_widget->uExtension.sButton.eTxtAlignmentV = _TxtAlignmentV;
@@ -13742,7 +13766,8 @@ blUIButtonFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool 
 	if (_widget->eType != BL_UT_BUTTON)
 		return;
 	memset(_widget->uExtension.sButton.aFontSource, 0, sizeof(_widget->uExtension.sButton.aFontSource));
-	strcpy(_widget->uExtension.sButton.aFontSource, _Font);
+	if (_Font)
+		strcpy(_widget->uExtension.sButton.aFontSource, _Font);
 	_widget->uExtension.sButton.nFontHeight = _FontHeight;
 	if (_Outline)
 	{
@@ -14125,12 +14150,21 @@ blUICheckText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _Tx
 		return;
 	if (_widget->eType != BL_UT_CHECK)
 		return;
-	BLU32 _strlen = blUtf8Length(_Text) + 1;
-	if (_widget->uExtension.sCheck.pText)
-		free(_widget->uExtension.sCheck.pText);
-	_widget->uExtension.sCheck.pText = (BLUtf8*)malloc(_strlen);
-	memset(_widget->uExtension.sCheck.pText, 0, _strlen);
-	strcpy((BLAnsi*)_widget->uExtension.sCheck.pText, (const BLAnsi*)_Text);
+	if (blUtf8Length(_Text))
+	{
+		BLU32 _strlen = blUtf8Length(_Text) + 1;
+		if (_widget->uExtension.sCheck.pText)
+			free(_widget->uExtension.sCheck.pText);
+		_widget->uExtension.sCheck.pText = (BLUtf8*)malloc(_strlen);
+		memset(_widget->uExtension.sCheck.pText, 0, _strlen);
+		strcpy((BLAnsi*)_widget->uExtension.sCheck.pText, (const BLAnsi*)_Text);
+	}
+	else
+	{
+		if (_widget->uExtension.sCheck.pText)
+			free(_widget->uExtension.sCheck.pText);
+		_widget->uExtension.sCheck.pText = NULL;
+	}
 	_widget->uExtension.sCheck.nTxtColor = _TxtColor;
 	_widget->uExtension.sCheck.eTxtAlignmentH = _TxtAlignmentH;
 	_widget->uExtension.sCheck.eTxtAlignmentV = _TxtAlignmentV;
@@ -14144,7 +14178,8 @@ blUICheckFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _
 	if (_widget->eType != BL_UT_CHECK)
 		return;
 	memset(_widget->uExtension.sCheck.aFontSource, 0, sizeof(_widget->uExtension.sCheck.aFontSource));
-	strcpy(_widget->uExtension.sCheck.aFontSource, _Font);
+	if (_Font)
+		strcpy(_widget->uExtension.sCheck.aFontSource, _Font);
 	_widget->uExtension.sCheck.nFontHeight = _FontHeight;
 	if (_Outline)
 	{
@@ -14210,7 +14245,7 @@ blUICheckState(IN BLGuid _ID, IN BLBool _Checked)
 	_widget->uExtension.sCheck.nState = (_Checked ? 2 : 1);
 }
 BLBool
-blUIGetCheckState(IN BLGuid _ID)
+blUICheckGetState(IN BLGuid _ID)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -14326,6 +14361,17 @@ blUITextTypography(IN BLGuid _ID, IN BLBool _Autoscroll, IN BLBool _Multiline)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
+blUITextGetTypography(IN BLGuid _ID, OUT BLBool* _Autoscroll, OUT BLBool* _Multiline)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TEXT)
+		return;
+	*_Autoscroll = _widget->uExtension.sText.bAutoscroll;
+	*_Multiline = _widget->uExtension.sText.bMultiline;
+}
+BLVoid
 blUITextPassword(IN BLGuid _ID, IN BLBool _Password)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14335,6 +14381,16 @@ blUITextPassword(IN BLGuid _ID, IN BLBool _Password)
 		return;
 	_widget->uExtension.sText.bPassword = _Password;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid
+blUITextGetPassword(IN BLGuid _ID, OUT BLBool* _Password)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TEXT)
+		return;
+	*_Password = _widget->uExtension.sText.bPassword;
 }
 BLVoid
 blUITextNumeric(IN BLGuid _ID, IN BLBool _Numeric, IN BLS32 _MinValue, IN BLS32 _MaxValue)
@@ -14360,6 +14416,18 @@ blUITextNumeric(IN BLGuid _ID, IN BLBool _Numeric, IN BLS32 _MinValue, IN BLS32 
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
+blUITextGetNumeric(IN BLGuid _ID, OUT BLBool* _Numeric, OUT BLS32* _MinValue, OUT BLS32* _MaxValue)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TEXT)
+		return;
+	*_Numeric = _widget->uExtension.sText.bNumeric;
+	*_MinValue = _widget->uExtension.sText.nMinValue;
+	*_MaxValue = _widget->uExtension.sText.nMaxValue;
+}
+BLVoid
 blUITextPadding(IN BLGuid _ID, IN BLF32 _PaddingX, IN BLF32 _PaddingY)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14372,6 +14440,17 @@ blUITextPadding(IN BLGuid _ID, IN BLF32 _PaddingX, IN BLF32 _PaddingY)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
+blUITextGetPadding(IN BLGuid _ID, OUT BLF32* _PaddingX, OUT BLF32* _PaddingY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TEXT)
+		return;
+	*_PaddingX = _widget->uExtension.sText.fPaddingX;
+	*_PaddingY = _widget->uExtension.sText.fPaddingY;
+}
+BLVoid
 blUITextMaxLength(IN BLGuid _ID, IN BLU32 _MaxLength)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14382,6 +14461,16 @@ blUITextMaxLength(IN BLGuid _ID, IN BLU32 _MaxLength)
 	_widget->uExtension.sText.nMaxLength = _MaxLength;
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUITextGetMaxLength(IN BLGuid _ID, OUT BLU32* _MaxLength)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TEXT)
+		return;
+	*_MaxLength = _widget->uExtension.sText.nMaxLength;
+}
 BLVoid
 blUITextPlaceholder(IN BLGuid _ID, IN BLUtf8* _Placeholder, IN BLU32 _PlaceholderColor)
 {
@@ -14390,14 +14479,30 @@ blUITextPlaceholder(IN BLGuid _ID, IN BLUtf8* _Placeholder, IN BLU32 _Placeholde
 		return;
 	if (_widget->eType != BL_UT_TEXT)
 		return;
-	BLU32 _strlen = blUtf8Length(_Placeholder) + 1;
-	if (_widget->uExtension.sText.pPlaceholder)
-		free(_widget->uExtension.sText.pPlaceholder);
-	_widget->uExtension.sText.pPlaceholder = (BLUtf8*)malloc(_strlen);
-	memset(_widget->uExtension.sText.pPlaceholder, 0, _strlen);
-	strcpy((BLAnsi*)_widget->uExtension.sText.pPlaceholder, (const BLAnsi*)_Placeholder);
+	if (_Placeholder)
+	{
+		BLU32 _strlen = blUtf8Length(_Placeholder) + 1;
+		if (_widget->uExtension.sText.pPlaceholder)
+			free(_widget->uExtension.sText.pPlaceholder);
+		_widget->uExtension.sText.pPlaceholder = (BLUtf8*)malloc(_strlen);
+		memset(_widget->uExtension.sText.pPlaceholder, 0, _strlen);
+		strcpy((BLAnsi*)_widget->uExtension.sText.pPlaceholder, (const BLAnsi*)_Placeholder);
+	}
+	else
+		_widget->uExtension.sText.pPlaceholder = NULL;
 	_widget->uExtension.sText.nPlaceholderColor = _PlaceholderColor;
 	_PrUIMem->bDirty = TRUE;
+}
+BLUtf8*
+blUITextGetPlaceholder(IN BLGuid _ID, OUT BLU32* _PlaceholderColor)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_TEXT)
+		return NULL;
+	*_PlaceholderColor = _widget->uExtension.sText.nPlaceholderColor;
+	return _widget->uExtension.sText.pPlaceholder;
 }
 BLVoid
 blUITextText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _TxtAlignmentH, IN BLEnum _TxtAlignmentV)
@@ -14409,17 +14514,38 @@ blUITextText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _Txt
 		return;
 	if (_widget->uExtension.sText.pText)
 		free(_widget->uExtension.sText.pText);
-	if (_Text)
+	if (blUtf8Length(_Text))
 	{
 		BLU32 _strlen = blUtf8Length(_Text) + 1;
+		if (_widget->uExtension.sText.pText)
+			free(_widget->uExtension.sText.pText);
 		_widget->uExtension.sText.pText = (BLUtf8*)malloc(_strlen);
 		memset(_widget->uExtension.sText.pText, 0, _strlen);
 		strcpy((BLAnsi*)_widget->uExtension.sText.pText, (const BLAnsi*)_Text);
+	}
+	else
+	{
+		if (_widget->uExtension.sText.pText)
+			free(_widget->uExtension.sText.pText);
+		_widget->uExtension.sText.pText = NULL;
 	}
 	_widget->uExtension.sText.nTxtColor = _TxtColor;
 	_widget->uExtension.sText.eTxtAlignmentH = _TxtAlignmentH;
 	_widget->uExtension.sText.eTxtAlignmentV = _TxtAlignmentV;
 	_PrUIMem->bDirty = TRUE;
+}
+BLUtf8*
+blUITextGetText(IN BLGuid _ID, OUT BLU32* _TxtColor, OUT BLEnum* _TxtAlignmentH, OUT BLEnum* _TxtAlignmentV)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_TEXT)
+		return NULL;
+	*_TxtColor = _widget->uExtension.sText.nTxtColor;
+	*_TxtAlignmentH = _widget->uExtension.sText.eTxtAlignmentH;
+	*_TxtAlignmentV = _widget->uExtension.sText.eTxtAlignmentV;
+	return _widget->uExtension.sText.pText;
 }
 BLVoid
 blUITextFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _Outline, IN BLBool _Bold, IN BLBool _Shadow, IN BLBool _Italics)
@@ -14430,7 +14556,8 @@ blUITextFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _O
 	if (_widget->eType != BL_UT_TEXT)
 		return;
 	memset(_widget->uExtension.sText.aFontSource, 0, sizeof(_widget->uExtension.sText.aFontSource));
-	strcpy(_widget->uExtension.sText.aFontSource, _Font);
+	if (_Font)
+		strcpy(_widget->uExtension.sText.aFontSource, _Font);
 	_widget->uExtension.sText.nFontHeight = _FontHeight;
 	if (_Outline)
 	{
@@ -14462,6 +14589,21 @@ blUITextFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _O
 	}
 	_PrUIMem->bDirty = TRUE;
 }
+BLAnsi* 
+blUITextGetFont(IN BLGuid _ID, OUT BLU32* _FontHeight, OUT BLBool* _Outline, OUT BLBool* _Bold, OUT BLBool* _Shadow, OUT BLBool* _Italics)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_TEXT)
+		return NULL;
+	*_Outline = _widget->uExtension.sText.bOutline;
+	*_Bold = _widget->uExtension.sText.bBold;
+	*_Shadow = _widget->uExtension.sText.bShadow;
+	*_Italics = _widget->uExtension.sText.bItalics;
+	*_FontHeight = _widget->uExtension.sText.nFontHeight;
+	return _widget->uExtension.sText.aFontSource;
+}
 BLVoid
 blUITextFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 {
@@ -14475,6 +14617,17 @@ blUITextFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
+blUITextGetFlip(IN BLGuid _ID, OUT BLBool* _FlipX, OUT BLBool* _FlipY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TEXT)
+		return;
+	*_FlipX = _widget->uExtension.sText.bFlipX;
+	*_FlipY = _widget->uExtension.sText.bFlipY;
+}
+BLVoid
 blUITextEnable(IN BLGuid _ID, IN BLBool _Enable)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -14484,6 +14637,16 @@ blUITextEnable(IN BLGuid _ID, IN BLBool _Enable)
 		return;
 	_widget->uExtension.sText.nState = _Enable ? 1 : 0;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUITextGetEnable(IN BLGuid _ID, OUT BLBool* _Enable)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TEXT)
+		return;
+	*_Enable = _widget->uExtension.sText.nState;
 }
 BLVoid 
 blUITextCaret(IN BLGuid _ID, IN BLBool _Show)
@@ -14496,15 +14659,15 @@ blUITextCaret(IN BLGuid _ID, IN BLBool _Show)
 	_widget->uExtension.sText.bShowCaret = _Show;
 	_PrUIMem->bDirty = TRUE;
 }
-const BLUtf8*
-blUIGetTextText(IN BLGuid _ID)
+BLVoid
+blUITextGetCaret(IN BLGuid _ID, OUT BLBool* _Show)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
-		return NULL;
+		return;
 	if (_widget->eType != BL_UT_TEXT)
-		return NULL;
-	return _widget->uExtension.sText.pText;
+		return;
+	*_Show = _widget->uExtension.sText.bShowCaret;
 }
 BLVoid
 blUIProgressPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
@@ -14624,12 +14787,21 @@ blUIProgressText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor)
 		return;
 	if (_widget->eType != BL_UT_PROGRESS)
 		return;
-	BLU32 _strlen = blUtf8Length(_Text) + 1;
-	if (_widget->uExtension.sProgress.pText)
-		free(_widget->uExtension.sProgress.pText);
-	_widget->uExtension.sProgress.pText = (BLUtf8*)malloc(_strlen);
-	memset(_widget->uExtension.sProgress.pText, 0, _strlen);
-	strcpy((BLAnsi*)_widget->uExtension.sProgress.pText, (const BLAnsi*)_Text);
+	if (blUtf8Length(_Text))
+	{
+		BLU32 _strlen = blUtf8Length(_Text) + 1;
+		if (_widget->uExtension.sProgress.pText)
+			free(_widget->uExtension.sProgress.pText);
+		_widget->uExtension.sCheck.sProgress = (BLUtf8*)malloc(_strlen);
+		memset(_widget->uExtension.sProgress.pText, 0, _strlen);
+		strcpy((BLAnsi*)_widget->uExtension.sProgress.pText, (const BLAnsi*)_Text);
+	}
+	else
+	{
+		if (_widget->uExtension.sProgress.pText)
+			free(_widget->uExtension.sProgress.pText);
+		_widget->uExtension.sProgress.pText = NULL;
+	}
 	_widget->uExtension.sProgress.nTxtColor = _TxtColor;
 	_PrUIMem->bDirty = TRUE;
 }
@@ -14642,7 +14814,8 @@ blUIProgressFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBoo
 	if (_widget->eType != BL_UT_PROGRESS)
 		return;
 	memset(_widget->uExtension.sProgress.aFontSource, 0, sizeof(_widget->uExtension.sProgress.aFontSource));
-	strcpy(_widget->uExtension.sProgress.aFontSource, _Font);
+	if (_Font)
+		strcpy(_widget->uExtension.sProgress.aFontSource, _Font);
 	_widget->uExtension.sProgress.nFontHeight = _FontHeight;
 	if (_Outline)
 	{
@@ -15160,7 +15333,7 @@ blUITableCell(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLU32 _Row
 	}
 	_PrUIMem->bDirty = TRUE;
 }
-const BLUtf8*
+BLUtf8*
 blUIGetTableText(IN BLGuid _ID, IN BLU32 _Row, IN BLU32 _Column)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -15182,7 +15355,8 @@ blUITableFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _
 	if (_widget->eType != BL_UT_TABLE)
 		return;
 	memset(_widget->uExtension.sTable.aFontSource, 0, sizeof(_widget->uExtension.sTable.aFontSource));
-	strcpy(_widget->uExtension.sTable.aFontSource, _Font);
+	if (_Font)
+		strcpy(_widget->uExtension.sTable.aFontSource, _Font);
 	_widget->uExtension.sTable.nFontHeight = _FontHeight;
 	if (_Outline)
 	{
