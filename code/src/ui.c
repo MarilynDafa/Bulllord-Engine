@@ -8794,7 +8794,7 @@ _DrawDial(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Heigh
 			}
 			if (_endx == 1)
 			{
-				BLF32 _theta2 = (_Node->uExtension.sDial.nEndAngle * PI_INTERNAL / 180.0f;
+				BLF32 _theta2 = _Node->uExtension.sDial.nEndAngle * PI_INTERNAL / 180.0f;
 				_pts[_endback].fX = _XPos + tanf(_theta2) * _Height * 0.5f;
 				_pts[_endback].fY = _YPos - _Height * 0.5f;
 				_tpts[_endback].fX = (_tx + tanf(_theta2) * _th * 0.5f) / _Node->uExtension.sDial.nTexWidth;
