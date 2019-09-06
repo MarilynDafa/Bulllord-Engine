@@ -926,27 +926,35 @@ BL_API BLVoid blUIDialAngle(
 	IN BLGuid _ID,
 	IN BLF32 _Angle);
 
+BL_API BLVoid blUIDialGetAngle(
+	IN BLGuid _ID,
+	OUT BLF32* _Angle);
+
 BL_API BLVoid blUIDialAngleRange(
 	IN BLGuid _ID,
 	IN BLS32 _StartAngle,
 	IN BLS32 _EndAngle);
 
+BL_API BLVoid blUIDialGetAngleRange(
+	IN BLGuid _ID,
+	OUT BLS32* _StartAngle,
+	OUT BLS32* _EndAngle);
+
 BL_API BLVoid blUIDialAngleCut(
 	IN BLGuid _ID,
 	IN BLBool _Cut);
+
+BL_API BLVoid blUIDialGetAngleCut(
+	IN BLGuid _ID,
+	OUT BLBool* _Cut);
 
 BL_API BLVoid blUIDialClockwise(
 	IN BLGuid _ID,
 	IN BLBool _Clockwise);
 
-BL_API BLVoid blUIGetDialAngle(
+BL_API BLVoid blUIDialGetClockwise(
 	IN BLGuid _ID,
-	OUT BLF32* _Angle);
-
-BL_API BLVoid blUIGetDialAngleRange(
-	IN BLGuid _ID,
-	OUT BLS32* _StartAngle,
-	OUT BLS32* _EndAngle);
+	OUT BLBool* _Clockwise);
 
 BL_API BLVoid blUIPrimitiveFill(
 	IN BLGuid _ID,
