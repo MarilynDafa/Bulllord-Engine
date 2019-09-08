@@ -13371,6 +13371,8 @@ blUIPanelStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap, IN BLF32 _Left, IN BL
 		return;
 	if (_widget->eType != BL_UT_PANEL)
 		return;
+	if (!_StencilMap)
+		return;
 	memset(_widget->uExtension.sPanel.aStencilMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sPanel.aStencilMap, _StencilMap);
 	_widget->uExtension.sPanel.sStencilTex.sLT.fX = _Left;
@@ -13386,6 +13388,8 @@ blUIPanelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF3
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_PANEL)
+		return;
+	if (!_CommonMap)
 		return;
 	memset(_widget->uExtension.sPanel.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sPanel.aCommonMap, _CommonMap);
@@ -13628,6 +13632,8 @@ blUIButtonStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap, IN BLF32 _Left, IN B
 		return;
 	if (_widget->eType != BL_UT_BUTTON)
 		return;
+	if (!_StencilMap)
+		return;
 	memset(_widget->uExtension.sButton.aStencilMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aStencilMap, _StencilMap);
 	_widget->uExtension.sButton.sStencilTex.sLT.fX = _Left;
@@ -13643,6 +13649,8 @@ blUIButtonCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_BUTTON)
+		return;
+	if (!_CommonMap)
 		return;
 	memset(_widget->uExtension.sButton.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aCommonMap, _CommonMap);
@@ -13664,6 +13672,8 @@ blUIButtonHoverMap(IN BLGuid _ID, IN BLAnsi* _HoveredMap, IN BLF32 _Left, IN BLF
 		return;
 	if (_widget->eType != BL_UT_BUTTON)
 		return;
+	if (!_HoveredMap)
+		return;
 	memset(_widget->uExtension.sButton.aHoveredMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aHoveredMap, _HoveredMap);
 	_widget->uExtension.sButton.sHoveredTex.sLT.fX = _Left;
@@ -13684,6 +13694,8 @@ blUIButtonPressMap(IN BLGuid _ID, IN BLAnsi* _PressedMap, IN BLF32 _Left, IN BLF
 		return;
 	if (_widget->eType != BL_UT_BUTTON)
 		return;
+	if (!_PressedMap)
+		return;
 	memset(_widget->uExtension.sButton.aPressedMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aPressedMap, _PressedMap);
 	_widget->uExtension.sButton.sPressedTex.sLT.fX = _Left;
@@ -13703,6 +13715,8 @@ blUIButtonDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _Left, IN B
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_BUTTON)
+		return;
+	if (!_DisableMap)
 		return;
 	memset(_widget->uExtension.sButton.aDisableMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sButton.aDisableMap, _DisableMap);
@@ -13901,6 +13915,8 @@ blUILabelStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap, IN BLF32 _Left, IN BL
 		return;
 	if (_widget->eType != BL_UT_LABEL)
 		return;
+	if (!_StencilMap)
+		return;
 	memset(_widget->uExtension.sLabel.aStencilMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sLabel.aStencilMap, _StencilMap);
 	_widget->uExtension.sLabel.sStencilTex.sLT.fX = _Left;
@@ -13916,6 +13932,8 @@ blUILabelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF3
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_LABEL)
+		return;
+	if (!_CommonMap)
 		return;
 	memset(_widget->uExtension.sLabel.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sLabel.aCommonMap, _CommonMap);
@@ -14074,6 +14092,8 @@ blUICheckStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap, IN BLF32 _Left, IN BL
 		return;
 	if (_widget->eType != BL_UT_CHECK)
 		return;
+	if (!_StencilMap)
+		return;
 	memset(_widget->uExtension.sCheck.aStencilMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sCheck.aStencilMap, _StencilMap);
 	_widget->uExtension.sCheck.sStencilTex.sLT.fX = _Left;
@@ -14089,6 +14109,8 @@ blUICheckCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF3
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_CHECK)
+		return;
+	if (!_CommonMap)
 		return;
 	memset(_widget->uExtension.sCheck.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sCheck.aCommonMap, _CommonMap);
@@ -14110,6 +14132,8 @@ blUICheckCheckedMap(IN BLGuid _ID, IN BLAnsi* _CheckedMap, IN BLF32 _Left, IN BL
 		return;
 	if (_widget->eType != BL_UT_CHECK)
 		return;
+	if (!_CheckedMap)
+		return;
 	memset(_widget->uExtension.sCheck.aCheckedMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sCheck.aCheckedMap, _CheckedMap);
 	_widget->uExtension.sCheck.sCheckedTex.sLT.fX = _Left;
@@ -14129,6 +14153,8 @@ blUICheckDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _Left, IN BL
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_CHECK)
+		return;
+	if (!_DisableMap)
 		return;
 	memset(_widget->uExtension.sCheck.aDisableMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sCheck.aDisableMap, _DisableMap);
@@ -14333,6 +14359,8 @@ blUITextStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap, IN BLF32 _Left, IN BLF
 		return;
 	if (_widget->eType != BL_UT_TEXT)
 		return;
+	if (!_StencilMap)
+		return;
 	memset(_widget->uExtension.sText.aStencilMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sText.aStencilMap, _StencilMap);
 	_widget->uExtension.sText.sStencilTex.sLT.fX = _Left;
@@ -14348,6 +14376,8 @@ blUITextCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF32
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_TEXT)
+		return;
+	if (!_CommonMap)
 		return;
 	memset(_widget->uExtension.sText.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sText.aCommonMap, _CommonMap);
@@ -14748,6 +14778,8 @@ blUIProgressStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap, IN BLF32 _Left, IN
 		return;
 	if (_widget->eType != BL_UT_PROGRESS)
 		return;
+	if (!_StencilMap)
+		return;
 	memset(_widget->uExtension.sProgress.aStencilMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sProgress.aStencilMap, _StencilMap);
 	_widget->uExtension.sProgress.sStencilTex.sLT.fX = _Left;
@@ -14763,6 +14795,8 @@ blUIProgressCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN B
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_PROGRESS)
+		return;
+	if (!_CommonMap)
 		return;
 	memset(_widget->uExtension.sProgress.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sProgress.aCommonMap, _CommonMap);
@@ -14783,6 +14817,8 @@ blUIProgressFillMap(IN BLGuid _ID, IN BLAnsi* _FillMap, IN BLF32 _Left, IN BLF32
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_PROGRESS)
+		return;
+	if (!_FillMap)
 		return;
 	memset(_widget->uExtension.sProgress.aFillMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sProgress.aFillMap, _FillMap);
@@ -14996,6 +15032,8 @@ blUISliderStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap, IN BLF32 _Left, IN B
 		return;
 	if (_widget->eType != BL_UT_SLIDER)
 		return;
+	if (!_StencilMap)
+		return;
 	memset(_widget->uExtension.sSlider.aStencilMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sSlider.aStencilMap, _StencilMap);
 	_widget->uExtension.sSlider.sStencilTex.sLT.fX = _Left;
@@ -15011,6 +15049,8 @@ blUISliderCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_SLIDER)
+		return;
+	if (!_CommonMap)
 		return;
 	memset(_widget->uExtension.sSlider.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sSlider.aCommonMap, _CommonMap);
@@ -15032,6 +15072,8 @@ blUISliderDisableMap(IN BLGuid _ID, IN BLAnsi* _DisableMap, IN BLF32 _Left, IN B
 		return;
 	if (_widget->eType != BL_UT_SLIDER)
 		return;
+	if (!_DisableMap)
+		return;
 	memset(_widget->uExtension.sSlider.aDisableMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sSlider.aDisableMap, _DisableMap);
 	_widget->uExtension.sSlider.sDisableTex.sLT.fX = _Left;
@@ -15052,6 +15094,8 @@ blUISliderSliderCommonMap(IN BLGuid _ID, IN BLAnsi* _SliderCommonMap, IN BLF32 _
 		return;
 	if (_widget->eType != BL_UT_SLIDER)
 		return;
+	if (!_SliderCommonMap)
+		return;
 	memset(_widget->uExtension.sSlider.aSliderCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sSlider.aSliderCommonMap, _SliderCommonMap);
 	_widget->uExtension.sSlider.sSliderCommonTex.sLT.fX = _Left;
@@ -15067,6 +15111,8 @@ blUISliderSliderDisableMap(IN BLGuid _ID, IN BLAnsi* _SliderDisableMap, IN BLF32
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_SLIDER)
+		return;
+	if (!_SliderDisableMap)
 		return;
 	memset(_widget->uExtension.sSlider.aSliderDisableMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sSlider.aSliderDisableMap, _SliderDisableMap);
@@ -15273,6 +15319,8 @@ blUITableStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap, IN BLF32 _Left, IN BL
 		return;
 	if (_widget->eType != BL_UT_TABLE)
 		return;
+	if (!_StencilMap)
+		return;
 	memset(_widget->uExtension.sTable.aStencilMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sTable.aStencilMap, _StencilMap);
 	_widget->uExtension.sTable.sStencilTex.sLT.fX = _Left;
@@ -15288,6 +15336,8 @@ blUITableCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF3
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_TABLE)
+		return;
+	if (!_CommonMap)
 		return;
 	memset(_widget->uExtension.sTable.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sTable.aCommonMap, _CommonMap);
@@ -15309,6 +15359,8 @@ blUITableOddItemMap(IN BLGuid _ID, IN BLAnsi* _OddItemMap, IN BLF32 _Left, IN BL
 		return;
 	if (_widget->eType != BL_UT_TABLE)
 		return;
+	if (!_OddItemMap)
+		return;
 	memset(_widget->uExtension.sTable.aOddItemMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sTable.aOddItemMap, _OddItemMap);
 	_widget->uExtension.sTable.sOddItemTex.sLT.fX = _Left;
@@ -15324,6 +15376,8 @@ blUITableEvenItemMap(IN BLGuid _ID, IN BLAnsi* _EvenItemMap, IN BLF32 _Left, IN 
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_TABLE)
+		return;
+	if (!_EvenItemMap)
 		return;
 	memset(_widget->uExtension.sTable.aEvenItemMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sTable.aEvenItemMap, _EvenItemMap);
@@ -15590,6 +15644,8 @@ blUIDialStencilMap(IN BLGuid _ID, IN BLAnsi* _StencilMap, IN BLF32 _Left, IN BLF
 		return;
 	if (_widget->eType != BL_UT_DIAL)
 		return;
+	if (!_StencilMap)
+		return;
 	memset(_widget->uExtension.sDial.aStencilMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sDial.aStencilMap, _StencilMap);
 	_widget->uExtension.sDial.sStencilTex.sLT.fX = _Left;
@@ -15605,6 +15661,8 @@ blUIDialCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF32
 	if (!_widget)
 		return;
 	if (_widget->eType != BL_UT_DIAL)
+		return;
+	if (!_CommonMap)
 		return;
 	memset(_widget->uExtension.sDial.aCommonMap, 0, sizeof(BLAnsi) * 128);
 	strcpy(_widget->uExtension.sDial.aCommonMap, _CommonMap);
