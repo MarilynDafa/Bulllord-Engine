@@ -15087,6 +15087,16 @@ blUISliderHorizontal(IN BLGuid _ID, IN BLBool _Horizontal)
 	_widget->uExtension.sSlider.bHorizontal = _Horizontal;
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUISliderGetHorizontal(IN BLGuid _ID, OUT BLBool* _Horizontal)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_SLIDER)
+		return;
+	*_Horizontal = _widget->uExtension.sSlider.bHorizontal;
+}
 BLVoid
 blUISliderSliderStep(IN BLGuid _ID, IN BLU32 _Step)
 {
@@ -15097,6 +15107,16 @@ blUISliderSliderStep(IN BLGuid _ID, IN BLU32 _Step)
 		return;
 	_widget->uExtension.sSlider.nStep = MIN_INTERNAL(_Step, (BLU32)(_widget->uExtension.sSlider.nMaxValue - _widget->uExtension.sSlider.nMinValue));
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUISliderGetSliderStep(IN BLGuid _ID, OUT BLU32* _Step)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_SLIDER)
+		return;
+	*_Step = _widget->uExtension.sSlider.nStep;
 }
 BLVoid
 blUISliderSliderPos(IN BLGuid _ID, IN BLS32 _Pos)
@@ -15109,6 +15129,16 @@ blUISliderSliderPos(IN BLGuid _ID, IN BLS32 _Pos)
 	_widget->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_Pos, (BLF32)_widget->uExtension.sSlider.nMinValue, (BLF32)_widget->uExtension.sSlider.nMaxValue);
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUISliderGetSliderPos(IN BLGuid _ID, OUT BLS32* _Pos)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_SLIDER)
+		return;
+	*_Pos = _widget->uExtension.sSlider.nSliderPosition;
+}
 BLVoid
 blUISliderSliderSize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
 {
@@ -15120,6 +15150,17 @@ blUISliderSliderSize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
 	_widget->uExtension.sSlider.sSliderSize.fX = (BLF32)_Width;
 	_widget->uExtension.sSlider.sSliderSize.fY = (BLF32)_Height;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUISliderGetSliderSize(IN BLGuid _ID, OUT BLU32* _Width, OUT BLU32* _Height)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_SLIDER)
+		return;
+	*_Width = (BLU32)_widget->uExtension.sSlider.sSliderSize.fX;
+	*_Height = (BLU32)_widget->uExtension.sSlider.sSliderSize.fY;
 }
 BLVoid
 blUISliderSliderRange(IN BLGuid _ID, IN BLU32 _MinValue, IN BLU32 _MaxValue)
@@ -15134,6 +15175,17 @@ blUISliderSliderRange(IN BLGuid _ID, IN BLU32 _MinValue, IN BLU32 _MaxValue)
 	_widget->uExtension.sSlider.nSliderPosition = (BLS32)blScalarClamp((BLF32)_widget->uExtension.sSlider.nSliderPosition, (BLF32)_widget->uExtension.sSlider.nMinValue, (BLF32)_widget->uExtension.sSlider.nMaxValue);
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUISliderGetSliderRange(IN BLGuid _ID, OUT BLU32* _MinValue, OUT BLU32* _MaxValue)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_SLIDER)
+		return;
+	*_MinValue = _widget->uExtension.sSlider.nMinValue;
+	*_MaxValue = _widget->uExtension.sSlider.nMaxValue;
+}
 BLVoid
 blUISliderFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 {
@@ -15147,6 +15199,17 @@ blUISliderFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
+blUISliderGetFlip(IN BLGuid _ID, OUT BLBool* _FlipX, OUT BLBool* _FlipY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PROGRESS)
+		return;
+	*_FlipX = _widget->uExtension.sSlider.bFlipX;
+	*_FlipY = _widget->uExtension.sSlider.bFlipY;
+}
+BLVoid
 blUISliderEnable(IN BLGuid _ID, IN BLBool _Enable)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
@@ -15157,15 +15220,15 @@ blUISliderEnable(IN BLGuid _ID, IN BLBool _Enable)
 	_widget->uExtension.sSlider.nState = _Enable ? 1 : 0;
 	_PrUIMem->bDirty = TRUE;
 }
-BLU32
-blUIGetSliderPos(IN BLGuid _ID)
+BLVoid
+blUISliderGetEnable(IN BLGuid _ID, OUT BLBool* _Enable)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
-		return 0;
+		return;
 	if (_widget->eType != BL_UT_SLIDER)
-		return 0;
-	return _widget->uExtension.sSlider.nSliderPosition;
+		return;
+	*_Enable = _widget->uExtension.sSlider.nState;
 }
 BLVoid
 blUITablePixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)

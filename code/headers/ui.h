@@ -814,35 +814,63 @@ BL_API BLVoid blUISliderHorizontal(
 	IN BLGuid _ID,
 	IN BLBool _Horizontal);
 
+BL_API BLVoid blUISliderGetHorizontal(
+	IN BLGuid _ID,
+	OUT BLBool* _Horizontal);
+
 BL_API BLVoid blUISliderSliderStep(
 	IN BLGuid _ID,
 	IN BLU32 _Step);
 
+BL_API BLVoid blUISliderGetSliderStep(
+	IN BLGuid _ID,
+	OUT BLU32* _Step);
+
 BL_API BLVoid blUISliderSliderPos(
 	IN BLGuid _ID,
 	IN BLS32 _Pos);
+
+BL_API BLVoid blUISliderGetSliderPos(
+	IN BLGuid _ID,
+	OUT BLS32* _Pos);
 
 BL_API BLVoid blUISliderSliderSize(
 	IN BLGuid _ID,
 	IN BLU32 _Width,
 	IN BLU32 _Height);
 
+BL_API BLVoid blUISliderGetSliderSize(
+	IN BLGuid _ID,
+	OUT BLU32* _Width,
+	OUT BLU32* _Height);
+
 BL_API BLVoid blUISliderSliderRange(
 	IN BLGuid _ID,
 	IN BLU32 _MinValue,
 	IN BLU32 _MaxValue);
+
+BL_API BLVoid blUISliderGetSliderRange(
+	IN BLGuid _ID,
+	OUT BLU32* _MinValue,
+	OUT BLU32* _MaxValue);
 
 BL_API BLVoid blUISliderFlip(
 	IN BLGuid _ID,
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
 
+BL_API BLVoid blUISliderGetFlip(
+	IN BLGuid _ID,
+	OUT BLBool* _FlipX,
+	OUT BLBool* _FlipY);
+
 BL_API BLVoid blUISliderEnable(
 	IN BLGuid _ID,
 	IN BLBool _Enable);
 
-BL_API BLU32 blUIGetSliderPos(
-	IN BLGuid _ID);
+BL_API BLVoid blUISliderGetEnable(
+	IN BLGuid _ID,
+	OUT BLBool* _Enable);
 
 BL_API BLVoid blUITablePixmap(
 	IN BLGuid _ID,
