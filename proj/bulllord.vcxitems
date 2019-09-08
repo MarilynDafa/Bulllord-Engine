@@ -1450,11 +1450,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c">
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-      <ExcludedFromBuild>false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc.h" />

@@ -13804,9 +13804,9 @@ blUIButtonGetFont(IN BLGuid _ID, OUT BLU32* _FontHeight, OUT BLBool* _Outline, O
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
-		return;
+		return NULL;
 	if (_widget->eType != BL_UT_BUTTON)
-		return;
+		return NULL;
 	*_FontHeight = _widget->uExtension.sButton.nFontHeight;
 	*_Outline = _widget->uExtension.sButton.bOutline;
 	*_Bold = _widget->uExtension.sButton.bBold;
@@ -14828,7 +14828,7 @@ blUIProgressText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor)
 		BLU32 _strlen = blUtf8Length(_Text) + 1;
 		if (_widget->uExtension.sProgress.pText)
 			free(_widget->uExtension.sProgress.pText);
-		_widget->uExtension.sCheck.sProgress = (BLUtf8*)malloc(_strlen);
+		_widget->uExtension.sProgress.pText = (BLUtf8*)malloc(_strlen);
 		memset(_widget->uExtension.sProgress.pText, 0, _strlen);
 		strcpy((BLAnsi*)_widget->uExtension.sProgress.pText, (const BLAnsi*)_Text);
 	}

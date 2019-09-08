@@ -1110,9 +1110,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_neon.c">
       <Filter>externals\webp\dsp</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <Filter>src</Filter>
     </ClCompile>
@@ -1163,6 +1160,9 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.c">
       <Filter>externals\duktape</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@
 #include "internal/thread.h"
 #include "internal/internal.h"
 #include "../externals/duktape/duktape.h"
-typedef struct _Ctx{
+typedef struct _Ctx {
 	BLU32 aState[4];
 	BLU32 aCount[2];
 	BLU8 aBuffer[64];
@@ -44,7 +44,7 @@ typedef struct _UtilMember {
 	BLUtf8 aU8Buf[32];
 	BLUtf16 aU16Buf[32];
 	BLAnsi aGuidBuf[32];
-    BLU32 nUriCount;
+	BLU32 nUriCount;
 }_BLUtilMember;
 static _BLUtilMember* _PrUtilMem = NULL;
 static BLVoid
@@ -64,14 +64,14 @@ _MD5GG(BLU32* _Aa, BLU32 _Bb, BLU32 _Cc, BLU32 _Dd, BLU32 _Xx, BLU32 _Ss, BLU32 
 static BLVoid
 _MD5HH(BLU32* _Aa, BLU32 _Bb, BLU32 _Cc, BLU32 _Dd, BLU32 _Xx, BLU32 _Ss, BLU32 _AC)
 {
-	*_Aa += ((_Bb) ^ (_Cc) ^ (_Dd)) + (_Xx) + (BLU32)(_AC);
+	*_Aa += ((_Bb) ^ (_Cc) ^ (_Dd)) + (_Xx)+(BLU32)(_AC);
 	*_Aa = (((*_Aa) << (_Ss)) | ((*_Aa) >> (32 - (_Ss))));
 	*_Aa += _Bb;
 }
 static BLVoid
 _MD5II(BLU32* _Aa, BLU32 _Bb, BLU32 _Cc, BLU32 _Dd, BLU32 _Xx, BLU32 _Ss, BLU32 _AC)
 {
-	*_Aa += ((_Cc) ^ ((_Bb) | (~_Dd))) + (_Xx) + (BLU32)(_AC);
+	*_Aa += ((_Cc) ^ ((_Bb) | (~_Dd))) + (_Xx)+(BLU32)(_AC);
 	*_Aa = (((*_Aa) << (_Ss)) | ((*_Aa) >> (32 - (_Ss))));
 	*_Aa += _Bb;
 }
@@ -192,7 +192,7 @@ _UtilsInit(DUK_CONTEXT* _DKC)
 	for (_idx = 0; _idx < _PrUtilMem->sMemCache.nMax; ++_idx)
 		_PrUtilMem->sMemCache.pDense[_idx] = _idx;
 	_PrUtilMem->pMutex = blGenMutex();
-    _PrUtilMem->nUriCount = 0;
+	_PrUtilMem->nUriCount = 0;
 }
 BLVoid
 _UtilsStep(BLU32 _Delta)
@@ -210,15 +210,15 @@ _UtilsDestroy()
 BLU32
 blUniqueUri()
 {
-    BLAnsi _buf[128] = { 0 };
+	BLAnsi _buf[128] = { 0 };
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-    sprintf(_buf, "%s_%I32u", "BulllordEngineUniqueUriCount", _PrUtilMem->nUriCount);
+	sprintf(_buf, "%s_%I32u", "BulllordEngineUniqueUriCount", _PrUtilMem->nUriCount);
 #elif defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_ANDROID)
-    sprintf(_buf, "%s_%zu", "BulllordEngineUniqueUriCount", _PrUtilMem->nUriCount);
+	sprintf(_buf, "%s_%zu", "BulllordEngineUniqueUriCount", _PrUtilMem->nUriCount);
 #else
-    sprintf(_buf, "%s_%u", "BulllordEngineUniqueUriCount", _PrUtilMem->nUriCount);
+	sprintf(_buf, "%s_%u", "BulllordEngineUniqueUriCount", _PrUtilMem->nUriCount);
 #endif
-    return blHashString((const BLUtf8*)_buf);
+	return blHashString((const BLUtf8*)_buf);
 }
 BLGuid
 blGenGuid(IN BLVoid* _Ptr, IN BLU32 _Uri)
@@ -234,8 +234,8 @@ blGenGuid(IN BLVoid* _Ptr, IN BLU32 _Uri)
 			_inptr = _PrUtilMem->sMemCache.pDense[_index];
 			_PrUtilMem->sMemCache.pSparse[_inptr] = _index;
 		}
-        else
-            blDebugOutput("GUID gen error");
+		else
+			blDebugOutput("GUID gen error");
 		_PrUtilMem->aPtrBuf[_inptr] = (BLVoid*)_Ptr;
 	}
 	BLGuid _gid;
@@ -265,7 +265,7 @@ blGuidAsPointer(IN BLGuid _ID)
 {
 	BLU32 _inptr = PTRPART_INTERNAL(_ID);
 	if (_inptr >= MEMCACHE_CAP_INTERNAL)
-        return NULL;
+		return NULL;
 	else
 		return _PrUtilMem->aPtrBuf[_inptr];
 }
@@ -308,7 +308,7 @@ blDebugOutput(IN BLAnsi* _Format, ...)
 #elif defined(BL_PLATFORM_ANDROID)
 	__android_log_print(ANDROID_LOG_INFO, "", "BULLLORD DEBUG INFORMATION > %s", _szbuf);
 #elif defined(BL_PLATFORM_OSX)
-    printf("BULLLORD DEBUG INFORMATION > %s\n", _szbuf);
+	printf("BULLLORD DEBUG INFORMATION > %s\n", _szbuf);
 #elif defined(BL_PLATFORM_IOS)
 	printf("BULLLORD DEBUG INFORMATION > %s\n", _szbuf);
 #elif defined(BL_PLATFORM_WEB)
@@ -353,122 +353,122 @@ blMD5String(IN BLAnsi* _Str)
 	}
 	memset(&_PrUtilMem->sContext, 0, sizeof(_BLCtx));
 	memset(_PrUtilMem->aMd5Buf, 0, sizeof(_PrUtilMem->aMd5Buf));
-	for (_i = 0; _i<16; _i++)
+	for (_i = 0; _i < 16; _i++)
 		sprintf(_PrUtilMem->aMd5Buf, "%s%02x", _PrUtilMem->aMd5Buf, _digest[_i]);
 	return _PrUtilMem->aMd5Buf;
 }
 const BLAnsi*
 blMd5File(IN BLAnsi* _Filename)
 {
-    if (!_Filename)
-        return NULL;
-    BLU32 _i, _j;
-    BLU32 _index = 0;
-    BLU32 _padlen;
-    BLU8 _bits[8];
-    BLU8 _data[1024];
-    _PrUtilMem->sContext.aCount[0] = _PrUtilMem->sContext.aCount[1] = 0;
-    _PrUtilMem->sContext.aState[0] = 0x67452301;
-    _PrUtilMem->sContext.aState[1] = 0xefcdab89;
-    _PrUtilMem->sContext.aState[2] = 0x98badcfe;
-    _PrUtilMem->sContext.aState[3] = 0x10325476;
-    BLAnsi _path[260] = { 0 };
-    strcpy(_path, blUserFolderDir());
-    strcat(_path, _Filename);
-    BLU32 _tmplen = (BLU32)strlen(_path);
-    for (_i = 0; _i < _tmplen; ++_i)
-    {
+	if (!_Filename)
+		return NULL;
+	BLU32 _i, _j;
+	BLU32 _index = 0;
+	BLU32 _padlen;
+	BLU8 _bits[8];
+	BLU8 _data[1024];
+	_PrUtilMem->sContext.aCount[0] = _PrUtilMem->sContext.aCount[1] = 0;
+	_PrUtilMem->sContext.aState[0] = 0x67452301;
+	_PrUtilMem->sContext.aState[1] = 0xefcdab89;
+	_PrUtilMem->sContext.aState[2] = 0x98badcfe;
+	_PrUtilMem->sContext.aState[3] = 0x10325476;
+	BLAnsi _path[260] = { 0 };
+	strcpy(_path, blUserFolderDir());
+	strcat(_path, _Filename);
+	BLU32 _tmplen = (BLU32)strlen(_path);
+	for (_i = 0; _i < _tmplen; ++_i)
+	{
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-        if (_path[_i] == '/')
-            _path[_i] = '\\';
+		if (_path[_i] == '/')
+			_path[_i] = '\\';
 #else
-        if (_path[_i] == '\\')
-            _path[_i] = '/';
+		if (_path[_i] == '\\')
+			_path[_i] = '/';
 #endif
-    }
+	}
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
-    WCHAR _wfilename[260] = { 0 };
-    MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
-    HANDLE _fp = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
+	WCHAR _wfilename[260] = { 0 };
+	MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
+	HANDLE _fp = CreateFile2(_wfilename, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, NULL);
 #else
-    HANDLE _fp = CreateFileA(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE _fp = CreateFileA(_path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
-    if (FILE_INVALID_INTERNAL(_fp))
-    {
-        while (1)
-        {
-            DWORD _readsz;
-            ReadFile(_fp, _data, 1024, &_readsz, NULL);
-            _MD5Update(_data, _readsz);
-            if (_readsz < 1024)
-                break;
-        }
-        CloseHandle(_fp);
-        goto md5final;
-    }
-    else
-        return NULL;
+	if (FILE_INVALID_INTERNAL(_fp))
+	{
+		while (1)
+		{
+			DWORD _readsz;
+			ReadFile(_fp, _data, 1024, &_readsz, NULL);
+			_MD5Update(_data, _readsz);
+			if (_readsz < 1024)
+				break;
+		}
+		CloseHandle(_fp);
+		goto md5final;
+	}
+	else
+		return NULL;
 #elif defined(BL_PLATFORM_WEB)
-    FILE* _fp = fopen(_path, "rb");
-    if (FILE_INVALID_INTERNAL(_fp))
-    {
-        while (1)
-        {
-            BLU32 _readsz = fread(_data, 1, 1024, _fp);
-            _MD5Update(_data, _readsz);
-            if (_readsz < 1024)
-                break;
-        }
-        fclose(_fp);
-        goto md5final;
-    }
-    else
-        return NULL;
+	FILE* _fp = fopen(_path, "rb");
+	if (FILE_INVALID_INTERNAL(_fp))
+	{
+		while (1)
+		{
+			BLU32 _readsz = fread(_data, 1, 1024, _fp);
+			_MD5Update(_data, _readsz);
+			if (_readsz < 1024)
+				break;
+		}
+		fclose(_fp);
+		goto md5final;
+	}
+	else
+		return NULL;
 #else
-    FILE* _fp = fopen(_path, "rb");
-    if (FILE_INVALID_INTERNAL(_fp))
-    {
-        while (1)
-        {
-            BLU32 _readsz = (BLU32)fread(_data, 1, 1024, _fp);
-            _MD5Update(_data, _readsz);
-            if (_readsz < 1024)
-                break;
-        }
-        fclose(_fp);
-        goto md5final;
-    }
-    else
-        return NULL;
+	FILE* _fp = fopen(_path, "rb");
+	if (FILE_INVALID_INTERNAL(_fp))
+	{
+		while (1)
+		{
+			BLU32 _readsz = (BLU32)fread(_data, 1, 1024, _fp);
+			_MD5Update(_data, _readsz);
+			if (_readsz < 1024)
+				break;
+		}
+		fclose(_fp);
+		goto md5final;
+	}
+	else
+		return NULL;
 #endif
 md5final:
-    for (_i = 0, _j = 0; _j < 8; _i++, _j += 4)
-    {
-        _bits[_j] = (BLU8)(_PrUtilMem->sContext.aCount[_i] & 0xff);
-        _bits[_j + 1] = (BLU8)((_PrUtilMem->sContext.aCount[_i] >> 8) & 0xff);
-        _bits[_j + 2] = (BLU8)((_PrUtilMem->sContext.aCount[_i] >> 16) & 0xff);
-        _bits[_j + 3] = (BLU8)((_PrUtilMem->sContext.aCount[_i] >> 24) & 0xff);
-    }
-    _index = (BLU32)((_PrUtilMem->sContext.aCount[0] >> 3) & 0x3f);
-    _padlen = (_index < 56) ? (56 - _index) : (120 - _index);
-    BLU8 _padding[64] = { 0 };
-    _padding[0] = 0x80;
-    _MD5Update(_padding, _padlen);
-    _MD5Update(_bits, 8);
-    BLU8 _digest[16];
-    for (_i = 0, _j = 0; _j < 16; _i++, _j += 4)
-    {
-        _digest[_j] = (BLU8)(_PrUtilMem->sContext.aState[_i] & 0xff);
-        _digest[_j + 1] = (BLU8)((_PrUtilMem->sContext.aState[_i] >> 8) & 0xff);
-        _digest[_j + 2] = (BLU8)((_PrUtilMem->sContext.aState[_i] >> 16) & 0xff);
-        _digest[_j + 3] = (BLU8)((_PrUtilMem->sContext.aState[_i] >> 24) & 0xff);
-    }
-    memset(&_PrUtilMem->sContext, 0, sizeof(_BLCtx));
-    memset(_PrUtilMem->aMd5Buf, 0, sizeof(_PrUtilMem->aMd5Buf));
-    for (_i = 0; _i<16; _i++)
-        sprintf(_PrUtilMem->aMd5Buf, "%s%02x", _PrUtilMem->aMd5Buf, _digest[_i]);
-    return _PrUtilMem->aMd5Buf;
+	for (_i = 0, _j = 0; _j < 8; _i++, _j += 4)
+	{
+		_bits[_j] = (BLU8)(_PrUtilMem->sContext.aCount[_i] & 0xff);
+		_bits[_j + 1] = (BLU8)((_PrUtilMem->sContext.aCount[_i] >> 8) & 0xff);
+		_bits[_j + 2] = (BLU8)((_PrUtilMem->sContext.aCount[_i] >> 16) & 0xff);
+		_bits[_j + 3] = (BLU8)((_PrUtilMem->sContext.aCount[_i] >> 24) & 0xff);
+	}
+	_index = (BLU32)((_PrUtilMem->sContext.aCount[0] >> 3) & 0x3f);
+	_padlen = (_index < 56) ? (56 - _index) : (120 - _index);
+	BLU8 _padding[64] = { 0 };
+	_padding[0] = 0x80;
+	_MD5Update(_padding, _padlen);
+	_MD5Update(_bits, 8);
+	BLU8 _digest[16];
+	for (_i = 0, _j = 0; _j < 16; _i++, _j += 4)
+	{
+		_digest[_j] = (BLU8)(_PrUtilMem->sContext.aState[_i] & 0xff);
+		_digest[_j + 1] = (BLU8)((_PrUtilMem->sContext.aState[_i] >> 8) & 0xff);
+		_digest[_j + 2] = (BLU8)((_PrUtilMem->sContext.aState[_i] >> 16) & 0xff);
+		_digest[_j + 3] = (BLU8)((_PrUtilMem->sContext.aState[_i] >> 24) & 0xff);
+	}
+	memset(&_PrUtilMem->sContext, 0, sizeof(_BLCtx));
+	memset(_PrUtilMem->aMd5Buf, 0, sizeof(_PrUtilMem->aMd5Buf));
+	for (_i = 0; _i < 16; _i++)
+		sprintf(_PrUtilMem->aMd5Buf, "%s%02x", _PrUtilMem->aMd5Buf, _digest[_i]);
+	return _PrUtilMem->aMd5Buf;
 }
 BLS32
 blNatCompare(IN BLAnsi* _StrA, IN BLAnsi* _StrB)
@@ -619,10 +619,10 @@ blUtf8Equal(IN BLUtf8* _Str1, IN BLUtf8* _Str2)
 	BLUtf8* _dst = (BLUtf8*)_Str2;
 	BLS32 _ret = 0;
 	while (!(_ret = (BLS32)(*_src - *_dst)) && *_dst)
-    {
-        ++_src;
-        ++_dst;
-    }
+	{
+		++_src;
+		++_dst;
+	}
 	if (_ret < 0)
 		return FALSE;
 	else if (_ret > 0)
@@ -638,10 +638,10 @@ blUtf16Equal(IN BLUtf16* _Str1, IN BLUtf16* _Str2)
 	BLUtf16* _dst = (BLUtf16*)_Str2;
 	BLS32 _ret = 0;
 	while (!(_ret = (BLS32)(*_src - *_dst)) && *_dst)
-    {
-        ++_src;
-        ++_dst;
-    }
+	{
+		++_src;
+		++_dst;
+	}
 	if (_ret < 0)
 		return FALSE;
 	else if (_ret > 0)
@@ -712,7 +712,7 @@ blUtf16ToInteger(IN BLUtf16* _Str)
 {
 	if (!_Str)
 		return 0;
-	BLUtf8 _buf[32] = {0};
+	BLUtf8 _buf[32] = { 0 };
 	BLUtf8* _dest = _buf;
 	const BLUtf16* _tmp = _Str;
 	BLU32 _cnt = 0;
@@ -995,33 +995,41 @@ blGenUtf16Str(IN BLUtf8* _Str)
 	while (*_tmp++)
 		_cnt++;
 	_strlen = _cnt;
-	while(_cnt--)
+	while (_cnt--)
 	{
 		_tcp = *_buf++;
 		++_encsze;
-		if(_tcp < 0x80)
-		{   ;	}
-		else if(_tcp < 0xE0)
-		{	--_cnt;	++_buf;	}
-		else if(_tcp < 0xF0)
-		{	_cnt -= 2;	_buf += 2;	}
+		if (_tcp < 0x80)
+		{
+			;
+		}
+		else if (_tcp < 0xE0)
+		{
+			--_cnt;	++_buf;
+		}
+		else if (_tcp < 0xF0)
+		{
+			_cnt -= 2;	_buf += 2;
+		}
 		else
-		{   _cnt -= 2;	_buf += 3;	}
+		{
+			_cnt -= 2;	_buf += 3;
+		}
 	}
 	_ret = _temp = (BLUtf16*)malloc((1 + _encsze) * sizeof(BLUtf16));
 	_destcapacity = _encsze;
-	for(_idx = 0; ((_idx < _strlen) && (_destcapacity > 0));)
+	for (_idx = 0; ((_idx < _strlen) && (_destcapacity > 0));)
 	{
 		BLUtf16 _cp;
 		BLUtf8 _cu = _Str[_idx++];
-		if(_cu < 0x80)
+		if (_cu < 0x80)
 			_cp = (BLUtf16)(_cu);
-		else if(_cu < 0xE0)
+		else if (_cu < 0xE0)
 		{
 			_cp = ((_cu & 0x1F) << 6);
 			_cp |= (_Str[_idx++] & 0x3F);
 		}
-		else if(_cu < 0xF0)
+		else if (_cu < 0xF0)
 		{
 			_cp = ((_cu & 0x0F) << 12);
 			_cp |= ((_Str[_idx++] & 0x3F) << 6);
@@ -1057,37 +1065,37 @@ blGenUtf8Str(IN BLUtf16* _Str)
 		_cnt++;
 	_tmpcnt = _cnt;
 	_tmp = _Str;
-	while(_tmpcnt--)
+	while (_tmpcnt--)
 	{
-		if(*_tmp < 0x80)
+		if (*_tmp < 0x80)
 			_buffsize += 1;
-		else if(*_tmp < 0x0800)
+		else if (*_tmp < 0x0800)
 			_buffsize += 2;
 		else
 			_buffsize += 3;
 		_tmp++;
 	}
-	_ret = (BLUtf8*)malloc((1 + _buffsize)*sizeof(BLUtf8));
+	_ret = (BLUtf8*)malloc((1 + _buffsize) * sizeof(BLUtf8));
 	_rettmp = (BLUtf8*)_ret;
 	_destcapacity = _buffsize;
-	for(_idx = 0; _idx < _cnt; ++_idx)
+	for (_idx = 0; _idx < _cnt; ++_idx)
 	{
 		BLUtf16 _cp = _Str[_idx];
 		BLU32 _tmpesz;
-		if(_cp < 0x80)
+		if (_cp < 0x80)
 			_tmpesz = 1;
-		else if(_cp < 0x0800)
+		else if (_cp < 0x0800)
 			_tmpesz = 2;
 		else
 			_tmpesz = 3;
-		if(_destcapacity < _tmpesz)
+		if (_destcapacity < _tmpesz)
 			break;
-		if(_cp < 0x80)
+		if (_cp < 0x80)
 		{
 			*_rettmp++ = (BLUtf8)_cp;
 			--_destcapacity;
 		}
-		else if(_cp < 0x0800)
+		else if (_cp < 0x0800)
 		{
 			*_rettmp++ = (BLUtf8)((_cp >> 6) | 0xC0);
 			*_rettmp++ = (BLUtf8)((_cp & 0x3F) | 0x80);
@@ -1169,38 +1177,38 @@ blFileSuffixUtf16(IN BLUtf16* _Filename)
 const BLAnsi*
 blGenBase64Encoder(IN BLU8* _Blob, IN BLU32 _Size)
 {
-    const BLAnsi _b64enc[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "abcdefghijklmnopqrstuvwxyz" "0123456789" "+/";
-    BLU32 _idx, _jdx, _mlen, _rpos, _dif;
-    BLU32 _frame = 0;
-    BLAnsi _out[5];
-    BLAnsi* _res;
-    _mlen = 4 * _Size / 3 + 1;
-    if (_Size % 3)
-        _mlen += 4;
-    _res = (BLAnsi*)malloc(_mlen);
-    if (!_res)
-        return NULL;
-    _res[_mlen - 1] = '\0';
-    _out[4] = '\0';
-    for (_idx = 0; _idx < _Size; _idx += 3)
-    {
-        _dif = (_Size - _idx) / 3 ? 3 : (_Size - _idx) % 3;
-        for (_jdx = 0; _jdx < _dif; ++_jdx)
-            memcpy(((BLAnsi*)&_frame) + 2 - _jdx, _Blob + _idx + _jdx, 1);
-        for (_jdx = 0; _jdx < _dif + 1; ++_jdx)
-        {
-            _out[_jdx] = (BLAnsi)((_frame & 0xFC0000) >> 18);
-            _out[_jdx] = _b64enc[(BLS32)_out[_jdx]];
-            _frame = _frame << 6;
-        }
-        if (_dif == 1)
-            _out[2] = _out [3] = '=';
-        else if (_dif == 2)
-            _out [3] = '=';
-        _rpos = (_idx / 3) * 4;
-        strcpy(_res + _rpos, _out);
-    }
-    return _res;
+	const BLAnsi _b64enc[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "abcdefghijklmnopqrstuvwxyz" "0123456789" "+/";
+	BLU32 _idx, _jdx, _mlen, _rpos, _dif;
+	BLU32 _frame = 0;
+	BLAnsi _out[5];
+	BLAnsi* _res;
+	_mlen = 4 * _Size / 3 + 1;
+	if (_Size % 3)
+		_mlen += 4;
+	_res = (BLAnsi*)malloc(_mlen);
+	if (!_res)
+		return NULL;
+	_res[_mlen - 1] = '\0';
+	_out[4] = '\0';
+	for (_idx = 0; _idx < _Size; _idx += 3)
+	{
+		_dif = (_Size - _idx) / 3 ? 3 : (_Size - _idx) % 3;
+		for (_jdx = 0; _jdx < _dif; ++_jdx)
+			memcpy(((BLAnsi*)&_frame) + 2 - _jdx, _Blob + _idx + _jdx, 1);
+		for (_jdx = 0; _jdx < _dif + 1; ++_jdx)
+		{
+			_out[_jdx] = (BLAnsi)((_frame & 0xFC0000) >> 18);
+			_out[_jdx] = _b64enc[(BLS32)_out[_jdx]];
+			_frame = _frame << 6;
+		}
+		if (_dif == 1)
+			_out[2] = _out[3] = '=';
+		else if (_dif == 2)
+			_out[3] = '=';
+		_rpos = (_idx / 3) * 4;
+		strcpy(_res + _rpos, _out);
+	}
+	return _res;
 }
 BLVoid
 blDeleteBase64Encoder(INOUT BLAnsi* _String)
@@ -1210,52 +1218,52 @@ blDeleteBase64Encoder(INOUT BLAnsi* _String)
 const BLU8*
 blGenBase64Decoder(IN BLAnsi* _String, OUT BLU32* _Size)
 {
-    BLU8* _res, _v;
-    BLU32 _jdx, _idx;
-    BLU32 _in = 0;
-    BLU32 _srclen = (BLU32)(strlen(_String));
-    if (_srclen % 4)
-        return NULL;
-    *_Size = (_srclen / 4) * 3;
-    _res = (BLU8*)malloc(*_Size);
-    if (!_res)
-        return NULL;
-    for (_idx = 0; _idx < _srclen; _idx += 4)
-    {
-        _in = 0;
-        for (_jdx = 0; _jdx < 4; ++_jdx)
-        {
-            BLAnsi _c = _String[_idx + _jdx];
-            if (_c >= 'A' && _c <= 'Z')
-                _v = _c - 'A';
-            else if (_c >= 'a' && _c <= 'z')
-                _v = _c - 'a' + 26;
-            else if (_c >= '0' && _c <= '9')
-                _v = _c - '0' + 52;
-            else if (_c == '+')
-                _v = 62;
-            else if (_c == '/')
-                _v = 63;
-            else if (_c == '=')
-                _v = 0;
-            else
-                _v = 0xFF;
-            if (_v == 0xFF)
-            {
-                free(_res);
-                return NULL;
-            }
-            _in = _in << 6;
-            _in += _v;
-        }
-        for (_jdx = 0; _jdx < 3; ++_jdx)
-            memcpy(_res + (_idx / 4) * 3 + _jdx, ((BLU8*)&_in) + 2 - _jdx, 1);
-    }
-    if (_String[_srclen-1] == '=')
-        (*_Size)--;
-    if (_String[_srclen-2] == '=')
-        (*_Size)--;
-    return _res;
+	BLU8* _res, _v;
+	BLU32 _jdx, _idx;
+	BLU32 _in = 0;
+	BLU32 _srclen = (BLU32)(strlen(_String));
+	if (_srclen % 4)
+		return NULL;
+	*_Size = (_srclen / 4) * 3;
+	_res = (BLU8*)malloc(*_Size);
+	if (!_res)
+		return NULL;
+	for (_idx = 0; _idx < _srclen; _idx += 4)
+	{
+		_in = 0;
+		for (_jdx = 0; _jdx < 4; ++_jdx)
+		{
+			BLAnsi _c = _String[_idx + _jdx];
+			if (_c >= 'A' && _c <= 'Z')
+				_v = _c - 'A';
+			else if (_c >= 'a' && _c <= 'z')
+				_v = _c - 'a' + 26;
+			else if (_c >= '0' && _c <= '9')
+				_v = _c - '0' + 52;
+			else if (_c == '+')
+				_v = 62;
+			else if (_c == '/')
+				_v = 63;
+			else if (_c == '=')
+				_v = 0;
+			else
+				_v = 0xFF;
+			if (_v == 0xFF)
+			{
+				free(_res);
+				return NULL;
+			}
+			_in = _in << 6;
+			_in += _v;
+		}
+		for (_jdx = 0; _jdx < 3; ++_jdx)
+			memcpy(_res + (_idx / 4) * 3 + _jdx, ((BLU8*)&_in) + 2 - _jdx, 1);
+	}
+	if (_String[_srclen - 1] == '=')
+		(*_Size)--;
+	if (_String[_srclen - 2] == '=')
+		(*_Size)--;
+	return _res;
 }
 BLVoid
 blDeleteBase64Decoder(INOUT BLU8* _Blob)
@@ -1265,29 +1273,29 @@ blDeleteBase64Decoder(INOUT BLU8* _Blob)
 BLU32
 blColor4B(IN BLU8 _Rr, IN BLU8 _Gg, IN BLU8 _Bb, IN BLU8 _Aa)
 {
-    return (_Aa << 24)+(_Bb << 16)+(_Gg << 8)+(_Rr << 0);
+	return (_Aa << 24) + (_Bb << 16) + (_Gg << 8) + (_Rr << 0);
 }
 BLU32
 blColor4F(IN BLF32 _Rr, IN BLF32 _Gg, IN BLF32 _Bb, IN BLF32 _Aa)
 {
-    BLU8 _r = (BLU8)(_Rr * 255 + 0.5f);
-    BLU8 _g = (BLU8)(_Gg * 255 + 0.5f);
-    BLU8 _b = (BLU8)(_Bb * 255 + 0.5f);
-    BLU8 _a = (BLU8)(_Aa * 255 + 0.5f);
-    return (_a << 24)+(_b << 16)+(_g << 8)+(_r << 0);
+	BLU8 _r = (BLU8)(_Rr * 255 + 0.5f);
+	BLU8 _g = (BLU8)(_Gg * 255 + 0.5f);
+	BLU8 _b = (BLU8)(_Bb * 255 + 0.5f);
+	BLU8 _a = (BLU8)(_Aa * 255 + 0.5f);
+	return (_a << 24) + (_b << 16) + (_g << 8) + (_r << 0);
 }
 BLVoid
 blDeColor4B(IN BLU32 _Clr, OUT BLU8 _Clrb[4])
 {
-    _Clrb[3] = (BLU8)(_Clr >> 24);
-    _Clrb[2] = (BLU8)(_Clr >> 16);
-    _Clrb[1] = (BLU8)(_Clr >>  8);
-    _Clrb[0] = (BLU8)(_Clr >>  0);
+	_Clrb[3] = (BLU8)(_Clr >> 24);
+	_Clrb[2] = (BLU8)(_Clr >> 16);
+	_Clrb[1] = (BLU8)(_Clr >> 8);
+	_Clrb[0] = (BLU8)(_Clr >> 0);
 }
 BLVoid
 blDeColor4F(IN BLU32 _Clr, OUT BLF32 _Clrf[4])
 {
-    BLF32 _inv = 1.0f / 255.0f;
+	BLF32 _inv = 1.0f / 255.0f;
 	BLU8 _a = (BLU8)(_Clr >> 24);
 	BLU8 _b = (BLU8)(_Clr >> 16);
 	BLU8 _g = (BLU8)(_Clr >> 8);
