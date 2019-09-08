@@ -921,23 +921,33 @@ BL_API BLVoid blUITableRowHeight(
 	IN BLGuid _ID,
 	IN BLU32 _RowHeight);
 
+BL_API BLVoid blUITableGetRowHeight(
+	IN BLGuid _ID,
+	OUT BLU32* _RowHeight);
+
 BL_API BLVoid blUITableColumnWidth(
 	IN BLGuid _ID,
 	IN BLU32 _Column,
 	IN BLU32 _Width);
 
+BL_API BLVoid blUITableGetColumnWidth(
+	IN BLGuid _ID,
+	IN BLU32 _Column,
+	OUT BLU32* _Width);
+
 //#image:picture.bmg#
 BL_API BLVoid blUITableCell(
 	IN BLGuid _ID,
 	IN BLUtf8* _Text,
-	IN BLU32 _TxtColor,
 	IN BLU32 _Row,
-	IN BLU32 _Column);
+	IN BLU32 _Column,
+	IN BLU32 _TxtColor);
 
-BL_API BLUtf8* blUIGetTableText(
+BL_API BLUtf8* blUITableGetCell(
 	IN BLGuid _ID,
 	IN BLU32 _Row,
-	IN BLU32 _Column);
+	IN BLU32 _Column,
+	OUT BLU32* _TxtColor);
 
 BL_API BLVoid blUITableFont(
 	IN BLGuid _ID,
@@ -948,10 +958,23 @@ BL_API BLVoid blUITableFont(
 	IN BLBool _Shadow,
 	IN BLBool _Italics);
 
+BL_API BLAnsi* blUITableGetFont(
+	IN BLGuid _ID,
+	OUT BLU32* _FontHeight,
+	OUT BLBool* _Outline,
+	OUT BLBool* _Bold,
+	OUT BLBool* _Shadow,
+	OUT BLBool* _Italics);
+
 BL_API BLVoid blUITableFlip(
 	IN BLGuid _ID,
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
+
+BL_API BLVoid blUITableGetFlip(
+	IN BLGuid _ID,
+	OUT BLBool* _FlipX,
+	OUT BLBool* _FlipY);
 
 BL_API BLVoid blUIDialPixmap(
 	IN BLGuid _ID,

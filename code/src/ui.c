@@ -15432,6 +15432,16 @@ blUITableRowHeight(IN BLGuid _ID, IN BLU32 _RowHeight)
 	_TableMake(_widget);
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUITableGetRowHeight(IN BLGuid _ID, OUT BLU32* _RowHeight)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TABLE)
+		return;
+	*_RowHeight = _widget->uExtension.sTable.nRowHeight;
+}
 BLVoid
 blUITableColumnWidth(IN BLGuid _ID, IN BLU32 _Column, IN BLU32 _Width)
 {
@@ -15488,8 +15498,18 @@ blUITableColumnWidth(IN BLGuid _ID, IN BLU32 _Column, IN BLU32 _Width)
 	_TableMake(_widget);
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUITableGetColumnWidth(IN BLGuid _ID, IN BLU32 _Column, OUT BLU32* _Width)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TABLE)
+		return;
+	*_Width = _widget->uExtension.sTable.aColumnWidth[_Column];
+}
 BLVoid
-blUITableCell(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLU32 _Row, IN BLU32 _Column)
+blUITableCell(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _Row, IN BLU32 _Column, IN BLU32 _TxtColor)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -15535,7 +15555,7 @@ blUITableCell(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLU32 _Row
 	_PrUIMem->bDirty = TRUE;
 }
 BLUtf8*
-blUIGetTableText(IN BLGuid _ID, IN BLU32 _Row, IN BLU32 _Column)
+blUITableGetCell(IN BLGuid _ID, IN BLU32 _Row, IN BLU32 _Column, OUT BLU32* _TxtColor)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -15544,7 +15564,10 @@ blUIGetTableText(IN BLGuid _ID, IN BLU32 _Row, IN BLU32 _Column)
 		return NULL;
 	BLU32 _cellidx = _Column + _Row * _widget->uExtension.sTable.nColumnNum;
 	if (_cellidx < _widget->uExtension.sTable.nCellNum)
+	{
+		*_TxtColor = _widget->uExtension.sTable.pCellColor[_cellidx];
 		return _widget->uExtension.sTable.pCellText[_cellidx];
+	}
     return NULL;
 }
 BLVoid
@@ -15589,6 +15612,21 @@ blUITableFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _
 	}
 	_PrUIMem->bDirty = TRUE;
 }
+BLAnsi* 
+blUITableGetFont(IN BLGuid _ID, OUT BLU32* _FontHeight, OUT BLBool* _Outline, OUT BLBool* _Bold, OUT BLBool* _Shadow, OUT BLBool* _Italics)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_TABLE)
+		return NULL;
+	*_FontHeight = _widget->uExtension.sTable.nFontHeight;
+	*_Outline = _widget->uExtension.sTable.bOutline;
+	*_Bold = _widget->uExtension.sTable.bBold;
+	*_Shadow = _widget->uExtension.sTable.bShadow;
+	*_Italics = _widget->uExtension.sTable.bItalics;
+	return _widget->uExtension.sTable.aFontSource;
+}
 BLVoid
 blUITableFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 {
@@ -15600,6 +15638,17 @@ blUITableFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_widget->uExtension.sTable.bFlipX = _FlipX;
 	_widget->uExtension.sTable.bFlipY = _FlipY;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid
+blUITableGetFlip(IN BLGuid _ID, OUT BLBool* _FlipX, OUT BLBool* _FlipY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_TABLE)
+		return;
+	*_FlipX = _widget->uExtension.sTable.bFlipX;
+	*_FlipY = _widget->uExtension.sTable.bFlipY;
 }
 BLVoid
 blUIDialPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
