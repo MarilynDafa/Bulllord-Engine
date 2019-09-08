@@ -14803,6 +14803,16 @@ blUIProgressPercent(IN BLGuid _ID, IN BLU32 _Percent)
 	_widget->uExtension.sProgress.nPercent = (BLU32)blScalarClamp((BLF32)_Percent, 0.f, 100.f);
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUIProgressGetPercent(IN BLGuid _ID, OUT BLU32* _Percent)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PROGRESS)
+		return;
+	*_Percent = _widget->uExtension.sProgress.nPercent;
+}
 BLVoid
 blUIProgressBorder(IN BLGuid _ID, IN BLU32 _BorderX, IN BLU32 _BorderY)
 {
@@ -14814,6 +14824,17 @@ blUIProgressBorder(IN BLGuid _ID, IN BLU32 _BorderX, IN BLU32 _BorderY)
 	_widget->uExtension.sProgress.nBorderX = _BorderX;
 	_widget->uExtension.sProgress.nBorderY = _BorderY;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUIProgressGetBorder(IN BLGuid _ID, OUT BLU32* _BorderX, OUT BLU32* _BorderY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PROGRESS)
+		return;
+	*_BorderX = _widget->uExtension.sProgress.nBorderX;
+	*_BorderY = _widget->uExtension.sProgress.nBorderY;
 }
 BLVoid
 blUIProgressText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor)
@@ -14840,6 +14861,17 @@ blUIProgressText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor)
 	}
 	_widget->uExtension.sProgress.nTxtColor = _TxtColor;
 	_PrUIMem->bDirty = TRUE;
+}
+BLUtf8*
+blUIProgressGetText(IN BLGuid _ID, OUT BLU32* _TxtColor)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_PROGRESS)
+		return NULL;
+	*_TxtColor = _widget->uExtension.sProgress.nTxtColor;
+	return _widget->uExtension.sProgress.pText;
 }
 BLVoid
 blUIProgressFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _Outline, IN BLBool _Bold, IN BLBool _Shadow, IN BLBool _Italics)
@@ -14883,6 +14915,21 @@ blUIProgressFont(IN BLGuid _ID, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBoo
 	}
 	_PrUIMem->bDirty = TRUE;
 }
+BLAnsi* 
+blUIProgressGetFont(IN BLGuid _ID, OUT BLU32* _FontHeight, OUT BLBool* _Outline, OUT BLBool* _Bold, OUT BLBool* _Shadow, OUT BLBool* _Italics)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_PROGRESS)
+		return NULL;
+	*_FontHeight = _widget->uExtension.sProgress.nFontHeight;
+	*_Bold = _widget->uExtension.sProgress.bOutline;
+	*_Bold = _widget->uExtension.sProgress.bBold;
+	*_Shadow = _widget->uExtension.sProgress.bShadow;
+	*_Italics = _widget->uExtension.sProgress.bItalics;
+	return _widget->uExtension.sProgress.aFontSource;
+}
 BLVoid
 blUIProgressFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 {
@@ -14895,15 +14942,16 @@ blUIProgressFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_widget->uExtension.sProgress.bFlipY = _FlipY;
 	_PrUIMem->bDirty = TRUE;
 }
-BLF32
-blUIGetProgressPercent(IN BLGuid _ID)
+BLVoid
+blUIProgressGetFlip(IN BLGuid _ID, OUT BLBool* _FlipX, OUT BLBool* _FlipY)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
-		return 0.f;
+		return;
 	if (_widget->eType != BL_UT_PROGRESS)
-		return 0.f;
-	return (BLF32)_widget->uExtension.sProgress.nPercent / 100.f;
+		return;
+	*_FlipX = _widget->uExtension.sProgress.bFlipX;
+	*_FlipY = _widget->uExtension.sProgress.bFlipY;
 }
 BLVoid
 blUISliderPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)

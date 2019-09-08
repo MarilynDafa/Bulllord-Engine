@@ -708,15 +708,28 @@ BL_API BLVoid blUIProgressPercent(
 	IN BLGuid _ID,
 	IN BLU32 _Percent);
 
+BL_API BLVoid blUIProgressGetPercent(
+	IN BLGuid _ID,
+	OUT BLU32* _Percent);
+
 BL_API BLVoid blUIProgressBorder(
 	IN BLGuid _ID,
 	IN BLU32 _BorderX,
 	IN BLU32 _BorderY);
 
+BL_API BLVoid blUIProgressGetBorder(
+	IN BLGuid _ID,
+	OUT BLU32* _BorderX,
+	OUT BLU32* _BorderY);
+
 BL_API BLVoid blUIProgressText(
 	IN BLGuid _ID,
 	IN BLUtf8* _Text,
 	IN BLU32 _TxtColor);
+
+BL_API BLUtf8* blUIProgressGetText(
+	IN BLGuid _ID,
+	OUT BLU32* _TxtColor);
 
 BL_API BLVoid blUIProgressFont(
 	IN BLGuid _ID,
@@ -727,13 +740,23 @@ BL_API BLVoid blUIProgressFont(
 	IN BLBool _Shadow,
 	IN BLBool _Italics);
 
+BL_API BLAnsi* blUIProgressGetFont(
+	IN BLGuid _ID,
+	OUT BLU32* _FontHeight,
+	OUT BLBool* _Outline,
+	OUT BLBool* _Bold,
+	OUT BLBool* _Shadow,
+	OUT BLBool* _Italics);
+
 BL_API BLVoid blUIProgressFlip(
 	IN BLGuid _ID,
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
 
-BL_API BLF32 blUIGetProgressPercent(
-	IN BLGuid _ID);
+BL_API BLVoid blUIProgressGetFlip(
+	IN BLGuid _ID,
+	OUT BLBool* _FlipX,
+	OUT BLBool* _FlipY);
 
 BL_API BLVoid blUISliderPixmap(
 	IN BLGuid _ID,
