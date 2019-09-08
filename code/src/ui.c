@@ -12429,10 +12429,10 @@ blUIFile(IN BLAnsi* _Filename)
 			blUISliderSliderCommonMap(_widguid, _slidercommonmap, 0, 0, 0, 0);
 			blUISliderSliderDisableMap(_widguid, _slidersisablemap, 0, 0, 0, 0);
 			blUISliderHorizontal(_widguid, _orientationvar);
-			blUISliderSliderStep(_widguid, _sliderstepvar);
-			blUISliderSliderPos(_widguid, _sliderpositionvar);
-			blUISliderSliderSize(_widguid, _slidersizevar[0], _slidersizevar[1]);
-			blUISliderSliderRange(_widguid, _rangevar[0], _rangevar[1]);
+			blUISliderStep(_widguid, _sliderstepvar);
+			blUISliderThumbPos(_widguid, _sliderpositionvar);
+			blUISliderThumbSize(_widguid, _slidersizevar[0], _slidersizevar[1]);
+			blUISliderRange(_widguid, _rangevar[0], _rangevar[1]);
 			blUISliderEnable(_widguid, _enablevar);
 			blUISliderPixmap(_widguid, _pixmap);
 			blUIAttach((_parentwid == _PrUIMem->pRoot || !_parentwid) ? _dummy->nID : _parentwid->nID, _widguid);
@@ -15098,7 +15098,7 @@ blUISliderGetHorizontal(IN BLGuid _ID, OUT BLBool* _Horizontal)
 	*_Horizontal = _widget->uExtension.sSlider.bHorizontal;
 }
 BLVoid
-blUISliderSliderStep(IN BLGuid _ID, IN BLU32 _Step)
+blUISliderStep(IN BLGuid _ID, IN BLU32 _Step)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -15109,7 +15109,7 @@ blUISliderSliderStep(IN BLGuid _ID, IN BLU32 _Step)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid 
-blUISliderGetSliderStep(IN BLGuid _ID, OUT BLU32* _Step)
+blUISliderGetStep(IN BLGuid _ID, OUT BLU32* _Step)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -15119,7 +15119,7 @@ blUISliderGetSliderStep(IN BLGuid _ID, OUT BLU32* _Step)
 	*_Step = _widget->uExtension.sSlider.nStep;
 }
 BLVoid
-blUISliderSliderPos(IN BLGuid _ID, IN BLS32 _Pos)
+blUISliderThumbPos(IN BLGuid _ID, IN BLS32 _Pos)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -15130,7 +15130,7 @@ blUISliderSliderPos(IN BLGuid _ID, IN BLS32 _Pos)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid 
-blUISliderGetSliderPos(IN BLGuid _ID, OUT BLS32* _Pos)
+blUISliderGetThumbPos(IN BLGuid _ID, OUT BLS32* _Pos)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -15140,7 +15140,7 @@ blUISliderGetSliderPos(IN BLGuid _ID, OUT BLS32* _Pos)
 	*_Pos = _widget->uExtension.sSlider.nSliderPosition;
 }
 BLVoid
-blUISliderSliderSize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
+blUISliderThumbSize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -15152,7 +15152,7 @@ blUISliderSliderSize(IN BLGuid _ID, IN BLU32 _Width, IN BLU32 _Height)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid 
-blUISliderGetSliderSize(IN BLGuid _ID, OUT BLU32* _Width, OUT BLU32* _Height)
+blUISliderGetThumbSize(IN BLGuid _ID, OUT BLU32* _Width, OUT BLU32* _Height)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -15163,7 +15163,7 @@ blUISliderGetSliderSize(IN BLGuid _ID, OUT BLU32* _Width, OUT BLU32* _Height)
 	*_Height = (BLU32)_widget->uExtension.sSlider.sSliderSize.fY;
 }
 BLVoid
-blUISliderSliderRange(IN BLGuid _ID, IN BLU32 _MinValue, IN BLU32 _MaxValue)
+blUISliderRange(IN BLGuid _ID, IN BLU32 _MinValue, IN BLU32 _MaxValue)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -15176,7 +15176,7 @@ blUISliderSliderRange(IN BLGuid _ID, IN BLU32 _MinValue, IN BLU32 _MaxValue)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid 
-blUISliderGetSliderRange(IN BLGuid _ID, OUT BLU32* _MinValue, OUT BLU32* _MaxValue)
+blUISliderGetRange(IN BLGuid _ID, OUT BLU32* _MinValue, OUT BLU32* _MaxValue)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)

@@ -818,38 +818,38 @@ BL_API BLVoid blUISliderGetHorizontal(
 	IN BLGuid _ID,
 	OUT BLBool* _Horizontal);
 
-BL_API BLVoid blUISliderSliderStep(
+BL_API BLVoid blUISliderStep(
 	IN BLGuid _ID,
 	IN BLU32 _Step);
 
-BL_API BLVoid blUISliderGetSliderStep(
+BL_API BLVoid blUISliderGetStep(
 	IN BLGuid _ID,
 	OUT BLU32* _Step);
 
-BL_API BLVoid blUISliderSliderPos(
+BL_API BLVoid blUISliderThumbPos(
 	IN BLGuid _ID,
 	IN BLS32 _Pos);
 
-BL_API BLVoid blUISliderGetSliderPos(
+BL_API BLVoid blUISliderGetThumbPos(
 	IN BLGuid _ID,
 	OUT BLS32* _Pos);
 
-BL_API BLVoid blUISliderSliderSize(
+BL_API BLVoid blUISliderThumbSize(
 	IN BLGuid _ID,
 	IN BLU32 _Width,
 	IN BLU32 _Height);
 
-BL_API BLVoid blUISliderGetSliderSize(
+BL_API BLVoid blUISliderGetThumbSize(
 	IN BLGuid _ID,
 	OUT BLU32* _Width,
 	OUT BLU32* _Height);
 
-BL_API BLVoid blUISliderSliderRange(
+BL_API BLVoid blUISliderRange(
 	IN BLGuid _ID,
 	IN BLU32 _MinValue,
 	IN BLU32 _MaxValue);
 
-BL_API BLVoid blUISliderGetSliderRange(
+BL_API BLVoid blUISliderGetRange(
 	IN BLGuid _ID,
 	OUT BLU32* _MinValue,
 	OUT BLU32* _MaxValue);
