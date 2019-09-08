@@ -423,19 +423,35 @@ BL_API BLVoid blUILableText(
 	IN BLBool _Italics,
 	IN BLBool _Rich);
 
+BL_API BLUtf8* blUILableGetText(
+	IN BLGuid _ID);
+
 BL_API BLVoid blUILabelPadding(
 	IN BLGuid _ID,
-	IN BLF32 _PaddingX,
-	IN BLF32 _PaddingY);
+	IN BLU32 _PaddingX,
+	IN BLU32 _PaddingY);
+
+BL_API BLVoid blUILabelGetPadding(
+	IN BLGuid _ID,
+	OUT BLU32* _PaddingX,
+	OUT BLU32* _PaddingY);
 
 BL_API BLVoid blUILabelFlip(
 	IN BLGuid _ID,
 	IN BLBool _FlipX,
 	IN BLBool _FlipY);
 
-BL_API BLVoid blUILabelTexture(
+BL_API BLVoid blUILabelGetFlip(
+	IN BLGuid _ID,
+	OUT BLBool* _FlipX,
+	OUT BLBool* _FlipY);
+
+BL_API BLVoid blUILabelRenderTexture(
 	IN BLGuid _ID,
 	IN BLGuid _Tex);
+
+BL_API BLGuid blUILabelGetRenderTexture(
+	IN BLGuid _ID);
 
 BL_API BLVoid blUICheckPixmap(
 	IN BLGuid _ID,
@@ -1034,19 +1050,39 @@ BL_API BLVoid blUIPrimitiveFill(
 	IN BLGuid _ID,
 	IN BLBool _Fill);
 
+BL_API BLVoid blUIPrimitiveGetFill(
+	IN BLGuid _ID,
+	OUT BLBool* _Fill);
+
 BL_API BLVoid blUIPrimitiveClosed(
 	IN BLGuid _ID,
 	IN BLBool _Closed);
 
+BL_API BLVoid blUIPrimitiveGetClosed(
+	IN BLGuid _ID,
+	OUT BLBool* _Closed);
+
 BL_API BLVoid blUIPrimitiveColor(
 	IN BLGuid _ID,
 	IN BLU32 _Color);
+
+BL_API BLVoid blUIPrimitiveGetColor(
+	IN BLGuid _ID,
+	OUT BLU32* _Color);
 
 BL_API BLVoid blUIPrimitivePath(
 	IN BLGuid _ID,
 	IN BLF32* _XPath,
 	IN BLF32* _YPath,
 	IN BLU32 _PathNum);
+
+BL_API BLF32* blUIPrimitiveGetPathX(
+	IN BLGuid _ID,
+	OUT BLU32* _PathNum);
+
+BL_API BLF32* blUIPrimitiveGetPathY(
+	IN BLGuid _ID,
+	OUT BLU32* _PathNum);
 
 BL_API BLBool blUIActionBegin(
 	IN BLGuid _ID);

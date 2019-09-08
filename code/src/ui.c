@@ -14013,8 +14013,18 @@ blUILableText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _Tx
 	_LabelParse(_widget);
 	_PrUIMem->bDirty = TRUE;
 }
+BLUtf8* 
+blUILableGetText(IN BLGuid _ID)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_LABEL)
+		return NULL;
+	return _widget->uExtension.sLabel.pText;
+}
 BLVoid
-blUILabelPadding(IN BLGuid _ID, IN BLF32 _PaddingX, IN BLF32 _PaddingY)
+blUILabelPadding(IN BLGuid _ID, IN BLU32 _PaddingX, IN BLU32 _PaddingY)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -14024,6 +14034,17 @@ blUILabelPadding(IN BLGuid _ID, IN BLF32 _PaddingX, IN BLF32 _PaddingY)
 	_widget->uExtension.sLabel.fPaddingX = _PaddingX;
 	_widget->uExtension.sLabel.fPaddingY = _PaddingY;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUILabelGetPadding(IN BLGuid _ID, OUT BLU32* _PaddingX, OUT BLU32* _PaddingY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_LABEL)
+		return;
+	*_PaddingX = _widget->uExtension.sLabel.fPaddingX;
+	*_PaddingY = _widget->uExtension.sLabel.fPaddingY;
 }
 BLVoid
 blUILabelFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
@@ -14038,7 +14059,18 @@ blUILabelFlip(IN BLGuid _ID, IN BLBool _FlipX, IN BLBool _FlipY)
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid 
-blUILabelTexture(IN BLGuid _ID, IN BLGuid _Tex)
+blUILabelGetFlip(IN BLGuid _ID, OUT BLBool* _FlipX, OUT BLBool* _FlipY)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_LABEL)
+		return;
+	*_FlipX = _widget->uExtension.sLabel.bFlipX;
+	*_FlipY = _widget->uExtension.sLabel.bFlipY;
+}
+BLVoid 
+blUILabelRenderTexture(IN BLGuid _ID, IN BLGuid _Tex)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -14048,6 +14080,16 @@ blUILabelTexture(IN BLGuid _ID, IN BLGuid _Tex)
 	_widget->uExtension.sLabel.nExTex = _Tex;
 	_widget->bValid = TRUE;
 	_PrUIMem->bDirty = TRUE;
+}
+BLGuid 
+blUILabelGetRenderTexture(IN BLGuid _ID)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return INVALID_GUID;
+	if (_widget->eType != BL_UT_LABEL)
+		return INVALID_GUID;
+	return _widget->uExtension.sLabel.nExTex;
 }
 BLVoid
 blUICheckPixmap(IN BLGuid _ID, IN BLAnsi* _Pixmap)
@@ -15818,6 +15860,16 @@ blUIPrimitiveFill(IN BLGuid _ID, IN BLBool _Fill)
 	_widget->uExtension.sPrimitive.bFill = _Fill;
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUIPrimitiveGetFill(IN BLGuid _ID, OUT BLBool* _Fill)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PRIMITIVE)
+		return;
+	*_Fill = _widget->uExtension.sPrimitive.bFill;
+}
 BLVoid
 blUIPrimitiveClosed(IN BLGuid _ID, IN BLBool _Closed)
 {
@@ -15829,6 +15881,16 @@ blUIPrimitiveClosed(IN BLGuid _ID, IN BLBool _Closed)
 	_widget->uExtension.sPrimitive.bClosed = _Closed;
 	_PrUIMem->bDirty = TRUE;
 }
+BLVoid 
+blUIPrimitiveGetClosed(IN BLGuid _ID, OUT BLBool* _Closed)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PRIMITIVE)
+		return;
+	*_Closed = _widget->uExtension.sPrimitive.bClosed;
+}
 BLVoid
 blUIPrimitiveColor(IN BLGuid _ID, IN BLU32 _Color)
 {
@@ -15839,6 +15901,16 @@ blUIPrimitiveColor(IN BLGuid _ID, IN BLU32 _Color)
 		return;
 	_widget->uExtension.sPrimitive.nColor = _Color;
 	_PrUIMem->bDirty = TRUE;
+}
+BLVoid 
+blUIPrimitiveGetColor(IN BLGuid _ID, OUT BLU32* _Color)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return;
+	if (_widget->eType != BL_UT_PRIMITIVE)
+		return;
+	*_Color = _widget->uExtension.sPrimitive.nColor;
 }
 BLVoid
 blUIPrimitivePath(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _PathNum)
@@ -15858,6 +15930,28 @@ blUIPrimitivePath(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _P
 	memcpy(_widget->uExtension.sPrimitive.pYPath, _YPath, _PathNum * sizeof(BLF32));
 	_widget->uExtension.sPrimitive.nPathNum = _PathNum;
 	_PrUIMem->bDirty = TRUE;
+}
+BLF32* 
+blUIPrimitiveGetPathX(IN BLGuid _ID, OUT BLU32* _PathNum)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_PRIMITIVE)
+		return NULL;
+	*_PathNum = _widget->uExtension.sPrimitive.nPathNum;
+	return _widget->uExtension.sPrimitive.pXPath;
+}
+BLF32* 
+blUIPrimitiveGetPathY(IN BLGuid _ID, OUT BLU32* _PathNum)
+{
+	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
+	if (!_widget)
+		return NULL;
+	if (_widget->eType != BL_UT_PRIMITIVE)
+		return NULL;
+	*_PathNum = _widget->uExtension.sPrimitive.nPathNum;
+	return _widget->uExtension.sPrimitive.pYPath;
 }
 BLBool
 blUIActionBegin(IN BLGuid _ID)
