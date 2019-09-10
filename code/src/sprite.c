@@ -2145,7 +2145,7 @@ blSpriteTile(IN BLGuid _ID, IN BLAnsi* _ImageFile, IN BLF32 _TexLTx, IN BLF32 _T
 	}
 }
 BLBool
-blSpriteAsEmit(IN BLGuid _ID, IN BLF32 _EmitAngle, IN BLF32 _EmitterRadius, IN BLF32 _Life, IN BLU32 _MaxAlive, IN BLU32 _GenPerSec, IN BLF32 _DirectionX, IN BLF32 _DirectionY, IN BLF32 _Velocity, IN BLF32 _VelVariance, IN BLF32 _Rotation, IN BLF32 _RotVariance, IN BLF32 _Scale, IN BLF32 _ScaleVariance, IN BLU32 _FadeColor, IN BLBool _Off)
+blSpriteAsEmit(IN BLGuid _ID, IN BLAnsi* _Code, IN BLBool _Off)
 {
     if (_ID == INVALID_GUID)
         return FALSE;
@@ -2161,36 +2161,34 @@ blSpriteAsEmit(IN BLGuid _ID, IN BLF32 _EmitAngle, IN BLF32 _EmitterRadius, IN B
 		}
 		return TRUE;
 	}
-	if (!_node->pEmitParam)
-    {
-        _node->pEmitParam = (_BLEmitParam*)malloc(sizeof(_BLEmitParam));
-        _node->pEmitParam->pAge = (BLU32*)malloc(_MaxAlive * sizeof(BLU32));
-        memset(_node->pEmitParam->pAge, 0, _MaxAlive * sizeof(BLU32));
-        _node->pEmitParam->pPositionX = (BLF32*)malloc(_MaxAlive * sizeof(BLF32));
-        _node->pEmitParam->pPositionY = (BLF32*)malloc(_MaxAlive * sizeof(BLF32));
-        _node->pEmitParam->pEmitAngle = (BLF32*)malloc(_MaxAlive * sizeof(BLF32));
-        _node->pEmitParam->pVelocity = (BLF32*)malloc(_MaxAlive * sizeof(BLF32));
-        _node->pEmitParam->pRotScale = (BLU32*)malloc(_MaxAlive * sizeof(BLU32));
-    }
-	_node->pEmitParam->fEmitterRadius = _EmitterRadius;
-	_node->pEmitParam->nLife = (BLU32)(_Life * 1000);
-	_node->pEmitParam->nMaxAlive = _MaxAlive;
-	_node->pEmitParam->fGenPerMSec = (BLF32)_GenPerSec / 1000.f;
-    BLVec2 _dir;
-    _dir.fX = _DirectionX;
-    _dir.fY = _DirectionY;
-    blVec2Normalize(&_dir);
-	_node->pEmitParam->fDirectionX = _dir.fX;
-    _node->pEmitParam->fDirectionY = _dir.fY;
-    _node->pEmitParam->fVelocity = _Velocity;
-    _node->pEmitParam->fVelVariance = _VelVariance;
-	_node->pEmitParam->fEmitAngle = _EmitAngle * PI_INTERNAL / 180.f;
-    _node->pEmitParam->fRotation = _Rotation * PI_INTERNAL / 180.f;
-    _node->pEmitParam->fRotVariance = _RotVariance * PI_INTERNAL / 180.f;
-    _node->pEmitParam->fScale = _Scale;
-    _node->pEmitParam->fScaleVariance = _ScaleVariance;
-    _node->pEmitParam->nFadeColor = _FadeColor;
-    _node->pEmitParam->nCurAlive = 0;
+	BLAnsi* _code = (BLAnsi*)malloc(strlen(_Code) + 1);
+	_code[strlen(_Code) + 1] = 0;
+	strcpy(_code, _Code);
+	BLAnsi* _tmp;
+	BLArray* _pars = blGenArray(FALSE);
+	_tmp = strtok((BLAnsi*)_code, "\n");
+	while (_tmp)
+	{
+		blArrayPushBack(_pars, _tmp);
+		_tmp = strtok(NULL, "\n");
+	}
+	{
+		BLU32 _idx = 0;
+		FOREACH_ARRAY(BLAnsi*, _iter, _pars)
+		{
+			switch (_idx)
+			{
+			case 0:
+				{
+				strtok(_iter, "=");
+				BLAnsi* _val = strtok(NULL, "=");
+				}
+				break;
+			}
+		}
+	}
+	free(_code);
+	blDeleteArray(_pars);
     return TRUE;
 }
 BLBool
@@ -2449,7 +2447,7 @@ blSpriteActionRotate(IN BLGuid _ID, IN BLS32 _Angle, IN BLBool _ClockWise, IN BL
 		_act->fCurTime = 0.f;
 		_act->fTotalTime = _Time;
 		_act->uAction.sRotate.bClockWise = _ClockWise;
-		_act->uAction.sRotate.fAngle = _Angle;
+		_act->uAction.sRotate.fAngle = (BLF32)_Angle;
 		if (!_node->pAction)
 		{
 			_node->pAction = _act;

@@ -176,20 +176,7 @@ BL_API BLVoid blSpriteTile(
     
 BL_API BLBool blSpriteAsEmit(
     IN BLGuid _ID,
-    IN BLF32 _EmitAngle,
-	IN BLF32 _EmitterRadius,
-	IN BLF32 _Life,
-	IN BLU32 _MaxAlive,
-	IN BLU32 _GenPerSec,
-	IN BLF32 _DirectionX,
-	IN BLF32 _DirectionY,
-    IN BLF32 _Velocity,
-    IN BLF32 _VelVariance,
-    IN BLF32 _Rotation,
-    IN BLF32 _RotVariance,
-	IN BLF32 _Scale,
-    IN BLF32 _ScaleVariance,
-    IN BLU32 _FadeColor,
+	IN BLAnsi* _Code,
 	IN BLBool _Off);
     
 BL_API BLBool blSpriteAsCursor(
