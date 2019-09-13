@@ -92,28 +92,94 @@ typedef struct _SpriteRecorder {
 	BLF32 fPosXRecord;
 	BLF32 fPosYRecord;
 } _BLSpriteRecorder;
+typedef struct _EmitData
+{
+	BLS16* pPosX;
+	BLS16* pPosY;
+	BLU8* pColorR;
+	BLU8* pColorG;
+	BLU8* pColorB;
+	BLU8* pColorA;
+	BLU8* pDeltaColorR;
+	BLU8* pDeltaColorG;
+	BLU8* pDeltaColorB;
+	BLU8* pDeltaColorA;
+	BLF32* pScale;
+	BLF32* pDeltaScale;
+	BLF32* pRotation;
+	BLF32* pDeltaRotation;
+	BLF32* pTimeToLive;
+	struct {
+		BLF32* pAngle;
+		BLF32* pDegreesPS;
+		BLF32* pRadius;
+		BLF32* pDeltaRadius;
+	} sModeA;
+	struct {
+		BLF32* pDirX;
+		BLF32* pDirY;
+		BLF32* pRadAccel;
+		BLF32* pTanAccel;
+	} sModeB;
+}_BLEmitData;
 typedef struct _EmitParam {
-	BLF32 fEmitterRadius;
-	BLU32 nLife;
-	BLU32 nMaxAlive;
-    BLU32 nCurAlive;
-	BLF32 fGenPerMSec;
-	BLF32 fDirectionX;
-	BLF32 fDirectionY;
-    BLF32 fVelocity;
-    BLF32 fVelVariance;
-	BLF32 fEmitAngle;
-    BLF32 fRotation;
-    BLF32 fRotVariance;
-    BLF32 fScale;
-    BLF32 fScaleVariance;
-    BLU32 nFadeColor;
-    BLU32* pAge;
-    BLF32* pPositionX;
-    BLF32* pPositionY;
-    BLF32* pEmitAngle;
-    BLF32* pVelocity;
-    BLU32* pRotScale;
+	BLF32 fLife;
+	BLF32 fLifeVariance;
+	BLU16 nTotalParticles;
+	BLU16 nParticleCount;
+	BLU16 nStartSize;
+	BLU16 nStartSizeVariance;
+	BLU16 nEndSize;
+	BLU16 nEndSizeVariance;
+	BLF32 fStartSpin;
+	BLF32 fStartSpinVariance;
+	BLF32 fEndSpin;
+	BLF32 fEndSpinVariance;
+	BLU8 nStartR;
+	BLU8 nStartG;
+	BLU8 nStartB;
+	BLU8 nStartA;
+	BLU8 nEndR;
+	BLU8 nEndG;
+	BLU8 nEndB;
+	BLU8 nEndA;
+	BLU8 nStartRVariance;
+	BLU8 nStartGVariance;
+	BLU8 nStartBVariance;
+	BLU8 nStartAVariance;
+	BLU8 nEndRVariance;
+	BLU8 nEndGVariance;
+	BLU8 nEndBVariance;
+	BLU8 nEndAVariance;
+	BLF32 fDuration;
+	BLF32 fAngle;
+	BLF32 fAngleVariance;
+	BLU16 nEmitterW;
+	BLU16 nEmitterH;
+	BLU16 nEmissionRate;
+	BLF32 fEmissionPS;
+	BLF32 fElapsed;
+	BLU8 nMode;
+	union {
+		struct _Gravity {
+			BLU32 nSpeed;
+			BLU32 nSpeedVariance;
+			BLS32 nGravityX;
+			BLS32 nGravityY;
+			BLS32 nRadAccel;
+			BLS32 nRadAccelVariance;
+			BLS32 nTanAccel;
+			BLS32 nTanAccelVariance;
+		}sGravity;
+		struct _Radius {
+			BLU32 nMaxRadius;
+			BLU32 nMaxRadiusVariance;
+			BLU32 nMinRadius;
+			BLS32 nRotPS;
+			BLS32 nRotPSVariance;
+		}sRadius;
+	} uMode;
+	_BLEmitData sData;
 }_BLEmitParam;
 typedef struct _SpriteSheet{
 	BLS32 nTag;
@@ -232,6 +298,16 @@ _UseCustomCursor()
 		return _PrSpriteMem->pCursor ? TRUE : FALSE;
 	else
 		return FALSE;
+}
+BLF32 _RandomM11(BLU32* _Seed)
+{
+	*_Seed = *_Seed * 134775813 + 1;
+	union {
+		BLU32 _d;
+		BLF32 _f;
+	} _u;
+	_u._d = (((BLU32)(*_Seed) & 0x7fff) << 8) | 0x40000000;
+	return _u._f - 3.0f;
 }
 static const BLBool
 _MouseSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, BLGuid _ID)
@@ -440,12 +516,6 @@ _SpriteSetup(BLVoid* _Src)
 			1.f
 		};
 		_node->nGBO = blGenGeometryBuffer(URIPART_INTERNAL(_node->nID), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-		if (_node->pEmitParam)
-		{
-			BLEnum _semantice[] = { BL_SL_COLOR1, BL_SL_INSTANCE1 };
-			BLEnum _decle[] = { BL_VD_FLOATX4, BL_VD_FLOATX4 };
-			blGeometryBufferInstance(_node->nGBO, _semantice, _decle, 2, _node->pEmitParam->nMaxAlive);
-		}
 		_node->nTex = blGenTexture(blHashString((const BLUtf8*)_node->aFilename), BL_TT_2D, _node->eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->nTexWidth, _node->nTexHeight, 1, _node->pTexData);
 		free(_node->pTexData);
 		_node->pTexData = NULL;
@@ -673,9 +743,35 @@ _UnloadSprite(BLVoid* _Src)
 	{
 		if (_node->pEmitParam)
 		{
-			free(_node->pEmitParam->pPositionX);
-			free(_node->pEmitParam->pPositionY);
-			free(_node->pEmitParam->pAge);
+			free(_node->pEmitParam->sData.pPosX);
+			free(_node->pEmitParam->sData.pPosY);
+			free(_node->pEmitParam->sData.pColorR);
+			free(_node->pEmitParam->sData.pColorG);
+			free(_node->pEmitParam->sData.pColorB);
+			free(_node->pEmitParam->sData.pColorA);
+			free(_node->pEmitParam->sData.pDeltaColorR);
+			free(_node->pEmitParam->sData.pDeltaColorG);
+			free(_node->pEmitParam->sData.pDeltaColorB);
+			free(_node->pEmitParam->sData.pDeltaColorA);
+			free(_node->pEmitParam->sData.pScale);
+			free(_node->pEmitParam->sData.pDeltaScale);
+			free(_node->pEmitParam->sData.pRotation);
+			free(_node->pEmitParam->sData.pDeltaRotation);
+			free(_node->pEmitParam->sData.pTimeToLive);
+			if (_node->pEmitParam->nMode == 0)
+			{
+				free(_node->pEmitParam->sData.sModeA.pAngle);
+				free(_node->pEmitParam->sData.sModeA.pDegreesPS);
+				free(_node->pEmitParam->sData.sModeA.pRadius);
+				free(_node->pEmitParam->sData.sModeA.pDeltaRadius);
+			}
+			else
+			{
+				free(_node->pEmitParam->sData.sModeB.pDirX);
+				free(_node->pEmitParam->sData.sModeB.pDirY);
+				free(_node->pEmitParam->sData.sModeB.pRadAccel);
+				free(_node->pEmitParam->sData.sModeB.pTanAccel);
+			}
 			free(_node->pEmitParam);
 		}
 		{
@@ -886,6 +982,160 @@ _SpriteUpdate(BLU32 _Delta)
 	}
 }
 static BLVoid
+_GenParticle(_BLSpriteNode* _Node, BLU32 _Delta)
+{
+	BLF32 _dt = _Delta / 1000.f;
+	BLF32 _rate = 1.0f / (BLF32)_Node->pEmitParam->nEmissionRate;
+	if (_Node->pEmitParam->nParticleCount < _Node->pEmitParam->nTotalParticles)
+	{
+		_Node->pEmitParam->fEmissionPS += _dt;
+		if (_Node->pEmitParam->fEmissionPS < 0.f)
+			_Node->pEmitParam->fEmissionPS = 0.f;
+	}
+	BLU32 _count = (BLU32)MIN(_Node->pEmitParam->nTotalParticles - _Node->pEmitParam->nParticleCount, _Node->pEmitParam->fEmissionPS / _rate);
+	BLU32 _seed = rand();
+	BLU32 _start = _Node->pEmitParam->nParticleCount;
+	_Node->pEmitParam->nParticleCount += _count;
+	for (BLU32 _i = _start; _i < _Node->pEmitParam->nParticleCount; ++_i)
+	{
+		BLF32 _life = _Node->pEmitParam->fLife + _Node->pEmitParam->fLifeVariance * _RandomM11(&_seed);
+		_Node->pEmitParam->sData.pTimeToLive[_i] = MAX_INTERNAL(0, _life);
+		_Node->pEmitParam->sData.pPosX[_i] = (BLS16)(_Node->pEmitParam->nEmitterW * (_RandomM11(&_seed) - 0.5f));
+		_Node->pEmitParam->sData.pPosY[_i] = (BLS16)(_Node->pEmitParam->nEmitterH * (_RandomM11(&_seed) - 0.5f));
+		_Node->pEmitParam->sData.pColorR[_i] = (BLU8)blScalarClamp(_Node->pEmitParam->nStartR + _Node->pEmitParam->nStartRVariance * _RandomM11(&_seed), 0, 255);
+		_Node->pEmitParam->sData.pColorG[_i] = (BLU8)blScalarClamp(_Node->pEmitParam->nStartG + _Node->pEmitParam->nStartRVariance * _RandomM11(&_seed), 0, 255);
+		_Node->pEmitParam->sData.pColorB[_i] = (BLU8)blScalarClamp(_Node->pEmitParam->nStartB + _Node->pEmitParam->nStartBVariance * _RandomM11(&_seed), 0, 255);
+		_Node->pEmitParam->sData.pColorA[_i] = (BLU8)blScalarClamp(_Node->pEmitParam->nStartA + _Node->pEmitParam->nStartAVariance * _RandomM11(&_seed), 0, 255);
+		_Node->pEmitParam->sData.pDeltaColorR[_i] = (BLU8)blScalarClamp(_Node->pEmitParam->nEndR + _Node->pEmitParam->nEndRVariance * _RandomM11(&_seed), 0, 255);
+		_Node->pEmitParam->sData.pDeltaColorG[_i] = (BLU8)blScalarClamp(_Node->pEmitParam->nEndG + _Node->pEmitParam->nEndGVariance * _RandomM11(&_seed), 0, 255);
+		_Node->pEmitParam->sData.pDeltaColorB[_i] = (BLU8)blScalarClamp(_Node->pEmitParam->nEndB + _Node->pEmitParam->nEndBVariance * _RandomM11(&_seed), 0, 255);
+		_Node->pEmitParam->sData.pDeltaColorA[_i] = (BLU8)blScalarClamp(_Node->pEmitParam->nEndA + _Node->pEmitParam->nEndAVariance * _RandomM11(&_seed), 0, 255);
+		_Node->pEmitParam->sData.pDeltaColorR[_i] = (BLU8)((_Node->pEmitParam->sData.pDeltaColorR[_i] - _Node->pEmitParam->sData.pColorR[_i]) / _Node->pEmitParam->sData.pTimeToLive[_i]);
+		_Node->pEmitParam->sData.pDeltaColorG[_i] = (BLU8)((_Node->pEmitParam->sData.pDeltaColorG[_i] - _Node->pEmitParam->sData.pColorG[_i]) / _Node->pEmitParam->sData.pTimeToLive[_i]);
+		_Node->pEmitParam->sData.pDeltaColorB[_i] = (BLU8)((_Node->pEmitParam->sData.pDeltaColorB[_i] - _Node->pEmitParam->sData.pColorB[_i]) / _Node->pEmitParam->sData.pTimeToLive[_i]);
+		_Node->pEmitParam->sData.pDeltaColorA[_i] = (BLU8)((_Node->pEmitParam->sData.pDeltaColorA[_i] - _Node->pEmitParam->sData.pColorA[_i]) / _Node->pEmitParam->sData.pTimeToLive[_i]);
+		_Node->pEmitParam->sData.pScale[_i] = (_Node->pEmitParam->nStartSize + _Node->pEmitParam->nStartSizeVariance * _RandomM11(&_seed)) * 2 / (_Node->sSize.fX + _Node->sSize.fY);
+		_Node->pEmitParam->sData.pDeltaScale[_i] = ((_Node->pEmitParam->nEndSize + _Node->pEmitParam->nEndSizeVariance * _RandomM11(&_seed)) * 2 / (_Node->sSize.fX + _Node->sSize.fY) - _Node->pEmitParam->sData.pScale[_i]) / _Node->pEmitParam->sData.pTimeToLive[_i];
+		_Node->pEmitParam->sData.pRotation[_i] = _Node->pEmitParam->fStartSpin + _Node->pEmitParam->fStartSpinVariance * _RandomM11(&_seed);
+		_Node->pEmitParam->sData.pDeltaRotation[_i] = (_Node->pEmitParam->fEndSpin + _Node->pEmitParam->fEndSpinVariance * _RandomM11(&_seed) - _Node->pEmitParam->sData.pRotation[_i]) / _Node->pEmitParam->sData.pTimeToLive[_i];
+		if (_Node->pEmitParam->nMode == 0)
+		{
+			_Node->pEmitParam->sData.sModeA.pRadius[_i] = _Node->pEmitParam->uMode.sRadius.nMaxRadius + _Node->pEmitParam->uMode.sRadius.nMaxRadiusVariance * _RandomM11(&_seed);
+			_Node->pEmitParam->sData.sModeA.pAngle[_i] = _Node->pEmitParam->fAngle + _Node->pEmitParam->fAngleVariance * _RandomM11(&_seed);
+			_Node->pEmitParam->sData.sModeA.pDegreesPS[_i] = _Node->pEmitParam->uMode.sRadius.nRotPS + _Node->pEmitParam->uMode.sRadius.nRotPSVariance * _RandomM11(&_seed);
+			_Node->pEmitParam->sData.sModeA.pDegreesPS[_i] = _Node->pEmitParam->uMode.sRadius.nRotPS + _Node->pEmitParam->uMode.sRadius.nRotPSVariance * _RandomM11(&_seed);
+			_Node->pEmitParam->sData.sModeA.pDeltaRadius[_i] = (_Node->pEmitParam->uMode.sRadius.nMinRadius - _Node->pEmitParam->sData.sModeA.pRadius[_i]) / _Node->pEmitParam->sData.pTimeToLive[_i];
+		}
+		else
+		{
+			_Node->pEmitParam->sData.sModeB.pRadAccel[_i] = _Node->pEmitParam->uMode.sGravity.nRadAccel + _Node->pEmitParam->uMode.sGravity.nRadAccelVariance * _RandomM11(&_seed);
+			_Node->pEmitParam->sData.sModeB.pTanAccel[_i] = _Node->pEmitParam->uMode.sGravity.nTanAccel + _Node->pEmitParam->uMode.sGravity.nTanAccelVariance * _RandomM11(&_seed);
+			BLF32 _a = _Node->pEmitParam->fAngle + _Node->pEmitParam->fAngleVariance * _RandomM11(&_seed);
+			BLF32 _s = _Node->pEmitParam->uMode.sGravity.nSpeed + _Node->pEmitParam->uMode.sGravity.nSpeedVariance * _RandomM11(&_seed);
+			_Node->pEmitParam->sData.sModeB.pDirX[_i] = cosf(_a) * _s;
+			_Node->pEmitParam->sData.sModeB.pDirY[_i] = sinf(_a) * _s;
+		}
+	}
+	_Node->pEmitParam->fEmissionPS -= _rate * _count;
+	_Node->pEmitParam->fElapsed += _dt;
+	if (_Node->pEmitParam->fElapsed < 0.f)
+		_Node->pEmitParam->fElapsed = 0.f;
+	if (_Node->pEmitParam->fDuration > 0 && _Node->pEmitParam->fDuration < _Node->pEmitParam->fElapsed)
+	{
+		_Node->pEmitParam->fElapsed = _Node->pEmitParam->fDuration;
+		_Node->pEmitParam->fEmissionPS = 0;
+	}
+	for (BLU32 _i = 0; _i < _Node->pEmitParam->nParticleCount; ++_i)
+	{
+		_Node->pEmitParam->sData.pTimeToLive[_i] -= _dt;
+		if (_Node->pEmitParam->sData.pTimeToLive[_i] <= 0.0f)
+		{
+			BLU32 _j = _Node->pEmitParam->nParticleCount - 1;
+			while (_j > 0 && _Node->pEmitParam->sData.pTimeToLive[_j] <= 0)
+			{
+				_Node->pEmitParam->nParticleCount--;
+				_j--;
+			}
+			_Node->pEmitParam->sData.pPosX[_i] = _Node->pEmitParam->sData.pPosX[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pPosY[_i] = _Node->pEmitParam->sData.pPosY[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pColorR[_i] = _Node->pEmitParam->sData.pColorR[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pColorG[_i] = _Node->pEmitParam->sData.pColorG[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pColorB[_i] = _Node->pEmitParam->sData.pColorB[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pColorA[_i] = _Node->pEmitParam->sData.pColorA[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pDeltaColorR[_i] = _Node->pEmitParam->sData.pDeltaColorR[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pDeltaColorG[_i] = _Node->pEmitParam->sData.pDeltaColorG[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pDeltaColorB[_i] = _Node->pEmitParam->sData.pDeltaColorB[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pDeltaColorA[_i] = _Node->pEmitParam->sData.pDeltaColorA[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pScale[_i] = _Node->pEmitParam->sData.pScale[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pDeltaScale[_i] = _Node->pEmitParam->sData.pDeltaScale[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pRotation[_i] = _Node->pEmitParam->sData.pRotation[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pDeltaRotation[_i] = _Node->pEmitParam->sData.pDeltaRotation[_Node->pEmitParam->nParticleCount - 1];
+			_Node->pEmitParam->sData.pTimeToLive[_i] = _Node->pEmitParam->sData.pTimeToLive[_Node->pEmitParam->nParticleCount - 1];
+			if (_Node->pEmitParam->nMode == 0)
+			{
+				_Node->pEmitParam->sData.sModeA.pAngle[_i] = _Node->pEmitParam->sData.sModeA.pAngle[_Node->pEmitParam->nParticleCount - 1];
+				_Node->pEmitParam->sData.sModeA.pDegreesPS[_i] = _Node->pEmitParam->sData.sModeA.pDegreesPS[_Node->pEmitParam->nParticleCount - 1];
+				_Node->pEmitParam->sData.sModeA.pRadius[_i] = _Node->pEmitParam->sData.sModeA.pRadius[_Node->pEmitParam->nParticleCount - 1];
+				_Node->pEmitParam->sData.sModeA.pDeltaRadius[_i] = _Node->pEmitParam->sData.sModeA.pDeltaRadius[_Node->pEmitParam->nParticleCount - 1];
+			}
+			else
+			{
+				_Node->pEmitParam->sData.sModeB.pDirX[_i] = _Node->pEmitParam->sData.sModeB.pDirX[_Node->pEmitParam->nParticleCount - 1];
+				_Node->pEmitParam->sData.sModeB.pDirY[_i] = _Node->pEmitParam->sData.sModeB.pDirY[_Node->pEmitParam->nParticleCount - 1];
+				_Node->pEmitParam->sData.sModeB.pRadAccel[_i] = _Node->pEmitParam->sData.sModeB.pRadAccel[_Node->pEmitParam->nParticleCount - 1];
+				_Node->pEmitParam->sData.sModeB.pTanAccel[_i] = _Node->pEmitParam->sData.sModeB.pTanAccel[_Node->pEmitParam->nParticleCount - 1];
+			}
+			--_Node->pEmitParam->nParticleCount;
+		}
+		_Node->pEmitParam->sData.pColorR[_i] += (BLU8)(_Node->pEmitParam->sData.pDeltaColorR[_i] * _dt);
+		_Node->pEmitParam->sData.pColorG[_i] += (BLU8)(_Node->pEmitParam->sData.pDeltaColorG[_i] * _dt);
+		_Node->pEmitParam->sData.pColorB[_i] += (BLU8)(_Node->pEmitParam->sData.pDeltaColorB[_i] * _dt);
+		_Node->pEmitParam->sData.pColorA[_i] += (BLU8)(_Node->pEmitParam->sData.pDeltaColorA[_i] * _dt);
+		_Node->pEmitParam->sData.pScale[_i] = _Node->pEmitParam->sData.pScale[_i] + _Node->pEmitParam->sData.pDeltaScale[_i] * _dt;
+		_Node->pEmitParam->sData.pRotation[_i] += _Node->pEmitParam->sData.pDeltaRotation[_i] * _dt;
+		if (_Node->pEmitParam->nMode == 0)
+		{
+			_Node->pEmitParam->sData.sModeA.pAngle[_i] += _Node->pEmitParam->sData.sModeA.pDegreesPS[_i] * _dt;
+			_Node->pEmitParam->sData.sModeA.pRadius[_i] += _Node->pEmitParam->sData.sModeA.pDeltaRadius[_i] * _dt;
+			_Node->pEmitParam->sData.pPosX[_i] = (BLS16)(-cosf(_Node->pEmitParam->sData.sModeA.pAngle[_i]) * _Node->pEmitParam->sData.sModeA.pRadius[_i]);
+			_Node->pEmitParam->sData.pPosY[_i] = (BLS16)(-sinf(_Node->pEmitParam->sData.sModeA.pAngle[_i]) * _Node->pEmitParam->sData.sModeA.pRadius[_i]);
+		}
+		else
+		{
+			BLF32 _radx = 0.f;
+			BLF32 _rady = 0.f;
+			if (_Node->pEmitParam->sData.pPosX[_i] || _Node->pEmitParam->sData.pPosY[_i])
+			{
+				BLF32 _n = (BLF32)(_Node->pEmitParam->sData.pPosX[_i] * _Node->pEmitParam->sData.pPosX[_i] + _Node->pEmitParam->sData.pPosY[_i] * _Node->pEmitParam->sData.pPosY[_i]);
+				if (!blScalarApproximate(_n, 1.0f))
+				{
+					_n = (BLF32)sqrt(_n);
+					if (!blScalarApproximate(_n, 0.f))
+					{
+						_n = 1.0f / _n;
+						_radx = _Node->pEmitParam->sData.pPosX[_i] * _n;
+						_rady = _Node->pEmitParam->sData.pPosY[_i] * _n;
+					}
+				}
+			}
+			BLF32 _tanx = _rady;
+			BLF32 _tany = _radx;
+			_radx *= _Node->pEmitParam->sData.sModeB.pRadAccel[_i];
+			_rady *= _Node->pEmitParam->sData.sModeB.pRadAccel[_i];
+			_tanx *= -_Node->pEmitParam->sData.sModeB.pTanAccel[_i];
+			_tany *= _Node->pEmitParam->sData.sModeB.pTanAccel[_i];
+			BLF32 _tmpx = (_radx + _tanx + _Node->pEmitParam->uMode.sGravity.nGravityX) * _dt;
+			BLF32 _tmpy = (_rady + _tany + _Node->pEmitParam->uMode.sGravity.nGravityY) * _dt;
+			_Node->pEmitParam->sData.sModeB.pDirX[_i] += _tmpx;
+			_Node->pEmitParam->sData.sModeB.pDirY[_i] += _tmpy;
+			_tmpx = _Node->pEmitParam->sData.sModeB.pDirX[_i] * _dt;
+			_tmpy = _Node->pEmitParam->sData.sModeB.pDirY[_i] * _dt;
+			_Node->pEmitParam->sData.pPosX[_i] += (BLS16)_tmpx;
+			_Node->pEmitParam->sData.pPosY[_i] += (BLS16)_tmpy;
+		}
+	}
+}
+static BLVoid
 _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 {
     if (!_Node->bValid)
@@ -942,14 +1192,14 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 				_Mat[4] = _Node->sSize.fX * 0.5f;
 				_Mat[5] = _Node->sSize.fY * 0.5f;
 			}
-			BLF32 _ltx = (_minx * _Mat[0]) + (_miny * _Mat[2]) + _Mat[4];
-			BLF32 _lty = (_minx * _Mat[1]) + (_miny * _Mat[3]) + _Mat[5];
-			BLF32 _rtx = (_maxx * _Mat[0]) + (_miny * _Mat[2]) + _Mat[4];
-			BLF32 _rty = (_maxx * _Mat[1]) + (_miny * _Mat[3]) + _Mat[5];
-			BLF32 _lbx = (_minx * _Mat[0]) + (_maxy * _Mat[2]) + _Mat[4];
-			BLF32 _lby = (_minx * _Mat[1]) + (_maxy * _Mat[3]) + _Mat[5];
-			BLF32 _rbx = (_maxx * _Mat[0]) + (_maxy * _Mat[2]) + _Mat[4];
-			BLF32 _rby = (_maxx * _Mat[1]) + (_maxy * _Mat[3]) + _Mat[5];
+			BLF32 _ltx = (_minx * _Mat[0]) + (_miny * _Mat[2]) + (_Node->pEmitParam ? 0 : _Mat[4]);
+			BLF32 _lty = (_minx * _Mat[1]) + (_miny * _Mat[3]) + (_Node->pEmitParam ? 0 : _Mat[5]);
+			BLF32 _rtx = (_maxx * _Mat[0]) + (_miny * _Mat[2]) + (_Node->pEmitParam ? 0 : _Mat[4]);
+			BLF32 _rty = (_maxx * _Mat[1]) + (_miny * _Mat[3]) + (_Node->pEmitParam ? 0 : _Mat[5]);
+			BLF32 _lbx = (_minx * _Mat[0]) + (_maxy * _Mat[2]) + (_Node->pEmitParam ? 0 : _Mat[4]);
+			BLF32 _lby = (_minx * _Mat[1]) + (_maxy * _Mat[3]) + (_Node->pEmitParam ? 0 : _Mat[5]);
+			BLF32 _rbx = (_maxx * _Mat[0]) + (_maxy * _Mat[2]) + (_Node->pEmitParam ? 0 : _Mat[4]);
+			BLF32 _rby = (_maxx * _Mat[1]) + (_maxy * _Mat[3]) + (_Node->pEmitParam ? 0 : _Mat[5]);
 			_Node->sAbsLT.fX = _ltx;
 			_Node->sAbsLT.fY = _lty;
 			_Node->sAbsRT.fX = _rtx;
@@ -960,65 +1210,24 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			_Node->sAbsRB.fY = _rby;
 			if (_Node->pEmitParam)
 			{
-				BLU32 _gen = (BLU32)(_Node->pEmitParam->fGenPerMSec * _Delta);
-				_Node->pEmitParam->nCurAlive = MIN_INTERNAL(_Node->pEmitParam->nMaxAlive, _gen + _Node->pEmitParam->nCurAlive);
-				BLF32* _clrbuf = (BLF32*)alloca(_Node->pEmitParam->nMaxAlive * 4 * sizeof(BLF32));
-				BLF32* _tranbuf = (BLF32*)alloca(_Node->pEmitParam->nMaxAlive * 4 * sizeof(BLF32));
-				for (BLU32 _idx = 0; _idx < _Node->pEmitParam->nCurAlive; ++_idx)
+				_GenParticle(_Node, _Delta);
+				if (_Node->pEmitParam->nParticleCount)
 				{
-					if (_Node->pEmitParam->pAge[_idx] == 0)
+					BLF32* _clrbuf = (BLF32*)alloca(_Node->pEmitParam->nParticleCount * 4 * sizeof(BLF32));
+					BLF32* _tranbuf = (BLF32*)alloca(_Node->pEmitParam->nParticleCount * 4 * sizeof(BLF32));
+					for (BLU32 _j = 0; _j < _Node->pEmitParam->nParticleCount; ++_j)
 					{
-						_Node->pEmitParam->pPositionX[_idx] = _Node->sPos.fX + cosf(blRandRangeF(0.f, PI_INTERNAL * 2.f)) * _Node->pEmitParam->fEmitterRadius * blRandF();
-						_Node->pEmitParam->pPositionY[_idx] = _Node->sPos.fY + sinf(blRandRangeF(0.f, PI_INTERNAL * 2.f)) * _Node->pEmitParam->fEmitterRadius * blRandF();
-						_Node->pEmitParam->pEmitAngle[_idx] = blRandRangeF(-_Node->pEmitParam->fEmitAngle, _Node->pEmitParam->fEmitAngle);
-						_Node->pEmitParam->pVelocity[_idx] = _Node->pEmitParam->fVelocity + blRandRangeF(-_Node->pEmitParam->fVelVariance, _Node->pEmitParam->fVelVariance);
-						BLS32 _initrot = 100 * (BLS32)(_Node->pEmitParam->fRotation + blRandRangeF(-_Node->pEmitParam->fRotVariance, _Node->pEmitParam->fRotVariance));
-						BLS32 _initscale = 100 * (BLS32)(_Node->pEmitParam->fScale + blRandRangeF(-_Node->pEmitParam->fScaleVariance, _Node->pEmitParam->fScaleVariance));
-						_Node->pEmitParam->pRotScale[_idx] = MAKEU32(MAX_INTERNAL(0, _initrot), MAX_INTERNAL(0, _initscale));
+						_clrbuf[_j * 4 + 0] = _Node->pEmitParam->sData.pColorR[_j] / 255.f;
+						_clrbuf[_j * 4 + 1] = _Node->pEmitParam->sData.pColorG[_j] / 255.f;
+						_clrbuf[_j * 4 + 2] = _Node->pEmitParam->sData.pColorB[_j] / 255.f;
+						_clrbuf[_j * 4 + 3] = _Node->pEmitParam->sData.pColorA[_j] / 255.f;
+						_tranbuf[_j * 4 + 0] = _Node->pEmitParam->sData.pPosX[_j] + _Mat[4];
+						_tranbuf[_j * 4 + 1] = _Node->pEmitParam->sData.pPosY[_j] + _Mat[5];
+						_tranbuf[_j * 4 + 2] = _Node->pEmitParam->sData.pRotation[_j];
+						_tranbuf[_j * 4 + 3] = _Node->pEmitParam->sData.pScale[_j];
 					}
-					else
-					{
-						BLF32 _s = _Node->pEmitParam->pVelocity[_idx] * _Delta / 1000.f;
-						BLF32 _xvec, _yvec;
-						_xvec = _Node->pEmitParam->fDirectionX * cosf(_Node->pEmitParam->pEmitAngle[_idx]) - _Node->pEmitParam->fDirectionY * sinf(_Node->pEmitParam->pEmitAngle[_idx]);
-						_yvec = _Node->pEmitParam->fDirectionX * sinf(_Node->pEmitParam->pEmitAngle[_idx]) + _Node->pEmitParam->fDirectionY * cosf(_Node->pEmitParam->pEmitAngle[_idx]);
-						_Node->pEmitParam->pPositionX[_idx] += _xvec * _s;
-						_Node->pEmitParam->pPositionY[_idx] += _yvec * _s;
-					}
-					BLF32 _fadeclr[4], _dyeclr[4];
-					blDeColor4F(_Node->pEmitParam->nFadeColor, _fadeclr);
-					blDeColor4F(_Node->nDyeColor, _dyeclr);
-					BLF32 _rot = (BLF32)HIGU16(_Node->pEmitParam->pRotScale[_idx]) / 100.f;
-					BLF32 _scale = (BLF32)LOWU16(_Node->pEmitParam->pRotScale[_idx]) / 100.f;
-					BLF32 _ratio = (BLF32)_Node->pEmitParam->pAge[_idx] / (BLF32)_Node->pEmitParam->nLife;
-					_clrbuf[4 * _idx + 0] = (_fadeclr[0] - _dyeclr[0]) * _ratio + _dyeclr[0];
-					_clrbuf[4 * _idx + 1] = (_fadeclr[1] - _dyeclr[1]) * _ratio + _dyeclr[1];
-					_clrbuf[4 * _idx + 2] = (_fadeclr[2] - _dyeclr[2]) * _ratio + _dyeclr[2];
-					_clrbuf[4 * _idx + 3] = (_fadeclr[3] - _dyeclr[3]) * _ratio + _dyeclr[3];
-					_tranbuf[4 * _idx + 0] = _Node->pEmitParam->pPositionX[_idx];
-					_tranbuf[4 * _idx + 1] = _Node->pEmitParam->pPositionY[_idx];
-					_tranbuf[4 * _idx + 2] = _rot * _ratio;
-					_tranbuf[4 * _idx + 3] = (_scale - 1.f) * _ratio + 1.f;
-					_Node->pEmitParam->pAge[_idx] += _Delta;
-				}
-				if (_Node->pEmitParam->nCurAlive)
-				{
-					blGeometryInstanceUpdate(_Node->nGBO, BL_SL_COLOR1, _clrbuf, _Node->pEmitParam->nCurAlive * 4 * sizeof(BLF32));
-					blGeometryInstanceUpdate(_Node->nGBO, BL_SL_INSTANCE1, _tranbuf, _Node->pEmitParam->nCurAlive * 4 * sizeof(BLF32));
-				}
-				for (BLU32 _idx = 0; _idx < _Node->pEmitParam->nMaxAlive; ++_idx)
-				{
-					if (_Node->pEmitParam->pAge[_idx] < _Node->pEmitParam->nLife)
-					{
-						memmove(_Node->pEmitParam->pAge, _Node->pEmitParam->pAge + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLU32));
-						memmove(_Node->pEmitParam->pPositionX, _Node->pEmitParam->pPositionX + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
-						memmove(_Node->pEmitParam->pPositionY, _Node->pEmitParam->pPositionY + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
-						memmove(_Node->pEmitParam->pEmitAngle, _Node->pEmitParam->pEmitAngle + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
-						memmove(_Node->pEmitParam->pVelocity, _Node->pEmitParam->pVelocity + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLF32));
-						memmove(_Node->pEmitParam->pRotScale, _Node->pEmitParam->pRotScale + _idx, (_Node->pEmitParam->nMaxAlive - _idx) * sizeof(BLU32));
-						memset(_Node->pEmitParam->pAge + _Node->pEmitParam->nMaxAlive - _idx, 0, _idx * sizeof(BLU32));
-						break;
-					}
+					blGeometryInstanceUpdate(_Node->nGBO, BL_SL_COLOR1, _clrbuf, _Node->pEmitParam->nParticleCount * 4 * sizeof(BLF32));
+					blGeometryInstanceUpdate(_Node->nGBO, BL_SL_INSTANCE1, _tranbuf, _Node->pEmitParam->nParticleCount * 4 * sizeof(BLF32));
 				}
 				blTechSampler(_PrSpriteMem->nSpriteInstTech, "Texture0", _Node->nTex, 0);
 			}
@@ -1123,7 +1332,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 				};
 				blGeometryBufferUpdate(_Node->nGBO, 0, (const BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 				if (_Node->pEmitParam)
-					blDraw(_PrSpriteMem->nSpriteInstTech, _Node->nGBO, _Node->pEmitParam->nCurAlive);
+					blDraw(_PrSpriteMem->nSpriteInstTech, _Node->nGBO, _Node->pEmitParam->nParticleCount);
 				else if (_Node->nBrightness > 0)
 					blDraw(_PrSpriteMem->nSpriteGlowTech, _Node->nGBO, 1);
 				else if (_Node->nStrokePixel > 0)
@@ -2147,8 +2356,8 @@ blSpriteTile(IN BLGuid _ID, IN BLAnsi* _ImageFile, IN BLF32 _TexLTx, IN BLF32 _T
 BLBool
 blSpriteAsEmit(IN BLGuid _ID, IN BLAnsi* _Code, IN BLBool _Off)
 {
-    if (_ID == INVALID_GUID)
-        return FALSE;
+	if (_ID == INVALID_GUID)
+		return FALSE;
 	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
 	if (!_node)
 		return FALSE;
@@ -2156,12 +2365,47 @@ blSpriteAsEmit(IN BLGuid _ID, IN BLAnsi* _Code, IN BLBool _Off)
 	{
 		if (_node->pEmitParam)
 		{
+			free(_node->pEmitParam->sData.pPosX);
+			free(_node->pEmitParam->sData.pPosY);
+			free(_node->pEmitParam->sData.pColorR);
+			free(_node->pEmitParam->sData.pColorG);
+			free(_node->pEmitParam->sData.pColorB);
+			free(_node->pEmitParam->sData.pColorA);
+			free(_node->pEmitParam->sData.pDeltaColorR);
+			free(_node->pEmitParam->sData.pDeltaColorG);
+			free(_node->pEmitParam->sData.pDeltaColorB);
+			free(_node->pEmitParam->sData.pDeltaColorA);
+			free(_node->pEmitParam->sData.pScale);
+			free(_node->pEmitParam->sData.pDeltaScale);
+			free(_node->pEmitParam->sData.pRotation);
+			free(_node->pEmitParam->sData.pDeltaRotation);
+			free(_node->pEmitParam->sData.pTimeToLive);
+			if (_node->pEmitParam->nMode == 0)
+			{
+				free(_node->pEmitParam->sData.sModeA.pAngle);
+				free(_node->pEmitParam->sData.sModeA.pDegreesPS);
+				free(_node->pEmitParam->sData.sModeA.pRadius);
+				free(_node->pEmitParam->sData.sModeA.pDeltaRadius);
+			}
+			else
+			{
+				free(_node->pEmitParam->sData.sModeB.pDirX);
+				free(_node->pEmitParam->sData.sModeB.pDirY);
+				free(_node->pEmitParam->sData.sModeB.pRadAccel);
+				free(_node->pEmitParam->sData.sModeB.pTanAccel);
+			}
 			free(_node->pEmitParam);
 			_node->pEmitParam = NULL;
 		}
 		return TRUE;
 	}
-	BLAnsi* _code = (BLAnsi*)malloc(strlen(_Code) + 1);
+	if (!_node->pEmitParam)
+	{
+		_node->pEmitParam = (_BLEmitParam*)malloc(sizeof(_BLEmitParam));
+		memset(&_node->pEmitParam->sData, 0, sizeof(_BLEmitData));
+	}
+	_node->pEmitParam->nParticleCount = 0;
+	BLAnsi* _code = (BLAnsi*)alloca(strlen(_Code) + 1);
 	_code[strlen(_Code) + 1] = 0;
 	strcpy(_code, _Code);
 	BLAnsi* _tmp;
@@ -2179,17 +2423,413 @@ blSpriteAsEmit(IN BLGuid _ID, IN BLAnsi* _Code, IN BLBool _Off)
 			switch (_idx)
 			{
 			case 0:
-				{
+			{
 				strtok(_iter, "=");
-				BLAnsi* _val = strtok(NULL, "=");
+				_node->pEmitParam->nStartSize = (BLU16)strtoul(strtok(NULL, ","), NULL, 10);
+				++_idx;
+			}
+			break;
+			case 1:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nStartSizeVariance = (BLU16)strtoul(strtok(NULL, ","), NULL, 10);
+				++_idx;
+			}
+			break;
+			case 2:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEndSize = (BLU16)strtoul(strtok(NULL, ","), NULL, 10);
+				++_idx;
+			}
+			break;
+			case 3:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEndSizeVariance = (BLU16)strtoul(strtok(NULL, ","), NULL, 10);
+				++_idx;
+			}
+			break;
+			case 4:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->fStartSpin = (BLF32)strtol(strtok(NULL, ","), NULL, 10) * PI_INTERNAL / 180.0f;
+				++_idx;
+			}
+			break;
+			case 5:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->fStartSpinVariance = (BLF32)strtol(strtok(NULL, ","), NULL, 10) * PI_INTERNAL / 180.0f;
+				++_idx;
+			}
+			break;
+			case 6:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->fEndSpin = (BLS32)strtol(strtok(NULL, ","), NULL, 10) * PI_INTERNAL / 180.0f;
+				++_idx;
+			}
+			break;
+			case 7:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->fEndSpinVariance = (BLS32)strtol(strtok(NULL, ","), NULL, 10) * PI_INTERNAL / 180.0f;
+				++_idx;
+			}
+			break;
+			case 8:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nStartR = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 9:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nStartG = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 10:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nStartB = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 11:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nStartA = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 12:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nStartRVariance = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 13:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nStartGVariance = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 14:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nStartBVariance = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 15:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nStartAVariance = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 16:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEndR = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 17:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEndG = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 18:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEndB = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 19:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEndA = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 20:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEndRVariance = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 21:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEndGVariance = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 22:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEndBVariance = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 23:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEndAVariance = (BLU8)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 24:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nTotalParticles = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+				++_idx;
+			}
+			break;
+			case 25:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->fDuration = (BLF32)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 26:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->fLife = (BLF32)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 27:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->fLifeVariance = (BLF32)strtod(strtok(NULL, ","), NULL);
+				++_idx;
+			}
+			break;
+			case 28:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEmissionRate = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+				++_idx;
+			}
+			break;
+			case 29:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->fAngle = (BLF32)strtol(strtok(NULL, ","), NULL, 10) * PI_INTERNAL / 180.0f;
+				++_idx;
+			}
+			break;
+			case 30:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->fAngleVariance = (BLF32)strtol(strtok(NULL, ","), NULL, 10) * PI_INTERNAL / 180.0f;
+				++_idx;
+			}
+			break;
+			case 31:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEmitterW = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+				++_idx;
+			}
+			break;
+			case 32:
+			{
+				strtok(_iter, "=");
+				_node->pEmitParam->nEmitterH = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+				++_idx;
+			}
+			break;
+			case 33:
+			{
+				strtok(_iter, "=");
+				if (!strcmp(strtok(NULL, ","), "Radius"))
+					_node->pEmitParam->nMode = 0;
+				else
+					_node->pEmitParam->nMode = 1;
+				++_idx;
+			}
+			break;
+			case 34:
+			{
+				if (_node->pEmitParam->nMode == 1)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sGravity.nSpeed = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
 				}
-				break;
+				++_idx;
+			}
+			break;
+			case 35:
+			{
+				if (_node->pEmitParam->nMode == 1)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sGravity.nSpeedVariance = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 36:
+			{
+				if (_node->pEmitParam->nMode == 1)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sGravity.nGravityX = (BLS32)strtol(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 37:
+			{
+				if (_node->pEmitParam->nMode == 1)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sGravity.nGravityY = (BLS32)strtol(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 38:
+			{
+				if (_node->pEmitParam->nMode == 1)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sGravity.nRadAccel = (BLS32)strtol(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 39:
+			{
+				if (_node->pEmitParam->nMode == 1)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sGravity.nRadAccelVariance = (BLS32)strtol(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 40:
+			{
+				if (_node->pEmitParam->nMode == 1)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sGravity.nTanAccel = (BLS32)strtol(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 41:
+			{
+				if (_node->pEmitParam->nMode == 1)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sGravity.nTanAccelVariance = (BLS32)strtol(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 42:
+			{
+				if (_node->pEmitParam->nMode == 0)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sRadius.nMaxRadius = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 43:
+			{
+				if (_node->pEmitParam->nMode == 0)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sRadius.nMaxRadiusVariance = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 44:
+			{
+				if (_node->pEmitParam->nMode == 0)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sRadius.nMinRadius = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 45:
+			{
+				if (_node->pEmitParam->nMode == 0)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sRadius.nRotPS = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
+			case 46:
+			{
+				if (_node->pEmitParam->nMode == 0)
+				{
+					strtok(_iter, "=");
+					_node->pEmitParam->uMode.sRadius.nRotPSVariance = (BLU32)strtoul(strtok(NULL, ","), NULL, 10);
+				}
+				++_idx;
+			}
+			break;
 			}
 		}
 	}
-	free(_code);
 	blDeleteArray(_pars);
-    return TRUE;
+	_node->pEmitParam->sData.pPosX = (BLS16*)realloc(_node->pEmitParam->sData.pPosX, _node->pEmitParam->nTotalParticles * sizeof(BLS16));
+	_node->pEmitParam->sData.pPosY = (BLS16*)realloc(_node->pEmitParam->sData.pPosY, _node->pEmitParam->nTotalParticles * sizeof(BLS16));
+	_node->pEmitParam->sData.pColorR = (BLU8*)realloc(_node->pEmitParam->sData.pColorR, _node->pEmitParam->nTotalParticles * sizeof(BLU8));
+	_node->pEmitParam->sData.pColorG = (BLU8*)realloc(_node->pEmitParam->sData.pColorG, _node->pEmitParam->nTotalParticles * sizeof(BLU8));
+	_node->pEmitParam->sData.pColorB = (BLU8*)realloc(_node->pEmitParam->sData.pColorB, _node->pEmitParam->nTotalParticles * sizeof(BLU8));
+	_node->pEmitParam->sData.pColorA = (BLU8*)realloc(_node->pEmitParam->sData.pColorA, _node->pEmitParam->nTotalParticles * sizeof(BLU8));
+	_node->pEmitParam->sData.pDeltaColorR = (BLU8*)realloc(_node->pEmitParam->sData.pDeltaColorR, _node->pEmitParam->nTotalParticles * sizeof(BLU8));
+	_node->pEmitParam->sData.pDeltaColorG = (BLU8*)realloc(_node->pEmitParam->sData.pDeltaColorG, _node->pEmitParam->nTotalParticles * sizeof(BLU8));
+	_node->pEmitParam->sData.pDeltaColorB = (BLU8*)realloc(_node->pEmitParam->sData.pDeltaColorB, _node->pEmitParam->nTotalParticles * sizeof(BLU8));
+	_node->pEmitParam->sData.pDeltaColorA = (BLU8*)realloc(_node->pEmitParam->sData.pDeltaColorA, _node->pEmitParam->nTotalParticles * sizeof(BLU8));
+	_node->pEmitParam->sData.pScale = (BLF32*)realloc(_node->pEmitParam->sData.pScale, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+	_node->pEmitParam->sData.pDeltaScale = (BLF32*)realloc(_node->pEmitParam->sData.pDeltaScale, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+	_node->pEmitParam->sData.pRotation = (BLF32*)realloc(_node->pEmitParam->sData.pRotation, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+	_node->pEmitParam->sData.pDeltaRotation = (BLF32*)realloc(_node->pEmitParam->sData.pDeltaRotation, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+	_node->pEmitParam->sData.pTimeToLive = (BLF32*)realloc(_node->pEmitParam->sData.pTimeToLive, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+	if (_node->pEmitParam->nMode == 1)
+	{
+		_node->pEmitParam->sData.sModeB.pDirX = (BLF32*)realloc(_node->pEmitParam->sData.sModeB.pDirX, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+		_node->pEmitParam->sData.sModeB.pDirY = (BLF32*)realloc(_node->pEmitParam->sData.sModeB.pDirY, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+		_node->pEmitParam->sData.sModeB.pRadAccel = (BLF32*)realloc(_node->pEmitParam->sData.sModeB.pRadAccel, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+		_node->pEmitParam->sData.sModeB.pTanAccel = (BLF32*)realloc(_node->pEmitParam->sData.sModeB.pTanAccel, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+	}
+	else
+	{
+		_node->pEmitParam->sData.sModeA.pAngle = (BLF32*)realloc(_node->pEmitParam->sData.sModeA.pAngle, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+		_node->pEmitParam->sData.sModeA.pDegreesPS = (BLF32*)realloc(_node->pEmitParam->sData.sModeA.pDegreesPS, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+		_node->pEmitParam->sData.sModeA.pRadius = (BLF32*)realloc(_node->pEmitParam->sData.sModeA.pRadius, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+		_node->pEmitParam->sData.sModeA.pDeltaRadius = (BLF32*)realloc(_node->pEmitParam->sData.sModeA.pDeltaRadius, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
+	}
+	BLEnum _semantice[] = { BL_SL_COLOR1, BL_SL_INSTANCE1 };
+	BLEnum _decle[] = { BL_VD_FLOATX4, BL_VD_FLOATX4 };
+	blGeometryBufferInstance(_node->nGBO, _semantice, _decle, 2, _node->pEmitParam->nTotalParticles);
+	return TRUE;
 }
 BLBool
 blSpriteAsCursor(IN BLGuid _ID)

@@ -3621,6 +3621,14 @@ blGeometryBufferInstance(IN BLGuid _GBO, IN BLEnum* _Semantic, IN BLEnum* _Decl,
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
         GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
+        if (_geo->uData.sGL.nInsHandle[0] != 0xFFFFFFFF)
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[0]));
+        if (_geo->uData.sGL.nInsHandle[1] != 0xFFFFFFFF)
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[1]));
+        if (_geo->uData.sGL.nInsHandle[2] != 0xFFFFFFFF)
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[2]));
+        if (_geo->uData.sGL.nInsHandle[3] != 0xFFFFFFFF)
+            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[3]));
         for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
         {
             GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nInsHandle[_idx]));
@@ -3650,6 +3658,7 @@ blGeometryBufferInstance(IN BLGuid _GBO, IN BLEnum* _Semantic, IN BLEnum* _Decl,
             GL_CHECK_INTERNAL(glVertexAttribDivisor(_Semantic[_idx], 1));
             _geo->aInsSem[_idx] = _Semantic[_idx];
         }
+		GL_CHECK_INTERNAL(glBindVertexArray(0));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)
@@ -4389,7 +4398,7 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
         {
             GL_CHECK_INTERNAL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _geo->uData.sGL.nIBHandle));
             GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
-            if (1 == _Instance)
+			if (_geo->uData.sGL.nInsHandle[0] == 0xFFFFFFFF)
             {
                 GL_CHECK_INTERNAL(glDrawElements(_prim, (_geo->eIBFormat == BL_IF_32) ? (_geo->nIBSize >> 2) : (_geo->nIBSize >> 1), (_geo->eIBFormat == BL_IF_32) ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT, NULL));
             }
@@ -4403,7 +4412,7 @@ blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
         {
             GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nVBHandle));
             GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
-            if (1 == _Instance)
+			if (_geo->uData.sGL.nInsHandle[0] == 0xFFFFFFFF)
             {
                 GL_CHECK_INTERNAL(glDrawArrays(_prim, 0, _geo->nVertexNum));
             }
