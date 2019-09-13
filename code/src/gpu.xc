@@ -3621,17 +3621,10 @@ blGeometryBufferInstance(IN BLGuid _GBO, IN BLEnum* _Semantic, IN BLEnum* _Decl,
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
         GL_CHECK_INTERNAL(glBindVertexArray(_geo->uData.sGL.nVAHandle));
-        if (_geo->uData.sGL.nInsHandle[0] != 0xFFFFFFFF)
-            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[0]));
-        if (_geo->uData.sGL.nInsHandle[1] != 0xFFFFFFFF)
-            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[1]));
-        if (_geo->uData.sGL.nInsHandle[2] != 0xFFFFFFFF)
-            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[2]));
-        if (_geo->uData.sGL.nInsHandle[3] != 0xFFFFFFFF)
-            GL_CHECK_INTERNAL(glDeleteBuffers(1, &_geo->uData.sGL.nInsHandle[3]));
         for (BLU32 _idx = 0; _idx < _DeclNum; ++_idx)
         {
-            GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nInsHandle[_idx]));
+			if (_geo->uData.sGL.nInsHandle[_idx] == 0xFFFFFFFF)
+				GL_CHECK_INTERNAL(glGenBuffers(1, &_geo->uData.sGL.nInsHandle[_idx]));
             BLU32 _vbsz = 0, _numele = 0;
             GLenum _type = GL_BYTE;
             switch(_Decl[_idx])

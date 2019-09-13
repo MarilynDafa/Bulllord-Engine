@@ -2399,11 +2399,14 @@ blSpriteAsEmit(IN BLGuid _ID, IN BLAnsi* _Code, IN BLBool _Off)
 		}
 		return TRUE;
 	}
+	BLU32 _total = 0xFFFFFFFF;
 	if (!_node->pEmitParam)
 	{
 		_node->pEmitParam = (_BLEmitParam*)malloc(sizeof(_BLEmitParam));
 		memset(&_node->pEmitParam->sData, 0, sizeof(_BLEmitData));
 	}
+	else
+		_total = _node->pEmitParam->nTotalParticles;
 	_node->pEmitParam->nParticleCount = 0;
 	BLAnsi* _code = (BLAnsi*)alloca(strlen(_Code) + 1);
 	_code[strlen(_Code) + 1] = 0;
@@ -2826,9 +2829,12 @@ blSpriteAsEmit(IN BLGuid _ID, IN BLAnsi* _Code, IN BLBool _Off)
 		_node->pEmitParam->sData.sModeA.pRadius = (BLF32*)realloc(_node->pEmitParam->sData.sModeA.pRadius, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
 		_node->pEmitParam->sData.sModeA.pDeltaRadius = (BLF32*)realloc(_node->pEmitParam->sData.sModeA.pDeltaRadius, _node->pEmitParam->nTotalParticles * sizeof(BLF32));
 	}
-	BLEnum _semantice[] = { BL_SL_COLOR1, BL_SL_INSTANCE1 };
-	BLEnum _decle[] = { BL_VD_FLOATX4, BL_VD_FLOATX4 };
-	blGeometryBufferInstance(_node->nGBO, _semantice, _decle, 2, _node->pEmitParam->nTotalParticles);
+	if (_total == 0xFFFFFFFF || _total != _node->pEmitParam->nTotalParticles)
+	{
+		BLEnum _semantice[] = { BL_SL_COLOR1, BL_SL_INSTANCE1 };
+		BLEnum _decle[] = { BL_VD_FLOATX4, BL_VD_FLOATX4 };
+		blGeometryBufferInstance(_node->nGBO, _semantice, _decle, 2, _node->pEmitParam->nTotalParticles);
+	}
 	return TRUE;
 }
 BLBool
