@@ -3684,6 +3684,7 @@ blGeometryInstanceUpdate(IN BLGuid _GBO, IN BLEnum _Semantic, IN BLVoid* _Buffer
         }
         GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, _geo->uData.sGL.nInsHandle[_idx]));
         GL_CHECK_INTERNAL(glBufferSubData(GL_ARRAY_BUFFER, 0, _BufferSz, _Buffer));
+		GL_CHECK_INTERNAL(glBindBuffer(GL_ARRAY_BUFFER, 0));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)

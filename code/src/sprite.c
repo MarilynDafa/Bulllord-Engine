@@ -600,6 +600,10 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 		blStreamRead(_stream, sizeof(BLU32), &_offset);
 		_node->nTexWidth = _width;
 		_node->nTexHeight = _height;
+		if (_node->sSize.fX < 0.f)
+			_node->sSize.fX = _width;
+		if (_node->sSize.fY < 0.f)
+			_node->sSize.fY = _height;
 		BLEnum _type;
 		if (_height == 1)
 			_type = BL_TT_1D;
