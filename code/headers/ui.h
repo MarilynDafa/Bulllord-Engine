@@ -409,7 +409,7 @@ BL_API BLVoid blUILabelCommonMap(
 //#tab:%d(pixel)##font:%s(fontsource):%d(fontheight):%d(fontflag)##align:%s(LT,LM,LB,MT,MM,MB,RT,RM,RB)##color:%zu(txtcolor):%d(linkid)#%s(text)
 //#color:%zu(linecolor)##line:%d(padding optional):%d(length optional):%d(linewidth optional)#
 //#image:(left or right or appand):%s(file):%d(linkid)#
-BL_API BLVoid blUILableText(
+BL_API BLVoid blUILabelText(
 	IN BLGuid _ID,
 	IN BLUtf8* _Text,
 	IN BLU32 _TxtColor,
@@ -423,7 +423,7 @@ BL_API BLVoid blUILableText(
 	IN BLBool _Italics,
 	IN BLBool _Rich);
 
-BL_API BLUtf8* blUILableGetText(
+BL_API BLUtf8* blUILabelGetText(
 	IN BLGuid _ID);
 
 BL_API BLVoid blUILabelPadding(

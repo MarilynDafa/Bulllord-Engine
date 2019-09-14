@@ -12108,7 +12108,7 @@ blUIFile(IN BLAnsi* _Filename)
 			blUIScissor(_widguid, _clipedvar, _absvar);
 			blUIPenetration(_widguid, _penetrationvar);
 			blUILabelFlip(_widguid, _flipxvar, _flipyvar);
-			blUILableText(_widguid, (const BLUtf8*)_text, 0xFFFFFFFF, 0, 0, NULL, 0, FALSE, FALSE, FALSE, FALSE, TRUE);
+			blUILabelText(_widguid, (const BLUtf8*)_text, 0xFFFFFFFF, 0, 0, NULL, 0, FALSE, FALSE, FALSE, FALSE, TRUE);
 			blUILabelStencilMap(_widguid, _stencilmap, 0, 0, 0, 0);
 			blUILabelCommonMap(_widguid, _commonmap, _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3], _commontexvar[0], _commontexvar[1], _commontexvar[2], _commontexvar[3]);
 			blUILabelPadding(_widguid, _paddingvar[0], _paddingvar[1]);
@@ -13948,7 +13948,7 @@ blUILabelCommonMap(IN BLGuid _ID, IN BLAnsi* _CommonMap, IN BLF32 _Left, IN BLF3
 	_PrUIMem->bDirty = TRUE;
 }
 BLVoid
-blUILableText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _TxtAlignmentH, IN BLEnum _TxtAlignmentV, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _Outline, IN BLBool _Bold, IN BLBool _Shadow, IN BLBool _Italics, IN BLBool _Rich)
+blUILabelText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _TxtAlignmentH, IN BLEnum _TxtAlignmentV, IN BLAnsi* _Font, IN BLU32 _FontHeight, IN BLBool _Outline, IN BLBool _Bold, IN BLBool _Shadow, IN BLBool _Italics, IN BLBool _Rich)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
@@ -14014,7 +14014,7 @@ blUILableText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _Tx
 	_PrUIMem->bDirty = TRUE;
 }
 BLUtf8* 
-blUILableGetText(IN BLGuid _ID)
+blUILabelGetText(IN BLGuid _ID)
 {
 	_BLWidget* _widget = (_BLWidget*)blGuidAsPointer(_ID);
 	if (!_widget)
