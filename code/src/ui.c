@@ -535,20 +535,8 @@ _FontFace(const BLAnsi* _Filename)
 		return FALSE;
 	}
 	_BLFont* _ret = (_BLFont*)malloc(sizeof(_BLFont));
-	BLU32 _endi = 0, _starti = 0;
-	BLS32 _filelen = (BLS32)strlen(_Filename);
-	for (BLS32 _idx = _filelen; _idx > 0; --_idx)
-	{
-		if (_Filename[_idx] == '.')
-			_endi = _idx - 1;
-		if (_Filename[_idx] == '/' || _Filename[_idx] == '\\')
-		{
-			_starti = _idx + 1;
-			break;
-		}
-	}
-	BLAnsi _basename[64] = { 0 };
-	strncpy(_basename, _Filename + _starti, _endi - _starti + 1);
+	BLAnsi _basename[256] = { 0 };
+	strcpy(_basename, _Filename);
 	blSwitchLowerUtf8((BLUtf8*)_basename);
 	_ret->nHashName = blHashString((const BLUtf8*)_basename);
 	{
@@ -1675,19 +1663,7 @@ _LabelParse(_BLWidget* _Node)
 							}
 						}
 						if (!_ft)
-						{
-							BLAnsi _texfilettf[260] = { 0 };
-							BLAnsi _texfilettc[260] = { 0 };
-							BLAnsi _texfilefnt[260] = { 0 };
-							sprintf(_texfilettf, "content/%s.ttf", _Node->uExtension.sLabel.aCurFontSource);
-							sprintf(_texfilettc, "content/%s.ttc", _Node->uExtension.sLabel.aCurFontSource);
-							sprintf(_texfilefnt, "content/%s.fnt", _Node->uExtension.sLabel.aCurFontSource);
-							if (!_FontFace(_texfilettf))
-							{
-								if (!_FontFace(_texfilettc))
-									_FontFace(_texfilefnt);
-							}
-						}
+							_FontFace(_Node->uExtension.sLabel.aCurFontSource);
 						_Node->uExtension.sLabel.nCurFontHeight = blUtf16ToUInteger(*(BLUtf16**)(_tokenparams->pData + 1));
 						_Node->uExtension.sLabel.nCurFontFlag = blUtf16ToUInteger(*(BLUtf16**)(_tokenparams->pData + 2));
 						_Node->uExtension.sLabel.pLastAtomCell = NULL;
