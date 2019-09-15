@@ -549,6 +549,7 @@ _FontFace(const BLAnsi* _Filename)
 	}
 	BLAnsi _basename[64] = { 0 };
 	strncpy(_basename, _Filename + _starti, _endi - _starti + 1);
+	blSwitchLowerUtf8((BLUtf8*)_basename);
 	_ret->nHashName = blHashString((const BLUtf8*)_basename);
 	{
 		FOREACH_ARRAY(_BLFont*, _pf, _PrUIMem->pFonts)
@@ -1659,6 +1660,7 @@ _LabelParse(_BLWidget* _Node)
 					{
 						memset(_Node->uExtension.sLabel.aCurFontSource, 0, sizeof(_Node->uExtension.sLabel.aCurFontSource));
 						const BLUtf8* _source = blGenUtf8Str(*(BLUtf16**)(_tokenparams->pData + 0));
+						blSwitchLowerUtf8((BLUtf8*)_source);
 						strcpy(_Node->uExtension.sLabel.aCurFontSource, (const BLAnsi*)_source);
 						blDeleteUtf8Str((BLUtf8*)_source);
 						_ft = NULL;
