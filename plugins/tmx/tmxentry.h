@@ -58,7 +58,9 @@ BL_API BLVoid blTMXObjectQueryEXT(
 	OUT BLS32* _YPos,
 	OUT BLU32* _Width,
 	OUT BLU32* _Height,
-	OUT BLAnsi** _Properties);
+	OUT BLAnsi** _Properties,
+	OUT BLU32* _Type,
+	OUT BLF32** _Data);
 
 BL_API BLVoid blTMXLayerVisibilityEXT(
 	IN BLAnsi* _Layer,

@@ -266,6 +266,9 @@ _ParseImageLayer(ezxml_t _Node, BLAnsi* _Filename, BLU32* _Layer)
 	const BLAnsi* _laname = ezxml_attr(_Node, "name");
 	const BLAnsi* _opacity = ezxml_attr(_Node, "opacity");
 	const BLAnsi* _visible = ezxml_attr(_Node, "visible");
+	BLBool _vis = TRUE;
+	if (_visible && _visible[0] == '0')
+		_vis = FALSE;
 	BLF32 _fopacity = 1.f;
 	if (_opacity)
 		_fopacity = strtof(_opacity, NULL);
@@ -311,11 +314,11 @@ _ParseImageLayer(ezxml_t _Node, BLAnsi* _Filename, BLU32* _Layer)
 				BLAnsi _buflayer[32] = { 0 };
 				sprintf(_buflayer, "%d", *_Layer);
 				BLGuid _id = blGenSprite(_buf, _buflayer, (BLF32)_PrTmxMem->nTileWidth, (BLF32)_PrTmxMem->nTileHeight, 0, 1, TRUE);
-				BLF32 _ltx = _deltax * _x;
+				BLF32 _ltx = _deltax * _x;	
 				BLF32 _lty = _deltay * _y;
 				BLF32 _rbx = _ltx + _deltax;
 				BLF32 _rby = _lty + _deltay;
-				blSpriteTile(_id, _source, _ltx, _lty, _rbx, _rby, (BLF32)_x * _PrTmxMem->nTileWidth, (BLF32)_y * _PrTmxMem->nTileHeight, _fopacity, _visible[0] == '0' ? FALSE : TRUE);
+				blSpriteTile(_id, _source, _ltx, _lty, _rbx, _rby, (BLF32)_x * _PrTmxMem->nTileWidth, (BLF32)_y * _PrTmxMem->nTileHeight, _fopacity, _vis);
 				_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pTiles[_y * _PrTmxMem->nWidth + _x] = _id;
 			}
 		}
@@ -328,6 +331,11 @@ _ParseLayer(ezxml_t _Node, BLAnsi* _Filename, BLU32* _Layer)
 	const BLAnsi* _laname = ezxml_attr(_Node, "name");
 	const BLAnsi* _opacity = ezxml_attr(_Node, "opacity");
 	const BLAnsi* _visible = ezxml_attr(_Node, "visible");
+	BLU32 _col = strtoul(ezxml_attr(_Node, "width"), NULL, 10);
+	BLU32 _row = strtoul(ezxml_attr(_Node, "height"), NULL, 10);
+	BLBool _vis = TRUE;
+	if (_visible && _visible[0] == '0')
+		_vis = FALSE;
 	BLF32 _fopacity = 1.f;
 	if (_opacity)
 		_fopacity = strtof(_opacity, NULL);
@@ -359,58 +367,80 @@ _ParseLayer(ezxml_t _Node, BLAnsi* _Filename, BLU32* _Layer)
 				mz_ulong _orisz = 4 * _PrTmxMem->nHeight * _PrTmxMem->nWidth;
 				BLU8* _orimem = (BLU8*)malloc(_orisz);
 				BLS32 _zipret = mz_uncompress(_orimem, &_orisz, _mem, _sz);
-				if (_zipret == MZ_OK)
-				{
-					BLU32 _tidx = 0;
-					BLAnsi _buf[32] = { 0 };
-					_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData = _orimem;
-					_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pTiles = (BLGuid*)malloc(_PrTmxMem->nHeight * _PrTmxMem->nWidth * sizeof(BLGuid));
-					for (BLU32 _y = 0; _y < _PrTmxMem->nHeight; ++_y)
-					{
-						for (BLU32 _x = 0; _x < _PrTmxMem->nWidth; ++_x)
-						{
-							BLU32 _gid = _orimem[_tidx] | _orimem[_tidx + 1] << 8 | _orimem[_tidx + 2] << 16 | _orimem[_tidx + 3] << 24;
-							_tidx += 4;
-							_gid &= ~(0x80000000 | 0x40000000 | 0x20000000);
-							memset(_buf, 0, 32);
-							sprintf(_buf, "@#tilespritelayer_%d_%d#@", *_Layer, _gid);
-							BLAnsi _source[260] = { 0 };
-							BLF32 _w = 1.f, _h = 1.f, _first = 0.f;
-							for (BLU32 _idx = 0; _idx < _PrTmxMem->nTilesetNum; ++_idx)
-							{
-								if (_gid >= _PrTmxMem->pTilesets[_idx].nFirstGid)
-								{
-									memset(_source, 0, sizeof(_source));
-									strcpy(_source, _PrTmxMem->pTilesets[_idx].aSource);
-									_w = (BLF32)_PrTmxMem->pTilesets[_idx].nWidth;
-									_h = (BLF32)_PrTmxMem->pTilesets[_idx].nHeight;
-									_first = (BLF32)_PrTmxMem->pTilesets[_idx].nFirstGid;
-								}
-							}
-							BLF32 _deltax = (BLF32)_PrTmxMem->nTileWidth / _w;
-							BLF32 _deltay = (BLF32)_PrTmxMem->nTileHeight / _h;
-							_w = (_w < 2.f) ? 1.f : _w / _PrTmxMem->nTileWidth;
-							_h = (_h < 2.f) ? 1.f : _h / _PrTmxMem->nTileHeight;
-							BLAnsi _buflayer[32] = { 0 };
-							sprintf(_buflayer, "%d", *_Layer);
-							BLGuid _id = blGenSprite(_buf, _buflayer, (BLF32)_PrTmxMem->nTileWidth, (BLF32)_PrTmxMem->nTileHeight, 0, 1, TRUE);
-							BLF32 _ltx = (BLF32)((_gid - (BLU32)_first) % (BLU32)_w) / _w;;
-							BLF32 _lty = (BLF32)((_gid - (BLU32)_first) / _w) / _h;
-							BLF32 _rbx = _ltx + _deltax;
-							BLF32 _rby = _lty + _deltay;
-							blSpriteTile(_id, _source, _ltx, _lty, _rbx, _rby, (BLF32)_x * _PrTmxMem->nTileWidth, (BLF32)_y * _PrTmxMem->nTileHeight, _fopacity, _visible[0] == '0' ? FALSE : TRUE);
-							_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pTiles[_y * _PrTmxMem->nWidth + _x] = _id;
-						}
-					}
-				}
+				_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData = _orimem;
+				_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pTiles = (BLGuid*)malloc(_PrTmxMem->nHeight * _PrTmxMem->nWidth * sizeof(BLGuid));
 				blDeleteBase64Decoder((BLU8*)_mem);
 			}
 			else
-				blDebugOutput("%s decode error", _Filename);
-			*_Layer = *_Layer + 1;
+				blDebugOutput("%s base64 decode error", _Filename);
+		}
+		else if (!strcmp(_encoding, "csv"))
+		{
+			BLAnsi* _tmp = _Node->child->txt;
+			if (_tmp)
+			{
+				_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData = (BLU8*)malloc(_row * _col * 4 * sizeof(BLU8));
+				BLU32 _idx = 0;
+				strtok(_tmp, ",");
+				while (_tmp)
+				{
+					BLU32 _val = strtoul(_tmp, NULL, 10);
+					_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_idx++] = (BLU8)(_val >> 0);
+					_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_idx++] = (BLU8)(_val >> 8);
+					_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_idx++] = (BLU8)(_val >> 16);
+					_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_idx++] = (BLU8)(_val >> 24);
+					_tmp = strtok(NULL, ",");
+				}
+				_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pTiles = (BLGuid*)malloc(_PrTmxMem->nHeight * _PrTmxMem->nWidth * sizeof(BLGuid));
+			}
 		}
 		else
 			blDebugOutput("%s use unsupport encoding format", _Filename);
+		if (_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData)
+		{
+			BLU32 _tidx = 0;
+			BLAnsi _buf[32] = { 0 };
+			for (BLU32 _y = 0; _y < _PrTmxMem->nHeight; ++_y)
+			{
+				for (BLU32 _x = 0; _x < _PrTmxMem->nWidth; ++_x)
+				{
+					BLU32 _gid = _PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_tidx] | _PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_tidx + 1] << 8 | _PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_tidx + 2] << 16 | _PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_tidx + 3] << 24;
+					_tidx += 4;
+					_gid &= ~(0x80000000 | 0x40000000 | 0x20000000);
+					memset(_buf, 0, 32);
+					sprintf(_buf, "@#tilespritelayer_%d_%d#@", *_Layer, _gid);
+					BLAnsi _source[260] = { 0 };
+					BLF32 _w = 1.f, _h = 1.f, _first = 0.f, _mar = 0.f, _sp = 0.f;
+					for (BLU32 _idx = 0; _idx < _PrTmxMem->nTilesetNum; ++_idx)
+					{
+						if (_gid >= _PrTmxMem->pTilesets[_idx].nFirstGid)
+						{
+							memset(_source, 0, sizeof(_source));
+							strcpy(_source, _PrTmxMem->pTilesets[_idx].aSource);
+							_w = (BLF32)_PrTmxMem->pTilesets[_idx].nWidth;
+							_h = (BLF32)_PrTmxMem->pTilesets[_idx].nHeight;
+							_mar = (BLF32)_PrTmxMem->pTilesets[_idx].nMargin;
+							_sp = (BLF32)_PrTmxMem->pTilesets[_idx].nSpacing;
+							_first = (BLF32)_PrTmxMem->pTilesets[_idx].nFirstGid;
+						}
+					}
+					_gid = _gid - (BLU32)_first;
+					BLAnsi _buflayer[32] = { 0 };
+					sprintf(_buflayer, "%d", *_Layer);
+					BLGuid _id = blGenSprite(_buf, _buflayer, (BLF32)_PrTmxMem->nTileWidth, (BLF32)_PrTmxMem->nTileHeight, 0, 1, TRUE);
+					BLU32 _maxx = (BLU32)((_w - _mar + _sp) / (_PrTmxMem->nTileWidth + _sp));
+					BLF32 _ox = (_gid % _maxx) * (_PrTmxMem->nTileWidth + _sp) + _mar;
+					BLF32 _oy = (_gid / _maxx) * (_PrTmxMem->nTileHeight + _sp) + _mar;
+					BLF32 _ltx = _ox / _w;
+					BLF32 _lty = _oy / _h;
+					BLF32 _rbx = (_ox + _PrTmxMem->nTileWidth) / _w;
+					BLF32 _rby = (_oy + _PrTmxMem->nTileHeight) / _h;
+					blSpriteTile(_id, _source, _ltx, _lty, _rbx, _rby, (BLF32)_x * _PrTmxMem->nTileWidth, (BLF32)_y * _PrTmxMem->nTileHeight, _fopacity, _vis);
+					_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pTiles[_y * _PrTmxMem->nWidth + _x] = _id;
+				}
+			}
+			*_Layer = *_Layer + 1;
+		}
 	}
 }
 static BLVoid
@@ -619,7 +649,7 @@ blTMXObjectGroupQueryEXT(IN BLAnsi* _GroupName, OUT BLU32* _ObjectNum, OUT BLBoo
 	}
 }
 BLVoid 
-blTMXObjectQueryEXT(IN BLAnsi* _GroupName, IN BLU32 _Index, OUT BLAnsi _Name[256], OUT BLS32* _XPos, OUT BLS32* _YPos, OUT BLU32* _Width, OUT BLU32* _Height, OUT BLAnsi** _Properties)
+blTMXObjectQueryEXT(IN BLAnsi* _GroupName, IN BLU32 _Index, OUT BLAnsi _Name[256], OUT BLS32* _XPos, OUT BLS32* _YPos, OUT BLU32* _Width, OUT BLU32* _Height, OUT BLAnsi** _Properties, OUT BLU32* _Type, OUT BLF32** _Data)
 {
 	if (!_PrTmxMem)
 		return;
@@ -636,6 +666,8 @@ blTMXObjectQueryEXT(IN BLAnsi* _GroupName, IN BLU32 _Index, OUT BLAnsi _Name[256
 			*_Width = _PrTmxMem->pGroups[_idx].pObjects[_Index].nWidth;
 			*_Height = _PrTmxMem->pGroups[_idx].pObjects[_Index].nHeight;
 			*_Properties = _PrTmxMem->pGroups[_idx].pObjects[_Index].pProperties;
+			*_Type = _PrTmxMem->pGroups[_idx].pObjects[_Index].nType;;
+			*_Data = _PrTmxMem->pGroups[_idx].pObjects[_Index].pExtraData;
 			return;
 		}
 	}
