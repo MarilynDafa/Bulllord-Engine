@@ -1410,10 +1410,10 @@ _SpriteInit(DUK_CONTEXT* _DKC)
     _PrSpriteMem->bShaking = FALSE;
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 		_PrSpriteMem->pTileArray[_idx] = blGenArray(FALSE);
-    _PrSpriteMem->nSpriteTech = blGenTechnique("shaders/2D.bsl", FALSE);
-    _PrSpriteMem->nSpriteInstTech = blGenTechnique("shaders/2DInstance.bsl", FALSE);
-	_PrSpriteMem->nSpriteStrokeTech = blGenTechnique("shaders/2DStroke.bsl", FALSE);
-    _PrSpriteMem->nSpriteGlowTech = blGenTechnique("shaders/2DGlow.bsl", FALSE);
+    _PrSpriteMem->nSpriteTech = blGenTechnique("shaders/2D.bsl", BL_DEBUG_MODE);
+    _PrSpriteMem->nSpriteInstTech = blGenTechnique("shaders/2DInstance.bsl", BL_DEBUG_MODE);
+	_PrSpriteMem->nSpriteStrokeTech = blGenTechnique("shaders/2DStroke.bsl", BL_DEBUG_MODE);
+    _PrSpriteMem->nSpriteGlowTech = blGenTechnique("shaders/2DGlow.bsl", BL_DEBUG_MODE);
 	_PrSpriteMem->nFBO = blGenFrameBuffer();
 	_PrSpriteMem->aExternalMethod[0].aSuffix[0] = 0;
 	_PrSpriteMem->aExternalMethod[1].aSuffix[0] = 0;

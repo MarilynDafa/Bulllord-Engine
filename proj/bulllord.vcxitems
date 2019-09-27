@@ -2240,7 +2240,11 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\headers\util.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\array.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\dictionary.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpu-ds.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpudx.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpucommon.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpugl.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpumtl.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpuvk.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\internal.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\list.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\mathematics.h" />

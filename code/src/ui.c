@@ -11239,7 +11239,7 @@ _UIInit(DUK_CONTEXT* _DKC, BLBool _Profiler)
 	_PrUIMem->pHoveredWidget = NULL;
 	_PrUIMem->pFocusWidget = NULL;
     _PrUIMem->pFonts = blGenArray(TRUE);
-	_PrUIMem->nUITech = blGenTechnique("shaders/2D.bsl", FALSE);
+	_PrUIMem->nUITech = blGenTechnique("shaders/2D.bsl", BL_DEBUG_MODE);
 	_PrUIMem->nFBO = blGenFrameBuffer();
 	_PrUIMem->bProfiler = _Profiler;
 	_PrUIMem->nCaretColor = 0xFFFFFFFF;

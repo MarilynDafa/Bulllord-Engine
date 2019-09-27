@@ -118,6 +118,12 @@ extern "C" {
 #define UIACTION_SCALE_INTERNAL			4
 #define UIACTION_ALPHA_INTERNAL			5
 #define UIACTION_DEAD_INTERNAL			6
+
+#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+#	define INLINE _forceinline
+#else
+#	define INLINE inline __attribute__((always_inline))
+#endif
 /* JS Bind */
 #define JS_FUNCTION_REG(name, func) duk_push_c_function(_DKC, func, DUK_VARARGS); duk_put_global_string(_DKC, name);
 #define DUK_REGISTER_CALLBACK(cb, jsfunc, funcobj) do { \

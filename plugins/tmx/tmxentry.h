@@ -31,11 +31,14 @@ BL_API BLVoid blTMXOpenEXT(
 BL_API BLVoid blTMXCloseEXT();
 
 //Base64 Zip
+//unsupport features
+//<tileoffset> <grid> <terraintypes> <terrain> <tile> <animation> <frame> <wangsets> <wangset> <wangcornercolor> <wangedgecolor> <wangtile>
 BL_API BLBool blTMXFileEXT(
 	IN BLAnsi* _Filename);
 
 BL_API BLVoid blTMXQueryEXT(
 	OUT BLAnsi _Orientation[32], 
+	OUT BLAnsi _RenderOrder[32],
 	OUT BLU32* _Width,
 	OUT BLU32* _Height,
 	OUT BLU32* _TileWidth,

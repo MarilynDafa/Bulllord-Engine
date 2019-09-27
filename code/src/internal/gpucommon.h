@@ -18,8 +18,8 @@
  misrepresented as being the original software.
  3. This notice may not be removed or altered from any source distribution.
  */
-#ifndef __gpuds_h_
-#define __gpuds_h_
+#ifndef __gpucommon_h_
+#define __gpucommon_h_
 #include "dictionary.h"
 #include "array.h"
 #include "mathematics.h"
@@ -305,4 +305,128 @@ typedef struct _CommandQueue {
     } sDX;
 #endif
 }_BLCommandQueue;
+
+typedef struct _GpuMember {
+	DUK_CONTEXT* pDukContext;
+	_BLHardwareCaps sHardwareCaps;
+	_BLPipelineState sPipelineState;
+	BLBool bVsync;
+	BLDictionary* pTextureCache;
+	BLDictionary* pBufferCache;
+	BLDictionary* pTechCache;
+	_BLUniformBuffer* pUBO;
+#if defined(BL_PLATFORM_WIN32)
+	HGLRC sGLRC;
+	HDC sGLHDC;
+#elif defined(BL_PLATFORM_UWP)
+	ID3D12Device* pDX;
+	IDXGISwapChain3* pSwapChain;
+	ID3D12Resource* aBackBuffer[4];
+	ID3D12Resource* pBackBufferDS;
+	ID3D12DescriptorHeap* pRTVHeap;
+	ID3D12DescriptorHeap* pDSVHeap;
+	ID3D12RootSignature* pRootSignature;
+	_BLCommandQueue pCmdQueue;
+	UINT64 aBackBufferFence[4];
+	BLDictionary* pPSOCache;
+	UINT nSyncInterval;
+	UINT nBackBuffer;
+#elif defined(BL_PLATFORM_OSX)
+	NSOpenGLContext* pGLC;
+#elif defined(BL_PLATFORM_IOS)
+	EAGLContext* pGLC;
+	GLuint nBackFB;
+	GLuint nBackRB;
+	GLuint nDepthRB;
+#elif defined(BL_PLATFORM_LINUX)
+	GLXContext pContext;
+	Display* pDisplay;
+	Window nWindow;
+	BLBool bCtxError;
+#elif defined(BL_PLATFORM_ANDROID)
+	EGLDisplay pEglDisplay;
+	EGLContext pEglContext;
+	EGLSurface pEglSurface;
+	EGLConfig pEglConfig;
+	BLBool bAEPSupport;
+#elif defined(BL_PLATFORM_WEB)
+	EMSCRIPTEN_WEBGL_CONTEXT_HANDLE pContext;
+#endif
+}_BLGpuMember;
+inline BLU32
+_TextureSize(BLEnum _BLFmt, BLU32 _Width, BLU32 _Height, BLU32 _Depth)
+{
+	switch (_BLFmt)
+	{
+	case BL_TF_ASTC:
+		return ((_Width + 3) / 4) * ((_Height + 3) / 4) * _Depth * 16;
+	case BL_TF_R8:
+		return _Width * _Height * _Depth * 1;
+	case BL_TF_R8I:
+		return _Width * _Height * _Depth * 1;
+	case BL_TF_R8U:
+		return _Width * _Height * _Depth * 1;
+	case BL_TF_R8S:
+		return _Width * _Height * _Depth * 1;
+	case BL_TF_R32I:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_R32U:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_R32F:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RG8:
+		return _Width * _Height * _Depth * 2;
+	case BL_TF_RG8I:
+		return _Width * _Height * _Depth * 2;
+	case BL_TF_RG8U:
+		return _Width * _Height * _Depth * 2;
+	case BL_TF_RG8S:
+		return _Width * _Height * _Depth * 2;
+	case BL_TF_RG32I:
+		return _Width * _Height * _Depth * 8;
+	case BL_TF_RG32U:
+		return _Width * _Height * _Depth * 8;
+	case BL_TF_RG32F:
+		return _Width * _Height * _Depth * 8;
+	case BL_TF_RGB8:
+		return _Width * _Height * _Depth * 3;
+	case BL_TF_RGB8I:
+		return _Width * _Height * _Depth * 3;
+	case BL_TF_RGB8U:
+		return _Width * _Height * _Depth * 3;
+	case BL_TF_RGB8S:
+		return _Width * _Height * _Depth * 3;
+	case BL_TF_RGB9E5F:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_R11G11B10F:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_BGRA8:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RGBA8:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RGBA8I:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RGBA8U:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RGBA8S:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_RGBA32I:
+		return _Width * _Height * _Depth * 16;
+	case BL_TF_RGBA32U:
+		return _Width * _Height * _Depth * 16;
+	case BL_TF_RGBA32F:
+		return _Width * _Height * _Depth * 16;
+	case BL_TF_RGB10A2:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_D16:
+		return _Width * _Height * _Depth * 2;
+	case BL_TF_D32:
+		return _Width * _Height * _Depth * 4;
+	case BL_TF_D24S8:
+		return _Width * _Height * _Depth * 4;
+	default:
+		return 0;
+	}
+}
+static _BLGpuMember* _PrGpuMem = NULL;
 #endif /* __gpuds_h_ */

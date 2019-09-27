@@ -44,9 +44,9 @@
 #	error unsupport platform
 #endif
 #if defined(DEBUG) | defined(_DEBUG)
-#	define BL_DEBUG_MODE
+#	define BL_DEBUG_MODE 1 
 #else
-#	define BL_RELEASE_MODE
+#	define BL_DEBUG_MODE 0
 #endif
 #include <stdlib.h>
 #include <stdio.h>

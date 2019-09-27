@@ -1110,9 +1110,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv_neon.c">
       <Filter>externals\webp\dsp</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
       <Filter>src</Filter>
     </ClCompile>
@@ -1162,6 +1159,9 @@
       <Filter>externals\duktape</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Bulllord-Engine\proj\..\code\src\gpu.xc">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2321,9 +2321,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\webp\types.h">
       <Filter>externals\webp</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpu-ds.h">
-      <Filter>src\internal</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.h">
       <Filter>externals\astc</Filter>
     </ClInclude>
@@ -2335,6 +2332,21 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc.h">
       <Filter>externals\astc</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpucommon.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpudx.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpugl.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpumtl.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpuvk.h">
+      <Filter>src\internal</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

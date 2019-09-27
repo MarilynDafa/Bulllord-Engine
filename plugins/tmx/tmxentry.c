@@ -31,6 +31,8 @@ typedef struct _TMXTileset {
 	BLU32 nFirstGid;
 	BLU32 nWidth;
 	BLU32 nHeight;
+	BLU32 nSpacing;
+	BLU32 nMargin;
 }_BLTMXTilesetExt;
 typedef struct _TMXLayer {
 	BLAnsi aName[256];
@@ -43,8 +45,11 @@ typedef struct _TMXObject {
 	BLS32 nY;
 	BLU32 nWidth;
 	BLU32 nHeight;
+	BLF32 fAngle;
 	BLS32 nType;
 	BLAnsi* pProperties;
+	BLF32* pExtraData;
+	BLU32 pExtraDataNum;
     BLBool bVisible;
 }_BLTMXObjectExt;
 typedef struct _TMXGroup {
@@ -55,6 +60,7 @@ typedef struct _TMXGroup {
 }_BLTMXGroupExt;
 typedef struct _TMXMember {
 	BLAnsi aOrientation[32];
+	BLAnsi aRenderOrder[32];
 	BLU32 nWidth;
 	BLU32 nHeight;
 	BLU32 nTileWidth;
@@ -70,6 +76,291 @@ typedef struct _TMXMember {
 	BLF32* pPathYRet;
 }_BLTMXMemberExt;
 static _BLTMXMemberExt* _PrTmxMem = NULL;
+static BLVoid 
+_ParseTileSet(ezxml_t _Node, BLAnsi* _Filename)
+{
+	const BLAnsi* _tsfirstgid = ezxml_attr(_Node, "firstgid");
+	BLBool _exttsx = (ezxml_attr(_Node, "source") != NULL);
+	BLAnsi _tsx[260] = { 0 };
+	BLGuid _tsxstream;
+	ezxml_t _tsxdoc;
+	if (_exttsx)
+	{
+		strcpy(_tsx, _Filename);
+		for (BLS32 _idx = (BLS32)strlen(_tsx) - 1; _idx >= 0; --_idx)
+		{
+			if (_tsx[_idx] == '/')
+				break;
+			_tsx[_idx] = 0;
+		}
+		strcat(_tsx, ezxml_attr(_Node, "source"));
+		_tsxstream = blGenStream(_tsx);
+		_tsxdoc = ezxml_parse_str((BLAnsi*)blStreamData(_tsxstream), blStreamLength(_tsxstream));
+		_Node = _tsxdoc;
+	}
+	const BLAnsi* _tsname = ezxml_attr(_Node, "name");
+	const BLAnsi* _spacing = ezxml_attr(_Node, "spacing");
+	const BLAnsi* _margin = ezxml_attr(_Node, "margin");
+	_PrTmxMem->nTilesetNum++;
+	_PrTmxMem->pTilesets = (_BLTMXTilesetExt*)realloc(_PrTmxMem->pTilesets, _PrTmxMem->nTilesetNum * sizeof(_BLTMXTilesetExt));
+	memset(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aName, 0, sizeof(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aName));
+	strcpy(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aName, _tsname);
+	_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nFirstGid = (BLU32)strtol(_tsfirstgid, NULL, 10);
+	_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nSpacing = (BLU32)strtol(_spacing, NULL, 10);
+	if (_margin)
+		_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nMargin = (BLU32)strtol(_margin, NULL, 10);
+	else
+		_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nMargin = 0;
+	if (_Node->child)
+	{
+		BLAnsi _source[260] = { 0 };
+		strcpy(_source, ezxml_attr(_Node->child, "source"));
+		const BLAnsi* _srcwidth = ezxml_attr(_Node->child, "width");
+		const BLAnsi* _srcheight = ezxml_attr(_Node->child, "height");
+		BLU32 _sourcelen = (BLU32)strlen(_source);
+		for (BLS32 _idx = (BLS32)_sourcelen - 1; _idx >= 0; --_idx)
+		{
+			if (_source[_idx] == '.')
+				break;
+			else
+				_source[_idx] = 0;
+		}
+		strcat(_source, "bmg");
+		memset(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aSource, 0, sizeof(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aSource));
+		strcpy(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aSource, _source);
+		_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nWidth = (BLU32)strtol(_srcwidth, NULL, 10);
+		_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nHeight = (BLU32)strtol(_srcheight, NULL, 10);
+	}
+	if (_exttsx)
+	{
+		ezxml_free(_tsxdoc);
+		blDeleteStream(_tsxstream);
+	}
+}
+static BLVoid
+_ParseObjectGroup(ezxml_t _Node)
+{
+	const BLAnsi* _ogname = ezxml_attr(_Node, "name");
+	const BLAnsi* _ogvisible = ezxml_attr(_Node, "visible");
+	_PrTmxMem->nGroupNum++;
+	_PrTmxMem->pGroups = (_BLTMXGroupExt*)realloc(_PrTmxMem->pGroups, _PrTmxMem->nGroupNum * sizeof(_BLTMXGroupExt));
+	memset(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].aName, 0, sizeof(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].aName));
+	strcpy(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].aName, _ogname);
+	if (_ogvisible)
+		_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].bVisible = (BLU32)strtol(_ogvisible, NULL, 10);
+	else
+		_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].bVisible = FALSE;
+	_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum = 0;
+	_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects = NULL;
+	ezxml_t _obj = ezxml_child(_Node, "object");
+	if (_obj)
+	{
+		do {
+			const BLAnsi* _oname = ezxml_attr(_obj, "name");
+			const BLAnsi* _ox = ezxml_attr(_obj, "x");
+			const BLAnsi* _oy = ezxml_attr(_obj, "y");
+			const BLAnsi* _owidth = ezxml_attr(_obj, "width");
+			const BLAnsi* _oheight = ezxml_attr(_obj, "height");
+			const BLAnsi* _ovisible = ezxml_attr(_obj, "visible");
+			const BLAnsi* _rotation = ezxml_attr(_obj, "rotation");
+			_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum++;
+			_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects = (_BLTMXObjectExt*)realloc(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects, _PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum * sizeof(_BLTMXObjectExt));
+			memset(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].aName, 0, sizeof(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].aName));
+			_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pExtraData = NULL;
+			if (_oname)
+				strcpy(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].aName, _oname);
+			if (_ox)
+				_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nX = (BLU32)strtol(_ox, NULL, 10);
+			if (_oy)
+				_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nY = (BLU32)strtol(_oy, NULL, 10);
+			if (_owidth)
+				_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nWidth = (BLU32)strtol(_owidth, NULL, 10);
+			if (_oheight)
+				_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nHeight = (BLU32)strtol(_oheight, NULL, 10);
+			if (_rotation)
+				_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].fAngle = (BLF32)strtod(_rotation, NULL);
+			else
+				_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].fAngle = 0;
+			if (_ovisible)
+				_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].bVisible = (BLU32)strtol(_ovisible, NULL, 10);
+			else
+				_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].bVisible = TRUE;
+			_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties = NULL;
+			if (_obj->child)
+			{
+				ezxml_t _pnode = _obj->child;
+				do {
+					if (!strcmp(_pnode->name, "polyline"))
+					{
+						BLAnsi* _points = (BLAnsi*)ezxml_attr(_pnode, "points");
+						BLAnsi* _tmp = _points;
+						BLAnsi* _params[256];
+						BLU32 _idx = 0;
+						_params[_idx] = strtok(_tmp, " ");
+						while (_tmp)
+						{
+							_idx++;
+							_tmp = strtok(NULL, " ");
+							_params[_idx] = _tmp;
+						}
+						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pExtraData = malloc(_idx * 2 * sizeof(BLF32));
+						for (BLU32 _jdx = 0; _jdx < _idx; ++_jdx)
+						{
+							_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pExtraData[_jdx * 2 + 0] = (BLF32)strtod(strtok(_params[_jdx], ","), NULL);
+							_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pExtraData[_jdx * 2 + 1] = (BLF32)strtod(strtok(NULL, ","), NULL);
+						}
+						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pExtraDataNum = _idx * 2;
+						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nType = 0;
+					}
+					else if (!strcmp(_pnode->name, "polygon"))
+					{
+						BLAnsi* _points = (BLAnsi*)ezxml_attr(_pnode, "points");
+						BLAnsi* _tmp = _points;
+						BLAnsi* _params[256];
+						BLU32 _idx = 0;
+						_params[_idx] = strtok(_tmp, " ");
+						while (_tmp)
+						{
+							_idx++;
+							_tmp = strtok(NULL, " ");
+							_params[_idx] = _tmp;
+						}
+						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pExtraData = malloc(_idx * 2 * sizeof(BLF32));
+						for (BLU32 _jdx = 0; _jdx < _idx; ++_jdx)
+						{
+							_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pExtraData[_jdx * 2 + 0] = (BLF32)strtod(strtok(_params[_jdx], ","), NULL);
+							_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pExtraData[_jdx * 2 + 1] = (BLF32)strtod(strtok(NULL, ","), NULL);
+						}
+						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pExtraDataNum = _idx * 2;
+						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nType = 1;
+					}
+					else if (!strcmp(_pnode->name, "ellipse"))
+					{
+						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nType = 2;
+					}
+					else if (!strcmp(_pnode->name, "properties"))
+					{
+						BLU32 _pos = 0;
+						ezxml_t _pro = _pnode->child;
+						do {
+							const BLAnsi* _opname = ezxml_attr(_pro, "name");
+							const BLAnsi* _opvalue = ezxml_attr(_pro, "value");
+							if (_opname && _opvalue)
+							{
+								BLAnsi _buf[512] = { 0 };
+								sprintf(_buf, "%s:%s", _opname, _opvalue);
+								_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties = (BLAnsi*)realloc(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties, _pos + strlen(_buf) + 1);
+								strcpy(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties + _pos, _buf);
+								strcat(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties, ",");
+								_pos += strlen(_buf) + 1;
+								_pro = _pro->next;
+							}
+						} while (_pro);
+						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties[_pos - 1] = 0;
+					}
+					_pnode = _pnode->sibling;
+				} while (_pnode);
+			}
+			_obj = _obj->next;
+		} while (_obj);
+	}
+}
+static BLVoid 
+_ParseImageLayer(ezxml_t _Node, BLAnsi* _Filename, BLU32* _Layer)
+{
+	const BLAnsi* _laname = ezxml_attr(_Node, "name");
+	const BLAnsi* _opacity = ezxml_attr(_Node, "opacity");
+	const BLAnsi* _visible = ezxml_attr(_Node, "visible");
+	BLF32 _fopacity = 1.f;
+	if (_opacity)
+		_fopacity = strtof(_opacity, NULL);
+	_PrTmxMem->nLayerNum++;
+	_PrTmxMem->pLayers = (_BLTMXLayerExt*)realloc(_PrTmxMem->pLayers, _PrTmxMem->nLayerNum * sizeof(_BLTMXLayerExt));
+	memset(_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].aName, 0, sizeof(_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].aName));
+	strcpy(_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].aName, _laname);
+	if (ezxml_child(_Node, "image"))
+	{
+		ezxml_t _imgnode = ezxml_child(_Node, "image");
+		BLAnsi _source[260] = { 0 };
+		strcpy(_source, _Filename);
+		for (BLS32 _idx = (BLS32)strlen(_source) - 1; _idx >= 0; --_idx)
+		{
+			if (_source[_idx] == '/')
+				break;
+			_source[_idx] = 0;
+		}
+		strcat(_source, ezxml_attr(_imgnode, "source"));
+		const BLAnsi* _srcwidth = ezxml_attr(_imgnode, "width");
+		const BLAnsi* _srcheight = ezxml_attr(_imgnode, "height");
+		BLU32 _sourcelen = (BLU32)strlen(_source);
+		for (BLS32 _idx = (BLS32)_sourcelen - 1; _idx >= 0; --_idx)
+		{
+			if (_source[_idx] == '.')
+				break;
+			else
+				_source[_idx] = 0;
+		}
+		strcat(_source, "bmg");
+		memset(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aSource, 0, sizeof(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aSource));
+		strcpy(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aSource, _source);
+		_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nWidth = (BLU32)strtol(_srcwidth, NULL, 10);
+		_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nHeight = (BLU32)strtol(_srcheight, NULL, 10);
+		BLU32 _tidx = 0;
+		BLAnsi _buf[32] = { 0 };
+		_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData = NULL;
+		_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pTiles = (BLGuid*)malloc(_PrTmxMem->nHeight * _PrTmxMem->nWidth * sizeof(BLGuid));
+		for (BLU32 _y = 0; _y < _PrTmxMem->nHeight; ++_y)
+		{
+			for (BLU32 _x = 0; _x < _PrTmxMem->nWidth; ++_x)
+			{
+				BLF32 _w = (BLF32)_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nWidth;
+				BLF32 _h = (BLF32)_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nHeight;
+				BLF32 _deltax = (BLF32)_PrTmxMem->nTileWidth / _w;
+				BLF32 _deltay = (BLF32)_PrTmxMem->nTileHeight / _h;
+				_w = (_w < 2.f) ? 1.f : _w / (BLF32)_PrTmxMem->nTileWidth;
+				_h = (_h < 2.f) ? 1.f : _h / (BLF32)_PrTmxMem->nTileHeight;
+				BLAnsi _buflayer[32] = { 0 };
+				sprintf(_buflayer, "%d", *_Layer);
+				BLGuid _id = blGenSprite(_buf, _buflayer, (BLF32)_PrTmxMem->nTileWidth, (BLF32)_PrTmxMem->nTileHeight, 0, 1, TRUE);
+				BLF32 _ltx = _deltax * _x;
+				BLF32 _lty = _deltay * _y;
+				BLF32 _rbx = _ltx + _deltax;
+				BLF32 _rby = _lty + _deltay;
+				blSpriteTile(_id, _source, _ltx, _lty, _rbx, _rby, (BLF32)_x * _PrTmxMem->nTileWidth, (BLF32)_y * _PrTmxMem->nTileHeight, _fopacity, TRUE);
+				_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pTiles[_y * _PrTmxMem->nWidth + _x] = _id;
+			}
+		}
+		*_Layer = *_Layer + 1;
+	}
+}
+static BLVoid
+_ParseLayer(ezxml_t _Node, BLAnsi* _Filename, BLU32* _Layer)
+{
+}
+static BLVoid
+_ParseGroup(ezxml_t _Node, BLAnsi* _Filename, BLU32* _Layer)
+{
+	ezxml_t _obj = _Node->child;
+	if (_obj)
+	{
+		do
+		{
+			if (!strcmp(_obj->name, "layer"))
+			{
+				_ParseLayer(_obj, _Filename, _Layer);
+			}
+			else if (!strcmp(_obj->name, "imagelayer"))
+			{
+				_ParseImageLayer(_obj, _Filename, _Layer);
+			}
+			else if (!strcmp(_obj->name, "group"))
+			{
+				_ParseGroup(_obj, _Filename, _Layer);
+			}
+			_obj = _obj->next;
+		} while (_obj);
+	}
+}
 BLVoid 
 blTMXOpenEXT(IN BLAnsi* _Version, ...)
 {
@@ -114,6 +405,8 @@ blTMXCloseEXT()
 			{
 				if (_PrTmxMem->pGroups[_idx].pObjects[_jdx].pProperties)
 					free(_PrTmxMem->pGroups[_idx].pObjects[_jdx].pProperties);
+				if (_PrTmxMem->pGroups[_idx].pObjects[_jdx].pExtraData)
+					free(_PrTmxMem->pGroups[_idx].pObjects[_jdx].pExtraData);
 			}
 			free(_PrTmxMem->pGroups[_idx].pObjects);
 		}
@@ -145,6 +438,8 @@ blTMXFileEXT(IN BLAnsi* _Filename)
 			{
 				if (_PrTmxMem->pGroups[_idx].pObjects[_jdx].pProperties)
 					free(_PrTmxMem->pGroups[_idx].pObjects[_jdx].pProperties);
+				if (_PrTmxMem->pGroups[_idx].pObjects[_jdx].pExtraData)
+					free(_PrTmxMem->pGroups[_idx].pObjects[_jdx].pExtraData);
 			}
 			free(_PrTmxMem->pGroups[_idx].pObjects);
 		}
@@ -159,6 +454,7 @@ blTMXFileEXT(IN BLAnsi* _Filename)
 	_PrTmxMem->nGroupNum = 0;
 	blSpriteClear(TRUE, FALSE);
 	memset(_PrTmxMem->aOrientation, 0, sizeof(_PrTmxMem->aOrientation));
+	memset(_PrTmxMem->aRenderOrder, 0, sizeof(_PrTmxMem->aRenderOrder));
 	BLGuid _stream;
     BLAnsi _dir[260] = { 0 };
     BLS32 _filelen = (BLS32)strlen(_Filename);
@@ -177,11 +473,13 @@ blTMXFileEXT(IN BLAnsi* _Filename)
 	ezxml_t _doc = ezxml_parse_str((BLAnsi*)blStreamData(_stream), blStreamLength(_stream));
 	ezxml_t _element = _doc;
 	const BLAnsi* _orientation = ezxml_attr(_element, "orientation");
+	const BLAnsi* _renderorder = ezxml_attr(_element, "renderorder");
 	const BLAnsi* _width = ezxml_attr(_element, "width");
 	const BLAnsi* _height = ezxml_attr(_element, "height");
 	const BLAnsi* _tilewidth = ezxml_attr(_element, "tilewidth");
 	const BLAnsi* _tileheight = ezxml_attr(_element, "tileheight");
 	strcpy(_PrTmxMem->aOrientation, _orientation);
+	strcpy(_PrTmxMem->aRenderOrder, _renderorder);
 	_PrTmxMem->nWidth = (BLU32)strtol(_width, NULL, 10);
 	_PrTmxMem->nHeight = (BLU32)strtol(_height, NULL, 10);
 	_PrTmxMem->nTileWidth = (BLU32)strtol(_tilewidth, NULL, 10);
@@ -191,33 +489,7 @@ blTMXFileEXT(IN BLAnsi* _Filename)
 	do {
 		if (!strcmp(ezxml_name(_element), "tileset"))
 		{
-			const BLAnsi* _tsfirstgid = ezxml_attr(_element, "firstgid");
-			const BLAnsi* _tsname = ezxml_attr(_element, "name");
-			_PrTmxMem->nTilesetNum++;
-			_PrTmxMem->pTilesets = (_BLTMXTilesetExt*)realloc(_PrTmxMem->pTilesets, _PrTmxMem->nTilesetNum * sizeof(_BLTMXTilesetExt));
-			memset(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aName, 0, sizeof(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aName));
-			strcpy(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aName, _tsname);
-			_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nFirstGid = (BLU32)strtol(_tsfirstgid, NULL, 10);
-			if (_element->child)
-			{
-				BLAnsi _source[260] = { 0 };
-				strcpy(_source, ezxml_attr(_element->child, "source"));
-				const BLAnsi* _srcwidth = ezxml_attr(_element->child, "width");
-				const BLAnsi* _srcheight = ezxml_attr(_element->child, "height");
-				BLU32 _sourcelen = (BLU32)strlen(_source);
-				for (BLS32 _idx = (BLS32)_sourcelen - 1; _idx >= 0; --_idx)
-				{
-					if (_source[_idx] == '.')
-						break;
-					else
-						_source[_idx] = 0;
-				}
-				strcat(_source, "bmg");
-				memset(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aSource, 0, sizeof(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aSource));
-				strcpy(_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].aSource, _source);
-				_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nWidth = (BLU32)strtol(_srcwidth, NULL, 10);
-				_PrTmxMem->pTilesets[_PrTmxMem->nTilesetNum - 1].nHeight = (BLU32)strtol(_srcheight, NULL, 10);
-			}
+			_ParseTileSet(_element, (BLAnsi*)_Filename);
 		}
 		else if (!strcmp(ezxml_name(_element), "layer"))
 		{
@@ -314,71 +586,17 @@ blTMXFileEXT(IN BLAnsi* _Filename)
                     blDebugOutput("%s use unsupport encoding format", _Filename);
 			}
 		}
+		else if (!strcmp(ezxml_name(_element), "imagelayer"))
+		{
+			_ParseImageLayer(_element, (BLAnsi*)_Filename, &_layer);
+		}
 		else if (!strcmp(ezxml_name(_element), "objectgroup"))
 		{
-			const BLAnsi* _ogname = ezxml_attr(_element, "name");
-			const BLAnsi* _ogvisible = ezxml_attr(_element, "visible");
-			_PrTmxMem->nGroupNum++;
-			_PrTmxMem->pGroups = (_BLTMXGroupExt*)realloc(_PrTmxMem->pGroups, _PrTmxMem->nGroupNum * sizeof(_BLTMXGroupExt));
-			memset(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].aName, 0, sizeof(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].aName));
-			strcpy(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].aName, _ogname);
-            if (_ogvisible)
-                _PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].bVisible = (BLU32)strtol(_ogvisible, NULL, 10);
-            else
-                _PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].bVisible = FALSE;
-			_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum = 0;
-			_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects = NULL;
-			ezxml_t _obj = _element->child;
-			if (_obj)
-			{
-				do {
-					const BLAnsi* _oname = ezxml_attr(_obj, "name");
-					const BLAnsi* _otype = ezxml_attr(_obj, "type");
-					const BLAnsi* _ox = ezxml_attr(_obj, "x");
-					const BLAnsi* _oy = ezxml_attr(_obj, "y");
-					const BLAnsi* _owidth = ezxml_attr(_obj, "width");
-					const BLAnsi* _oheight = ezxml_attr(_obj, "height");
-                    const BLAnsi* _ovisible = ezxml_attr(_obj, "visible");
-					_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum++;
-					_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects = (_BLTMXObjectExt*)realloc(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects, _PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum * sizeof(_BLTMXObjectExt));
-					memset(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].aName, 0, sizeof(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].aName));
-					if (_oname)
-						strcpy(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].aName, _oname);
-					if (_otype)
-						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nType = (BLS32)strtol(_otype, NULL, 10);
-					if (_ox)
-						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nX = (BLU32)strtol(_ox, NULL, 10);
-					if (_oy)
-						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nY = (BLU32)strtol(_oy, NULL, 10);
-					if (_owidth)
-						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nWidth = (BLU32)strtol(_owidth, NULL, 10);
-					if (_oheight)
-                        _PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].nHeight = (BLU32)strtol(_oheight, NULL, 10);
-                    if (_ovisible)
-                        _PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].bVisible = (BLU32)strtol(_ovisible, NULL, 10);
-                    else
-                        _PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].bVisible = TRUE;
-					_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties = NULL;
-					if (_obj->child)
-					{
-						BLU32 _pos = 0;
-						ezxml_t _pro = _obj->child->child;
-						do {
-							const BLAnsi* _opname = ezxml_attr(_pro, "name");
-							const BLAnsi* _opvalue = ezxml_attr(_pro, "value");
-							BLAnsi _buf[512] = { 0 };
-							sprintf(_buf, "%s:%s", _opname, _opvalue);
-							_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties = (BLAnsi*)realloc(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties, _pos + strlen(_buf) + 1);
-							strcpy(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties + _pos, _buf);
-							strcat(_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties, ",");
-							_pos += strlen(_buf) + 1;
-							_pro = _pro->next;
-						} while (_pro);
-						_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].pObjects[_PrTmxMem->pGroups[_PrTmxMem->nGroupNum - 1].nObjectNum - 1].pProperties[_pos - 1] = 0;
-					}
-					_obj = _obj->next;
-				} while (_obj);
-			}
+			_ParseObjectGroup(_element);
+		}
+		else if (!strcmp(ezxml_name(_element), "group"))
+		{
+			_ParseGroup(_element, (BLAnsi*)_Filename, &_layer);
 		}
         _element = _element->ordered;
 	} while (_element);
@@ -387,12 +605,14 @@ blTMXFileEXT(IN BLAnsi* _Filename)
 	return TRUE;
 }
 BLVoid 
-blTMXQueryEXT(OUT BLAnsi _Orientation[32], OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _TileWidth, OUT BLU32* _TileHeight)
+blTMXQueryEXT(OUT BLAnsi _Orientation[32], OUT BLAnsi _RenderOrder[32], OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _TileWidth, OUT BLU32* _TileHeight)
 {
 	if (!_PrTmxMem)
 		return;
 	memset(_Orientation, 0, 32 * sizeof(BLAnsi));
 	strcpy(_Orientation, _PrTmxMem->aOrientation);
+	memset(_RenderOrder, 0, 32 * sizeof(BLAnsi));
+	strcpy(_RenderOrder, _PrTmxMem->aRenderOrder);
 	*_Width = _PrTmxMem->nWidth;
 	*_Height = _PrTmxMem->nHeight;
 	*_TileWidth = _PrTmxMem->nTileWidth;
