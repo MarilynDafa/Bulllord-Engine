@@ -405,6 +405,9 @@ _ParseLayer(ezxml_t _Node, BLAnsi* _Filename, BLU32* _Layer)
 				for (BLU32 _x = 0; _x < _PrTmxMem->nWidth; ++_x)
 				{
 					BLU32 _gid = _PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_tidx] | _PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_tidx + 1] << 8 | _PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_tidx + 2] << 16 | _PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pData[_tidx + 3] << 24;
+					BLBool _fliph = ((_gid & 0x80000000) == 0x80000000);
+					BLBool _flipv = ((_gid & 0x40000000) == 0x40000000);
+					BLBool _flipd = ((_gid & 0x20000000) == 0x20000000);
 					_tidx += 4;
 					_gid &= ~(0x80000000 | 0x40000000 | 0x20000000);
 					memset(_buf, 0, 32);
@@ -427,14 +430,33 @@ _ParseLayer(ezxml_t _Node, BLAnsi* _Filename, BLU32* _Layer)
 					_gid = _gid - (BLU32)_first;
 					BLAnsi _buflayer[32] = { 0 };
 					sprintf(_buflayer, "%d", *_Layer);
-					BLGuid _id = blGenSprite(_buf, _buflayer, (BLF32)_PrTmxMem->nTileWidth, (BLF32)_PrTmxMem->nTileHeight, 0, 1, TRUE);
+					BLU32 _rot = 0;
+					if (_flipd && _fliph)
+						_rot = 90;
+					else if (_flipd && _flipv)
+						_rot = 270;
+					BLGuid _id = blGenSprite(_buf, _buflayer, (BLF32)_PrTmxMem->nTileWidth, (BLF32)_PrTmxMem->nTileHeight, 0, _rot, TRUE);
 					BLU32 _maxx = (BLU32)((_w - _mar + _sp) / (_PrTmxMem->nTileWidth + _sp));
 					BLF32 _ox = (_gid % _maxx) * (_PrTmxMem->nTileWidth + _sp) + _mar;
 					BLF32 _oy = (_gid / _maxx) * (_PrTmxMem->nTileHeight + _sp) + _mar;
-					BLF32 _ltx = _ox / _w;
-					BLF32 _lty = _oy / _h;
-					BLF32 _rbx = (_ox + _PrTmxMem->nTileWidth) / _w;
-					BLF32 _rby = (_oy + _PrTmxMem->nTileHeight) / _h;
+					BLF32 _ltx;
+					BLF32 _lty;
+					BLF32 _rbx;
+					BLF32 _rby;
+					if (!_flipd)
+					{
+						_ltx = _fliph ? ((_ox + _PrTmxMem->nTileWidth) / _w) : (_ox / _w);
+						_lty = _flipv ? ((_oy + _PrTmxMem->nTileHeight) / _h) : (_oy / _h);
+						_rbx = !_fliph ? ((_ox + _PrTmxMem->nTileWidth) / _w) : (_ox / _w);
+						_rby = !_flipv ? ((_oy + _PrTmxMem->nTileHeight) / _h) : (_oy / _h);
+					}
+					else
+					{
+						_ltx = _ox / _w;
+						_lty = _oy / _h;
+						_rbx = (_ox + _PrTmxMem->nTileWidth) / _w;
+						_rby = (_oy + _PrTmxMem->nTileHeight) / _h;
+					}
 					blSpriteTile(_id, _source, _ltx, _lty, _rbx, _rby, (BLF32)_x * _PrTmxMem->nTileWidth, (BLF32)_y * _PrTmxMem->nTileHeight, _fopacity, _vis);
 					_PrTmxMem->pLayers[_PrTmxMem->nLayerNum - 1].pTiles[_y * _PrTmxMem->nWidth + _x] = _id;
 				}
