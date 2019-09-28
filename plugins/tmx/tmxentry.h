@@ -32,7 +32,8 @@ BL_API BLVoid blTMXCloseEXT();
 
 //Base64 Zip
 //unsupport features
-//<tileoffset> <grid> <terraintypes> <terrain> <tile> <animation> <frame> <wangsets> <wangset> <wangcornercolor> <wangedgecolor> <wangtile>
+//template
+//isometric
 BL_API BLBool blTMXFileEXT(
 	IN BLAnsi* _Filename);
 
