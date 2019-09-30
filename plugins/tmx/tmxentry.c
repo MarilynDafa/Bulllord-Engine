@@ -26,6 +26,7 @@ misrepresented as being the original software.
 #include "xml/ezxml.h"
 #include "miniz/miniz.h"
 #include "tmxparser.h"
+#include "layer.h"
 typedef struct _TMXMember {
 	TMXMapInfo* pMapInfo;
 	BLS8* pNavigation;
@@ -63,6 +64,55 @@ blTMXFileEXT(IN BLAnsi* _Filename)
 		destroyMapInfo(_PrTmxMem->pMapInfo);
 	}
 	_PrTmxMem->pMapInfo = createMapInfo(_Filename);
+	BLU32 _lidx = 0;
+	FOREACH_ARRAY(TMXLayerInfo*, _iter, _PrTmxMem->pMapInfo->_layers)
+	{
+		if (_iter->_visible) 
+		{
+			TMXLayer* _layer = NULL;
+			TMXTilesetInfo* _tileset = NULL;
+			BLU32 _height = (BLU32)_iter->_layerSize.height;
+			BLU32 _width = (BLU32)_iter->_layerSize.width;
+			BLArray* _tilesets = _PrTmxMem->pMapInfo->_tilesets;
+			BLU32 _tilesetnum = _tilesets->nSize;
+			for (BLU32 _idx = _tilesetnum - 1; _idx >= 0; --_idx)
+			{
+				TMXTilesetInfo* _t = (TMXTilesetInfo*)blArrayElement(_tilesets, _idx);
+				if (_t)
+				{
+					for (BLU32 _y = 0; _y < _height; _y++)
+					{
+						for (BLU32 _x = 0; _x < _width; _x++)
+						{
+							BLU32 _pos = _x + _width * _y;
+							BLU32 _gid = _iter->_tiles[_pos];
+							if (_gid != 0)
+							{
+								if (_t->_firstGid < 0 || (_gid & kTMXFlippedMask) >= (BLU32)_t->_firstGid)
+								{
+									_tileset = _t;
+									goto findts;
+								}
+							}
+						}
+					}
+				}
+			}
+findts:
+			if (_tileset)
+			{
+				TMXLayer* _layer = createLayer(_tileset, _iter, _PrTmxMem->pMapInfo, _lidx);
+				if (_layer)
+				{
+					_iter->_ownTiles = FALSE;
+					setupTiles(_layer);
+				}
+			}
+			else
+				continue;
+		}
+		++_lidx;
+	}
 	return TRUE;
 }
 BLVoid 

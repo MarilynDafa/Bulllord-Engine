@@ -136,7 +136,7 @@ TMXMapInfo* createMapInfo(const char* tmxFileName)
 
 	if (parseXMLFile(info, info->_TMXFileName))
 	{
-		//return info;
+		return info;
 	}
 	destroyMapInfo(info);
 	return NULL;	
@@ -313,6 +313,7 @@ void startElement(TMXMapInfo* tmxMapInfo, ezxml_t node)
 			s.height = ezxml_attrf(node, "tileheight");
 			tileset->_tileSize = s;
 
+
 			blArrayPushBack(tmxMapInfo->_tilesets, tileset);
 		}
 	}
@@ -412,6 +413,8 @@ void startElement(TMXMapInfo* tmxMapInfo, ezxml_t node)
 		tileset->_sourceImage = calloc(1, strlen(tileset->_originSourceImage) + strlen(tmxMapInfo->_dir) +1 );
 		strcpy(tileset->_sourceImage, tmxMapInfo->_dir);
 		strcat(tileset->_sourceImage, tileset->_originSourceImage);
+		tileset->_imageSize.width = ezxml_attrf(node, "width");
+		tileset->_imageSize.height = ezxml_attrf(node, "height");
 
 	}
 	else if (!strcmp(elementName , "data"))
