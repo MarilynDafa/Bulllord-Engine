@@ -21,6 +21,24 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)tmxentry.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)tmxparser.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)array.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)dictionary.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)objectgroup.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)misc.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)layer.c">
+      <Filter>externals</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)AStar.h">
@@ -31,6 +49,24 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)tmxentry.h">
       <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)tmxparser.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)objectgroup.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)misc.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)array.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)dictionary.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)layer.h">
+      <Filter>externals</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

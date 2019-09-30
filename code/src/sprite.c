@@ -1488,7 +1488,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			BLU32 _totalnum = (BLU32)((_scalevp.sRB.fX - _scalevp.sLT.fX) * (_scalevp.sRB.fY - _scalevp.sLT.fY) / (_first->sSize.fX * _first->sSize.fY)) * 2;
 			BLGuid _layertex = INVALID_GUID;
 			blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, FALSE);
-			BLU8* _geomem = (BLU8*)alloca(_totalnum * 48 * sizeof(BLF32));
+			BLU8* _geomem = (BLU8*)malloc(_totalnum * 48 * sizeof(BLF32));
 			for (BLS32 _idx = 0; _idx < 8; ++_idx)
 			{
 				BLU32 _tilenum = 0;
@@ -1716,6 +1716,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 					blDeleteGeometryBuffer(_geo);
 				}
 			}
+			free(_geomem);
 		}
 		_SpriteUpdate(_Delta);
 		for (BLU32 _idx = 0; _idx < _PrSpriteMem->nNodeNum; ++_idx)

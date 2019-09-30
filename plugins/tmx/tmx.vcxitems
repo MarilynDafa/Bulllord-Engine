@@ -14,13 +14,27 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)array.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)AStar.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)dictionary.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)IndexPriorityQueue.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)layer.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)misc.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)objectgroup.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)tmxparser.c">
+      <FileType>CppCode</FileType>
+    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)tmxentry.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)array.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)AStar.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)dictionary.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)IndexPriorityQueue.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)layer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)misc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)objectgroup.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)tmxparser.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)tmxentry.h" />
   </ItemGroup>
 </Project>

@@ -37,31 +37,36 @@ BL_API BLVoid blTMXCloseEXT();
 BL_API BLBool blTMXFileEXT(
 	IN BLAnsi* _Filename);
 
-BL_API BLVoid blTMXQueryEXT(
+BL_API BLVoid blTMXMapQueryEXT(
 	OUT BLAnsi _Orientation[32], 
-	OUT BLAnsi _RenderOrder[32],
 	OUT BLU32* _Width,
 	OUT BLU32* _Height,
 	OUT BLU32* _TileWidth,
 	OUT BLU32* _TileHeight);
 
-BL_API BLVoid blTMXObjectGroupQueryEXT(
+BL_API BLVoid blTMXGroupQueryEXT(
 	IN BLAnsi* _GroupName,
-	OUT BLU32* _ObjectNum,
-	OUT BLBool* _Visible);
+	OUT BLU32* _ObjectNum);
 
-//name0:valye0,name1:value1,name2:value2
 BL_API BLVoid blTMXObjectQueryEXT(
 	IN BLAnsi* _GroupName,
 	IN BLU32 _Index,
 	OUT BLAnsi _Name[256],
+	OUT BLS32* _ID,
+	OUT BLS32* _GID,
+	OUT BLAnsi _Type[64],
 	OUT BLS32* _XPos,
 	OUT BLS32* _YPos,
 	OUT BLU32* _Width,
 	OUT BLU32* _Height,
-	OUT BLAnsi** _Properties,
-	OUT BLU32* _Type,
-	OUT BLF32** _Data);
+	OUT BLF32* _Rotate,
+	OUT BLF32** _Geometry);
+
+BL_API BLVoid blTMXPropertyQueryEXT(
+	IN BLAnsi* _GroupName,
+	IN BLAnsi* _ObjectName,
+	IN BLAnsi* _Name,
+	OUT BLAnsi _Value[64]);
 
 BL_API BLVoid blTMXLayerVisibilityEXT(
 	IN BLAnsi* _Layer,

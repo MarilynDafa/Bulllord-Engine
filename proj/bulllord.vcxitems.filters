@@ -1161,7 +1161,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Bulllord-Engine\proj\..\code\src\gpu.xc">
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
