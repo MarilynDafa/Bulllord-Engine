@@ -62,6 +62,7 @@ blTMXFileEXT(IN BLAnsi* _Filename)
 	if (_PrTmxMem->pMapInfo)
 	{
 		destroyMapInfo(_PrTmxMem->pMapInfo);
+		blSpriteClear(TRUE, FALSE);
 	}
 	_PrTmxMem->pMapInfo = createMapInfo(_Filename);
 	BLU32 _lidx = 0;
