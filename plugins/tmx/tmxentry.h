@@ -30,9 +30,8 @@ BL_API BLVoid blTMXOpenEXT(
 
 BL_API BLVoid blTMXCloseEXT();
 
-//Base64 Zip
 //unsupport features
-//template
+//imagelayer
 //isometric
 BL_API BLBool blTMXFileEXT(
 	IN BLAnsi* _Filename);

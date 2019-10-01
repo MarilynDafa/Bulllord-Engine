@@ -103,7 +103,7 @@ bool initWithTilesetInfo(TMXLayer* layer, TMXTilesetInfo *tilesetInfo, TMXLayerI
 
 		float width = 0;
 		float height = 0;
-		if (layer->_layerOrientation == TMXOrientationHex) {
+		if (layer->_layerOrientation == TMXOrientationHex || layer->_layerOrientation == TMXOrientationStaggered) {
 			if (layer->_staggerAxis == TMXStaggerAxis_X) {
 				height = layer->_mapTileSize.height * (layer->_layerSize.height + 0.5f);
 				width = (layer->_mapTileSize.width + layer->_hexSideLength) * ((int)(layer->_layerSize.width / 2)) + layer->_mapTileSize.width * ((int)layer->_layerSize.width % 2);
@@ -129,42 +129,51 @@ bool initWithTilesetInfo(TMXLayer* layer, TMXTilesetInfo *tilesetInfo, TMXLayerI
 }
 Vec2 calculateLayerOffset(TMXLayer* layer, Vec2 pos)
 {
+	float dx = layer->_mapTileSize.width * 0.5f;
+	float dy = layer->_mapTileSize.height * 0.5f;
 	Vec2 ret;
 	switch (layer->_layerOrientation)
 	{
 	case TMXOrientationOrtho:
-		ret.x = pos.x * layer->_mapTileSize.width;
-		ret.y = -pos.y *layer->_mapTileSize.height;
+		ret.x = pos.x * layer->_mapTileSize.width + dx;
+		ret.y = pos.y *layer->_mapTileSize.height + dy;
 		break;
 	case TMXOrientationIso:
-		ret.x = (layer->_mapTileSize.width / 2) * (pos.x - pos.y);
-		ret.y = (layer->_mapTileSize.height / 2) * (-pos.x - pos.y);
+		ret.x = (layer->_mapTileSize.width / 2) * (pos.x - pos.y) + dx;
+		ret.y = (layer->_mapTileSize.height / 2) * (-pos.x - pos.y) + dy;
 		break;
 	case TMXOrientationHex:
 	{
 		if (layer->_staggerAxis == TMXStaggerAxis_Y)
 		{
 			int diffX = (int)((layer->_staggerIndex == TMXStaggerIndex_Even) ? layer->_mapTileSize.width / 2 : 0);
-			ret.x = pos.x * layer->_mapTileSize.width + diffX;
-			ret.y = -pos.y * (layer->_mapTileSize.height - (layer->_mapTileSize.width - layer->_hexSideLength) / 2);
+			ret.x = pos.x * layer->_mapTileSize.width + diffX + dx;
+			ret.y = pos.y * (layer->_mapTileSize.height - (layer->_mapTileSize.width - layer->_hexSideLength) / 2) + dy;
 		}
 		else if (layer->_staggerAxis == TMXStaggerAxis_X)
 		{
 			int diffY = (int)((layer->_staggerIndex == TMXStaggerIndex_Odd) ? layer->_mapTileSize.height / 2 : 0);
-			ret.x = pos.x * (layer->_mapTileSize.width - (layer->_mapTileSize.width - layer->_hexSideLength) / 2);
-			ret.y = -pos.y * layer->_mapTileSize.height + diffY;
+			ret.x = pos.x * (layer->_mapTileSize.width - (layer->_mapTileSize.width - layer->_hexSideLength) / 2) + dx;
+			ret.y = pos.y * layer->_mapTileSize.height - diffY + dy;
 		}
 		break;
 	}
 	case TMXOrientationStaggered:
 	{
-		float diffX = 0;
-		if ((int)fabs(pos.y) % 2 == 1)
+		if (layer->_staggerAxis == TMXStaggerAxis_Y)
 		{
-			diffX = layer->_mapTileSize.width / 2;
+			int diffX = (int)((layer->_staggerIndex == TMXStaggerIndex_Even) ? layer->_mapTileSize.width / 2 : 0);
+			ret.x = pos.x * layer->_mapTileSize.width + diffX + dx;
+			ret.y = (pos.y) * layer->_mapTileSize.height / 2 + dy;
+
 		}
-		ret.x = pos.x * layer->_mapTileSize.width + diffX;
-		ret.y = (-pos.y) * layer->_mapTileSize.height / 2;
+		else if (layer->_staggerAxis == TMXStaggerAxis_X)
+		{
+			int diffY = (int)((layer->_staggerIndex == TMXStaggerIndex_Even) ? layer->_mapTileSize.height / 2 : 0);
+			ret.x = pos.x * layer->_mapTileSize.width/2 + dx;
+			ret.y = (pos.y) * layer->_mapTileSize.height +diffY + dy;//eve
+		}
+
 	}
 	break;
 	}
@@ -289,7 +298,7 @@ void setupTiles(TMXLayer* layer)
 		{
 			int newX = x;
 			// fix correct render ordering in Hexagonal maps when stagger axis == x
-			if (layer->_staggerAxis == TMXStaggerAxis_X && layer->_layerOrientation == TMXOrientationHex)
+			if (layer->_staggerAxis == TMXStaggerAxis_X && ((layer->_layerOrientation == TMXOrientationHex) || (layer->_layerOrientation == TMXOrientationStaggered)))
 			{
 				if (layer->_staggerIndex == TMXStaggerIndex_Odd)
 				{
@@ -368,7 +377,7 @@ int getZForPos(TMXLayer* layer, Vec2 pos)
 {
 	int z = -1;
 	// fix correct render ordering in Hexagonal maps when stagger axis == x
-	if (layer->_staggerAxis == TMXStaggerAxis_X && layer->_layerOrientation == TMXOrientationHex)
+	if (layer->_staggerAxis == TMXStaggerAxis_X && ((layer->_layerOrientation == TMXOrientationHex) || (layer->_layerOrientation == TMXOrientationStaggered)))
 	{
 		if (layer->_staggerIndex == TMXStaggerIndex_Odd)
 		{
@@ -393,18 +402,60 @@ int getZForPos(TMXLayer* layer, Vec2 pos)
 }
 void setupTileSprite(TMXLayer* layer, Vec2 pos, Rect tr, BLU32 gid)
 {
+	int _rot = 0;
+	bool flipx = FALSE;
+	bool flipy = FALSE;
+	if (gid & kTMXTileDiagonalFlag)
+	{
+		BLU32 flag = gid & (kTMXTileHorizontalFlag | kTMXTileVerticalFlag);
+
+		// handle the 4 diagonally flipped states.
+		if (flag == kTMXTileHorizontalFlag)
+		{
+			_rot = 90;
+		}
+		else if (flag == kTMXTileVerticalFlag)
+		{
+			_rot = 270;
+		}
+		else if (flag == (kTMXTileVerticalFlag | kTMXTileHorizontalFlag))
+		{
+			_rot = 90;
+			flipx = 1;
+		}
+		else
+		{
+			_rot = 270;
+			flipx = 1;
+		}
+	}
+	else
+	{
+		if (gid & kTMXTileHorizontalFlag)
+		{
+			flipx = 1;
+		}
+
+		if (gid & kTMXTileVerticalFlag)
+		{
+			flipy = 1;
+		}
+	}
 	BLAnsi _buf[32] = { 0 };
 	memset(_buf, 0, 32);
 	sprintf(_buf, "@#tilespritelayer_%d_%d#@", layer->index, gid);
 	BLAnsi _buflayer[32] = { 0 };
 	sprintf(_buflayer, "%d", layer->index);
-	BLGuid _id = blGenSprite(_buf, _buflayer, tr.size.width, tr.size.height, 0, 0, TRUE);
+	BLGuid _id = blGenSprite(_buf, _buflayer, tr.size.width, tr.size.height, 0, _rot, TRUE);
 	Vec2 p = getPositionAt(layer, pos);
-	BLF32 ltx = tr.origin.x / layer->_tileSet->_imageSize.width;
-	BLF32 lty = tr.origin.y / layer->_tileSet->_imageSize.height;
-	BLF32 rbx = (tr.size.width + tr.origin.x) / layer->_tileSet->_imageSize.width;
-	BLF32 rby = (tr.size.height + tr.origin.y) / layer->_tileSet->_imageSize.height;
-	blSpriteTile(_id, layer->_tileSet->_sourceImage, ltx, lty, rbx, rby, p.x, p.y, layer->_opacity / 255.f, layer->_vis);
+	BLF32 ltx = !flipx ? (tr.origin.x / layer->_tileSet->_imageSize.width) : ((tr.size.width + tr.origin.x) / layer->_tileSet->_imageSize.width);
+	BLF32 lty = !flipy ? (tr.origin.y / layer->_tileSet->_imageSize.height) : ((tr.size.height + tr.origin.y) / layer->_tileSet->_imageSize.height);
+	BLF32 rbx = flipx ? (tr.origin.x / layer->_tileSet->_imageSize.width) : ((tr.size.width + tr.origin.x) / layer->_tileSet->_imageSize.width);
+	BLF32 rby = flipy ? (tr.origin.y / layer->_tileSet->_imageSize.height) : ((tr.size.height + tr.origin.y) / layer->_tileSet->_imageSize.height);
+	blSpriteTile(_id, layer->_tileSet->_sourceImage, ltx, lty, rbx, rby, 
+		p.x+layer->_position.x, 
+		p.y + layer->_position.y, 
+		layer->_opacity / 255.f, layer->_vis);
 }
 Vec2 getPositionAt(TMXLayer* layer, Vec2 pos)
 {
@@ -437,7 +488,7 @@ Vec2 getPositionForOrthoAt(TMXLayer* layer, Vec2 pos)
 {
 	Vec2 ret;
 	ret.x = pos.x * layer->_mapTileSize.width;
-	ret.y = (layer->_layerSize.height - pos.y - 1) * layer->_mapTileSize.height;
+	ret.y = pos.y * layer->_mapTileSize.height;
 	return ret;
 }
 Vec2 getPositionForHexAt(TMXLayer* layer, Vec2 pos)
@@ -456,7 +507,7 @@ Vec2 getPositionForHexAt(TMXLayer* layer, Vec2 pos)
 			diffX = layer->_mapTileSize.width / 2 * odd_even;
 		}
 		xy.x = pos.x * layer->_mapTileSize.width + diffX + offset.x;
-		xy.y = (layer->_layerSize.height - pos.y - 1) * (layer->_mapTileSize.height - (layer->_mapTileSize.height - layer->_hexSideLength) / 2) - offset.y;
+		xy.y = pos.y* (layer->_mapTileSize.height - (layer->_mapTileSize.height - layer->_hexSideLength) / 2) + offset.y;
 		break;
 	}
 
@@ -469,7 +520,7 @@ Vec2 getPositionForHexAt(TMXLayer* layer, Vec2 pos)
 		}
 
 		xy.x = pos.x * (layer->_mapTileSize.width - (layer->_mapTileSize.width - layer->_hexSideLength) / 2) + offset.x;
-		xy.y = (layer->_layerSize.height - pos.y - 1) * layer->_mapTileSize.height + diffY - offset.y;
+		xy.y = pos.y * layer->_mapTileSize.height - diffY + offset.y;
 		break;
 	}
 	}
@@ -477,13 +528,34 @@ Vec2 getPositionForHexAt(TMXLayer* layer, Vec2 pos)
 }
 Vec2 getPositionForStaggeredAt(TMXLayer* layer, Vec2 pos)
 {
-	Vec2 ret;
-	float diffX = 0;
-	if ((int)pos.y % 2 == 1)
+	Vec2 xy;
+	int odd_even = (layer->_staggerIndex == TMXStaggerIndex_Odd) ? 1 : -1;
+	switch (layer->_staggerAxis)
 	{
-		diffX = layer->_mapTileSize.width / 2;
+	case TMXStaggerAxis_Y:
+	{
+		float diffX = 0;
+		if ((int)pos.y % 2 == 1)
+		{
+			diffX = layer->_mapTileSize.width / 2 * odd_even;
+		}
+		xy.x = pos.x * layer->_mapTileSize.width + diffX;
+		xy.y = pos.y * layer->_mapTileSize.height / 2;
 	}
-	ret.x = pos.x * layer->_mapTileSize.width + diffX;
-	ret.y = (layer->_layerSize.height - pos.y - 1) * layer->_mapTileSize.height / 2;
-	return ret;
+	break;
+
+	case TMXStaggerAxis_X:
+	{
+		float diffY = 0;
+		if ((int)pos.x % 2 == 1)
+		{
+			diffY = layer->_mapTileSize.height / 2 * -odd_even;
+		}
+
+		xy.x = pos.x * layer->_mapTileSize.width / 2;
+		xy.y = pos.y * layer->_mapTileSize.height - diffY;
+	}
+	break;
+	}
+	return xy;
 }
