@@ -480,8 +480,9 @@ Vec2 getPositionAt(TMXLayer* layer, Vec2 pos)
 Vec2 getPositionForIsoAt(TMXLayer* layer, Vec2 pos)
 {
 	Vec2 ret;
+	float y = (layer->_layerSize.height * 2 - pos.x - pos.y) - 2;
 	ret.x = layer->_mapTileSize.width / 2 * (layer->_layerSize.width + pos.x - pos.y - 1);
-	ret.y = layer->_mapTileSize.height / 2 * ((layer->_layerSize.height * 2 - pos.x - pos.y) - 2);
+	ret.y = layer->_mapTileSize.height / 2 * (layer->_layerSize.height*2 - y);
 	return ret;
 }
 Vec2 getPositionForOrthoAt(TMXLayer* layer, Vec2 pos)
