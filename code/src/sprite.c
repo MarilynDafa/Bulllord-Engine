@@ -28,7 +28,6 @@
 #include "internal/array.h"
 #include "internal/internal.h"
 #include "internal/mathematics.h"
-#include "../externals/duktape/duktape.h"
 #include "../externals/webp/src/webp/decode.h"
 #include "../externals/astc/astc.h"
 typedef struct _SpriteAction{
@@ -213,7 +212,6 @@ typedef struct _ExternalMethod {
 	const BLVoid(*pDrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**);
 } _BLExternalMethod;
 typedef struct _SpriteNode{
-	DUK_CONTEXT* pDukContext;
     struct _SpriteNode* pParent;
     struct _SpriteNode** pChildren;
 	_BLSpriteAction* pAction;
@@ -266,7 +264,6 @@ typedef struct _SpriteNode{
     BLBool bShow;
 }_BLSpriteNode;
 typedef struct _SpriteMember {
-	DUK_CONTEXT* pDukContext;
     BLGuid nSpriteTech;
     BLGuid nSpriteInstTech;
 	BLGuid nSpriteStrokeTech;
@@ -1403,10 +1400,9 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 	}
 }
 BLVoid
-_SpriteInit(DUK_CONTEXT* _DKC)
+_SpriteInit()
 {
     _PrSpriteMem = (_BLSpriteMember*)malloc(sizeof(_BLSpriteMember));
-	_PrSpriteMem->pDukContext = _DKC;
     _PrSpriteMem->pNodeList = NULL;
     _PrSpriteMem->nNodeNum = 0;
     _PrSpriteMem->nNodeCap = 0;

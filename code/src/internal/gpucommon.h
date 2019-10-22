@@ -29,7 +29,6 @@
 #include "../headers/system.h"
 #include "../headers/streamio.h"
 #include "../externals/xml/ezxml.h"
-#include "../externals/duktape/duktape.h"
 #if defined(BL_PLATFORM_OSX)
 #   include <AppKit/NSOpenGL.h>
 #   include <AppKit/NSApplication.h>
@@ -307,7 +306,6 @@ typedef struct _CommandQueue {
 }_BLCommandQueue;
 
 typedef struct _GpuMember {
-	DUK_CONTEXT* pDukContext;
 	_BLHardwareCaps sHardwareCaps;
 	_BLPipelineState sPipelineState;
 	BLBool bVsync;

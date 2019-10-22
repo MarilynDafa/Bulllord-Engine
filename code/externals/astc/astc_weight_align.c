@@ -37,6 +37,7 @@
  */ 
 /*----------------------------------------------------------------------------*/ 
 
+#ifndef EMSCRIPTEN
 #include <math.h>
 #include "astc.h"
 #define M_PI 3.14159265358979323846
@@ -596,3 +597,4 @@ void compute_angular_endpoints_2planes(float mode_cutoff,
 		high_value2[i] = high_values2[decim_mode][quant_mode];
 	}
 }
+#endif

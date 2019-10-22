@@ -96,10 +96,9 @@ _PipelineStateRefresh()
 }
 #if defined(BL_PLATFORM_WIN32)
 BLVoid
-_GpuIntervention(DUK_CONTEXT* _DKC, HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(HWND _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
-    _PrGpuMem->pDukContext = _DKC;
     _PrGpuMem->bVsync = _Vsync;
     _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
@@ -243,10 +242,9 @@ _GpuAnitIntervention(HWND _Hwnd)
 }
 #elif defined(BL_PLATFORM_UWP)
 BLVoid
-_GpuIntervention(DUK_CONTEXT* _DKC, Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(Windows::UI::Core::CoreWindow^ _Hwnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
     _PrGpuMem = new _BLGpuMember;
-    _PrGpuMem->pDukContext = _DKC;
     _PrGpuMem->bVsync = _Vsync;
     _PrGpuMem->sHardwareCaps.bCSSupport = TRUE;
     _PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
@@ -453,10 +451,9 @@ _CtxErrorHandler(Display*, XErrorEvent*)
     return 0;
 }
 BLVoid
-_GpuIntervention(DUK_CONTEXT* _DKC, Display* _Display, Window _Window, BLU32 _Width, BLU32 _Height, GLXFBConfig _Config, BLVoid* _Lib, BLBool _Vsync)
+_GpuIntervention(Display* _Display, Window _Window, BLU32 _Width, BLU32 _Height, GLXFBConfig _Config, BLVoid* _Lib, BLBool _Vsync)
 {
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
-    _PrGpuMem->pDukContext = _DKC;
     _PrGpuMem->bVsync = _Vsync;
     _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
@@ -593,7 +590,7 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_ANDROID)
 BLVoid
-_GpuIntervention(DUK_CONTEXT* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync, BLBool _Backend, BLBool _AEP)
+_GpuIntervention(ANativeWindow* _Wnd, BLU32 _Width, BLU32 _Height, BLBool _Vsync, BLBool _Backend, BLBool _AEP)
 {
     if (_Backend)
     {
@@ -611,7 +608,6 @@ _GpuIntervention(DUK_CONTEXT* _DKC, ANativeWindow* _Wnd, BLU32 _Width, BLU32 _He
         return;
     }
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
-    _PrGpuMem->pDukContext = _DKC;
     _PrGpuMem->bVsync = _Vsync;
     _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
@@ -771,10 +767,9 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_OSX)
 BLVoid
-_GpuIntervention(DUK_CONTEXT* _DKC, NSView* _View, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(NSView* _View, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
-    _PrGpuMem->pDukContext = _DKC;
     _PrGpuMem->bVsync = _Vsync;
     _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bGSSupport = TRUE;
@@ -927,10 +922,9 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_IOS)
 BLVoid
-_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)
+_GpuIntervention(CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)
 {
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
-    _PrGpuMem->pDukContext = _DKC;
     _PrGpuMem->bVsync = _Vsync;
     _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bGSSupport = FALSE;
@@ -1047,7 +1041,7 @@ _GpuAnitIntervention()
 }
 #elif defined(BL_PLATFORM_WEB)
 BLVoid
-_GpuIntervention(DUK_CONTEXT* _DKC, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
+_GpuIntervention(BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 {
 	EM_ASM({
 		Array.prototype.someExtensionFromThirdParty = {};
@@ -1055,7 +1049,6 @@ _GpuIntervention(DUK_CONTEXT* _DKC, BLU32 _Width, BLU32 _Height, BLBool _Vsync)
 		Array.prototype.someExtensionFromThirdParty.something = function() { return "Surprise!"; };
 	  });
     _PrGpuMem = (_BLGpuMember*)malloc(sizeof(_BLGpuMember));
-    _PrGpuMem->pDukContext = _DKC;
     _PrGpuMem->bVsync = _Vsync;
     _PrGpuMem->sHardwareCaps.bCSSupport = FALSE;
     _PrGpuMem->sHardwareCaps.bGSSupport = FALSE;

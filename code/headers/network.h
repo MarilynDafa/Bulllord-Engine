@@ -39,27 +39,6 @@ BL_API BLVoid blSendNetMsg(
 	IN BLBool _Overwrite,
 	IN BLEnum _Nettype);
 
-BL_API BLBool blRSASign(
-	IN BLAnsi* _Input,
-	IN BLAnsi* _PrivateKey,
-	IN BLU32 _Version,
-	OUT BLAnsi _Output[1025]);
-
-BL_API BLBool blRSAVerify(
-	IN BLAnsi* _Input,
-	IN BLAnsi* _PublicKey,
-	IN BLU32 _Version);
-
-BL_API BLBool blRSAEncrypt(
-	IN BLAnsi* _Input,
-	IN BLAnsi* _PublicKey,
-	OUT BLAnsi _Output[1025]);
-
-BL_API BLBool blRSADecrypt(
-	IN BLAnsi* _Input,
-	IN BLAnsi* _PrivateKey,
-	OUT BLAnsi _Output[1025]);
-
 BL_API BLBool blHTTPRequest(
 	IN BLAnsi* _Url,
 	IN BLAnsi* _Param,

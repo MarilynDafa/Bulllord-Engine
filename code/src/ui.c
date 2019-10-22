@@ -30,7 +30,6 @@
 #include "internal/internal.h"
 #include "../externals/xml/ezxml.h"
 #include "../externals/miniz/miniz.h"
-#include "../externals/duktape/duktape.h"
 #include "../externals/webp/src/webp/decode.h"
 #include "../externals/astc/astc.h"
 #include "ft2build.h"
@@ -499,7 +498,6 @@ typedef struct _Widget {
 	} uExtension;
 }_BLWidget;
 typedef struct _UIMember {
-	DUK_CONTEXT* pDukContext;
 	_BLWidget* pRoot;
 	_BLWidget* pBasePlate;
 	_BLWidget* pHoveredWidget;
@@ -11205,11 +11203,10 @@ _SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, B
 	return FALSE;
 }
 BLVoid
-_UIInit(DUK_CONTEXT* _DKC, BLBool _Profiler)
+_UIInit(BLBool _Profiler)
 {
     _PrUIMem = (_BLUIMember*)malloc(sizeof(_BLUIMember));
     FT_Init_FreeType(&_PrUIMem->sFtLibrary);
-	_PrUIMem->pDukContext = _DKC;
 	_PrUIMem->pBasePlate = NULL;
 	_PrUIMem->pModalWidget = NULL;
 	_PrUIMem->pPixmapsCache = blGenDict(TRUE);

@@ -22,7 +22,6 @@
 #include "../headers/system.h"
 #include "internal/thread.h"
 #include "internal/internal.h"
-#include "../externals/duktape/duktape.h"
 typedef struct _Ctx {
 	BLU32 aState[4];
 	BLU32 aCount[2];
@@ -35,7 +34,6 @@ typedef struct _MemCache {
 	BLU32* pSparse;
 }_BLMemCache;
 typedef struct _UtilMember {
-	DUK_CONTEXT* pDukContext;
 	_BLMemCache sMemCache;
 	BLVoid* aPtrBuf[MEMCACHE_CAP_INTERNAL];
 	blMutex* pMutex;
@@ -177,14 +175,13 @@ _MD5Update(BLU8* _Input, BLU32 _Inputlen)
 	memcpy(_PrUtilMem->sContext.aBuffer + _index, _Input + _i, _Inputlen - _i);
 }
 BLVoid
-_UtilsInit(DUK_CONTEXT* _DKC)
+_UtilsInit()
 {
 	BLU32 _idx;
 	_PrUtilMem = (_BLUtilMember*)malloc(sizeof(_BLUtilMember));
 	memset(_PrUtilMem->aU8Buf, 0, sizeof(_PrUtilMem->aU8Buf));
 	memset(_PrUtilMem->aU16Buf, 0, sizeof(_PrUtilMem->aU16Buf));
 	memset(_PrUtilMem->aPtrBuf, 0, sizeof(_PrUtilMem->aPtrBuf));
-	_PrUtilMem->pDukContext = _DKC;
 	_PrUtilMem->sMemCache.nUsed = 0;
 	_PrUtilMem->sMemCache.nMax = MEMCACHE_CAP_INTERNAL;
 	_PrUtilMem->sMemCache.pDense = (BLU32*)malloc(_PrUtilMem->sMemCache.nMax * sizeof(BLU32));

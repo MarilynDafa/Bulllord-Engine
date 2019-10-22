@@ -30,7 +30,6 @@
 #if defined BL_PLATFORM_ANDROID
 #	include <android/asset_manager.h>
 #endif
-#include "../externals/duktape/duktape.h"
 #pragma pack(1)
 typedef struct _BpkFileHeader{
     BLU32 nFourCC;
@@ -85,7 +84,6 @@ typedef struct _Stream {
 	BLU8* pEnd;
 }_BLStream;
 typedef struct _StreamIOMember {
-	DUK_CONTEXT* pDukContext;
 	BLVoid* pAndroidAM;
 	BLArray* pArchives;
 	BLS32 nSqlRef;
@@ -291,10 +289,9 @@ _LoadThreadFunc(BLVoid* _Userdata)
 #endif
 }
 BLVoid
-_StreamIOInit(DUK_CONTEXT* _DKC, BLVoid* _AssetMgr)
+_StreamIOInit(BLVoid* _AssetMgr)
 {
 	_PrStreamIOMem = (_BLStreamIOMember*)malloc(sizeof(_BLStreamIOMember));
-	_PrStreamIOMem->pDukContext = _DKC;
 	_PrStreamIOMem->pAndroidAM = _AssetMgr;
 	_PrStreamIOMem->pArchives = blGenArray(FALSE);
 	_PrStreamIOMem->pLoadingQueue = blGenList(TRUE);

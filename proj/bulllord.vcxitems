@@ -27,7 +27,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_weight_align.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc_weight_quant_xfer_tables.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.c" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\fastlz\fastlz.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
@@ -716,371 +715,6 @@
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aes.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aesni.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\arc4.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aria.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\asn1parse.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\asn1write.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\base64.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\bignum.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\blowfish.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\camellia.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ccm.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\certs.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cipher.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cipher_wrap.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cmac.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ctr_drbg.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\debug.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\des.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\dhm.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecdh.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecdsa.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecjpake.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecp.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecp_curves.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\entropy.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\entropy_poll.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\error.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\gcm.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\havege.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\hmac_drbg.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md2.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md4.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md5.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md_wrap.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\memory_buffer_alloc.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\net_sockets.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\oid.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\padlock.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pem.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pk.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs11.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs12.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs5.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkparse.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkwrite.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pk_wrap.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\platform.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\platform_util.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ripemd160.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\rsa.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\rsa_internal.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha1.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha256.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha512.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_cache.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_ciphersuites.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_cli.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_cookie.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_srv.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_ticket.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_tls.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\threading.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\timing.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\version.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\version_features.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509write_crt.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509write_csr.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_create.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_crl.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_crt.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_csr.c">
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <CompileAs>CompileAsC</CompileAs>
-      <CompileAsWinRT>false</CompileAsWinRT>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz.c">
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <CompileAs>CompileAsC</CompileAs>
@@ -1106,6 +740,11 @@
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\bjson.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\cutils.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libregexp.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libunicode.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\alpha_dec.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
@@ -1455,8 +1094,6 @@
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\astc.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\astc\softfloat.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duktape.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\duktape\duk_config.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\fastlz\fastlz.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftheader.h" />
@@ -2115,79 +1752,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\gl\glcorearb.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\gl\glxext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\gl\wglext.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aes.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aesni.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\arc4.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\aria.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\asn1.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\asn1write.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\base64.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\bignum.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\blowfish.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\bn_mul.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\camellia.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ccm.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\certs.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\check_config.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cipher.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cipher_internal.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\cmac.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\compat-1.3.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\config.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ctr_drbg.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\debug.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\des.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\dhm.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecdh.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecdsa.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecjpake.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecp.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ecp_internal.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\entropy.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\entropy_poll.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\error.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\gcm.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\havege.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\hmac_drbg.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md2.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md4.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md5.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\md_internal.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\memory_buffer_alloc.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\net.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\net_sockets.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\oid.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\padlock.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pem.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pk.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs11.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs12.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pkcs5.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\pk_internal.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\platform.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\platform_time.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\platform_util.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ripemd160.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\rsa.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\rsa_internal.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha1.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha256.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\sha512.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_cache.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_ciphersuites.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_cookie.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_internal.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\ssl_ticket.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\threading.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\timing.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\version.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_crl.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_crt.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\x509_csr.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mbedtls\xtea.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_common.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\miniz\miniz_tdef.h" />
@@ -2196,6 +1760,16 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudec.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudectab.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpegaudio.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\cutils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libregexp-opcode.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libregexp.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libunicode-table.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libunicode.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\list.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs-atom.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs-libc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs-opcode.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\alphai_dec.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\common_dec.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8i_dec.h" />

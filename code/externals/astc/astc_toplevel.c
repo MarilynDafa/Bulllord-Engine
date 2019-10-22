@@ -16,6 +16,7 @@
  */
 /*----------------------------------------------------------------------------*/
 
+#ifndef EMSCRIPTEN
 #include "astc.h"
 #include <stdlib.h>
 #include <string.h>
@@ -169,3 +170,4 @@ int astcmain(int argc, const char** argv, const unsigned char* _src, unsigned ch
 
 }
 
+#endif

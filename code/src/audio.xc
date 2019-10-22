@@ -27,7 +27,6 @@
 #include "internal/thread.h"
 #include "internal/internal.h"
 #include "../externals/mpaudec/mpaudec.h"
-#include "../externals/duktape/duktape.h"
 #if defined(BL_PLATFORM_IOS) || defined(BL_PLATFORM_OSX)
 #   define BL_USE_AL_API
 #include <OpenAL/al.h>
@@ -138,7 +137,6 @@ typedef struct _AudioSource {
 #endif
 }_BLAudioSource;
 typedef struct _AudioMember {
-	DUK_CONTEXT* pDukContext;
 	_BLAudioDevice pAudioDev;
 	_BLAudioSource* pBackMusic;
 	BLList* pSounds;
@@ -1038,10 +1036,9 @@ _WEBDestroy()
 }
 #endif
 BLVoid
-_AudioInit(DUK_CONTEXT* _DKC)
+_AudioInit()
 {
 	_PrAudioMem = (_BLAudioMember*)malloc(sizeof(_BLAudioMember));
-	_PrAudioMem->pDukContext = _DKC;
 	_PrAudioMem->pBackMusic = NULL;
 	_PrAudioMem->pSounds = NULL;
 	_PrAudioMem->pMusicMutex = NULL;

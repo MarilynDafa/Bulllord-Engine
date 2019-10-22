@@ -55,12 +55,6 @@ typedef struct __GLXcontextRec *GLXContext;
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* Duktape */
-#if defined(BL_PLATFORM_WEB)
-#	define DUK_CONTEXT BLVoid
-#else
-#	define DUK_CONTEXT duk_context
-#endif
 /* Math */
 #define EPSILON_INTERNAL 0.00001f
 #define PI_INTERNAL 3.141592653589793f

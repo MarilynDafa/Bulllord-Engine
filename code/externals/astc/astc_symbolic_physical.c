@@ -13,6 +13,7 @@
  *			the physical representation.
  */ 
 /*----------------------------------------------------------------------------*/ 
+#ifndef EMSCRIPTEN
 
 #include "astc.h"
 
@@ -429,3 +430,4 @@ void physical_to_symbolic(int xdim, int ydim, int zdim, physical_compressed_bloc
 		res->plane2_color_component = read_bits(2, below_weights_pos - 2, pb.data);
 
 }
+#endif
