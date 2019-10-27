@@ -58,8 +58,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
-    <OutDir>../bin/js</OutDir>
-    <IntDir>$(Configuration)\js\$(Platform)</IntDir>
+    <OutDir>../bin/web</OutDir>
+    <IntDir>$(Configuration)\web\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
     <ClangPath>$(CLANG_BIN)</ClangPath>
     <TargetExt>.js</TargetExt>
@@ -71,8 +71,8 @@
     <TargetExt>.js</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
-    <IntDir>$(Configuration)\js\$(Platform)</IntDir>
-    <OutDir>../bin/js</OutDir>
+    <IntDir>$(Configuration)\web\$(Platform)</IntDir>
+    <OutDir>../bin/web</OutDir>
     <TargetName>libBulllord</TargetName>
     <ClangPath>$(CLANG_BIN)</ClangPath>
     <TargetExt>.js</TargetExt>
@@ -139,7 +139,7 @@
     </ClCompile>
     <Link>
       <LinkerOptimizationLevel>O3</LinkerOptimizationLevel>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1  -s EXPORT_ALL=1  -s WASM=0 -s MAIN_MODULE=2 --memory-init-file 0 -s MODULARIZE=1 -s EXPORT_NAME='BL' %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1  -s EXPORT_ALL=1  -s WASM=0 -s MAIN_MODULE=2 --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>

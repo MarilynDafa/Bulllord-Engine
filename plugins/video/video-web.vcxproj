@@ -26,14 +26,6 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="videoentry.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="videoentry.xc">
-      <FileType>Document</FileType>
-    </ClCompile>
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9C1F153E-08F6-4827-8DC1-51384B2D69F7}</ProjectGuid>
     <RootNamespace>hello_world_c</RootNamespace>
