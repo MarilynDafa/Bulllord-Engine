@@ -1,9 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Clang">
+      <Configuration>Debug</Configuration>
+      <Platform>Clang</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Clang">
+      <Configuration>Release</Configuration>
+      <Platform>Clang</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
@@ -33,7 +41,20 @@
     <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141_xp</PlatformToolset>
@@ -62,7 +83,13 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -78,6 +105,11 @@
     <IntDir>$(Configuration)\win32\$(Platform)</IntDir>
     <TargetName>libVideoPlugin</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">
+    <IntDir>$(Configuration)\win32\$(Platform)</IntDir>
+    <TargetName>libVideoPlugin</TargetName>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\..\bin\win32</OutDir>
@@ -90,6 +122,11 @@
     <IntDir>$(Configuration)\win32\$(Platform)</IntDir>
     <TargetName>libVideoPlugin</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">
+    <IntDir>$(Configuration)\win32\$(Platform)</IntDir>
+    <TargetName>libVideoPlugin</TargetName>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\..\bin\win32</OutDir>
@@ -97,6 +134,21 @@
     <TargetName>libVideoPlugin</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_IX86;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>..\..\bin\win32</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libBulllord.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -145,6 +197,25 @@
       <AdditionalDependencies>libBulllord.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>BL_EXPORT;OPUS_BUILD;DLL_EXPORT;HAVE_CONFIG_H;WINDLL;_CRT_SECURE_NO_WARNINGS;WIN32;_M_IX86;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;./webm/ogg/include;./webm;./webm/opus;./webm/opus/celt;./webm/opus/silk;./webm/opus/include;./webm/opus/silk/float;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\..\bin\win32</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libBulllord.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -168,16 +239,22 @@
     <CustomBuild Include="webm\vp8\common\x86\copy_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_copy_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -185,16 +262,22 @@
     <CustomBuild Include="webm\vp8\common\x86\copy_sse3.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse3_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse3_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_copy_sse3_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_copy_sse3_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -202,455 +285,631 @@
     <CustomBuild Include="webm\vp8\common\x86\dequantize_mmx.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_dequantize_mmx_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="webm\vp8\common\arm\loopfilter_arm.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\bilinearpredict_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\copymem_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\dc_only_idct_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\dequantizeb_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\dequant_idct_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\idct_blk_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\idct_dequant_0_2x_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\idct_dequant_full_2x_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\iwalsh_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\loopfiltersimplehorizontaledge_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\loopfiltersimpleverticaledge_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\mbloopfilter_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\shortidct4x4llm_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\sixtappredict_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\arm\neon\vp8_loopfilter_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\x86\filter_x86.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\x86\idct_blk_mmx.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\x86\idct_blk_sse2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\x86\loopfilter_x86.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vp8\common\x86\vp8_asm_stubs.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vp9\common\arm\neon\vp9_iht4x4_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp9\common\arm\neon\vp9_iht8x8_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vp9\common\x86\vp9_idct_intrin_sse2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\avg_pred_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\idct16x16_1_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\idct16x16_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\idct32x32_135_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\idct32x32_1_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\idct32x32_34_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\idct32x32_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\idct4x4_1_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\idct4x4_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\idct8x8_1_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\idct8x8_add_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\intrapred_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\loopfilter_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\vpx_convolve8_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\vpx_convolve_avg_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\vpx_convolve_copy_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\arm\vpx_convolve_neon.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\avg_pred_sse2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\inv_txfm_sse2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\inv_txfm_ssse3.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\loopfilter_sse2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\variance_sse2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\vpx_asm_stubs.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vpx_dsp\x86\vpx_subpixel_8t_intrin_ssse3.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="webm\vpx_ports\arm_cpudetect.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -667,16 +926,22 @@
     <CustomBuild Include="webm\vp8\common\x86\idctllm_mmx.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_idctllm_mmx_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -684,16 +949,22 @@
     <CustomBuild Include="webm\vp8\common\x86\idctllm_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_idctllm_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -701,16 +972,22 @@
     <CustomBuild Include="webm\vp8\common\x86\iwalsh_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_iwalsh_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -718,33 +995,45 @@
     <CustomBuild Include="webm\vp8\common\x86\loopfilter_block_sse2_x86_64.asm">
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_block_sse2_x86_64_asm.obj</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="webm\vp8\common\x86\loopfilter_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_loopfilter_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -752,16 +1041,22 @@
     <CustomBuild Include="webm\vp8\common\x86\mfqe_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_mfqe_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -769,16 +1064,22 @@
     <CustomBuild Include="webm\vp8\common\x86\recon_mmx.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_mmx_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64 -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_mmx_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64 -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_mmx_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_recon_mmx_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -786,16 +1087,22 @@
     <CustomBuild Include="webm\vp8\common\x86\recon_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_recon_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_recon_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -803,16 +1110,22 @@
     <CustomBuild Include="webm\vp8\common\x86\subpixel_mmx.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_subpixel_mmx_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -820,16 +1133,22 @@
     <CustomBuild Include="webm\vp8\common\x86\subpixel_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_subpixel_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -837,16 +1156,22 @@
     <CustomBuild Include="webm\vp8\common\x86\subpixel_ssse3.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vp8_common_x86_subpixel_ssse3_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -854,16 +1179,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\add_noise_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_add_noise_sse2_asm.obj</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
     </CustomBuild>
   </ItemGroup>
@@ -871,16 +1202,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\deblock_sse2.asm">
       <FileType>Document</FileType>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_deblock_sse2_asm.obj</Command>
     </CustomBuild>
   </ItemGroup>
@@ -888,16 +1225,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\intrapred_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_intrapred_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -905,16 +1248,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\intrapred_ssse3.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_intrapred_ssse3_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -922,16 +1271,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\inv_wht_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_inv_wht_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -939,16 +1294,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\subpel_variance_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_subpel_variance_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -956,16 +1317,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_convolve_copy_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_vpx_convolve_copy_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -973,16 +1340,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_8t_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -990,16 +1363,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_8t_ssse3.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_8t_ssse3_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -1007,16 +1386,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_bilinear_sse2.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_sse2_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -1024,16 +1409,22 @@
     <CustomBuild Include="webm\vpx_dsp\x86\vpx_subpixel_bilinear_ssse3.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_dsp_x86_vpx_subpixel_bilinear_ssse3_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>
@@ -1041,16 +1432,22 @@
     <CustomBuild Include="webm\vpx_ports\emms.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_ports_emms_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_ports_emms_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_ports_emms_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_ports_emms_asm.obj</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">yasm -Xvc -f win32  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_ports_emms_asm.obj</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">yasm -Xvc -f win64  -I"." -I"./webm" "%(FullPath)" -o $(IntDir)vpx_ports_emms_asm.obj</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Assembling %(Filename)%(Extension)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">Assembling %(Filename)%(Extension)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Assembling %(Filename)%(Extension)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)vpx_ports_emms_asm.obj</Outputs>
     </CustomBuild>
   </ItemGroup>

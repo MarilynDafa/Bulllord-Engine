@@ -3940,18 +3940,26 @@ BLBool
 blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 {
 	BLAnsi _path[260] = { 0 };
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
+#if defined(BL_PLATFORM_WEB)
+	if (_Set)
+	{
+		EM_ASM_ARGS({ var _key = Pointer_stringify($0); var _value = Pointer_stringify($1); localStorage.setItem(_key, _value); }, (const BLAnsi*)_Section, (const BLAnsi*)_Value);
+	}
+	else
+	{
+		BLAnsi* _ret = (BLAnsi*)EM_ASM_INT({
+			var _key = Pointer_stringify($0);
+			return localStorage.getItem(_key);
+		}, (const BLAnsi*)_Section);
+		memset(_Value, 0, 256);
+		strcpy(_Value, _ret);
+	}
+#elif defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	HANDLE _fp;
     WIN32_FILE_ATTRIBUTE_DATA _wfad;
     strcpy_s(_path, 260, blUserFolderDir());
     strcat_s(_path, 260, "EnvStringOptions");
 	BLBool _fileexist = GetFileAttributesExA(_path, GetFileExInfoStandard, &_wfad) ? TRUE : FALSE;
-#else
-    FILE* _fp;
-    strcpy(_path, blUserFolderDir());
-    strcat(_path, "EnvStringOptions");
-	BLBool _fileexist = (access(_path, 0) != -1) ? TRUE : FALSE;
-#endif
 	BLDictionary* _tmpdic = NULL;
 	BLUtf8* _tmpstr = NULL;
 	BLU32 _vallen = blUtf8Length(_Value);
@@ -3960,7 +3968,6 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 		return FALSE;		
 	else if (_Set && !_fileexist)
 	{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 		WCHAR _wfilename[260] = { 0 };
 		MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
@@ -3968,13 +3975,8 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 #else
 		_fp = CreateFileA(_path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 #endif
-#elif defined(BL_PLATFORM_WEB)
-#else
-		_fp = fopen(_path, "wb");
-#endif
 		_tmpdic = blGenDict(FALSE);
 	}
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	else
 	{
 #ifdef WINAPI_FAMILY
@@ -4015,39 +4017,6 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 			_tmpdic = blGenDict(FALSE);
 	}
 	CloseHandle(_fp);
-#else
-	else
-	{
-		_fp = fopen(_path, "rb");
-		fseek(_fp, 0, SEEK_END);
-		if (ftell(_fp) != 0)
-		{
-			fseek(_fp, 0, SEEK_SET);
-			_tmpdic = blGenDict(FALSE);
-			do
-			{
-				BLU32 _strsz, _sid;
-				if (!fread(&_sid, sizeof(BLU32), 1, _fp))
-					break;
-				if (_sid == 0xDEAD)
-					break;
-				if (!fread(&_strsz, sizeof(BLU32), 1, _fp))
-					break;
-				_tmpstr = (BLUtf8*)malloc(_strsz + 1);
-				if (!fread(_tmpstr, sizeof(BLUtf8), _strsz, _fp))
-				{
-					free(_tmpstr);
-					break;
-				}
-				_tmpstr[_strsz] = 0;
-				blDictInsert(_tmpdic, _sid, _tmpstr);
-			} while (1);
-		}
-		else
-			_tmpdic = blGenDict(FALSE);
-	}
-	fclose(_fp);
-#endif
 	if (!_Set)
 	{
 		memset(_Value, 0, sizeof(BLUtf8) * 256);
@@ -4084,7 +4053,6 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 			_tmpstr[_vallen] = 0;
 			blDictInsert(_tmpdic, _id, _tmpstr);
 		}
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 		WCHAR _wfilename[260] = { 0 };
 		MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
@@ -4102,7 +4070,95 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 		_sz = 0xDEAD;
 		WriteFile(_fp, &_sz, sizeof(BLU32), NULL, NULL);
 		CloseHandle(_fp);
+	}
+	FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
+	{
+		free(_iter);
+	}
+	blDeleteDict(_tmpdic);
 #else
+    FILE* _fp;
+    strcpy(_path, blUserFolderDir());
+    strcat(_path, "EnvStringOptions");
+	BLBool _fileexist = (access(_path, 0) != -1) ? TRUE : FALSE;
+	BLDictionary* _tmpdic = NULL;
+	BLUtf8* _tmpstr = NULL;
+	BLU32 _vallen = blUtf8Length(_Value);
+	BLU32 _id = blHashString(_Section);
+	if (!_Set && !_fileexist)
+		return FALSE;		
+	else if (_Set && !_fileexist)
+	{
+		_fp = fopen(_path, "wb");
+		_tmpdic = blGenDict(FALSE);
+	}
+	else
+	{
+		_fp = fopen(_path, "rb");
+		fseek(_fp, 0, SEEK_END);
+		if (ftell(_fp) != 0)
+		{
+			fseek(_fp, 0, SEEK_SET);
+			_tmpdic = blGenDict(FALSE);
+			do
+			{
+				BLU32 _strsz, _sid;
+				if (!fread(&_sid, sizeof(BLU32), 1, _fp))
+					break;
+				if (_sid == 0xDEAD)
+					break;
+				if (!fread(&_strsz, sizeof(BLU32), 1, _fp))
+					break;
+				_tmpstr = (BLUtf8*)malloc(_strsz + 1);
+				if (!fread(_tmpstr, sizeof(BLUtf8), _strsz, _fp))
+				{
+					free(_tmpstr);
+					break;
+				}
+				_tmpstr[_strsz] = 0;
+				blDictInsert(_tmpdic, _sid, _tmpstr);
+			} while (1);
+		}
+		else
+			_tmpdic = blGenDict(FALSE);
+	}
+	fclose(_fp);
+	if (!_Set)
+	{
+		memset(_Value, 0, sizeof(BLUtf8) * 256);
+		BLUtf8* _str = (BLUtf8*)blDictElement(_tmpdic, _id);
+		if (_str)
+			memcpy(_Value, _str, strlen((const BLAnsi*)_str));
+		else
+		{
+			FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
+			{
+				free(_iter);
+			}
+			blDeleteDict(_tmpdic);
+			return FALSE;
+		}
+	}
+	else
+	{
+		BLUtf8* _str = (BLUtf8*)blDictElement(_tmpdic, _id);
+		BLU32 _sz;
+		if (_str)
+		{
+			free(_str);
+			blDictErase(_tmpdic, _id);
+			_tmpstr = (BLUtf8*)malloc(_vallen + 1);
+			memcpy(_tmpstr, _Value, _vallen);
+			_tmpstr[_vallen] = 0;
+			blDictInsert(_tmpdic, _id, _tmpstr);
+		}
+		else
+		{
+			_tmpstr = (BLUtf8*)malloc(_vallen + 1);
+			memcpy(_tmpstr, _Value, _vallen);
+			_tmpstr[_vallen] = 0;
+			blDictInsert(_tmpdic, _id, _tmpstr);
+		}
 		_fp = fopen(_path, "wb");
 		FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
 		{
@@ -4114,13 +4170,13 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 		_sz = 0xDEAD;
 		fwrite(&_sz, sizeof(BLU32), 1, _fp);
 		fclose(_fp);
-#endif
 	}
 	FOREACH_DICT(BLUtf8*, _iter, _tmpdic)
 	{
 		free(_iter);
 	}
 	blDeleteDict(_tmpdic);
+#endif
 	return TRUE;
 }
 BLVoid
@@ -4192,7 +4248,7 @@ blOpenURL(IN BLUtf8* _Url)
     NSURL* _url = [NSURL URLWithString : _str];
     [[UIApplication sharedApplication] openURL:_url options:@{} completionHandler : nil];
 #elif defined(BL_PLATFORM_WEB)
-	EM_ASM_ARGS({ var _url = Pointer_stringify($0); window.open(_url, 'newwindow'); }, (const BLAnsi*)_absurl);
+	EM_ASM_({ var _url = Pointer_stringify(); window.open(_url, 'newwindow'); }, (const BLAnsi*)_absurl);
 #endif
 	if (_malloc)
 		free(_absurl);

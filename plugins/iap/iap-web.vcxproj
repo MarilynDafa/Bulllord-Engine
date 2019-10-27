@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Clang">
+      <Configuration>Debug</Configuration>
+      <Platform>Clang</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Emscripten">
       <Configuration>Debug</Configuration>
       <Platform>Emscripten</Platform>
@@ -8,6 +12,10 @@
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Clang">
+      <Configuration>Release</Configuration>
+      <Platform>Clang</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Emscripten">
       <Configuration>Release</Configuration>
@@ -42,7 +50,15 @@
     <PlatformToolset>emcc</PlatformToolset>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'" Label="Configuration">
+    <PlatformToolset>emcc</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
+    <PlatformToolset>emcc</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'" Label="Configuration">
     <PlatformToolset>emcc</PlatformToolset>
     <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
@@ -60,18 +76,30 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
-    <ClangPath>$(VCClangBinDir)</ClangPath>
-    <IntDir>$(Configuration)\web\$(Platform)</IntDir>
-    <OutDir>../../bin/web</OutDir>
+    <ClangPath>$(CLANG_BIN)</ClangPath>
+    <IntDir>$(Configuration)\js\$(Platform)</IntDir>
+    <OutDir>../../bin/js</OutDir>
     <TargetName>libIAPPlugin</TargetName>
     <TargetExt>.js</TargetExt>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
-    <IntDir>$(Configuration)\web\$(Platform)</IntDir>
-    <OutDir>../../bin/web</OutDir>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">
     <TargetName>libIAPPlugin</TargetName>
-    <ClangPath>$(VCClangBinDir)</ClangPath>
     <TargetExt>.js</TargetExt>
+    <ClangPath>$(CLANG_BIN)</ClangPath>
+    <IntDir>$(Configuration)\js\$(Platform)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
+    <IntDir>$(Configuration)\js\$(Platform)</IntDir>
+    <OutDir>../../bin/js</OutDir>
+    <TargetName>libIAPPlugin</TargetName>
+    <ClangPath>$(CLANG_BIN)</ClangPath>
+    <TargetExt>.js</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">
+    <TargetName>libIAPPlugin</TargetName>
+    <ClangPath>$(CLANG_BIN)</ClangPath>
+    <TargetExt>.js</TargetExt>
+    <IntDir>$(Configuration)\js\$(Platform)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>../bin/web</OutDir>
@@ -119,14 +147,32 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;EMSCRIPTEN;DUK_F_X86;ASSERTIONS=1;SAFE_HEAP=1;EMCC_DEBUG=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;EMSCRIPTEN;ASSERTIONS=1;SAFE_HEAP=1;EMCC_DEBUG=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
-      <AdditionalOptions>-g -fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-g -xc %(AdditionalOptions)</AdditionalOptions>
       <VerboseOutput>NoVerboseOutput</VerboseOutput>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s SIDE_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s SIDE_MODULE=2 -s EXPORT_ALL=1  -s WASM=0  --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <JsLibrary>
+      </JsLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">
+    <ClCompile>
+      <PreprocessorDefinitions>BL_EXPORT;EMSCRIPTEN;ASSERTIONS=1;SAFE_HEAP=1;EMCC_DEBUG=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
+      <AdditionalOptions>-g -xc %(AdditionalOptions)</AdditionalOptions>
+      <VerboseOutput>NoVerboseOutput</VerboseOutput>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>-s SIDE_MODULE=2 -s EXPORT_ALL=1  -s WASM=0  --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>
@@ -137,13 +183,26 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;EMSCRIPTEN;DUK_F_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;EMSCRIPTEN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
-      <AdditionalOptions>-fshort-wchar -xc %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-xc %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s SIDE_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s SIDE_MODULE=2 -s EXPORT_ALL=1  -s WASM=0  --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">
+    <ClCompile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;EMSCRIPTEN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\code\headers;..\..\code\externals;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <LanguageStandardMode>NoLanguageStandardSet</LanguageStandardMode>
+      <AdditionalOptions>-xc %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>-s SIDE_MODULE=2 -s EXPORT_ALL=1  -s WASM=0  --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>
       </AdditionalDependencies>
     </Link>

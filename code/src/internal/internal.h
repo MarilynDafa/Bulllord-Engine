@@ -116,7 +116,7 @@ extern "C" {
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #	define INLINE _forceinline
 #else
-#	define INLINE inline __attribute__((always_inline))
+#	define INLINE __attribute__((always_inline))
 #endif
 /* JS Bind */
 #define JS_FUNCTION_REG(name, func) duk_push_c_function(_DKC, func, DUK_VARARGS); duk_put_global_string(_DKC, name);

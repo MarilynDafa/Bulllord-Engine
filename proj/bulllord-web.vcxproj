@@ -5,17 +5,9 @@
       <Configuration>Debug</Configuration>
       <Platform>Emscripten</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Emscripten">
       <Configuration>Release</Configuration>
       <Platform>Emscripten</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -39,12 +31,18 @@
     <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
-    <PlatformToolset>emcc</PlatformToolset>
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <PlatformToolset>emcc</PlatformToolset>
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'" Label="Configuration">
+    <PlatformToolset>emcc</PlatformToolset>
+    <ConfigurationType>Application</ConfigurationType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -60,18 +58,30 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
-    <ClangPath>$(CLANG_BIN)</ClangPath>
-    <OutDir>../bin/web</OutDir>
-    <IntDir>$(Configuration)\web\$(Platform)</IntDir>
+    <OutDir>../bin/js</OutDir>
+    <IntDir>$(Configuration)\js\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
-    <TargetExt>.bc</TargetExt>
+    <ClangPath>$(CLANG_BIN)</ClangPath>
+    <TargetExt>.js</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">
+    <IntDir>$(Configuration)\js\$(Platform)</IntDir>
+    <TargetName>libBulllord</TargetName>
+    <ClangPath>$(CLANG_BIN)</ClangPath>
+    <TargetExt>.js</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
-    <IntDir>$(Configuration)\web\$(Platform)</IntDir>
-    <OutDir>../bin/web</OutDir>
+    <IntDir>$(Configuration)\js\$(Platform)</IntDir>
+    <OutDir>../bin/js</OutDir>
     <TargetName>libBulllord</TargetName>
     <ClangPath>$(CLANG_BIN)</ClangPath>
-    <TargetExt>.bc</TargetExt>
+    <TargetExt>.js</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">
+    <TargetName>libBulllord</TargetName>
+    <ClangPath>$(CLANG_BIN)</ClangPath>
+    <TargetExt>.js</TargetExt>
+    <IntDir>$(Configuration)\js\$(Platform)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>../bin/web</OutDir>
@@ -108,7 +118,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory);..\code\externals\webp</AdditionalIncludeDirectories>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;SQLITE_HAS_CODEC;CODEC_TYPE=CODEC_TYPE_AES128;SQLITE_CORE;THREADSAFE=1;SQLITE_SECURE_DELETE;SQLITE_SOUNDEX;SQLITE_ENABLE_COLUMN_METADATA;SQLITE_ENABLE_FTS3;SQLITE_ENABLE_FTS3_PARENTHESIS;SQLITE_ENABLE_RTREE;FT2_BUILD_LIBRARY;WINDLL;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;WINDLL;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -119,7 +129,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;EMCC_DEBUG=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;EMCC_DEBUG=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\webp;..\code\externals;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>LanguageStandardGnu99</LanguageStandardMode>
       <AdditionalOptions>-g -fno-exceptions -xc %(AdditionalOptions)</AdditionalOptions>
@@ -129,13 +139,29 @@
     </ClCompile>
     <Link>
       <LinkerOptimizationLevel>O3</LinkerOptimizationLevel>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s MAIN_MODULE=1 %(AdditionalOptions)</AdditionalOptions>
-      <OutputFile>../bin/web/libBulllord$(TargetExt)</OutputFile>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1  -s EXPORT_ALL=1  -s WASM=0 -s MAIN_MODULE=2 --memory-init-file 0 -s MODULARIZE=1 -s EXPORT_NAME='BL' %(AdditionalOptions)</AdditionalOptions>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">
+    <ClCompile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;EMCC_DEBUG=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\webp;..\code\externals;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <LanguageStandardMode>LanguageStandardGnu99</LanguageStandardMode>
+      <AdditionalOptions>-g -fno-exceptions -xc %(AdditionalOptions)</AdditionalOptions>
+      <VerboseOutput>NoVerboseOutput</VerboseOutput>
+      <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
+      <OptimizationLevel>O0</OptimizationLevel>
+    </ClCompile>
+    <Link>
+      <LinkerOptimizationLevel>O3</LinkerOptimizationLevel>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1  -s EXPORT_ALL=1  -s WASM=0 -s MAIN_MODULE=2 --memory-init-file 0 -s MODULARIZE=1 -s EXPORT_NAME='BL' %(AdditionalOptions)</AdditionalOptions>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
     <ClCompile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;DUK_F_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\webp;..\code\externals;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <LanguageStandardMode>LanguageStandardGnu99</LanguageStandardMode>
       <AdditionalOptions>-xc -fno-exceptions %(AdditionalOptions)</AdditionalOptions>
@@ -143,7 +169,20 @@
       <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s USE_GLFW=3 -s NO_EXIT_RUNTIME=1 -s MAIN_MODULE=2 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s NO_EXIT_RUNTIME=1  -s EXPORT_ALL=1  -s WASM=0  -s MAIN_MODULE=2 --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">
+    <ClCompile>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;EMSCRIPTEN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\code\externals\webp;..\code\externals;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+      <LanguageStandardMode>LanguageStandardGnu99</LanguageStandardMode>
+      <AdditionalOptions>-xc -fno-exceptions %(AdditionalOptions)</AdditionalOptions>
+      <OptimizationLevel>O3</OptimizationLevel>
+      <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s NO_EXIT_RUNTIME=1  -s EXPORT_ALL=1  -s WASM=0  -s MAIN_MODULE=2 --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
