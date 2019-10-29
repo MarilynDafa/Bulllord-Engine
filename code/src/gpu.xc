@@ -1069,7 +1069,7 @@ _GpuIntervention(BLU32 _Width, BLU32 _Height, BLBool _Vsync)
     _attrs.majorVersion = 2;
 	_attrs.minorVersion = 0;
 	_attrs.powerPreference = EM_WEBGL_POWER_PREFERENCE_DEFAULT;
-    _PrGpuMem->pContext = emscripten_webgl_create_context("canvas", &_attrs);
+    _PrGpuMem->pContext = emscripten_webgl_create_context("#canvas", &_attrs);
 	if (_PrGpuMem->pContext)
 	{
 		memset(&_attrs, -1, sizeof(_attrs));
@@ -2217,7 +2217,7 @@ blGeometryInstanceUpdate(IN BLGuid _GBO, IN BLEnum _Semantic, IN BLVoid* _Buffer
 #endif
 }
 BLGuid
-blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
+blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Source, IN BLBool _ForceCompile)
 {
     BLBool _cache = FALSE;
     _BLTechnique* _tech;
@@ -2292,14 +2292,23 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
         memset(_path, 0, 260 * sizeof(BLAnsi));
         strcpy(_path, "b");
         strcat(_path, _Filename);
-        _stream = blGenStream(_path);
+		_stream = blGenStream(_path);
         _findbinary = (_stream == INVALID_GUID) ? FALSE : TRUE;
     }
 #endif
     if (!_findbinary)
     {
-        _stream = blGenStream(_Filename);
-        _doc = ezxml_parse_str((BLAnsi*)blStreamData(_stream), blStreamLength(_stream));
+		if (!_Source)
+		{
+			_stream = blGenStream(_Filename);
+			_doc = ezxml_parse_str((BLAnsi*)blStreamData(_stream), blStreamLength(_stream));
+		}
+		else
+		{
+			BLAnsi* _source = (BLAnsi*)alloca(strlen(_Source) + 1);
+			strcpy(_source, _Source);
+			_doc = ezxml_parse_str(_source, strlen(_Source));
+		}
         const BLAnsi* _tag = NULL;
         switch (_PrGpuMem->sHardwareCaps.eApiType)
         {
@@ -2498,138 +2507,6 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)
 #elif defined(BL_DX_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_DX_API)
     {
-#if defined(_DEBUG)
-        UINT _compileflags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-        UINT _compileflags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
-#endif
-        BLU32 _written = 0;
-        if (!_findbinary)
-        {
-            BLU8* _bs = NULL;
-            if (_vert)
-            {
-                ID3DBlob* _err;
-                D3DCompile(_vert, strlen(_vert), "VS", nullptr, nullptr, "main", "vs_5_0", _compileflags, 0, &_tech->uData.sDX.pVS, &_err);
-                if (_err)
-                {
-                    blDebugOutput((LPCSTR)_err->GetBufferPointer());
-                    _err->Release();
-                }
-                else
-                {
-                    _bs = (BLU8*)realloc(_bs, _written + sizeof(BLU8) + sizeof(BLU32) + _tech->uData.sDX.pVS->GetBufferSize());
-                    BLU8 _tag = 0;
-                    memcpy(_bs + _written, &_tag, sizeof(BLU8));
-                    _written += sizeof(BLU8);
-                    BLU32 _sz = _tech->uData.sDX.pVS->GetBufferSize();
-                    memcpy(_bs + _written, &_sz, sizeof(BLU32));
-                    _written += sizeof(BLU32);
-                    memcpy(_bs + _written, _tech->uData.sDX.pVS->GetBufferPointer(), _tech->uData.sDX.pVS->GetBufferSize());
-                    _written += _tech->uData.sDX.pVS->GetBufferSize();
-                }
-            }
-            if (_frag)
-            {
-                ID3DBlob* _err;
-                D3DCompile(_frag, strlen(_frag), "PS", nullptr, nullptr, "main", "ps_5_0", _compileflags, 0, &_tech->uData.sDX.pPS, &_err);
-                if (_err)
-                {
-                    blDebugOutput((LPCSTR)_err->GetBufferPointer());
-                    _err->Release();
-                }
-                else
-                {
-                    _bs = (BLU8*)realloc(_bs, _written + sizeof(BLU8) + sizeof(BLU32) + _tech->uData.sDX.pPS->GetBufferSize());
-                    BLU8 _tag = 1;
-                    memcpy(_bs + _written, &_tag, sizeof(BLU8));
-                    _written += sizeof(BLU8);
-                    BLU32 _sz = _tech->uData.sDX.pPS->GetBufferSize();
-                    memcpy(_bs + _written, &_sz, sizeof(BLU32));
-                    _written += sizeof(BLU32);
-                    memcpy(_bs + _written, _tech->uData.sDX.pPS->GetBufferPointer(), _tech->uData.sDX.pPS->GetBufferSize());
-                    _written += _tech->uData.sDX.pPS->GetBufferSize();
-                }
-            }
-            if (_geom && _PrGpuMem->sHardwareCaps.bGSSupport)
-            {
-                ID3DBlob* _err;
-                D3DCompile(_geom, strlen(_geom), "GS", nullptr, nullptr, "main", "gs_5_0", _compileflags, 0, &_tech->uData.sDX.pGS, &_err);
-                if (_err)
-                {
-                    blDebugOutput((LPCSTR)_err->GetBufferPointer());
-                    _err->Release();
-                }
-                else
-                {
-                    _bs = (BLU8*)realloc(_bs, _written + sizeof(BLU8) + sizeof(BLU32) + _tech->uData.sDX.pGS->GetBufferSize());
-                    BLU8 _tag = 2;
-                    memcpy(_bs + _written, &_tag, sizeof(BLU8));
-                    _written += sizeof(BLU8);
-                    BLU32 _sz = _tech->uData.sDX.pGS->GetBufferSize();
-                    memcpy(_bs + _written, &_sz, sizeof(BLU32));
-                    _written += sizeof(BLU32);
-                    memcpy(_bs + _written, _tech->uData.sDX.pGS->GetBufferPointer(), _tech->uData.sDX.pGS->GetBufferSize());
-                    _written += _tech->uData.sDX.pGS->GetBufferSize();
-                }
-            }
-            if (_written && _compileflags == D3DCOMPILE_OPTIMIZATION_LEVEL3)
-            {
-                memset(_path, 0, 260 * sizeof(BLAnsi));
-                strcpy(_path, "b");
-                strcat(_path, _Filename);
-                blFileWrite(_path, _written, _bs);
-            }
-        }
-        else
-        {
-            while (!blStreamEos(_stream))
-            {
-                BLU8 _tag;
-                blStreamRead(_stream, sizeof(BLU8), &_tag);
-                BLU32 _sz;
-                blStreamRead(_stream, sizeof(BLU32), &_sz);
-                BLU8* _buf = NULL;
-                switch (_tag)
-                {
-                    case 0:
-                        _buf = (BLU8*)realloc(_buf, _sz);
-                        blStreamRead(_stream, _sz, _buf);
-                        D3DCreateBlob(_sz, &_tech->uData.sDX.pVS);
-                        CopyMemory(_tech->uData.sDX.pVS->GetBufferPointer(), _buf, _sz);
-                        break;
-                    case 1:
-                        _buf = (BLU8*)realloc(_buf, _sz);
-                        blStreamRead(_stream, _sz, _buf);
-                        D3DCreateBlob(_sz, &_tech->uData.sDX.pPS);
-                        CopyMemory(_tech->uData.sDX.pPS->GetBufferPointer(), _buf, _sz);
-                        break;
-                    case 2:
-                        _buf = (BLU8*)realloc(_buf, _sz);
-                        blStreamRead(_stream, _sz, _buf);
-                        D3DCreateBlob(_sz, &_tech->uData.sDX.pGS);
-                        CopyMemory(_tech->uData.sDX.pGS->GetBufferPointer(), _buf, _sz);
-                        break;
-                    case 3:
-                        _buf = (BLU8*)realloc(_buf, _sz);
-                        blStreamRead(_stream, _sz, _buf);
-                        D3DCreateBlob(_sz, &_tech->uData.sDX.pDS);
-                        CopyMemory(_tech->uData.sDX.pDS->GetBufferPointer(), _buf, _sz);
-                        break;
-                    case 4:
-                        _buf = (BLU8*)realloc(_buf, _sz);
-                        blStreamRead(_stream, _sz, _buf);
-                        D3DCreateBlob(_sz, &_tech->uData.sDX.pHS);
-                        CopyMemory(_tech->uData.sDX.pHS->GetBufferPointer(), _buf, _sz);
-                        break;
-                    default:
-                        assert(0);
-                        break;
-                }
-                if (_buf)
-                    free(_buf);
-            }
-        }
     }
 #endif
     if (!_findbinary)

@@ -62,7 +62,7 @@
     <IntDir>$(Configuration)\web\$(Platform)</IntDir>
     <TargetName>libBulllord</TargetName>
     <ClangPath>$(CLANG_BIN)</ClangPath>
-    <TargetExt>.js</TargetExt>
+    <TargetExt>.bc</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Clang'">
     <IntDir>$(Configuration)\js\$(Platform)</IntDir>
@@ -139,7 +139,7 @@
     </ClCompile>
     <Link>
       <LinkerOptimizationLevel>O3</LinkerOptimizationLevel>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1  -s EXPORT_ALL=1  -s WASM=0 -s MAIN_MODULE=2 --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 -s FULL_ES3=1 -s USE_WEBGL2=1  -s EXPORT_ALL=1  -s WASM=0 -s MAIN_MODULE=2 --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -169,7 +169,7 @@
       <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s FULL_ES3=1 -s USE_WEBGL2=1 -s NO_EXIT_RUNTIME=1  -s EXPORT_ALL=1  -s WASM=0  -s MAIN_MODULE=2 --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s USE_PTHREADS=1 -s EMTERPRETIFY_ASYNC=1 -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 -s FULL_ES3=1 -s USE_WEBGL2=1 -s NO_EXIT_RUNTIME=1  -s EXPORT_ALL=1  -s WASM=0  -s MAIN_MODULE=2 --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">

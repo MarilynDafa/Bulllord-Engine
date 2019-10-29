@@ -28,6 +28,7 @@
 #include "internal/list.h"
 #include "internal/dictionary.h"
 #include "internal/internal.h"
+#include "internal/gpucommon.h"
 #include "../externals/xml/ezxml.h"
 #include "../externals/miniz/miniz.h"
 #include "../externals/webp/src/webp/decode.h"
@@ -11236,7 +11237,7 @@ _UIInit(BLBool _Profiler)
 	_PrUIMem->pHoveredWidget = NULL;
 	_PrUIMem->pFocusWidget = NULL;
     _PrUIMem->pFonts = blGenArray(TRUE);
-	_PrUIMem->nUITech = blGenTechnique("shaders/2D.bsl", BL_DEBUG_MODE);
+	_PrUIMem->nUITech = blGenTechnique("shaders/2D.bsl", SHADER_2D, BL_DEBUG_MODE);
 	_PrUIMem->nFBO = blGenFrameBuffer();
 	_PrUIMem->bProfiler = _Profiler;
 	_PrUIMem->nCaretColor = 0xFFFFFFFF;

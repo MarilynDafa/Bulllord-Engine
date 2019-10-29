@@ -96,6 +96,16 @@ typedef struct _StreamIOMember {
 }_BLStreamIOMember;
 static _BLStreamIOMember* _PrStreamIOMem = NULL;
 extern BLBool _FontFace(const BLAnsi* _Filename);
+static BLVoid
+_PreloadFile(const BLAnsi* _Filename)
+{
+	if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_Filename), (const BLUtf8*)"ttf"))
+		_FontFace(_Filename);
+	else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_Filename), (const BLUtf8*)"ttc"))
+		_FontFace(_Filename);
+	else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_Filename), (const BLUtf8*)"fnt"))
+		_FontFace(_Filename);
+}
 #if defined(BL_PLATFORM_WEB)
 static BLVoid 
 _OnWGetLoaded(const BLAnsi* _Filename)
@@ -108,13 +118,14 @@ _OnWGetLoaded(const BLAnsi* _Filename)
 			if (_ret)
 			{
 				blListPushBack(_PrStreamIOMem->pSetupQueue, _iter);
-				_iterator_iter = blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
+				blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
 			}
 			else
 			{
-				_iterator_iter = blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
+				blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
 				free(_iter);
-			}			
+			}
+			break;
 		}
 	}
 }
@@ -131,6 +142,50 @@ _OnWGetError(const BLAnsi* _Filename)
 			break;
 		}
 	}
+}
+static BLVoid
+_OnPreloadLoaded(const BLAnsi* _Filename)
+{
+	FOREACH_LIST(BLAnsi*, _iter, _PrStreamIOMem->pPreloadQueue)
+	{
+		if (!strcmp(_iter, _Filename + 1))
+		{
+			_PreloadFile(_iter);
+			blInvokeEvent(BL_ET_SYSTEM, BL_SE_PRELOAD, (_PrStreamIOMem->nPreloadNum - _PrStreamIOMem->pPreloadQueue->nSize - 1) * 100 / _PrStreamIOMem->nPreloadNum, _iter, INVALID_GUID);
+			blListErase(_PrStreamIOMem->pPreloadQueue, _iterator_iter);
+			free(_iter);
+			break;
+		}
+	}
+}
+static BLVoid
+_OnPreloadError(const BLAnsi* _Filename)
+{
+	blDebugOutput("%s preload error", _Filename);
+	FOREACH_LIST(BLAnsi*, _iter, _PrStreamIOMem->pPreloadQueue)
+	{
+		if (!strcmp(_iter, _Filename + 1))
+		{
+			blListErase(_PrStreamIOMem->pPreloadQueue, _iterator_iter);
+			free(_iter);
+			break;
+		}
+	}
+}
+static BLVoid
+_OnIDBLoaded(BLVoid* _Stream, void* _Ptr, BLS32 _Size)
+{
+	_BLStream* _stream = (_BLStream*)_Stream;
+	_stream->pBuffer = malloc(_Size);
+	memcpy(_stream->pBuffer, _Ptr, _Size);
+	_stream->nLen = _Size;
+	_stream->pPos = (BLU8*)_stream->pBuffer;
+	_stream->pEnd = _stream->pPos + _stream->nLen;
+}
+static BLVoid
+_OnIDBError(BLVoid* _Stream)
+{
+	free(_Stream);
 }
 #endif
 BLBool
@@ -243,16 +298,6 @@ _DiscardResource(BLGuid _ID, BLBool(*_Unload)(BLVoid*), BLBool(*_Release)(BLVoid
 	}
 	return TRUE;
 }
-static BLVoid
-_PreloadFile(const BLAnsi* _Filename)
-{
-	if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_Filename), (const BLUtf8*)"ttf"))
-		_FontFace(_Filename);
-	else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_Filename), (const BLUtf8*)"ttc"))
-		_FontFace(_Filename);
-	else if (blUtf8Equal(blFileSuffixUtf8((const BLUtf8*)_Filename), (const BLUtf8*)"fnt"))
-		_FontFace(_Filename);
-}
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 static DWORD __stdcall
 _LoadThreadFunc(BLVoid* _Userdata)
@@ -315,12 +360,13 @@ _StreamIOStep(BLU32 _Delta)
 		strcpy(_absfile, blWorkingDir());
 		strcat(_absfile, _node);
 		if (access(_absfile, 0) == -1)
-			emscripten_wget(_absfile, _absfile);
-#endif
+			emscripten_async_wget(_absfile, _absfile, _OnPreloadLoaded, _OnPreloadError);
+#else
 		_PreloadFile(_node);
 		blInvokeEvent(BL_ET_SYSTEM, BL_SE_PRELOAD, (_PrStreamIOMem->nPreloadNum - _PrStreamIOMem->pPreloadQueue->nSize - 1) * 100 / _PrStreamIOMem->nPreloadNum, _node, INVALID_GUID);
 		blListPopFront(_PrStreamIOMem->pPreloadQueue);
 		free(_node);
+#endif
 	}
 	_BLResNode* _res;
 	blMutexLock(_PrStreamIOMem->pSetupQueue->pMutex);
@@ -384,12 +430,6 @@ blGenStream(IN BLAnsi* _Filename)
 		{
 			memset(_tmpname, 0, sizeof(_tmpname));
 			strcpy(_tmpname, _Filename);
-			BLU32 _tmplen = (BLU32)strlen(_tmpname);
-			for (_i = 0; _i < _tmplen; ++_i)
-			{
-				if (_tmpname[_i] == '\\')
-					_tmpname[_i] = '/';
-			}
 			_id = blHashString((const BLUtf8*)_tmpname);
 			_file = (_BLBpkFileEntry*)blDictElement(_iter->pFiles, _id);
 			if (_file)
@@ -444,17 +484,6 @@ blGenStream(IN BLAnsi* _Filename)
 		BLAnsi _path[260] = { 0 };
 		strcpy(_path, blWorkingDir());
 		strcat(_path, _Filename);
-		BLU32 _tmplen = (BLU32)strlen(_path);
-		for (_i = 0; _i < _tmplen; ++_i)
-		{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-			if (_path[_i] == '/')
-				_path[_i] = '\\';
-#else
-			if (_path[_i] == '\\')
-				_path[_i] = '/';
-#endif
-		}
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 		WCHAR _wfilename[260] = { 0 };
@@ -483,17 +512,6 @@ blGenStream(IN BLAnsi* _Filename)
 			memset(_path, 0, sizeof(_path));
 			strcpy(_path, blUserFolderDir());
 			strcat(_path, _Filename);
-			BLU32 _tmplen = (BLU32)strlen(_path);
-			for (_i = 0; _i < _tmplen; ++_i)
-			{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-				if (_path[_i] == '/')
-					_path[_i] = '\\';
-#else
-				if (_path[_i] == '\\')
-					_path[_i] = '/';
-#endif
-			}
 #ifdef WINAPI_FAMILY
 			memset(_wfilename, 0, sizeof(_wfilename));
 			MultiByteToWideChar(CP_UTF8, 0, _path, -1, _wfilename, sizeof(_wfilename));
@@ -539,12 +557,6 @@ blGenStream(IN BLAnsi* _Filename)
 			memset(_path, 0, sizeof(_path));
 			strcpy(_path, blUserFolderDir());
 			strcat(_path, _Filename);
-			BLU32 _tmplen = (BLU32)strlen(_path);
-			for (_i = 0; _i < _tmplen; ++_i)
-			{
-				if (_path[_i] == '\\')
-					_path[_i] = '/';
-			}
 			FILE* _fp2 = fopen(_path, "rb");
 			if (FILE_INVALID_INTERNAL(_fp2))
 			{
@@ -586,34 +598,9 @@ blGenStream(IN BLAnsi* _Filename)
 			memset(_path, 0, sizeof(_path));
 			strcpy(_path, blUserFolderDir());
 			strcat(_path, _Filename);
-			_tmplen = (BLU32)strlen(_path);
-			for (_i = 0; _i < _tmplen; ++_i)
-			{
-				if (_path[_i] == '\\')
-					_path[_i] = '/';
-			}
-			memset(_path, 0, sizeof(_path));
-			strcpy(_path, blWorkingDir());
-			strcat(_path, _Filename);
-			emscripten_wget(_path, _path);
-			FILE* _fp = fopen(_path, "rb");
-			if (FILE_INVALID_INTERNAL(_fp))
-			{
-				BLU32 _datasz;
-				fseek(_fp, 0, SEEK_END);
-				_datasz = (BLU32)ftell(_fp);
-				fseek(_fp, 0, SEEK_SET);
-				_ret = (_BLStream*)malloc(sizeof(_BLStream));
-				_ret->pBuffer = malloc(_datasz);
-				fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp);
-				_ret->nLen = _datasz;
-				_ret->pPos = (BLU8*)_ret->pBuffer;
-				_ret->pEnd = _ret->pPos + _ret->nLen;
-				fclose(_fp);
-				return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
-			}
-			else
-				return INVALID_GUID;
+			_ret = (_BLStream*)malloc(sizeof(_BLStream));
+			emscripten_idb_async_load("/emscriptenfs", _path, _ret, _OnIDBLoaded, _OnIDBError);
+			return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
 		}
 #else
 		FILE* _fp = fopen(_path, "rb");
@@ -637,12 +624,6 @@ blGenStream(IN BLAnsi* _Filename)
 			memset(_path, 0, sizeof(_path));
 			strcpy(_path, blUserFolderDir());
 			strcat(_path, _Filename);
-			_tmplen = (BLU32)strlen(_path);
-			for (_i = 0; _i < _tmplen; ++_i)
-			{
-				if (_path[_i] == '\\')
-					_path[_i] = '/';
-			}
 			_fp = fopen(_path, "rb");
 			if (FILE_INVALID_INTERNAL(_fp))
 			{
@@ -812,16 +793,6 @@ blFileExist(IN BLAnsi* _AbsFilename)
 	BLU32 _i;
 	BLAnsi _tmpname[260];
 	strcpy(_tmpname, _AbsFilename);
-	for (_i = 0; _i < strlen(_tmpname); ++_i)
-	{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		if (_tmpname[_i] == '/')
-			_tmpname[_i] = '\\';
-#else
-		if (_tmpname[_i] == '\\')
-			_tmpname[_i] = '/';
-#endif
-	}
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	WIN32_FILE_ATTRIBUTE_DATA _wfad;
 	if (GetFileAttributesExA(_tmpname, GetFileExInfoStandard, &_wfad))
@@ -839,21 +810,9 @@ BLBool
 blFileWrite(IN BLAnsi* _Filename, IN BLU32 _Count, IN BLU8* _Data)
 {
 	BLU32 _i;
-	BLAnsi _tmpname[260] = { 0 };
     BLAnsi _path[260] = { 0 };
-    strcpy(_tmpname , _Filename);
-    for (_i = 0 ; _i < strlen(_tmpname) ; ++_i)
-    {
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-        if(_tmpname[_i] == '/')
-            _tmpname[_i] = '\\';
-#else
-        if(_tmpname[_i] == '\\')
-            _tmpname[_i] = '/';
-#endif
-    }
     strcpy(_path , blUserFolderDir());
-    strcat(_path , _tmpname);
+    strcat(_path , _Filename);
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 	WCHAR _wfilename[260] = { 0 };
@@ -870,7 +829,7 @@ blFileWrite(IN BLAnsi* _Filename, IN BLU32 _Count, IN BLU8* _Data)
 	}
 #elif defined(BL_PLATFORM_WEB)
 	BLS32 _error;
-	emscripten_idb_store("/emscriptenfs", _path, _Data, _Count, &_error);
+	emscripten_idb_async_store("/emscriptenfs", _path, _Data, _Count, NULL, NULL, NULL);
 	return TRUE;
 #else
 	FILE* _fp = fopen(_path , "wb");
@@ -888,25 +847,15 @@ blFileDelete(IN BLAnsi* _Filename)
 {
 	BLU32 _i;
 	BLAnsi _tmpname[260];
-	strcpy(_tmpname, _Filename);
-	for (_i = 0; _i < strlen(_tmpname); ++_i)
-	{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		if (_tmpname[_i] == '/')
-			_tmpname[_i] = '\\';
-#else
-		if (_tmpname[_i] == '\\')
-			_tmpname[_i] = '/';
-#endif
-	}
+	strcpy(_tmpname, blUserFolderDir());
+	strcat(_tmpname, _Filename);
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	if (DeleteFileA(_tmpname))
 		return FALSE;
 	else
 		return TRUE;
 #elif defined(BL_PLATFORM_WEB)
-	BLS32 _error;
-	emscripten_idb_delete("/emscriptenfs", _tmpname, &_error);
+	emscripten_idb_async_delete("/emscriptenfs", _tmpname, NULL, NULL, NULL);
 	return TRUE;
 #else
 	if (remove(_tmpname))
@@ -926,16 +875,6 @@ blArchiveRegist(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
     strcpy(_tmpname , _Filename);
 	strcpy(_path, blWorkingDir());
     strcat(_path, _tmpname);
-	for (_i = 0; _i < strlen(_path); ++_i)
-	{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		if (_path[_i] == '/')
-			_path[_i] = '\\';
-#else
-		if (_path[_i] == '\\')
-			_path[_i] = '/';
-#endif
-	}
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 	WCHAR _wfilename[260] = { 0 };
@@ -955,16 +894,6 @@ blArchiveRegist(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
         memset(_path , 0 , sizeof(_path));
         strcpy(_path , blUserFolderDir());
         strcat(_path , _tmpname);
-		for (_i = 0; _i < strlen(_path); ++_i)
-		{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-			if (_path[_i] == '/')
-				_path[_i] = '\\';
-#else
-			if (_path[_i] == '\\')
-				_path[_i] = '/';
-#endif
-		}
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 		memset(_wfilename, 0, sizeof(_wfilename));
@@ -1099,16 +1028,6 @@ blArchivePatch(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
     if (!_iter)
 		return FALSE;
     strcpy(_tmpname , _Filename);
-    for (_i = 0 ; _i < strlen(_tmpname) ; ++_i)
-    {
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-        if(_tmpname[_i] == '/')
-            _tmpname[_i] = '\\';
-#else
-        if(_tmpname[_i] == '\\')
-            _tmpname[_i] = '/';
-#endif
-    }
     strcpy(_path , blUserFolderDir());
     strcat(_path , _tmpname);
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -1131,16 +1050,6 @@ blArchivePatch(IN BLAnsi* _Filename, IN BLAnsi* _Archive)
 		memset(_path, 0, sizeof(_path));
 		strcpy(_path, blWorkingDir());
 		strcat(_path, _tmpname);
-		for (_i = 0; _i < strlen(_path); ++_i)
-		{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-			if (_path[_i] == '/')
-				_path[_i] = '\\';
-#else
-			if (_path[_i] == '\\')
-				_path[_i] = '/';
-#endif
-		}
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 		memset(_wfilename, 0, sizeof(_wfilename));
@@ -1320,7 +1229,7 @@ blArchiveQuery(IN BLAnsi* _Archive, OUT BLU32* _Version)
     return FALSE;
 }
 BLVoid 
-blPreload(IN BLAnsi* _Filenames, IN BLBool _Flush)
+blPreload(IN BLAnsi* _Filenames)
 {
 	FOREACH_LIST(BLAnsi*, _iter, _PrStreamIOMem->pPreloadQueue)
 	{
@@ -1336,9 +1245,6 @@ blPreload(IN BLAnsi* _Filenames, IN BLBool _Flush)
 		_tmp = strtok((BLAnsi*)_tag, ",");
 		while (_tmp)
 		{
-			if (_Flush)
-				_PreloadFile(_tmp);
-			else
 			{
 				BLAnsi* _node = (BLAnsi*)malloc(strlen(_tmp) + 1);
 				memset(_node, 0, strlen(_tmp) + 1);
@@ -1347,10 +1253,7 @@ blPreload(IN BLAnsi* _Filenames, IN BLBool _Flush)
 			}
 			_tmp = strtok(NULL, ",");
 		}
-		if (!_Flush)
-			_PrStreamIOMem->nPreloadNum = _PrStreamIOMem->pPreloadQueue->nSize;
-		else
-			blInvokeEvent(BL_ET_SYSTEM, BL_SE_PRELOAD, 100, _Filenames, INVALID_GUID);
+		_PrStreamIOMem->nPreloadNum = _PrStreamIOMem->pPreloadQueue->nSize;
 	}
 }
 

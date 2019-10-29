@@ -214,7 +214,7 @@
 #	include <arpa/inet.h>
 #   include <errno.h>
 #	include <emscripten/emscripten.h>
-#	include <emscripten/threading.h>
+#	include <emscripten/html5.h>
 #	include <GLFW/glfw3.h>
 #   define BL_GL_BACKEND
 #else

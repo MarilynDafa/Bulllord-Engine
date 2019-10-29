@@ -1054,6 +1054,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <ExcludedFromBuild>false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpucommon.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\list.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>

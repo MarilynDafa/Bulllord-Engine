@@ -372,17 +372,6 @@ blMd5File(IN BLAnsi* _Filename)
 	BLAnsi _path[260] = { 0 };
 	strcpy(_path, blUserFolderDir());
 	strcat(_path, _Filename);
-	BLU32 _tmplen = (BLU32)strlen(_path);
-	for (_i = 0; _i < _tmplen; ++_i)
-	{
-#if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-		if (_path[_i] == '/')
-			_path[_i] = '\\';
-#else
-		if (_path[_i] == '\\')
-			_path[_i] = '/';
-#endif
-	}
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY
 	WCHAR _wfilename[260] = { 0 };

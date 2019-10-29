@@ -95,6 +95,7 @@ typedef struct _PipelineState{
     union {
 #if defined(BL_GL_BACKEND)
         struct _GLPS {
+			int dummy;
         } sGL;
 #elif defined(BL_VK_BACKEND)
         struct _VKPS {
@@ -154,7 +155,6 @@ typedef struct _TextureBuffer {
         } sMTL;
 #elif defined(BL_DX_BACKEND)
         struct _DXTBO {
-            ID3D12Resource* pHandle;
         } sDX;
 #endif
     } uData;
@@ -276,11 +276,6 @@ typedef struct _Technique{
         } sMTL;
 #elif defined(BL_DX_BACKEND)
         struct _DXSMPD {
-            ID3DBlob* pVS;
-            ID3DBlob* pPS;
-            ID3DBlob* pDS;
-            ID3DBlob* pHS;
-            ID3DBlob* pGS;
         } sDX;
 #endif
     } uData;
@@ -288,19 +283,13 @@ typedef struct _Technique{
 typedef struct _CommandQueue {
 #if defined(BL_VK_BACKEND)
     struct _VKCMD {
+		int dummy;
     } sVK;
 #elif defined(BL_MTL_BACKEND)
     struct _MTLCMD {
     } sMTL;
 #elif defined(BL_DX_BACKEND)
     struct _DXCMD {
-        ID3D12CommandQueue* pCmdQueue;
-        ID3D12Fence* pFence;
-        ID3D12GraphicsCommandList* aCmdList[256];
-        ID3D12CommandAllocator* aCmdAllocator[256];
-        UINT64 nCurrentFence;
-        UINT64 nCompletedFence;
-        HANDLE nEvent;
     } sDX;
 #endif
 }_BLCommandQueue;
@@ -317,18 +306,6 @@ typedef struct _GpuMember {
 	HGLRC sGLRC;
 	HDC sGLHDC;
 #elif defined(BL_PLATFORM_UWP)
-	ID3D12Device* pDX;
-	IDXGISwapChain3* pSwapChain;
-	ID3D12Resource* aBackBuffer[4];
-	ID3D12Resource* pBackBufferDS;
-	ID3D12DescriptorHeap* pRTVHeap;
-	ID3D12DescriptorHeap* pDSVHeap;
-	ID3D12RootSignature* pRootSignature;
-	_BLCommandQueue pCmdQueue;
-	UINT64 aBackBufferFence[4];
-	BLDictionary* pPSOCache;
-	UINT nSyncInterval;
-	UINT nBackBuffer;
 #elif defined(BL_PLATFORM_OSX)
 	NSOpenGLContext* pGLC;
 #elif defined(BL_PLATFORM_IOS)
@@ -351,7 +328,12 @@ typedef struct _GpuMember {
 	EMSCRIPTEN_WEBGL_CONTEXT_HANDLE pContext;
 #endif
 }_BLGpuMember;
-inline BLU32
+static _BLGpuMember* _PrGpuMem = NULL;
+extern const BLAnsi* SHADER_2D;
+extern const BLAnsi* SHADER_2D_GLOW;
+extern const BLAnsi* SHADER_2D_INSTANCE;
+extern const BLAnsi* SHADER_2D_STROKE;
+static BLU32
 _TextureSize(BLEnum _BLFmt, BLU32 _Width, BLU32 _Height, BLU32 _Depth)
 {
 	switch (_BLFmt)
@@ -426,5 +408,4 @@ _TextureSize(BLEnum _BLFmt, BLU32 _Width, BLU32 _Height, BLU32 _Depth)
 		return 0;
 	}
 }
-static _BLGpuMember* _PrGpuMem = NULL;
 #endif /* __gpuds_h_ */

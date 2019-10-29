@@ -81,8 +81,7 @@ BL_API BLBool blArchiveQuery(
 	OUT BLU32* _Version);
 
 BL_API BLVoid blPreload(
-	IN BLAnsi* _Filenames, 
-	IN BLBool _Flush);
+	IN BLAnsi* _Filenames);
 
 #ifdef __cplusplus
 }

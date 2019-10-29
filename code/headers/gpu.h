@@ -238,6 +238,7 @@ BL_API BLVoid blGeometryInstanceUpdate(
 
 BL_API BLGuid blGenTechnique(
     IN BLAnsi* _Filename,
+	IN BLAnsi* _Source,
     IN BLBool _ForceCompile);
 
 BL_API BLBool blDeleteTechnique(

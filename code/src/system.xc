@@ -3099,9 +3099,9 @@ _MouseProc(BLS32 _EventType, const EmscriptenMouseEvent* _MouseEvent, BLVoid* _U
         case EMSCRIPTEN_EVENT_MOUSEENTER:
         case EMSCRIPTEN_EVENT_MOUSELEAVE:
             if (_UseCustomCursor())
-				EM_ASM({ document.querySelector("canvas").cursor = "none"; });
+				EM_ASM({ document.querySelector("#canvas").cursor = "none"; });
             else
-				EM_ASM({ document.querySelector("canvas").cursor = "auto"; });
+				EM_ASM({ document.querySelector("#canvas").cursor = "auto"; });
             break;
         default:
             break;
@@ -3153,23 +3153,23 @@ _ShowWindow()
 {
 	BLU32 _width = _PrSystemMem->sBoostParam.nScreenWidth;
 	BLU32 _height = _PrSystemMem->sBoostParam.nScreenHeight;
-	emscripten_set_canvas_element_size("canvas", _width, _height);
+	emscripten_set_canvas_element_size("#canvas", _width, _height);
     _GpuIntervention(_width, _height, !_PrSystemMem->sBoostParam.bProfiler);
-    emscripten_set_mousedown_callback("canvas", 0, TRUE, _MouseProc);
-    emscripten_set_mouseup_callback("canvas", 0, TRUE, _MouseProc);
-    emscripten_set_mousemove_callback("canvas", 0, TRUE, _MouseProc);
-    emscripten_set_mouseenter_callback("canvas", 0, TRUE, _MouseProc);
-    emscripten_set_mouseleave_callback("canvas", 0, TRUE, _MouseProc);
-    emscripten_set_wheel_callback("canvas", 0, TRUE, _ScrollProc);
+    emscripten_set_mousedown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _MouseProc);
+    emscripten_set_mouseup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _MouseProc);
+    emscripten_set_mousemove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _MouseProc);
+    emscripten_set_mouseenter_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _MouseProc);
+    emscripten_set_mouseleave_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _MouseProc);
+    emscripten_set_wheel_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _ScrollProc);
     emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _KeyProc);
     emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _KeyProc);
     emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _KeyProc);
-    emscripten_set_touchstart_callback("canvas", 0, TRUE, _TouchProc);
-    emscripten_set_touchmove_callback("canvas", 0, TRUE, _TouchProc);
-    emscripten_set_touchend_callback("canvas", 0, TRUE, _TouchProc);
-    emscripten_set_touchcancel_callback("canvas", 0, TRUE, _TouchProc);
-    emscripten_set_webglcontextlost_callback("canvas", 0, TRUE, _ContextProc);
-    emscripten_set_webglcontextrestored_callback("canvas", 0, TRUE, _ContextProc);
+    emscripten_set_touchstart_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _TouchProc);
+    emscripten_set_touchmove_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _TouchProc);
+    emscripten_set_touchend_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _TouchProc);
+    emscripten_set_touchcancel_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, 0, TRUE, _TouchProc);
+    emscripten_set_webglcontextlost_callback("#canvas", 0, TRUE, _ContextProc);
+    emscripten_set_webglcontextrestored_callback("#canvas", 0, TRUE, _ContextProc);
     if (_PrSystemMem->sBoostParam.bFullscreen)
         _EnterFullscreen();
 }
@@ -3503,7 +3503,6 @@ blTickDelay(IN BLU32 _Ms)
 	}
     mach_wait_until(_Ms * 1000 / 1e6 / _timebase + mach_absolute_time());
 #elif defined(BL_PLATFORM_WEB)
-	emscripten_sleep(_Ms);
 #endif
 }
 const BLAnsi*
@@ -3514,7 +3513,7 @@ blUserFolderDir()
     {
         BLAnsi _fullpath[260 + 1];
         GetModuleFileNameA(NULL, _fullpath, 260 + 1);
-        BLAnsi* _basename = strrchr(_fullpath, '\\');
+        BLAnsi* _basename = strrchr(_fullpath, '/');
         if (_basename)
         {
             BLAnsi _appdatapath[260 + 1];
@@ -3533,7 +3532,7 @@ blUserFolderDir()
                         break;
                     }
                 }
-                strcat_s(_PrSystemMem->aUserDir, 260, "\\");
+                strcat_s(_PrSystemMem->aUserDir, 260, "/");
 				SHCreateDirectoryExA(NULL, _PrSystemMem->aUserDir, NULL);
             }
         }
@@ -3553,7 +3552,7 @@ blUserFolderDir()
         BLU32 _y;
         for (_y = 0; _y < _wsz; ++_y)
 			_PrSystemMem->aUserDir[_y] = (BLAnsi)_wstr[_y];
-        strcat(_PrSystemMem->aUserDir, "\\");
+        strcat(_PrSystemMem->aUserDir, "/");
 		Windows::Storage::ApplicationData::Current->LocalFolder->CreateFolderAsync(L"bshaders");  
     }
     return _PrSystemMem->aUserDir;
@@ -3674,7 +3673,7 @@ blWorkingDir()
 			return NULL;
 		for (_idx = _len - 1; _idx > 0; _idx--)
 		{
-			if (_path[_idx] == '\\')
+			if (_path[_idx] == '/')
 				break;
 		}
 		assert(_idx > 0);
@@ -3694,7 +3693,7 @@ blWorkingDir()
 		BLU32 _y;
 		for (_y = 0; _y < _wsz; ++_y)
 			_PrSystemMem->aWorkDir[_y] = (BLAnsi)_wstr[_y];
-		strcat(_PrSystemMem->aWorkDir, "\\Assets\\");
+		strcat(_PrSystemMem->aWorkDir, "/Assets/");
 	}
 #elif defined(BL_PLATFORM_LINUX)
 	if (!_PrSystemMem->aWorkDir[0])
@@ -4306,7 +4305,6 @@ blOpenPlugin(IN BLAnsi* _Basename)
 	strcat(_path, "lib");
 	strcat(_path, _Basename);
 	strcat(_path, "Plugin.js");
-	emscripten_wget(_path, _path);
 #endif
 #if defined(BL_PLATFORM_WIN32)
     WCHAR _wfilename[260] = { 0 };
@@ -4800,9 +4798,9 @@ blCursorVisiblity(IN BLBool _Show)
 #	endif
 #elif defined(BL_PLATFORM_WEB)
     if (_Show)
-		EM_ASM({ document.querySelector("canvas").cursor = "none"; });
+		EM_ASM({ document.querySelector("#canvas").cursor = "none"; });
     else
-		EM_ASM({ document.querySelector("canvas").cursor = "auto"; });
+		EM_ASM({ document.querySelector("#canvas").cursor = "auto"; });
 #endif
 }
 BLVoid

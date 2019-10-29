@@ -456,8 +456,7 @@ _OnWGetLoaded(BLU32 _Dummy, BLVoid* _User, BLVoid* _Data, BLU32 _DataSz)
 			break;
 		}
 	}
-	BLS32 _error;
-	emscripten_idb_store("/emscriptenfs", _local, _Data, _DataSz, &_error);
+	emscripten_idb_async_store("/emscriptenfs", _local, _Data, _DataSz, NULL, NULL, NULL);
 	free(_url);
 	free(_local);
 	blArrayPopFront(_PrNetworkMem->pDownList);
@@ -2396,16 +2395,12 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 	{
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 		if (_localpath[_idx] == '/')
-			_localpath[_idx] = '\\';
-		if (_Localpath[_idx] == '\\')
 		{
 			BLAnsi _tmppath[256] = { 0 };
 			strncpy(_tmppath, _localpath, _idx);
 			CreateDirectoryA(_tmppath, NULL);
 		}
 #else
-		if (_localpath[_idx] == '\\')
-			_localpath[_idx] = '/';
 		if (_localpath[_idx] == '/')
 		{
 			BLAnsi _tmppath[256] = { 0 };

@@ -28,6 +28,7 @@
 #include "internal/array.h"
 #include "internal/internal.h"
 #include "internal/mathematics.h"
+#include "internal/gpucommon.h"
 #include "../externals/webp/src/webp/decode.h"
 #include "../externals/astc/astc.h"
 typedef struct _SpriteAction{
@@ -1410,10 +1411,10 @@ _SpriteInit()
     _PrSpriteMem->bShaking = FALSE;
 	for (BLU32 _idx = 0; _idx < 8; ++_idx)
 		_PrSpriteMem->pTileArray[_idx] = blGenArray(FALSE);
-    _PrSpriteMem->nSpriteTech = blGenTechnique("shaders/2D.bsl", BL_DEBUG_MODE);
-    _PrSpriteMem->nSpriteInstTech = blGenTechnique("shaders/2DInstance.bsl", BL_DEBUG_MODE);
-	_PrSpriteMem->nSpriteStrokeTech = blGenTechnique("shaders/2DStroke.bsl", BL_DEBUG_MODE);
-    _PrSpriteMem->nSpriteGlowTech = blGenTechnique("shaders/2DGlow.bsl", BL_DEBUG_MODE);
+    _PrSpriteMem->nSpriteTech = blGenTechnique("shaders/2D.bsl", SHADER_2D, BL_DEBUG_MODE);
+    _PrSpriteMem->nSpriteInstTech = blGenTechnique("shaders/2DInstance.bsl", SHADER_2D_INSTANCE, BL_DEBUG_MODE);
+	_PrSpriteMem->nSpriteStrokeTech = blGenTechnique("shaders/2DStroke.bsl", SHADER_2D_STROKE, BL_DEBUG_MODE);
+    _PrSpriteMem->nSpriteGlowTech = blGenTechnique("shaders/2DGlow.bsl", SHADER_2D_GLOW, BL_DEBUG_MODE);
 	_PrSpriteMem->nFBO = blGenFrameBuffer();
 	_PrSpriteMem->aExternalMethod[0].aSuffix[0] = 0;
 	_PrSpriteMem->aExternalMethod[1].aSuffix[0] = 0;

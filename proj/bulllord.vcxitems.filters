@@ -954,6 +954,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs.c">
       <Filter>externals\quickjs</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\internal\gpucommon.c">
+      <Filter>src\internal</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h">

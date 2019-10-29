@@ -118,19 +118,6 @@ extern "C" {
 #else
 #	define INLINE __attribute__((always_inline))
 #endif
-/* JS Bind */
-#define JS_FUNCTION_REG(name, func) duk_push_c_function(_DKC, func, DUK_VARARGS); duk_put_global_string(_DKC, name);
-#define DUK_REGISTER_CALLBACK(cb, jsfunc, funcobj) do { \
-			if ((funcobj = duk_get_heapptr(_DKC, 0)) == NULL) \
-			{ \
-				cb = NULL; \
-				duk_push_null(_DKC); \
-				return 1; \
-			} \
-			cb = jsfunc; \
-			duk_push_heapptr(_DKC, funcobj); \
-		} while (0); \
-		return 1
 /* Default Font*/
 extern const BLAnsi* DEFAULTFONT_INTERNAL;
 extern const BLAnsi* DEFAULTFONTIMG_INTERNAL;
