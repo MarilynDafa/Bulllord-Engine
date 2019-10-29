@@ -3942,12 +3942,12 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 #if defined(BL_PLATFORM_WEB)
 	if (_Set)
 	{
-		EM_ASM_ARGS({ var _key = Pointer_stringify($0); var _value = Pointer_stringify($1); localStorage.setItem(_key, _value); }, (const BLAnsi*)_Section, (const BLAnsi*)_Value);
+		EM_ASM_ARGS({ var _key = UTF8ToString($0); var _value = UTF8ToString($1); localStorage.setItem(_key, _value); }, (const BLAnsi*)_Section, (const BLAnsi*)_Value);
 	}
 	else
 	{
 		BLAnsi* _ret = (BLAnsi*)EM_ASM_INT({
-			var _key = Pointer_stringify($0);
+			var _key = UTF8ToString($0);
 			return localStorage.getItem(_key);
 		}, (const BLAnsi*)_Section);
 		memset(_Value, 0, 256);
@@ -4247,7 +4247,7 @@ blOpenURL(IN BLUtf8* _Url)
     NSURL* _url = [NSURL URLWithString : _str];
     [[UIApplication sharedApplication] openURL:_url options:@{} completionHandler : nil];
 #elif defined(BL_PLATFORM_WEB)
-	EM_ASM_({ var _url = Pointer_stringify(); window.open(_url, 'newwindow'); }, (const BLAnsi*)_absurl);
+	EM_ASM_({ var _url = UTF8ToString($0); window.open(_url, 'newwindow'); }, (const BLAnsi*)_absurl);
 #endif
 	if (_malloc)
 		free(_absurl);
@@ -5032,6 +5032,9 @@ blSystemPrepare(IN BLVoid* _Activity, IN BLVoid* _State, IN BLU32 _StateSize)
 	while (!_GbSystemRunning)
 		pthread_cond_wait(&_PrSystemMem->sCond, &_PrSystemMem->sMutex);
 	pthread_mutex_unlock(&_PrSystemMem->sMutex);
+#elif defined(BL_PLATFORM_WEB)
+	_SystemInit();
+	emscripten_request_animation_frame_loop(_SystemStep, 0);
 #endif
 }
 BLVoid
@@ -5178,8 +5181,14 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 #elif defined(BL_PLATFORM_IOS)
     _SystemInit();
 #elif defined(BL_PLATFORM_WEB)
-	_SystemInit();
-	emscripten_request_animation_frame_loop(_SystemStep, 0);
+	EM_ASM(
+		FS.mkdir('/remote');
+		FS.mount(IDBFS, {}, '/remote');
+		FS.syncfs(true, function(err) {
+			assert(!err);
+			ccall('blSystemPrepare', 'v', ['number', 'number', 'number'], [0, 0, 0]);
+		});
+	);
 #endif
 }
 BLVoid

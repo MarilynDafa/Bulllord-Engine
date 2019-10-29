@@ -750,9 +750,9 @@ blVideoPlayEXT(IN BLAnsi* _Filename, IN BLBool _LClickInterrupt, IN BLEnum _KeyI
 {
 #if defined(EMSCRIPTEN)
 	EM_ASM_ARGS({
-		var _url = Pointer_stringify($0);
-		var _click = Pointer_stringify($1);
-		var _key = Pointer_stringify($2);
+		var _url = UTF8ToString($0);
+		var _click = UTF8ToString($1);
+		var _key = UTF8ToString($2);
 		var _glcanvas = document.querySelector('canvas');				
 		var _video = document.createElement('video');
 		var _absx = _glcanvas.getBoundingClientRect().left + document.body.scrollLeft; 

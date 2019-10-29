@@ -456,13 +456,19 @@ _OnWGetLoaded(BLU32 _Dummy, BLVoid* _User, BLVoid* _Data, BLU32 _DataSz)
 			break;
 		}
 	}
-	emscripten_idb_async_store("/emscriptenfs", _local, _Data, _DataSz, NULL, NULL, NULL);
+	FILE* _fp = fopen(_local, "wb");
+	fwrite(_Data, _DataSz, 1, _fp);
+	fclose(_fp);
 	free(_url);
 	free(_local);
 	blArrayPopFront(_PrNetworkMem->pDownList);
 	blArrayPopFront(_PrNetworkMem->pLocalList);
 	if (_PrNetworkMem->pDownList->nSize)
 		blDownload();
+	else
+	{
+		EM_ASM(FS.syncfs(false, function(err) {}););
+	}
 }
 static BLVoid
 _OnWGetError(BLU32 _Dummy, BLVoid* _User, BLS32 _Error, const BLAnsi* _Stats)
@@ -2391,6 +2397,15 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 	memset(_localpath, 0, sizeof(BLAnsi) * 260);
 	strcpy(_localpath, blUserFolderDir());
 	strcat(_localpath, _Localpath);
+	FOREACH_ARRAY(BLAnsi*, _iter, _PrNetworkMem->pDownList)
+	{
+		if (strcmp(_iter, _Host) == 0)
+		{
+			free(_remoteurl);
+			free(_localpath);
+			return FALSE;
+		}
+	}
 	for (_idx = 0; _idx < strlen(_localpath); ++_idx)
 	{
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
@@ -2408,15 +2423,6 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 			mkdir(_tmppath, 0755);
 		}
 #endif
-	}
-	FOREACH_ARRAY(BLAnsi*, _iter, _PrNetworkMem->pDownList)
-	{
-		if (strcmp(_iter, _Host) == 0)
-		{
-			free(_remoteurl);
-			free(_localpath);
-			return FALSE;
-		}
 	}
 	for (_idx = (BLS32)strlen(_Host) - 1; _idx >= 1; --_idx)
 	{

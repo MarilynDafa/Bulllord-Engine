@@ -576,32 +576,6 @@ blGenStream(IN BLAnsi* _Filename)
 			else
 				return INVALID_GUID;
 		}
-#elif defined(BL_PLATFORM_WEB)
-		FILE* _fp = fopen(_path, "rb");
-		if (FILE_INVALID_INTERNAL(_fp))
-		{
-			BLU32 _datasz;
-			fseek(_fp, 0, SEEK_END);
-			_datasz = (BLU32)ftell(_fp);
-			fseek(_fp, 0, SEEK_SET);
-			_ret = (_BLStream*)malloc(sizeof(_BLStream));
-			_ret->pBuffer = malloc(_datasz);
-			fread(_ret->pBuffer, sizeof(BLU8), _datasz, _fp);
-			_ret->nLen = _datasz;
-			_ret->pPos = (BLU8*)_ret->pBuffer;
-			_ret->pEnd = _ret->pPos + _ret->nLen;
-			fclose(_fp);
-			return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
-		}
-		else
-		{
-			memset(_path, 0, sizeof(_path));
-			strcpy(_path, blUserFolderDir());
-			strcat(_path, _Filename);
-			_ret = (_BLStream*)malloc(sizeof(_BLStream));
-			emscripten_idb_async_load("/emscriptenfs", _path, _ret, _OnIDBLoaded, _OnIDBError);
-			return blGenGuid(_ret, blHashString((const BLUtf8*)_path));
-		}
 #else
 		FILE* _fp = fopen(_path, "rb");
 		if (FILE_INVALID_INTERNAL(_fp))
@@ -827,10 +801,6 @@ blFileWrite(IN BLAnsi* _Filename, IN BLU32 _Count, IN BLU8* _Data)
 		CloseHandle(_fp);
 		return TRUE;
 	}
-#elif defined(BL_PLATFORM_WEB)
-	BLS32 _error;
-	emscripten_idb_async_store("/emscriptenfs", _path, _Data, _Count, NULL, NULL, NULL);
-	return TRUE;
 #else
 	FILE* _fp = fopen(_path , "wb");
     if (FILE_INVALID_INTERNAL(_fp))
@@ -839,6 +809,9 @@ blFileWrite(IN BLAnsi* _Filename, IN BLU32 _Count, IN BLU8* _Data)
         fclose(_fp);
         return TRUE;
     }
+#endif
+#if defined(BL_PLATFORM_WEB)
+	EM_ASM(FS.syncfs(false, function(err) {}););
 #endif
     return FALSE;
 }
@@ -854,14 +827,14 @@ blFileDelete(IN BLAnsi* _Filename)
 		return FALSE;
 	else
 		return TRUE;
-#elif defined(BL_PLATFORM_WEB)
-	emscripten_idb_async_delete("/emscriptenfs", _tmpname, NULL, NULL, NULL);
-	return TRUE;
 #else
 	if (remove(_tmpname))
 		return FALSE;
 	else
 		return TRUE;
+#endif
+#if defined(BL_PLATFORM_WEB)
+	EM_ASM(FS.syncfs(false, function(err) {}););
 #endif
 }
 BLBool
