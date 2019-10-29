@@ -61,6 +61,5 @@ code/externals/opus/celt/dump_modes/Makefile
 *.o-77144ac4
 /bin/web/content/wz/pixmap/common.bmg
 *.bmg
-*.bsl
 *.html
 /bin/web/index.js
