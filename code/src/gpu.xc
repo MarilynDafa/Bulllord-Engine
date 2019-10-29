@@ -2367,8 +2367,10 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Source, IN BLBool _ForceCompile
                     GL_CHECK_INTERNAL(glGetShaderiv(_vs, GL_INFO_LOG_LENGTH, &_len));
                     if (_len)
                     {
-                        BLAnsi* _info = (BLAnsi*)alloca((_len+1)*sizeof(BLAnsi));
+                        BLAnsi* _info = (BLAnsi*)alloca((_len+100)*sizeof(BLAnsi));
                         GL_CHECK_INTERNAL(glGetShaderInfoLog(_vs, _len, &_len, _info));
+						strcat(_info, _Filename);
+						strcat(_info, "vs");
                         blDebugOutput(_info);
                     }
                 }
@@ -2398,8 +2400,10 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Source, IN BLBool _ForceCompile
                     GL_CHECK_INTERNAL(glGetShaderiv(_fs, GL_INFO_LOG_LENGTH, &_len));
                     if (_len)
                     {
-                        BLAnsi* _info = (BLAnsi*)alloca((_len+1)*sizeof(BLAnsi));
+                        BLAnsi* _info = (BLAnsi*)alloca((_len+100)*sizeof(BLAnsi));
                         GL_CHECK_INTERNAL(glGetShaderInfoLog(_fs, _len, &_len, _info));
+						strcat(_info, _Filename);
+						strcat(_info, "fs");
                         blDebugOutput(_info);
                     }
                 }
@@ -2422,6 +2426,8 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Source, IN BLBool _ForceCompile
                     {
                         BLAnsi* _info = (BLAnsi*)alloca((_len+1)*sizeof(BLAnsi));
                         GL_CHECK_INTERNAL(glGetShaderInfoLog(_gs, _len, &_len, _info));
+						strcat(_info, _Filename);
+						strcat(_info, "gs");
                         blDebugOutput(_info);
                     }
                 }

@@ -29,8 +29,8 @@ uniform vec4 Border;\
 out vec4 FragColor;\
 in vec2 TexCoordVary;\
 in vec4 Color0Vary;\
-const float CosArray[12] = float[12](1, 0.866, 0.5, 0, -0.5, -0.866, -0.1, -0.866, -0.5, 0, 0.5, 0.866);\
-const float SinArray[12] = float[12](0, 0.5, 0.866, 1, 0.866, 0.5, 0, -0.5, -0.866, -1, -0.866, -0.5);\
+const float[] CosArray = float[](1.0, 0.866, 0.5, 0.0, -0.5, -0.866, -0.1, -0.866, -0.5, 0.0, 0.5, 0.866);\
+const float[] SinArray = float[](0.0, 0.5, 0.866, 1.0, 0.866, 0.5, 0.0, -0.5, -0.866, -1.0, -0.866, -0.5);\
 vec4 Texture2D(sampler2D Tex, vec2 Coord)\
 {\
 	if ((Coord.x * TexSize.x > Border.x + Stroke.a) && (Coord.y * TexSize.y > Border.y + Stroke.a) && (Coord.x * TexSize.x < Border.z - Stroke.a) && (Coord.y * TexSize.y < Border.w - Stroke.a))\

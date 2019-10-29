@@ -41,7 +41,7 @@ void main()\
 	vec4 preClr = Texture2D(Texture0, TexCoordVary);\
 	if (preClr.a >= 0.5)\
 	{\
-		FragColor = Color0Vary * preClr*2;\
+		FragColor = Color0Vary * preClr*2.0;\
 		return;\
 	}\
 	FragColor =  Texture2D(Texture0, vec2(TexCoordVary.x - 3.0 / TexSize.x, TexCoordVary.y - 3.0 / TexSize.y)) * 0.09;\
