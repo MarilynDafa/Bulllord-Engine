@@ -154,7 +154,7 @@ BL_API BLVoid blWindowResize(
 	IN BLU32 _Height, 
 	IN BLBool _Fullscreen);
 
-BL_API BLVoid blSystemPrepare(
+BL_API BLBool blSystemPrepare(
 	IN BLVoid* _Activity,
 	IN BLVoid* _State,
 	IN BLU32 _StateSize);

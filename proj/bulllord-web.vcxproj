@@ -139,7 +139,7 @@
     </ClCompile>
     <Link>
       <LinkerOptimizationLevel>O3</LinkerOptimizationLevel>
-      <AdditionalOptions>-s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 -s FULL_ES3=1 -s USE_WEBGL2=1  -s EXPORT_ALL=1  -s WASM=0 -s MAIN_MODULE=2 --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s RESERVED_FUNCTION_POINTERS=20 -s 'EXTRA_EXPORTED_RUNTIME_METHODS=["cwrap"]' -s ASSERTIONS=2 -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 -s FULL_ES3=1 -s USE_WEBGL2=1 -s WASM=1 -s MAIN_MODULE=2 --memory-init-file 0 -lidbfs.js %(AdditionalOptions)</AdditionalOptions>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -169,7 +169,7 @@
       <DisableWarnings>incompatible-pointer-types-discards-qualifiers;bitwise-op-parentheses;unsequenced;%(DisableWarnings)</DisableWarnings>
     </ClCompile>
     <Link>
-      <AdditionalOptions>-s USE_PTHREADS=1 -s EMTERPRETIFY_ASYNC=1 -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 -s FULL_ES3=1 -s USE_WEBGL2=1 -s NO_EXIT_RUNTIME=1  -s EXPORT_ALL=1  -s WASM=0  -s MAIN_MODULE=2 --memory-init-file 0 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-s RESERVED_FUNCTION_POINTERS=20 -s 'EXTRA_EXPORTED_RUNTIME_METHODS=["cwrap"]' -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1 -s FULL_ES3=1 -s USE_WEBGL2=1 -s NO_EXIT_RUNTIME=1 -s WASM=1  -s MAIN_MODULE=2 --memory-init-file 0 -lidbfs.js %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Clang'">

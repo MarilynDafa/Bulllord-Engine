@@ -3027,7 +3027,7 @@ _CloseWindow()
     [_PrSystemMem->pPool release];
 }
 #elif defined(BL_PLATFORM_WEB)
-static EM_BOOL
+EM_BOOL
 _ContextProc(BLS32 _EventType, const BLVoid* _Reserved, BLVoid* _UserData)
 {
     switch (_EventType) {
@@ -3037,7 +3037,7 @@ _ContextProc(BLS32 _EventType, const BLVoid* _Reserved, BLVoid* _UserData)
     }
     return TRUE;
 }
-static EM_BOOL
+EM_BOOL
 _KeyProc(BLS32 _EventType, const EmscriptenKeyboardEvent* _KeyEvent, BLVoid* _UserData)
 {
 	BLEnum _scancode = SCANCODE_INTERNAL[_KeyEvent->keyCode];
@@ -3055,7 +3055,7 @@ _KeyProc(BLS32 _EventType, const EmscriptenKeyboardEvent* _KeyEvent, BLVoid* _Us
     }
     return TRUE;
 }
-static EM_BOOL
+EM_BOOL
 _TouchProc(BLS32 _EventType, const EmscriptenTouchEvent* _TouchEvent, BLVoid* _UserData)
 {
     for (BLS32 _i = 0; _i < _TouchEvent->numTouches; _i++)
@@ -3080,7 +3080,7 @@ _TouchProc(BLS32 _EventType, const EmscriptenTouchEvent* _TouchEvent, BLVoid* _U
     }
     return TRUE;
 }
-static EM_BOOL
+EM_BOOL
 _MouseProc(BLS32 _EventType, const EmscriptenMouseEvent* _MouseEvent, BLVoid* _UserData)
 {
     BLS32 _x = (BLS32)_MouseEvent->targetX;
@@ -3108,7 +3108,7 @@ _MouseProc(BLS32 _EventType, const EmscriptenMouseEvent* _MouseEvent, BLVoid* _U
     }
     return TRUE;
 }
-static EM_BOOL
+EM_BOOL
 _ScrollProc(BLS32 _EventType, const EmscriptenWheelEvent* _WheelEvent, BLVoid* _UserData)
 {
     BLS16 _val = _WheelEvent->deltaY < 0 ? 1 : -1;
@@ -3118,7 +3118,7 @@ _ScrollProc(BLS32 _EventType, const EmscriptenWheelEvent* _WheelEvent, BLVoid* _
         blInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL, INVALID_GUID);
     return TRUE;
 }
-static EM_BOOL 
+EM_BOOL 
 _FullscreenProc(BLS32 _EventType, const BLVoid* _Reserved, BLVoid* _UserData)
 {
 	BLS32 _Width, _Height;
@@ -4988,7 +4988,7 @@ blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
 	blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, TRUE);
 #endif
 }
-BLVoid
+BLBool
 blSystemPrepare(IN BLVoid* _Activity, IN BLVoid* _State, IN BLU32 _StateSize)
 {
 #if defined(BL_PLATFORM_ANDROID)
@@ -5036,10 +5036,12 @@ blSystemPrepare(IN BLVoid* _Activity, IN BLVoid* _State, IN BLU32 _StateSize)
 	_SystemInit();
 	emscripten_request_animation_frame_loop(_SystemStep, 0);
 #endif
+	return TRUE;
 }
 BLVoid
 blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _DesignWidth, IN BLU32 _DesignHeight, IN BLBool _UseDesignRes, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))
 {
+	blDebugOutput("Run %s app:%d x %d", _Appname, _Width, _Height);
 #if defined(BL_PLATFORM_UWP)
 	_PrSystemMem = new _BLSystemMember;
 #elif defined(BL_PLATFORM_ANDROID)
@@ -5186,7 +5188,7 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 		FS.mount(IDBFS, {}, '/remote');
 		FS.syncfs(true, function(err) {
 			assert(!err);
-			ccall('blSystemPrepare', 'v', ['number', 'number', 'number'], [0, 0, 0]);
+			ccall('blSystemPrepare', 'number', ['number', 'number', 'number'], [0, 0, 0]);
 		});
 	);
 #endif
