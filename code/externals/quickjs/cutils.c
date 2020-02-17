@@ -36,6 +36,7 @@
 #include <Windows.h>
 #endif
 
+#ifdef WIN32
 int gettimeofday(struct timeval * val, struct timezone * zone)
 {
 	if (val)
@@ -48,6 +49,7 @@ int gettimeofday(struct timeval * val, struct timezone * zone)
 	}
 	return 0;
 }
+#endif
 void pstrcpy(char *buf, int buf_size, const char *str)
 {
     int c;
@@ -280,7 +282,6 @@ int unicode_from_utf8(const uint8_t *p, int max_len, const uint8_t **pp)
         *pp = p;
         return c;
     }
-#ifdef _MSC_VER
 	if (c >= 0xc0 && c <= 0xdf)
 		l = 1;
 	else if (c >= 0xe0 && c <= 0xef)
@@ -293,27 +294,6 @@ int unicode_from_utf8(const uint8_t *p, int max_len, const uint8_t **pp)
 		l = 5;
 	else
 		return -1;
-#else
-    switch(c) {
-    case 0xc0: ... 0xdf:
-        l = 1;
-        break;
-    case 0xe0 ... 0xef:
-        l = 2;
-        break;
-    case 0xf0 ... 0xf7:
-        l = 3;
-        break;
-    case 0xf8 ... 0xfb:
-        l = 4;
-        break;
-    case 0xfc ... 0xfd:
-        l = 5;
-        break;
-    default:
-        return -1;
-    }
-#endif
     /* check that we have enough characters */
     if (l > (max_len - 1))
         return -1;

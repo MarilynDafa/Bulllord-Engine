@@ -74,7 +74,7 @@ extern "C" {
 #define PTRPART_INTERNAL(val) ((BLU32)((((BLU64)(val)) >> 32) & 0xFFFFFFFF))
 #define MAKEGUID_INTERNAL(sys, user) ((BLU64)(((BLU32)(((BLU64)(user)) & 0xFFFFFFFF)) | ((BLU64)((BLU32)(((BLU64)(sys)) & 0xFFFFFFFF))) << 32))
 /* Utf16 char*/
-#if defined (BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP) || defined(BL_PLATFORM_WEB)
+#if defined (BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP) || defined(BL_PLATFORM_WEB) || defined(BL_PLATFORM_ANDROID)
 #   define U16(str) L##str
 #else
 #   define U16(str) u##str

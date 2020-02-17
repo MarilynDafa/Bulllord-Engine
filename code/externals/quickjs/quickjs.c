@@ -11143,6 +11143,16 @@ static double js_pow(double a, double b)
     }
 }
 
+static double js_floor(double a)
+{
+	return floor(a);
+}
+
+static double js_ceil(double a)
+{
+	return ceil(a);
+}
+
 #ifdef CONFIG_BIGNUM
 
 JSValue JS_NewBigInt64(JSContext *ctx, int64_t v)
@@ -39639,8 +39649,8 @@ static const JSCFunctionListEntry js_math_funcs[] = {
 #else
     JS_CFUNC_SPECIAL_DEF("abs", 1, f_f, fabs ),
 #endif
-    JS_CFUNC_SPECIAL_DEF("floor", 1, f_f, floor ),
-    JS_CFUNC_SPECIAL_DEF("ceil", 1, f_f, ceil ),
+    JS_CFUNC_SPECIAL_DEF("floor", 1, f_f, js_floor ),
+    JS_CFUNC_SPECIAL_DEF("ceil", 1, f_f, js_ceil ),
     JS_CFUNC_SPECIAL_DEF("round", 1, f_f, js_math_round ),
     JS_CFUNC_SPECIAL_DEF("sqrt", 1, f_f, sqrt ),
 

@@ -437,7 +437,7 @@ void VP8DspInit(void);
 //------------------------------------------------------------------------------
 // WebP I/O
 
-#define FANCY_UPSAMPLING   // undefined to remove fancy upsampling support
+//#define FANCY_UPSAMPLING   // undefined to remove fancy upsampling support
 
 // Convert a pair of y/u/v lines together to the output rgb/a colorspace.
 // bottom_y can be NULL if only one line of output is needed (at top/bottom).
