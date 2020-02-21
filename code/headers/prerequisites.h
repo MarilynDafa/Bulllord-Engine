@@ -285,11 +285,7 @@ typedef unsigned long long BLGuid;
  * Uniform Entry Point
  */
 #if defined(BL_PLATFORM_WIN32)
-#	ifdef _DEBUG
-#		define BL_MAINBEGIN(argc, argv) int main(int argc, char** argv) {
-#	else
 #		define BL_MAINBEGIN(argc, argv) int _stdcall WinMain(HINSTANCE inst, HINSTANCE hinst, LPSTR argv, int argc) {
-#	endif
 #		define BL_MAINEND return 0; }
 #elif defined(BL_PLATFORM_UWP)
 #		define BL_MAINBEGIN(argc, argv) [Platform::MTAThread] int main(Platform::Array<Platform::String^>^ argc) {
