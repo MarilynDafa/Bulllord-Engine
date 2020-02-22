@@ -1624,13 +1624,13 @@ _CloseWindow()
 }
 #elif defined(BL_PLATFORM_ANDROID)
 extern "C" {
-	JNIEXPORT BLVoid JNICALL Java_org_bulllord_lib_BLActivity_textChanged(JNIEnv* _Env, jobject, jstring _Text)
+	JNIEXPORT BLVoid JNICALL Java_org_bulllord_app_BLActivity_textChanged(JNIEnv* _Env, jobject, jstring _Text)
 	{
 		const BLUtf8* _utf8str = (const BLUtf8*)_Env->GetStringUTFChars(_Text, NULL);
 		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str, INVALID_GUID);
 		_Env->ReleaseStringUTFChars(_Text, (const BLAnsi*)_utf8str);
 	}
-	JNIEXPORT BLVoid JNICALL Java_org_bulllord_lib_BLActivity_activityReady(JNIEnv* _Env, jobject, jobject _Activity, jint _Aep)
+	JNIEXPORT BLVoid JNICALL Java_org_bulllord_app_BLActivity_activityReady(JNIEnv* _Env, jobject, jobject _Activity, jint _Aep)
 	{
 		_PrSystemMem->pBLJava = _Activity;
 		_PrSystemMem->bAEPSupport = (_Aep == 1) ? TRUE : FALSE;
