@@ -1786,11 +1786,21 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\msa_macro.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\neon.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dsp\yuv.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\backward_references_enc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\cost_enc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\histogram_enc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\vp8i_enc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\vp8li_enc.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\bit_reader_inl_utils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\bit_reader_utils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\bit_writer_utils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\color_cache_utils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\endian_inl_utils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\filters_utils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\huffman_encode_utils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\huffman_utils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\quant_levels_dec_utils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\quant_levels_utils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\random_utils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\rescaler_utils.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\thread_utils.h" />
@@ -1838,5 +1848,19 @@
       <ExcludedFromBuild>false</ExcludedFromBuild>
       <FileType>Document</FileType>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_2D.bsl">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_2D_GLOW.bsl">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_2D_INSTANCE.bsl">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_2D_STROKE.bsl">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
 </Project>

@@ -58,6 +58,12 @@
     <Filter Include="externals\quickjs">
       <UniqueIdentifier>{68ed35ff-bd47-494e-a05b-41aeda819ccf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="externals\webp\enc">
+      <UniqueIdentifier>{59537b69-54f2-430f-835c-c0d8fa60158e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="externals\webp\webp">
+      <UniqueIdentifier>{0b4c6658-11db-4433-938f-79e960fbaaa2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\src\autofit\autofit.c">
@@ -1946,5 +1952,49 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs-opcode.h">
       <Filter>externals\quickjs</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\bit_writer_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\endian_inl_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\filters_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\huffman_encode_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\utils\quant_levels_utils.h">
+      <Filter>externals\webp\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\backward_references_enc.h">
+      <Filter>externals\webp\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\cost_enc.h">
+      <Filter>externals\webp\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\histogram_enc.h">
+      <Filter>externals\webp\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\vp8i_enc.h">
+      <Filter>externals\webp\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\vp8li_enc.h">
+      <Filter>externals\webp\enc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_2D.bsl">
+      <Filter>src\internal</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_2D_GLOW.bsl">
+      <Filter>src\internal</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_2D_INSTANCE.bsl">
+      <Filter>src\internal</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_2D_STROKE.bsl">
+      <Filter>src\internal</Filter>
+    </None>
   </ItemGroup>
 </Project>

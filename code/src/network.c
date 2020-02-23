@@ -104,10 +104,8 @@ _FillAddr(const BLAnsi* _Host, BLU16 _Port, struct sockaddr_in* _Out, struct soc
             _hints.ai_socktype = SOCK_STREAM;
 #if defined(WIN32)
 			_hints.ai_flags = AI_NUMERICHOST;
-#elif defined(EMSCRIPTEN)
-			_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
-            _hints.ai_flags = AI_DEFAULT;
+            _hints.ai_flags = AI_ADDRCONFIG | AI_V4MAPPED;
 #endif
             BLS32 _rlt = getaddrinfo("ipv4only.arpa", NULL, &_hints, &_res);
             if (_rlt == 0)
@@ -147,10 +145,8 @@ _FillAddr(const BLAnsi* _Host, BLU16 _Port, struct sockaddr_in* _Out, struct soc
             _hints.ai_socktype = SOCK_DGRAM;
 #if defined(WIN32)
 			_hints.ai_flags = AI_NUMERICHOST;
-#elif defined(EMSCRIPTEN)
-			_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
-			_hints.ai_flags = AI_DEFAULT;
+			_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #endif
             BLS32 _rlt = getaddrinfo("ipv4only.arpa", NULL, &_hints, &_res);
             if (_rlt == 0)
@@ -189,10 +185,8 @@ _FillAddr(const BLAnsi* _Host, BLU16 _Port, struct sockaddr_in* _Out, struct soc
             _hints.ai_socktype = SOCK_STREAM;
 #if defined(WIN32)
 			_hints.ai_flags = AI_NUMERICHOST;
-#elif defined(EMSCRIPTEN)
-			_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
-			_hints.ai_flags = AI_DEFAULT;
+			_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #endif
             BLS32 _rlt = getaddrinfo("ipv4only.arpa", NULL, &_hints, &_res);
             if (_rlt == 0)
@@ -1863,10 +1857,8 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
         _hints.ai_socktype = SOCK_DGRAM;
 #if defined(WIN32)
 		_hints.ai_flags = AI_NUMERICHOST;
-#elif defined(EMSCRIPTEN)
-		_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
-		_hints.ai_flags = AI_DEFAULT;
+		_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #endif
         struct addrinfo* _answer;
         getaddrinfo(_Host, NULL, &_hints, &_answer);
@@ -1897,10 +1889,8 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
         _hints.ai_socktype = SOCK_STREAM;
 #if defined(WIN32)
 		_hints.ai_flags = AI_NUMERICHOST;
-#elif defined(EMSCRIPTEN)
-		_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
-		_hints.ai_flags = AI_DEFAULT;
+		_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #endif
         struct addrinfo* _answer;
         getaddrinfo(_Host, NULL, &_hints, &_answer);
@@ -1953,10 +1943,8 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
         _hints.ai_socktype = SOCK_STREAM;
 #if defined(WIN32)
 		_hints.ai_flags = AI_NUMERICHOST;
-#elif defined(EMSCRIPTEN)
-		_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #else
-		_hints.ai_flags = AI_DEFAULT;
+		_hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
 #endif
         struct addrinfo* _answer;
         getaddrinfo(_Host, NULL, &_hints, &_answer);

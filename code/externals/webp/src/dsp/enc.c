@@ -785,9 +785,10 @@ WEBP_DSP_INIT_FUNC(VP8EncDspInit) {
     }
 #endif
 #if defined(WEBP_USE_AVX2)
+	/*
     if (VP8GetCPUInfo(kAVX2)) {
       VP8EncDspInitAVX2();
-    }
+    }*/
 #endif
 #if defined(WEBP_USE_MIPS32)
     if (VP8GetCPUInfo(kMIPS32)) {
