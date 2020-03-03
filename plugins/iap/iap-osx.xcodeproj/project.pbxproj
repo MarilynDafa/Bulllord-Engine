@@ -14,7 +14,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C7ABA51A22A846EC003EDE15 /* liblibIAPPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblibIAPPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7ABA51A22A846EC003EDE15 /* libIAPPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libIAPPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7ABA53A22A84BA9003EDE15 /* iapentry.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = iapentry.xc; sourceTree = "<group>"; };
 		C7ABA53B22A84BAF003EDE15 /* iapentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iapentry.h; sourceTree = "<group>"; };
 		C7ABA54722A84D11003EDE15 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -47,7 +47,7 @@
 		C7ABA51B22A846EC003EDE15 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7ABA51A22A846EC003EDE15 /* liblibIAPPlugin.dylib */,
+				C7ABA51A22A846EC003EDE15 /* libIAPPlugin.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -105,7 +105,7 @@
 			);
 			name = "iap-osx";
 			productName = "iap-osx";
-			productReference = C7ABA51A22A846EC003EDE15 /* liblibIAPPlugin.dylib */;
+			productReference = C7ABA51A22A846EC003EDE15 /* libIAPPlugin.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -114,7 +114,7 @@
 		C7ABA51222A846EB003EDE15 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = trix;
 				TargetAttributes = {
 					C7ABA51922A846EC003EDE15 = {
@@ -129,6 +129,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = C7ABA51122A846EB003EDE15;
 			productRefGroup = C7ABA51B22A846EC003EDE15 /* Products */;
@@ -166,6 +167,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -173,6 +175,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -187,6 +190,8 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = ../../bin/osx;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -211,7 +216,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = libIAPPlugin;
+				OTHER_CFLAGS = "-fshort-wchar";
+				PRODUCT_NAME = IAPPlugin;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -230,6 +236,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -237,6 +244,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -251,6 +259,8 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = ../../bin/osx;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -268,7 +278,8 @@
 				LIBRARY_SEARCH_PATHS = ../../bin/osx;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = libIAPPlugin;
+				OTHER_CFLAGS = "-fshort-wchar";
+				PRODUCT_NAME = IAPPlugin;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -280,7 +291,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = libIAPPlugin;
+				PRODUCT_NAME = IAPPlugin;
 			};
 			name = Debug;
 		};
@@ -291,7 +302,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
-				PRODUCT_NAME = libIAPPlugin;
+				PRODUCT_NAME = IAPPlugin;
 			};
 			name = Release;
 		};

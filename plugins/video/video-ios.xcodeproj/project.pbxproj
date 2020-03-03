@@ -724,7 +724,7 @@
 		C7D0298F1F478C6500E35DB0 /* tables_pulses_per_block.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tables_pulses_per_block.c; path = webm/opus/silk/tables_pulses_per_block.c; sourceTree = "<group>"; };
 		C7D029901F478C6500E35DB0 /* VAD.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VAD.c; path = webm/opus/silk/VAD.c; sourceTree = "<group>"; };
 		C7D029911F478C6500E35DB0 /* VQ_WMat_EC.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VQ_WMat_EC.c; path = webm/opus/silk/VQ_WMat_EC.c; sourceTree = "<group>"; };
-		C7F71B1A1EF9598E00F31075 /* liblibVideoPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblibVideoPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7F71B1A1EF9598E00F31075 /* libVideoPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libVideoPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7F71B251EF95CCD00F31075 /* libbulllord.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbulllord.dylib; path = "/Users/zhoubo/Downloads/Bulllord-Engine-master/proj/xcode/../../bin/ios/libbulllord.dylib"; sourceTree = "<absolute>"; };
 		C7F71B2D1EF95D3800F31075 /* videoentry.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = videoentry.xc; sourceTree = "<group>"; };
 		C7F71B2E1EF95D3E00F31075 /* videoentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = videoentry.h; sourceTree = "<group>"; };
@@ -1285,7 +1285,7 @@
 		C7F71B1B1EF9598E00F31075 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7F71B1A1EF9598E00F31075 /* liblibVideoPlugin.dylib */,
+				C7F71B1A1EF9598E00F31075 /* libVideoPlugin.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2002,7 +2002,7 @@
 			);
 			name = "video-ios";
 			productName = "video-ios";
-			productReference = C7F71B1A1EF9598E00F31075 /* liblibVideoPlugin.dylib */;
+			productReference = C7F71B1A1EF9598E00F31075 /* libVideoPlugin.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
@@ -2011,7 +2011,7 @@
 		C7F71B121EF9598E00F31075 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = trix;
 				TargetAttributes = {
 					C7F71B191EF9598E00F31075 = {
@@ -2022,10 +2022,11 @@
 			};
 			buildConfigurationList = C7F71B151EF9598E00F31075 /* Build configuration list for PBXProject "video-ios" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = C7F71B111EF9598E00F31075;
 			productRefGroup = C7F71B1B1EF9598E00F31075 /* Products */;
@@ -2306,6 +2307,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -2315,6 +2317,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -2322,6 +2325,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -2369,13 +2373,16 @@
 					../../code/externals,
 				);
 				INSTALL_PATH = "@executable_path/";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LIBRARY_SEARCH_PATHS = ../../bin/ios;
 				MACH_O_TYPE = mh_dylib;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = libVideoPlugin;
+				OTHER_CFLAGS = "-fshort-wchar";
+				PRODUCT_NAME = VideoPlugin;
 				SDKROOT = iphoneos;
 				SYMROOT = build;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -2383,6 +2390,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -2392,6 +2400,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -2399,6 +2408,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -2443,12 +2453,15 @@
 					../../code/externals,
 				);
 				INSTALL_PATH = "@executable_path/";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LIBRARY_SEARCH_PATHS = ../../bin/ios;
 				MACH_O_TYPE = mh_dylib;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = libVideoPlugin;
+				OTHER_CFLAGS = "-fshort-wchar";
+				PRODUCT_NAME = VideoPlugin;
 				SDKROOT = iphoneos;
 				SYMROOT = build;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -2479,7 +2492,8 @@
 					../../code/externals,
 				);
 				INSTALL_PATH = "@executable_path/";
-				PRODUCT_NAME = libVideoPlugin;
+				OTHER_CFLAGS = "-fshort-wchar";
+				PRODUCT_NAME = VideoPlugin;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -2510,7 +2524,8 @@
 					../../code/externals,
 				);
 				INSTALL_PATH = "@executable_path/";
-				PRODUCT_NAME = libVideoPlugin;
+				OTHER_CFLAGS = "-fshort-wchar";
+				PRODUCT_NAME = VideoPlugin;
 				SDKROOT = iphoneos;
 			};
 			name = Release;

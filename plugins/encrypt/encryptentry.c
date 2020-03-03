@@ -30,7 +30,7 @@ blEncryptOpenEXT(IN BLAnsi* _Version, ...)
 {
 }
 BLVoid
-blIAPCloseEXT()
+blEncryptCloseEXT()
 {
 }
 BLBool

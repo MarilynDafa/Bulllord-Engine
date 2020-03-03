@@ -3,157 +3,113 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 50;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		C7ABA53F22A84BF6003EDE15 /* iapentry.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7ABA53D22A84BB8003EDE15 /* iapentry.xc */; };
-		C7ABA54322A84C72003EDE15 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7ABA54222A84C71003EDE15 /* StoreKit.framework */; };
-		C7ABA54522A84CB2003EDE15 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7ABA54422A84CB2003EDE15 /* UIKit.framework */; };
-/* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		C7ABA52822A8472B003EDE15 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		C7ABA52A22A8472B003EDE15 /* libIAPPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIAPPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		C7ABA53D22A84BB8003EDE15 /* iapentry.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = iapentry.xc; sourceTree = "<group>"; };
-		C7ABA53E22A84BC3003EDE15 /* iapentry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iapentry.h; sourceTree = "<group>"; };
-		C7ABA54222A84C71003EDE15 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		C7ABA54422A84CB2003EDE15 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		C7413135240E685300354ACC /* libEncryptPlugin.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libEncryptPlugin.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		C7ABA52722A8472B003EDE15 /* Frameworks */ = {
+		C7413133240E685300354ACC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C7ABA54522A84CB2003EDE15 /* UIKit.framework in Frameworks */,
-				C7ABA54322A84C72003EDE15 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		C7ABA52122A8472B003EDE15 = {
+		C741312C240E685300354ACC = {
 			isa = PBXGroup;
 			children = (
-				C7ABA53922A84B9E003EDE15 /* src */,
-				C7ABA53822A84B98003EDE15 /* headers */,
-				C7ABA52B22A8472B003EDE15 /* Products */,
-				C7ABA54122A84C71003EDE15 /* Frameworks */,
+				C7413136240E685300354ACC /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		C7ABA52B22A8472B003EDE15 /* Products */ = {
+		C7413136240E685300354ACC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C7ABA52A22A8472B003EDE15 /* libIAPPlugin.dylib */,
+				C7413135240E685300354ACC /* libEncryptPlugin.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C7ABA53822A84B98003EDE15 /* headers */ = {
-			isa = PBXGroup;
-			children = (
-				C7ABA53E22A84BC3003EDE15 /* iapentry.h */,
-			);
-			name = headers;
-			sourceTree = "<group>";
-		};
-		C7ABA53922A84B9E003EDE15 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				C7ABA53D22A84BB8003EDE15 /* iapentry.xc */,
-			);
-			name = src;
-			sourceTree = "<group>";
-		};
-		C7ABA54122A84C71003EDE15 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				C7ABA54422A84CB2003EDE15 /* UIKit.framework */,
-				C7ABA54222A84C71003EDE15 /* StoreKit.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		C7413131240E685300354ACC /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
-		C7ABA52922A8472B003EDE15 /* iap-ios */ = {
+		C7413134240E685300354ACC /* encrypt-osx */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C7ABA53322A8472B003EDE15 /* Build configuration list for PBXNativeTarget "iap-ios" */;
+			buildConfigurationList = C7413139240E685300354ACC /* Build configuration list for PBXNativeTarget "encrypt-osx" */;
 			buildPhases = (
-				C7ABA52622A8472B003EDE15 /* Sources */,
-				C7ABA52722A8472B003EDE15 /* Frameworks */,
-				C7ABA52822A8472B003EDE15 /* CopyFiles */,
+				C7413131240E685300354ACC /* Headers */,
+				C7413132240E685300354ACC /* Sources */,
+				C7413133240E685300354ACC /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "iap-ios";
-			productName = "iap-ios";
-			productReference = C7ABA52A22A8472B003EDE15 /* libIAPPlugin.dylib */;
-			productType = "com.apple.product-type.library.static";
+			name = "encrypt-osx";
+			productName = "encrypt-osx";
+			productReference = C7413135240E685300354ACC /* libEncryptPlugin.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		C7ABA52222A8472B003EDE15 /* Project object */ = {
+		C741312D240E685300354ACC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = trix;
 				TargetAttributes = {
-					C7ABA52922A8472B003EDE15 = {
-						CreatedOnToolsVersion = 9.2;
-						ProvisioningStyle = Automatic;
+					C7413134240E685300354ACC = {
+						CreatedOnToolsVersion = 11.3.1;
 					};
 				};
 			};
-			buildConfigurationList = C7ABA52522A8472B003EDE15 /* Build configuration list for PBXProject "iap-ios" */;
-			compatibilityVersion = "Xcode 8.0";
+			buildConfigurationList = C7413130240E685300354ACC /* Build configuration list for PBXProject "encrypt-osx" */;
+			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = C7ABA52122A8472B003EDE15;
-			productRefGroup = C7ABA52B22A8472B003EDE15 /* Products */;
+			mainGroup = C741312C240E685300354ACC;
+			productRefGroup = C7413136240E685300354ACC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C7ABA52922A8472B003EDE15 /* iap-ios */,
+				C7413134240E685300354ACC /* encrypt-osx */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C7ABA52622A8472B003EDE15 /* Sources */ = {
+		C7413132240E685300354ACC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C7ABA53F22A84BF6003EDE15 /* iapentry.xc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		C7ABA53122A8472B003EDE15 /* Debug */ = {
+		C7413137240E685300354ACC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -163,6 +119,7 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
@@ -184,8 +141,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
-				CONFIGURATION_BUILD_DIR = ../../bin/ios/plugins;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -210,22 +165,20 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					../../code/headers,
-					../../code/externals,
+					../encrypt,
 				);
-				INSTALL_PATH = "@executable_path/";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LIBRARY_SEARCH_PATHS = ../../bin/ios;
-				MACH_O_TYPE = mh_dylib;
-				MTL_ENABLE_DEBUG_INFO = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-fshort-wchar";
-				PRODUCT_NAME = IAPPlugin;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				PRODUCT_NAME = EncryptPlugin;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
-		C7ABA53222A8472B003EDE15 /* Release */ = {
+		C7413138240E685300354ACC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -235,6 +188,7 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
@@ -256,8 +210,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "";
-				CONFIGURATION_BUILD_DIR = ../../bin/ios/plugins;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -276,65 +228,64 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					../../code/headers,
-					../../code/externals,
+					../encrypt,
 				);
-				INSTALL_PATH = "@executable_path/";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LIBRARY_SEARCH_PATHS = ../../bin/ios;
-				MACH_O_TYPE = mh_dylib;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
 				OTHER_CFLAGS = "-fshort-wchar";
-				PRODUCT_NAME = IAPPlugin;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
+				PRODUCT_NAME = EncryptPlugin;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
-		C7ABA53422A8472B003EDE15 /* Debug */ = {
+		C741313A240E685300354ACC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = IAPPlugin;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = EncryptPlugin;
 				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		C7ABA53522A8472B003EDE15 /* Release */ = {
+		C741313B240E685300354ACC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = IAPPlugin;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = EncryptPlugin;
 				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C7ABA52522A8472B003EDE15 /* Build configuration list for PBXProject "iap-ios" */ = {
+		C7413130240E685300354ACC /* Build configuration list for PBXProject "encrypt-osx" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C7ABA53122A8472B003EDE15 /* Debug */,
-				C7ABA53222A8472B003EDE15 /* Release */,
+				C7413137240E685300354ACC /* Debug */,
+				C7413138240E685300354ACC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C7ABA53322A8472B003EDE15 /* Build configuration list for PBXNativeTarget "iap-ios" */ = {
+		C7413139240E685300354ACC /* Build configuration list for PBXNativeTarget "encrypt-osx" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C7ABA53422A8472B003EDE15 /* Debug */,
-				C7ABA53522A8472B003EDE15 /* Release */,
+				C741313A240E685300354ACC /* Debug */,
+				C741313B240E685300354ACC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = C7ABA52222A8472B003EDE15 /* Project object */;
+	rootObject = C741312D240E685300354ACC /* Project object */;
 }

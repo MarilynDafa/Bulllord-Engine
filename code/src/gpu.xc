@@ -28,6 +28,13 @@
 #elif defined(BL_MTL_BACKEND)
 #include "internal/gpumtl.h"
 #endif
+#if defined(BL_PLATFORM_OSX)
+#   include <AppKit/NSOpenGL.h>
+#   include <AppKit/NSApplication.h>
+#elif defined(BL_PLATFORM_IOS)
+#   include <UIKit/UIKit.h>
+#   include <OpenGLES/EAGLDrawable.h>
+#endif
 
 static void
 _AllocUBO(_BLUniformBuffer* _UBO)
@@ -949,14 +956,15 @@ _GpuIntervention(CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLB
         _PrGpuMem->sHardwareCaps.eApiType = BL_GL_API;
         _PrGpuMem->sHardwareCaps.nApiVersion = 300;
         _PrGpuMem->pGLC = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
-        if (![EAGLContext setCurrentContext:_PrGpuMem->pGLC])
+        EAGLContext* _pglc = (EAGLContext*)_PrGpuMem->pGLC;
+        if (![EAGLContext setCurrentContext:_pglc])
         {
             blDebugOutput("OpenGLES set context failed");
             return;
         }
         glGenRenderbuffers(1, &_PrGpuMem->nBackRB);
         glBindRenderbuffer(GL_RENDERBUFFER, _PrGpuMem->nBackRB);
-        if (![_PrGpuMem->pGLC renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer*)_Layer])
+        if (![_pglc renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer*)_Layer])
         {
             blDebugOutput("OpenGLES set RenderBufferStorage faield");
             return;
@@ -1323,6 +1331,7 @@ blGenFrameBuffer()
     {
     }
 #endif
+    return INVALID_GUID;
 }
 BLVoid
 blDeleteFrameBuffer(IN BLGuid _FBO)
@@ -1433,6 +1442,7 @@ blFrameBufferAttach(IN BLGuid _FBO, IN BLGuid _Tex, IN BLEnum _CFace)
     {
     }
 #endif
+    return INVALID_GUID;
 }
 BLVoid
 blFrameBufferDetach(IN BLGuid _FBO, IN BLBool _DepthStencil)
@@ -1477,6 +1487,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
     {
     }
 #endif
+    return INVALID_GUID;
 }
 BLBool
 blDeleteTexture(IN BLGuid _Tex)

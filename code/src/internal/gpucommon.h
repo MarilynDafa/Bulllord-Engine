@@ -30,11 +30,7 @@
 #include "../headers/streamio.h"
 #include "../externals/xml/ezxml.h"
 #if defined(BL_PLATFORM_OSX)
-#   include <AppKit/NSOpenGL.h>
-#   include <AppKit/NSApplication.h>
 #elif defined(BL_PLATFORM_IOS)
-#   include <UIKit/UIKit.h>
-#   include <OpenGLES/EAGLDrawable.h>
 #elif defined(BL_PLATFORM_ANDROID)
 #    include <EGL/egl.h>
 #    include <EGL/eglext.h>
@@ -307,9 +303,9 @@ typedef struct _GpuMember {
 	HDC sGLHDC;
 #elif defined(BL_PLATFORM_UWP)
 #elif defined(BL_PLATFORM_OSX)
-	NSOpenGLContext* pGLC;
+	BLVoid* pGLC;
 #elif defined(BL_PLATFORM_IOS)
-	EAGLContext* pGLC;
+	BLVoid* pGLC;
 	GLuint nBackFB;
 	GLuint nBackRB;
 	GLuint nDepthRB;

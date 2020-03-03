@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Bucket
+   uuid = "0109B5A5-209A-4A58-A39B-2EEDFC73A797"
    type = "0"
    version = "2.0">
    <Breakpoints>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "0E297B9B-7FC3-4C28-9CDB-CB12C7E978D7"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -22,6 +24,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "0E9331C9-ABBC-473F-91F5-51D3DE6CE452"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -38,6 +41,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "9077646E-D80F-436D-B930-C622629F6589"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -54,6 +58,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "4C201ADB-6330-4371-A7C4-FA3FC1A647B3"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -70,6 +75,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "34356103-AFA8-4A69-8B50-F83C5A15F15F"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -86,6 +92,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "5B7239A8-4407-429E-A834-064C8B13EA0D"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -102,6 +109,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "4608305E-05EA-4117-B02A-67E270C7BBAC"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -118,6 +126,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "506ED929-0471-4ABE-A987-9A7FCB752DAA"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -127,13 +136,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2416"
             endingLineNumber = "2416"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "1F8E739D-E7E8-4D33-85F8-D6C3EF0D1B6B"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -150,6 +160,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "B2558B68-9954-486A-A219-B8E21ACFAA1E"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -166,6 +177,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "A50503BE-EFED-4DAA-AA0E-4DCD39BBA109"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -182,6 +194,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "1599B3C0-9E0F-473C-9B40-38A9FAFB3980"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -198,6 +211,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "A46BFA73-E162-4302-A55A-3E5F8E446B85"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -207,13 +221,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2413"
             endingLineNumber = "2413"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "868CA93D-DE3A-4E0C-BF13-164234439360"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -230,6 +245,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "93C0857C-29A4-4904-A2F8-2CBB26706CB7"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -246,6 +262,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "3DE0D08C-95ED-476C-83D1-F6B96EB74644"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -262,6 +279,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "732922D9-E9D7-42B2-8838-2DCC9389BAA0"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -271,13 +289,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2410"
             endingLineNumber = "2410"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "EEFF6B4F-773B-4E99-842F-683BE930506A"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -294,6 +313,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "0066B9A2-1653-4489-AA04-7AFA18600EC6"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -310,6 +330,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "78A84921-D8AA-47BB-97F3-ADB86716DAA4"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -326,6 +347,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "C4987764-BFF6-4D4C-89B7-76AD3CA296DF"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -342,6 +364,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "C29A9D81-733A-4D87-AE96-0995240A61B5"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -351,13 +374,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2445"
             endingLineNumber = "2445"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "5756BC44-F4C7-40EF-B50F-5268CC1A862D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -367,13 +391,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2438"
             endingLineNumber = "2438"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "A20255AD-DED4-48CD-B29B-4D5F69109D19"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -383,13 +408,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2450"
             endingLineNumber = "2450"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "0E91B85B-0609-4FAD-9682-1E4FE4AD572B"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -399,13 +425,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2476"
             endingLineNumber = "2476"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "12F8ACE5-88ED-4027-BFE4-20841E5A593A"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -415,13 +442,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2479"
             endingLineNumber = "2479"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "972833D1-2B15-4BAC-ACE5-EA2B552867DA"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -438,6 +466,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "44D5A533-2BEC-41B5-AF9E-410182E985FB"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -454,6 +483,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "585C217F-0727-4E17-B5B6-7C761739723F"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -470,6 +500,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "E332DAE4-AA5F-4431-ABAA-CF4E1B50384B"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -479,13 +510,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "11533"
             endingLineNumber = "11533"
-            landmarkName = "_UIDestroy"
+            landmarkName = "_UIUpdate(_Node, _Interval)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "04BAC426-83BD-4C62-86CC-5ADE6D1A1C4E"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -495,13 +527,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2490"
             endingLineNumber = "2490"
-            landmarkName = "_GpuSwapBuffer()"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "62446292-2A4E-45EA-A019-E66B41E175D6"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -510,14 +543,13 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "4312"
-            endingLineNumber = "4312"
-            landmarkName = "blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)"
-            landmarkType = "9">
+            endingLineNumber = "4312">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "FC02D3D1-2C7F-4BF4-8A71-CF987060CEC2"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -526,14 +558,13 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "4282"
-            endingLineNumber = "4282"
-            landmarkName = "blGenTechnique(IN BLAnsi* _Filename, IN BLBool _ForceCompile)"
-            landmarkType = "9">
+            endingLineNumber = "4282">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "A132F9AA-CAF4-40AE-A20B-2D38A730732B"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -543,13 +574,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2453"
             endingLineNumber = "2453"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "5938FA2A-A19A-44D3-BA7D-8801C0CC3EBB"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -559,13 +591,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2468"
             endingLineNumber = "2468"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "6C5D9FEE-EE90-4CD2-B946-C40353D59DC7"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -575,13 +608,14 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2480"
             endingLineNumber = "2480"
-            landmarkName = "_GpuIntervention(DUK_CONTEXT* _DKC, CALayer* _Layer, BLU32 _Width, BLU32 _Height, BLF32 _Scale, BLBool _Vsync)"
+            landmarkName = "blGenTechnique(_Filename, _Source, _ForceCompile)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "C4CD2606-EB4A-48F6-9720-8F7ED6B83FEF"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -598,6 +632,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "7D1D0456-CDA5-4C5E-8CB2-53E68DD8BBF0"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -614,6 +649,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "1204BFD4-6288-4909-93A7-FB2DE053E4E9"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -630,6 +666,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "BCC3B65F-8A0C-4868-B4C4-9700206D0E61"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -646,6 +683,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "55264AD6-291F-48D5-8D50-EE7119FBBD86"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -662,6 +700,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "C4599018-CF20-43E0-A416-937E39BAE17B"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -678,6 +717,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "1FAA600E-803D-4A6A-89E5-CE5698F77664"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -694,6 +734,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "9FCB9E51-8555-407F-A2E0-5E82B3FFBEEC"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -710,6 +751,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "D716C788-BF14-4F69-AC77-C0D6EA51C832"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -726,6 +768,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "30F8BBBD-D72C-4DF3-B088-B70A65C8FC0B"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -742,6 +785,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "4ED83A1B-7139-4AAB-ABF7-D3A7619C1753"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -758,6 +802,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "2F10B88C-7678-4D07-8B0A-89874E69CD85"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -774,6 +819,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "DAA0F260-79DB-4AAE-92D3-9C00A94F8D05"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -790,6 +836,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "7F15CBF9-2981-4C3F-AB00-1BD1867594F2"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -806,6 +853,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "3DE660C1-0EBD-4F4E-819E-B28CC02DBC4A"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"

@@ -735,7 +735,8 @@ _VSyncGL(IN BLBool _On)
 	wglSwapIntervalEXT(_On);
 #elif defined(BL_PLATFORM_OSX)
 	GLint _sync = _On;
-	[_PrGpuMem->pGLC setValues : &_sync forParameter : NSOpenGLCPSwapInterval];
+   // NSOpenGLContext* _pglc = (NSOpenGLContext*)_PrGpuMem->pGLC;
+	//[_pglc setValues : &_sync forParameter : NSOpenGLCPSwapInterval];
 #elif defined(BL_PLATFORM_LINUX)
 	PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC)glXGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
 	PFNGLXSWAPINTERVALSGIPROC glXSwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC)glXGetProcAddress((const GLubyte*)"glXSwapIntervalSGI");
