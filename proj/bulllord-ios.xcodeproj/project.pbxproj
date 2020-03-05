@@ -100,7 +100,6 @@
 		C7C769AA1F365C8200EB0AEE /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C7699C1F365C8200EB0AEE /* ui.c */; };
 		C7C769AC1F365C8F00EB0AEE /* audio.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7C7699E1F365C8200EB0AEE /* audio.xc */; };
 		C7C769AD1F365C9900EB0AEE /* gpu.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7C7699F1F365C8200EB0AEE /* gpu.xc */; };
-		C7C769AE1F365CA000EB0AEE /* system.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7C769A01F365C8200EB0AEE /* system.xc */; };
 		C7C769D31F365DCC00EB0AEE /* fastlz.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769D21F365DCC00EB0AEE /* fastlz.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7C769D61F365DDD00EB0AEE /* ezxml.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C769D51F365DDD00EB0AEE /* ezxml.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7C76A581F36866E00EB0AEE /* winfnt.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A571F36866E00EB0AEE /* winfnt.c */; settings = {COMPILER_FLAGS = "-w"; }; };
@@ -286,7 +285,6 @@
 		C7C7699C1F365C8200EB0AEE /* ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ui.c; path = ../code/src/ui.c; sourceTree = "<group>"; };
 		C7C7699E1F365C8200EB0AEE /* audio.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = audio.xc; path = ../code/src/audio.xc; sourceTree = "<group>"; };
 		C7C7699F1F365C8200EB0AEE /* gpu.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = gpu.xc; path = ../code/src/gpu.xc; sourceTree = "<group>"; };
-		C7C769A01F365C8200EB0AEE /* system.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = system.xc; path = ../code/src/system.xc; sourceTree = "<group>"; };
 		C7C769AF1F365CAE00EB0AEE /* array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = array.h; path = ../code/src/internal/array.h; sourceTree = "<group>"; };
 		C7C769B01F365CAE00EB0AEE /* dictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dictionary.h; path = ../code/src/internal/dictionary.h; sourceTree = "<group>"; };
 		C7C769B11F365CAE00EB0AEE /* internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = internal.h; path = ../code/src/internal/internal.h; sourceTree = "<group>"; };
@@ -358,6 +356,7 @@
 		C7D026341F4783A700E35DB0 /* mpaudec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mpaudec.c; path = ../code/externals/mpaudec/mpaudec.c; sourceTree = "<group>"; };
 		C7DC035F1FC7288A0033DB27 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		C7DC03611FCC50310033DB27 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		C7ED826324116A9500510695 /* system.xc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = system.xc; path = ../code/src/system.xc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -496,6 +495,7 @@
 		C7321ACB1D9D2EEB00E58DD8 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				C7ED826324116A9500510695 /* system.xc */,
 				C75341622180E897003A789A /* util.c */,
 				C7C769931F365C8200EB0AEE /* array.c */,
 				C7C769941F365C8200EB0AEE /* dictionary.c */,
@@ -509,7 +509,6 @@
 				C7C7699C1F365C8200EB0AEE /* ui.c */,
 				C7C7699E1F365C8200EB0AEE /* audio.xc */,
 				C7C7699F1F365C8200EB0AEE /* gpu.xc */,
-				C7C769A01F365C8200EB0AEE /* system.xc */,
 				C7321ACA1D9D2EEB00E58DD8 /* internal */,
 			);
 			name = src;
@@ -874,7 +873,6 @@
 				C75344232180EC87003A789A /* rescaler_sse2.c in Sources */,
 				C7C76A811F36884000EB0AEE /* ftbitmap.c in Sources */,
 				C7ABA4EF22A5A174003EDE15 /* astc_percentile_tables.c in Sources */,
-				C7C769AE1F365CA000EB0AEE /* system.xc in Sources */,
 				C7C76A801F36884000EB0AEE /* ftbase.c in Sources */,
 				C753443F2180ED16003A789A /* color_cache_utils.c in Sources */,
 				C7C76A931F36887F00EB0AEE /* ftotval.c in Sources */,

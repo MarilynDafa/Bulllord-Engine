@@ -153,8 +153,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3151"
             endingLineNumber = "3151"
-            landmarkName = "-postFinishLaunch"
-            landmarkType = "7">
+            landmarkName = "unknown"
+            landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -203,9 +203,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "5325"
-            endingLineNumber = "5325"
-            landmarkName = "blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _DesignWidth, IN BLU32 _DesignHeight, IN BLBool _UseDesignRes, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))"
-            landmarkType = "9">
+            endingLineNumber = "5325">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -238,7 +236,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3513"
             endingLineNumber = "3513"
-            landmarkName = "_SystemStep()"
+            landmarkName = "blUserFolderDir()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -255,7 +253,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3202"
             endingLineNumber = "3202"
-            landmarkName = "_CloseWindow()"
+            landmarkName = "_PollEvent()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -272,7 +270,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3203"
             endingLineNumber = "3203"
-            landmarkName = "_CloseWindow()"
+            landmarkName = "_PollEvent()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -306,7 +304,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2724"
             endingLineNumber = "2724"
-            landmarkName = "-touchesBegan:withEvent:"
+            landmarkName = "-init"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -323,7 +321,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2726"
             endingLineNumber = "2726"
-            landmarkName = "-touchesBegan:withEvent:"
+            landmarkName = "-init"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -340,7 +338,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2727"
             endingLineNumber = "2727"
-            landmarkName = "-touchesBegan:withEvent:"
+            landmarkName = "-init"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -357,7 +355,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2804"
             endingLineNumber = "2804"
-            landmarkName = "-initWithFrame:scale:"
+            landmarkName = "-supportedInterfaceOrientations"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -459,7 +457,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3565"
             endingLineNumber = "3565"
-            landmarkName = "_SystemDestroy()"
+            landmarkName = "blUserFolderDir()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -476,7 +474,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3540"
             endingLineNumber = "3540"
-            landmarkName = "_SystemStep()"
+            landmarkName = "blUserFolderDir()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -493,8 +491,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3223"
             endingLineNumber = "3223"
-            landmarkName = "unknown"
-            landmarkType = "0">
+            landmarkName = "_PollEvent()"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -625,8 +623,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3138"
             endingLineNumber = "3138"
-            landmarkName = "-postFinishLaunch"
-            landmarkType = "7">
+            landmarkName = "_EnterFullscreen()"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -642,8 +640,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3166"
             endingLineNumber = "3166"
-            landmarkName = "-application:didFinishLaunchingWithOptions:"
-            landmarkType = "7">
+            landmarkName = "_ShowWindow()"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -659,8 +657,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3148"
             endingLineNumber = "3148"
-            landmarkName = "-postFinishLaunch"
-            landmarkType = "7">
+            landmarkName = "_ExitFullscreen(_Width, _Height)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -676,7 +674,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3512"
             endingLineNumber = "3512"
-            landmarkName = "_SystemStep()"
+            landmarkName = "blUserFolderDir()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -693,7 +691,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3187"
             endingLineNumber = "3187"
-            landmarkName = "_ShowWindow()"
+            landmarkName = "_PollEvent()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -727,7 +725,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "2801"
             endingLineNumber = "2801"
-            landmarkName = "-initWithFrame:scale:"
+            landmarkName = "-supportedInterfaceOrientations"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -744,8 +742,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3028"
             endingLineNumber = "3028"
-            landmarkName = "-setView:"
-            landmarkType = "7">
+            landmarkName = "_CloseWindow()"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -761,8 +759,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3060"
             endingLineNumber = "3060"
-            landmarkName = "-setKeyboardHeight:"
-            landmarkType = "7">
+            landmarkName = "_TouchProc(_EventType, _TouchEvent, _UserData)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -778,8 +776,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3143"
             endingLineNumber = "3143"
-            landmarkName = "-postFinishLaunch"
-            landmarkType = "7">
+            landmarkName = "_ExitFullscreen(_Width, _Height)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -795,8 +793,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3134"
             endingLineNumber = "3134"
-            landmarkName = "-postFinishLaunch"
-            landmarkType = "7">
+            landmarkName = "_EnterFullscreen()"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -811,9 +809,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "5385"
-            endingLineNumber = "5385"
-            landmarkName = "blSystemScriptRun(IN BLAnsi* _Encryptkey)"
-            landmarkType = "9">
+            endingLineNumber = "5385">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -828,9 +824,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "5332"
-            endingLineNumber = "5332"
-            landmarkName = "blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _DesignWidth, IN BLU32 _DesignHeight, IN BLBool _UseDesignRes, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))"
-            landmarkType = "9">
+            endingLineNumber = "5332">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -846,8 +840,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3152"
             endingLineNumber = "3152"
-            landmarkName = "-application:didFinishLaunchingWithOptions:"
-            landmarkType = "7">
+            landmarkName = "_ShowWindow()"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -863,8 +857,40 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "3190"
             endingLineNumber = "3190"
-            landmarkName = "_PollMsg()"
+            landmarkName = "_PollEvent()"
             landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F4FB3C7E-41F0-4F5C-9591-C55E6453C53D"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../code/src/system.mm"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2680"
+            endingLineNumber = "2680"
+            landmarkName = "-doLoop:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0F298AA7-8D4C-41D1-AE6F-E4C3B27CCCBB"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../code/src/system.mm"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "2791"
+            endingLineNumber = "2791"
+            landmarkName = "-hideLaunchScreen"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

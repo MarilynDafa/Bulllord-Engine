@@ -2629,140 +2629,6 @@ _CloseWindow()
     return self;
 }
 @end
-@interface IOSLaunchController : UIViewController
-- (instancetype)init;
-- (BLVoid)loadView;
-- (NSUInteger)supportedInterfaceOrientations;
-@end
-@implementation IOSLaunchController
-- (BLVoid)loadView{}
-- (BOOL)shouldAutorotate{ return NO; }
-- (NSUInteger)supportedInterfaceOrientations{ return UIInterfaceOrientationMaskAll; }
-- (instancetype)init
-{
-    if (!(self = [super initWithNibName:nil bundle:nil]))
-        return nil;
-    NSBundle* _bundle = [NSBundle mainBundle];
-    NSString* _screenname = [_bundle objectForInfoDictionaryKey:@"UILaunchStoryboardName"];
-    BOOL _atleast8 = [[UIDevice currentDevice].systemVersion doubleValue] >= (8.0);
-    if (_screenname && _atleast8)
-    {
-        @try
-        {
-            self.view = [_bundle loadNibNamed:_screenname owner:self options:nil][0];
-        }
-        @catch (NSException* _exception)
-        {
-            return nil;
-        }
-    }
-    if (!self.view)
-    {
-        NSArray* _launches = [_bundle objectForInfoDictionaryKey:@"UILaunchImages"];
-        UIInterfaceOrientation _curorient = [UIApplication sharedApplication].statusBarOrientation;
-        NSString* _imagename = nil;
-        UIImage* _image = nil;
-        BLU32 _screenw = (BLU32)([UIScreen mainScreen].bounds.size.width + 0.5);
-        BLU32 _screenh = (BLU32)([UIScreen mainScreen].bounds.size.height + 0.5);
-        if (_screenw > _screenh)
-        {
-            BLU32 _width = _screenw;
-            _screenw = _screenh;
-            _screenh = _width;
-        }
-        if (_launches)
-        {
-            for (NSDictionary* _dict in _launches)
-            {
-                UIInterfaceOrientationMask _orientmask = UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
-                NSString* _minversion = _dict[@"UILaunchImageMinimumOSVersion"];
-                NSString* _sizestring = _dict[@"UILaunchImageSize"];
-                NSString* _orientstring = _dict[@"UILaunchImageOrientation"];
-                if (_minversion && [[UIDevice currentDevice].systemVersion doubleValue] < _minversion.doubleValue)
-                    continue;
-                if (_sizestring)
-                {
-                    CGSize _size = CGSizeFromString(_sizestring);
-                    if ((BLU32)(_size.width + 0.5) != _screenw || (BLU32)(_size.height + 0.5) != _screenh)
-                        continue;
-                }
-                if (_orientstring)
-                {
-                    if ([_orientstring isEqualToString:@"PortraitUpsideDown"])
-                        _orientmask = UIInterfaceOrientationMaskPortraitUpsideDown;
-                    else if ([_orientstring isEqualToString:@"Landscape"])
-                        _orientmask = UIInterfaceOrientationMaskLandscape;
-                    else if ([_orientstring isEqualToString:@"LandscapeLeft"])
-                        _orientmask = UIInterfaceOrientationMaskLandscapeLeft;
-                    else if ([_orientstring isEqualToString:@"LandscapeRight"])
-                        _orientmask = UIInterfaceOrientationMaskLandscapeRight;
-                }
-                if ((_orientmask & (1 << _curorient)) == 0)
-                    continue;
-                _imagename = _dict[@"UILaunchImageName"];
-            }
-            if (_imagename)
-                _image = [UIImage imageNamed:_imagename];
-        }
-        else
-        {
-            _imagename = [_bundle objectForInfoDictionaryKey:@"UILaunchImageFile"];
-            if (!_image)
-                _imagename = @"Default";
-            UIInterfaceOrientation _curorient = [UIApplication sharedApplication].statusBarOrientation;
-            UIUserInterfaceIdiom _idiom = [UIDevice currentDevice].userInterfaceIdiom;
-            if (_idiom == UIUserInterfaceIdiomPhone && _screenh == 568)
-                _image = [UIImage imageNamed:[NSString stringWithFormat:@"%@-568h", _imagename]];
-            else if (_idiom == UIUserInterfaceIdiomPad)
-            {
-                if (UIInterfaceOrientationIsLandscape(_curorient))
-                {
-                    if (_curorient == UIInterfaceOrientationLandscapeLeft)
-                        _image = [UIImage imageNamed:[NSString stringWithFormat:@"%@-LandscapeLeft", _imagename]];
-                    else
-                        _image = [UIImage imageNamed:[NSString stringWithFormat:@"%@-LandscapeRight", _imagename]];
-                    if (!_image)
-                        _image = [UIImage imageNamed:[NSString stringWithFormat:@"%@-Landscape", _imagename]];
-                }
-                else
-                {
-                    if (_curorient == UIInterfaceOrientationPortraitUpsideDown)
-                        _image = [UIImage imageNamed:[NSString stringWithFormat:@"%@-PortraitUpsideDown", _imagename]];
-                    if (!_image)
-                        _image = [UIImage imageNamed:[NSString stringWithFormat:@"%@-Portrait", _imagename]];
-                }
-            }
-            if (!_image)
-                _image = [UIImage imageNamed:_imagename];
-        }
-        if (_image)
-        {
-            UIImageView* _imgview = [[UIImageView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-            UIImageOrientation _imageorient = UIImageOrientationUp;
-            if (UIInterfaceOrientationIsLandscape(_curorient))
-            {
-                if (_atleast8 && _image.size.width < _image.size.height)
-                {
-                    if (_curorient == UIInterfaceOrientationLandscapeLeft)
-                        _imageorient = UIImageOrientationRight;
-                    else if (_curorient == UIInterfaceOrientationLandscapeRight)
-                        _imageorient = UIImageOrientationLeft;
-                }
-                else if (!_atleast8 && _image.size.width > _image.size.height)
-                {
-                    if (_curorient == UIInterfaceOrientationLandscapeLeft)
-                        _imageorient = UIImageOrientationLeft;
-                    else if (_curorient == UIInterfaceOrientationLandscapeRight)
-                        _imageorient = UIImageOrientationRight;
-                }
-            }
-            _imgview.image = [[UIImage alloc] initWithCGImage:_image.CGImage scale:_image.scale orientation:_imageorient];
-            self.view = _imgview;
-        }
-    }
-    return self;
-}
-@end
 @interface IOSController : UIViewController <UITextFieldDelegate>
 - (instancetype)initWithNil;
 - (BLVoid)loadView;
@@ -2797,20 +2663,10 @@ _CloseWindow()
 - (NSUInteger)supportedInterfaceOrientations
 {
     NSUInteger _mask = 0;
-    if ([[UIDevice currentDevice].systemVersion doubleValue] >= 7.0)
-    {
-        if (_PrSystemMem->nOrientation == SCREEN_LANDSCAPE_INTERNAL)
-            _mask |= UIInterfaceOrientationMaskLandscape;
-        else
-            _mask |= (UIInterfaceOrientationMaskPortrait);
-    }
+    if (_PrSystemMem->nOrientation == SCREEN_LANDSCAPE_INTERNAL)
+        _mask |= UIInterfaceOrientationMaskLandscape;
     else
-    {
-        if (_PrSystemMem->nOrientation == SCREEN_LANDSCAPE_INTERNAL)
-            _mask |= UIInterfaceOrientationMaskLandscape;
-        else
-            _mask |= (UIInterfaceOrientationMaskPortrait);
-    }
+        _mask |= (UIInterfaceOrientationMaskPortrait);
     return _mask;
 }
 - (BLVoid)viewDidLayoutSubviews
@@ -2827,7 +2683,7 @@ _CloseWindow()
 {
     _PrSystemMem->pTICcxt = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
     _PrSystemMem->pTICcxt.delegate = self;
-    _PrSystemMem->pTICcxt.text = @" ";
+    _PrSystemMem->pTICcxt.text = @"                                                                ";
     _PrSystemMem->pTICcxt.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _PrSystemMem->pTICcxt.autocorrectionType = UITextAutocorrectionTypeNo;
     _PrSystemMem->pTICcxt.enablesReturnKeyAutomatically = NO;
@@ -2839,6 +2695,7 @@ _CloseWindow()
     NSNotificationCenter* _center = [NSNotificationCenter defaultCenter];
     [_center addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
     [_center addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    [_center addObserver:self selector:@selector(textFieldTextDidChange:) name:UITextFieldTextDidChangeNotification object:nil];
 }
 - (BLVoid)deinitKeyboard
 {
@@ -2905,7 +2762,7 @@ _CloseWindow()
     return YES;
 }
 @end
-@interface IOSDelegate : UIResponder <UIApplicationDelegate>
+@interface IOSDelegate : NSObject<UIApplicationDelegate>
 + (id)sharedAppDelegate;
 + (NSString*)getAppDelegateClassName;
 - (void)hideLaunchScreen;
@@ -2932,12 +2789,14 @@ _CloseWindow()
         _window.alpha = 0.0;
     } completion:^(BOOL _Finished) {
         _window.hidden = YES;
+        //fixme
         [_window removeFromSuperview];
     }];
 }
 - (BLVoid)postFinishLaunch
 {
     [self performSelector:@selector(hideLaunchScreen) withObject:nil afterDelay:0.0];
+    [UIApplication sharedApplication].statusBarHidden = YES;
     CGRect _frame = [[UIScreen mainScreen] bounds];
     BLF32 _maxv = MAX_INTERNAL(_frame.size.width, _frame.size.height);
     BLF32 _minv = MIN_INTERNAL(_frame.size.width, _frame.size.height);
@@ -2954,8 +2813,8 @@ _CloseWindow()
     _PrSystemMem->sBoostParam.bFullscreen = TRUE;
     _PrSystemMem->sBoostParam.nScreenWidth = _frame.size.width * _PrSystemMem->nRetinaScale;
     _PrSystemMem->sBoostParam.nScreenHeight = _frame.size.height * _PrSystemMem->nRetinaScale;
-    IOSController* _controller = [[IOSController alloc] initWithNil];
     _PrSystemMem->pWindow = [[IOSWindow alloc] initWithFrame : _frame];
+    IOSController* _controller = [[IOSController alloc] initWithNil];
     [_PrSystemMem->pWindow makeKeyAndVisible];
     _PrSystemMem->pCtlView = [[IOSGLESView alloc] initWithFrame : _frame scale : _PrSystemMem->nRetinaScale];
     _GpuIntervention(_PrSystemMem->pCtlView.layer, _PrSystemMem->sBoostParam.nScreenWidth, _PrSystemMem->sBoostParam.nScreenHeight, _PrSystemMem->nRetinaScale, !_PrSystemMem->sBoostParam.bProfiler);
@@ -2976,18 +2835,28 @@ _CloseWindow()
 }
 - (BOOL)application:(UIApplication*)_App didFinishLaunchingWithOptions:(NSDictionary*)_Opt
 {
-    [UIApplication sharedApplication].statusBarHidden = YES;
-    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
     _PrSystemMem->nRetinaScale = [[UIScreen mainScreen] scale];
-    UIViewController* _launchcontroller = [[IOSLaunchController alloc] init];
-    if (_launchcontroller.view)
+    UIViewController* _vc = nil;
+    NSString* _screenname = nil;
+    NSBundle* _bundle = [NSBundle mainBundle];
+    _screenname = [_bundle objectForInfoDictionaryKey:@"UILaunchStoryboardName"];
+    if (_screenname) {
+        @try {
+            UIStoryboard* _storyboard = [UIStoryboard storyboardWithName:_screenname bundle:_bundle];
+            _vc = [_storyboard instantiateInitialViewController];
+        }
+        @catch (NSException *exception) {
+            /* Do nothing (there's more code to execute below). */
+        }
+    }
+    if (_vc.view)
     {
         _launch = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
         _launch.windowLevel = UIWindowLevelNormal + 1.0;
         _launch.hidden = NO;
-        _launch.rootViewController = _launchcontroller;
+        _launch.rootViewController = _vc;
     }
-    [[NSFileManager defaultManager] changeCurrentDirectoryPath: [[NSBundle mainBundle] resourcePath]];
+    [[NSFileManager defaultManager] changeCurrentDirectoryPath: [_bundle resourcePath]];
     [self performSelector:@selector(postFinishLaunch) withObject:nil afterDelay:0.0];
     return YES;
 }

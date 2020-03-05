@@ -145,7 +145,6 @@
 		C7C76D591F36978A00EB0AEE /* ui.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D4B1F36978A00EB0AEE /* ui.c */; };
 		C7C76D5B1F36979200EB0AEE /* audio.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D4D1F36978A00EB0AEE /* audio.xc */; };
 		C7C76D5C1F36979A00EB0AEE /* gpu.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D4E1F36978A00EB0AEE /* gpu.xc */; };
-		C7C76D5F1F369AC000EB0AEE /* system.xc in Sources */ = {isa = PBXBuildFile; fileRef = C7C76D5E1F369AB700EB0AEE /* system.xc */; };
 		C7C76DCD1F37895500EB0AEE /* bdf.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A491F36636200EB0AEE /* bdf.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7C76DCE1F37895500EB0AEE /* cff.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A471F36634500EB0AEE /* cff.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		C7C76DCF1F37895500EB0AEE /* ftcache.c in Sources */ = {isa = PBXBuildFile; fileRef = C7C76A451F36633400EB0AEE /* ftcache.c */; settings = {COMPILER_FLAGS = "-w"; }; };
@@ -383,7 +382,6 @@
 		C7C76D4B1F36978A00EB0AEE /* ui.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ui.c; path = ../code/src/ui.c; sourceTree = "<group>"; };
 		C7C76D4D1F36978A00EB0AEE /* audio.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = audio.xc; path = ../code/src/audio.xc; sourceTree = "<group>"; };
 		C7C76D4E1F36978A00EB0AEE /* gpu.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = gpu.xc; path = ../code/src/gpu.xc; sourceTree = "<group>"; };
-		C7C76D5E1F369AB700EB0AEE /* system.xc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = system.xc; path = ../code/src/system.xc; sourceTree = "<group>"; };
 		C7D0260B1F47838400E35DB0 /* internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = internal.h; path = ../code/externals/mpaudec/internal.h; sourceTree = "<group>"; };
 		C7D0260C1F47838400E35DB0 /* mpaudec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mpaudec.h; path = ../code/externals/mpaudec/mpaudec.h; sourceTree = "<group>"; };
 		C7D0260D1F47838400E35DB0 /* mpaudectab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mpaudectab.h; path = ../code/externals/mpaudec/mpaudectab.h; sourceTree = "<group>"; };
@@ -397,6 +395,7 @@
 		C7D0261B1F47838F00E35DB0 /* miniz_tdef.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = miniz_tdef.c; path = ../code/externals/miniz/miniz_tdef.c; sourceTree = "<group>"; };
 		C7D0261C1F47838F00E35DB0 /* miniz_tinfl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = miniz_tinfl.c; path = ../code/externals/miniz/miniz_tinfl.c; sourceTree = "<group>"; };
 		C7D0261D1F47838F00E35DB0 /* miniz.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = miniz.c; path = ../code/externals/miniz/miniz.c; sourceTree = "<group>"; };
+		C7ED826224116A8B00510695 /* system.xc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = system.xc; path = ../code/src/system.xc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -529,8 +528,8 @@
 		C73216EC1D9D2E4200E58DD8 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				C7ED826224116A8B00510695 /* system.xc */,
 				C75342422180E9E1003A789A /* util.c */,
-				C7C76D5E1F369AB700EB0AEE /* system.xc */,
 				C7C76D421F36978A00EB0AEE /* array.c */,
 				C7C76D431F36978A00EB0AEE /* dictionary.c */,
 				C7C76D441F36978A00EB0AEE /* internal.c */,
@@ -907,7 +906,6 @@
 				C753439A2180EB72003A789A /* buffer_dec.c in Sources */,
 				C75343D82180EC32003A789A /* cost.c in Sources */,
 				C7412DD9240E435800354ACC /* bjson.c in Sources */,
-				C7C76D5F1F369AC000EB0AEE /* system.xc in Sources */,
 				C75343E82180EC32003A789A /* upsampling.c in Sources */,
 				C75343D62180EC32003A789A /* ssim.c in Sources */,
 				C75344532180ED56003A789A /* quant_levels_dec_utils.c in Sources */,

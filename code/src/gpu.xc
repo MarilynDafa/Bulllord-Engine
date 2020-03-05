@@ -1004,7 +1004,10 @@ _GpuSwapBuffer()
     {
     }
     else
-        [_PrGpuMem->pGLC presentRenderbuffer:GL_RENDERBUFFER];
+    {
+        EAGLContext* _glc = (EAGLContext*)_PrGpuMem->pGLC;
+        [_glc presentRenderbuffer:GL_RENDERBUFFER];
+    }
 }
 BLVoid
 _GpuAnitIntervention()
