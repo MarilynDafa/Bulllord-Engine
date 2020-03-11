@@ -24,11 +24,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-BL_API BLGuid blGenStream(
+BL_API BLGuid blStreamGen(
 	IN BLAnsi* _Filename);
 
-BL_API BLBool blDeleteStream(
+BL_API BLBool blStreamDelete(
 	IN BLGuid _ID);
 
 BL_API BLVoid* blStreamData(
@@ -80,11 +79,9 @@ BL_API BLBool blArchiveQuery(
 	IN BLAnsi* _Archive,
 	OUT BLU32* _Version);
 
-BL_API BLVoid blPreload(
+BL_API BLVoid blResourcePreload(
 	IN BLAnsi* _Filenames);
-
 #ifdef __cplusplus
 }
 #endif
-
 #endif/* __streamio_h_ */

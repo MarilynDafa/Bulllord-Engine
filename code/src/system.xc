@@ -321,7 +321,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 		GetWindowRect(_PrSystemMem->nHwnd, &_rc);
 		InvalidateRect(_PrSystemMem->nHwnd, &_rc, FALSE);
 		UpdateWindow(_PrSystemMem->nHwnd);
-		blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
 	}
 	break;
 	case WM_GETMINMAXINFO:
@@ -334,7 +334,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
     case WM_DESTROY:
     case WM_CLOSE:
     {
-		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
         SetCursor(LoadCursorW(NULL, IDC_ARROW));
         ReleaseCapture();
         PostQuitMessage(0);
@@ -358,7 +358,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 			else
 				SetCursor(LoadCursorW(NULL, IDC_ARROW));
 		}
-		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_MOVE, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_MOVE, NULL, INVALID_GUID);
 		TRACKMOUSEEVENT _tme;
 		_tme.cbSize = sizeof(_tme);
 		_tme.dwFlags = TME_LEAVE;
@@ -371,32 +371,32 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
     {
 		BLS16 _val= (BLS16)((BLS16)HIWORD(_Wparam) / 120.f);
 		if (_val > 0)
-			blInvokeEvent(BL_ET_MOUSE, MAKEU32(1, _val), BL_ME_WHEEL, NULL, INVALID_GUID);
+			blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(1, _val), BL_ME_WHEEL, NULL, INVALID_GUID);
 		else
-			blInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL, INVALID_GUID);
+			blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL, INVALID_GUID);
 	}
 	break;
     case WM_LBUTTONDOWN:
 	{
-		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_LDOWN, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_LDOWN, NULL, INVALID_GUID);
         SetCapture(_Hwnd);
 	}
 	break;
     case WM_LBUTTONUP:
 	{
-		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_LUP, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_LUP, NULL, INVALID_GUID);
 		ReleaseCapture();
 	}
 	break;
     case WM_RBUTTONDOWN:
     {
-		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_RDOWN, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_RDOWN, NULL, INVALID_GUID);
         SetCapture(_Hwnd);
 	}
 	break;
     case WM_RBUTTONUP:
 	{
-		blInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_RUP, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_MOUSE, (BLU32)_Lparam, BL_ME_RUP, NULL, INVALID_GUID);
 		ReleaseCapture();
 	}
 	break;
@@ -495,24 +495,24 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 			switch (_code)
 			{
 			case BL_KC_A:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_SELECT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_SELECT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			case BL_KC_C:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_COPY, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_COPY, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			case BL_KC_X:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_CUT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_CUT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			case BL_KC_V:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_PASTE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_PASTE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			default:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			}
 		}
 		else
-			blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+			blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 	}
 	break;
 	case WM_KEYUP:
@@ -605,7 +605,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 		}
 		if (_code == BL_KC_LCTRL)
 			_PrSystemMem->bCtrlPressed = FALSE;
-		blInvokeEvent(BL_ET_KEY, MAKEU32(_code, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
 	}
 	break;
 	case WM_CHAR:
@@ -641,7 +641,7 @@ _WndProc(HWND _Hwnd, UINT _Msg, WPARAM _Wparam, LPARAM _Lparam)
 		}
 		else
 			break;
-		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _text, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _text, INVALID_GUID);
     }
 	break;
 	default:
@@ -858,7 +858,7 @@ protected:
 	{
 		if (_GbSystemRunning == 2)
 		{
-			blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+			blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 			_GbSystemRunning = FALSE;
 			_SystemDestroy();
 		}
@@ -875,7 +875,7 @@ protected:
 	{
 		_PrSystemMem->sBoostParam.nScreenWidth = ((BLS32)(0.5f + (((BLF32)(_Sender->Bounds.Width) * (BLF32)Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi) / 96.f)));
 		_PrSystemMem->sBoostParam.nScreenHeight = ((BLS32)(0.5f + (((BLF32)(_Sender->Bounds.Height) * (BLF32)Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi) / 96.f)));
-		blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
 	}
 	BLVoid OnVisibilityChanged(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::VisibilityChangedEventArgs^ _Args)
 	{
@@ -888,7 +888,7 @@ protected:
 #if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
 	BLVoid OnBackButtonPressed(Platform::Object^ _Sender, Windows::Phone::UI::Input::BackPressedEventArgs^ _Args)
 	{
-		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_ESCAPE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_ESCAPE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 	}
 #endif
 	BLVoid OnOrientationChanged(Windows::Graphics::Display::DisplayInformation^ _Sender, Platform::Object^ _Args)
@@ -897,15 +897,15 @@ protected:
 	BLVoid OnPointerPressed(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
 	{
 		_leftmouse = _Args->CurrentPoint->Properties->IsLeftButtonPressed;
-		blInvokeEvent(BL_ET_MOUSE, MAKEU32(_Args->CurrentPoint->Position.Y, _Args->CurrentPoint->Position.X), _leftmouse ? BL_ME_LDOWN : BL_ME_RDOWN, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_Args->CurrentPoint->Position.Y, _Args->CurrentPoint->Position.X), _leftmouse ? BL_ME_LDOWN : BL_ME_RDOWN, NULL, INVALID_GUID);
 	}
 	BLVoid OnPointerReleased(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
 	{
-		blInvokeEvent(BL_ET_MOUSE, MAKEU32(_Args->CurrentPoint->Position.Y, _Args->CurrentPoint->Position.X), _leftmouse ? BL_ME_LUP : BL_ME_RUP, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_Args->CurrentPoint->Position.Y, _Args->CurrentPoint->Position.X), _leftmouse ? BL_ME_LUP : BL_ME_RUP, NULL, INVALID_GUID);
 	}
 	BLVoid OnPointerMoved(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
 	{
-		blInvokeEvent(BL_ET_MOUSE, MAKEU32(_Args->CurrentPoint->Position.Y, _Args->CurrentPoint->Position.X), BL_ME_MOVE, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_Args->CurrentPoint->Position.Y, _Args->CurrentPoint->Position.X), BL_ME_MOVE, NULL, INVALID_GUID);
 	}
 	BLVoid OnPointerEntered(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::PointerEventArgs^ _Args)
 	{
@@ -926,9 +926,9 @@ protected:
 	{
 		BLS32 _val = (BLS32)((BLF32)_Args->CurrentPoint->Properties->MouseWheelDelta / WHEEL_DELTA);
 		if (_val > 0)
-			blInvokeEvent(BL_ET_MOUSE, MAKEU32(1, _val), BL_ME_WHEEL, NULL, INVALID_GUID);
+			blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(1, _val), BL_ME_WHEEL, NULL, INVALID_GUID);
 		else
-			blInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL, INVALID_GUID);
+			blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL, INVALID_GUID);
 	}
 	BLVoid OnKeyDown(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::KeyEventArgs^ _Args)
 	{
@@ -996,24 +996,24 @@ protected:
 			switch (_scancode)
 			{
 			case BL_KC_A:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_SELECT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_SELECT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			case BL_KC_C:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_COPY, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_COPY, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			case BL_KC_X:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_CUT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_CUT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			case BL_KC_V:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_PASTE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_PASTE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			default:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			}
 		}
 		else
-			blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+			blSysInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 	}
 	BLVoid OnKeyUp(Windows::UI::Core::CoreWindow^ _Sender, Windows::UI::Core::KeyEventArgs^ _Args)
 	{
@@ -1076,7 +1076,7 @@ protected:
 		}
 		if (_scancode == BL_KC_LCTRL)
 			_PrSystemMem->bCtrlPressed = FALSE;
-		blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
 	}
 	BLVoid OnLayoutRequested(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextLayoutRequestedEventArgs^ _Args)
 	{
@@ -1102,7 +1102,7 @@ protected:
 	{
 		BLUtf8 _tmp[1024] = { 0 };
 		WideCharToMultiByte(CP_UTF8, 0, _cachestr->Data(), -1, (LPSTR)_tmp, 1024, NULL, NULL);
-		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _tmp, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _tmp, INVALID_GUID);
 		_cachestr = L"";
 	}
 	BLVoid OnSelectionRequested(Windows::UI::Text::Core::CoreTextEditContext^ _Sender, Windows::UI::Text::Core::CoreTextSelectionRequestedEventArgs^ _Args){}
@@ -1195,19 +1195,19 @@ _WndProc(XEvent* _Event)
 			switch (_scancode)
 			{
 			case BL_KC_A:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_SELECT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_SELECT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			case BL_KC_C:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_COPY, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_COPY, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			case BL_KC_X:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_CUT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_CUT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			case BL_KC_V:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_PASTE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_PASTE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			default:
-				blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				break;
 			}
 		}
@@ -1216,7 +1216,7 @@ _WndProc(XEvent* _Event)
             if (_PrSystemMem->nLastCode != _code || _PrSystemMem->nLastCode != _Event->xkey.time)
             {
                 if (_code)
-                    blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+                    blSysInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
             }
             _PrSystemMem->nLastCode = _code;
             if (!_filtered && _PrSystemMem->pIC)
@@ -1232,10 +1232,10 @@ _WndProc(XEvent* _Event)
                     _count = Xutf8LookupString(_PrSystemMem->pIC, &_Event->xkey, _temp, _count, NULL, &_status);
                 }
                 if (_status == XLookupChars || _status == XLookupBoth)
-                    blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _temp, INVALID_GUID);
+                    blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _temp, INVALID_GUID);
             }
             else
-                blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+                blSysInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
         }
     }
     break;
@@ -1247,34 +1247,34 @@ _WndProc(XEvent* _Event)
         BLEnum _scancode = SCANCODE_INTERNAL[_code - _mincode];
 		if (_scancode == BL_KC_LCTRL)
 			_PrSystemMem->bCtrlPressed = FALSE;
-		blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
     }
     break;
     case ButtonPress:
     {
         if (_Event->xbutton.button == Button1)
-        	blInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_LDOWN, NULL, INVALID_GUID);
+        	blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_LDOWN, NULL, INVALID_GUID);
         else if (_Event->xbutton.button == Button3)
-        	blInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_RDOWN, NULL, INVALID_GUID);
+        	blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_RDOWN, NULL, INVALID_GUID);
         else if (_Event->xbutton.button == Button4)
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(1, 1), BL_ME_WHEEL, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(1, 1), BL_ME_WHEEL, NULL, INVALID_GUID);
         else if (_Event->xbutton.button == Button5)
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(0, 1), BL_ME_WHEEL, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(0, 1), BL_ME_WHEEL, NULL, INVALID_GUID);
     }
     break;
     case ButtonRelease:
     {
         if (_Event->xbutton.button == Button1)
-        	blInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_LUP, NULL, INVALID_GUID);
+        	blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_LUP, NULL, INVALID_GUID);
         else if(_Event->xbutton.button == Button3)
-        	blInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_RUP, NULL, INVALID_GUID);
+        	blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_RUP, NULL, INVALID_GUID);
     }
     break;
     case MotionNotify:
     {
         _PrSystemMem->nMouseX = _Event->xmotion.x;
         _PrSystemMem->nMouseY = _Event->xmotion.y;
-        blInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_MOVE, NULL, INVALID_GUID);
+        blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_PrSystemMem->nMouseY, _PrSystemMem->nMouseX), BL_ME_MOVE, NULL, INVALID_GUID);
     }
     break;
     case EnterNotify:
@@ -1300,7 +1300,7 @@ _WndProc(XEvent* _Event)
     {
         _PrSystemMem->sBoostParam.nScreenWidth = _Event->xconfigure.width;
         _PrSystemMem->sBoostParam.nScreenHeight = _Event->xconfigure.height;
-		blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
     }
     break;
     case ClientMessage:
@@ -1316,7 +1316,7 @@ _WndProc(XEvent* _Event)
                 return;
             if (_protocol == _PrSystemMem->nDelwin)
             {
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
                 _GbSystemRunning = FALSE;
             }
             else if (_protocol == _PrSystemMem->nPing)
@@ -1347,7 +1347,7 @@ _WndProc(XEvent* _Event)
     }
     break;
     case DestroyNotify:
-		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
     break;
     default: break;
     }
@@ -1627,7 +1627,7 @@ extern "C" {
 	JNIEXPORT BLVoid JNICALL Java_org_bulllord_app_BLActivity_textChanged(JNIEnv* _Env, jobject, jstring _Text)
 	{
 		const BLUtf8* _utf8str = (const BLUtf8*)_Env->GetStringUTFChars(_Text, NULL);
-		blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str, INVALID_GUID);
+		blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str, INVALID_GUID);
 		_Env->ReleaseStringUTFChars(_Text, (const BLAnsi*)_utf8str);
 	}
 	JNIEXPORT BLVoid JNICALL Java_org_bulllord_app_BLActivity_activityReady(JNIEnv* _Env, jobject, jobject _Activity, jint _Aep)
@@ -1837,7 +1837,7 @@ _PollMsg()
 				break;
 			case 15:
 				pthread_mutex_lock(&_PrSystemMem->sMutex);
-				blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				_GbSystemRunning = FALSE;
 				pthread_mutex_unlock(&_PrSystemMem->sMutex);
 				break;
@@ -1892,7 +1892,7 @@ _PollMsg()
                         {
                             BLS32 _x = AMotionEvent_getX(_event, _action >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
                             BLS32 _y = AMotionEvent_getY(_event, _action >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
-                            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
+                            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
                             AInputQueue_finishEvent(_PrSystemMem->pInputQueue, _event, 1);
                         }
                         break;
@@ -1900,7 +1900,7 @@ _PollMsg()
                         {
                             BLS32 _x = AMotionEvent_getX(_event, _action >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
                             BLS32 _y = AMotionEvent_getY(_event, _action >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
-                            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_LDOWN, NULL, INVALID_GUID);
+                            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_LDOWN, NULL, INVALID_GUID);
                             AInputQueue_finishEvent(_PrSystemMem->pInputQueue, _event, 1);
                         }
                         break;
@@ -1908,7 +1908,7 @@ _PollMsg()
                         {
                             BLS32 _x = AMotionEvent_getX(_event, _action >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
                             BLS32 _y = AMotionEvent_getY(_event, _action >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
-                            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_RDOWN, NULL, INVALID_GUID);
+                            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_RDOWN, NULL, INVALID_GUID);
                             AInputQueue_finishEvent(_PrSystemMem->pInputQueue, _event, 1);
                         }
                         break;
@@ -1916,7 +1916,7 @@ _PollMsg()
                         {
                             BLS32 _x = AMotionEvent_getX(_event, _action >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
                             BLS32 _y = AMotionEvent_getY(_event, _action >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
-                            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_LUP, NULL, INVALID_GUID);
+                            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_LUP, NULL, INVALID_GUID);
                             AInputQueue_finishEvent(_PrSystemMem->pInputQueue, _event, 1);
                         }
                         break;
@@ -1924,7 +1924,7 @@ _PollMsg()
                         {
                             BLS32 _x = AMotionEvent_getX(_event, _action >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
                             BLS32 _y = AMotionEvent_getY(_event, _action >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT);
-                            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_RUP, NULL, INVALID_GUID);
+                            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_RUP, NULL, INVALID_GUID);
                             AInputQueue_finishEvent(_PrSystemMem->pInputQueue, _event, 1);
                         }
                         break;
@@ -1944,16 +1944,16 @@ _PollMsg()
 						{
 						case AKEY_EVENT_ACTION_DOWN:
 							if (_code == BL_KC_BACKSPACE || _code == BL_KC_RETURN)
-								blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+								blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 							else if(_code == BL_KC_AC_BACK)
-								blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_ESCAPE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+								blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_ESCAPE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 							AInputQueue_finishEvent(_PrSystemMem->pInputQueue, _event, 1);
 							break;
 						case AKEY_EVENT_ACTION_UP:
 							if (_code == BL_KC_BACKSPACE || _code == BL_KC_RETURN)
-								blInvokeEvent(BL_ET_KEY, MAKEU32(_code, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+								blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
 							else if (_code == BL_KC_AC_BACK)
-								blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_ESCAPE, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+								blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_ESCAPE, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
 							else
 							{
 								JNIEnv* _env = _PrSystemMem->pActivity->env;
@@ -1976,7 +1976,7 @@ _PollMsg()
 								_PrSystemMem->pActivity->vm->DetachCurrentThread();
 								BLUtf16 _tmp[2] = { _unicode, 0 };
 								const BLUtf8* _utf8str = blGenUtf8Str(_tmp);
-								blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str, INVALID_GUID);
+								blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _utf8str, INVALID_GUID);
 								blDeleteUtf8Str((BLUtf8*)_utf8str);
 							}
 							AInputQueue_finishEvent(_PrSystemMem->pInputQueue, _event, 1);
@@ -2084,7 +2084,7 @@ _AppEntry(BLVoid* _Param)
 		else
 			break;
 	}
-	blSystemRun(NULL, 84, 84, 84, 84, 1, 1, 1, 1, NULL, NULL, NULL);
+	blSysRun(NULL, 84, 84, 84, 84, 1, 1, 1, 1, NULL, NULL, NULL);
 	pthread_mutex_lock(&_PrSystemMem->sMutex);
 	if (_PrSystemMem->pSavedState != NULL)
 	{
@@ -2122,11 +2122,11 @@ _AppEntry(BLVoid* _Param)
     NSTrackingAreaOptions _options = NSTrackingMouseEnteredAndExited|NSTrackingActiveAlways|NSTrackingAssumeInside;
     _area = [[NSTrackingArea alloc] initWithRect:_view.bounds options:_options owner:_view userInfo:nil];
     [_view addTrackingArea:_area];
-	blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
+	blSysInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
 }
 - (BLVoid)close
 {
-	blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+	blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
     _GbSystemRunning = FALSE;
     [_PrSystemMem->pWindow setDelegate:nil];
     if ([_PrSystemMem->pWindow nextResponder] == self)
@@ -2158,7 +2158,7 @@ _AppEntry(BLVoid* _Param)
         _str = (const BLUtf8*)[[_String string] UTF8String];
     else
         _str = (const BLUtf8*)[_String UTF8String];
-    blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _str, INVALID_GUID);
+    blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, _str, INVALID_GUID);
 }
 - (BLVoid)insertText:(id)_String
 {
@@ -2320,7 +2320,7 @@ _PollMsg()
 							NSPoint _origin = [_PrSystemMem->pWindow frame].origin;
 							BLU32 _x = _pos.x - _origin.x;
 							BLU32 _y = _PrSystemMem->sBoostParam.nScreenHeight - _pos.y + _origin.y;
-							blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_LDOWN, NULL, INVALID_GUID);
+							blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_LDOWN, NULL, INVALID_GUID);
 						}
 					}
 				}
@@ -2335,7 +2335,7 @@ _PollMsg()
 							NSPoint _origin = [_PrSystemMem->pWindow frame].origin;
 							BLU32 _x = _pos.x - _origin.x;
 							BLU32 _y = _PrSystemMem->sBoostParam.nScreenHeight - _pos.y + _origin.y;
-							blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_RDOWN, NULL, INVALID_GUID);
+							blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_RDOWN, NULL, INVALID_GUID);
 						}
 					}
 				}
@@ -2350,7 +2350,7 @@ _PollMsg()
 							NSPoint _origin = [_PrSystemMem->pWindow frame].origin;
 							BLU32 _x = _pos.x - _origin.x;
 							BLU32 _y = _PrSystemMem->sBoostParam.nScreenHeight - _pos.y + _origin.y;
-							blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_LUP, NULL, INVALID_GUID);
+							blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_LUP, NULL, INVALID_GUID);
 						}
 					}
 				}
@@ -2365,7 +2365,7 @@ _PollMsg()
 							NSPoint _origin = [_PrSystemMem->pWindow frame].origin;
 							BLU32 _x = _pos.x - _origin.x;
 							BLU32 _y = _PrSystemMem->sBoostParam.nScreenHeight - _pos.y + _origin.y;
-							blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_RUP, NULL, INVALID_GUID);
+							blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_RUP, NULL, INVALID_GUID);
 						}
 					}
 				}
@@ -2380,7 +2380,7 @@ _PollMsg()
 							NSPoint _origin = [_PrSystemMem->pWindow frame].origin;
 							BLU32 _x = _pos.x - _origin.x;
 							BLU32 _y = _PrSystemMem->sBoostParam.nScreenHeight - _pos.y + _origin.y;
-							blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
+							blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
 						}
 					}
 				}
@@ -2398,9 +2398,9 @@ _PollMsg()
 						_delta = [_event deltaY];
 					_delta *= 10;
 					if (_delta < 0)
-						blInvokeEvent(BL_ET_MOUSE, MAKEU32(1, (BLS32)-_delta), BL_ME_WHEEL, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(1, (BLS32)-_delta), BL_ME_WHEEL, NULL, INVALID_GUID);
 					else
-						blInvokeEvent(BL_ET_MOUSE, MAKEU32(0, (BLS32)_delta), BL_ME_WHEEL, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(0, (BLS32)_delta), BL_ME_WHEEL, NULL, INVALID_GUID);
 				}
                 break;
 				case NSKeyDown:
@@ -2411,29 +2411,29 @@ _PollMsg()
 						switch (_code)
 						{
 							case BL_KC_A:
-								blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_SELECT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+								blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_SELECT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 								break;
 							case BL_KC_C:
-								blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_COPY, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+								blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_COPY, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 								break;
 							case BL_KC_X:
-								blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_CUT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+								blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_CUT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 								break;
 							case BL_KC_V:
-								blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_PASTE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+								blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_PASTE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 								break;
 							default:
-								blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+								blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 								break;
 						}
 					}
 					else
-						blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 				}
                 break;
 				case NSKeyUp:
 				{
-					blInvokeEvent(BL_ET_KEY, MAKEU32(SCANCODE_INTERNAL[[_event keyCode]], FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+					blSysInvokeEvent(BL_ET_KEY, MAKEU32(SCANCODE_INTERNAL[[_event keyCode]], FALSE), BL_ET_KEY, NULL, INVALID_GUID);
 				}
                 break;
 				case NSFlagsChanged:
@@ -2442,26 +2442,26 @@ _PollMsg()
 					NSEventModifierFlags _flags = [_event modifierFlags];
 					if (_code == BL_KC_CAPSLOCK)
 					{
-						blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
-						blInvokeEvent(BL_ET_KEY, MAKEU32(_code, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
 						break;
 					}
 					if (_flags & NSFunctionKeyMask)
-						blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 					else if (_flags & NSAlternateKeyMask)
-						blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 					else if (_flags & NSControlKeyMask)
-						blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 					else if (_flags & NSShiftKeyMask)
-						blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 					else if (_flags & NSNumericPadKeyMask)
-						blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 					else if (_flags & NSHelpKeyMask)
-						blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 					else if (_flags & NSCommandKeyMask)
 					{
 						_PrSystemMem->bCtrlPressed = TRUE;
-						blInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+						blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
 					}
 					else
 					{
@@ -2469,10 +2469,10 @@ _PollMsg()
 						{
 							if (_code == BL_KC_LGUI || _code == BL_KC_RGUI)
 								_PrSystemMem->bCtrlPressed = FALSE;
-							blInvokeEvent(BL_ET_KEY, MAKEU32(_code, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+							blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
 						}
 						else
-							blInvokeEvent(BL_ET_KEY, MAKEU32(_code, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+							blSysInvokeEvent(BL_ET_KEY, MAKEU32(_code, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
 					}
 				}
                 break;
@@ -2543,12 +2543,12 @@ _CloseWindow()
         if (_FFDown == _touch)
         {
             CGPoint _location = [self touchLocation:_touch shouldNormalize:NO];
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_location.y * _PrSystemMem->nRetinaScale, _location.x * _PrSystemMem->nRetinaScale), BL_ME_LDOWN, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_location.y * _PrSystemMem->nRetinaScale, _location.x * _PrSystemMem->nRetinaScale), BL_ME_LDOWN, NULL, INVALID_GUID);
         }
         else
         {
             CGPoint _location = [self touchLocation:_touch shouldNormalize:YES];
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_location.y * _PrSystemMem->nRetinaScale, _location.x * _PrSystemMem->nRetinaScale), BL_ME_RDOWN, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_location.y * _PrSystemMem->nRetinaScale, _location.x * _PrSystemMem->nRetinaScale), BL_ME_RDOWN, NULL, INVALID_GUID);
         }
     }
 }
@@ -2559,13 +2559,13 @@ _CloseWindow()
         if (_touch == _FFDown)
         {
             CGPoint _location = [self touchLocation:_touch shouldNormalize:NO];
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_location.y * _PrSystemMem->nRetinaScale, _location.x * _PrSystemMem->nRetinaScale), BL_ME_LUP, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_location.y * _PrSystemMem->nRetinaScale, _location.x * _PrSystemMem->nRetinaScale), BL_ME_LUP, NULL, INVALID_GUID);
             _FFDown = nil;
         }
         else
         {
             CGPoint _location = [self touchLocation:_touch shouldNormalize:YES];
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_location.y * _PrSystemMem->nRetinaScale, _location.x * _PrSystemMem->nRetinaScale), BL_ME_RUP, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_location.y * _PrSystemMem->nRetinaScale, _location.x * _PrSystemMem->nRetinaScale), BL_ME_RUP, NULL, INVALID_GUID);
         }
     }
 }
@@ -2578,7 +2578,7 @@ _CloseWindow()
     for (UITouch* _touch in _Touches)
     {
         CGPoint _location = [self touchLocation:_touch shouldNormalize:NO];
-        blInvokeEvent(BL_ET_MOUSE, MAKEU32(_location.y * _PrSystemMem->nRetinaScale, _location.x * _PrSystemMem->nRetinaScale), BL_ME_MOVE, NULL, INVALID_GUID);
+        blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_location.y * _PrSystemMem->nRetinaScale, _location.x * _PrSystemMem->nRetinaScale), BL_ME_MOVE, NULL, INVALID_GUID);
     }
 }
 @end
@@ -2747,17 +2747,17 @@ _CloseWindow()
     NSUInteger _len = _String.length;
     if (_len == 0)
     {
-        blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_BACKSPACE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
-        blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_BACKSPACE, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+        blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_BACKSPACE, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+        blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_BACKSPACE, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
     }
     else
-        blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, [_String UTF8String], INVALID_GUID);
+        blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_UNKNOWN, FALSE), BL_ET_KEY, [_String UTF8String], INVALID_GUID);
     return NO;
 }
 - (BOOL)textFieldShouldReturn:(UITextField*)_TextField
 {
-    blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_RETURN, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
-    blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_RETURN, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+    blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_RETURN, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+    blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_RETURN, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
     [_PrSystemMem->pTICcxt resignFirstResponder];
     return YES;
 }
@@ -2864,7 +2864,7 @@ _CloseWindow()
 - (BLVoid)applicationDidEnterBackground:(UIApplication*)_App { _GbSystemRunning = 2; }
 - (BLVoid)applicationWillTerminate:(UIApplication*)_App
 {
-	blInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+	blSysInvokeEvent(BL_ET_KEY, MAKEU32(BL_KC_EXIT, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
     _GbSystemRunning = FALSE;
     _SystemDestroy();
 }
@@ -2914,10 +2914,10 @@ _KeyProc(BLS32 _EventType, const EmscriptenKeyboardEvent* _KeyEvent, BLVoid* _Us
 	BLUtf8 _text[5];
     switch (_EventType) {
         case EMSCRIPTEN_EVENT_KEYDOWN:
-            blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, TRUE), BL_ET_KEY, NULL, INVALID_GUID);
             break;
         case EMSCRIPTEN_EVENT_KEYUP:
-            blInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_KEY, MAKEU32(_scancode, FALSE), BL_ET_KEY, NULL, INVALID_GUID);
             break;
         default:
             break;
@@ -2935,13 +2935,13 @@ _TouchProc(BLS32 _EventType, const EmscriptenTouchEvent* _TouchEvent, BLVoid* _U
         switch (_EventType)
         {
             case EMSCRIPTEN_EVENT_TOUCHSTART:
-                blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _i = 0 ? BL_ME_LDOWN : BL_ME_RDOWN , NULL, INVALID_GUID);
+                blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _i = 0 ? BL_ME_LDOWN : BL_ME_RDOWN , NULL, INVALID_GUID);
                 break;
             case EMSCRIPTEN_EVENT_TOUCHEND:
-                blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _i = 0 ? BL_ME_LUP : BL_ME_RUP, NULL, INVALID_GUID);
+                blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _i = 0 ? BL_ME_LUP : BL_ME_RUP, NULL, INVALID_GUID);
                 break;
             case EMSCRIPTEN_EVENT_TOUCHMOVE:
-                blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
+                blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
                 break;
             default:
                 break;
@@ -2957,13 +2957,13 @@ _MouseProc(BLS32 _EventType, const EmscriptenMouseEvent* _MouseEvent, BLVoid* _U
     switch (_EventType)
     {
         case EMSCRIPTEN_EVENT_MOUSEDOWN:
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _MouseEvent->button == 0 ? BL_ME_LDOWN : BL_ME_RDOWN, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _MouseEvent->button == 0 ? BL_ME_LDOWN : BL_ME_RDOWN, NULL, INVALID_GUID);
             break;
         case EMSCRIPTEN_EVENT_MOUSEUP:
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _MouseEvent->button == 0 ? BL_ME_LUP : BL_ME_RUP, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), _MouseEvent->button == 0 ? BL_ME_LUP : BL_ME_RUP, NULL, INVALID_GUID);
             break;
         case EMSCRIPTEN_EVENT_MOUSEMOVE:
-            blInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
+            blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(_y, _x), BL_ME_MOVE, NULL, INVALID_GUID);
             break;
         case EMSCRIPTEN_EVENT_MOUSEENTER:
         case EMSCRIPTEN_EVENT_MOUSELEAVE:
@@ -2982,9 +2982,9 @@ _ScrollProc(BLS32 _EventType, const EmscriptenWheelEvent* _WheelEvent, BLVoid* _
 {
     BLS16 _val = _WheelEvent->deltaY < 0 ? 1 : -1;
     if (_val > 0)
-        blInvokeEvent(BL_ET_MOUSE, MAKEU32(1, _val), BL_ME_WHEEL, NULL, INVALID_GUID);
+        blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(1, _val), BL_ME_WHEEL, NULL, INVALID_GUID);
     else
-        blInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL, INVALID_GUID);
+        blSysInvokeEvent(BL_ET_MOUSE, MAKEU32(0, -_val), BL_ME_WHEEL, NULL, INVALID_GUID);
     return TRUE;
 }
 EM_BOOL 
@@ -2994,7 +2994,7 @@ _FullscreenProc(BLS32 _EventType, const BLVoid* _Reserved, BLVoid* _UserData)
     emscripten_get_canvas_element_size(NULL, &_Width, &_Height);
 	_PrSystemMem->sBoostParam.nScreenWidth = _Width;
 	_PrSystemMem->sBoostParam.nScreenHeight = _Height;
-	blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);	
+	blSysInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);	
 	return TRUE;
 }
 BLVoid
@@ -3015,7 +3015,7 @@ _ExitFullscreen(BLU32 _Width, BLU32 _Height)
     emscripten_set_canvas_element_size(NULL, _Width, _Height);
 	_PrSystemMem->sBoostParam.nScreenWidth = _Width;
 	_PrSystemMem->sBoostParam.nScreenHeight = _Height;
-	blInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
+	blSysInvokeEvent(BL_ET_SYSTEM, BL_SE_RESOLUTION, 0, NULL, INVALID_GUID);
 }
 BLVoid
 _ShowWindow()
@@ -3173,7 +3173,7 @@ _PollEvent()
 BLVoid
 _SystemInit()
 {
-	_PrSystemMem->nSysTime = blTickCounts();
+	_PrSystemMem->nSysTime = blSysTickCounts();
 	_UtilsInit();
 #if defined(BL_PLATFORM_ANDROID)
 	_StreamIOInit(_PrSystemMem->pActivity->assetManager);
@@ -3199,7 +3199,7 @@ _SystemStep()
 #endif
 {
 	blFrameBufferClear(TRUE, TRUE, TRUE);
-	BLU32 _now = blTickCounts();
+	BLU32 _now = blSysTickCounts();
 	BLU32 _delta = _now - _PrSystemMem->nSysTime;
 	_PrSystemMem->nSysTime = _now;
 	for (BLU32 _idx = 0 ; _idx < 8; ++_idx)
@@ -3208,7 +3208,7 @@ _SystemStep()
 		{
 			if (_PrSystemMem->nSysTime - _PrSystemMem->aTimers[_idx].nLastTime >= (BLU32)_PrSystemMem->aTimers[_idx].fElapse * 1000)
 			{
-				blInvokeEvent(BL_ET_SYSTEM, BL_SE_TIMER, _PrSystemMem->aTimers[_idx].nId, NULL, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_SYSTEM, BL_SE_TIMER, _PrSystemMem->aTimers[_idx].nId, NULL, INVALID_GUID);
 				_PrSystemMem->aTimers[_idx].nLastTime = _PrSystemMem->nSysTime;
 			}
 		}
@@ -3244,19 +3244,19 @@ _SystemDestroy()
 		_GbTVMode = FALSE;
 	BLAnsi _tmp[256] = { 0 };
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenWidth);
-	blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, TRUE);
+	blSysEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenHeight);
-	blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, TRUE);
+	blSysEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	if (_PrSystemMem->sBoostParam.bFullscreen)
 		strcpy(_tmp, "true");
 	else
 		strcpy(_tmp, "false");
-	blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, TRUE);
+	blSysEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.eQuality);
-	blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, TRUE);
+	blSysEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, TRUE);
 	_PrSystemMem->pEndFunc();
     _NetworkDestroy();
     _SpriteDestroy();
@@ -3276,7 +3276,7 @@ _SystemDestroy()
 #endif
 }
 BLEnum
-blPlatformIdentity()
+blSysPlatformId()
 {
 #if defined(BL_PLATFORM_WIN32)
     return BL_PLATFORM_WIN32;
@@ -3297,7 +3297,7 @@ blPlatformIdentity()
 #endif
 }
 BLU32
-blCPUCoresCounts()
+blSysCpuCores()
 {
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
     SYSTEM_INFO _systemInfo;
@@ -3320,7 +3320,7 @@ blCPUCoresCounts()
 #endif
 }
 BLU32
-blTickCounts()
+blSysTickCounts()
 {
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	static LARGE_INTEGER _litime = { 0 };
@@ -3351,7 +3351,7 @@ blTickCounts()
     return 0;
 }
 BLVoid
-blTickDelay(IN BLU32 _Ms)
+blSysTickDelay(IN BLU32 _Ms)
 {
 	if (_Ms == 0)
 		return;
@@ -3375,7 +3375,7 @@ blTickDelay(IN BLU32 _Ms)
 #endif
 }
 const BLAnsi*
-blUserFolderDir()
+blSysUserFolderDir()
 {
 #if defined(BL_PLATFORM_WIN32)
     if (!_PrSystemMem->aUserDir[0])
@@ -3503,7 +3503,7 @@ blUserFolderDir()
 #endif
 }
 const BLAnsi*
-blWorkingDir()
+blSysWorkingDir()
 {
 #if defined(BL_PLATFORM_WIN32)
 	if (!_PrSystemMem->aWorkDir[0])
@@ -3605,7 +3605,7 @@ blWorkingDir()
 	return _PrSystemMem->aWorkDir;
 }
 BLBool
-blClipboardCopy(IN BLUtf8* _Text)
+blSysClipboardCopy(IN BLUtf8* _Text)
 {
 	if (!_Text)
 		return FALSE;
@@ -3689,7 +3689,7 @@ blClipboardCopy(IN BLUtf8* _Text)
 #endif
 }
 const BLUtf8*
-blClipboardPaste()
+blSysClipboardPaste()
 {
 #if defined(BL_PLATFORM_WIN32)
 	memset(_PrSystemMem->aClipboard, 0, 1024);
@@ -3764,7 +3764,7 @@ blClipboardPaste()
 	return _PrSystemMem->aClipboard;
 }
 BLBool
-blPeekEvent(IN BLBool _LClick, IN BLEnum _Key)
+blSysPeekEvent(IN BLBool _LClick, IN BLEnum _Key)
 {
 	BLBool _triggered = FALSE;
 	_PollMsg();
@@ -3805,7 +3805,7 @@ blPeekEvent(IN BLBool _LClick, IN BLEnum _Key)
 	return _triggered;
 }
 BLBool
-blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
+blSysEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 {
 	BLAnsi _path[260] = { 0 };
 #if defined(BL_PLATFORM_WEB)
@@ -3825,7 +3825,7 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 #elif defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 	HANDLE _fp;
     WIN32_FILE_ATTRIBUTE_DATA _wfad;
-    strcpy_s(_path, 260, blUserFolderDir());
+    strcpy_s(_path, 260, blSysUserFolderDir());
     strcat_s(_path, 260, "EnvStringOptions");
 	BLBool _fileexist = GetFileAttributesExA(_path, GetFileExInfoStandard, &_wfad) ? TRUE : FALSE;
 	BLDictionary* _tmpdic = NULL;
@@ -3946,7 +3946,7 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 	blDeleteDict(_tmpdic);
 #else
     FILE* _fp;
-    strcpy(_path, blUserFolderDir());
+    strcpy(_path, blSysUserFolderDir());
     strcat(_path, "EnvStringOptions");
 	BLBool _fileexist = (access(_path, 0) != -1) ? TRUE : FALSE;
 	BLDictionary* _tmpdic = NULL;
@@ -4048,7 +4048,7 @@ blEnvVariable(IN BLUtf8* _Section, INOUT BLUtf8 _Value[256], IN BLBool _Set)
 	return TRUE;
 }
 BLVoid
-blOpenURL(IN BLUtf8* _Url)
+blSysOpenURL(IN BLUtf8* _Url)
 {
 	BLUtf8* _absurl;
 	BLBool _malloc = FALSE;
@@ -4122,7 +4122,7 @@ blOpenURL(IN BLUtf8* _Url)
 		free(_absurl);
 }
 BLBool
-blOpenPlugin(IN BLAnsi* _Basename)
+blSysOpenPlugin(IN BLAnsi* _Basename)
 {
 	BLU32 _hashname = blHashString((const BLUtf8*)_Basename);
 	BLU32 _idx = 0;
@@ -4138,12 +4138,12 @@ blOpenPlugin(IN BLAnsi* _Basename)
 	_PrSystemMem->aPlugins[_idx].nHash = _hashname;
     BLAnsi _path[260] = { 0 };
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-    strcpy_s(_path, 260, blWorkingDir());
+    strcpy_s(_path, 260, blSysWorkingDir());
     strcat_s(_path, 260, "lib");
     strcat_s(_path, 260, _Basename);
     strcat_s(_path, 260, "Plugin.dll");
 #elif defined(BL_PLATFORM_LINUX)
-    strcpy(_path, blWorkingDir());
+    strcpy(_path, blSysWorkingDir());
     strcat(_path, "lib");
     strcat(_path, _Basename);
     strcat(_path, "Plugin.so");
@@ -4165,12 +4165,12 @@ blOpenPlugin(IN BLAnsi* _Basename)
 	strcat(_path, _Basename);
 	strcat(_path, "Plugin.so");
 #elif defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_IOS)
-    strcpy(_path, blWorkingDir());
+    strcpy(_path, blSysWorkingDir());
     strcat(_path, "lib");
     strcat(_path, _Basename);
     strcat(_path, "Plugin.dylib");
 #elif defined(BL_PLATFORM_WEB)	
-    strcpy(_path, blWorkingDir());
+    strcpy(_path, blSysWorkingDir());
 	strcat(_path, "lib");
 	strcat(_path, _Basename);
 	strcat(_path, "Plugin.js");
@@ -4205,7 +4205,7 @@ blOpenPlugin(IN BLAnsi* _Basename)
 	strcat(_path, "OpenEXT");
 #endif
 	BLVoid(*_open)(IN BLAnsi*, ...);
-	_open = (BLVoid(*)(IN BLAnsi*, ...))blPluginProcAddress(_Basename, _path);	
+	_open = (BLVoid(*)(IN BLAnsi*, ...))blSysPluginProcAddress(_Basename, _path);	
 #if defined(BL_PLATFORM_WIN32)
 	_open(BL_SDK_VERSION, &_PrSystemMem->nHwnd);
 #elif defined(BL_PLATFORM_UWP)
@@ -4224,7 +4224,7 @@ blOpenPlugin(IN BLAnsi* _Basename)
     return TRUE;
 }
 BLBool
-blClosePlugin(IN BLAnsi* _Basename)
+blSysClosePlugin(IN BLAnsi* _Basename)
 {
 	BLU32 _hashname = blHashString((const BLUtf8*)_Basename);
 	BLU32 _idx = 0;
@@ -4246,7 +4246,7 @@ blClosePlugin(IN BLAnsi* _Basename)
 	strcat(_path, "CloseEXT");
 #endif
 	BLVoid(*_close)(BLVoid);
-	_close = (BLVoid(*)(BLVoid))blPluginProcAddress(_Basename, _path);
+	_close = (BLVoid(*)(BLVoid))blSysPluginProcAddress(_Basename, _path);
 	_close();
 #if defined(BL_PLATFORM_WIN32)
     FreeLibrary(_PrSystemMem->aPlugins[_idx].pHandle);
@@ -4267,7 +4267,7 @@ blClosePlugin(IN BLAnsi* _Basename)
     return TRUE;
 }
 BLVoid*
-blPluginProcAddress(IN BLAnsi* _Basename, IN BLAnsi* _Function)
+blSysPluginProcAddress(IN BLAnsi* _Basename, IN BLAnsi* _Function)
 {
 	BLU32 _hashname = blHashString((const BLUtf8*)_Basename);
 	BLU32 _idx = 0;
@@ -4297,7 +4297,7 @@ blPluginProcAddress(IN BLAnsi* _Basename, IN BLAnsi* _Function)
     return _ret;
 }
 BLVoid
-blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
+blSysAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
 {
 	BLF32 _x = _Xpos, _y = _Ypos;
 	if (_PrSystemMem->sBoostParam.bUseDesignRes)
@@ -4586,7 +4586,7 @@ blAttachIME(IN BLF32 _Xpos, IN BLF32 _Ypos, IN BLEnum _Type)
 #endif
 }
 BLVoid
-blDetachIME(IN BLEnum _Type)
+blSysDetachIME(IN BLEnum _Type)
 {
 #if defined(BL_PLATFORM_WIN32)
 	if (_PrSystemMem->nIMC && _Type == BL_IT_TEXT)
@@ -4644,7 +4644,7 @@ blDetachIME(IN BLEnum _Type)
 #endif
 }
 BLVoid
-blCursorVisiblity(IN BLBool _Show)
+blSysCursorVisiblity(IN BLBool _Show)
 {
 #if defined(BL_PLATFORM_WIN32)
 	ShowCursor(_Show);
@@ -4673,7 +4673,7 @@ blCursorVisiblity(IN BLBool _Show)
 #endif
 }
 BLVoid
-blSubscribeEvent(IN BLEnum _Type, IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid))
+blSysSubscribeEvent(IN BLEnum _Type, IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid))
 {
 	BLU32 _idx = 0;
 	while (_PrSystemMem->pSubscriber[_Type][_idx])
@@ -4681,7 +4681,7 @@ blSubscribeEvent(IN BLEnum _Type, IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, 
 	_PrSystemMem->pSubscriber[_Type][_idx] = _Subscriber;
 }
 BLVoid
-blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _Pparam, IN BLGuid _ID)
+blSysInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _Pparam, IN BLGuid _ID)
 {
 #ifdef BL_PLATFORM_ANDROID
 	BLS32 _busy;
@@ -4764,7 +4764,7 @@ blInvokeEvent(IN BLEnum _Type, IN BLU32 _Uparam, IN BLS32 _Sparam, IN BLVoid* _P
 #endif
 }
 BLVoid
-blDateTime(OUT BLS32* _Year, OUT BLS32* _Month, OUT BLS32* _Day, OUT BLS32* _Hour, OUT BLS32* _Minute, OUT BLS32* _Second, OUT BLS32* _Wday, OUT BLS32* _Yday, OUT BLS32* _Dst)
+blSysDateTime(OUT BLS32* _Year, OUT BLS32* _Month, OUT BLS32* _Day, OUT BLS32* _Hour, OUT BLS32* _Minute, OUT BLS32* _Second, OUT BLS32* _Wday, OUT BLS32* _Yday, OUT BLS32* _Dst)
 {
 	time_t _timer;
 	struct tm* _tblock;
@@ -4781,7 +4781,7 @@ blDateTime(OUT BLS32* _Year, OUT BLS32* _Month, OUT BLS32* _Day, OUT BLS32* _Hou
 	*_Dst = _tblock->tm_isdst;
 }
 BLBool
-blTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
+blSysTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
 {
 	BLU32 _idx = 0;
 	BLBool _full = TRUE;
@@ -4797,11 +4797,11 @@ blTimer(IN BLS32 _PositiveID, IN BLF32 _Elapse)
 		return FALSE;
 	_PrSystemMem->aTimers[_idx].nId = _PositiveID;
 	_PrSystemMem->aTimers[_idx].fElapse = _Elapse;
-	_PrSystemMem->aTimers[_idx].nLastTime = blTickCounts();
+	_PrSystemMem->aTimers[_idx].nLastTime = blSysTickCounts();
 	return TRUE;
 }
 BLVoid
-blWindowQuery(OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _ActualWidth, OUT BLU32* _ActualHeight, OUT BLF32* _RatioX, OUT BLF32* _RatioY)
+blSysWindowQuery(OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _ActualWidth, OUT BLU32* _ActualHeight, OUT BLF32* _RatioX, OUT BLF32* _RatioY)
 {
 	*_Width = _PrSystemMem->sBoostParam.nScreenWidth;
 	*_Height = _PrSystemMem->sBoostParam.nScreenHeight;
@@ -4833,7 +4833,7 @@ blWindowQuery(OUT BLU32* _Width, OUT BLU32* _Height, OUT BLU32* _ActualWidth, OU
 	}
 }
 BLVoid
-blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
+blSysWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
 {
 #if defined(BL_PLATFORM_OSX) || defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_LINUX) || defined(BL_PLATFORM_UWP) || defined(BL_PLATFORM_WEB)
     if (_Fullscreen)
@@ -4842,23 +4842,23 @@ blWindowResize(IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Fullscreen)
         _ExitFullscreen(_Width, _Height);
 	BLAnsi _tmp[256] = { 0 };
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenWidth);
-	blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, TRUE);
+	blSysEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.nScreenHeight);
-	blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, TRUE);
+	blSysEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	if (_PrSystemMem->sBoostParam.bFullscreen)
 		strcpy(_tmp, "true");
 	else
 		strcpy(_tmp, "false");
-	blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, TRUE);
+	blSysEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, TRUE);
 	memset(_tmp, 0, sizeof(_tmp));
 	sprintf(_tmp, "%d", _PrSystemMem->sBoostParam.eQuality);
-	blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, TRUE);
+	blSysEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, TRUE);
 #endif
 }
 BLBool
-blSystemPrepare(IN BLVoid* _Activity, IN BLVoid* _State, IN BLU32 _StateSize)
+blSysPrepare(IN BLVoid* _Activity, IN BLVoid* _State, IN BLU32 _StateSize)
 {
 #if defined(BL_PLATFORM_ANDROID)
 	ANativeActivity* _activity = (ANativeActivity*)_Activity;
@@ -4908,7 +4908,7 @@ blSystemPrepare(IN BLVoid* _Activity, IN BLVoid* _State, IN BLU32 _StateSize)
 	return TRUE;
 }
 BLVoid
-blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _DesignWidth, IN BLU32 _DesignHeight, IN BLBool _UseDesignRes, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))
+blSysRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _DesignWidth, IN BLU32 _DesignHeight, IN BLBool _UseDesignRes, IN BLBool _Fullscreen, IN BLBool _Profiler, IN BLEnum _Quality, IN BLVoid(*_Begin)(BLVoid), IN BLVoid(*_Step)(BLU32), IN BLVoid(*_End)(BLVoid))
 {
 	blDebugOutput("Run %s app:%d x %d", _Appname, _Width, _Height);
 #if defined(BL_PLATFORM_UWP)
@@ -4990,22 +4990,22 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 	if (_Width + _Height == 0)
 	{
 		BLAnsi _tmp[256] = { 0 };
-		if (blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, FALSE))
+		if (blSysEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, FALSE))
 			_PrSystemMem->sBoostParam.nScreenWidth = (BLU32)strtoul(_tmp, NULL, 10);
 		else
 			_PrSystemMem->sBoostParam.nScreenWidth = 0;
 		memset(_tmp, 0, sizeof(_tmp));
-		if (blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, FALSE))
+		if (blSysEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, FALSE))
 			_PrSystemMem->sBoostParam.nScreenHeight = (BLU32)strtoul(_tmp, NULL, 10);
 		else
 			_PrSystemMem->sBoostParam.nScreenHeight = 0;
 		memset(_tmp, 0, sizeof(_tmp));
-		if (blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, FALSE))
+		if (blSysEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, FALSE))
 			_PrSystemMem->sBoostParam.bFullscreen = strcmp(_tmp, "true") ? FALSE : TRUE;
 		else
 			_PrSystemMem->sBoostParam.bFullscreen = FALSE;
 		memset(_tmp, 0, sizeof(_tmp));
-		if (blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, FALSE))
+		if (blSysEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, FALSE))
 			_PrSystemMem->sBoostParam.eQuality = (BLU32)strtoul(_tmp, NULL, 10);
 		else
 			_PrSystemMem->sBoostParam.eQuality = BL_RQ_NORMAL;
@@ -5057,13 +5057,13 @@ blSystemRun(IN BLAnsi* _Appname, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _De
 		FS.mount(IDBFS, {}, '/remote');
 		FS.syncfs(true, function(err) {
 			assert(!err);
-			ccall('blSystemPrepare', 'number', ['number', 'number', 'number'], [0, 0, 0]);
+			ccall('blSysPrepare', 'number', ['number', 'number', 'number'], [0, 0, 0]);
 		});
 	);
 #endif
 }
 BLVoid
-blSystemScriptRun(IN BLAnsi* _Encryptkey)
+blSysScriptRun(IN BLAnsi* _Encryptkey)
 {
 #if defined(BL_PLATFORM_UWP)
 	_PrSystemMem = new _BLSystemMember;
@@ -5087,22 +5087,22 @@ blSystemScriptRun(IN BLAnsi* _Encryptkey)
 	for (BLU32 _idx = 0; _idx < 64; ++_idx)
 		_PrSystemMem->aPlugins[_idx].nHash = 0;
 	BLAnsi _tmp[256] = { 0 };
-	if (blEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, FALSE))
+	if (blSysEnvVariable((const BLUtf8*)"SCREEN_WIDTH", (BLUtf8*)_tmp, FALSE))
 		_PrSystemMem->sBoostParam.nScreenWidth = (BLU32)strtoul(_tmp, NULL, 10);
 	else
 		_PrSystemMem->sBoostParam.nScreenWidth = 0;
 	memset(_tmp, 0, sizeof(_tmp));
-	if (blEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, FALSE))
+	if (blSysEnvVariable((const BLUtf8*)"SCREEN_HEIGHT", (BLUtf8*)_tmp, FALSE))
 		_PrSystemMem->sBoostParam.nScreenHeight = (BLU32)strtoul(_tmp, NULL, 10);
 	else
 		_PrSystemMem->sBoostParam.nScreenHeight = 0;
 	memset(_tmp, 0, sizeof(_tmp));
-	if (blEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, FALSE))
+	if (blSysEnvVariable((const BLUtf8*)"FULLSCREEN", (BLUtf8*)_tmp, FALSE))
 		_PrSystemMem->sBoostParam.bFullscreen = strcmp(_tmp, "true") ? FALSE : TRUE;
 	else
 		_PrSystemMem->sBoostParam.bFullscreen = FALSE;
 	memset(_tmp, 0, sizeof(_tmp));
-	if (blEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, FALSE))
+	if (blSysEnvVariable((const BLUtf8*)"QUALITY", (BLUtf8*)_tmp, FALSE))
 		_PrSystemMem->sBoostParam.eQuality = (BLU32)strtoul(_tmp, NULL, 10);
 	else
 		_PrSystemMem->sBoostParam.eQuality = BL_RQ_NORMAL;

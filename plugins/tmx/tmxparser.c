@@ -173,11 +173,11 @@ void destroyMapInfo(TMXMapInfo* obj)
 bool parseXMLFile(TMXMapInfo* obj, const char* xmlFilename)
 {
 	BLGuid _stream;
-	_stream = blGenStream(xmlFilename);
+	_stream = blStreamGen(xmlFilename);
 	ezxml_t _doc = ezxml_parse_str((BLAnsi*)blStreamData(_stream), blStreamLength(_stream));
 	travelXML(obj, _doc);
 	ezxml_free(_doc);
-	blDeleteStream(_stream);
+	blStreamDelete(_stream);
 	return TRUE;
 }
 void travelXML(TMXMapInfo* obj, ezxml_t node)

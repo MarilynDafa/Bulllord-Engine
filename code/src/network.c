@@ -458,7 +458,7 @@ _OnWGetLoaded(BLU32 _Dummy, BLVoid* _User, BLVoid* _Data, BLU32 _DataSz)
 	blArrayPopFront(_PrNetworkMem->pDownList);
 	blArrayPopFront(_PrNetworkMem->pLocalList);
 	if (_PrNetworkMem->pDownList->nSize)
-		blDownload();
+		blNetDownload();
 	else
 	{
 		EM_ASM(FS.syncfs(false, function(err) {}););
@@ -476,7 +476,7 @@ _OnWGetError(BLU32 _Dummy, BLVoid* _User, BLS32 _Error, const BLAnsi* _Stats)
 		blArrayPopFront(_PrNetworkMem->pDownList);
 		blArrayPopFront(_PrNetworkMem->pLocalList);
 		if (_PrNetworkMem->pDownList->nSize)
-			blDownload();
+			blNetDownload();
 	}
 }
 static BLVoid
@@ -1764,7 +1764,7 @@ _NetworkStep(BLU32 _Delta)
 		{
 			blDeleteThread(_PrNetworkMem->pConnThread);
 			_PrNetworkMem->pConnThread = NULL;
-			blInvokeEvent(BL_ET_NET, 0xFFFFFFFF, 0xFFFFFFFF, NULL, INVALID_GUID);
+			blSysInvokeEvent(BL_ET_NET, 0xFFFFFFFF, 0xFFFFFFFF, NULL, INVALID_GUID);
 		}
 		if (!_PrNetworkMem->bConnected)
 		{
@@ -1772,7 +1772,7 @@ _NetworkStep(BLU32 _Delta)
 			_PrNetworkMem->pSendThread = NULL;
 			blDeleteThread(_PrNetworkMem->pRecvThread);
 			_PrNetworkMem->pRecvThread = NULL;
-			blInvokeEvent(BL_ET_NET, 0, 0, NULL, INVALID_GUID);
+			blSysInvokeEvent(BL_ET_NET, 0, 0, NULL, INVALID_GUID);
 		}
 		blMutexLock(_PrNetworkMem->pRevList->pMutex);
 		{
@@ -1780,7 +1780,7 @@ _NetworkStep(BLU32 _Delta)
 			{
 				BLVoid* _buf = malloc(_iter->nLength);
 				memcpy(_buf, _iter->pBuf, _iter->nLength);
-				blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
+				blSysInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
 				free(_iter->pBuf);
 				free(_iter);
 			}
@@ -1794,7 +1794,7 @@ _NetworkStep(BLU32 _Delta)
 		{
 			BLVoid* _buf = malloc(_iter->nLength);
 			memcpy(_buf, _iter->pBuf, _iter->nLength);
-			blInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
+			blSysInvokeEvent(BL_ET_NET, _iter->nID, _iter->nLength, _buf, INVALID_GUID);
 			free(_iter->pBuf);
 			free(_iter);
 		}
@@ -1847,7 +1847,7 @@ _NetworkStep(BLU32 _Delta)
 #endif
 }
 BLVoid
-blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
+blNetConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 {
 	if (_Type == BL_NT_UDP)
 	{
@@ -1968,7 +1968,7 @@ blConnect(IN BLAnsi* _Host, IN BLU16 _Port, IN BLEnum _Type)
 	}
 }
 BLVoid
-blDisconnect()
+blNetDisconnect()
 {
 	{
 		FOREACH_LIST(_BLNetMsg*, _citer, _PrNetworkMem->pCriList)
@@ -2032,7 +2032,7 @@ blDisconnect()
 	}
 }
 BLVoid 
-blSendNetMsg(IN BLU32 _ID, IN BLAnsi* _JsonData, IN BLBool _Critical, IN BLBool _Overwrite, IN BLEnum _Nettype)
+blNetSendMsg(IN BLU32 _ID, IN BLAnsi* _JsonData, IN BLBool _Critical, IN BLBool _Overwrite, IN BLEnum _Nettype)
 {
 	_BLNetMsg* _msg = (_BLNetMsg*)malloc(sizeof(_BLNetMsg));
 	_msg->nID = _ID;
@@ -2121,7 +2121,7 @@ blSendNetMsg(IN BLU32 _ID, IN BLAnsi* _JsonData, IN BLBool _Critical, IN BLBool 
 	}
 }
 BLBool 
-blHTTPRequest(IN BLAnsi* _Url, IN BLAnsi* _Param, IN BLBool _Get, OUT BLAnsi _Response[1025])
+blNetHTTPRequest(IN BLAnsi* _Url, IN BLAnsi* _Param, IN BLBool _Get, OUT BLAnsi _Response[1025])
 {
 	if (strlen(_Url) >= 1024)
 		return FALSE;
@@ -2370,7 +2370,7 @@ failed:
 	return FALSE;
 }
 BLBool
-blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
+blNetAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 {
 	if (_PrNetworkMem->pDownList->nSize >= 64)
 		return FALSE;
@@ -2383,7 +2383,7 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 	_sz = (BLU32)strlen(_Localpath);
 	BLAnsi* _localpath = (BLAnsi*)malloc(260);
 	memset(_localpath, 0, sizeof(BLAnsi) * 260);
-	strcpy(_localpath, blUserFolderDir());
+	strcpy(_localpath, blSysUserFolderDir());
 	strcat(_localpath, _Localpath);
 	FOREACH_ARRAY(BLAnsi*, _iter, _PrNetworkMem->pDownList)
 	{
@@ -2558,7 +2558,7 @@ blAddDownloadList(IN BLAnsi* _Host, IN BLAnsi* _Localpath, OUT BLU32* _Taskid)
 	return TRUE;
 }
 BLVoid
-blDownload()
+blNetDownload()
 {
 #if defined(BL_PLATFORM_WEB)
 	const BLAnsi* _url = (const BLAnsi*)blArrayFrontElement(_PrNetworkMem->pDownList);
@@ -2573,7 +2573,7 @@ blDownload()
 #endif
 }
 BLVoid
-blProgressQuery(OUT BLU32* _Curtask, OUT BLU32* _Progress, OUT BLU32 _Finish[64])
+blNetDownloadProgressQuery(OUT BLU32* _Curtask, OUT BLU32* _Progress, OUT BLU32 _Finish[64])
 {
 	*_Curtask = _PrNetworkMem->_PrCurDownHash;
 	*_Progress = _PrNetworkMem->nCurDownSize * 100 / _PrNetworkMem->nCurDownTotal;

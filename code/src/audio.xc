@@ -256,7 +256,7 @@ _LoadAudio(BLVoid* _Src, const BLAnsi* _Filename)
 {
 	_BLAudioSource* _src = (_BLAudioSource*)_Src;
 #if !defined(BL_USE_WEB_API)
-	_src->nStream = blGenStream(_Filename);
+	_src->nStream = blStreamGen(_Filename);
 	if (_src->nStream == INVALID_GUID)
 		return FALSE;
 	if (blUtf8Equal(blFileSuffixUtf8((BLUtf8*)_Filename), (const BLUtf8*)"mp3"))
@@ -390,7 +390,7 @@ _UnloadAudio(BLVoid* _Src)
 		mpaudec_clear(_src->pMp3Context);
 		free(_src->pMp3Context);
 	}
-	blDeleteStream(_src->nStream);
+	blStreamDelete(_src->nStream);
 	if (!_src->b3d && _src->bLoop)
 		_PrAudioMem->pBackMusic = NULL;
 	blMutexUnlock(_PrAudioMem->pMusicMutex);
@@ -1541,7 +1541,7 @@ blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 		do {
 			_PrAudioMem->pPCMStream->GetState(&_state);
 			if (_state.BuffersQueued > 6)
-				blTickDelay(10);
+				blSysTickDelay(10);
 		} while (_state.BuffersQueued > 6);
 #elif defined(BL_USE_AL_API)
 		ALint _processed = 0;
@@ -1564,7 +1564,7 @@ blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 		do {
 			alGetSourcei(_PrAudioMem->pPCMStream, AL_BUFFERS_QUEUED, &_queued);
 			if (_queued > 6)
-				blTickDelay(10);
+				blSysTickDelay(10);
 		} while (_queued > 6);
 		assert(alGetError() == AL_NO_ERROR);
 #elif defined(BL_USE_SL_API)
@@ -1575,7 +1575,7 @@ blPCMStreamData(IN BLS16* _PCM, IN BLU32 _Length)
 		do {
 			(*_bufferfunc)->GetState(_bufferfunc, &_queued);
 			if (_queued.count > 6)
-				blTickDelay(10);
+				blSysTickDelay(10);
 		} while (_queued.count > 6);
 #elif defined(BL_USE_WEB_API)
 #endif

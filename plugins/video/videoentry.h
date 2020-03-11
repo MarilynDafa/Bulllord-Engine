@@ -37,4 +37,4 @@ BL_API BLBool blVideoPlayEXT(
 #ifdef __cplusplus
 }
 #endif
-#endif/* __videoentry_h_ */
+#endif/* __video_h_ */

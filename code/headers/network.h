@@ -24,41 +24,38 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-BL_API BLVoid blConnect(
+BL_API BLVoid blNetConnect(
 	IN BLAnsi* _Host, 
 	IN BLU16 _Port, 
 	IN BLEnum _Type);
     
-BL_API BLVoid blDisconnect();
+BL_API BLVoid blNetDisconnect();
     
-BL_API BLVoid blSendNetMsg(
+BL_API BLVoid blNetSendMsg(
 	IN BLU32 _ID,
 	IN BLAnsi* _JsonData,
 	IN BLBool _Critical,
 	IN BLBool _Overwrite,
 	IN BLEnum _Nettype);
 
-BL_API BLBool blHTTPRequest(
+BL_API BLBool blNetHTTPRequest(
 	IN BLAnsi* _Url,
 	IN BLAnsi* _Param,
 	IN BLBool _Get,
 	OUT BLAnsi _Response[1025]);
 
-BL_API BLBool blAddDownloadList(
+BL_API BLBool blNetAddDownloadList(
 	IN BLAnsi* _Host,
 	IN BLAnsi* _Localpath, 
 	OUT BLU32* _Taskid);
 
-BL_API BLVoid blDownload();
+BL_API BLVoid blNetDownload();
 
-BL_API BLVoid blProgressQuery(
+BL_API BLVoid blNetDownloadProgressQuery(
 	OUT BLU32* _Curtask, 
 	OUT BLU32* _Progress,
-	OUT BLU32 _Finish[64]);
-    
+	OUT BLU32 _Finish[64]);    
 #ifdef __cplusplus
 }
 #endif
-
 #endif/* __network_h_ */

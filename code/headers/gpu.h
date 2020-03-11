@@ -24,10 +24,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-BL_API BLVoid blVSync(
+BL_API BLVoid blGpuVSync(
     IN BLBool _On);
 
-BL_API BLVoid blHardwareCapsQuery(
+BL_API BLVoid blGpuCapsQuery(
     OUT BLEnum* _Api,
     OUT BLBool* _CSSupport,
     OUT BLBool* _GSSupport,
@@ -43,7 +43,7 @@ BL_API BLVoid blHardwareCapsQuery(
  _Scissor TRUE
  */
 
-BL_API BLVoid blRasterState(
+BL_API BLVoid blGpuRasterState(
     IN BLEnum _CullMode,
     IN BLS32 _DepthBias,
     IN BLF32 _SlopeScaledDepthBias,
@@ -71,7 +71,7 @@ BL_API BLVoid blRasterState(
  _BackStencilPassOp BL_SO_KEEP
  _BackStencilCompFunc BL_CF_ALWAYS
  */
-BL_API BLVoid blDepthStencilState(
+BL_API BLVoid blGpuDepthStencilState(
     IN BLBool _Depth,
     IN BLBool _Mask,
     IN BLEnum _DepthCompFunc,
@@ -99,7 +99,7 @@ BL_API BLVoid blDepthStencilState(
  _BlendOp BL_BO_ADD
  _BlendOpAlpha BL_BO_ADD
  */
-BL_API BLVoid blBlendState(
+BL_API BLVoid blGpuBlendState(
     IN BLBool _AlphaToCoverage,
     IN BLBool _Blend,
     IN BLEnum _SrcBlendFactor,
@@ -110,9 +110,9 @@ BL_API BLVoid blBlendState(
     IN BLEnum _BlendOpAlpha,
     IN BLBool _Force);
 
-BL_API BLGuid blGenFrameBuffer();
+BL_API BLGuid blFrameBufferGen();
 
-BL_API BLVoid blDeleteFrameBuffer(
+BL_API BLVoid blFrameBufferDelete(
     IN BLGuid _FBO);
 
 BL_API BLVoid blFrameBufferBind(
@@ -136,7 +136,7 @@ BL_API BLVoid blFrameBufferDetach(
     IN BLGuid _FBO,
     IN BLBool _DepthStencil);
 
-BL_API BLGuid blGenTexture(
+BL_API BLGuid blTextureGen(
     IN BLU32 _Hash,
     IN BLEnum _Target,
     IN BLEnum _Format,
@@ -150,7 +150,7 @@ BL_API BLGuid blGenTexture(
     IN BLU32 _Depth,
     IN BLU8* _Data);
 
-BL_API BLBool blDeleteTexture(
+BL_API BLBool blTextureDelete(
     IN BLGuid _Tex);
 
 BL_API BLGuid blTextureGain(
@@ -195,7 +195,7 @@ BL_API BLVoid blTextureQuery(
     OUT BLU32* _Depth,
     OUT BLU32* _Size);
 
-BL_API BLGuid blGenGeometryBuffer(
+BL_API BLGuid blGeometryBufferGen(
     IN BLU32 _Hash,
     IN BLEnum _Topology,
     IN BLBool _Dynamic,
@@ -208,7 +208,7 @@ BL_API BLGuid blGenGeometryBuffer(
     IN BLU32 _IBSz,
     IN BLEnum _IBFmt);
 
-BL_API BLBool blDeleteGeometryBuffer(
+BL_API BLBool blGeometryBufferDelete(
     IN BLGuid _GBO);
 
 BL_API BLGuid blGeometryBufferGain(
@@ -236,31 +236,31 @@ BL_API BLVoid blGeometryInstanceUpdate(
     IN BLVoid* _Buffer,
     IN BLU32 _BufferSz);
 
-BL_API BLGuid blGenTechnique(
+BL_API BLGuid blTechniqueGen(
     IN BLAnsi* _Filename,
 	IN BLAnsi* _Source,
     IN BLBool _ForceCompile);
 
-BL_API BLBool blDeleteTechnique(
+BL_API BLBool blTechniqueDelete(
     IN BLGuid _Tech);
 
 BL_API BLGuid blTechniqueGain(
     IN BLU32 _Hash);
 
-BL_API BLVoid blTechUniform(
+BL_API BLVoid blTechniqueUniform(
     IN BLGuid _Tech,
     IN BLEnum _Type,
     IN BLAnsi* _Name,
     IN BLVoid* _Data,
     IN BLU32 _DataSz);
 
-BL_API BLVoid blTechSampler(
+BL_API BLVoid blTechniqueSampler(
     IN BLGuid _Tech,
     IN BLAnsi* _Name,
     IN BLGuid _Tex,
     IN BLU32 _Unit);
 
-BL_API BLVoid blDraw(
+BL_API BLVoid blTechniqueDraw(
     IN BLGuid _Tech,
     IN BLGuid _GBO,
     IN BLU32 _Instance);

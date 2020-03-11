@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{13bd0d4b-a78e-43c4-a878-51b6bff8ca9f}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunkentry.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\chipmunk.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\chipmunk_ffi.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\chipmunk_private.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\chipmunk_structs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\chipmunk_types.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\chipmunk_unsafe.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpArbiter.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpBB.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpBody.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpConstraint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpDampedRotarySpring.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpDampedSpring.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpGearJoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpGrooveJoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpMarch.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpPinJoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpPivotJoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpPolyShape.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpRatchetJoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpRobust.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpRotaryLimitJoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpShape.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpSimpleMotor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpSlideJoint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpSpace.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpSpatialIndex.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpTransform.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\cpVect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)chipmunk\prime.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunkentry.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\chipmunk.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpArbiter.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpArray.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpBBTree.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpBody.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpCollision.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpConstraint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpDampedRotarySpring.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpDampedSpring.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpGearJoint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpGrooveJoint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpHashSet.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpMarch.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpPinJoint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpPivotJoint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpPolyShape.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpRatchetJoint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpRobust.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpRotaryLimitJoint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpShape.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpSimpleMotor.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpSlideJoint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpSpace.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpSpaceComponent.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpSpaceDebug.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpSpaceHash.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpSpaceQuery.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpSpaceStep.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpSpatialIndex.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)chipmunk\cpSweep1D.c" />
+  </ItemGroup>
+</Project>

@@ -98,14 +98,14 @@ _PipelineStateRefreshGL()
 		{
 			BLF32 _rx, _ry;
 			BLU32 _w, _h, _aw, _ah;
-			blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+			blSysWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 			GL_CHECK_INTERNAL(glScissor(0, 0, _w, _h));
 		}
 		else
 		{
 			BLF32 _rx, _ry;
 			BLU32 _w, _h, _aw, _ah;
-			blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+			blSysWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 			BLS32 _scissorx = (BLS32)(_PrGpuMem->sPipelineState.nScissorX);
 			BLS32 _scissory = (BLS32)(_ah - _PrGpuMem->sPipelineState.nScissorH - _PrGpuMem->sPipelineState.nScissorY);
 			BLS32 _scissorw = (BLS32)(_PrGpuMem->sPipelineState.nScissorW);
@@ -777,7 +777,7 @@ _BindFrameBufferGL(IN BLGuid _FBO, IN BLBool _Bind)
 	_BLFrameBuffer* _fbo = (_BLFrameBuffer*)blGuidAsPointer(_FBO);
 	BLU32 _w, _h, _aw, _ah;
 	BLF32 _rx, _ry;
-	blWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
+	blSysWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
 	if (_Bind)
 	{
 		GL_CHECK_INTERNAL(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &_fbo->uData.sGL.nPrevHandle));

@@ -24,7 +24,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-BL_API BLVoid blRegistExternalMethod(
+BL_API BLVoid blSpriteRegistExternal(
 	IN BLAnsi* _Suffix,
 	IN BLBool(*_LoadCB)(BLGuid, const BLAnsi*, BLVoid**),
 	IN BLBool(*_SetupCB)(BLGuid, BLVoid**),
@@ -32,7 +32,7 @@ BL_API BLVoid blRegistExternalMethod(
 	IN BLBool(*_ReleaseCB)(BLGuid, BLVoid**),
 	IN BLVoid(*_DrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**));
 
-BL_API BLGuid blGenImageSprite(
+BL_API BLGuid blSpriteImageGen(
 	IN BLAnsi* _Filename,
 	IN BLAnsi* _Tag,
     IN BLF32 _Width,
@@ -41,7 +41,7 @@ BL_API BLGuid blGenImageSprite(
 	IN BLU32 _FPS,
 	IN BLBool _AsTile);
 
-BL_API BLGuid blGenTextSprite(
+BL_API BLGuid blSpriteTextGen(
 	IN BLUtf8* _Text,
 	IN BLU32 _TxtColor,
 	IN BLEnum _TxtAlignmentH,
@@ -54,15 +54,15 @@ BL_API BLGuid blGenTextSprite(
 	IN BLBool _Italics,
 	IN BLF32 _Zv);
 
-BL_API BLVoid blDeleteSprite(
+BL_API BLVoid blSpriteDelete(
 	IN BLGuid _ID);
 
-BL_API BLGuid blGenSpriteRenderTexture(
+BL_API BLGuid blSpriteRenderTextureGen(
 	IN BLGuid _ID,
 	IN BLU32 _Width,
 	IN BLU32 _Height);
 
-BL_API BLVoid blDeleteSpriteRenderTexture(
+BL_API BLVoid blSpriteRenderTextureDelete(
 	IN BLGuid _ID,
 	IN BLGuid _Tex);
 
@@ -276,17 +276,17 @@ BL_API BLBool blSpriteActionAlpha(
 	IN BLF32 _Time,
 	IN BLBool _Loop);
     
-BL_API BLVoid blViewportQuery(
+BL_API BLVoid blSpriteViewportQuery(
     OUT BLF32* _LTPosX,
     OUT BLF32* _LTPosY,
     OUT BLF32* _RBPosX,
     OUT BLF32* _RBPosY);
 
-BL_API BLVoid blViewportMoveTo(
+BL_API BLVoid blSpriteViewportMoveTo(
 	IN BLF32 _XPos,
 	IN BLF32 _YPos);
 
-BL_API BLVoid blViewportShake(
+BL_API BLVoid blSpriteViewportShake(
 	IN BLF32 _Time,
 	IN BLBool _Vertical,
 	IN BLF32 _Force);

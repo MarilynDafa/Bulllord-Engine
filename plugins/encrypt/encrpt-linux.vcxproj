@@ -191,20 +191,30 @@
     <Link>
       <AdditionalDependencies>-lBulllord;$(StlAdditionalDependencies);%(Link.AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>/root/projects/bin/linux;%(Link.AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>-m32 -Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BL_EXPORT;__linux__;</PreprocessorDefinitions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+      <PositionIndependentCode>true</PositionIndependentCode>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <Link>
       <AdditionalDependencies>-lBulllord;$(StlAdditionalDependencies);%(Link.AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>/root/projects/bin/linux;%(Link.AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>-m32 -Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BL_EXPORT;__linux__;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+      <PositionIndependentCode>true</PositionIndependentCode>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -35,7 +35,7 @@ BL_API BLVoid blUIDirty();
 BL_API BLGuid blUIFile(
 	IN BLAnsi* _Filename);
 
-BL_API BLGuid blGenUI(
+BL_API BLGuid blUIGen(
 	IN BLAnsi* _WidgetName,
 	IN BLS32 _PosX,
 	IN BLS32 _PosY,
@@ -43,7 +43,7 @@ BL_API BLGuid blGenUI(
 	IN BLU32 _Height,
 	IN BLEnum _Type);
 
-BL_API BLVoid blDeleteUI(
+BL_API BLVoid blUIDelete(
 	IN BLGuid _ID);
 
 BL_API BLBool blUIAttach(

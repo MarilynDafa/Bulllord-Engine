@@ -38,12 +38,12 @@ class MkvReader : public mkvparser::IMkvReader
 public:
 	MkvReader(const BLAnsi* _FilePath)
 	{
-		_file = blGenStream(_FilePath);
+		_file = blStreamGen(_FilePath);
 	}
 	~MkvReader()
 	{
 		if (_file != INVALID_GUID)
-			blDeleteStream(_file);
+			blStreamDelete(_file);
 	}
 	virtual int Read(long long _Pos, long _Len, unsigned char* _Buf)
 	{
@@ -637,9 +637,9 @@ _DecodeThreadFunc(BLVoid* _Userdata)
 			if (!_RenderVideoFrame(&_videoframe, &_demuxer))
 				break;
 			BLF64 _mintime = _audioframe.fTime < _videoframe.fTime ? _audioframe.fTime : _videoframe.fTime;
-			blTickDelay((BLU32)((_mintime - _lasttime) * 500));
+			blSysTickDelay((BLU32)((_mintime - _lasttime) * 500));
 			_lasttime = _mintime;
-		} while (!blPeekEvent(_PrVideoMem->bClickInterrupt, _PrVideoMem->eKeyInterrupt));
+		} while (!blSysPeekEvent(_PrVideoMem->bClickInterrupt, _PrVideoMem->eKeyInterrupt));
 		free(_pcm);
 		_PrVideoMem->fTime = 0.0;
 		if (_videoframe.pBuffer)
@@ -713,9 +713,9 @@ blVideoOpenEXT(IN BLAnsi* _Version, ...)
 		1.f,
 		1.f
 	};
-	_PrVideoMem->nGeo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
-	blVSync(FALSE);
-	blCursorVisiblity(FALSE);
+	_PrVideoMem->nGeo = blGeometryBufferGen(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
+	blGpuVSync(FALSE);
+	blSysCursorVisiblity(FALSE);
 #if defined(WIN32)
 	InitializeCriticalSectionEx(&(_PrVideoMem->sHandle), 0, 0);
 #else
@@ -732,16 +732,16 @@ blVideoCloseEXT()
 #else
 	pthread_mutex_destroy(&(_PrVideoMem->sHandle));
 #endif
-	blVSync(TRUE);
-	blCursorVisiblity(TRUE);
+	blGpuVSync(TRUE);
+	blSysCursorVisiblity(TRUE);
 	blPCMStreamParam(-1, -1);
 	_AudioCodecClose(_PrVideoMem->pAudioDecodec);
 	_VideoCodecClose(_PrVideoMem->pVideoDecodec);
 	if (INVALID_GUID != _PrVideoMem->nTex)
-		blDeleteTexture(_PrVideoMem->nTex);
+		blTextureDelete(_PrVideoMem->nTex);
 	if (INVALID_GUID != _PrVideoMem->nGeo)
-		blDeleteGeometryBuffer(_PrVideoMem->nGeo);
-	blDeleteTechnique(_PrVideoMem->nTech);
+		blGeometryBufferDelete(_PrVideoMem->nGeo);
+	blTechniqueDelete(_PrVideoMem->nTech);
 	free(_PrVideoMem->pImgDataCache);
 #endif
 }
@@ -810,10 +810,10 @@ blVideoPlayEXT(IN BLAnsi* _Filename, IN BLBool _LClickInterrupt, IN BLEnum _KeyI
 	BLF64 _framedelta = 0.0;
 	BLU32 _width, _height, _dwidth, _dheight;
 	BLF32 _rx, _ry;
-	blWindowQuery(&_width, &_height, &_dwidth, &_dheight, &_rx, &_ry);
+	blSysWindowQuery(&_width, &_height, &_dwidth, &_dheight, &_rx, &_ry);
 	BLF32 _screensz[2] = { 2.f / (BLF32)_width, 2.f / (BLF32)_height };
-	blTechUniform(_PrVideoMem->nTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0, FALSE);
+	blTechniqueUniform(_PrVideoMem->nTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
+	blGpuRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0, FALSE);
 #if defined(WIN32)
 	DWORD _tid;
 	_PrVideoMem->sThread = CreateThread(NULL, 0, _DecodeThreadFunc, (LPVOID)_Filename, 0, &_tid);
@@ -821,15 +821,15 @@ blVideoPlayEXT(IN BLAnsi* _Filename, IN BLBool _LClickInterrupt, IN BLEnum _KeyI
 	pthread_create(&_PrVideoMem->sThread, NULL, _DecodeThreadFunc, (BLVoid*)_Filename);
 #endif
 	while (_PrVideoMem->bVideoSetParams || _PrVideoMem->bAudioSetParams)
-		blTickDelay(5);
+		blSysTickDelay(5);
 	if (_PrVideoMem->nVideoWidth == 0 || _PrVideoMem->nVideoHeight == 0)
 		return FALSE;
     _PrVideoMem->bClickInterrupt = _LClickInterrupt;
     _PrVideoMem->eKeyInterrupt = _KeyInterrupt;
 	_PrVideoMem->fTime = 0.0;
-	_PrVideoMem->nTex = blGenTexture(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, (BLU32)_PrVideoMem->nVideoWidth, (BLU32)_PrVideoMem->nVideoHeight, 1, NULL);
+	_PrVideoMem->nTex = blTextureGen(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, (BLU32)_PrVideoMem->nVideoWidth, (BLU32)_PrVideoMem->nVideoHeight, 1, NULL);
 	blTextureFilter(_PrVideoMem->nTex, BL_TF_LINEAR, BL_TF_LINEAR, BL_TW_CLAMP, BL_TW_CLAMP, FALSE);
-	blTechSampler(_PrVideoMem->nTech, "Texture0", _PrVideoMem->nTex, 0);
+	blTechniqueSampler(_PrVideoMem->nTech, "Texture0", _PrVideoMem->nTex, 0);
 	BLF32 _videoratio = (BLF32)_PrVideoMem->nVideoWidth / (BLF32)_PrVideoMem->nVideoHeight;
 	BLF32 _vbo[] = {
 		0.f,
@@ -871,14 +871,14 @@ blVideoPlayEXT(IN BLAnsi* _Filename, IN BLBool _LClickInterrupt, IN BLEnum _KeyI
 		{
 			if (_PrVideoMem->bVideoOver)
 				goto videoend;
-			blTickDelay(10);
+			blSysTickDelay(10);
 		}
 		blFrameBufferClear(TRUE, TRUE, FALSE);
 		blTextureUpdate(_PrVideoMem->nTex, 0, 0, BL_CTF_IGNORE, 0, 0, 0, _PrVideoMem->nVideoWidth, _PrVideoMem->nVideoHeight, 1, _PrVideoMem->pImgDataCache->pFirst->pData);
-		blDraw(_PrVideoMem->nTech, _PrVideoMem->nGeo, 1);
+		blTechniqueDraw(_PrVideoMem->nTech, _PrVideoMem->nGeo, 1);
 		blFlush();
 		_framedelta = _PrVideoMem->pImgDataCache->pFirst->fTime - _PrVideoMem->fTime;
-		blTickDelay((BLU32)(_framedelta * 1000));
+		blSysTickDelay((BLU32)(_framedelta * 1000));
 		_PrVideoMem->fTime = _PrVideoMem->pImgDataCache->pFirst->fTime;
 #if defined(WIN32)
 		EnterCriticalSection(&(_PrVideoMem->sHandle));

@@ -370,7 +370,7 @@ blMd5File(IN BLAnsi* _Filename)
 	_PrUtilMem->sContext.aState[2] = 0x98badcfe;
 	_PrUtilMem->sContext.aState[3] = 0x10325476;
 	BLAnsi _path[260] = { 0 };
-	strcpy(_path, blUserFolderDir());
+	strcpy(_path, blSysUserFolderDir());
 	strcat(_path, _Filename);
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
 #ifdef WINAPI_FAMILY

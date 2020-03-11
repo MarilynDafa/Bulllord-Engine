@@ -448,7 +448,7 @@ blIAPCloseEXT()
     free(_PrIapMem);
 }
 BLVoid
-blRegistProductsEXT(IN BLEnum _Channel, IN BLAnsi* _Products, IN BLAnsi* _GoogleLicense)
+blIAPRegistProductsEXT(IN BLEnum _Channel, IN BLAnsi* _Products, IN BLAnsi* _GoogleLicense)
 {
 	_PrIapMem->eChannel = _Channel;
 #if defined(BL_PLATFORM_IOS) || defined(BL_PLATFORM_OSX)
@@ -567,7 +567,7 @@ blRegistProductsEXT(IN BLEnum _Channel, IN BLAnsi* _Products, IN BLAnsi* _Google
 #endif
 }
 BLBool
-blPurchaseEXT(IN BLAnsi* _ProductID, IN BLVoid(*_Subscriber)(BLEnum, BLAnsi*, BLAnsi*))
+blIAPPurchaseEXT(IN BLAnsi* _ProductID, IN BLVoid(*_Subscriber)(BLEnum, BLAnsi*, BLAnsi*))
 {
 	if (_PrIapMem->aProductID[0] != 0)
 		return FALSE;
@@ -687,7 +687,7 @@ blPurchaseEXT(IN BLAnsi* _ProductID, IN BLVoid(*_Subscriber)(BLEnum, BLAnsi*, BL
 	return TRUE;
 }
 BLVoid
-blValidationEXT(IN BLVoid(*_Subscriber)(BLBool))
+blIAPValidationEXT(IN BLVoid(*_Subscriber)(BLBool))
 {
 #if defined BL_PLATFORM_WIN32
 #elif defined BL_PLATFORM_UWP
@@ -770,7 +770,7 @@ blValidationEXT(IN BLVoid(*_Subscriber)(BLBool))
 #endif
 }
 BLVoid 
-blCheckUnfulfilledEXT(IN BLVoid(*_Subscriber)(BLAnsi*, BLAnsi*, BLAnsi*))
+blIAPCheckUnfulfilledEXT(IN BLVoid(*_Subscriber)(BLAnsi*, BLAnsi*, BLAnsi*))
 {
 #if defined BL_PLATFORM_WIN32
 #elif defined BL_PLATFORM_UWP

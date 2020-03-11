@@ -44,21 +44,21 @@ BL_API BLVoid blIAPOpenEXT(
 
 BL_API BLVoid blIAPCloseEXT();
     
-BL_API BLVoid blRegistProductsEXT(
+BL_API BLVoid blIAPRegistProductsEXT(
 	IN BLEnum _Channel,
 	IN BLAnsi* _Products,
 	IN BLAnsi* _GoogleLicense);
 
-BL_API BLBool blPurchaseEXT(
+BL_API BLBool blIAPPurchaseEXT(
 	IN BLAnsi* _ProductID,
 	IN BLVoid(*_Subscriber)(BLEnum, BLAnsi*, BLAnsi*));
 
-BL_API BLVoid blValidationEXT(
+BL_API BLVoid blIAPValidationEXT(
 	IN BLVoid(*_Subscriber)(BLBool));
 
-BL_API BLVoid blCheckUnfulfilledEXT(
+BL_API BLVoid blIAPCheckUnfulfilledEXT(
 	IN BLVoid(*_Subscriber)(BLAnsi*, BLAnsi*, BLAnsi*));
 #ifdef __cplusplus
 }
 #endif
-#endif/* __tmx_h_ */
+#endif/* __iap_h_ */

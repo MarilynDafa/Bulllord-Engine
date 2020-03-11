@@ -59,9 +59,9 @@ bool initWithTilesetInfo(TMXLayer* layer, TMXTilesetInfo *tilesetInfo, TMXLayerI
 	float capacity = totalNumberOfTiles * 0.35f + 1; // 35 percent is occupied ?
 	char workdir[260] = {0};
 	char userdir[260] = {0};
-	strcpy(workdir, blWorkingDir());
+	strcpy(workdir, blSysWorkingDir());
 	strcat(workdir, tilesetInfo->_sourceImage);
-	strcpy(userdir, blUserFolderDir());
+	strcpy(userdir, blSysUserFolderDir());
 	strcat(userdir, tilesetInfo->_sourceImage);
 	/*
 	Texture2D *texture = nullptr;

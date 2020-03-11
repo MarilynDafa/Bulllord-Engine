@@ -34,7 +34,7 @@ blEncryptCloseEXT()
 {
 }
 BLBool
-blRSASignEXT(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, IN BLU32 _Version, OUT BLAnsi _Output[1025])
+blEncryptRSASignEXT(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, IN BLU32 _Version, OUT BLAnsi _Output[1025])
 {
 	mbedtls_pk_context _ctx;
 	mbedtls_pk_init(&_ctx);
@@ -83,7 +83,7 @@ blRSASignEXT(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, IN BLU32 _Version, OUT B
 	return TRUE;
 }
 BLBool
-blRSAVerifyEXT(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, IN BLU32 _Version)
+blEncryptRSAVerifyEXT(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, IN BLU32 _Version)
 {
 	mbedtls_pk_context _ctx;
 	mbedtls_pk_init(&_ctx);
@@ -130,7 +130,7 @@ blRSAVerifyEXT(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, IN BLU32 _Version)
 	return TRUE;
 }
 BLBool
-blRSAEncryptEXT(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, OUT BLAnsi _Output[1025])
+blEncryptRSAEXT(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, OUT BLAnsi _Output[1025])
 {
 	mbedtls_pk_context _ctx;
 	mbedtls_pk_init(&_ctx);
@@ -170,7 +170,7 @@ blRSAEncryptEXT(IN BLAnsi* _Input, IN BLAnsi* _PublicKey, OUT BLAnsi _Output[102
 	return TRUE;
 }
 BLBool
-blRSADecryptEXT(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, OUT BLAnsi _Output[1025])
+blDecryptRSAEXT(IN BLAnsi* _Input, IN BLAnsi* _PrivateKey, OUT BLAnsi _Output[1025])
 {
 	mbedtls_pk_context _ctx;
 	mbedtls_pk_init(&_ctx);

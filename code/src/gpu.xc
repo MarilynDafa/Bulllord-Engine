@@ -1149,7 +1149,7 @@ _GpuAnitIntervention()
 #   "error what's the fucking platform"
 #endif
 BLVoid
-blVSync(IN BLBool _On)
+blGpuVSync(IN BLBool _On)
 {
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
@@ -1172,7 +1172,7 @@ blVSync(IN BLBool _On)
 #endif
 }
 BLVoid
-blHardwareCapsQuery(OUT BLEnum* _Api, OUT BLBool* _CSSupport, OUT BLBool* _GSSupport, OUT BLBool* _TSSupport, OUT BLBool* _FloatRTSupport, OUT BLBool _TexSupport[BL_TF_COUNT])
+blGpuCapsQuery(OUT BLEnum* _Api, OUT BLBool* _CSSupport, OUT BLBool* _GSSupport, OUT BLBool* _TSSupport, OUT BLBool* _FloatRTSupport, OUT BLBool _TexSupport[BL_TF_COUNT])
 {
     if (_Api)
         *_Api = _PrGpuMem->sHardwareCaps.eApiType;
@@ -1188,7 +1188,7 @@ blHardwareCapsQuery(OUT BLEnum* _Api, OUT BLBool* _CSSupport, OUT BLBool* _GSSup
         _TexSupport[_idx] = _PrGpuMem->sHardwareCaps.aTexFormats[_idx];
 }
 BLVoid
-blRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDepthBias, IN BLBool _Scissor, IN BLS32 _XPos, IN BLS32 _YPos, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Force)
+blGpuRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDepthBias, IN BLBool _Scissor, IN BLS32 _XPos, IN BLS32 _YPos, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Force)
 {
     if (_PrGpuMem->sPipelineState.eCullMode != _CullMode ||
         _PrGpuMem->sPipelineState.nDepthBias != _DepthBias ||
@@ -1224,7 +1224,7 @@ blRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDep
     }
 }
 BLVoid
-blDepthStencilState(IN BLBool _Depth, IN BLBool _Mask, IN BLEnum _DepthCompFunc, IN BLBool _Stencil, IN BLU8 _StencilReadMask, IN BLU8 _StencilWriteMask, IN BLEnum _FrontStencilFailOp, IN BLEnum _FrontStencilDepthFailOp, IN BLEnum _FrontStencilPassOp, IN BLEnum _FrontStencilCompFunc, IN BLEnum _BackStencilFailOp, IN BLEnum _BackStencilDepthFailOp, IN BLEnum _BackStencilPassOp, IN BLEnum _BackStencilCompFunc, IN BLBool _Force)
+blGpuDepthStencilState(IN BLBool _Depth, IN BLBool _Mask, IN BLEnum _DepthCompFunc, IN BLBool _Stencil, IN BLU8 _StencilReadMask, IN BLU8 _StencilWriteMask, IN BLEnum _FrontStencilFailOp, IN BLEnum _FrontStencilDepthFailOp, IN BLEnum _FrontStencilPassOp, IN BLEnum _FrontStencilCompFunc, IN BLEnum _BackStencilFailOp, IN BLEnum _BackStencilDepthFailOp, IN BLEnum _BackStencilPassOp, IN BLEnum _BackStencilCompFunc, IN BLBool _Force)
 {
     if (_PrGpuMem->sPipelineState.bDepth != _Depth ||
         _PrGpuMem->sPipelineState.bDepthMask != _Mask ||
@@ -1278,7 +1278,7 @@ blDepthStencilState(IN BLBool _Depth, IN BLBool _Mask, IN BLEnum _DepthCompFunc,
     }
 }
 BLVoid
-blBlendState(IN BLBool _AlphaToCoverage, IN BLBool _Blend, IN BLEnum _SrcBlendFactor, IN BLEnum _DestBlendFactor, IN BLEnum _SrcBlendAlphaFactor, IN BLEnum _DestBlendAlphaFactor, IN BLEnum _BlendOp, IN BLEnum _BlendOpAlpha, IN BLBool _Force)
+blGpuBlendState(IN BLBool _AlphaToCoverage, IN BLBool _Blend, IN BLEnum _SrcBlendFactor, IN BLEnum _DestBlendFactor, IN BLEnum _SrcBlendAlphaFactor, IN BLEnum _DestBlendAlphaFactor, IN BLEnum _BlendOp, IN BLEnum _BlendOpAlpha, IN BLBool _Force)
 {
     if (_PrGpuMem->sPipelineState.bAlphaToCoverage != _AlphaToCoverage ||
         _PrGpuMem->sPipelineState.bBlend != _Blend ||
@@ -1314,7 +1314,7 @@ blBlendState(IN BLBool _AlphaToCoverage, IN BLBool _Blend, IN BLEnum _SrcBlendFa
     }
 }
 BLGuid
-blGenFrameBuffer()
+blFrameBufferGen()
 {
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
@@ -1337,7 +1337,7 @@ blGenFrameBuffer()
     return INVALID_GUID;
 }
 BLVoid
-blDeleteFrameBuffer(IN BLGuid _FBO)
+blFrameBufferDelete(IN BLGuid _FBO)
 {
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
@@ -1470,7 +1470,7 @@ blFrameBufferDetach(IN BLGuid _FBO, IN BLBool _DepthStencil)
 #endif
 }
 BLGuid
-blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Srgb, IN BLBool _Immutable, IN BLBool _RenderTarget, IN BLU32 _Layer, IN BLU32 _Mipmap, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, IN BLU8* _Data)
+blTextureGen(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Srgb, IN BLBool _Immutable, IN BLBool _RenderTarget, IN BLU32 _Layer, IN BLU32 _Mipmap, IN BLU32 _Width, IN BLU32 _Height, IN BLU32 _Depth, IN BLU8* _Data)
 {
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
@@ -1493,7 +1493,7 @@ blGenTexture(IN BLU32 _Hash, IN BLEnum _Target, IN BLEnum _Format, IN BLBool _Sr
     return INVALID_GUID;
 }
 BLBool
-blDeleteTexture(IN BLGuid _Tex)
+blTextureDelete(IN BLGuid _Tex)
 {
     BLBool _discard = FALSE;
     _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
@@ -1874,7 +1874,7 @@ blTextureQuery(IN BLGuid _Tex, OUT BLEnum* _Target, OUT BLEnum* _Format, OUT BLU
     *_Size = _TextureSize(_tex->eFormat, _tex->nWidth, _tex->nHeight, _tex->nDepth);
 }
 BLGuid
-blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN BLEnum* _Semantic, IN BLEnum* _Decl, IN BLU32 _DeclNum,IN BLVoid* _VBO, IN BLU32 _VBSz, IN BLVoid* _IBO, IN BLU32 _IBSz, IN BLEnum _IBFmt)
+blGeometryBufferGen(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN BLEnum* _Semantic, IN BLEnum* _Decl, IN BLU32 _DeclNum,IN BLVoid* _VBO, IN BLU32 _VBSz, IN BLVoid* _IBO, IN BLU32 _IBSz, IN BLEnum _IBFmt)
 {
     _BLGeometryBuffer* _geo = NULL;
     BLBool _cache = FALSE;
@@ -2021,7 +2021,7 @@ blGenGeometryBuffer(IN BLU32 _Hash, IN BLEnum _Topology, IN BLBool _Dynamic, IN 
     return _geo->nID;
 }
 BLBool
-blDeleteGeometryBuffer(IN BLGuid _GBO)
+blGeometryBufferDelete(IN BLGuid _GBO)
 {
     BLBool _discard = FALSE;
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);
@@ -2231,7 +2231,7 @@ blGeometryInstanceUpdate(IN BLGuid _GBO, IN BLEnum _Semantic, IN BLVoid* _Buffer
 #endif
 }
 BLGuid
-blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Source, IN BLBool _ForceCompile)
+blTechniqueGen(IN BLAnsi* _Filename, IN BLAnsi* _Source, IN BLBool _ForceCompile)
 {
     BLBool _cache = FALSE;
     _BLTechnique* _tech;
@@ -2306,7 +2306,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Source, IN BLBool _ForceCompile
         memset(_path, 0, 260 * sizeof(BLAnsi));
         strcpy(_path, "b");
         strcat(_path, _Filename);
-		_stream = blGenStream(_path);
+		_stream = blStreamGen(_path);
         _findbinary = (_stream == INVALID_GUID) ? FALSE : TRUE;
     }
 #endif
@@ -2314,7 +2314,7 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Source, IN BLBool _ForceCompile
     {
 		if (!_Source)
 		{
-			_stream = blGenStream(_Filename);
+			_stream = blStreamGen(_Filename);
 			_doc = ezxml_parse_str((BLAnsi*)blStreamData(_stream), blStreamLength(_stream));
 		}
 		else
@@ -2540,12 +2540,12 @@ blGenTechnique(IN BLAnsi* _Filename, IN BLAnsi* _Source, IN BLBool _ForceCompile
         blDictInsert(_PrGpuMem->pTechCache, _hash, _res);
         blMutexUnlock(_PrGpuMem->pTechCache->pMutex);
     }
-    blDeleteStream(_stream);
+    blStreamDelete(_stream);
     _tech->nID = blGenGuid(_tech, _hash);
     return _tech->nID;
 }
 BLBool
-blDeleteTechnique(IN BLGuid _Tech)
+blTechniqueDelete(IN BLGuid _Tech)
 {
     BLBool _discard = FALSE;
     _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
@@ -2618,7 +2618,7 @@ blTechniqueGain(IN BLU32 _Hash)
         return INVALID_GUID;
 }
 BLVoid
-blTechUniform(IN BLGuid _Tech, IN BLEnum _Type, IN BLAnsi* _Name, IN BLVoid* _Data, IN BLU32 _DataSz)
+blTechniqueUniform(IN BLGuid _Tech, IN BLEnum _Type, IN BLAnsi* _Name, IN BLVoid* _Data, IN BLU32 _DataSz)
 {
     _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
     if (!_tech)
@@ -2675,7 +2675,7 @@ blTechUniform(IN BLGuid _Tech, IN BLEnum _Type, IN BLAnsi* _Name, IN BLVoid* _Da
     }
 }
 BLVoid
-blTechSampler(IN BLGuid _Tech, IN BLAnsi* _Name, IN BLGuid _Tex, IN BLU32 _Unit)
+blTechniqueSampler(IN BLGuid _Tech, IN BLAnsi* _Name, IN BLGuid _Tex, IN BLU32 _Unit)
 {
     _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
     _BLTextureBuffer* _tex = (_BLTextureBuffer*)blGuidAsPointer(_Tex);
@@ -2702,7 +2702,7 @@ blTechSampler(IN BLGuid _Tech, IN BLAnsi* _Name, IN BLGuid _Tex, IN BLU32 _Unit)
     }
 }
 BLVoid
-blDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
+blTechniqueDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 {
     _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
     _BLGeometryBuffer* _geo = (_BLGeometryBuffer*)blGuidAsPointer(_GBO);

@@ -101,11 +101,11 @@ _spAtlasPage_createTexture(spAtlasPage* _Self, const BLAnsi* _Filename)
 			_source[_idx] = 0;
 	}
 	strcat(_source, "bmg");
-	BLGuid _stream = blGenStream(_source);
+	BLGuid _stream = blStreamGen(_source);
 	if (INVALID_GUID == _stream)
 		return;
 	BLBool _texsupport[BL_TF_COUNT];
-	blHardwareCapsQuery(NULL, NULL, NULL, NULL, NULL, _texsupport);
+	blGpuCapsQuery(NULL, NULL, NULL, NULL, NULL, _texsupport);
 	BLU8 _identifier[12];
 	blStreamRead(_stream, sizeof(_identifier), _identifier);
 	if (_identifier[0] != 0xDD ||
@@ -121,7 +121,7 @@ _spAtlasPage_createTexture(spAtlasPage* _Self, const BLAnsi* _Filename)
 		_identifier[10] != 0xDD ||
 		_identifier[11] != 0xDD)
 	{
-		blDeleteStream(_stream);
+		blStreamDelete(_stream);
 		return;
 	}
 	BLU32 _width, _height, _depth;
@@ -225,7 +225,7 @@ _spAtlasPage_createTexture(spAtlasPage* _Self, const BLAnsi* _Filename)
 	_Self->rendererObject = _tcd;
 	_Self->width = _width;
 	_Self->height = _height;
-	blDeleteStream(_stream);
+	blStreamDelete(_stream);
 }
 void
 _spAtlasPage_disposeTexture(spAtlasPage* _Self) 
@@ -234,13 +234,13 @@ _spAtlasPage_disposeTexture(spAtlasPage* _Self)
 BLAnsi* 
 _spUtil_readFile(const BLAnsi* _Filename, BLS32* _Length)
 {
-	BLGuid _stream = blGenStream(_Filename);
+	BLGuid _stream = blStreamGen(_Filename);
 	if (INVALID_GUID == _stream)
 		return NULL;
 	*_Length = blStreamLength(_stream);
 	BLAnsi* _ret = (BLAnsi*)malloc(*_Length);
 	blStreamRead(_stream, *_Length, _ret);
-	blDeleteStream(_stream);
+	blStreamDelete(_stream);
 	return _ret;
 }
 static void 
@@ -249,7 +249,7 @@ _AnimationCallback(spAnimationState* _State, spEventType _Type, spTrackEntry* _E
 	if (!_State->rendererObject)
 		return;
 	if (_Type == SP_ANIMATION_COMPLETE && !_Entry->loop)
-		blInvokeEvent(BL_ET_SPRITE, 0xFFFFFFFF, 0, NULL, ((_BLSpineDataExt*)_State->rendererObject)->nID);
+		blSysInvokeEvent(BL_ET_SPRITE, 0xFFFFFFFF, 0, NULL, ((_BLSpineDataExt*)_State->rendererObject)->nID);
 }
 static const BLBool
 _LoadSpine(BLGuid _ID, const BLAnsi* _Filename, BLVoid** _ExtData)
@@ -337,7 +337,7 @@ _SpineSetup(BLGuid _ID, BLVoid** _ExtData)
 	_BLSpineDataExt* _sd = (_BLSpineDataExt*)*_ExtData;
 	_sd->nID = _ID;
 	_BLTexCacheDataExt* _tcd = (_BLTexCacheDataExt*)_sd->pAtlas->pages->rendererObject;
-	_sd->nTexture = blGenTexture(((BLU32)(((BLU64)(_ID)) & 0xFFFFFFFF)), BL_TT_2D, _tcd->eFormat, FALSE, TRUE, FALSE, 1, 1, _tcd->nWidth, _tcd->nHeight, 1, _tcd->pData);
+	_sd->nTexture = blTextureGen(((BLU32)(((BLU64)(_ID)) & 0xFFFFFFFF)), BL_TT_2D, _tcd->eFormat, FALSE, TRUE, FALSE, 1, 1, _tcd->nWidth, _tcd->nHeight, 1, _tcd->pData);
 	blTextureFilter(_sd->nTexture, BL_TF_LINEAR, BL_TF_LINEAR, _tcd->bRepeatWrap ? BL_TW_REPEAT : BL_TW_CLAMP, _tcd->bRepeatWrap ? BL_TW_REPEAT : BL_TW_CLAMP, FALSE);
 	free(_tcd);
 	_sd->pAtlas->pages->rendererObject = NULL;
@@ -362,7 +362,7 @@ static const BLBool
 _SpineRelease(BLGuid _ID, BLVoid** _ExtData)
 {
 	_BLSpineDataExt* _sd = (_BLSpineDataExt*)*_ExtData;
-	blDeleteTexture(_sd->nTexture);
+	blTextureDelete(_sd->nTexture);
 	return TRUE;
 }
 static const BLVoid
@@ -386,7 +386,7 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 	_sd->pSkeleton->flipY = _flipy;
 	_sd->fMinY = _sd->fMinX = 999999.f;
 	_sd->fMaxY = _sd->fMaxX = -999999.f;
-	blTechSampler(_PrSpineMem->nTech, "Texture0", _sd->nTexture, 0);
+	blTechniqueSampler(_PrSpineMem->nTech, "Texture0", _sd->nTexture, 0);
 	for (BLS32 _idx = 0; _idx < _sd->pSkeleton->slotsCount; ++_idx)
 	{
 		spSlot* _slot = _sd->pSkeleton->drawOrder[_idx];
@@ -398,25 +398,25 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 		{
 		case SP_BLEND_MODE_ADDITIVE:
 			_mode = SP_BLEND_MODE_ADDITIVE;
-			blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_ONE, BL_BF_ONE, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
+			blGpuBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_ONE, BL_BF_ONE, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
 			break;
 		case SP_BLEND_MODE_MULTIPLY:
 			_mode = SP_BLEND_MODE_MULTIPLY;
-			blBlendState(FALSE, TRUE, BL_BF_DESTCOLOR, BL_BF_ZERO, BL_BF_DESTCOLOR, BL_BF_ZERO, BL_BO_ADD, BL_BO_ADD, FALSE);
+			blGpuBlendState(FALSE, TRUE, BL_BF_DESTCOLOR, BL_BF_ZERO, BL_BF_DESTCOLOR, BL_BF_ZERO, BL_BO_ADD, BL_BO_ADD, FALSE);
 			break;
 		case SP_BLEND_MODE_SCREEN:
 			_mode = SP_BLEND_MODE_SCREEN;
-			blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVSRCALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
+			blGpuBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVSRCALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
 			break;
 		default:
 			_mode = 0;
-			blBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
+			blGpuBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
 		}
 		if (_PrSpineMem->nBlendMode != _mode)
 		{
-			BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _gbdata, _gbi * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
-			blDraw(_PrSpineMem->nTech, _geo, 1);
-			blDeleteGeometryBuffer(_geo);
+			BLGuid _geo = blGeometryBufferGen(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _gbdata, _gbi * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
+			blTechniqueDraw(_PrSpineMem->nTech, _geo, 1);
+			blGeometryBufferDelete(_geo);
 			_gbcap = _sd->pSkeletonData->bonesCount * 32;
 			_gbi = 0;
 			_PrSpineMem->nBlendMode = _mode;
@@ -518,9 +518,9 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 			}
 		}
 	}
-	BLGuid _geo = blGenGeometryBuffer(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _gbdata, _gbi * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
-	blDraw(_PrSpineMem->nTech, _geo, 1);
-	blDeleteGeometryBuffer(_geo);
+	BLGuid _geo = blGeometryBufferGen(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _gbdata, _gbi * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
+	blTechniqueDraw(_PrSpineMem->nTech, _geo, 1);
+	blGeometryBufferDelete(_geo);
 	free(_gbdata);
 }
 BLVoid 
@@ -529,13 +529,13 @@ blSpineOpenEXT(IN BLAnsi* _Version, ...)
 	_PrSpineMem = (_BLSpineMemberExt*)malloc(sizeof(_BLSpineMemberExt));
 	_PrSpineMem->nTech = blTechniqueGain(blHashString((const BLUtf8*)"shaders/2D.bsl"));
 	_PrSpineMem->nBlendMode = 0;
-	blRegistExternalMethod("json", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw);
-	blRegistExternalMethod("skel", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw);
+	blSpriteRegistExternal("json", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw);
+	blSpriteRegistExternal("skel", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw);
 }
 BLVoid 
 blSpineCloseEXT()
 {
-	blDeleteTechnique(_PrSpineMem->nTech);
+	blTechniqueDelete(_PrSpineMem->nTech);
 	free(_PrSpineMem);
 }
 BLVoid

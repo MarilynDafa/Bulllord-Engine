@@ -71,4 +71,4 @@ BL_API BLBool blSpriteBoundingBoxEXT(
 #ifdef __cplusplus
 }
 #endif
-#endif/* __tmx_h_ */
+#endif/* __spine_h_ */

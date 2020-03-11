@@ -30,27 +30,27 @@ BL_API BLVoid blEncryptOpenEXT(
 
 BL_API BLVoid blEncryptCloseEXT();
 
-BL_API BLBool blRSASignEXT(
+BL_API BLBool blEncryptRSASignEXT(
 	IN BLAnsi* _Input,
 	IN BLAnsi* _PrivateKey,
 	IN BLU32 _Version,
 	OUT BLAnsi _Output[1025]);
 
-BL_API BLBool blRSAVerifyEXT(
+BL_API BLBool blEncryptRSAVerifyEXT(
 	IN BLAnsi* _Input,
 	IN BLAnsi* _PublicKey,
 	IN BLU32 _Version);
 
-BL_API BLBool blRSAEncryptEXT(
+BL_API BLBool blEncryptRSAEXT(
 	IN BLAnsi* _Input,
 	IN BLAnsi* _PublicKey,
 	OUT BLAnsi _Output[1025]);
 
-BL_API BLBool blRSADecryptEXT(
+BL_API BLBool blDecryptRSAEXT(
 	IN BLAnsi* _Input,
 	IN BLAnsi* _PrivateKey,
 	OUT BLAnsi _Output[1025]);
 #ifdef __cplusplus
 }
 #endif
-#endif/* __tmx_h_ */
+#endif/* __encrypt_h_ */

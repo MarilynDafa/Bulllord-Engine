@@ -57,25 +57,25 @@ extern "C" {
 //			BL_ET_SPRITE	0xFFFFFFFF								0														NULL		id	sprite action end
 */
     
-BL_API BLEnum blPlatformIdentity();
+BL_API BLEnum blSysPlatformId();
     
-BL_API BLU32 blCPUCoresCounts();
+BL_API BLU32 blSysCpuCores();
     
-BL_API BLU32 blTickCounts();
+BL_API BLU32 blSysTickCounts();
 
-BL_API BLVoid blTickDelay(
+BL_API BLVoid blSysTickDelay(
 	IN BLU32 _Ms);
 
-BL_API const BLAnsi* blUserFolderDir();
+BL_API const BLAnsi* blSysUserFolderDir();
 
-BL_API const BLAnsi* blWorkingDir();
+BL_API const BLAnsi* blSysWorkingDir();
 
-BL_API BLBool blClipboardCopy(
+BL_API BLBool blSysClipboardCopy(
 	IN BLUtf8* _Text);
 
-BL_API const BLUtf8* blClipboardPaste();
+BL_API const BLUtf8* blSysClipboardPaste();
 
-BL_API BLBool blPeekEvent(
+BL_API BLBool blSysPeekEvent(
     IN BLBool _LClick,
     IN BLEnum _Key);
 
@@ -86,47 +86,47 @@ SCREEN_HEIGHT
 FULLSCREEN
 QUALITY
 */
-BL_API BLBool blEnvVariable(
+BL_API BLBool blSysEnvVariable(
 	IN BLUtf8* _Section,
 	INOUT BLUtf8 _Value[256],
 	IN BLBool _Set);
 
-BL_API BLVoid blOpenURL(
+BL_API BLVoid blSysOpenURL(
 	IN BLUtf8* _Url);
     
-BL_API BLBool blOpenPlugin(
+BL_API BLBool blSysOpenPlugin(
     IN BLAnsi* _Basename);
     
-BL_API BLBool blClosePlugin(
+BL_API BLBool blSysClosePlugin(
 	IN BLAnsi* _Basename);
     
-BL_API BLVoid* blPluginProcAddress(
+BL_API BLVoid* blSysPluginProcAddress(
 	IN BLAnsi* _Basename,
     IN BLAnsi* _Function);
 
-BL_API BLVoid blAttachIME(
+BL_API BLVoid blSysAttachIME(
 	IN BLF32 _Xpos,
 	IN BLF32 _Ypos,
 	IN BLEnum _Type);
 
-BL_API BLVoid blDetachIME(
+BL_API BLVoid blSysDetachIME(
 	IN BLEnum _Type);
 
-BL_API BLVoid blCursorVisiblity(
+BL_API BLVoid blSysCursorVisiblity(
 	IN BLBool _Show);
 
-BL_API BLVoid blSubscribeEvent(
+BL_API BLVoid blSysSubscribeEvent(
 	IN BLEnum _Type, 
 	IN BLBool(*_Subscriber)(BLEnum, BLU32, BLS32, BLVoid*, BLGuid));
 
-BL_API BLVoid blInvokeEvent(
+BL_API BLVoid blSysInvokeEvent(
 	IN BLEnum _Type, 
 	IN BLU32 _Uparam, 
 	IN BLS32 _Sparam, 
 	IN BLVoid* _Pparam,
 	IN BLGuid _ID);
 
-BL_API BLVoid blDateTime(
+BL_API BLVoid blSysDateTime(
 	OUT BLS32* _Year,
 	OUT BLS32* _Month,
 	OUT BLS32* _Day,
@@ -137,11 +137,11 @@ BL_API BLVoid blDateTime(
 	OUT BLS32* _Yday,
 	OUT BLS32* _Dst);
 
-BL_API BLBool blTimer(
+BL_API BLBool blSysTimer(
 	IN BLS32 _PositiveID,
 	IN BLF32 _Elapse);
     
-BL_API BLVoid blWindowQuery(
+BL_API BLVoid blSysWindowQuery(
 	OUT BLU32* _Width, 
 	OUT BLU32* _Height,
 	OUT BLU32* _ActualWidth,
@@ -149,17 +149,17 @@ BL_API BLVoid blWindowQuery(
 	OUT BLF32* _RatioX,
 	OUT BLF32* _RatioY);
 
-BL_API BLVoid blWindowResize(
+BL_API BLVoid blSysWindowResize(
 	IN BLU32 _Width, 
 	IN BLU32 _Height, 
 	IN BLBool _Fullscreen);
 
-BL_API BLBool blSystemPrepare(
+BL_API BLBool blSysPrepare(
 	IN BLVoid* _Activity,
 	IN BLVoid* _State,
 	IN BLU32 _StateSize);
     
-BL_API BLVoid blSystemRun(
+BL_API BLVoid blSysRun(
 	IN BLAnsi* _Appname, 
 	IN BLU32 _Width,
 	IN BLU32 _Height,
@@ -173,7 +173,7 @@ BL_API BLVoid blSystemRun(
 	IN BLVoid(*_Step)(BLU32),
 	IN BLVoid(*_End)(BLVoid));
 
-BL_API BLVoid blSystemScriptRun(
+BL_API BLVoid blSysScriptRun(
 	IN BLAnsi* _Encryptkey);
 #ifdef __cplusplus
 }

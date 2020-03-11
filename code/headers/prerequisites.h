@@ -300,7 +300,7 @@ typedef unsigned long long BLGuid;
 #       define BL_MAINBEGIN(argc, argv) int main(int argc, const char* argv[]) {
 #		define BL_MAINEND return 0; }
 #elif defined(BL_PLATFORM_ANDROID)		
-#       define BL_MAINBEGIN(argc, argv) void ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _StateSize) {blSystemPrepare(_Activity, _State, _StateSize);
+#       define BL_MAINBEGIN(argc, argv) void ANativeActivity_onCreate(ANativeActivity* _Activity, void* _State, size_t _StateSize) {blSysPrepare(_Activity, _State, _StateSize);
 #		define BL_MAINEND  }
 #elif defined(BL_PLATFORM_WEB)
 #       define BL_MAINBEGIN(argc, argv) int main(int argc, const char* argv[]) {
