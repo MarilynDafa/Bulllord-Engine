@@ -343,11 +343,11 @@ typedef unsigned long long BLGuid;
 #if defined INVALID_GUID
 #   undef INVALID_GUID
 #endif
-#define INVALID_GUID 0xFFFFFFFFFFFFFFFF         ///<Invalid Guid
+#define INVALID_GUID 0         ///<Invalid Guid
 #if defined ASSOCIATED_GUID
 #	undef ASSOCIATED_GUID
 #endif
-#define ASSOCIATED_GUID 0xFFFFFFFF00000000      ///<Associated Guid
+#define ASSOCIATED_GUID 0x00000000FFFFFFFF      ///<Associated Guid
 
 /**
  * Event Util Macro

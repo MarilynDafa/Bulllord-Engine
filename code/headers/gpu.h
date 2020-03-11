@@ -115,7 +115,7 @@ BL_API BLGuid blGenFrameBuffer();
 BL_API BLVoid blDeleteFrameBuffer(
     IN BLGuid _FBO);
 
-BL_API BLVoid blBindFrameBuffer(
+BL_API BLVoid blFrameBufferBind(
     IN BLGuid _FBO,
     IN BLBool _Bind);
 
@@ -153,7 +153,7 @@ BL_API BLGuid blGenTexture(
 BL_API BLBool blDeleteTexture(
     IN BLGuid _Tex);
 
-BL_API BLGuid blGainTexture(
+BL_API BLGuid blTextureGain(
     IN BLU32 _Hash);
 
 BL_API BLVoid blTextureFilter(
@@ -211,7 +211,7 @@ BL_API BLGuid blGenGeometryBuffer(
 BL_API BLBool blDeleteGeometryBuffer(
     IN BLGuid _GBO);
 
-BL_API BLGuid blGainGeometryBuffer(
+BL_API BLGuid blGeometryBufferGain(
     IN BLU32 _Hash);
 
 BL_API BLVoid blGeometryBufferUpdate(
@@ -244,7 +244,7 @@ BL_API BLGuid blGenTechnique(
 BL_API BLBool blDeleteTechnique(
     IN BLGuid _Tech);
 
-BL_API BLGuid blGainTechnique(
+BL_API BLGuid blTechniqueGain(
     IN BLU32 _Hash);
 
 BL_API BLVoid blTechUniform(

@@ -32,7 +32,7 @@ BL_API BLVoid blRegistExternalMethod(
 	IN BLBool(*_ReleaseCB)(BLGuid, BLVoid**),
 	IN BLVoid(*_DrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**));
 
-BL_API BLGuid blGenSprite(
+BL_API BLGuid blGenImageSprite(
 	IN BLAnsi* _Filename,
 	IN BLAnsi* _Tag,
     IN BLF32 _Width,
@@ -41,8 +41,30 @@ BL_API BLGuid blGenSprite(
 	IN BLU32 _FPS,
 	IN BLBool _AsTile);
 
+BL_API BLGuid blGenTextSprite(
+	IN BLUtf8* _Text,
+	IN BLU32 _TxtColor,
+	IN BLEnum _TxtAlignmentH,
+	IN BLEnum _TxtAlignmentV,
+	IN BLAnsi* _Font,
+	IN BLU32 _FontHeight,
+	IN BLBool _Outline,
+	IN BLBool _Bold,
+	IN BLBool _Shadow,
+	IN BLBool _Italics,
+	IN BLF32 _Zv);
+
 BL_API BLVoid blDeleteSprite(
 	IN BLGuid _ID);
+
+BL_API BLGuid blGenSpriteRenderTexture(
+	IN BLGuid _ID,
+	IN BLU32 _Width,
+	IN BLU32 _Height);
+
+BL_API BLVoid blDeleteSpriteRenderTexture(
+	IN BLGuid _ID,
+	IN BLGuid _Tex);
 
 BL_API BLVoid* blSpriteExternalData(
 	IN BLGuid _ID,
@@ -109,6 +131,19 @@ BL_API BLBool blSpriteZValue(
 	IN BLGuid _ID,
     IN BLF32 _Zv,
     IN BLBool _Passdown);
+
+BL_API BLBool blSpriteText(
+	IN BLGuid _ID,
+	IN BLUtf8* _Text,
+	IN BLU32 _TxtColor,
+	IN BLEnum _TxtAlignmentH,
+	IN BLEnum _TxtAlignmentV,
+	IN BLAnsi* _Font,
+	IN BLU32 _FontHeight,
+	IN BLBool _Outline,
+	IN BLBool _Bold,
+	IN BLBool _Shadow,
+	IN BLBool _Italics);
 
 BL_API BLBool blSpriteStroke(
 	IN BLGuid _ID,
@@ -240,15 +275,6 @@ BL_API BLBool blSpriteActionAlpha(
 	IN BLBool _Reverse,
 	IN BLF32 _Time,
 	IN BLBool _Loop);
-
-BL_API BLGuid blGenSpriteRT(
-	IN BLGuid _ID,
-	IN BLU32 _Width,
-	IN BLU32 _Height);
-
-BL_API BLVoid blDeleteSpriteRT(
-	IN BLGuid _ID,
-	IN BLGuid _Tex);
     
 BL_API BLVoid blViewportQuery(
     OUT BLF32* _LTPosX,

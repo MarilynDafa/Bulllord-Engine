@@ -524,153 +524,6 @@ typedef struct _UIMember {
 static _BLUIMember* _PrUIMem = NULL;
 extern BLBool _FetchResource(const BLAnsi*, BLVoid**, BLGuid, BLBool(*)(BLVoid*, const BLAnsi*), BLBool(*)(BLVoid*), BLBool);
 extern BLBool _DiscardResource(BLGuid, BLBool(*)(BLVoid*), BLBool(*)(BLVoid*));
-BLBool
-_FontFace(const BLAnsi* _Filename)
-{
-	BLGuid _font = blGenStream(_Filename);
-	if (_font == INVALID_GUID)
-	{
-		blDeleteStream(_font);
-		return FALSE;
-	}
-	_BLFont* _ret = (_BLFont*)malloc(sizeof(_BLFont));
-	BLAnsi _basename[256] = { 0 };
-	strcpy(_basename, _Filename);
-	blSwitchLowerUtf8((BLUtf8*)_basename);
-	_ret->nHashName = blHashString((const BLUtf8*)_basename);
-	{
-		FOREACH_ARRAY(_BLFont*, _pf, _PrUIMem->pFonts)
-		{
-			if (_pf->nHashName == _ret->nHashName)
-			{
-				free(_ret);
-				blDeleteStream(_font);
-				return FALSE;
-			}
-		}
-	}
-	_ret->pGlyphAtlas = blGenDict(FALSE);
-	if (!strcmp((const BLAnsi*)blFileSuffixUtf8((const BLUtf8*)_Filename), "fnt"))
-	{
-		_ret->nFTStream = 0xDEAD;
-		_ret->bFreetype = FALSE;
-		_BLGlyphAtlas* _glyphatlas = (_BLGlyphAtlas*)malloc(sizeof(_BLGlyphAtlas));
-		memset(_glyphatlas, 0, sizeof(_BLGlyphAtlas));
-		_glyphatlas->pTextures = blGenArray(FALSE);
-		_glyphatlas->pGlyphs = blGenDict(FALSE);
-		_glyphatlas->nCurTexture = INVALID_GUID;
-		ezxml_t _doc = ezxml_parse_str(blStreamData(_font), blStreamLength(_font));
-		ezxml_t _element = _doc->child;
-		do {
-			if (!strcmp(ezxml_name(_element), "pages"))
-			{
-				ezxml_t _page = _element->child;
-				do {
-					const BLAnsi* _tga = ezxml_attr(_page, "file");
-					BLGuid _image;
-					BLAnsi _tmpname[260];
-					sprintf(_tmpname, "%s%s", blWorkingDir(), _tga);
-					_image = blGenStream(_tmpname);
-					if (INVALID_GUID == _image)
-					{
-						free(_ret);
-						blDeleteStream(_image);
-						ezxml_free(_doc);
-						blDeleteStream(_font);
-						return FALSE;
-					}
-					BLU8 _tgaheader[12];
-					blStreamRead(_image, 12 * sizeof(BLU8), _tgaheader);
-					BLU16 _imgw, _imgh;
-					blStreamRead(_image, sizeof(BLU16), &_imgw);
-					blStreamRead(_image, sizeof(BLU16), &_imgh);
-					BLU8 _bpp, _attrib;
-					blStreamRead(_image, sizeof(BLU8), &_bpp);
-					blStreamRead(_image, sizeof(BLU8), &_attrib);
-					BLEnum _fmt = BL_TF_UNKNOWN;
-					if (_bpp == 8)
-						_fmt = BL_TF_R8;
-					else if (_bpp == 32)
-						_fmt = BL_TF_RGBA8;
-					else
-						blDebugOutput("fnt image unsupport format: %s", _tmpname);
-					BLU32 _imgsz = _imgw * _imgh * _bpp / 8;
-					BLU8* _imgdata = (BLU8*)malloc(_imgsz + 3 * sizeof(BLU32));
-					BLU32* _tmp = (BLU32*)_imgdata;
-					_tmp[0] = _fmt;
-					_tmp[1] = _imgw;
-					_tmp[2] = _imgh;
-					blStreamRead(_image, _imgsz, _imgdata + 3 * sizeof(BLU32));
-					blArrayPushBack(_glyphatlas->pTextures, _imgdata);
-					blDeleteStream(_image);
-					_page = _page->ordered;
-				} while (_page);
-			}
-			else if (!strcmp(ezxml_name(_element), "chars"))
-			{
-				ezxml_t _char = _element->child;
-				do {
-					const BLAnsi* _id = ezxml_attr(_char, "id");
-					const BLAnsi* _x = ezxml_attr(_char, "x");
-					const BLAnsi* _y = ezxml_attr(_char, "y");
-					const BLAnsi* _width = ezxml_attr(_char, "width");
-					const BLAnsi* _height = ezxml_attr(_char, "height");
-					const BLAnsi* _xoffset = ezxml_attr(_char, "xoffset");
-					const BLAnsi* _yoffset = ezxml_attr(_char, "yoffset");
-					const BLAnsi* _xadvance = ezxml_attr(_char, "xadvance");
-					const BLAnsi* _page = ezxml_attr(_char, "page");
-					_char = _char->ordered;
-					_BLGlyph* _gi = (_BLGlyph*)malloc(sizeof(_BLGlyph));
-					_gi->bValid = FALSE;
-					_gi->nAdv = (BLU32)strtoul(_xadvance, NULL, 10);
-					_gi->sRect.sLT.fX = strtof(_x, NULL);
-					_gi->sRect.sLT.fY = strtof(_y, NULL);
-					_gi->sRect.sRB.fX = _gi->sRect.sLT.fX + strtof(_width, NULL);
-					_gi->sRect.sRB.fY = _gi->sRect.sLT.fY + strtof(_height, NULL);
-					_gi->sOffset.fX = strtof(_xoffset, NULL);
-					_gi->sOffset.fY = strtof(_yoffset, NULL);
-					_gi->nTexture = strtoul(_page, NULL, 10);
-					blDictInsert(_glyphatlas->pGlyphs, MAKEU32(strtoul(_id, NULL, 10), 0), _gi);
-				} while (_char);
-			}
-			else if (!strcmp(ezxml_name(_element), "common"))
-			{
-				_glyphatlas->nYB = (BLU32)strtoul(ezxml_attr(_element, "lineHeight"), NULL, 10);
-			}
-			_element = _element->ordered;
-		} while (_element);
-		ezxml_free(_doc);
-		blDeleteStream(_font);
-		blDictInsert(_ret->pGlyphAtlas, _glyphatlas->nYB, _glyphatlas);
-	}
-	else
-	{
-		_ret->bFreetype = TRUE;
-		if (FT_New_Memory_Face(_PrUIMem->sFtLibrary, (FT_Bytes)blStreamData(_font), blStreamLength(_font), 0, &_ret->pFtFace))
-		{
-			free(_ret);
-			blDeleteStream(_font);
-			return FALSE;
-		}
-		FT_Select_Charmap(_ret->pFtFace, FT_ENCODING_UNICODE);
-		if (!_ret->pFtFace->charmap)
-		{
-			FT_Done_Face(_ret->pFtFace);
-			_ret->pFtFace = NULL;
-			free(_ret);
-			blDeleteStream(_font);
-			return FALSE;
-		}
-		_ret->nFTStream = _font;
-	}
-	if (_ret)
-	{
-		blArrayPushBack(_PrUIMem->pFonts, _ret);
-		return TRUE;
-	}
-	else
-		return FALSE;
-}
 static _BLWidget*
 _WidgetQuery(_BLWidget* _Node, BLU32 _HashName, BLBool _SearchChildren)
 {
@@ -733,6 +586,34 @@ _WidgetScissorRect(_BLWidget* _Node, BLRect* _Rect)
 			_node = _node->pParent;
 		*_Rect = _node->sAbsRegion;
 	}
+}
+static _BLFont* 
+_FontGet(const BLAnsi* _Font) 
+{
+	_BLFont* _ft = NULL;
+	BLU32 _hash = blHashString((const BLUtf8*)_Font);
+	{
+		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
+		{
+			if (_iter->nHashName == _hash)
+			{
+				_ft = _iter;
+				break;
+			}
+		}
+	}
+	if (!_ft)
+	{
+		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
+		{
+			if (_iter->nHashName == blHashString((const BLUtf8*)"default"))
+			{
+				_ft = _iter;
+				break;
+			}
+		}
+	}
+	return _ft;
 }
 static _BLGlyph*
 _FontGlyph(_BLFont* _Font, BLU32 _Char, BLU32 _FontHeight)
@@ -1239,6 +1120,374 @@ _FontMeasure(const BLUtf16* _Text, _BLFont* _Font, BLU32 _FontHeight, BLF32* _Wi
 		*_Height += 1;
 	else if (_shadow)
 		*_Height += 1;
+}
+BLBool
+_FontFace(const BLAnsi* _Filename)
+{
+	BLGuid _font = blGenStream(_Filename);
+	if (_font == INVALID_GUID)
+	{
+		blDeleteStream(_font);
+		return FALSE;
+	}
+	_BLFont* _ret = (_BLFont*)malloc(sizeof(_BLFont));
+	BLAnsi _basename[256] = { 0 };
+	strcpy(_basename, _Filename);
+	blSwitchLowerUtf8((BLUtf8*)_basename);
+	_ret->nHashName = blHashString((const BLUtf8*)_basename);
+	{
+		FOREACH_ARRAY(_BLFont*, _pf, _PrUIMem->pFonts)
+		{
+			if (_pf->nHashName == _ret->nHashName)
+			{
+				free(_ret);
+				blDeleteStream(_font);
+				return FALSE;
+			}
+		}
+	}
+	_ret->pGlyphAtlas = blGenDict(FALSE);
+	if (!strcmp((const BLAnsi*)blFileSuffixUtf8((const BLUtf8*)_Filename), "fnt"))
+	{
+		_ret->nFTStream = 0xDEAD;
+		_ret->bFreetype = FALSE;
+		_BLGlyphAtlas* _glyphatlas = (_BLGlyphAtlas*)malloc(sizeof(_BLGlyphAtlas));
+		memset(_glyphatlas, 0, sizeof(_BLGlyphAtlas));
+		_glyphatlas->pTextures = blGenArray(FALSE);
+		_glyphatlas->pGlyphs = blGenDict(FALSE);
+		_glyphatlas->nCurTexture = INVALID_GUID;
+		ezxml_t _doc = ezxml_parse_str(blStreamData(_font), blStreamLength(_font));
+		ezxml_t _element = _doc->child;
+		do {
+			if (!strcmp(ezxml_name(_element), "pages"))
+			{
+				ezxml_t _page = _element->child;
+				do {
+					const BLAnsi* _tga = ezxml_attr(_page, "file");
+					BLGuid _image;
+					BLAnsi _tmpname[260];
+					sprintf(_tmpname, "%s%s", blWorkingDir(), _tga);
+					_image = blGenStream(_tmpname);
+					if (INVALID_GUID == _image)
+					{
+						free(_ret);
+						blDeleteStream(_image);
+						ezxml_free(_doc);
+						blDeleteStream(_font);
+						return FALSE;
+					}
+					BLU8 _tgaheader[12];
+					blStreamRead(_image, 12 * sizeof(BLU8), _tgaheader);
+					BLU16 _imgw, _imgh;
+					blStreamRead(_image, sizeof(BLU16), &_imgw);
+					blStreamRead(_image, sizeof(BLU16), &_imgh);
+					BLU8 _bpp, _attrib;
+					blStreamRead(_image, sizeof(BLU8), &_bpp);
+					blStreamRead(_image, sizeof(BLU8), &_attrib);
+					BLEnum _fmt = BL_TF_UNKNOWN;
+					if (_bpp == 8)
+						_fmt = BL_TF_R8;
+					else if (_bpp == 32)
+						_fmt = BL_TF_RGBA8;
+					else
+						blDebugOutput("fnt image unsupport format: %s", _tmpname);
+					BLU32 _imgsz = _imgw * _imgh * _bpp / 8;
+					BLU8* _imgdata = (BLU8*)malloc(_imgsz + 3 * sizeof(BLU32));
+					BLU32* _tmp = (BLU32*)_imgdata;
+					_tmp[0] = _fmt;
+					_tmp[1] = _imgw;
+					_tmp[2] = _imgh;
+					blStreamRead(_image, _imgsz, _imgdata + 3 * sizeof(BLU32));
+					blArrayPushBack(_glyphatlas->pTextures, _imgdata);
+					blDeleteStream(_image);
+					_page = _page->ordered;
+				} while (_page);
+			}
+			else if (!strcmp(ezxml_name(_element), "chars"))
+			{
+				ezxml_t _char = _element->child;
+				do {
+					const BLAnsi* _id = ezxml_attr(_char, "id");
+					const BLAnsi* _x = ezxml_attr(_char, "x");
+					const BLAnsi* _y = ezxml_attr(_char, "y");
+					const BLAnsi* _width = ezxml_attr(_char, "width");
+					const BLAnsi* _height = ezxml_attr(_char, "height");
+					const BLAnsi* _xoffset = ezxml_attr(_char, "xoffset");
+					const BLAnsi* _yoffset = ezxml_attr(_char, "yoffset");
+					const BLAnsi* _xadvance = ezxml_attr(_char, "xadvance");
+					const BLAnsi* _page = ezxml_attr(_char, "page");
+					_char = _char->ordered;
+					_BLGlyph* _gi = (_BLGlyph*)malloc(sizeof(_BLGlyph));
+					_gi->bValid = FALSE;
+					_gi->nAdv = (BLU32)strtoul(_xadvance, NULL, 10);
+					_gi->sRect.sLT.fX = strtof(_x, NULL);
+					_gi->sRect.sLT.fY = strtof(_y, NULL);
+					_gi->sRect.sRB.fX = _gi->sRect.sLT.fX + strtof(_width, NULL);
+					_gi->sRect.sRB.fY = _gi->sRect.sLT.fY + strtof(_height, NULL);
+					_gi->sOffset.fX = strtof(_xoffset, NULL);
+					_gi->sOffset.fY = strtof(_yoffset, NULL);
+					_gi->nTexture = strtoul(_page, NULL, 10);
+					blDictInsert(_glyphatlas->pGlyphs, MAKEU32(strtoul(_id, NULL, 10), 0), _gi);
+				} while (_char);
+			}
+			else if (!strcmp(ezxml_name(_element), "common"))
+			{
+				_glyphatlas->nYB = (BLU32)strtoul(ezxml_attr(_element, "lineHeight"), NULL, 10);
+			}
+			_element = _element->ordered;
+		} while (_element);
+		ezxml_free(_doc);
+		blDeleteStream(_font);
+		blDictInsert(_ret->pGlyphAtlas, _glyphatlas->nYB, _glyphatlas);
+	}
+	else
+	{
+		_ret->bFreetype = TRUE;
+		if (FT_New_Memory_Face(_PrUIMem->sFtLibrary, (FT_Bytes)blStreamData(_font), blStreamLength(_font), 0, &_ret->pFtFace))
+		{
+			free(_ret);
+			blDeleteStream(_font);
+			return FALSE;
+		}
+		FT_Select_Charmap(_ret->pFtFace, FT_ENCODING_UNICODE);
+		if (!_ret->pFtFace->charmap)
+		{
+			FT_Done_Face(_ret->pFtFace);
+			_ret->pFtFace = NULL;
+			free(_ret);
+			blDeleteStream(_font);
+			return FALSE;
+		}
+		_ret->nFTStream = _font;
+	}
+	if (_ret)
+	{
+		blArrayPushBack(_PrUIMem->pFonts, _ret);
+		return TRUE;
+	}
+	else
+		return FALSE;
+}
+BLVoid
+_TextMeasure(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLF32* _Width, BLF32* _Height, BLU16 _Flag)
+{
+	_BLFont* _ft = _FontGet(_Font);
+	BLF32 _w;
+	BLF32 _h;
+	_FontMeasure(_Text, _ft, _FontHeight, &_w, &_h, _Flag);
+	*_Width = _w;
+	*_Height = _h;
+}
+BLVoid
+_WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum _AlignmentH, BLEnum _AlignmentV, BLBool _Multiline, BLRect* _Area, BLRect* _ClipArea, BLU32 _Color, BLF32 _Alpha, BLU16 _Flag, BLBool _Pwd)
+{
+	BLU32 _txtlen = blUtf16Length(_Text);
+	if (!_txtlen)
+		return;
+	if (!_Font)
+		return;
+	_BLFont* _ft = NULL;
+	BLUtf16* _str = (BLUtf16*)alloca((_txtlen + 1) * sizeof(BLUtf16));
+	memset(_str, 0, (_txtlen + 1) * sizeof(BLUtf16));
+	if (_Pwd)
+	{
+		for (BLU32 _idx = 0; _idx < _txtlen; ++_idx)
+			_str[_idx] = L'*';
+	}
+	else
+	{
+		for (BLU32 _idx = 0; _idx < _txtlen; ++_idx)
+			_str[_idx] = _Text[_idx];
+	}
+	_ft = _FontGet(_Font);
+	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_ClipArea->sLT.fX, (BLS32)_ClipArea->sLT.fY, (BLU32)(_ClipArea->sRB.fX - _ClipArea->sLT.fX), (BLU32)(_ClipArea->sRB.fY - _ClipArea->sLT.fY), FALSE);
+	_BLGlyphAtlas* _gatlas = _ft->bFreetype ? blDictElement(_ft->pGlyphAtlas, _FontHeight) : blDictRootElement(_ft->pGlyphAtlas);
+	if (!_gatlas)
+	{
+		_gatlas = (_BLGlyphAtlas*)malloc(sizeof(_BLGlyphAtlas));
+		memset(_gatlas, 0, sizeof(_BLGlyphAtlas));
+		_gatlas->pTextures = blGenArray(FALSE);
+		_gatlas->pGlyphs = blGenDict(FALSE);
+		_gatlas->nCurTexture = INVALID_GUID;
+		blDictInsert(_ft->pGlyphAtlas, _FontHeight, _gatlas);
+	}
+	BLF32 _scale = 1.f;
+	if (_ft->bFreetype)
+		FT_Set_Char_Size(_ft->pFtFace, _FontHeight * 64, 0, 72 * 64, 72);
+	else
+	{
+		_scale = (BLF32)_FontHeight / _gatlas->nYB;
+	}
+	BLF32 _w, _h;
+	_FontMeasure(_str, _ft, _FontHeight, &_w, &_h, _Flag);
+	BLVec2 _pt;
+	_pt.fX = _Area->sLT.fX;
+	_pt.fY = _Area->sLT.fY;
+	if (_AlignmentV == BL_UA_VCENTER)
+		_pt.fY = (_Area->sLT.fY + _Area->sRB.fY) * 0.5f - _h * 0.5f;
+	else if (_AlignmentV == BL_UA_BOTTOM)
+		_pt.fY = _Area->sRB.fY - _h;
+	else
+		_pt.fY = _Area->sLT.fY;
+	if (!_Multiline)
+	{
+		if (_AlignmentH == BL_UA_HCENTER)
+			_pt.fX = (_Area->sLT.fX + _Area->sRB.fX) * 0.5f - _w * 0.5f;
+		else if (_AlignmentH == BL_UA_RIGHT)
+			_pt.fX = _Area->sRB.fX - _w;
+		else
+			_pt.fX = _Area->sLT.fX;
+		for (BLU32 _idx = 0; _idx < _txtlen; ++_idx)
+		{
+			BLUtf16 _c = _str[_idx];
+			if (_c == 13 || _c == 10)
+				continue;
+			_BLGlyph* _gi = _FontGlyph(_ft, MAKEU32(_c, _Flag), _FontHeight);
+			if (!_gi)
+				continue;
+			BLF32 _ltx = _pt.fX + _gi->sOffset.fX * _scale;
+			BLF32 _lty = _pt.fY + _gi->sOffset.fY * _scale;
+			BLF32 _rbx = _ltx + _gi->sRect.sRB.fX * _scale - _gi->sRect.sLT.fX * _scale;
+			BLF32 _rby = _lty + _gi->sRect.sRB.fY * _scale - _gi->sRect.sLT.fY * _scale;
+			BLF32 _texltx = _gi->sRect.sLT.fX / (_ft->bFreetype ? 256.f : _gatlas->nRecordX);
+			BLF32 _texlty = _gi->sRect.sLT.fY / (_ft->bFreetype ? 256.f : _gatlas->nRecordY);
+			BLF32 _texrbx = _gi->sRect.sRB.fX / (_ft->bFreetype ? 256.f : _gatlas->nRecordX);
+			BLF32 _texrby = _gi->sRect.sRB.fY / (_ft->bFreetype ? 256.f : _gatlas->nRecordY);
+			BLF32 _rgba[4];
+			blDeColor4F(_Color, _rgba);
+			BLF32 _vbo[] = {
+				PIXEL_ALIGNED_INTERNAL(_ltx),
+				PIXEL_ALIGNED_INTERNAL(_lty),
+				_rgba[0],
+				_rgba[1],
+				_rgba[2],
+				_rgba[3] * _Alpha,
+				_texltx,
+				_texlty,
+				PIXEL_ALIGNED_INTERNAL(_rbx),
+				PIXEL_ALIGNED_INTERNAL(_lty),
+				_rgba[0],
+				_rgba[1],
+				_rgba[2],
+				_rgba[3] * _Alpha,
+				_texrbx,
+				_texlty,
+				PIXEL_ALIGNED_INTERNAL(_ltx),
+				PIXEL_ALIGNED_INTERNAL(_rby),
+				_rgba[0],
+				_rgba[1],
+				_rgba[2],
+				_rgba[3] * _Alpha,
+				_texltx,
+				_texrby,
+				PIXEL_ALIGNED_INTERNAL(_rbx),
+				PIXEL_ALIGNED_INTERNAL(_rby),
+				_rgba[0],
+				_rgba[1],
+				_rgba[2],
+				_rgba[3] * _Alpha,
+				_texrbx,
+				_texrby
+			};
+			_pt.fX += _gi->nAdv;
+			blTechSampler(_PrUIMem->nUITech, "Texture0", _gi->nTexture, 0);
+			blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+			blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
+		}
+	}
+	else
+	{
+		BLU32 _ls = 0, _le = 0;
+		BLUtf16* _line = (BLUtf16*)alloca((_txtlen + 1) * sizeof(BLUtf16));
+		while (_le < _txtlen)
+		{
+			memset(_line, 0, (_txtlen + 1) * sizeof(BLUtf16));
+			_le = _txtlen;
+			for (BLU32 _idx = _ls; _idx < _txtlen; ++_idx)
+			{
+				if (_str[_idx] == 10)
+				{
+					_le = _idx;
+					break;
+				}
+			}
+			for (BLU32 _idx = 0; _idx < _le - _ls; ++_idx)
+				_line[_idx] = _str[_idx + _ls];
+			if (_AlignmentH == BL_UA_HCENTER)
+			{
+				BLF32 _linew, _lineh;
+				_FontMeasure(_line, _ft, _FontHeight, &_linew, &_lineh, _Flag);
+				_pt.fX = (_Area->sLT.fX + _Area->sRB.fX) * 0.5f - _linew * 0.5f;
+			}
+			else if (_AlignmentH == BL_UA_RIGHT)
+			{
+				BLF32 _linew, _lineh;
+				_FontMeasure(_line, _ft, _FontHeight, &_linew, &_lineh, _Flag);
+				_pt.fX = _Area->sRB.fX - _linew;
+			}
+			else
+				_pt.fX = _Area->sLT.fX;
+			for (BLU32 _idx = 0; _idx < _le - _ls; ++_idx)
+			{
+				BLUtf16 _c = _line[_idx];
+				if (_c == 13 || _c == 10)
+					continue;
+				_BLGlyph* _gi = _FontGlyph(_ft, MAKEU32(_c, _Flag), _FontHeight);
+				if (_gi->nTexture == INVALID_GUID)
+					continue;
+				BLF32 _ltx = _pt.fX + _gi->sOffset.fX * _scale;
+				BLF32 _lty = _pt.fY + _gi->sOffset.fY * _scale;
+				BLF32 _rbx = _ltx + _gi->sRect.sRB.fX * _scale - _gi->sRect.sLT.fX * _scale;
+				BLF32 _rby = _lty + _gi->sRect.sRB.fY * _scale - _gi->sRect.sLT.fY * _scale;
+				BLF32 _texltx = _gi->sRect.sLT.fX / (_ft->bFreetype ? 256.f : _gatlas->nRecordX);
+				BLF32 _texlty = _gi->sRect.sLT.fY / (_ft->bFreetype ? 256.f : _gatlas->nRecordY);
+				BLF32 _texrbx = _gi->sRect.sRB.fX / (_ft->bFreetype ? 256.f : _gatlas->nRecordX);
+				BLF32 _texrby = _gi->sRect.sRB.fY / (_ft->bFreetype ? 256.f : _gatlas->nRecordY);
+				BLF32 _rgba[4];
+				blDeColor4F(_Color, _rgba);
+				BLF32 _vbo[] = {
+					PIXEL_ALIGNED_INTERNAL(_ltx),
+					PIXEL_ALIGNED_INTERNAL(_lty),
+					_rgba[0],
+					_rgba[1],
+					_rgba[2],
+					_rgba[3] * _Alpha,
+					_texltx,
+					_texlty,
+					PIXEL_ALIGNED_INTERNAL(_rbx),
+					PIXEL_ALIGNED_INTERNAL(_lty),
+					_rgba[0],
+					_rgba[1],
+					_rgba[2],
+					_rgba[3] * _Alpha,
+					_texrbx,
+					_texlty,
+					PIXEL_ALIGNED_INTERNAL(_ltx),
+					PIXEL_ALIGNED_INTERNAL(_rby),
+					_rgba[0],
+					_rgba[1],
+					_rgba[2],
+					_rgba[3] * _Alpha,
+					_texltx,
+					_texrby,
+					PIXEL_ALIGNED_INTERNAL(_rbx),
+					PIXEL_ALIGNED_INTERNAL(_rby),
+					_rgba[0],
+					_rgba[1],
+					_rgba[2],
+					_rgba[3] * _Alpha,
+					_texrbx,
+					_texrby
+				};
+				_pt.fX += _gi->nAdv;
+				blTechSampler(_PrUIMem->nUITech, "Texture0", _gi->nTexture, 0);
+				blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
+				blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
+			}
+			_ls = _le + 1;
+			_pt.fY += _FontHeight;
+		}
+	}
 }
 static void
 _LabelRow(_BLWidget* _Node)
@@ -2382,7 +2631,7 @@ _UISetup(BLVoid* _Src)
 			_node->uExtension.sPanel.pTexData = NULL;
 		}
 		else
-			_node->uExtension.sPanel.nPixmapTex = blGainTexture(blHashString((const BLUtf8*)_node->uExtension.sPanel.aPixmap));
+			_node->uExtension.sPanel.nPixmapTex = blTextureGain(blHashString((const BLUtf8*)_node->uExtension.sPanel.aPixmap));
 		break;
 	case BL_UT_LABEL:
 		if (_node->uExtension.sLabel.pTexData && _node->uExtension.sLabel.nPixmapTex == INVALID_GUID)
@@ -2392,7 +2641,7 @@ _UISetup(BLVoid* _Src)
 			_node->uExtension.sLabel.pTexData = NULL;
 		}
 		else
-			_node->uExtension.sLabel.nPixmapTex = blGainTexture(blHashString((const BLUtf8*)_node->uExtension.sLabel.aPixmap));
+			_node->uExtension.sLabel.nPixmapTex = blTextureGain(blHashString((const BLUtf8*)_node->uExtension.sLabel.aPixmap));
 		break;
 	case BL_UT_BUTTON:
 		if (_node->uExtension.sButton.pTexData && _node->uExtension.sButton.nPixmapTex == INVALID_GUID)
@@ -2402,7 +2651,7 @@ _UISetup(BLVoid* _Src)
 			_node->uExtension.sButton.pTexData = NULL;
 		}
 		else
-			_node->uExtension.sButton.nPixmapTex = blGainTexture(blHashString((const BLUtf8*)_node->uExtension.sButton.aPixmap));
+			_node->uExtension.sButton.nPixmapTex = blTextureGain(blHashString((const BLUtf8*)_node->uExtension.sButton.aPixmap));
 		break;
 	case BL_UT_CHECK:
 		if (_node->uExtension.sCheck.pTexData && _node->uExtension.sCheck.nPixmapTex == INVALID_GUID)
@@ -2412,7 +2661,7 @@ _UISetup(BLVoid* _Src)
 			_node->uExtension.sCheck.pTexData = NULL;
 		}
 		else
-			_node->uExtension.sCheck.nPixmapTex = blGainTexture(blHashString((const BLUtf8*)_node->uExtension.sCheck.aPixmap));
+			_node->uExtension.sCheck.nPixmapTex = blTextureGain(blHashString((const BLUtf8*)_node->uExtension.sCheck.aPixmap));
 		break;
 	case BL_UT_SLIDER:
 		if (_node->uExtension.sSlider.pTexData && _node->uExtension.sSlider.nPixmapTex == INVALID_GUID)
@@ -2422,7 +2671,7 @@ _UISetup(BLVoid* _Src)
 			_node->uExtension.sSlider.pTexData = NULL;
 		}
 		else
-			_node->uExtension.sSlider.nPixmapTex = blGainTexture(blHashString((const BLUtf8*)_node->uExtension.sSlider.aPixmap));
+			_node->uExtension.sSlider.nPixmapTex = blTextureGain(blHashString((const BLUtf8*)_node->uExtension.sSlider.aPixmap));
 		break;
 	case BL_UT_TEXT:
 		if (_node->uExtension.sText.pTexData && _node->uExtension.sText.nPixmapTex == INVALID_GUID)
@@ -2432,7 +2681,7 @@ _UISetup(BLVoid* _Src)
 			_node->uExtension.sText.pTexData = NULL;
 		}
 		else
-			_node->uExtension.sText.nPixmapTex = blGainTexture(blHashString((const BLUtf8*)_node->uExtension.sText.aPixmap));
+			_node->uExtension.sText.nPixmapTex = blTextureGain(blHashString((const BLUtf8*)_node->uExtension.sText.aPixmap));
 		break;
 	case BL_UT_PROGRESS:
 		if (_node->uExtension.sProgress.pTexData && _node->uExtension.sProgress.nPixmapTex == INVALID_GUID)
@@ -2442,7 +2691,7 @@ _UISetup(BLVoid* _Src)
 			_node->uExtension.sProgress.pTexData = NULL;
 		}
 		else
-			_node->uExtension.sProgress.nPixmapTex = blGainTexture(blHashString((const BLUtf8*)_node->uExtension.sProgress.aPixmap));
+			_node->uExtension.sProgress.nPixmapTex = blTextureGain(blHashString((const BLUtf8*)_node->uExtension.sProgress.aPixmap));
 		break;
 	case BL_UT_DIAL:
 		if (_node->uExtension.sDial.pTexData && _node->uExtension.sDial.nPixmapTex == INVALID_GUID)
@@ -2452,7 +2701,7 @@ _UISetup(BLVoid* _Src)
 			_node->uExtension.sDial.pTexData = NULL;
 		}
 		else
-			_node->uExtension.sDial.nPixmapTex = blGainTexture(blHashString((const BLUtf8*)_node->uExtension.sDial.aPixmap));
+			_node->uExtension.sDial.nPixmapTex = blTextureGain(blHashString((const BLUtf8*)_node->uExtension.sDial.aPixmap));
 		break;
 	case BL_UT_TABLE:
 		if (_node->uExtension.sTable.pTexData && _node->uExtension.sTable.nPixmapTex == INVALID_GUID)
@@ -2462,7 +2711,7 @@ _UISetup(BLVoid* _Src)
 			_node->uExtension.sTable.pTexData = NULL;
 		}
 		else
-			_node->uExtension.sTable.nPixmapTex = blGainTexture(blHashString((const BLUtf8*)_node->uExtension.sTable.aPixmap));
+			_node->uExtension.sTable.nPixmapTex = blTextureGain(blHashString((const BLUtf8*)_node->uExtension.sTable.aPixmap));
 		break;
 	default: break;
 	}
@@ -3349,239 +3598,6 @@ _UnloadUI(BLVoid* _Src)
 	}
 	_widget->bValid = FALSE;
 	return TRUE;
-}
-static BLVoid
-_WriteText(const BLUtf16* _Text, const BLAnsi* _Font, BLU32 _FontHeight, BLEnum _AlignmentH, BLEnum _AlignmentV, BLBool _Multiline, BLRect* _Area, BLRect* _ClipArea, BLU32 _Color, BLF32 _Alpha, BLU16 _Flag, BLBool _Pwd)
-{
-	BLU32 _txtlen = blUtf16Length(_Text);
-	if (!_txtlen)
-		return;
-	if (!_Font)
-		return;
-	if (!strlen(_Font))
-		return;
-	_BLFont* _ft = NULL;
-	BLUtf16* _str = (BLUtf16*)alloca((_txtlen + 1) * sizeof(BLUtf16));
-	memset(_str, 0, (_txtlen + 1) * sizeof(BLUtf16));
-	if (_Pwd)
-	{
-		for (BLU32 _idx = 0; _idx < _txtlen; ++_idx)
-			_str[_idx] = L'*';
-	}
-	else
-	{
-		for (BLU32 _idx = 0; _idx < _txtlen; ++_idx)
-			_str[_idx] = _Text[_idx];
-	}
-	{
-		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
-		{
-			if (_iter->nHashName == blHashString((const BLUtf8*)_Font))
-			{
-				_ft = _iter;
-				break;
-			}
-		}
-	}
-	if (!_ft)
-	{
-		FOREACH_ARRAY(_BLFont*, _iter, _PrUIMem->pFonts)
-		{
-			if (_iter->nHashName == blHashString((const BLUtf8*)"default"))
-			{
-				_ft = _iter;
-				break;
-			}
-		}
-	}
-	blRasterState(BL_CM_CW, 0, 0.f, TRUE, (BLS32)_ClipArea->sLT.fX, (BLS32)_ClipArea->sLT.fY, (BLU32)(_ClipArea->sRB.fX - _ClipArea->sLT.fX), (BLU32)(_ClipArea->sRB.fY - _ClipArea->sLT.fY), FALSE);
-	_BLGlyphAtlas* _gatlas = _ft->bFreetype ? blDictElement(_ft->pGlyphAtlas, _FontHeight) : blDictRootElement(_ft->pGlyphAtlas);
-	if (!_gatlas)
-	{
-		_gatlas = (_BLGlyphAtlas*)malloc(sizeof(_BLGlyphAtlas));
-		memset(_gatlas, 0, sizeof(_BLGlyphAtlas));
-		_gatlas->pTextures = blGenArray(FALSE);
-		_gatlas->pGlyphs = blGenDict(FALSE);
-		_gatlas->nCurTexture = INVALID_GUID;
-		blDictInsert(_ft->pGlyphAtlas, _FontHeight, _gatlas);
-	}
-	BLF32 _scale = 1.f;
-	if (_ft->bFreetype)
-		FT_Set_Char_Size(_ft->pFtFace, _FontHeight * 64, 0, 72 * 64, 72);
-	else
-	{
-		_scale = (BLF32)_FontHeight / _gatlas->nYB;
-	}
-	BLF32 _w, _h;
-	_FontMeasure(_str, _ft, _FontHeight, &_w, &_h, _Flag);
-	BLVec2 _pt;
-	_pt.fX = _Area->sLT.fX;
-	_pt.fY = _Area->sLT.fY;
-	if (_AlignmentV == BL_UA_VCENTER)
-		_pt.fY = (_Area->sLT.fY + _Area->sRB.fY) * 0.5f - _h * 0.5f;
-	else if (_AlignmentV == BL_UA_BOTTOM)
-		_pt.fY = _Area->sRB.fY - _h;
-	else
-		_pt.fY = _Area->sLT.fY;
-	if (!_Multiline)
-	{
-		if (_AlignmentH == BL_UA_HCENTER)
-			_pt.fX = (_Area->sLT.fX + _Area->sRB.fX) * 0.5f - _w * 0.5f;
-		else if (_AlignmentH == BL_UA_RIGHT)
-			_pt.fX = _Area->sRB.fX - _w;
-		else
-			_pt.fX = _Area->sLT.fX;
-		for (BLU32 _idx = 0; _idx < _txtlen; ++_idx)
-		{
-			BLUtf16 _c = _str[_idx];
-			if (_c == 13 || _c == 10)
-				continue;
-			_BLGlyph* _gi = _FontGlyph(_ft, MAKEU32(_c, _Flag), _FontHeight);
-			if (!_gi)
-				continue;
-			BLF32 _ltx = _pt.fX + _gi->sOffset.fX * _scale;
-			BLF32 _lty = _pt.fY + _gi->sOffset.fY * _scale;
-			BLF32 _rbx = _ltx + _gi->sRect.sRB.fX * _scale - _gi->sRect.sLT.fX * _scale;
-			BLF32 _rby = _lty + _gi->sRect.sRB.fY * _scale - _gi->sRect.sLT.fY * _scale;
-			BLF32 _texltx = _gi->sRect.sLT.fX / (_ft->bFreetype ? 256.f : _gatlas->nRecordX);
-			BLF32 _texlty = _gi->sRect.sLT.fY / (_ft->bFreetype ? 256.f : _gatlas->nRecordY);
-			BLF32 _texrbx = _gi->sRect.sRB.fX / (_ft->bFreetype ? 256.f : _gatlas->nRecordX);
-			BLF32 _texrby = _gi->sRect.sRB.fY / (_ft->bFreetype ? 256.f : _gatlas->nRecordY);
-			BLF32 _rgba[4];
-			blDeColor4F(_Color, _rgba);
-			BLF32 _vbo[] = {
-				PIXEL_ALIGNED_INTERNAL(_ltx),
-				PIXEL_ALIGNED_INTERNAL(_lty),
-				_rgba[0],
-				_rgba[1],
-				_rgba[2],
-				_rgba[3] * _Alpha,
-				_texltx,
-				_texlty,
-				PIXEL_ALIGNED_INTERNAL(_rbx),
-				PIXEL_ALIGNED_INTERNAL(_lty),
-				_rgba[0],
-				_rgba[1],
-				_rgba[2],
-				_rgba[3] * _Alpha,
-				_texrbx,
-				_texlty,
-				PIXEL_ALIGNED_INTERNAL(_ltx),
-				PIXEL_ALIGNED_INTERNAL(_rby),
-				_rgba[0],
-				_rgba[1],
-				_rgba[2],
-				_rgba[3] * _Alpha,
-				_texltx,
-				_texrby,
-				PIXEL_ALIGNED_INTERNAL(_rbx),
-				PIXEL_ALIGNED_INTERNAL(_rby),
-				_rgba[0],
-				_rgba[1],
-				_rgba[2],
-				_rgba[3] * _Alpha,
-				_texrbx,
-				_texrby
-			};
-			_pt.fX += _gi->nAdv;
-			blTechSampler(_PrUIMem->nUITech, "Texture0", _gi->nTexture, 0);
-			blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-			blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
-		}
-	}
-	else
-	{
-		BLU32 _ls = 0, _le = 0;
-		BLUtf16* _line = (BLUtf16*)alloca((_txtlen + 1) * sizeof(BLUtf16));
-		while (_le < _txtlen)
-		{
-			memset(_line, 0, (_txtlen + 1)* sizeof(BLUtf16));
-			_le = _txtlen;
-			for (BLU32 _idx = _ls; _idx < _txtlen; ++_idx)
-			{
-				if (_str[_idx] == 10)
-				{
-					_le = _idx;
-					break;
-				}
-			}
-			for (BLU32 _idx = 0; _idx < _le - _ls; ++_idx)
-				_line[_idx] = _str[_idx + _ls];
-			if (_AlignmentH == BL_UA_HCENTER)
-			{
-				BLF32 _linew, _lineh;
-				_FontMeasure(_line, _ft, _FontHeight, &_linew, &_lineh, _Flag);
-				_pt.fX = (_Area->sLT.fX + _Area->sRB.fX) * 0.5f - _linew * 0.5f;
-			}
-			else if (_AlignmentH == BL_UA_RIGHT)
-			{
-				BLF32 _linew, _lineh;
-				_FontMeasure(_line, _ft, _FontHeight, &_linew, &_lineh, _Flag);
-				_pt.fX = _Area->sRB.fX - _linew;
-			}
-			else
-				_pt.fX = _Area->sLT.fX;
-			for (BLU32 _idx = 0; _idx < _le - _ls; ++_idx)
-			{
-				BLUtf16 _c = _line[_idx];
-				if (_c == 13 || _c == 10)
-					continue;
-				_BLGlyph* _gi = _FontGlyph(_ft, MAKEU32(_c, _Flag), _FontHeight);
-				if (_gi->nTexture == INVALID_GUID)
-					continue;
-				BLF32 _ltx = _pt.fX + _gi->sOffset.fX * _scale;
-				BLF32 _lty = _pt.fY + _gi->sOffset.fY * _scale;
-				BLF32 _rbx = _ltx + _gi->sRect.sRB.fX * _scale - _gi->sRect.sLT.fX * _scale;
-				BLF32 _rby = _lty + _gi->sRect.sRB.fY * _scale - _gi->sRect.sLT.fY * _scale;
-				BLF32 _texltx = _gi->sRect.sLT.fX / (_ft->bFreetype ? 256.f : _gatlas->nRecordX);
-				BLF32 _texlty = _gi->sRect.sLT.fY / (_ft->bFreetype ? 256.f : _gatlas->nRecordY);
-				BLF32 _texrbx = _gi->sRect.sRB.fX / (_ft->bFreetype ? 256.f : _gatlas->nRecordX);
-				BLF32 _texrby = _gi->sRect.sRB.fY / (_ft->bFreetype ? 256.f : _gatlas->nRecordY);
-				BLF32 _rgba[4];
-				blDeColor4F(_Color, _rgba);
-				BLF32 _vbo[] = {
-					PIXEL_ALIGNED_INTERNAL(_ltx),
-					PIXEL_ALIGNED_INTERNAL(_lty),
-					_rgba[0],
-					_rgba[1],
-					_rgba[2],
-					_rgba[3] * _Alpha,
-					_texltx,
-					_texlty,
-					PIXEL_ALIGNED_INTERNAL(_rbx),
-					PIXEL_ALIGNED_INTERNAL(_lty),
-					_rgba[0],
-					_rgba[1],
-					_rgba[2],
-					_rgba[3] * _Alpha,
-					_texrbx,
-					_texlty,
-					PIXEL_ALIGNED_INTERNAL(_ltx),
-					PIXEL_ALIGNED_INTERNAL(_rby),
-					_rgba[0],
-					_rgba[1],
-					_rgba[2],
-					_rgba[3] * _Alpha,
-					_texltx,
-					_texrby,
-					PIXEL_ALIGNED_INTERNAL(_rbx),
-					PIXEL_ALIGNED_INTERNAL(_rby),
-					_rgba[0],
-					_rgba[1],
-					_rgba[2],
-					_rgba[3] * _Alpha,
-					_texrbx,
-					_texrby
-				};
-				_pt.fX += _gi->nAdv;
-				blTechSampler(_PrUIMem->nUITech, "Texture0", _gi->nTexture, 0);
-				blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-				blDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
-			}
-			_ls = _le + 1;
-			_pt.fY += _FontHeight;
-		}
-	}
 }
 static BLVoid
 _DrawPanel(_BLWidget* _Node, BLF32 _XPos, BLF32 _YPos, BLF32 _Width, BLF32 _Height)
@@ -11661,13 +11677,13 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 		_UIUpdate(_PrUIMem->pRoot, _Delta);
 		if (_PrUIMem->bDirty)
 		{
-			blBindFrameBuffer(_PrUIMem->nFBO, TRUE);
+			blFrameBufferBind(_PrUIMem->nFBO, TRUE);
 			BLF32 _screensz[2] = { 2.f / (BLF32)_PrUIMem->nFboWidth, 2.f / (BLF32)_PrUIMem->nFboHeight };
 			blTechUniform(_PrUIMem->nUITech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
 			blFrameBufferClear(TRUE, FALSE, FALSE);
 			_DrawWidget(_PrUIMem->pRoot, 0.f, 0.f, 1.f, 1.f);
 			blFrameBufferResolve(_PrUIMem->nFBO);
-			blBindFrameBuffer(_PrUIMem->nFBO, FALSE);
+			blFrameBufferBind(_PrUIMem->nFBO, FALSE);
 			_PrUIMem->bDirty = FALSE;
 		}
 		BLF32 _screensz[2] = { 2.f / (BLF32)_width, 2.f / (BLF32)_height };

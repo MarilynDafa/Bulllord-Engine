@@ -1359,7 +1359,7 @@ blDeleteFrameBuffer(IN BLGuid _FBO)
 #endif
 }
 BLVoid
-blBindFrameBuffer(IN BLGuid _FBO, IN BLBool _Bind)
+blFrameBufferBind(IN BLGuid _FBO, IN BLBool _Bind)
 {
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
@@ -1554,7 +1554,7 @@ blDeleteTexture(IN BLGuid _Tex)
 	return TRUE;
 }
 BLGuid
-blGainTexture(IN BLU32 _Hash)
+blTextureGain(IN BLU32 _Hash)
 {
     blMutexLock(_PrGpuMem->pTextureCache->pMutex);
     _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTextureCache, _Hash);
@@ -2093,7 +2093,7 @@ blDeleteGeometryBuffer(IN BLGuid _GBO)
 	return TRUE;
 }
 BLGuid
-blGainGeometryBuffer(IN BLU32 _Hash)
+blGeometryBufferGain(IN BLU32 _Hash)
 {
     blMutexLock(_PrGpuMem->pBufferCache->pMutex);
     _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pBufferCache, _Hash);
@@ -2604,7 +2604,7 @@ blDeleteTechnique(IN BLGuid _Tech)
 	return TRUE;
 }
 BLGuid
-blGainTechnique(IN BLU32 _Hash)
+blTechniqueGain(IN BLU32 _Hash)
 {
     blMutexLock(_PrGpuMem->pTechCache->pMutex);
     _BLGpuRes* _res = (_BLGpuRes*)blDictElement(_PrGpuMem->pTechCache, _Hash);
