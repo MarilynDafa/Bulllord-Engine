@@ -2134,7 +2134,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\$(ToolchainName)\$(ToolchainFullVersionName)\$(PlatformShortName);$(StlLibraryPath)</AdditionalLibraryDirectories>
-      <LibraryDependencies>Bulllord;m;$(StlLibraryName);%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>Bulllord;%(LibraryDependencies)</LibraryDependencies>
       <AdditionalOptions>-Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -2147,7 +2147,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories);$(ToolchainPrebuiltPath)\lib\gcc\$(ToolchainName)\$(ToolchainFullVersionName)\$(PlatformShortName);$(StlLibraryPath)</AdditionalLibraryDirectories>
-      <LibraryDependencies>Bulllord;m;$(StlLibraryName);%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>Bulllord;%(LibraryDependencies)</LibraryDependencies>
       <AdditionalOptions>-Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
       <DebuggerSymbolInformation>OmitAllSymbolInformation</DebuggerSymbolInformation>
     </Link>

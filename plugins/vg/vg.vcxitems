@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{4050b989-5b06-4cf0-89e9-e4e76c5faade}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)bezier.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)curve.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spline.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)vgentry.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)bezier.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)curve.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spline.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)vgentry.c" />
+  </ItemGroup>
+</Project>

@@ -35,15 +35,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{6dd71aba-5a92-45ea-baca-2381025b3226}</ProjectGuid>
+    <ProjectGuid>{5ba53eb0-49b0-4a13-a315-f65e4bdae68f}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>chipmunk_linux</RootNamespace>
+    <RootNamespace>vg_linux</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
     <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
     <LinuxProjectType>{2238F9CD-F817-4ECC-BD14-2524D2669B35}</LinuxProjectType>
-    <ProjectName>chipmunk</ProjectName>
+    <ProjectName>vg</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
@@ -75,53 +75,59 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared">
-    <Import Project="chipmunk.vcxitems" Label="Shared" />
+    <Import Project="vg.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
-    <TargetName>libChipmunkPlugin</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <OutDir>..\..\bin\linux</OutDir>
+    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
+    <OutDir>..\..\bin\linux</OutDir>
+    <TargetName>libVGPlugin</TargetName>
     <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <OutDir>..\..\bin\linux</OutDir>
     <IntDir>$(Configuration)\linux\$(Platform)</IntDir>
-    <TargetName>libChipmunkPlugin</TargetName>
+    <OutDir>..\..\bin\linux</OutDir>
+    <TargetName>libVGPlugin</TargetName>
     <TargetExt>.so</TargetExt>
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
-      <PositionIndependentCode>true</PositionIndependentCode>
-      <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++11</CppLanguageStandard>
-    </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>/root/projects/bin/linux;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>-lBulllord;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>-m32 -Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;__linux__;</PreprocessorDefinitions>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BL_EXPORT;__linux__;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
-      <PositionIndependentCode>true</PositionIndependentCode>
-      <CLanguageStandard>gnu11</CLanguageStandard>
-      <CppLanguageStandard>gnu++11</CppLanguageStandard>
-    </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>/root/projects/bin/linux;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>-lBulllord;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>-m32 -Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>/root/projects/bulllord/externals;/root/projects/bulllord/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BL_EXPORT;__linux__;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CLanguageStandard>gnu11</CLanguageStandard>
+      <CppLanguageStandard>gnu++11</CppLanguageStandard>
+      <AdditionalOptions>-march=native -msse4.1 -fshort-wchar -m32 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

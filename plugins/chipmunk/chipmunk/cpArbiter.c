@@ -21,6 +21,56 @@
 
 #include "chipmunk/chipmunk_private.h"
 
+#if __ARM_NEON__
+#include <arm_neon.h>
+#if CP_USE_DOUBLES
+#if !__arm64
+#error Cannot use CP_USE_DOUBLES on 32 bit ARM.
+#endif
+
+typedef float64_t cpFloat_t;
+typedef float64x2_t cpFloatx2_t;
+#define vld vld1q_f64
+#define vdup_n vdupq_n_f64
+#define vst vst1q_f64
+#define vst_lane vst1q_lane_f64
+#define vadd vaddq_f64
+#define vsub vsubq_f64
+#define vpadd vpaddq_f64
+#define vmul vmulq_f64
+#define vmul_n vmulq_n_f64
+#define vneg vnegq_f64
+#define vget_lane vgetq_lane_f64
+#define vset_lane vsetq_lane_f64
+#define vmin vminq_f64
+#define vmax vmaxq_f64
+#define vrev(__a) __builtin_shufflevector(__a, __a, 1, 0)
+#else
+typedef float32_t cpFloat_t;
+typedef float32x2_t cpFloatx2_t;
+#define vld vld1_f32
+#define vdup_n vdup_n_f32
+#define vst vst1_f32
+#define vst_lane vst1_lane_f32
+#define vadd vadd_f32
+#define vsub vsub_f32
+#define vpadd vpadd_f32
+#define vmul vmul_f32
+#define vmul_n vmul_n_f32
+#define vneg vneg_f32
+#define vget_lane vget_lane_f32
+#define vset_lane vset_lane_f32
+#define vmin vmin_f32
+#define vmax vmax_f32
+#define vrev vrev64_f32
+#endif
+static inline cpFloatx2_t
+vmake(cpFloat_t x, cpFloat_t y)
+{
+	return (cpFloatx2_t) { x, y };
+}
+#endif
+
 // TODO: make this generic so I can reuse it for constraints also.
 static inline void
 unthreadHelper(cpArbiter *arb, cpBody *body)
@@ -457,6 +507,74 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef)
 void
 cpArbiterApplyImpulse(cpArbiter *arb)
 {
+#ifdef __ARM_NEON__
+	cpBody *a = arb->body_a;
+	cpBody *b = arb->body_b;
+	cpFloatx2_t surface_vr = vld((cpFloat_t *)&arb->surface_vr);
+	cpFloatx2_t n = vld((cpFloat_t *)&arb->n);
+	cpFloat_t friction = arb->u;
+	int numContacts = arb->count;
+	struct cpContact *contacts = arb->contacts;
+	for (int i = 0; i < numContacts; i++) {
+		struct cpContact *con = contacts + i;
+		cpFloatx2_t r1 = vld((cpFloat_t *)&con->r1);
+		cpFloatx2_t r2 = vld((cpFloat_t *)&con->r2);
+		cpFloatx2_t perp = vmake(-1.0, 1.0);
+		cpFloatx2_t r1p = vmul(vrev(r1), perp);
+		cpFloatx2_t r2p = vmul(vrev(r2), perp);
+		cpFloatx2_t vBias_a = vld((cpFloat_t *)&a->v_bias);
+		cpFloatx2_t vBias_b = vld((cpFloat_t *)&b->v_bias);
+		cpFloatx2_t wBias = vmake(a->w_bias, b->w_bias);
+		cpFloatx2_t vb1 = vadd(vBias_a, vmul_n(r1p, vget_lane(wBias, 0)));
+		cpFloatx2_t vb2 = vadd(vBias_b, vmul_n(r2p, vget_lane(wBias, 1)));
+		cpFloatx2_t vbr = vsub(vb2, vb1);
+		cpFloatx2_t v_a = vld((cpFloat_t *)&a->v);
+		cpFloatx2_t v_b = vld((cpFloat_t *)&b->v);
+		cpFloatx2_t w = vmake(a->w, b->w);
+		cpFloatx2_t v1 = vadd(v_a, vmul_n(r1p, vget_lane(w, 0)));
+		cpFloatx2_t v2 = vadd(v_b, vmul_n(r2p, vget_lane(w, 1)));
+		cpFloatx2_t vr = vsub(v2, v1);
+		cpFloatx2_t vbn_vrn = vpadd(vmul(vbr, n), vmul(vr, n));
+		cpFloatx2_t v_offset = vmake(con->bias, -con->bounce);
+		cpFloatx2_t jOld = vmake(con->jBias, con->jnAcc);
+		cpFloatx2_t jbn_jn = vmul_n(vsub(v_offset, vbn_vrn), con->nMass);
+		jbn_jn = vmax(vadd(jOld, jbn_jn), vdup_n(0.0));
+		cpFloatx2_t jApply = vsub(jbn_jn, jOld);
+		cpFloatx2_t t = vmul(vrev(n), perp);
+		cpFloatx2_t vrt_tmp = vmul(vadd(vr, surface_vr), t);
+		cpFloatx2_t vrt = vpadd(vrt_tmp, vrt_tmp);
+		cpFloatx2_t jtOld = {}; jtOld = vset_lane(con->jtAcc, jtOld, 0);
+		cpFloatx2_t jtMax = vrev(vmul_n(jbn_jn, friction));
+		cpFloatx2_t jt = vmul_n(vrt, -con->tMass);
+		jt = vmax(vneg(jtMax), vmin(vadd(jtOld, jt), jtMax));
+		cpFloatx2_t jtApply = vsub(jt, jtOld);
+		cpFloatx2_t i_inv = vmake(-a->i_inv, b->i_inv);
+		cpFloatx2_t nperp = vmake(1.0, -1.0);
+		cpFloatx2_t jBias = vmul_n(n, vget_lane(jApply, 0));
+		cpFloatx2_t jBiasCross = vmul(vrev(jBias), nperp);
+		cpFloatx2_t biasCrosses = vpadd(vmul(r1, jBiasCross), vmul(r2, jBiasCross));
+		wBias = vadd(wBias, vmul(i_inv, biasCrosses));
+		vBias_a = vsub(vBias_a, vmul_n(jBias, a->m_inv));
+		vBias_b = vadd(vBias_b, vmul_n(jBias, b->m_inv));
+		cpFloatx2_t j = vadd(vmul_n(n, vget_lane(jApply, 1)), vmul_n(t, vget_lane(jtApply, 0)));
+		cpFloatx2_t jCross = vmul(vrev(j), nperp);
+		cpFloatx2_t crosses = vpadd(vmul(r1, jCross), vmul(r2, jCross));
+		w = vadd(w, vmul(i_inv, crosses));
+		v_a = vsub(v_a, vmul_n(j, a->m_inv));
+		v_b = vadd(v_b, vmul_n(j, b->m_inv));
+		vst((cpFloat_t *)&a->v_bias, vBias_a);
+		vst((cpFloat_t *)&b->v_bias, vBias_b);
+		vst_lane((cpFloat_t *)&a->w_bias, wBias, 0);
+		vst_lane((cpFloat_t *)&b->w_bias, wBias, 1);
+		vst((cpFloat_t *)&a->v, v_a);
+		vst((cpFloat_t *)&b->v, v_b);
+		vst_lane((cpFloat_t *)&a->w, w, 0);
+		vst_lane((cpFloat_t *)&b->w, w, 1);
+		vst_lane((cpFloat_t *)&con->jBias, jbn_jn, 0);
+		vst_lane((cpFloat_t *)&con->jnAcc, jbn_jn, 1);
+		vst_lane((cpFloat_t *)&con->jtAcc, jt, 0);
+	}
+#else
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
 	cpVect n = arb->n;
@@ -493,4 +611,5 @@ cpArbiterApplyImpulse(cpArbiter *arb)
 		apply_bias_impulses(a, b, r1, r2, cpvmult(n, con->jBias - jbnOld));
 		apply_impulses(a, b, r1, r2, cpvrotate(n, cpv(con->jnAcc - jnOld, con->jtAcc - jtOld)));
 	}
+#endif
 }

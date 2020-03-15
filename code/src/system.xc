@@ -3542,11 +3542,16 @@ blSysWorkingDir()
 			return NULL;
 		for (_idx = _len - 1; _idx > 0; _idx--)
 		{
-			if (_path[_idx] == '/')
+			if (_path[_idx] == '/' || _path[_idx] == '\\')
 				break;
 		}
 		assert(_idx > 0);
 		_path[_idx + 1] = '\0';
+		for (BLS32 _i = 0; _i <= _idx; ++_i)
+		{
+			if (_path[_i] == '\\')
+				_path[_i] = '/';
+		}
 		const BLAnsi* _tmp = (const BLAnsi*)blGenUtf8Str((const BLUtf16*)_path);
 		strcpy_s(_PrSystemMem->aWorkDir, 260, _tmp);
 		blDeleteUtf8Str((BLUtf8*)_tmp);

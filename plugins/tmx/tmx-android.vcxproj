@@ -234,7 +234,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <LibraryDependencies>Bulllord;m;%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>Bulllord;%(LibraryDependencies)</LibraryDependencies>
       <AdditionalOptions>-Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -247,7 +247,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\bin\android;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <LibraryDependencies>Bulllord;m;%(LibraryDependencies)</LibraryDependencies>
+      <LibraryDependencies>Bulllord;%(LibraryDependencies)</LibraryDependencies>
       <AdditionalOptions>-Wl,-rpath,'$ORIGIN' %(AdditionalOptions)</AdditionalOptions>
       <DebuggerSymbolInformation>OmitAllSymbolInformation</DebuggerSymbolInformation>
     </Link>
