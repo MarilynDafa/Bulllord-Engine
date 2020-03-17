@@ -23,3 +23,4 @@
 #include "SHADER_2D_GLOW.bsl"
 #include "SHADER_2D_INSTANCE.bsl"
 #include "SHADER_2D_STROKE.bsl"
+#include "SHADER_LINE.bsl"

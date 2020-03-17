@@ -939,9 +939,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\util.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\bjson.c">
       <Filter>externals\quickjs</Filter>
     </ClCompile>
@@ -961,6 +958,9 @@
       <Filter>src\internal</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\system.xc">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1994,6 +1994,9 @@
       <Filter>src\internal</Filter>
     </None>
     <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_2D_STROKE.bsl">
+      <Filter>src\internal</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_LINE.bsl">
       <Filter>src\internal</Filter>
     </None>
   </ItemGroup>

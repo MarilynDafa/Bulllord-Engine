@@ -1070,6 +1070,24 @@ BL_API BLVoid blUIPrimitiveGetColor(
 	IN BLGuid _ID,
 	OUT BLU32* _Color);
 
+BL_API BLVoid blUIPrimitiveStipple(
+	IN BLGuid _ID,
+	IN BLU32 _Dash,
+	IN BLU32 _Gap);
+
+BL_API BLVoid blUIPrimitiveGetStipple(
+	IN BLGuid _ID,
+	OUT BLU32* _Dash,
+	OUT BLU32* _Gap);
+
+BL_API BLVoid blUIPrimitiveLineWidth(
+	IN BLGuid _ID,
+	IN BLU32 _Width);
+
+BL_API BLVoid blUIPrimitiveGetLineWidth(
+	IN BLGuid _ID,
+	OUT BLU32* _Width);
+
 BL_API BLVoid blUIPrimitivePath(
 	IN BLGuid _ID,
 	IN BLF32* _XPath,

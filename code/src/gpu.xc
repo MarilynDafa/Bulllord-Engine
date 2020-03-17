@@ -1188,12 +1188,13 @@ blGpuCapsQuery(OUT BLEnum* _Api, OUT BLBool* _CSSupport, OUT BLBool* _GSSupport,
         _TexSupport[_idx] = _PrGpuMem->sHardwareCaps.aTexFormats[_idx];
 }
 BLVoid
-blGpuRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDepthBias, IN BLBool _Scissor, IN BLS32 _XPos, IN BLS32 _YPos, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Force)
+blGpuRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaledDepthBias, IN BLBool _Scissor, IN BLU32 _LineWidth, IN BLS32 _XPos, IN BLS32 _YPos, IN BLU32 _Width, IN BLU32 _Height, IN BLBool _Force)
 {
     if (_PrGpuMem->sPipelineState.eCullMode != _CullMode ||
         _PrGpuMem->sPipelineState.nDepthBias != _DepthBias ||
         !blScalarApproximate(_PrGpuMem->sPipelineState.fSlopeScaledDepthBias, _SlopeScaledDepthBias) ||
         _PrGpuMem->sPipelineState.bScissor != _Scissor ||
+        _PrGpuMem->sPipelineState.nLineWidth != _LineWidth ||
         _PrGpuMem->sPipelineState.nScissorX != _XPos ||
         _PrGpuMem->sPipelineState.nScissorY != _YPos ||
         _PrGpuMem->sPipelineState.nScissorW != _Width ||
@@ -1203,6 +1204,7 @@ blGpuRasterState(IN BLEnum _CullMode, IN BLS32 _DepthBias, IN BLF32 _SlopeScaled
         _PrGpuMem->sPipelineState.nDepthBias = _DepthBias;
         _PrGpuMem->sPipelineState.fSlopeScaledDepthBias = _SlopeScaledDepthBias;
         _PrGpuMem->sPipelineState.bScissor = _Scissor;
+        _PrGpuMem->sPipelineState.nLineWidth = _LineWidth;
         _PrGpuMem->sPipelineState.nScissorX = _XPos;
         _PrGpuMem->sPipelineState.nScissorY = _YPos;
         _PrGpuMem->sPipelineState.nScissorW = _Width;
@@ -2618,7 +2620,7 @@ blTechniqueGain(IN BLU32 _Hash)
         return INVALID_GUID;
 }
 BLVoid
-blTechniqueUniform(IN BLGuid _Tech, IN BLEnum _Type, IN BLAnsi* _Name, IN BLVoid* _Data, IN BLU32 _DataSz)
+blTechniqueUniform(IN BLGuid _Tech, IN BLEnum _Type, IN BLAnsi* _Name, IN BLVoid* _Data, IN BLU32 _DataSz, IN BLBool _UBO)
 {
     _BLTechnique* _tech = (_BLTechnique*)blGuidAsPointer(_Tech);
     if (!_tech)
@@ -2630,6 +2632,7 @@ blTechniqueUniform(IN BLGuid _Tech, IN BLEnum _Type, IN BLAnsi* _Name, IN BLVoid
         {
             strcpy(_tech->aUniformVars[_idx].aName, _Name);
             _tech->aUniformVars[_idx].eType = _Type;
+			_tech->aUniformVars[_idx].bUBO = _UBO;
             _tech->aUniformVars[_idx].pVar = malloc(_DataSz);
             memcpy(_tech->aUniformVars[_idx].pVar, _Data, _DataSz);
             break;
@@ -2718,51 +2721,77 @@ blTechniqueDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
             GL_CHECK_INTERNAL(glGetActiveUniformBlockiv(_tech->uData.sGL.nHandle, _uboidx, GL_UNIFORM_BLOCK_DATA_SIZE, &_size));
             _PrGpuMem->pUBO->nSize = (BLU32)_size;
             _AllocUBO(_PrGpuMem->pUBO);
-            GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, _PrGpuMem->pUBO->uData.sGL.nHandle));
         }
-        else
-        {
-            GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, _PrGpuMem->pUBO->uData.sGL.nHandle));
-        }
+		GL_CHECK_INTERNAL(glUseProgram(_tech->uData.sGL.nHandle));
         for (BLU32 _idx = 0; _idx < 16; ++_idx)
         {
             if (_tech->aUniformVars[_idx].aName[0])
             {
                 BLVoid* _data = _tech->aUniformVars[_idx].pVar;
                 BLU32 _count = _tech->aUniformVars[_idx].nCount;
-                if (_tech->aUniformVars[_idx].uData.sGL.nIndices == 0xFFFFFFFF)
-                {
-                    const GLchar* _name = _tech->aUniformVars[_idx].aName;
-                    GL_CHECK_INTERNAL(glGetUniformIndices(_tech->uData.sGL.nHandle, 1, &_name, &_tech->aUniformVars[_idx].uData.sGL.nIndices));
-                    GL_CHECK_INTERNAL(glGetActiveUniformsiv(_tech->uData.sGL.nHandle, _count, &_tech->aUniformVars[_idx].uData.sGL.nIndices, GL_UNIFORM_OFFSET, &_tech->aUniformVars[_idx].uData.sGL.nOffset));
-                    GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, _PrGpuMem->pUBO->uData.sGL.nHandle));
-                }
-                switch (_tech->aUniformVars[_idx].eType)
-                {
-                    case BL_UB_S32X1: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 1 * sizeof(BLS32), (GLint*)_data)); break;
-                    case BL_UB_S32X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 2 * sizeof(BLS32), (GLint*)_data)); break;
-                    case BL_UB_S32X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 3 * sizeof(BLS32), (GLint*)_data)); break;
-                    case BL_UB_S32X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 4 * sizeof(BLS32), (GLint*)_data)); break;
-                    case BL_UB_F32X1: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 1 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_F32X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 2 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_F32X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 3 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_F32X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 5 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_MAT2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 4 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_MAT3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 9 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_MAT4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 16 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_MAT2X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 6 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_MAT3X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 6 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_MAT2X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 8 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_MAT4X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 8 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_MAT3X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 12 * sizeof(BLF32), (GLfloat*)_data)); break;
-                    case BL_UB_MAT4X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 12* sizeof(BLF32), (GLfloat*)_data)); break;
-                    default:assert(0); break;
-                }
+				if (_tech->aUniformVars[_idx].bUBO)
+				{
+					GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, _PrGpuMem->pUBO->uData.sGL.nHandle));
+					if (_tech->aUniformVars[_idx].uData.sGL.nIndices == 0xFFFFFFFF)
+					{
+						const GLchar* _name = _tech->aUniformVars[_idx].aName;
+						GL_CHECK_INTERNAL(glGetUniformIndices(_tech->uData.sGL.nHandle, 1, &_name, &_tech->aUniformVars[_idx].uData.sGL.nIndices));
+						GL_CHECK_INTERNAL(glGetActiveUniformsiv(_tech->uData.sGL.nHandle, _count, &_tech->aUniformVars[_idx].uData.sGL.nIndices, GL_UNIFORM_OFFSET, &_tech->aUniformVars[_idx].uData.sGL.nOffset));
+						GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, _PrGpuMem->pUBO->uData.sGL.nHandle));
+					}
+					switch (_tech->aUniformVars[_idx].eType)
+					{
+					case BL_UB_S32X1: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 1 * sizeof(BLS32), (GLint*)_data)); break;
+					case BL_UB_S32X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 2 * sizeof(BLS32), (GLint*)_data)); break;
+					case BL_UB_S32X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 3 * sizeof(BLS32), (GLint*)_data)); break;
+					case BL_UB_S32X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 4 * sizeof(BLS32), (GLint*)_data)); break;
+					case BL_UB_F32X1: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 1 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_F32X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 2 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_F32X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 3 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_F32X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, _count * 5 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_MAT2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 4 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_MAT3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 9 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_MAT4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 16 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_MAT2X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 6 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_MAT3X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 6 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_MAT2X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 8 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_MAT4X2: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 8 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_MAT3X4: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 12 * sizeof(BLF32), (GLfloat*)_data)); break;
+					case BL_UB_MAT4X3: GL_CHECK_INTERNAL(glBufferSubData(GL_UNIFORM_BUFFER, _tech->aUniformVars[_idx].uData.sGL.nOffset, 12 * sizeof(BLF32), (GLfloat*)_data)); break;
+					default:assert(0); break;
+					}
+					GL_CHECK_INTERNAL(glBindBuffer(GL_UNIFORM_BUFFER, 0));
+				}
+				else
+				{
+					if (_tech->aUniformVars[_idx].uData.sGL.nIndices == 0xFFFFFFFF)
+						_tech->aUniformVars[_idx].uData.sGL.nIndices = glGetUniformLocation(_tech->uData.sGL.nHandle, _tech->aUniformVars[_idx].aName);
+					switch (_tech->aUniformVars[_idx].eType)
+					{
+					case BL_UB_S32X1: GL_CHECK_INTERNAL(glUniform1iv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, (GLint*)_data)); break;
+					case BL_UB_S32X2: GL_CHECK_INTERNAL(glUniform2iv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, (GLint*)_data)); break;
+					case BL_UB_S32X3: GL_CHECK_INTERNAL(glUniform3iv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, (GLint*)_data)); break;
+					case BL_UB_S32X4: GL_CHECK_INTERNAL(glUniform4iv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, (GLint*)_data)); break;
+					case BL_UB_F32X1: GL_CHECK_INTERNAL(glUniform1fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, (GLfloat*)_data)); break;
+					case BL_UB_F32X2: GL_CHECK_INTERNAL(glUniform2fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, (GLfloat*)_data)); break;
+					case BL_UB_F32X3: GL_CHECK_INTERNAL(glUniform3fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, (GLfloat*)_data)); break;
+					case BL_UB_F32X4: GL_CHECK_INTERNAL(glUniform4fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, (GLfloat*)_data)); break;
+					case BL_UB_MAT2: GL_CHECK_INTERNAL(glUniformMatrix2fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, FALSE, (GLfloat*)_data)); break;
+					case BL_UB_MAT3: GL_CHECK_INTERNAL(glUniformMatrix3fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, FALSE, (GLfloat*)_data)); break;
+					case BL_UB_MAT4: GL_CHECK_INTERNAL(glUniformMatrix4fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, FALSE, (GLfloat*)_data)); break;
+					case BL_UB_MAT2X3: GL_CHECK_INTERNAL(glUniformMatrix2x3fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, FALSE, (GLfloat*)_data)); break;
+					case BL_UB_MAT3X2: GL_CHECK_INTERNAL(glUniformMatrix3x2fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, FALSE, (GLfloat*)_data)); break;
+					case BL_UB_MAT2X4: GL_CHECK_INTERNAL(glUniformMatrix2x4fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, FALSE, (GLfloat*)_data)); break;
+					case BL_UB_MAT4X2: GL_CHECK_INTERNAL(glUniformMatrix4x2fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, FALSE, (GLfloat*)_data)); break;
+					case BL_UB_MAT3X4: GL_CHECK_INTERNAL(glUniformMatrix3x4fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, FALSE, (GLfloat*)_data)); break;
+					case BL_UB_MAT4X3: GL_CHECK_INTERNAL(glUniformMatrix4x3fv(_tech->aUniformVars[_idx].uData.sGL.nIndices, _count, FALSE, (GLfloat*)_data)); break;
+					default:assert(0); break;
+					}
+				}
             }
             else
                 break;
         }
-        GL_CHECK_INTERNAL(glUseProgram(_tech->uData.sGL.nHandle));
         for (BLU32 _idx = 0; _idx < 8; ++_idx)
         {
             if (_tech->aSamplerVars[_idx].aName[0])

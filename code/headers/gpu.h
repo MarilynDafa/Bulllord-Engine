@@ -48,6 +48,7 @@ BL_API BLVoid blGpuRasterState(
     IN BLS32 _DepthBias,
     IN BLF32 _SlopeScaledDepthBias,
     IN BLBool _Scissor,
+	IN BLU32 _LineWidth,
     IN BLS32 _XPos,
     IN BLS32 _YPos,
     IN BLU32 _Width,
@@ -252,7 +253,8 @@ BL_API BLVoid blTechniqueUniform(
     IN BLEnum _Type,
     IN BLAnsi* _Name,
     IN BLVoid* _Data,
-    IN BLU32 _DataSz);
+    IN BLU32 _DataSz,
+	IN BLBool _UBO);
 
 BL_API BLVoid blTechniqueSampler(
     IN BLGuid _Tech,

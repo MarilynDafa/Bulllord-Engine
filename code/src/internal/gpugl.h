@@ -15,6 +15,7 @@ _PipelineStateDefaultGL(BLU32 _Width, BLU32 _Height)
 	_PrGpuMem->sPipelineState.nDepthBias = 0;
 	_PrGpuMem->sPipelineState.fSlopeScaledDepthBias = 0.f;
 	GL_CHECK_INTERNAL(glDisable(GL_SCISSOR_TEST));
+	_PrGpuMem->sPipelineState.nLineWidth = 1;
 	_PrGpuMem->sPipelineState.nScissorX = 0;
 	_PrGpuMem->sPipelineState.nScissorY = 0;
 	_PrGpuMem->sPipelineState.nScissorW = _Width;
@@ -85,6 +86,7 @@ _PipelineStateRefreshGL()
 		}
 		break;
 		}
+		GL_CHECK_INTERNAL(glLineWidth(_PrGpuMem->sPipelineState.nLineWidth));
 		if (!blScalarApproximate(_PrGpuMem->sPipelineState.fSlopeScaledDepthBias, 0.f) || _PrGpuMem->sPipelineState.nDepthBias)
 		{
 			GL_CHECK_INTERNAL(glEnable(GL_POLYGON_OFFSET_FILL));

@@ -32,10 +32,12 @@ blVGCloseEXT()
 {
 }
 BLVoid 
-blVGRectangleEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _Width, IN BLF32 _Height, IN BLF32 _Rotate, IN BLBool _Fill, IN BLU32 _Color)
+blVGRectangleEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _Width, IN BLF32 _Height, IN BLF32 _Rotate, IN BLBool _Fill, IN BLU32 _Color, IN BLU32 _Dash, IN BLU32 _Gap, IN BLU32 _LineWidth)
 {
 	blUIPrimitiveColor(_ID, _Color);
 	blUIPrimitiveFill(_ID, _Fill);
+	blUIPrimitiveStipple(_ID, _Dash, _Gap);
+	blUIPrimitiveLineWidth(_ID, _LineWidth);
 	BLF32 _x[4] = { 0 };
 	BLF32 _y[4] = { 0 };
 	BLF32 _cosf = cosf(_Rotate * 3.141592653589793f / 180.f);
@@ -51,10 +53,12 @@ blVGRectangleEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _Width, IN BL
 	blUIPrimitivePath(_ID, _x, _y, 4);
 }
 BLVoid 
-blVGEllipseEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _XRadius, IN BLF32 _YRadius, IN BLF32 _Rotate, IN BLBool _Fill, IN BLU32 _Color)
+blVGEllipseEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _XRadius, IN BLF32 _YRadius, IN BLF32 _Rotate, IN BLBool _Fill, IN BLU32 _Color, IN BLU32 _Dash, IN BLU32 _Gap, IN BLU32 _LineWidth)
 {
 	blUIPrimitiveColor(_ID, _Color);
 	blUIPrimitiveFill(_ID, _Fill);
+	blUIPrimitiveStipple(_ID, _Dash, _Gap);
+	blUIPrimitiveLineWidth(_ID, _LineWidth);
 	BLF32 _cosf = cosf(_Rotate * 3.141592653589793f / 180.f);
 	BLF32 _sinf = sinf(_Rotate * 3.141592653589793f / 180.f);
 	BLF32* _x = (BLF32*)alloca(120 * sizeof(BLF32));
@@ -67,11 +71,13 @@ blVGEllipseEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _XRadius, IN BL
 	blUIPrimitivePath(_ID, _x, _y, 120);
 }
 BLVoid 
-blVGArcEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _XRadius, IN BLF32 _YRadius, IN BLF32 _StartAngle, IN BLF32 _EndAngle, IN BLF32 _Rotate, IN BLU32 _Color)
+blVGArcEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _XRadius, IN BLF32 _YRadius, IN BLF32 _StartAngle, IN BLF32 _EndAngle, IN BLF32 _Rotate, IN BLU32 _Color, IN BLU32 _Dash, IN BLU32 _Gap, IN BLU32 _LineWidth)
 {
 	blUIPrimitiveColor(_ID, _Color);
 	blUIPrimitiveFill(_ID, FALSE);
 	blUIPrimitiveClosed(_ID, FALSE);
+	blUIPrimitiveStipple(_ID, _Dash, _Gap);
+	blUIPrimitiveLineWidth(_ID, _LineWidth);
 	BLF32 _cosf = cosf(_Rotate * 3.141592653589793f / 180.f);
 	BLF32 _sinf = sinf(_Rotate * 3.141592653589793f / 180.f);
 	BLU32 _div = (BLU32)(fabs(_EndAngle - _StartAngle) / 3);
@@ -85,11 +91,13 @@ blVGArcEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _XRadius, IN BLF32 
 	blUIPrimitivePath(_ID, _x, _y, _div);
 }
 BLVoid 
-blVGSplineEXT(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _PathNum, IN BLU32 _Divisions, IN BLU32 _Color)
+blVGSplineEXT(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _PathNum, IN BLU32 _Divisions, IN BLU32 _Color, IN BLU32 _Dash, IN BLU32 _Gap, IN BLU32 _LineWidth)
 {
 	blUIPrimitiveColor(_ID, _Color);
 	blUIPrimitiveFill(_ID, FALSE);
 	blUIPrimitiveClosed(_ID, FALSE);
+	blUIPrimitiveStipple(_ID, _Dash, _Gap);
+	blUIPrimitiveLineWidth(_ID, _LineWidth);
 	Spline* _sp = InitSpine();
 	for (BLU32 _i = 0; _i < _PathNum; ++_i) 
 	{
@@ -107,11 +115,13 @@ blVGSplineEXT(IN BLGuid _ID, IN BLF32* _XPath, IN BLF32* _YPath, IN BLU32 _PathN
 	free(_y);
 }
 BLVoid 
-blVGBezierEXT(IN BLGuid _ID, IN BLF32 _X1, IN BLF32 _Y1, IN BLF32 _CX1, IN BLF32 _CY1, IN BLF32 _X2, IN BLF32 _Y2, IN BLF32 _CX2, IN BLF32 _CY2, IN BLU32 _Divisions, IN BLU32 _Color)
+blVGBezierEXT(IN BLGuid _ID, IN BLF32 _X1, IN BLF32 _Y1, IN BLF32 _CX1, IN BLF32 _CY1, IN BLF32 _X2, IN BLF32 _Y2, IN BLF32 _CX2, IN BLF32 _CY2, IN BLU32 _Divisions, IN BLU32 _Color, IN BLU32 _Dash, IN BLU32 _Gap, IN BLU32 _LineWidth)
 {
 	blUIPrimitiveColor(_ID, _Color);
 	blUIPrimitiveFill(_ID, FALSE);
 	blUIPrimitiveClosed(_ID, FALSE);
+	blUIPrimitiveStipple(_ID, _Dash, _Gap);
+	blUIPrimitiveLineWidth(_ID, _LineWidth);
 	CubicBezier* _cb = InitCubicBezier();
 	_cb->v0.x = _X1;
 	_cb->v0.y = _Y1;

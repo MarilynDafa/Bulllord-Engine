@@ -59,6 +59,7 @@ typedef struct _PipelineState{
     BLS32 nDepthBias;
     BLF32 fSlopeScaledDepthBias;
     BLBool bScissor;
+	BLU32 nLineWidth;
     BLS32 nScissorX;
     BLS32 nScissorY;
     BLU32 nScissorW;
@@ -219,6 +220,7 @@ typedef struct _Technique{
         BLEnum eType;
         BLU32 nCount;
         BLVoid* pVar;
+		BLBool bUBO;
         union {
 #if defined(BL_GL_BACKEND)
             struct _GLTCH {
@@ -326,6 +328,7 @@ typedef struct _GpuMember {
 }_BLGpuMember;
 static _BLGpuMember* _PrGpuMem = NULL;
 extern const BLAnsi* SHADER_2D;
+extern const BLAnsi* SHADER_LINE;
 extern const BLAnsi* SHADER_2D_GLOW;
 extern const BLAnsi* SHADER_2D_INSTANCE;
 extern const BLAnsi* SHADER_2D_STROKE;

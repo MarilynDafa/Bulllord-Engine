@@ -38,7 +38,10 @@ extern "C" {
 		IN BLF32 _Height,
 		IN BLF32 _Rotate,
 		IN BLBool _Fill,
-		IN BLU32 _Color);
+		IN BLU32 _Color,
+		IN BLU32 _Dash,
+		IN BLU32 _Gap,
+		IN BLU32 _LineWidth);
 
 	BL_API BLVoid blVGEllipseEXT(
 		IN BLGuid _ID,
@@ -48,7 +51,10 @@ extern "C" {
 		IN BLF32 _YRadius,
 		IN BLF32 _Rotate,
 		IN BLBool _Fill,
-		IN BLU32 _Color);
+		IN BLU32 _Color,
+		IN BLU32 _Dash,
+		IN BLU32 _Gap,
+		IN BLU32 _LineWidth);
 
 	BL_API BLVoid blVGArcEXT(
 		IN BLGuid _ID,
@@ -59,7 +65,10 @@ extern "C" {
 		IN BLF32 _StartAngle,
 		IN BLF32 _EndAngle,
 		IN BLF32 _Rotate,
-		IN BLU32 _Color);
+		IN BLU32 _Color,
+		IN BLU32 _Dash,
+		IN BLU32 _Gap,
+		IN BLU32 _LineWidth);
 
 	BL_API BLVoid blVGSplineEXT(
 		IN BLGuid _ID,
@@ -67,7 +76,10 @@ extern "C" {
 		IN BLF32* _YPath,
 		IN BLU32 _PathNum,
 		IN BLU32 _Divisions,
-		IN BLU32 _Color);
+		IN BLU32 _Color,
+		IN BLU32 _Dash,
+		IN BLU32 _Gap,
+		IN BLU32 _LineWidth);
 
 	BL_API BLVoid blVGBezierEXT(
 		IN BLGuid _ID,
@@ -80,7 +92,10 @@ extern "C" {
 		IN BLF32 _CX2,
 		IN BLF32 _CY2,
 		IN BLU32 _Divisions,
-		IN BLU32 _Color);
+		IN BLU32 _Color,
+		IN BLU32 _Dash,
+		IN BLU32 _Gap,
+		IN BLU32 _LineWidth);
 #ifdef __cplusplus
 }
 #endif

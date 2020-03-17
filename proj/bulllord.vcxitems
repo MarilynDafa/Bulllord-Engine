@@ -1862,5 +1862,8 @@
     <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_2D_STROKE.bsl">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)..\code\src\internal\SHADER_LINE.bsl">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
 </Project>
