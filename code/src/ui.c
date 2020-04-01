@@ -11600,7 +11600,7 @@ _UIStep(BLU32 _Delta, BLBool _Baseplate)
 		};
 		blTechniqueSampler(_PrUIMem->nUITech, "Texture0", _PrUIMem->nFBOTex, 0);
 		blGeometryBufferUpdate(_PrUIMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-		blGpuRasterState(BL_CM_CW, 0, 0.f, TRUE, 1, 0, 0, 0, 0, FALSE);
+		blGpuRasterState(BL_CM_CW, 0, 0.f, FALSE, 1, 0, 0, 0, 0, FALSE);
 		blTechniqueDraw(_PrUIMem->nUITech, _PrUIMem->nQuadGeo, 1);
 		static BLAnsi _fps[32] = { 0 };
 		if (_PrUIMem->bProfiler == 7)

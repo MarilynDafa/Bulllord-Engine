@@ -212,7 +212,8 @@ typedef struct _ExternalMethod {
 	const BLBool(*pSetupCB)(BLGuid, BLVoid**);
 	const BLBool(*pUnloadCB)(BLGuid, BLVoid**);
 	const BLBool(*pReleaseCB)(BLGuid, BLVoid**);
-	const BLVoid(*pDrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**);
+	const BLBool(*pDrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**);
+	const BLVoid(*pStep)(BLU32);
 } _BLExternalMethod;
 typedef struct _SpriteNode{
     struct _SpriteNode* pParent;
@@ -265,17 +266,13 @@ typedef struct _SpriteNode{
     BLU32 nChildren;
 	BLBool bValid;
     BLBool bShow;
+	BLBool bLocked;
 }_BLSpriteNode;
 typedef struct _SpriteMember {
     BLGuid nSpriteTech;
     BLGuid nSpriteInstTech;
 	BLGuid nSpriteStrokeTech;
 	BLGuid nSpriteGlowTech;
-	BLGuid nFBO;
-	BLGuid nFBOTex;
-	BLGuid nQuadGeo;
-	BLU32 nFboWidth;
-	BLU32 nFboHeight;
     _BLSpriteNode** pNodeList;
 	_BLSpriteNode* pCursor;
 	_BLSpriteRecorder sActionRecorder;
@@ -288,7 +285,7 @@ typedef struct _SpriteMember {
     BLBool bShakingVertical;
     BLF32 fShakingForce;
 	BLU8* pTileData;
-	_BLExternalMethod aExternalMethod[8];
+	_BLExternalMethod aExternalMethod[4];
 }_BLSpriteMember;
 static _BLSpriteMember* _PrSpriteMem = NULL;
 extern BLBool _FetchResource(const BLAnsi*, BLVoid**, BLGuid, BLBool(*)(BLVoid*, const BLAnsi*), BLBool(*)(BLVoid*), BLBool);
@@ -354,21 +351,17 @@ _SystemSubscriber(BLEnum _Type, BLU32 _UParam, BLS32 _SParam, BLVoid* _PParam, B
 {
 	if (_UParam == BL_SE_RESOLUTION)
 	{
-		blFrameBufferDetach(_PrSpriteMem->nFBO, FALSE);
-		blTextureDelete(_PrSpriteMem->nFBOTex);
-		BLU32 _width, _height;
+		BLU32 _width, _height, _aw, _ah;
 		BLF32 _rx, _ry;
-		blSysWindowQuery(&_width, &_height, &_PrSpriteMem->nFboWidth, &_PrSpriteMem->nFboHeight, &_rx, &_ry);
+		blSysWindowQuery(&_width, &_height, &_aw, &_ah, &_rx, &_ry);
 		BLF32 _centerx = (_PrSpriteMem->sViewport.sLT.fX + _PrSpriteMem->sViewport.sRB.fX) * 0.5f;
 		BLF32 _centery = (_PrSpriteMem->sViewport.sLT.fY + _PrSpriteMem->sViewport.sRB.fY) * 0.5f;
-		_PrSpriteMem->sViewport.sLT.fX = _centerx - _PrSpriteMem->nFboWidth * 0.5f;
-		_PrSpriteMem->sViewport.sLT.fY = _centery - _PrSpriteMem->nFboHeight * 0.5f;
-		_PrSpriteMem->sViewport.sRB.fX = _centerx + _PrSpriteMem->nFboWidth * 0.5f;
-		_PrSpriteMem->sViewport.sRB.fY = _centery + _PrSpriteMem->nFboHeight * 0.5f;
+		_PrSpriteMem->sViewport.sLT.fX = _centerx - _width * 0.5f;
+		_PrSpriteMem->sViewport.sLT.fY = _centery - _height * 0.5f;
+		_PrSpriteMem->sViewport.sRB.fX = _centerx + _width * 0.5f;
+		_PrSpriteMem->sViewport.sRB.fY = _centery + _height * 0.5f;
 		free(_PrSpriteMem->pTileData);
-		_PrSpriteMem->pTileData = malloc(6 * (_PrSpriteMem->nFboHeight * _PrSpriteMem->nFboWidth) / 1024);
-		_PrSpriteMem->nFBOTex = blTextureGen(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, 1, NULL);
-		blFrameBufferAttach(_PrSpriteMem->nFBO, _PrSpriteMem->nFBOTex, BL_CTF_IGNORE);
+		_PrSpriteMem->pTileData = malloc(192 * 2 * (_height * _width) / 256);
 	}
 	return FALSE;
 }
@@ -476,12 +469,10 @@ _SpriteSetup(BLVoid* _Src)
     _BLSpriteNode* _node = (_BLSpriteNode*)_Src;
     if (_node != _PrSpriteMem->pCursor && !_node->pParent)
         _AddToNodeList(_node);
-	if (_node->pExternal)
-	{
-		_node->bValid = _node->pExternal->pSetupCB(_node->nID, &_node->pExternalData);
-		return _node->bValid;
-	}
-	else
+	BLBool _finishex = 2;
+	if (_node->pExternal && _node->pExternal->pSetupCB)
+		_finishex = _node->bValid = _node->pExternal->pSetupCB(_node->nID, &_node->pExternalData);
+	if (_finishex == 2)
 	{
 		BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 		BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
@@ -526,8 +517,8 @@ _SpriteSetup(BLVoid* _Src)
 		free(_node->pTexData);
 		_node->pTexData = NULL;
 		_node->bValid = TRUE;
-		return TRUE;
 	}
+	return _finishex > 0 ? TRUE : FALSE;
 }
 static BLBool
 _SpriteRelease(BLVoid* _Src)
@@ -552,24 +543,29 @@ _SpriteRelease(BLVoid* _Src)
 	}
 	else
 		_RemoveFromNodeList(_node);
-	if (_node->pExternal)
-		_node->pExternal->pReleaseCB(_node->nID, &_node->pExternalData);
-	else
+	BLBool _finishex = 2;
+	if (_node->pExternal && _node->pExternal->pReleaseCB)
+		_finishex = _node->pExternal->pReleaseCB(_node->nID, &_node->pExternalData);
+	if (_finishex == 2 && strcmp("@duplicate", _node->aFilename))
 	{
 		blGeometryBufferDelete(_node->nGBO);
 		blTextureDelete(_node->nTex);
+	}
+	if (_node->nExFBO != INVALID_GUID)
+	{
 		blFrameBufferDetach(_node->nExFBO, FALSE);
 		blFrameBufferDelete(_node->nExFBO);
 	}
-    return TRUE;
+	return _finishex > 0 ? TRUE : FALSE;
 }
 static BLBool
 _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
 {
 	_BLSpriteNode* _node = (_BLSpriteNode*)_Src;
-	if (_node->pExternal)
-		return _node->pExternal->pLoadCB(_node->nID, _Filename, &_node->pExternalData);
-	else
+	BLBool _finishex = 2;
+	if (_node->pExternal && _node->pExternal->pLoadCB)
+		_finishex = _node->pExternal->pLoadCB(_node->nID, _Filename, &_node->pExternalData);
+	if (_finishex == 2)
 	{
 		BLGuid _stream = blStreamGen(_Filename);
 		BLU8 _identifier[12];
@@ -707,8 +703,8 @@ _LoadSprite(BLVoid* _Src, const BLAnsi* _Filename)
                 _node->pTexData = NULL;
 		}
 		blStreamDelete(_stream);
-		return TRUE;
 	}
+	return _finishex > 0 ? TRUE : FALSE;
 }
 static BLBool
 _UnloadSprite(BLVoid* _Src)
@@ -747,9 +743,10 @@ _UnloadSprite(BLVoid* _Src)
 			_tmp = _tmpnext;
 		}
 	}
-	if (_node->pExternal)
-		_node->pExternal->pUnloadCB(_node->nID, &_node->pExternalData);
-	else
+	BLBool _finishex = 2;
+	if (_node->pExternal && _node->pExternal->pUnloadCB)
+		_finishex = _node->pExternal->pUnloadCB(_node->nID, &_node->pExternalData);
+	if (_finishex == 2)
 	{
 		if (_node->pEmitParam)
 		{
@@ -793,16 +790,16 @@ _UnloadSprite(BLVoid* _Src)
 		}
 	}
 	_node->bValid = FALSE;
-    return TRUE;
+	return _finishex > 0 ? TRUE : FALSE;
 }
 static BLVoid
 _SpriteUpdate(BLU32 _Delta)
 {
 	for (BLU32 _idx = 0; _idx < _PrSpriteMem->nNodeNum;)
 	{
-		BLBool _delete = FALSE;
+		BLBool _delete = FALSE, _finishex = FALSE;
 		_BLSpriteNode* _node = _PrSpriteMem->pNodeList[_idx];
-		if (_node->pCurAction)
+		if (_node->pCurAction && !_node->bLocked)
 		{
 			_BLSpriteAction* _action = _node->pCurAction;
 			do
@@ -1151,7 +1148,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
     if (!_Node->bValid)
         return;
 	if (_Node->sScissor.sLT.fX < 0.f)
-		blGpuRasterState(BL_CM_CW, 0, 0.f, TRUE, 1, 0, 0, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, FALSE);
+		blGpuRasterState(BL_CM_CW, 0, 0.f, FALSE, 1, 0, 0, 0, 0, FALSE);
 	else
 		blGpuRasterState(BL_CM_CW, 0, 0.f, TRUE, 1, (BLS32)_Node->sScissor.sLT.fX, (BLS32)_Node->sScissor.sLT.fY, (BLU32)(_Node->sScissor.sRB.fX - _Node->sScissor.sLT.fX), (BLU32)(_Node->sScissor.sRB.fY - _Node->sScissor.sLT.fY), FALSE);
 	if (_Node->nFrameNum > 1)
@@ -1178,7 +1175,10 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			blTechniqueUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz), TRUE);
 			blFrameBufferClear(TRUE, FALSE, FALSE);
 		}
-		if (INVALID_GUID != _Node->nTex && _Node->bShow && !_Node->pExternal)
+		BLBool _finishex = 2; 
+		if (_Node->pExternal && _Node->pExternal->pDrawCB)
+			_finishex =_Node->pExternal->pDrawCB(_Delta, _Node->nID, _Mat, ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f), ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f), &_Node->pExternalData);
+		if (INVALID_GUID != _Node->nTex && _Node->bShow && _finishex != 1)
 		{
 			_BLSpriteSheet* _ss = blDictElement(_Node->pTagSheet, _Node->aTag[_Node->nCurFrame]);
 			BLF32 _minx, _miny, _maxx, _maxy;
@@ -1191,7 +1191,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			}
 			else
 			{
-				BLF32 _dif = (BLF32)MAX_INTERNAL(_Node->nStrokePixel, 3);
+				BLF32 _dif = MAX_INTERNAL((BLF32)_Node->nStrokePixel, 0.00001f);
 				_maxx = _Node->sSize.fX * 0.5f + _dif - _ss->nOffsetX;
 				_minx = _maxx - _ss->nRBx + _ss->nLTx - _dif;
 				_maxy = _Node->sSize.fY * 0.5f + _dif - _ss->nOffsetY;
@@ -1272,19 +1272,11 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			BLF32 _lttx = 0.f, _ltty = 1.f, _rttx = 1.f, _rtty = 1.f, _lbtx = 0.f, _lbty = 0.f, _rbtx = 1.f, _rbty = 0.f;
 			if (_ss)
 			{
-				BLS32 _dif = MAX_INTERNAL(_Node->nStrokePixel, 3);
-				_lbtx = _lttx = (BLF32)((BLS32)_ss->nLTx - _dif) / (BLF32)_Node->nTexWidth;
-				_rtty = _ltty = (BLF32)((BLS32)_ss->nLTy - _dif) / (BLF32)_Node->nTexHeight;
-				_rbtx = _rttx = (BLF32)((BLS32)_ss->nRBx + _dif) / (BLF32)_Node->nTexWidth;
-				_rbty = _lbty = (BLF32)((BLS32)_ss->nRBy + _dif) / (BLF32)_Node->nTexHeight;
-				_lttx += 0.01f;
-				_lbtx += 0.01f;
-				_rttx -= 0.01f;
-				_rbtx -= 0.01f;
-				_ltty += 0.01f;
-				_lbty -= 0.01f;
-				_rtty += 0.01f;
-				_rbty -= 0.01f;
+				BLF32 _dif = MAX_INTERNAL((BLF32)_Node->nStrokePixel, 0.00001f);
+				_lbtx = _lttx = (BLF32)(_ss->nLTx - _dif) / (BLF32)_Node->nTexWidth;
+				_rtty = _ltty = (BLF32)(_ss->nLTy - _dif) / (BLF32)_Node->nTexHeight;
+				_rbtx = _rttx = (BLF32)(_ss->nRBx + _dif) / (BLF32)_Node->nTexWidth;
+				_rbty = _lbty = (BLF32)(_ss->nRBy + _dif) / (BLF32)_Node->nTexHeight;
 				if (_i == 1)
 				{
 					BLF32 _tmp;
@@ -1307,33 +1299,35 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 				_rtty = _ltty = _rbty;
 				_rbty = _lbty = _tmp;
 			}
+			BLF32 _forcex = ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f);
+			BLF32 _forcey = ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f);
 			BLF32 _vbo[] = {
-				_ltx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-				_lty + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_ltx + _forcex,
+				_lty + _forcey,
 				_rgba[0],
 				_rgba[1],
 				_rgba[2],
 				_Node->fAlpha,
 				_lttx,
 				_ltty,
-				_rtx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-				_rty + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_rtx + _forcex,
+				_rty + _forcey,
 				_rgba[0],
 				_rgba[1],
 				_rgba[2],
 				_Node->fAlpha,
 				_rttx,
 				_rtty,
-				_lbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-				_lby + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_lbx + _forcex,
+				_lby + _forcey,
 				_rgba[0],
 				_rgba[1],
 				_rgba[2],
 				_Node->fAlpha,
 				_lbtx,
 				_lbty,
-				_rbx + ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
-				_rby + ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f),
+				_rbx + _forcex,
+				_rby + _forcey,
 				_rgba[0],
 				_rgba[1],
 				_rgba[2],
@@ -1351,8 +1345,6 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			else
 				blTechniqueDraw(_PrSpriteMem->nSpriteTech, _Node->nGBO, 1);
 		}
-		else if (_Node->pExternal)
-			_Node->pExternal->pDrawCB(_Delta, _Node->nID, _Mat, ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f), ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f), &_Node->pExternalData);
 		for (BLU32 _idx = 0; _idx < _Node->nChildren; ++_idx)
 		{
 			_BLSpriteNode* _chnode = _Node->pChildren[_idx];
@@ -1361,7 +1353,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			BLF32 _sin = sinf(_chnode->fRotate);
 			BLF32 _pivotx = (_chnode->sPivot.fX - 0.5f) * _chnode->sSize.fX;
 			BLF32 _pivoty = (_chnode->sPivot.fY - 0.5f) * _chnode->sSize.fY;
-			BLBool _affine = blScalarApproximate(_chnode->fSkewX, 0.f) && blScalarApproximate(_chnode->fSkewY, 0.f);
+			BLBool _affine = (_chnode->fSkewX < 1e-6) && (_chnode->fSkewY < 1e-6);
 			if (_affine)
 			{
 				_mat[0] = (_chnode->fScaleX * _cos);
@@ -1394,7 +1386,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 		{
 			blFrameBufferResolve(_Node->nExFBO);
 			blFrameBufferBind(_Node->nExFBO, FALSE);
-			BLF32 _screensz[2] = { 2.f / (BLF32)_PrSpriteMem->nFboWidth, 2.f / (BLF32)_PrSpriteMem->nFboHeight };
+			BLF32 _screensz[2] = { 2.f / (BLF32)(_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX), 2.f / (BLF32)(_PrSpriteMem->sViewport.sRB.fY - _PrSpriteMem->sViewport.sLT.fY) };
 			blTechniqueUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz), TRUE);
 			blTechniqueUniform(_PrSpriteMem->nSpriteInstTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz), TRUE);
 			blTechniqueUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz), TRUE);
@@ -1417,37 +1409,28 @@ _SpriteInit()
     _PrSpriteMem->nSpriteInstTech = blTechniqueGen("shaders/2DInstance.bsl", SHADER_2D_INSTANCE, BL_DEBUG_MODE);
 	_PrSpriteMem->nSpriteStrokeTech = blTechniqueGen("shaders/2DStroke.bsl", SHADER_2D_STROKE, BL_DEBUG_MODE);
     _PrSpriteMem->nSpriteGlowTech = blTechniqueGen("shaders/2DGlow.bsl", SHADER_2D_GLOW, BL_DEBUG_MODE);
-	_PrSpriteMem->nFBO = blFrameBufferGen();
 	_PrSpriteMem->aExternalMethod[0].aSuffix[0] = 0;
 	_PrSpriteMem->aExternalMethod[1].aSuffix[0] = 0;
 	_PrSpriteMem->aExternalMethod[2].aSuffix[0] = 0;
 	_PrSpriteMem->aExternalMethod[3].aSuffix[0] = 0;
-	_PrSpriteMem->aExternalMethod[4].aSuffix[0] = 0;
-	_PrSpriteMem->aExternalMethod[5].aSuffix[0] = 0;
-	_PrSpriteMem->aExternalMethod[6].aSuffix[0] = 0;
-	_PrSpriteMem->aExternalMethod[7].aSuffix[0] = 0;
-	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
-	_PrSpriteMem->nQuadGeo = blGeometryBufferGen(blHashString((const BLUtf8*)"#@quadgeosprite@#"), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, NULL, sizeof(BLF32) * 32, NULL, 0, BL_IF_INVALID);
-    blSysSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
+	blSysSubscribeEvent(BL_ET_MOUSE, _MouseSubscriber);
 	blSysSubscribeEvent(BL_ET_SYSTEM, _SystemSubscriber);
-	BLU32 _width, _height;
+	BLU32 _width, _height, _aw, _ah;
 	BLF32 _rx, _ry;
-	blSysWindowQuery(&_width, &_height, &_PrSpriteMem->nFboWidth, &_PrSpriteMem->nFboHeight, &_rx, &_ry);
-	_PrSpriteMem->sViewport.sLT.fX = _PrSpriteMem->sViewport.sLT.fY = 0.f;
-	_PrSpriteMem->sViewport.sRB.fX = (BLF32)_PrSpriteMem->nFboWidth;
-	_PrSpriteMem->sViewport.sRB.fY = (BLF32)_PrSpriteMem->nFboHeight;
-	_PrSpriteMem->pTileData = malloc(192 * 2 * (_PrSpriteMem->nFboHeight * _PrSpriteMem->nFboWidth) / 256);
-	_PrSpriteMem->nFBOTex = blTextureGen(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, 1, NULL);
-	blFrameBufferAttach(_PrSpriteMem->nFBO, _PrSpriteMem->nFBOTex, BL_CTF_IGNORE);
+	blSysWindowQuery(&_width, &_height, &_aw, &_ah, &_rx, &_ry);
+	_PrSpriteMem->sViewport.sLT.fX = -0.5f * _width;
+	_PrSpriteMem->sViewport.sLT.fY = -0.5f * _height;
+	_PrSpriteMem->sViewport.sRB.fX = 0.5f * _width;
+	_PrSpriteMem->sViewport.sRB.fY = 0.5f * _height;
+	_PrSpriteMem->pTileData = malloc(192 * 2 * (_width * _height) / 256);
 }
 BLVoid
 _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 {
-	BLU32 _screenwidth, _screenheight;
+	BLU32 _screenwidth, _screenheight, _aw, _ah;
 	BLF32 _rx, _ry;
     BLBool _texsupport[BL_TF_COUNT];
-	blSysWindowQuery(&_screenwidth, &_screenheight, &_PrSpriteMem->nFboWidth, &_PrSpriteMem->nFboHeight, &_rx, &_ry);
+	blSysWindowQuery(&_screenwidth, &_screenheight, &_aw, &_ah, &_rx, &_ry);
     blGpuCapsQuery(NULL, NULL, NULL, NULL, NULL, _texsupport);
 	blGpuDepthStencilState(FALSE, TRUE, BL_CF_LESS, FALSE, 0xFF, 0xFF, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, BL_SO_KEEP, BL_SO_KEEP, BL_SO_KEEP, BL_CF_ALWAYS, FALSE);
     blGpuBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
@@ -1468,18 +1451,16 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 		_mat[3] = _PrSpriteMem->pCursor->fScaleY;
 		_mat[4] = (-_pivotx * _PrSpriteMem->pCursor->fScaleX) + _PrSpriteMem->pCursor->sPos.fX;
 		_mat[5] = (-_pivoty * _PrSpriteMem->pCursor->fScaleY) + _PrSpriteMem->pCursor->sPos.fY;
-		blGpuRasterState(BL_CM_CW, 0, 0.f, TRUE, 1, 0, 0, 0, 0, FALSE);
+		blGpuRasterState(BL_CM_CW, 0, 0.f, FALSE, 1, 0, 0, 0, 0, FALSE);
 		_SpriteDraw(_Delta, _PrSpriteMem->pCursor, _mat);
     }
     else
     {
-		blFrameBufferBind(_PrSpriteMem->nFBO, TRUE);
-		BLF32 _screensz[2] = { 2.f / (BLF32)_PrSpriteMem->nFboWidth, 2.f / (BLF32)_PrSpriteMem->nFboHeight };
+		BLF32 _screensz[2] = { 2.f / (BLF32)_screenwidth, 2.f / (BLF32)_screenheight };
 		blTechniqueUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz), TRUE);
 		blTechniqueUniform(_PrSpriteMem->nSpriteInstTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz), TRUE);
 		blTechniqueUniform(_PrSpriteMem->nSpriteStrokeTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz), TRUE);
 		blTechniqueUniform(_PrSpriteMem->nSpriteGlowTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz), TRUE);
-		blFrameBufferClear(TRUE, FALSE, FALSE);
 		BLRect _scalevp = _PrSpriteMem->sViewport;
 		_scalevp.sLT.fX -= (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.1f;
 		_scalevp.sRB.fX += (_PrSpriteMem->sViewport.sRB.fX - _PrSpriteMem->sViewport.sLT.fX) * 0.1f;
@@ -1489,7 +1470,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 		if (_first)
 		{
 			BLGuid _layertex = INVALID_GUID;
-			blGpuRasterState(BL_CM_CW, 0, 0.f, TRUE, 1, 0, 0, _PrSpriteMem->nFboWidth, _PrSpriteMem->nFboHeight, FALSE);
+			blGpuRasterState(BL_CM_CW, 0, 0.f, TRUE, 1, 0, 0, _screenwidth, _screenheight, FALSE);
 			for (BLS32 _idx = 0; _idx < 8; ++_idx)
 			{
 				BLU32 _tilenum = 0;
@@ -1718,6 +1699,11 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			}
 		}
 		_SpriteUpdate(_Delta);
+		for (BLU32 _idx = 0; _idx < 4; ++_idx)
+		{
+			if (_PrSpriteMem->aExternalMethod[_idx].aSuffix[0] != 0 && _PrSpriteMem->aExternalMethod[_idx].pStep)
+				_PrSpriteMem->aExternalMethod[_idx].pStep(_Delta);
+		}
 		for (BLU32 _idx = 0; _idx < _PrSpriteMem->nNodeNum; ++_idx)
 		{
 			_BLSpriteNode* _node = _PrSpriteMem->pNodeList[_idx];
@@ -1726,7 +1712,7 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			BLF32 _sin = sinf(_node->fRotate);
 			BLF32 _pivotx = (_node->sPivot.fX - 0.5f) * _node->sSize.fX;
 			BLF32 _pivoty = (_node->sPivot.fY - 0.5f) * _node->sSize.fY;
-			BLBool _affine = blScalarApproximate(_node->fSkewX, 0.f) && blScalarApproximate(_node->fSkewY, 0.f);
+			BLBool _affine = (_node->fSkewX < 1e-6) && (_node->fSkewY < 1e-6);
 			if (_affine)
 			{
 				_mat[0] = (_node->fScaleX * _cos);
@@ -1749,7 +1735,6 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			}
 			_SpriteDraw(_Delta, _node, _mat);
 		}
-		blFrameBufferResolve(_PrSpriteMem->nFBO);
 		if (_PrSpriteMem->bShaking)
 		{
 			_PrSpriteMem->fShakingForce = -_PrSpriteMem->fShakingForce;
@@ -1757,48 +1742,6 @@ _SpriteStep(BLU32 _Delta, BLBool _Cursor)
 			if (_PrSpriteMem->fShakingTime < 0.f)
 				_PrSpriteMem->bShaking = FALSE;
 		}
-		blFrameBufferBind(_PrSpriteMem->nFBO, FALSE);
-		_screensz[0] = 2.f / (BLF32)_screenwidth;
-		_screensz[1] = 2.f / (BLF32)_screenheight;
-		blTechniqueUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz), TRUE);
-		BLF32 _vbo[] = {
-			PIXEL_ALIGNED_INTERNAL(0.f),
-			PIXEL_ALIGNED_INTERNAL(0.f),
-			1.f,
-			1.f,
-			1.f,
-			1.f,
-			0.f,
-			1.f,
-			PIXEL_ALIGNED_INTERNAL(_screenwidth),
-			PIXEL_ALIGNED_INTERNAL(0.f),
-			1.f,
-			1.f,
-			1.f,
-			1.f,
-			1.f,
-			1.f,
-			PIXEL_ALIGNED_INTERNAL(0.f),
-			PIXEL_ALIGNED_INTERNAL(_screenheight),
-			1.f,
-			1.f,
-			1.f,
-			1.f,
-			0.f,
-			0.f,
-			PIXEL_ALIGNED_INTERNAL(_screenwidth),
-			PIXEL_ALIGNED_INTERNAL(_screenheight),
-			1.f,
-			1.f,
-			1.f,
-			1.f,
-			1.f,
-			0.f
-		};
-		blTechniqueSampler(_PrSpriteMem->nSpriteTech, "Texture0", _PrSpriteMem->nFBOTex, 0);
-		blGeometryBufferUpdate(_PrSpriteMem->nQuadGeo, 0, (BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
-		blGpuRasterState(BL_CM_CW, 0, 0.f, TRUE, 1, 0, 0, 0, 0, FALSE);
-		blTechniqueDraw(_PrSpriteMem->nSpriteTech, _PrSpriteMem->nQuadGeo, 1);
     }
 }
 BLVoid
@@ -1816,10 +1759,6 @@ _SpriteDestroy()
 	}
     if (_PrSpriteMem->pNodeList)
         free(_PrSpriteMem->pNodeList);
-	blGeometryBufferDelete(_PrSpriteMem->nQuadGeo);
-	blFrameBufferDetach(_PrSpriteMem->nFBO, FALSE);
-	blTextureDelete(_PrSpriteMem->nFBOTex);
-	blFrameBufferDelete(_PrSpriteMem->nFBO);
     blTechniqueDelete(_PrSpriteMem->nSpriteTech);
     blTechniqueDelete(_PrSpriteMem->nSpriteInstTech);
 	blTechniqueDelete(_PrSpriteMem->nSpriteStrokeTech);
@@ -1829,9 +1768,9 @@ _SpriteDestroy()
 	_PrSpriteMem = NULL;
 }
 BLVoid
-blSpriteRegistExternal(IN BLAnsi* _Suffix, IN BLBool(*_LoadCB)(BLGuid, const BLAnsi*, BLVoid**), IN BLBool(*_SetupCB)(BLGuid, BLVoid**), IN BLBool(*_UnloadCB)(BLGuid, BLVoid**), IN BLBool(*_ReleaseCB)(BLGuid, BLVoid**), IN BLVoid(*_DrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**))
+blSpriteRegistExternal(IN BLAnsi* _Suffix, IN BLBool(*_LoadCB)(BLGuid, const BLAnsi*, BLVoid**), IN BLBool(*_SetupCB)(BLGuid, BLVoid**), IN BLBool(*_UnloadCB)(BLGuid, BLVoid**), IN BLBool(*_ReleaseCB)(BLGuid, BLVoid**), IN BLBool(*_DrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**), IN BLVoid(*_Step)(BLU32))
 {
-	for (BLU32 _idx = 0; _idx < 8; ++_idx)
+	for (BLU32 _idx = 0; _idx < 4; ++_idx)
 	{
 		if (_PrSpriteMem->aExternalMethod[_idx].aSuffix[0] == 0)
 		{
@@ -1842,6 +1781,7 @@ blSpriteRegistExternal(IN BLAnsi* _Suffix, IN BLBool(*_LoadCB)(BLGuid, const BLA
 			_PrSpriteMem->aExternalMethod[_idx].pUnloadCB = _UnloadCB;
 			_PrSpriteMem->aExternalMethod[_idx].pReleaseCB = _ReleaseCB;
 			_PrSpriteMem->aExternalMethod[_idx].pDrawCB = _DrawCB;
+			_PrSpriteMem->aExternalMethod[_idx].pStep = _Step;
 			break;
 		}
 	}
@@ -1905,6 +1845,7 @@ blSpriteImageGen(IN BLAnsi* _Filename, IN BLAnsi* _Tag, IN BLF32 _Width, IN BLF3
 		_node->nFrameNum = 1;
 		_node->bFlipX = FALSE;
 		_node->bFlipY = FALSE;
+		_node->bLocked = FALSE;
 		memset(_node->aTag, 0, sizeof(_node->aTag));
 		memset(_node->aFilename, 0, sizeof(_node->aFilename));
 		if (_Tag)
@@ -1926,22 +1867,18 @@ blSpriteImageGen(IN BLAnsi* _Filename, IN BLAnsi* _Tag, IN BLF32 _Width, IN BLF3
 		}
 		if (_Filename)
 		{
+			const BLAnsi* _suffix = (const BLAnsi*)blFileSuffixUtf8((const BLUtf8*)_Filename);
 			strcpy(_node->aFilename, _Filename);
 			_node->nID = blGenGuid(_node, blHashString((const BLUtf8*)_Filename));
-			if (!strcmp((const BLAnsi*)blFileSuffixUtf8((const BLUtf8*)_Filename), "bmg"))
-				_FetchResource(_Filename, (BLVoid**)&_node, _node->nID, _LoadSprite, _SpriteSetup, TRUE);
-			else
+			for (BLU32 _idx = 0; _idx < 4; ++_idx)
 			{
-				for (BLU32 _idx = 0; _idx < 8; ++_idx)
+				if (_PrSpriteMem->aExternalMethod[_idx].aSuffix[0] && !strcmp(_suffix, _PrSpriteMem->aExternalMethod[_idx].aSuffix))
 				{
-					if (_PrSpriteMem->aExternalMethod[_idx].aSuffix[0] && !strcmp((const BLAnsi*)blFileSuffixUtf8((const BLUtf8*)_Filename), _PrSpriteMem->aExternalMethod[_idx].aSuffix))
-					{
-						_node->pExternal = &_PrSpriteMem->aExternalMethod[_idx];
-						_FetchResource(_Filename, (BLVoid**)&_node, _node->nID, _LoadSprite, _SpriteSetup, TRUE);
-						break;
-					}
+					_node->pExternal = &_PrSpriteMem->aExternalMethod[_idx];
+					break;
 				}
 			}
+			_FetchResource(_Filename, (BLVoid**)&_node, _node->nID, _LoadSprite, _SpriteSetup, TRUE);
 		}
 		else
 		{
@@ -1994,6 +1931,7 @@ blSpriteTextGen(IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _TxtAlignmentH, 
 	_node->nFrameNum = 1;
 	_node->bFlipX = FALSE;
 	_node->bFlipY = FALSE;
+	_node->bLocked = FALSE;
 	_node->pTagSheet = blGenDict(FALSE);
 	memset(_node->aTag, 0, sizeof(_node->aTag));
 	memset(_node->aFilename, 0, sizeof(_node->aFilename));
@@ -2050,7 +1988,7 @@ blSpriteTextGen(IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _TxtAlignmentH, 
 	};
 	_node->nGBO = blGeometryBufferGen(0xFFFFFFFF, BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
 	BLGuid _fb = blFrameBufferGen();
-	_node->nTex = blTextureGen(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, _width, _height, 1, NULL);
+	_node->nTex = blTextureGen(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, (BLU32)_width, (BLU32)_height, 1, NULL);
 	blFrameBufferAttach(_fb, _node->nTex, BL_CTF_IGNORE);
 	blFrameBufferBind(_fb, TRUE);
 	BLRect _area;
@@ -2070,6 +2008,32 @@ blSpriteTextGen(IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _TxtAlignmentH, 
 	_node->bValid = TRUE;
 	_AddToNodeList(_node);
 	return _node->nID;
+}
+BLGuid 
+blSpriteAssignGen(IN BLGuid _ID)
+{
+	if (_ID == INVALID_GUID)
+		return INVALID_GUID;
+	_BLSpriteNode* _source = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_source)
+		return INVALID_GUID;
+	if (!_source->bValid)
+		_FetchResource(_source->aFilename, (BLVoid**)&_source, _source->nID, _LoadSprite, _SpriteSetup, FALSE);
+	_BLSpriteNode* _target = (_BLSpriteNode*)malloc(sizeof(_BLSpriteNode));
+	memcpy(_target, _source, sizeof(_BLSpriteNode));
+	_target->pParent = NULL;
+	_target->pChildren = NULL;
+	_target->pAction = NULL;
+	_target->pCurAction = NULL;
+	_target->pEmitParam = NULL;
+	_target->pTexData = NULL;
+	_target->nExFBO = INVALID_GUID;
+	_target->nGBO = _source->nGBO;
+	_target->nTex = _source->nTex;
+	strcpy(_target->aFilename, "@duplicate");
+	_target->nID = blGenGuid(_target, blUniqueUri());
+	_AddToNodeList(_target);
+	return _target->nID;
 }
 BLVoid
 blSpriteDelete(IN BLGuid _ID)
@@ -2249,8 +2213,6 @@ blSpriteQuery(IN BLGuid _ID, OUT BLF32* _Width, OUT BLF32* _Height,OUT BLF32* _X
         return FALSE;
     *_Width = _node->sSize.fX;
     *_Height = _node->sSize.fY;
-    *_XPos = _node->sPos.fX;
-    *_YPos = _node->sPos.fY;
     *_Zv = _node->fZValue;
     *_Rotate = _node->fRotate;
     *_XScale = _node->fScaleX;
@@ -2260,6 +2222,95 @@ blSpriteQuery(IN BLGuid _ID, OUT BLF32* _Width, OUT BLF32* _Height,OUT BLF32* _X
 	*_FlipX = _node->bFlipX;
 	*_FlipY = _node->bFlipY;
     *_Show = _node->bShow;
+	_BLSpriteNode* _nodes[16] = { NULL };
+	BLS32 _i = 0;
+	for (; _i < 16; ++_i)
+	{
+		if (_node)
+		{
+			_nodes[_i] = _node;
+			_node = _node->pParent;
+		}
+		else
+			break;
+	}
+	BLF32 _x = 0.f, _y = 0.f;
+	BLF32 _curmat[6] = { 1, 0, 0, 1, 0, 0 }, _mat[6] = { 0.f };
+	BLBool _setp = FALSE;
+	_i--;
+	for (; _i >= 0; --_i)
+	{
+		_node = _nodes[_i];
+		if (_node)
+		{
+			BLF32 _cos = cosf(_node->fRotate);
+			BLF32 _sin = sinf(_node->fRotate);
+			BLF32 _pivotx = (_node->sPivot.fX - 0.5f) * _node->sSize.fX;
+			BLF32 _pivoty = (_node->sPivot.fY - 0.5f) * _node->sSize.fY;
+			BLBool _affine = (_node->fSkewX < 1e-6) && (_node->fSkewY < 1e-6);
+			if (!_setp)
+			{
+				_setp = TRUE;
+				if (_affine)
+				{
+					_mat[0] = (_node->fScaleX * _cos);
+					_mat[1] = (_node->fScaleX * _sin);
+					_mat[2] = (-_node->fScaleY * _sin);
+					_mat[3] = (_node->fScaleY * _cos);
+					_mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX;
+					_mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY;
+				}
+				else
+				{
+					BLF32 _tanx = tanf(_node->fSkewX);
+					BLF32 _tany = tanf(_node->fSkewY);
+					_mat[0] = (_node->fScaleX * _cos) + (-_node->fScaleY * _sin) * _tany;
+					_mat[1] = (_node->fScaleX * _sin) + (_node->fScaleY * _cos) * _tany;
+					_mat[2] = (-_node->fScaleY * _sin) + (_node->fScaleX * _cos) * _tanx;
+					_mat[3] = (_node->fScaleY * _cos) + (_node->fScaleX * _sin) * _tanx;
+					_mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX;
+					_mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY;
+				}
+			}
+			else
+			{
+				if (_affine)
+				{
+					_curmat[0] = (_node->fScaleX * _cos);
+					_curmat[1] = (_node->fScaleX * _sin);
+					_curmat[2] = (-_node->fScaleY * _sin);
+					_curmat[3] = (_node->fScaleY * _cos);
+					_curmat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX;
+					_curmat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY;
+				}
+				else
+				{
+					BLF32 _tanx = tanf(_node->fSkewX);
+					BLF32 _tany = tanf(_node->fSkewY);
+					_curmat[0] = (_node->fScaleX * _cos) + (-_node->fScaleY * _sin) * _tany;
+					_curmat[1] = (_node->fScaleX * _sin) + (_node->fScaleY * _cos) * _tany;
+					_curmat[2] = (-_node->fScaleY * _sin) + (_node->fScaleX * _cos) * _tanx;
+					_curmat[3] = (_node->fScaleY * _cos) + (_node->fScaleX * _sin) * _tanx;
+					_curmat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX;
+					_curmat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY;
+				}
+			}
+			BLF32 _m0 = (_curmat[0] * _mat[0]) + (_curmat[1] * _mat[2]);
+			BLF32 _m1 = (_curmat[0] * _mat[1]) + (_curmat[1] * _mat[3]);
+			BLF32 _m2 = (_curmat[2] * _mat[0]) + (_curmat[3] * _mat[2]);
+			BLF32 _m3 = (_curmat[2] * _mat[1]) + (_curmat[3] * _mat[3]);
+			BLF32 _m4 = (_curmat[4] * _mat[0]) + (_curmat[5] * _mat[2]) + _mat[4];
+			BLF32 _m5 = (_curmat[4] * _mat[1]) + (_curmat[5] * _mat[3]) + _mat[5];
+			_mat[0] = _m0;
+			_mat[1] = _m1;
+			_mat[2] = _m2;
+			_mat[3] = _m3;
+			_mat[4] = _m4;
+			_mat[5] = _m5;
+		}
+	}
+	*_XPos = _mat[4];
+	*_YPos = _mat[5];
     return TRUE;
 }
 BLBool
@@ -2277,6 +2328,16 @@ blSpriteVisibility(IN BLGuid _ID, IN BLBool _Show, IN BLBool _Passdown)
             blSpriteVisibility(_node->pChildren[_idx]->nID, _Show, _Passdown);
     }
     return TRUE;
+}
+BLVoid 
+blSpriteLocked(IN BLGuid _ID, IN BLBool _Locked)
+{
+	if (_ID == INVALID_GUID)
+		return;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return;
+	_node->bLocked= _Locked;
 }
 BLBool
 blSpriteDimension(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _Height, IN BLBool _Passdown)
@@ -2406,6 +2467,78 @@ blSpriteText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _Txt
 {
 	if (_ID == INVALID_GUID)
 		return FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return FALSE;
+	BLU16 _flag = 0;
+	if (_Outline)
+		_flag |= 0x000F;
+	else if (_Bold)
+		_flag |= 0x00F0;
+	else if (_Shadow)
+		_flag |= 0x0F00;
+	if (_Italics)
+		_flag |= 0xF000;
+	const BLUtf16* _text16 = blGenUtf16Str(_Text);
+	BLF32 _width, _height;
+	_TextMeasure(_text16, _Font, _FontHeight, &_width, &_height, _flag);
+	_node->sSize.fX = _width;
+	_node->sSize.fY = _height;
+	BLF32 _vbo[] = {
+		-_node->sSize.fX * 0.5f,
+		-_node->sSize.fY * 0.5f,
+		1.f,
+		1.f,
+		1.f,
+		_node->fAlpha,
+		0.f,
+		1.f,
+		_node->sSize.fX * 0.5f,
+		-_node->sSize.fY * 0.5f,
+		1.f,
+		1.f,
+		1.f,
+		_node->fAlpha,
+		1.f,
+		1.f,
+		-_node->sSize.fX * 0.5f,
+		_node->sSize.fY * 0.5f,
+		1.f,
+		1.f,
+		1.f,
+		_node->fAlpha,
+		0.f,
+		0.f,
+		_node->sSize.fX * 0.5f,
+		_node->sSize.fY * 0.5f,
+		1.f,
+		1.f,
+		1.f,
+		_node->fAlpha,
+		1.f,
+		0.f
+	};
+	blGeometryBufferUpdate(_node->nGBO, 0, _vbo, sizeof(_vbo), 0, NULL, 0);
+	BLGuid _fb = blFrameBufferGen();
+	blTextureDelete(_node->nTex);
+	_node->nTex = blTextureGen(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, (BLU32)_width, (BLU32)_height, 1, NULL);
+	blFrameBufferAttach(_fb, _node->nTex, BL_CTF_IGNORE);
+	blFrameBufferBind(_fb, TRUE);
+	BLRect _area;
+	_area.sLT.fX = _area.sLT.fY = 0.f;
+	_area.sRB.fX = _width;
+	_area.sRB.fY = _height;
+	BLRect _carea = { {0.f, 0.f}, {0.f, 0.f} };
+	BLF32 _screensz[2] = { 2.f / _width , 2.f / _height };
+	blTechniqueUniform(_PrSpriteMem->nSpriteTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz), TRUE);
+	blFrameBufferClear(TRUE, FALSE, FALSE);
+	_WriteText(_text16, _Font, _FontHeight, _TxtAlignmentH, _TxtAlignmentV, FALSE, &_area, &_carea, _TxtColor, 1.f, _flag, FALSE);
+	blDeleteUtf16Str((BLUtf16*)_text16);
+	blFrameBufferResolve(_fb);
+	blFrameBufferBind(_fb, FALSE);
+	blFrameBufferDetach(_fb, FALSE);
+	blFrameBufferDelete(_fb);
+	return TRUE;
 }
 BLBool
 blSpriteStroke(IN BLGuid _ID, IN BLU32 _Color, IN BLU32 _Pixel, IN BLBool _Passdown)
@@ -2481,6 +2614,8 @@ blSpriteMove(IN BLGuid _ID, IN BLF32 _XVec, IN BLF32 _YVec)
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
+	if (_node->bLocked)
+		return FALSE;
     _node->sPos.fX += _XVec;
     _node->sPos.fY += _YVec;
     return TRUE;
@@ -2493,6 +2628,8 @@ blSpriteScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale)
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
+	if (_node->bLocked)
+		return FALSE;
     _node->fScaleX *= _XScale;
     _node->fScaleY *= _YScale;
     return TRUE;
@@ -2505,6 +2642,8 @@ blSpriteRotate(IN BLGuid _ID, IN BLS32 _Rotate)
     _BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
     if (!_node)
         return FALSE;
+	if (_node->bLocked)
+		return FALSE;
     _node->fRotate += _Rotate * PI_INTERNAL / 180.0f;
     return TRUE;
 }

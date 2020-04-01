@@ -924,9 +924,7 @@ _CAInit()
 		return;
 	}
 #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
-	DWORD _mask;
-	_PrAudioMem->pAudioDev.pCAContext->GetChannelMask(&_mask);
-	X3DAudioInitialize(_mask, X3DAUDIO_SPEED_OF_SOUND, _PrAudioMem->pAudioDev.pCAInstance);
+	X3DAudioInitialize(1, X3DAUDIO_SPEED_OF_SOUND, _PrAudioMem->pAudioDev.pCAInstance);
 #else
 	XAUDIO2_DEVICE_DETAILS _details;
 	_PrAudioMem->pAudioDev.pCADevice->GetDeviceDetails(0, &_details);

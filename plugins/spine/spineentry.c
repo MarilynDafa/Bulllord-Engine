@@ -365,7 +365,7 @@ _SpineRelease(BLGuid _ID, BLVoid** _ExtData)
 	blTextureDelete(_sd->nTexture);
 	return TRUE;
 }
-static const BLVoid
+static const BLBool
 _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY, BLVoid** _ExtData)
 {
 	_BLSpineDataExt* _sd = (_BLSpineDataExt*)*_ExtData;
@@ -522,6 +522,7 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 	blTechniqueDraw(_PrSpineMem->nTech, _geo, 1);
 	blGeometryBufferDelete(_geo);
 	free(_gbdata);
+	return 1;
 }
 BLVoid 
 blSpineOpenEXT(IN BLAnsi* _Version, ...)
@@ -529,8 +530,8 @@ blSpineOpenEXT(IN BLAnsi* _Version, ...)
 	_PrSpineMem = (_BLSpineMemberExt*)malloc(sizeof(_BLSpineMemberExt));
 	_PrSpineMem->nTech = blTechniqueGain(blHashString((const BLUtf8*)"shaders/2D.bsl"));
 	_PrSpineMem->nBlendMode = 0;
-	blSpriteRegistExternal("json", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw);
-	blSpriteRegistExternal("skel", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw);
+	blSpriteRegistExternal("json", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw, NULL);
+	blSpriteRegistExternal("skel", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw, NULL);
 }
 BLVoid 
 blSpineCloseEXT()

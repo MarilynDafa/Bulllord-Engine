@@ -54,7 +54,7 @@
 
 #ifndef CP_USE_DOUBLES
 	// Use doubles by default for higher precision.
-	#define CP_USE_DOUBLES 1
+	//#define CP_USE_DOUBLES 1
 #endif
 
 /// @defgroup basicTypes Basic Types

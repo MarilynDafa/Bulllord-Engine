@@ -42,7 +42,7 @@ blRandRangeF(IN BLF32 _Min, IN BLF32 _Max)
 BLBool
 blScalarApproximate(IN BLF32 _V1, IN BLF32 _V2)
 {
-	return fabs(_V1 - _V2) < 0.000001f;
+	return fabs(_V1 - _V2) < 1e-6;
 }
 BLF32
 blScalarClamp(IN BLF32 _Val, IN BLF32 _Min, IN BLF32 _Max)
@@ -57,13 +57,13 @@ blScalarClamp(IN BLF32 _Val, IN BLF32 _Min, IN BLF32 _Max)
 BLBool
 blRectApproximate(IN BLRect* _R1, IN BLRect* _R2)
 {
-	if (fabs(_R1->sLT.fX - _R2->sLT.fX) > 0.000001f)
+	if (fabs(_R1->sLT.fX - _R2->sLT.fX) > 1e-6)
 		return FALSE;
-	if (fabs(_R1->sLT.fY - _R2->sLT.fY) > 0.000001f)
+	if (fabs(_R1->sLT.fY - _R2->sLT.fY) > 1e-6)
 		return FALSE;
-	if (fabs(_R1->sRB.fX - _R2->sRB.fX) > 0.000001f)
+	if (fabs(_R1->sRB.fX - _R2->sRB.fX) > 1e-6)
 		return FALSE;
-	if (fabs(_R1->sRB.fY - _R2->sRB.fY) > 0.000001f)
+	if (fabs(_R1->sRB.fY - _R2->sRB.fY) > 1e-6)
 		return FALSE;
 	return TRUE;
 }
@@ -117,9 +117,9 @@ blRectExtend(INOUT BLRect* _Tar, IN BLVec2* _Pt)
 BLBool
 blVec2Approximate(IN BLVec2* _V1, IN BLVec2* _V2)
 {
-	if (fabs(_V1->fX - _V2->fX) > 0.000001f)
+	if (fabs(_V1->fX - _V2->fX) > 1e-6)
 		return FALSE;
-	if (fabs(_V1->fY - _V2->fY) > 0.000001f)
+	if (fabs(_V1->fY - _V2->fY) > 1e-6)
 		return FALSE;
 	return TRUE;
 }
@@ -137,7 +137,7 @@ BLVoid
 blVec2Normalize(INOUT BLVec2* _V)
 {
 	BLF32 _veclength = sqrtf(_V->fX * _V->fX + _V->fY * _V->fY);
-	if (_veclength > 0.000001f)
+	if (_veclength > 1e-6)
 	{
 		_V->fX /= _veclength;
 		_V->fY /= _veclength;
@@ -156,11 +156,11 @@ blVec2CrossProduct(IN BLVec2* _V1, IN BLVec2* _V2)
 BLBool
 blVec3Approximate(IN BLVec3* _V1, IN BLVec3* _V2)
 {
-	if (fabs(_V1->fX - _V2->fX) > 0.000001f)
+	if (fabs(_V1->fX - _V2->fX) > 1e-6)
 		return FALSE;
-	if (fabs(_V1->fY - _V2->fY) > 0.000001f)
+	if (fabs(_V1->fY - _V2->fY) > 1e-6)
 		return FALSE;
-	if (fabs(_V1->fZ - _V2->fZ) > 0.000001f)
+	if (fabs(_V1->fZ - _V2->fZ) > 1e-6)
 		return FALSE;
 	return TRUE;
 }
@@ -203,13 +203,13 @@ blVec3CrossProduct(IN BLVec3* _V1, IN BLVec3* _V2)
 BLBool
 blQuatApproximate(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2)
 {
-	if (fabs(_Q1->fX - _Q2->fX) > 0.000001f)
+	if (fabs(_Q1->fX - _Q2->fX) > 1e-6)
 		return FALSE;
-	if (fabs(_Q1->fY - _Q2->fY) > 0.000001f)
+	if (fabs(_Q1->fY - _Q2->fY) > 1e-6)
 		return FALSE;
-	if (fabs(_Q1->fZ - _Q2->fZ) > 0.000001f)
+	if (fabs(_Q1->fZ - _Q2->fZ) > 1e-6)
 		return FALSE;
-	if (fabs(_Q1->fW - _Q2->fW) > 0.000001f)
+	if (fabs(_Q1->fW - _Q2->fW) > 1e-6)
 		return FALSE;
 	return TRUE;
 }
@@ -291,7 +291,7 @@ blQuatFrom2Vec(IN BLVec3* _Src, IN BLVec3* _Dest)
 		_axis.fY = -_v0.fZ;
 		_axis.fZ = _v0.fY;
 		_sqlen = (_axis.fX * _axis.fX) + (_axis.fY * _axis.fY) + (_axis.fZ * _axis.fZ);
-		if (_sqlen < (0.000001f * 0.000001f))
+		if (_sqlen < (1e-6 * 1e-6))
 		{
 			_axis.fX = _v0.fZ;
 			_axis.fY = 0.f;
@@ -471,7 +471,7 @@ blQuatSlerp(IN BLQuaternion* _Q1, IN BLQuaternion* _Q2, IN BLF32 _T)
 	{
 		_rkt = *_Q2;
 	}
-	if (fabs(_fcos) < 1 - 0.000001f)
+	if (fabs(_fcos) < 1 - 1e-6)
 	{
 		BLF32 _fsin = sqrtf(1 - _fcos * _fcos);
 		BLF32 _fangle = atan2f(_fsin, _fcos);
@@ -521,7 +521,7 @@ BLBool
 blMatApproximate(IN BLMatrix* _M1, IN BLMatrix* _M2)
 {
 	for (BLU32 _idx = 0; _idx < 16; ++_idx)
-		if (fabs(_M1->fEle[_idx] - _M1->fEle[_idx]) > 0.000001f)
+		if (fabs(_M1->fEle[_idx] - _M1->fEle[_idx]) > 1e-6)
 			return FALSE;
 	return TRUE;
 }
@@ -590,7 +590,7 @@ blMatDecompose(IN BLMatrix* _Mat, OUT BLVec3* _Trans, OUT BLVec3* _Scale, OUT BL
 	_Trans->fY = _Mat->fData[3][1];
 	_Trans->fZ = _Mat->fData[3][2];
 	_invlen = _Mat->fData[0][0] * _Mat->fData[0][0] + _Mat->fData[0][1] * _Mat->fData[0][1] + _Mat->fData[0][2] * _Mat->fData[0][2];
-	if (fabs(_invlen) > 0.000001f)
+	if (fabs(_invlen) > 1e-6)
 		_invlen = 1.f / sqrtf(_invlen);
 	_matq.fData[0][0] = _Mat->fData[0][0] * _invlen;
 	_matq.fData[0][1] = _Mat->fData[0][1] * _invlen;
@@ -600,7 +600,7 @@ blMatDecompose(IN BLMatrix* _Mat, OUT BLVec3* _Trans, OUT BLVec3* _Scale, OUT BL
 	_matq.fData[1][1] = _Mat->fData[1][1] - _dot * _matq.fData[0][1];
 	_matq.fData[1][2] = _Mat->fData[1][2] - _dot * _matq.fData[0][2];
 	_invlen = _matq.fData[1][0] * _matq.fData[1][0] + _matq.fData[1][1] * _matq.fData[1][1] + _matq.fData[1][2] * _matq.fData[1][2];
-	if (fabs(_invlen) > 0.000001f)
+	if (fabs(_invlen) > 1e-6)
 		_invlen = 1.f / sqrtf(_invlen);
 	_matq.fData[1][0] *= _invlen;
 	_matq.fData[1][1] *= _invlen;
@@ -614,7 +614,7 @@ blMatDecompose(IN BLMatrix* _Mat, OUT BLVec3* _Trans, OUT BLVec3* _Scale, OUT BL
 	_matq.fData[2][1] -= _dot * _matq.fData[1][1];
 	_matq.fData[2][2] -= _dot * _matq.fData[1][2];
 	_invlen = _matq.fData[2][0] * _matq.fData[2][0] + _matq.fData[2][1] * _matq.fData[2][1] + _matq.fData[2][2] * _matq.fData[2][2];
-	if (fabs(_invlen) > 0.000001f)
+	if (fabs(_invlen) > 1e-6)
 		_invlen = 1.f / sqrtf(_invlen);
 	_matq.fData[2][0] *= _invlen;
 	_matq.fData[2][1] *= _invlen;
@@ -776,13 +776,13 @@ blMatLookatL(OUT BLMatrix* _Mat, IN BLVec3* _Eye, IN BLVec3* _Focus, IN BLVec3* 
 BLBool
 blPlaneApproximate(IN BLPlane* _P1, IN BLPlane* _P2)
 {
-	if (fabs(_P1->sNormal.fX - _P2->sNormal.fX) > 0.000001f)
+	if (fabs(_P1->sNormal.fX - _P2->sNormal.fX) > 1e-6)
 		return FALSE;
-	if (fabs(_P1->sNormal.fY - _P2->sNormal.fY) > 0.000001f)
+	if (fabs(_P1->sNormal.fY - _P2->sNormal.fY) > 1e-6)
 		return FALSE;
-	if (fabs(_P1->sNormal.fZ - _P2->sNormal.fZ) > 0.000001f)
+	if (fabs(_P1->sNormal.fZ - _P2->sNormal.fZ) > 1e-6)
 		return FALSE;
-	if (fabs(_P1->fDistance - _P2->fDistance) > 0.000001f)
+	if (fabs(_P1->fDistance - _P2->fDistance) > 1e-6)
 		return FALSE;
 	return TRUE;
 }
@@ -823,17 +823,17 @@ blPlaneFromPN(IN BLVec3* _Pt, IN BLVec3* _Nor)
 BLBool
 blBoxApproximate(IN BLBox* _B1, IN BLBox* _B2)
 {
-	if (fabs(_B1->sMinPt.fX - _B2->sMinPt.fX) > 0.000001f)
+	if (fabs(_B1->sMinPt.fX - _B2->sMinPt.fX) > 1e-6)
 		return FALSE;
-	if (fabs(_B1->sMinPt.fY - _B2->sMinPt.fY) > 0.000001f)
+	if (fabs(_B1->sMinPt.fY - _B2->sMinPt.fY) > 1e-6)
 		return FALSE;
-	if (fabs(_B1->sMinPt.fZ - _B2->sMinPt.fZ) > 0.000001f)
+	if (fabs(_B1->sMinPt.fZ - _B2->sMinPt.fZ) > 1e-6)
 		return FALSE;
-	if (fabs(_B1->sMaxPt.fX - _B2->sMaxPt.fX) > 0.000001f)
+	if (fabs(_B1->sMaxPt.fX - _B2->sMaxPt.fX) > 1e-6)
 		return FALSE;
-	if (fabs(_B1->sMaxPt.fY - _B2->sMaxPt.fY) > 0.000001f)
+	if (fabs(_B1->sMaxPt.fY - _B2->sMaxPt.fY) > 1e-6)
 		return FALSE;
-	if (fabs(_B1->sMaxPt.fZ - _B2->sMaxPt.fZ) > 0.000001f)
+	if (fabs(_B1->sMaxPt.fZ - _B2->sMaxPt.fZ) > 1e-6)
 		return FALSE;
 	return TRUE;
 }

@@ -813,7 +813,7 @@ blVideoPlayEXT(IN BLAnsi* _Filename, IN BLBool _LClickInterrupt, IN BLEnum _KeyI
 	blSysWindowQuery(&_width, &_height, &_dwidth, &_dheight, &_rx, &_ry);
 	BLF32 _screensz[2] = { 2.f / (BLF32)_width, 2.f / (BLF32)_height };
 	blTechniqueUniform(_PrVideoMem->nTech, BL_UB_F32X2, "ScreenDim", _screensz, sizeof(_screensz));
-	blGpuRasterState(BL_CM_CW, 0, 0.f, TRUE, 0, 0, 0, 0, FALSE);
+	blGpuRasterState(BL_CM_CW, 0, 0.f, FALSE, 0, 0, 0, 0, FALSE);
 #if defined(WIN32)
 	DWORD _tid;
 	_PrVideoMem->sThread = CreateThread(NULL, 0, _DecodeThreadFunc, (LPVOID)_Filename, 0, &_tid);

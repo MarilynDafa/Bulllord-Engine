@@ -30,7 +30,8 @@ BL_API BLVoid blSpriteRegistExternal(
 	IN BLBool(*_SetupCB)(BLGuid, BLVoid**),
 	IN BLBool(*_UnloadCB)(BLGuid, BLVoid**),
 	IN BLBool(*_ReleaseCB)(BLGuid, BLVoid**),
-	IN BLVoid(*_DrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**));
+	IN BLBool(*_DrawCB)(BLU32, BLGuid, BLF32[6], BLF32, BLF32, BLVoid**),
+	IN BLVoid(*_Step)(BLU32));
 
 BL_API BLGuid blSpriteImageGen(
 	IN BLAnsi* _Filename,
@@ -53,6 +54,9 @@ BL_API BLGuid blSpriteTextGen(
 	IN BLBool _Shadow,
 	IN BLBool _Italics,
 	IN BLF32 _Zv);
+
+BL_API BLGuid blSpriteAssignGen(
+	IN BLGuid _ID);
 
 BL_API BLVoid blSpriteDelete(
 	IN BLGuid _ID);
@@ -103,6 +107,10 @@ BL_API BLBool blSpriteVisibility(
 	IN BLGuid _ID,
 	IN BLBool _Show,
     IN BLBool _Passdown);
+
+BL_API BLVoid blSpriteLocked(
+	IN BLGuid _ID,
+	IN BLBool _Locked);
 
 BL_API BLBool blSpriteDimension(
 	IN BLGuid _ID,

@@ -199,8 +199,11 @@ _FetchResource(const BLAnsi* _Filename, BLVoid** _Res, BLGuid _ID, BLBool(*_Load
 			{
 				if (_iter->nGuid == _ID)
 				{
+					blListErase(_PrStreamIOMem->pLoadingQueue, _iterator_iter);
 					blMutexUnlock(_PrStreamIOMem->pLoadingQueue->pMutex);
-					return FALSE;
+					_Load(*_Res, _Filename);
+					_Setup(*_Res);
+					return TRUE;
 				}
 			}
 		}
@@ -211,8 +214,10 @@ _FetchResource(const BLAnsi* _Filename, BLVoid** _Res, BLGuid _ID, BLBool(*_Load
 			{
 				if (_iter->nGuid == _ID)
 				{
+					blListErase(_PrStreamIOMem->pSetupQueue, _iterator_iter);
 					blMutexUnlock(_PrStreamIOMem->pSetupQueue->pMutex);
-					return FALSE;
+					_Setup(*_Res);
+					return TRUE;
 				}
 			}
 		}

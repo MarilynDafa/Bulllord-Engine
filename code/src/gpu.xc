@@ -2712,7 +2712,6 @@ blTechniqueDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
 #if defined(BL_GL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_GL_API)
     {
-        GL_CHECK_INTERNAL(glEnable(GL_SCISSOR_TEST));
         _PipelineStateRefresh();
         if (!_PrGpuMem->pUBO->nSize)
         {
@@ -2859,7 +2858,6 @@ blTechniqueDraw(IN BLGuid _Tech, IN BLGuid _GBO, IN BLU32 _Instance)
             GL_CHECK_INTERNAL(glBindVertexArray(0));
         }
         GL_CHECK_INTERNAL(glUseProgram(0));
-        GL_CHECK_INTERNAL(glDisable(GL_SCISSOR_TEST));
     }
 #elif defined(BL_MTL_BACKEND)
     if (_PrGpuMem->sHardwareCaps.eApiType == BL_METAL_API)

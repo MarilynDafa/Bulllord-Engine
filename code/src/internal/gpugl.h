@@ -98,13 +98,11 @@ _PipelineStateRefreshGL()
 		}
 		if (!_PrGpuMem->sPipelineState.nScissorW && !_PrGpuMem->sPipelineState.nScissorH)
 		{
-			BLF32 _rx, _ry;
-			BLU32 _w, _h, _aw, _ah;
-			blSysWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
-			GL_CHECK_INTERNAL(glScissor(0, 0, _w, _h));
+			GL_CHECK_INTERNAL(glDisable(GL_SCISSOR_TEST));
 		}
 		else
 		{
+			GL_CHECK_INTERNAL(glEnable(GL_SCISSOR_TEST));
 			BLF32 _rx, _ry;
 			BLU32 _w, _h, _aw, _ah;
 			blSysWindowQuery(&_w, &_h, &_aw, &_ah, &_rx, &_ry);
@@ -113,6 +111,7 @@ _PipelineStateRefreshGL()
 			BLS32 _scissorw = (BLS32)(_PrGpuMem->sPipelineState.nScissorW);
 			BLS32 _scissorh = (BLS32)(_PrGpuMem->sPipelineState.nScissorH);
 			GL_CHECK_INTERNAL(glScissor(_scissorx, _scissory, _scissorw, _scissorh));
+			GL_CHECK_INTERNAL(glDisable(GL_SCISSOR_TEST));
 		}
 		_PrGpuMem->sPipelineState.bRasterStateDirty = FALSE;
 	}

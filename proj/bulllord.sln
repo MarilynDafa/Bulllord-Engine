@@ -148,6 +148,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chipmunk", "..\plugins\chipmunk\chipmunk.vcxitems", "{13BD0D4B-A78E-43C4-A878-51B6BFF8CA9F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chipmunk(Win32)", "..\plugins\chipmunk\chipmunk-win32.vcxproj", "{CA3C4688-A36B-47EE-B693-060AFD8D5EF0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{12CD8F03-B670-4693-A7A4-06BE8F9BDD64} = {12CD8F03-B670-4693-A7A4-06BE8F9BDD64}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chipmunk", "..\plugins\chipmunk\chipmunk-android.vcxproj", "{07037BEE-75EA-480A-8849-DCC7DB69D89A}"
 EndProject
@@ -1014,5 +1017,11 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AC172F00-27C0-4902-8D07-A911D76BD7DE}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
