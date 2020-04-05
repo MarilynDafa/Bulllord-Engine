@@ -514,6 +514,11 @@ _SpriteSetup(BLVoid* _Src)
 		};
 		_node->nGBO = blGeometryBufferGen(URIPART_INTERNAL(_node->nID), BL_PT_TRIANGLESTRIP, TRUE, _semantic, _decls, 3, _vbo, sizeof(_vbo), NULL, 0, BL_IF_INVALID);
 		_node->nTex = blTextureGen(blHashString((const BLUtf8*)_node->aFilename), BL_TT_2D, _node->eTexFormat, FALSE, TRUE, FALSE, 1, 1, _node->nTexWidth, _node->nTexHeight, 1, _node->pTexData);
+		if (_node->sSize.fX < 1e-6 || _node->sSize.fY < 1e-6)
+		{
+			_node->sSize.fX = (BLF32)_node->nTexWidth;
+			_node->sSize.fY = (BLF32)_node->nTexHeight;
+		}
 		free(_node->pTexData);
 		_node->pTexData = NULL;
 		_node->bValid = TRUE;
@@ -1301,9 +1306,10 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 			}
 			BLF32 _forcex = ((_PrSpriteMem->bShaking && !_PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f);
 			BLF32 _forcey = ((_PrSpriteMem->bShaking && _PrSpriteMem->bShakingVertical) ? _PrSpriteMem->fShakingForce : 0.f);
+			BLF32 _height = _PrSpriteMem->sViewport.sRB.fY - _PrSpriteMem->sViewport.sLT.fY;
 			BLF32 _vbo[] = {
 				_ltx + _forcex,
-				_lty + _forcey,
+				_height - _rby + _forcey,
 				_rgba[0],
 				_rgba[1],
 				_rgba[2],
@@ -1311,7 +1317,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 				_lttx,
 				_ltty,
 				_rtx + _forcex,
-				_rty + _forcey,
+				_height - _lby + _forcey,
 				_rgba[0],
 				_rgba[1],
 				_rgba[2],
@@ -1319,7 +1325,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 				_rttx,
 				_rtty,
 				_lbx + _forcex,
-				_lby + _forcey,
+				_height - _rty + _forcey,
 				_rgba[0],
 				_rgba[1],
 				_rgba[2],
@@ -1327,7 +1333,7 @@ _SpriteDraw(BLU32 _Delta, _BLSpriteNode* _Node, BLF32 _Mat[6])
 				_lbtx,
 				_lbty,
 				_rbx + _forcex,
-				_rby + _forcey,
+				_height - _lty + _forcey,
 				_rgba[0],
 				_rgba[1],
 				_rgba[2],
@@ -2518,7 +2524,7 @@ blSpriteText(IN BLGuid _ID, IN BLUtf8* _Text, IN BLU32 _TxtColor, IN BLEnum _Txt
 		1.f,
 		0.f
 	};
-	blGeometryBufferUpdate(_node->nGBO, 0, _vbo, sizeof(_vbo), 0, NULL, 0);
+	blGeometryBufferUpdate(_node->nGBO, 0, (const BLU8*)_vbo, sizeof(_vbo), 0, NULL, 0);
 	BLGuid _fb = blFrameBufferGen();
 	blTextureDelete(_node->nTex);
 	_node->nTex = blTextureGen(0xFFFFFFFF, BL_TT_2D, BL_TF_RGBA8, FALSE, FALSE, TRUE, 1, 1, (BLU32)_width, (BLU32)_height, 1, NULL);

@@ -42,42 +42,42 @@ extern "C" {
 		OUT BLU32* _Iterations);
 
 	BL_API BLVoid blChipmunkSpaceGravityEXT(
-		IN BLF64 _X,
-		IN BLF64 _Y);
+		IN BLF32 _X,
+		IN BLF32 _Y);
 
 	BL_API BLVoid blChipmunkSpaceGetGravityEXT(
-		OUT BLF64* _X,
-		OUT BLF64* _Y);
+		OUT BLF32* _X,
+		OUT BLF32* _Y);
 
 	BL_API BLVoid blChipmunkSpaceDampingEXT(
-		IN BLF64 _Damping);
+		IN BLF32 _Damping);
 
 	BL_API BLVoid blChipmunkSpaceGetDampingEXT(
-		OUT BLF64* _Damping);
+		OUT BLF32* _Damping);
 
 	BL_API BLVoid blChipmunkSpaceSpeedThreshold(
-		IN BLF64 _Threshold);
+		IN BLF32 _Threshold);
 
 	BL_API BLVoid blChipmunkSpaceGetSpeedThreshold(
-		OUT BLF64* _Threshold);
+		OUT BLF32* _Threshold);
 
 	BL_API BLVoid blChipmunkSpaceSleepTimeThresholdEXT(
-		IN BLF64 _Threshold);
+		IN BLF32 _Threshold);
 
 	BL_API BLVoid blChipmunkSpaceGetSleepTimeThresholdEXT(
-		OUT BLF64* _Threshold);
+		OUT BLF32* _Threshold);
 
 	BL_API BLVoid blChipmunkSpaceCollisionSlopEXT(
-		IN BLF64 _Slop);
+		IN BLF32 _Slop);
 
 	BL_API BLVoid blChipmunkSpaceGetCollisionSlopEXT(
-		OUT BLF64* _Slop);
+		OUT BLF32* _Slop);
 
 	BL_API BLVoid blChipmunkSpaceCollisionBiasEXT(
-		IN BLF64 _Bias);
+		IN BLF32 _Bias);
 
 	BL_API BLVoid blChipmunkSpaceGetCollisionBiasEXT(
-		OUT BLF64* _Bias);
+		OUT BLF32* _Bias);
 
 	BL_API BLVoid blChipmunkSpaceCollisionPersistenceEXT(
 		IN BLU32 _Persistence);
@@ -123,12 +123,12 @@ extern "C" {
 		IN BLU32 _VertNum,
 		IN BLF32 _Radius);
 
-	BL_API BLF32 blChipmunkMomentRectEXT(
+	BL_API BLF32 blChipmunkMomentBoxEXT(
 		IN BLF32 _M,
 		IN BLF32 _Width,
 		IN BLF32 _Height);
 
-	BL_API BLF32 blChipmunkAreaRectEXT(
+	BL_API BLF32 blChipmunkAreaBoxEXT(
 		IN BLF32 _Width,
 		IN BLF32 _Height);
 

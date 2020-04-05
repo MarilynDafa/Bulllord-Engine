@@ -91,7 +91,7 @@ blChipmunkSpaceGetIterationsEXT(OUT BLU32* _Iterations)
 	*_Iterations = cpSpaceGetIterations(_PrCpMem->pSpace);
 }
 BLVoid 
-blChipmunkSpaceGravityEXT(IN BLF64 _X, IN BLF64 _Y)
+blChipmunkSpaceGravityEXT(IN BLF32 _X, IN BLF32 _Y)
 {
 	cpVect _vec;
 	_vec.x = _X;
@@ -99,59 +99,59 @@ blChipmunkSpaceGravityEXT(IN BLF64 _X, IN BLF64 _Y)
 	cpSpaceSetGravity(_PrCpMem->pSpace, _vec);
 }
 BLVoid 
-blChipmunkSpaceGetGravityEXT(OUT BLF64* _X, OUT BLF64* _Y)
+blChipmunkSpaceGetGravityEXT(OUT BLF32* _X, OUT BLF32* _Y)
 {
 	cpVect _ret = cpSpaceGetGravity(_PrCpMem->pSpace);
 	*_X = _ret.x;
 	*_Y = _ret.y;
 }
 BLVoid 
-blChipmunkSpaceDampingEXT(IN BLF64 _Damping)
+blChipmunkSpaceDampingEXT(IN BLF32 _Damping)
 {
 	cpSpaceSetDamping(_PrCpMem->pSpace, _Damping);
 }
 BLVoid 
-blChipmunkSpaceGetDampingEXT(OUT BLF64* _Damping)
+blChipmunkSpaceGetDampingEXT(OUT BLF32* _Damping)
 {
 	*_Damping = cpSpaceGetDamping(_PrCpMem->pSpace);
 }
 BLVoid 
-blChipmunkSpaceSpeedThreshold(IN BLF64 _Threshold)
+blChipmunkSpaceSpeedThreshold(IN BLF32 _Threshold)
 {
 	cpSpaceSetIdleSpeedThreshold(_PrCpMem->pSpace, _Threshold);
 }
 BLVoid 
-blChipmunkSpaceGetSpeedThreshold(OUT BLF64* _Threshold)
+blChipmunkSpaceGetSpeedThreshold(OUT BLF32* _Threshold)
 {
 	*_Threshold = cpSpaceGetIdleSpeedThreshold(_PrCpMem->pSpace);
 }
 BLVoid 
-blChipmunkSpaceSleepTimeThresholdEXT(IN BLF64 _Threshold)
+blChipmunkSpaceSleepTimeThresholdEXT(IN BLF32 _Threshold)
 {
 	cpSpaceSetSleepTimeThreshold(_PrCpMem->pSpace, _Threshold);
 }
 BLVoid 
-blChipmunkSpaceGetSleepTimeThresholdEXT(OUT BLF64* _Threshold)
+blChipmunkSpaceGetSleepTimeThresholdEXT(OUT BLF32* _Threshold)
 {
 	*_Threshold = cpSpaceGetSleepTimeThreshold(_PrCpMem->pSpace);
 }
 BLVoid 
-blChipmunkSpaceCollisionSlopEXT(IN BLF64 _Slop)
+blChipmunkSpaceCollisionSlopEXT(IN BLF32 _Slop)
 {
 	cpSpaceSetCollisionSlop(_PrCpMem->pSpace, _Slop);
 }
 BLVoid 
-blChipmunkSpaceGetCollisionSlopEXT(OUT BLF64* _Slop)
+blChipmunkSpaceGetCollisionSlopEXT(OUT BLF32* _Slop)
 {
 	*_Slop = cpSpaceGetCollisionSlop(_PrCpMem->pSpace);
 }
 BLVoid 
-blChipmunkSpaceCollisionBiasEXT(IN BLF64 _Bias)
+blChipmunkSpaceCollisionBiasEXT(IN BLF32 _Bias)
 {
 	cpSpaceSetCollisionBias(_PrCpMem->pSpace, _Bias);
 }
 BLVoid 
-blChipmunkSpaceGetCollisionBiasEXT(OUT BLF64* _Bias)
+blChipmunkSpaceGetCollisionBiasEXT(OUT BLF32* _Bias)
 {
 	*_Bias = cpSpaceGetCollisionBias(_PrCpMem->pSpace);
 }
@@ -203,12 +203,12 @@ blChipmunkAreaPolyEXT(IN BLF32* _Verts, IN BLU32 _VertNum, IN BLF32 _Radius)
 	return cpAreaForPoly(_hullcount, _verts, _Radius);
 }
 BLF32
-blChipmunkMomentRectEXT(IN BLF32 _M, IN BLF32 _Width, IN BLF32 _Height)
+blChipmunkMomentBoxEXT(IN BLF32 _M, IN BLF32 _Width, IN BLF32 _Height)
 {
 	return cpMomentForBox(_M, _Width, _Height);
 }
 BLF32
-blChipmunkAreaRectEXT(IN BLF32 _Width, IN BLF32 _Height)
+blChipmunkAreaBoxEXT(IN BLF32 _Width, IN BLF32 _Height)
 {
 	return _Width * _Height;
 }
