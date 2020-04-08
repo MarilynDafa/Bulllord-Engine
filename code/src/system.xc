@@ -3173,7 +3173,6 @@ _PollEvent()
 BLVoid
 _SystemInit()
 {
-	_PrSystemMem->nSysTime = blSysTickCounts();
 	_UtilsInit();
 #if defined(BL_PLATFORM_ANDROID)
 	_StreamIOInit(_PrSystemMem->pActivity->assetManager);
@@ -3189,6 +3188,7 @@ _SystemInit()
 	_GbSystemRunning = TRUE;
 	_PrSystemMem->pBeginFunc();
 #endif
+	_PrSystemMem->nSysTime = blSysTickCounts();
 }
 #ifdef EMSCRIPTEN
 static EM_BOOL 

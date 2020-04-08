@@ -184,7 +184,17 @@ BL_API BLBool blSpriteMove(
 	IN BLF32 _XVec,
 	IN BLF32 _YVec);
 
+BL_API BLBool blSpriteMoveTo(
+	IN BLGuid _ID,
+	IN BLF32 _XPos,
+	IN BLF32 _YPos);
+
 BL_API BLBool blSpriteScale(
+	IN BLGuid _ID,
+	IN BLF32 _XScale,
+	IN BLF32 _YScale);
+
+BL_API BLBool blSpriteScaleTo(
 	IN BLGuid _ID,
 	IN BLF32 _XScale,
 	IN BLF32 _YScale);
@@ -193,7 +203,16 @@ BL_API BLBool blSpriteRotate(
 	IN BLGuid _ID,
 	IN BLS32 _Rotate);
 
+BL_API BLBool blSpriteRotateTo(
+	IN BLGuid _ID,
+	IN BLS32 _Rotate);
+
 BL_API BLBool blSpriteSkew(
+	IN BLGuid _ID,
+	IN BLS32 _XSkew,
+	IN BLS32 _YSkew);
+
+BL_API BLBool blSpriteSkewTo(
 	IN BLGuid _ID,
 	IN BLS32 _XSkew,
 	IN BLS32 _YSkew);

@@ -193,10 +193,11 @@ extern "C" {
 		IN BLF32 _BY,
 		IN BLF32 _Radius);
 
-	BL_API BLBool blChipmunkSpritePosNVelEXT(
+	BL_API BLBool blChipmunkSpriteStateEXT(
 		IN BLGuid _ID,
 		IN BLF32 _XPos,
 		IN BLF32 _YPos,
+		IN BLF32 _Angle,
 		IN BLF32 _XVel,
 		IN BLF32 _YVel);
 

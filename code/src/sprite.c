@@ -2626,6 +2626,108 @@ blSpriteMove(IN BLGuid _ID, IN BLF32 _XVec, IN BLF32 _YVec)
     _node->sPos.fY += _YVec;
     return TRUE;
 }
+BLBool 
+blSpriteMoveTo(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return FALSE;
+	if (_node->bLocked)
+		return FALSE;
+	BLF32 _deltax, _deltay;
+	_BLSpriteNode* _nodes[16] = { NULL };
+	BLS32 _i = 0;
+	for (; _i < 16; ++_i)
+	{
+		if (_node)
+		{
+			_nodes[_i] = _node;
+			_node = _node->pParent;
+		}
+		else
+			break;
+	}
+	BLF32 _x = 0.f, _y = 0.f;
+	BLF32 _curmat[6] = { 1.f, 0.f, 0.f, 1.f, 0.f, 0.f }, _mat[6] = { 0.f };
+	BLBool _setp = FALSE;
+	_i--;
+	for (; _i >= 0; --_i)
+	{
+		_node = _nodes[_i];
+		if (_node)
+		{
+			BLF32 _cos = cosf(_node->fRotate);
+			BLF32 _sin = sinf(_node->fRotate);
+			BLF32 _pivotx = (_node->sPivot.fX - 0.5f) * _node->sSize.fX;
+			BLF32 _pivoty = (_node->sPivot.fY - 0.5f) * _node->sSize.fY;
+			BLBool _affine = (_node->fSkewX < 1e-6) && (_node->fSkewY < 1e-6);
+			if (!_setp)
+			{
+				_setp = TRUE;
+				if (_affine)
+				{
+					_mat[0] = (_node->fScaleX * _cos);
+					_mat[1] = (_node->fScaleX * _sin);
+					_mat[2] = (-_node->fScaleY * _sin);
+					_mat[3] = (_node->fScaleY * _cos);
+					_mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX;
+					_mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY;
+				}
+				else
+				{
+					BLF32 _tanx = tanf(_node->fSkewX);
+					BLF32 _tany = tanf(_node->fSkewY);
+					_mat[0] = (_node->fScaleX * _cos) + (-_node->fScaleY * _sin) * _tany;
+					_mat[1] = (_node->fScaleX * _sin) + (_node->fScaleY * _cos) * _tany;
+					_mat[2] = (-_node->fScaleY * _sin) + (_node->fScaleX * _cos) * _tanx;
+					_mat[3] = (_node->fScaleY * _cos) + (_node->fScaleX * _sin) * _tanx;
+					_mat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX;
+					_mat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY;
+				}
+			}
+			else
+			{
+				if (_affine)
+				{
+					_curmat[0] = (_node->fScaleX * _cos);
+					_curmat[1] = (_node->fScaleX * _sin);
+					_curmat[2] = (-_node->fScaleY * _sin);
+					_curmat[3] = (_node->fScaleY * _cos);
+					_curmat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX;
+					_curmat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY;
+				}
+				else
+				{
+					BLF32 _tanx = tanf(_node->fSkewX);
+					BLF32 _tany = tanf(_node->fSkewY);
+					_curmat[0] = (_node->fScaleX * _cos) + (-_node->fScaleY * _sin) * _tany;
+					_curmat[1] = (_node->fScaleX * _sin) + (_node->fScaleY * _cos) * _tany;
+					_curmat[2] = (-_node->fScaleY * _sin) + (_node->fScaleX * _cos) * _tanx;
+					_curmat[3] = (_node->fScaleY * _cos) + (_node->fScaleX * _sin) * _tanx;
+					_curmat[4] = ((-_pivotx * _node->fScaleX) * _cos) + ((_pivoty * _node->fScaleY) * _sin) + _node->sPos.fX;
+					_curmat[5] = ((-_pivotx * _node->fScaleX) * _sin) + ((-_pivoty * _node->fScaleY) * _cos) + _node->sPos.fY;
+				}
+			}
+			BLF32 _m0 = (_curmat[0] * _mat[0]) + (_curmat[1] * _mat[2]);
+			BLF32 _m1 = (_curmat[0] * _mat[1]) + (_curmat[1] * _mat[3]);
+			BLF32 _m2 = (_curmat[2] * _mat[0]) + (_curmat[3] * _mat[2]);
+			BLF32 _m3 = (_curmat[2] * _mat[1]) + (_curmat[3] * _mat[3]);
+			BLF32 _m4 = (_curmat[4] * _mat[0]) + (_curmat[5] * _mat[2]) + _mat[4];
+			BLF32 _m5 = (_curmat[4] * _mat[1]) + (_curmat[5] * _mat[3]) + _mat[5];
+			_mat[0] = _m0;
+			_mat[1] = _m1;
+			_mat[2] = _m2;
+			_mat[3] = _m3;
+			_mat[4] = _m4;
+			_mat[5] = _m5;
+		}
+	}
+	_node->sPos.fX += _XPos - _mat[4];
+	_node->sPos.fY += _YPos - _mat[5];
+	return TRUE;
+}
 BLBool
 blSpriteScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale)
 {
@@ -2639,6 +2741,20 @@ blSpriteScale(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale)
     _node->fScaleX *= _XScale;
     _node->fScaleY *= _YScale;
     return TRUE;
+}
+BLBool 
+blSpriteScaleTo(IN BLGuid _ID, IN BLF32 _XScale, IN BLF32 _YScale)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return FALSE;
+	if (_node->bLocked)
+		return FALSE;
+	_node->fScaleX = _XScale;
+	_node->fScaleY = _YScale;
+	return TRUE;
 }
 BLBool
 blSpriteRotate(IN BLGuid _ID, IN BLS32 _Rotate)
@@ -2654,6 +2770,19 @@ blSpriteRotate(IN BLGuid _ID, IN BLS32 _Rotate)
     return TRUE;
 }
 BLBool
+blSpriteRotateTo(IN BLGuid _ID, IN BLS32 _Rotate)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return FALSE;
+	if (_node->bLocked)
+		return FALSE;
+	_node->fRotate = _Rotate * PI_INTERNAL / 180.0f;
+	return TRUE;
+}
+BLBool
 blSpriteSkew(IN BLGuid _ID, IN BLS32 _XSkew, IN BLS32 _YSkew)
 {
 	if (_ID == INVALID_GUID)
@@ -2663,6 +2792,18 @@ blSpriteSkew(IN BLGuid _ID, IN BLS32 _XSkew, IN BLS32 _YSkew)
 		return FALSE;
 	_node->fSkewX += _XSkew * PI_INTERNAL / 180.f;
 	_node->fSkewY += _YSkew * PI_INTERNAL / 180.f;
+	return TRUE;
+}
+BLBool
+blSpriteSkewTo(IN BLGuid _ID, IN BLS32 _XSkew, IN BLS32 _YSkew)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return FALSE;
+	_node->fSkewX = _XSkew * PI_INTERNAL / 180.f;
+	_node->fSkewY = _YSkew * PI_INTERNAL / 180.f;
 	return TRUE;
 }
 BLBool

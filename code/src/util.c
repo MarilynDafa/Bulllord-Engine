@@ -260,6 +260,8 @@ blDeleteGuid(IN BLGuid _ID)
 BLVoid*
 blGuidAsPointer(IN BLGuid _ID)
 {
+	if (_ID == INVALID_GUID)
+		return NULL;
 	BLU32 _inptr = PTRPART_INTERNAL(_ID);
 	if (_inptr >= MEMCACHE_CAP_INTERNAL)
 		return NULL;

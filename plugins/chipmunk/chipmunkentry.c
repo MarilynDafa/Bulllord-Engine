@@ -32,18 +32,14 @@ _BodyCp(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY,
 {
 	cpShape* _shape = blSpriteExternalData(_ID, NULL);
 	if (!_shape)
-		return 0;
+		return 2;
 	cpBody* _body = cpShapeGetBody(_shape);
 	cpVect _pos = cpBodyGetPosition(_body);
-	cpVect _rot = cpBodyGetRotation(_body);
-	BLF32 _ltx, _lty, _rbx, _rby;
-	blSpriteViewportQuery(&_ltx, &_lty, &_rbx, &_rby);
-	if (fabs(_pos.x - _Mat[4] - _ltx) > 1e-6 || fabs(_pos.y - _Mat[5] - _lty) > 1e-6)
-	{
-		blSpriteLocked(_ID, FALSE);
-		blSpriteMove(_ID, _pos.x - _Mat[4] - _ltx, _pos.y - _Mat[5] - _lty);
-		blSpriteLocked(_ID, TRUE);
-	}
+	cpFloat _rot = cpBodyGetAngle(_body);
+	blSpriteLocked(_ID, FALSE);
+	blSpriteRotateTo(_ID, _rot * -57.29578049044297f);
+	blSpriteMoveTo(_ID, _pos.x, _pos.y);
+	blSpriteLocked(_ID, TRUE);
 	return 2;
 }
 static const BLVoid
@@ -379,20 +375,18 @@ blChipmunkSpriteDynamicSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _M
 	return TRUE;
 }
 BLBool 
-blChipmunkSpritePosNVelEXT(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos, IN BLF32 _XVel, IN BLF32 _YVel)
+blChipmunkSpriteStateEXT(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos, IN BLF32 _Angle, IN BLF32 _XVel, IN BLF32 _YVel)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
 		return FALSE;
 	cpBody* _body = cpShapeGetBody(_shape);
-	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
-	BLU32 _clr;
-	BLBool _show, _flipx, _flipy;
-	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
 	cpBodySetPosition(_body, cpv(_XPos, _YPos));
 	cpBodySetVelocity(_body, cpv(_XVel, _YVel));
+	cpBodySetAngle(_body, -_Angle * 0.0174532922222222f);
 	blSpriteLocked(_ID, FALSE);
-	blSpriteMove(_ID, _XPos - _xpos, _YPos - _ypos);
+	blSpriteRotateTo(_ID, _Angle);
+	blSpriteMoveTo(_ID, _XPos, _YPos);
 	blSpriteLocked(_ID, TRUE);
 	return TRUE;
 }
