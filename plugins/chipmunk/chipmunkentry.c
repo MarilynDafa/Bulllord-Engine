@@ -37,7 +37,7 @@ _BodyCp(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY,
 	cpVect _pos = cpBodyGetPosition(_body);
 	cpFloat _rot = cpBodyGetAngle(_body);
 	blSpriteLocked(_ID, FALSE);
-	blSpriteRotateTo(_ID, _rot * -57.29578049044297f);
+	blSpriteRotateTo(_ID, (BLS32)(_rot * -57.29578049044297f));
 	blSpriteMoveTo(_ID, _pos.x, _pos.y);
 	blSpriteLocked(_ID, TRUE);
 	return 2;
@@ -375,19 +375,125 @@ blChipmunkSpriteDynamicSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _M
 	return TRUE;
 }
 BLBool 
-blChipmunkSpriteStateEXT(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos, IN BLF32 _Angle, IN BLF32 _XVel, IN BLF32 _YVel)
+blChipmunkSpriteSleepEXT(IN BLGuid _ID, IN BLBool _Sleep)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	cpBody* _body = cpShapeGetBody(_shape);
+	if (_Sleep)
+		cpBodySleep(_body);
+	else
+		cpBodyActivate(_body);
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteIsSleepEXT(IN BLGuid _ID)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	cpBody* _body = cpShapeGetBody(_shape);
+	return cpBodyIsSleeping(_body);
+}
+BLBool
+blChipmunkSpriteStatesEXT(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos, IN BLS32 _Angle)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
 		return FALSE;
 	cpBody* _body = cpShapeGetBody(_shape);
 	cpBodySetPosition(_body, cpv(_XPos, _YPos));
-	cpBodySetVelocity(_body, cpv(_XVel, _YVel));
 	cpBodySetAngle(_body, -_Angle * 0.0174532922222222f);
 	blSpriteLocked(_ID, FALSE);
 	blSpriteRotateTo(_ID, _Angle);
 	blSpriteMoveTo(_ID, _XPos, _YPos);
 	blSpriteLocked(_ID, TRUE);
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteMassEXT(IN BLGuid _ID, IN BLF32 _Mass)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return FALSE;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodySetMass(_body, _Mass);
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteMomentEXT(IN BLGuid _ID, IN BLF32 _Moment)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return FALSE;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodySetMoment(_body, _Moment);
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteCenterOfGravityEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return FALSE;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodySetCenterOfGravity(_body, cpv(_X, _Y));
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteVelocityEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return FALSE;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodySetVelocity(_body, cpv(_X, _Y));
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteForceEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return FALSE;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodySetForce(_body, cpv(_X, _Y));
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteAngularVelocityEXT(IN BLGuid _ID, IN BLF32 _Vel)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return FALSE;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodySetAngularVelocity(_body, _Vel);
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteTorqueEXT(IN BLGuid _ID, IN BLF32 _Tor)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return FALSE;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodySetTorque(_body, _Tor);
+	return TRUE;
+}
+BLBool 
+blChipmunkSpritePhysicalQuantitiesEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Moment, OUT BLF32* _CenterX, OUT BLF32* _CenterY, OUT BLF32* _VelocityX, OUT BLF32* _VelocityY, OUT BLF32* _VelocityA, OUT BLF32* _ForceX, OUT BLF32* _ForceY, OUT BLF32* _Torque)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return FALSE;
+	cpBody* _body = cpShapeGetBody(_shape);
+	*_Mass = cpBodyGetMass(_body);
+	*_Moment = cpBodyGetMoment(_body);
+	*_CenterX = cpBodyGetCenterOfGravity(_body).x;
+	*_CenterY = cpBodyGetCenterOfGravity(_body).y;
+	*_VelocityX = cpBodyGetVelocity(_body).x;
+	*_VelocityY = cpBodyGetVelocity(_body).y;
+	*_VelocityA = cpBodyGetAngularVelocity(_body);
+	*_ForceX = cpBodyGetForce(_body).x;
+	*_ForceY = cpBodyGetForce(_body).y;
+	*_Torque = cpBodyGetTorque(_body);
 	return TRUE;
 }
 BLVoid
@@ -443,7 +549,7 @@ blChipmunkShapeFilterEXT(IN BLGuid _ID, IN BLU32 _Group, IN BLU32 _Category, IN 
 	cpShapeSetFilter(_shape, _filter);
 }
 BLVoid 
-blChipmunkQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Density, OUT BLBool* _Sensor, OUT BLF32* _Elasticity, OUT BLF32* _Friction, OUT BLF32* _XVelocity, OUT BLF32* _YVelocity, OUT BLU32* _CollisionType, OUT BLU32* _Group, OUT BLU32* _Category, OUT BLU32* _Mask)
+blChipmunkQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Density, OUT BLBool* _Sensor, OUT BLF32* _Elasticity, OUT BLF32* _Friction, OUT BLF32* _XVelocityS, OUT BLF32* _YVelocityS, OUT BLU32* _CollisionType, OUT BLU32* _Group, OUT BLU32* _Category, OUT BLU32* _Mask)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	*_Mass = cpShapeGetMass(_shape);
@@ -451,8 +557,8 @@ blChipmunkQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Density, OUT BLB
 	*_Sensor = cpShapeGetSensor(_shape);
 	*_Elasticity = cpShapeGetElasticity(_shape);
 	*_Friction = cpShapeGetFriction(_shape);
-	*_XVelocity = cpShapeGetSurfaceVelocity(_shape).x;
-	*_YVelocity = cpShapeGetSurfaceVelocity(_shape).y;
+	*_XVelocityS = cpShapeGetSurfaceVelocity(_shape).x;
+	*_YVelocityS = cpShapeGetSurfaceVelocity(_shape).y;
 	*_CollisionType = cpShapeGetCollisionType(_shape);
 	*_Group = cpShapeGetFilter(_shape).group;
 	*_Category = cpShapeGetFilter(_shape).categories;

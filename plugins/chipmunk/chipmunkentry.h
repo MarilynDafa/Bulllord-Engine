@@ -193,13 +193,62 @@ extern "C" {
 		IN BLF32 _BY,
 		IN BLF32 _Radius);
 
-	BL_API BLBool blChipmunkSpriteStateEXT(
+	BL_API BLBool blChipmunkSpriteSleepEXT(
+		IN BLGuid _ID,
+		IN BLBool _Sleep);
+
+	BL_API BLBool blChipmunkSpriteIsSleepEXT(
+		IN BLGuid _ID);
+
+	BL_API BLBool blChipmunkSpriteStatesEXT(
 		IN BLGuid _ID,
 		IN BLF32 _XPos,
 		IN BLF32 _YPos,
-		IN BLF32 _Angle,
-		IN BLF32 _XVel,
-		IN BLF32 _YVel);
+		IN BLS32 _Angle);
+
+	BL_API BLBool blChipmunkSpriteMassEXT(
+		IN BLGuid _ID,
+		IN BLF32 _Mass);
+
+	BL_API BLBool blChipmunkSpriteMomentEXT(
+		IN BLGuid _ID,
+		IN BLF32 _Moment);
+
+	BL_API BLBool blChipmunkSpriteCenterOfGravityEXT(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y);
+
+	BL_API BLBool blChipmunkSpriteVelocityEXT(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y);
+
+	BL_API BLBool blChipmunkSpriteForceEXT(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y);
+
+	BL_API BLBool blChipmunkSpriteAngularVelocityEXT(
+		IN BLGuid _ID,
+		IN BLF32 _Vel);
+
+	BL_API BLBool blChipmunkSpriteTorqueEXT(
+		IN BLGuid _ID,
+		IN BLF32 _Tor);
+
+	BL_API BLBool blChipmunkSpritePhysicalQuantitiesEXT(
+		IN BLGuid _ID,
+		OUT BLF32* _Mass, 
+		OUT BLF32* _Moment,
+		OUT BLF32* _CenterX,
+		OUT BLF32* _CenterY, 
+		OUT BLF32* _VelocityX,
+		OUT BLF32* _VelocityY,
+		OUT BLF32* _VelocityA,
+		OUT BLF32* _ForceX,
+		OUT BLF32* _ForceY,
+		OUT BLF32* _Torque);
 
 	//shape
 	BL_API BLVoid blChipmunkShapeMassEXT(
@@ -244,8 +293,8 @@ extern "C" {
 		OUT BLBool* _Sensor,
 		OUT BLF32* _Elasticity,
 		OUT BLF32* _Friction,
-		OUT BLF32* _XVelocity,
-		OUT BLF32* _YVelocity,
+		OUT BLF32* _XVelocityS,
+		OUT BLF32* _YVelocityS,
 		OUT BLU32* _CollisionType,
 		OUT BLU32* _Group,
 		OUT BLU32* _Category,
