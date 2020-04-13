@@ -36,10 +36,13 @@ _BodyCp(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY,
 	cpBody* _body = cpShapeGetBody(_shape);
 	cpVect _pos = cpBodyGetPosition(_body);
 	cpFloat _rot = cpBodyGetAngle(_body);
-	blSpriteLocked(_ID, FALSE);
-	blSpriteRotateTo(_ID, (BLS32)(_rot * -57.29578049044297f));
-	blSpriteMoveTo(_ID, _pos.x, _pos.y);
-	blSpriteLocked(_ID, TRUE);
+	if (_body != cpSpaceGetStaticBody(_PrCpMem->pSpace))
+	{
+		blSpriteLocked(_ID, FALSE);
+		blSpriteRotateTo(_ID, (BLS32)(_rot * -57.29578049044297f));
+		blSpriteMoveTo(_ID, _pos.x, _pos.y);
+		blSpriteLocked(_ID, TRUE);
+	}
 	return 2;
 }
 static const BLVoid
@@ -186,7 +189,7 @@ blChipmunkMomentPolyEXT(IN BLF32 _M, IN BLF32* _Verts, IN BLU32 _VertNum, IN BLF
 {
 	cpFloat tolerance = 2.f;
 	cpVect* _verts = (cpVect *)alloca(_VertNum * sizeof(cpVect));
-	BLU32 _hullcount = cpConvexHull(_VertNum, (cpVect*)_Verts, _verts, NULL, tolerance);
+	BLU32 _hullcount = cpConvexHull(_VertNum / (2 * sizeof(BLF32)), (cpVect*)_Verts, _verts, NULL, tolerance);
 	cpVect _offset = cpCentroidForPoly(_hullcount, (cpVect*)_verts);
 	return cpMomentForPoly(_M, _hullcount, (cpVect*)_verts, _offset, _Radius);
 }
@@ -209,83 +212,88 @@ blChipmunkAreaBoxEXT(IN BLF32 _Width, IN BLF32 _Height)
 	return _Width * _Height;
 }
 BLBool
-blChipmunkSpriteStaticPolyBodyEXT(IN BLGuid _ID, IN BLF32* _ShapeData, IN BLU32 _DataNum, IN BLF32 _Radius)
+blChipmunkSpriteStaticPolyBodyEXT(IN BLGuid _ID, IN BLF32* _ShapeData, IN BLU32 _DataNum, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y, IN BLS32 _Angle)
 {
 	if (blSpriteExternalData(_ID, NULL))
 		return FALSE;
 	cpShape* _shape;
 	cpBody* _static = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	blSpriteLocked(_ID, FALSE);
+	blSpriteRotateTo(_ID, _Angle);
+	blSpriteMoveTo(_ID, _X, _Y);
 	blSpriteLocked(_ID, TRUE);
 	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
 	BLU32 _clr;
 	BLBool _show, _flipx, _flipy;
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
-	cpBodySetPosition(_static, cpv(_xpos, _ypos));
 	if (_ShapeData)
 	{
-		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_static, _DataNum, (cpVect*)_ShapeData, cpTransformTranslate(cpv(0.f, 0.f)), _Radius));
+		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_static, _DataNum / (2 * sizeof(BLF32)), (cpVect*)_ShapeData, cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f), _Radius));
 	}
 	else
 	{
 		cpVect _tris[] = {
 			cpv(-_width * 0.5f, -_height * 0.5f),
-			cpv(_width * 0.5f, -_height * 0.5f),
-			cpv(_width * 0.5f, _height * 0.5f),
 			cpv(-_width * 0.5f, _height * 0.5f),
+			cpv(_width * 0.5f, _height * 0.5f),
+			cpv(_width * 0.5f, -_height * 0.5f),
 		};
-		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_static, 4, _tris, cpTransformTranslate(cpv(0.f, 0.f)), _Radius));
+		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_static, 4, _tris, cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f), _Radius));
 	}
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
 BLBool 
-blChipmunkSpriteStaticCircleBodyEXT(IN BLGuid _ID, IN BLF32 _OffsetX, IN BLF32 _OffsetY, IN BLF32 _Radius)
+blChipmunkSpriteStaticCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y)
 {
 	if (blSpriteExternalData(_ID, NULL))
 		return FALSE;
 	cpShape* _shape;
 	cpBody* _static = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	blSpriteLocked(_ID, FALSE);
+	blSpriteMoveTo(_ID, _X, _Y);
 	blSpriteLocked(_ID, TRUE);
 	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
 	BLU32 _clr;
 	BLBool _show, _flipx, _flipy;
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
-	cpBodySetPosition(_static, cpv(_xpos, _ypos));
-	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpCircleShapeNew(_static, _Radius, cpv(_OffsetX, _OffsetY)));
+	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpCircleShapeNew(_static, _Radius, cpv(_X, _Y)));
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
 BLBool 
-blChipmunkSpriteStaticBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _Height, IN BLF32 _Radius)
+blChipmunkSpriteStaticBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _Height, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y)
 {
 	if (blSpriteExternalData(_ID, NULL))
 		return FALSE;
 	cpShape* _shape;
 	cpBody* _static = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	blSpriteLocked(_ID, FALSE);
+	blSpriteMoveTo(_ID, _X, _Y);
 	blSpriteLocked(_ID, TRUE);
 	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
 	BLU32 _clr;
 	BLBool _show, _flipx, _flipy;
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
-	cpBodySetPosition(_static, cpv(_xpos, _ypos));
-	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpBoxShapeNew(_static, _Width, _Height, _Radius));
+	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpBoxShapeNew2(_static, cpBBNew(_X - _Width * 0.5f, _Y - _Height * 0.5f, _X + _Width * 0.5f, _Y + _Height * 0.5f), _Radius));
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
 BLBool 
-blChipmunkSpriteStaticSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _AX, IN BLF32 _AY, IN BLF32 _BX, IN BLF32 _BY, IN BLF32 _Radius)
+blChipmunkSpriteStaticSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _AX, IN BLF32 _AY, IN BLF32 _BX, IN BLF32 _BY, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y)
 {
 	if (blSpriteExternalData(_ID, NULL))
 		return FALSE;
 	cpShape* _shape;
 	cpBody* _static = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	blSpriteLocked(_ID, FALSE);
+	blSpriteMoveTo(_ID, _X, _Y);
 	blSpriteLocked(_ID, TRUE);
 	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
 	BLU32 _clr;
 	BLBool _show, _flipx, _flipy;
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
-	cpBodySetPosition(_static, cpv(_xpos, _ypos));
-	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(_static, cpv(_AX, _AY), cpv(_BX, _BY), _Radius));
+	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(_static, cpv(_AX + _X, _AY + _Y), cpv(_BX + _X, _BY + _Y), _Radius));
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -304,24 +312,24 @@ blChipmunkSpriteDynamicPolyBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Mome
 	cpBodySetPosition(_body, cpv(_xpos, _ypos));
 	if (_ShapeData)
 	{
-		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_body, _DataNum, (cpVect*)_ShapeData, cpTransformTranslate(cpv(0.f, 0.f)), _Radius));
+		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNewRaw(_body, _DataNum / (2 * sizeof(BLF32)), (cpVect*)_ShapeData, _Radius));
 	}
 	else 
 	{
 		cpVect _tris[] = {
 			cpv(-_width * 0.5f, -_height * 0.5f),
-			cpv(_width * 0.5f, -_height * 0.5f),
-			cpv(_width * 0.5f, _height * 0.5f),
 			cpv(-_width * 0.5f, _height * 0.5f),
+			cpv(_width * 0.5f, _height * 0.5f),
+			cpv(_width * 0.5f, -_height * 0.5f),
 		};
-		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_body, 4, _tris, cpTransformTranslate(cpv(0.f, 0.f)), _Radius));
+		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNewRaw(_body, 4, _tris, _Radius));
 	}
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
 BLBool 
-blChipmunkSpriteDynamicCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Moment, IN BLF32 _OffsetX, IN BLF32 _OffsetY, IN BLF32 _Radius)
+blChipmunkSpriteDynamicCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Moment, IN BLF32 _Radius)
 {
 	if (blSpriteExternalData(_ID, NULL))
 		return FALSE;
@@ -333,7 +341,7 @@ blChipmunkSpriteDynamicCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Mo
 	BLBool _show, _flipx, _flipy;
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
 	cpBodySetPosition(_body, cpv(_xpos, _ypos));
-	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpCircleShapeNew(_body, _Radius, cpv(_OffsetX, _OffsetY)));
+	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpCircleShapeNew(_body, _Radius, cpvzero));
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
@@ -399,12 +407,15 @@ blChipmunkSpriteStatesEXT(IN BLGuid _ID, IN BLF32 _XPos, IN BLF32 _YPos, IN BLS3
 	if (!_shape)
 		return FALSE;
 	cpBody* _body = cpShapeGetBody(_shape);
-	cpBodySetPosition(_body, cpv(_XPos, _YPos));
-	cpBodySetAngle(_body, -_Angle * 0.0174532922222222f);
-	blSpriteLocked(_ID, FALSE);
-	blSpriteRotateTo(_ID, _Angle);
-	blSpriteMoveTo(_ID, _XPos, _YPos);
-	blSpriteLocked(_ID, TRUE);
+	if (_body != cpSpaceGetStaticBody(_PrCpMem->pSpace))
+	{
+		blSpriteLocked(_ID, FALSE);
+		cpBodySetPosition(_body, cpv(_XPos, _YPos));
+		cpBodySetAngle(_body, -_Angle * 0.0174532922222222f);
+		blSpriteRotateTo(_ID, _Angle);
+		blSpriteMoveTo(_ID, _XPos, _YPos);
+		blSpriteLocked(_ID, TRUE);
+	}
 	return TRUE;
 }
 BLBool 

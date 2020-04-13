@@ -137,19 +137,24 @@ extern "C" {
 		IN BLGuid _ID,
 		IN BLF32* _ShapeData,
 		IN BLU32 _DataNum,
-		IN BLF32 _Radius);
+		IN BLF32 _Radius,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		IN BLS32 _Angle);
 
 	BL_API BLBool blChipmunkSpriteStaticCircleBodyEXT(
 		IN BLGuid _ID,
-		IN BLF32 _OffsetX,
-		IN BLF32 _OffsetY,
-		IN BLF32 _Radius);
+		IN BLF32 _Radius,
+		IN BLF32 _X,
+		IN BLF32 _Y);
 
 	BL_API BLBool blChipmunkSpriteStaticBoxBodyEXT(
 		IN BLGuid _ID,
 		IN BLF32 _Width,
 		IN BLF32 _Height,
-		IN BLF32 _Radius);
+		IN BLF32 _Radius,
+		IN BLF32 _X,
+		IN BLF32 _Y);
 
 	BL_API BLBool blChipmunkSpriteStaticSegmentBodyEXT(
 		IN BLGuid _ID,
@@ -157,7 +162,9 @@ extern "C" {
 		IN BLF32 _AY,
 		IN BLF32 _BX,
 		IN BLF32 _BY,
-		IN BLF32 _Radius);
+		IN BLF32 _Radius,
+		IN BLF32 _X,
+		IN BLF32 _Y);
 
 	BL_API BLBool blChipmunkSpriteDynamicPolyBodyEXT(
 		IN BLGuid _ID,
@@ -171,8 +178,6 @@ extern "C" {
 		IN BLGuid _ID,
 		IN BLF32 _Mass,
 		IN BLF32 _Moment,
-		IN BLF32 _OffsetX,
-		IN BLF32 _OffsetY,
 		IN BLF32 _Radius);
 
 	BL_API BLBool blChipmunkSpriteDynamicBoxBodyEXT(
