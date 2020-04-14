@@ -164,7 +164,8 @@ extern "C" {
 		IN BLF32 _BY,
 		IN BLF32 _Radius,
 		IN BLF32 _X,
-		IN BLF32 _Y);
+		IN BLF32 _Y,
+		IN BLS32 _Angle);
 
 	BL_API BLBool blChipmunkSpriteDynamicPolyBodyEXT(
 		IN BLGuid _ID,

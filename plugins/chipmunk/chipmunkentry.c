@@ -280,20 +280,24 @@ blChipmunkSpriteStaticBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _Heigh
 	return TRUE;
 }
 BLBool 
-blChipmunkSpriteStaticSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _AX, IN BLF32 _AY, IN BLF32 _BX, IN BLF32 _BY, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y)
+blChipmunkSpriteStaticSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _AX, IN BLF32 _AY, IN BLF32 _BX, IN BLF32 _BY, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y, IN BLS32 _Angle)
 {
 	if (blSpriteExternalData(_ID, NULL))
 		return FALSE;
 	cpShape* _shape;
 	cpBody* _static = cpSpaceGetStaticBody(_PrCpMem->pSpace);
 	blSpriteLocked(_ID, FALSE);
+	blSpriteRotateTo(_ID, _Angle);
 	blSpriteMoveTo(_ID, _X, _Y);
 	blSpriteLocked(_ID, TRUE);
 	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
 	BLU32 _clr;
 	BLBool _show, _flipx, _flipy;
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
-	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(_static, cpv(_AX + _X, _AY + _Y), cpv(_BX + _X, _BY + _Y), _Radius));
+	cpVect _pta = cpv(_AX, _AY);
+	cpVect _ptb = cpv(_BX, _BY);
+	cpTransform _tm = cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f);
+	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(_static, cpTransformPoint(_tm, _pta), cpTransformPoint(_tm, _ptb), _Radius));
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
