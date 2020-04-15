@@ -302,6 +302,100 @@ blChipmunkSpriteStaticSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _AX, IN BLF32 _AY, 
 	return TRUE;
 }
 BLBool 
+blChipmunkSpriteKinematicPolyBodyEXT(IN BLGuid _ID, IN BLF32* _ShapeData, IN BLU32 _DataNum, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y, IN BLS32 _Angle)
+{
+	if (blSpriteExternalData(_ID, NULL))
+		return FALSE;
+	cpShape* _shape;
+	cpBody* _kinematic = cpBodyNewKinematic();
+	blSpriteLocked(_ID, FALSE);
+	blSpriteRotateTo(_ID, _Angle);
+	blSpriteMoveTo(_ID, _X, _Y);
+	blSpriteLocked(_ID, TRUE);
+	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
+	BLU32 _clr;
+	BLBool _show, _flipx, _flipy;
+	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
+	if (_ShapeData)
+	{
+		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_kinematic, _DataNum / (2 * sizeof(BLF32)), (cpVect*)_ShapeData, cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f), _Radius));
+	}
+	else
+	{
+		cpVect _tris[] = {
+			cpv(-_width * 0.5f, -_height * 0.5f),
+			cpv(-_width * 0.5f, _height * 0.5f),
+			cpv(_width * 0.5f, _height * 0.5f),
+			cpv(_width * 0.5f, -_height * 0.5f),
+		};
+		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_kinematic, 4, _tris, cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f), _Radius));
+	}
+	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	blSpriteExternalData(_ID, _shape);
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteKinematicCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y)
+{
+	if (blSpriteExternalData(_ID, NULL))
+		return FALSE;
+	cpShape* _shape;
+	cpBody* _kinematic = cpBodyNewKinematic();
+	blSpriteLocked(_ID, FALSE);
+	blSpriteMoveTo(_ID, _X, _Y);
+	blSpriteLocked(_ID, TRUE);
+	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
+	BLU32 _clr;
+	BLBool _show, _flipx, _flipy;
+	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
+	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpCircleShapeNew(_kinematic, _Radius, cpv(_X, _Y)));
+	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	blSpriteExternalData(_ID, _shape);
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteKinematicBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _Height, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y)
+{
+	if (blSpriteExternalData(_ID, NULL))
+		return FALSE;
+	cpShape* _shape;
+	cpBody* _kinematic = cpBodyNewKinematic();
+	blSpriteLocked(_ID, FALSE);
+	blSpriteMoveTo(_ID, _X, _Y);
+	blSpriteLocked(_ID, TRUE);
+	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
+	BLU32 _clr;
+	BLBool _show, _flipx, _flipy;
+	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
+	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpBoxShapeNew2(_kinematic, cpBBNew(_X - _Width * 0.5f, _Y - _Height * 0.5f, _X + _Width * 0.5f, _Y + _Height * 0.5f), _Radius));
+	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	blSpriteExternalData(_ID, _shape);
+	return TRUE;
+}
+BLBool 
+blChipmunkSpriteKinematicSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _AX, IN BLF32 _AY, IN BLF32 _BX, IN BLF32 _BY, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y, IN BLS32 _Angle)
+{
+	if (blSpriteExternalData(_ID, NULL))
+		return FALSE;
+	cpShape* _shape;
+	cpBody* _kinematic = cpBodyNewKinematic();
+	blSpriteLocked(_ID, FALSE);
+	blSpriteRotateTo(_ID, _Angle);
+	blSpriteMoveTo(_ID, _X, _Y);
+	blSpriteLocked(_ID, TRUE);
+	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
+	BLU32 _clr;
+	BLBool _show, _flipx, _flipy;
+	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
+	cpVect _pta = cpv(_AX, _AY);
+	cpVect _ptb = cpv(_BX, _BY);
+	cpTransform _tm = cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f);
+	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(_kinematic, cpTransformPoint(_tm, _pta), cpTransformPoint(_tm, _ptb), _Radius));
+	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	blSpriteExternalData(_ID, _shape);
+	return TRUE;
+}
+BLBool 
 blChipmunkSpriteDynamicPolyBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Moment, IN BLF32* _ShapeData, IN BLU32 _DataNum, IN BLF32 _Radius)
 {
 	if (blSpriteExternalData(_ID, NULL))
@@ -578,4 +672,46 @@ blChipmunkQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Density, OUT BLB
 	*_Group = cpShapeGetFilter(_shape).group;
 	*_Category = cpShapeGetFilter(_shape).categories;
 	*_Mask = cpShapeGetFilter(_shape).mask;
+}
+BLVoid 
+test() {
+#define GRABBABLE_MASK_BIT (1<<31)
+	cpShape *shape;
+	cpShapeFilter NOT_GRABBABLE_FILTER = { CP_NO_GROUP, ~GRABBABLE_MASK_BIT, ~GRABBABLE_MASK_BIT };
+
+	// Set up the static box.
+	cpVect a = cpv(-200, -200);
+	cpVect b = cpv(-200, 200);
+	cpVect c = cpv(200, 200);
+	cpVect d = cpv(200, -200);
+
+	cpBody* KinematicBoxBody1 = cpSpaceAddBody(_PrCpMem->pSpace, cpBodyNewKinematic());
+	shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(KinematicBoxBody1, a, b, 0.0f));
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
+	cpBodySetAngularVelocity(KinematicBoxBody1, 0.4f);
+
+	cpBody* KinematicBoxBody2 = cpSpaceAddBody(_PrCpMem->pSpace, cpBodyNewKinematic());
+	shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(KinematicBoxBody2, b, c, 0.0f));
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
+	cpBodySetAngularVelocity(KinematicBoxBody2, 0.4f);
+
+	cpBody* KinematicBoxBody3 = cpSpaceAddBody(_PrCpMem->pSpace, cpBodyNewKinematic());
+	shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(KinematicBoxBody3, c, d, 0.0f));
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
+	cpBodySetAngularVelocity(KinematicBoxBody3, 0.4f);
+
+	cpBody* KinematicBoxBody4 = cpSpaceAddBody(_PrCpMem->pSpace, cpBodyNewKinematic());
+	shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(KinematicBoxBody4, d, a, 0.0f));
+
+
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
+	cpBodySetAngularVelocity(KinematicBoxBody4, 0.4f);
 }

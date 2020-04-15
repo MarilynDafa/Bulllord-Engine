@@ -167,6 +167,40 @@ extern "C" {
 		IN BLF32 _Y,
 		IN BLS32 _Angle);
 
+	BL_API BLBool blChipmunkSpriteKinematicPolyBodyEXT(
+		IN BLGuid _ID,
+		IN BLF32* _ShapeData,
+		IN BLU32 _DataNum,
+		IN BLF32 _Radius,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		IN BLS32 _Angle);
+
+	BL_API BLBool blChipmunkSpriteKinematicCircleBodyEXT(
+		IN BLGuid _ID,
+		IN BLF32 _Radius,
+		IN BLF32 _X,
+		IN BLF32 _Y);
+
+	BL_API BLBool blChipmunkSpriteKinematicBoxBodyEXT(
+		IN BLGuid _ID,
+		IN BLF32 _Width,
+		IN BLF32 _Height,
+		IN BLF32 _Radius,
+		IN BLF32 _X,
+		IN BLF32 _Y);
+
+	BL_API BLBool blChipmunkSpriteKinematicSegmentBodyEXT(
+		IN BLGuid _ID,
+		IN BLF32 _AX,
+		IN BLF32 _AY,
+		IN BLF32 _BX,
+		IN BLF32 _BY,
+		IN BLF32 _Radius,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		IN BLS32 _Angle);
+
 	BL_API BLBool blChipmunkSpriteDynamicPolyBodyEXT(
 		IN BLGuid _ID,
 		IN BLF32 _Mass,
@@ -305,6 +339,8 @@ extern "C" {
 		OUT BLU32* _Group,
 		OUT BLU32* _Category,
 		OUT BLU32* _Mask);
+
+	BL_API BLVoid test();
 
 	//constraint
 	//arbiter
