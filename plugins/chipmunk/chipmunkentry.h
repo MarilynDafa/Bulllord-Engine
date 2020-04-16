@@ -290,6 +290,67 @@ extern "C" {
 		OUT BLF32* _ForceY,
 		OUT BLF32* _Torque);
 
+	BL_API BLVoid blChipmunkSpriteVelocityUpdateFunc(
+		IN BLGuid _ID,
+		IN BLVoid(*_VelocityFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32));
+
+	BL_API BLVoid blChipmunkSpritePositionUpdateFunc(
+		IN BLGuid _ID,
+		IN BLVoid(*_PositionFunc)(BLGuid, BLF32));
+
+	BL_API BLVoid blChipmunkSpriteUpdateVelocity(
+		IN BLGuid _ID,
+		IN BLF32 _GravityX,
+		IN BLF32 _GravityY, 
+		IN BLF32 _Damping, 
+		IN BLF32 _Dt);
+
+	BL_API BLVoid blChipmunkSpriteUpdatePosition(
+		IN BLGuid _ID,
+		IN BLF32 _Dt);
+
+	BL_API BLVoid blChipmunkSpriteLocalToWorld(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		OUT BLF32* _OX,
+		OUT BLF32* _OY);
+
+	BL_API BLVoid blChipmunkSpriteWorldToLocal(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		OUT BLF32* _OX,
+		OUT BLF32* _OY);
+
+	BL_API BLVoid blChipmunkSpriteApplyForceAtWorld(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		IN BLF32 _ForceX,
+		IN BLF32 _ForceY);
+
+	BL_API BLVoid blChipmunkSpriteApplyForceAtLocal(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		IN BLF32 _ForceX,
+		IN BLF32 _ForceY);
+
+	BL_API BLVoid blChipmunkSpriteApplyImpulseAtWorld(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		IN BLF32 _ImpulseX,
+		IN BLF32 _ImpulseY);
+
+	BL_API BLVoid blChipmunkSpriteApplyImpulseAtLocal(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		IN BLF32 _ImpulseX,
+		IN BLF32 _ImpulseY);
+
 	//shape
 	BL_API BLVoid blChipmunkShapeMassEXT(
 		IN BLGuid _ID,
@@ -339,9 +400,6 @@ extern "C" {
 		OUT BLU32* _Group,
 		OUT BLU32* _Category,
 		OUT BLU32* _Mask);
-
-	BL_API BLVoid test();
-
 	//constraint
 	//arbiter
 #ifdef __cplusplus

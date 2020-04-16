@@ -23,10 +23,30 @@ misrepresented as being the original software.
 #include "chipmunk/chipmunk_unsafe.h"
 #include "sprite.h"
 #include "util.h"
+typedef struct _BodyGuidNode {
+	cpBody* pBody;
+	BLGuid nID;
+	BLVoid(*pVelocity)(BLGuid, BLF32, BLF32, BLF32, BLF32);
+	BLVoid(*pPosition)(BLGuid, BLF32);
+}_BLBodyGuidNode;
 typedef struct _ChipmunkMember {
 	cpSpace* pSpace;
 }_BLChipmunkMember;
 static _BLChipmunkMember* _PrCpMem = NULL;
+static void
+_VelocityUpdateFunc(cpBody* _Body, cpVect _Gravity, cpFloat _Damping, cpFloat _Dt)
+{
+	_BLBodyGuidNode* _bgn = cpBodyGetUserData(_Body);
+	if (_bgn->pVelocity)
+		_bgn->pVelocity(_bgn->nID, _Gravity.x, _Gravity.y, _Damping, _Dt);
+}
+static void
+_PositionUpdateFunc(cpBody* _Body, cpFloat _Dt)
+{
+	_BLBodyGuidNode* _bgn = cpBodyGetUserData(_Body);
+	if (_bgn->pPosition)
+		_bgn->pPosition(_bgn->nID, _Dt);
+}
 static const BLBool
 _BodyCp(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY, BLVoid** _ExtData)
 {
@@ -56,6 +76,9 @@ _UnloadCP(BLGuid _ID, BLVoid** _ExtData)
 	cpShape* _shape = (cpShape*)*_ExtData;
 	cpBody* _sbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
 	cpBody* _body = cpShapeGetBody(_shape);
+	_BLBodyGuidNode* _bgn = cpBodyGetUserData(_body);
+	if (_bgn)
+		free(_bgn);
 	if (_body != _sbody)
 		cpBodyFree(_body);
 	cpShapeFree(_shape);
@@ -605,6 +628,112 @@ blChipmunkSpritePhysicalQuantitiesEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32
 	*_Torque = cpBodyGetTorque(_body);
 	return TRUE;
 }
+BLVoid 
+blChipmunkSpriteVelocityUpdateFunc(IN BLGuid _ID, IN BLVoid(*_VelocityFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32))
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_node->pBody = _body;
+	_node->nID = _ID;
+	_node->pPosition = NULL;
+	_node->pVelocity = _VelocityFunc;
+	cpBodySetUserData(_body, _node);
+	cpBodySetVelocityUpdateFunc(_body, _VelocityUpdateFunc);
+}
+BLVoid 
+blChipmunkSpritePositionUpdateFunc(IN BLGuid _ID, IN BLVoid(*_PositionFunc)(BLGuid, BLF32))
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_node->pBody = _body;
+	_node->nID = _ID;
+	_node->pPosition = _PositionFunc;
+	_node->pVelocity = NULL;
+	cpBodySetUserData(_body, _node);
+	cpBodySetPositionUpdateFunc(_body, _PositionUpdateFunc);
+}
+BLVoid 
+blChipmunkSpriteUpdateVelocity(IN BLGuid _ID, IN BLF32 _GravityX, IN BLF32 _GravityY, IN BLF32 _Damping, IN BLF32 _Dt)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodyUpdateVelocity(_body, cpv(_GravityX, _GravityY), _Damping, _Dt);
+}
+BLVoid 
+blChipmunkSpriteUpdatePosition(IN BLGuid _ID, IN BLF32 _Dt)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodyUpdatePosition(_body, _Dt);
+}
+BLVoid 
+blChipmunkSpriteLocalToWorld(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32* _OX, OUT BLF32* _OY)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpVect _out = cpBodyLocalToWorld(_body, cpv(_X, _Y));
+	*_OX = _out.x;
+	*_OY = _out.y;
+}
+BLVoid 
+blChipmunkSpriteWorldToLocal(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32* _OX, OUT BLF32* _OY)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpVect _out = cpBodyWorldToLocal(_body, cpv(_X, _Y));
+	*_OX = _out.x;
+	*_OY = _out.y;
+}
+BLVoid 
+blChipmunkSpriteApplyForceAtWorld(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ForceX, IN BLF32 _ForceY)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodyApplyForceAtWorldPoint(_body, cpv(_ForceX, _ForceY), cpv(_X, _Y));
+}
+BLVoid 
+blChipmunkSpriteApplyForceAtLocal(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ForceX, IN BLF32 _ForceY)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodyApplyForceAtLocalPoint(_body, cpv(_ForceX, _ForceY), cpv(_X, _Y));
+}
+BLVoid 
+blChipmunkSpriteApplyImpulseAtWorld(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ImpulseX, IN BLF32 _ImpulseY)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodyApplyImpulseAtWorldPoint(_body, cpv(_ImpulseX, _ImpulseY), cpv(_X, _Y));
+}
+BLVoid 
+blChipmunkSpriteApplyImpulseAtLocal(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ImpulseX, IN BLF32 _ImpulseY)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpBodyApplyImpulseAtLocalPoint(_body, cpv(_ImpulseX, _ImpulseY), cpv(_X, _Y));
+}
 BLVoid
 blChipmunkShapeMassEXT(IN BLGuid _ID, IN BLF32 _Mass)
 {
@@ -672,46 +801,4 @@ blChipmunkQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Density, OUT BLB
 	*_Group = cpShapeGetFilter(_shape).group;
 	*_Category = cpShapeGetFilter(_shape).categories;
 	*_Mask = cpShapeGetFilter(_shape).mask;
-}
-BLVoid 
-test() {
-#define GRABBABLE_MASK_BIT (1<<31)
-	cpShape *shape;
-	cpShapeFilter NOT_GRABBABLE_FILTER = { CP_NO_GROUP, ~GRABBABLE_MASK_BIT, ~GRABBABLE_MASK_BIT };
-
-	// Set up the static box.
-	cpVect a = cpv(-200, -200);
-	cpVect b = cpv(-200, 200);
-	cpVect c = cpv(200, 200);
-	cpVect d = cpv(200, -200);
-
-	cpBody* KinematicBoxBody1 = cpSpaceAddBody(_PrCpMem->pSpace, cpBodyNewKinematic());
-	shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(KinematicBoxBody1, a, b, 0.0f));
-	cpShapeSetElasticity(shape, 1.0f);
-	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
-	cpBodySetAngularVelocity(KinematicBoxBody1, 0.4f);
-
-	cpBody* KinematicBoxBody2 = cpSpaceAddBody(_PrCpMem->pSpace, cpBodyNewKinematic());
-	shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(KinematicBoxBody2, b, c, 0.0f));
-	cpShapeSetElasticity(shape, 1.0f);
-	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
-	cpBodySetAngularVelocity(KinematicBoxBody2, 0.4f);
-
-	cpBody* KinematicBoxBody3 = cpSpaceAddBody(_PrCpMem->pSpace, cpBodyNewKinematic());
-	shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(KinematicBoxBody3, c, d, 0.0f));
-	cpShapeSetElasticity(shape, 1.0f);
-	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
-	cpBodySetAngularVelocity(KinematicBoxBody3, 0.4f);
-
-	cpBody* KinematicBoxBody4 = cpSpaceAddBody(_PrCpMem->pSpace, cpBodyNewKinematic());
-	shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(KinematicBoxBody4, d, a, 0.0f));
-
-
-	cpShapeSetElasticity(shape, 1.0f);
-	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
-	cpBodySetAngularVelocity(KinematicBoxBody4, 0.4f);
 }
