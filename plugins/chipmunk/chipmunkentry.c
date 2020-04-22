@@ -29,6 +29,14 @@ typedef struct _BodyGuidNode {
 	BLVoid(*pVelocity)(BLGuid, BLF32, BLF32, BLF32, BLF32);
 	BLVoid(*pPosition)(BLGuid, BLF32);
 }_BLBodyGuidNode;
+typedef struct _ConstraintGuidNode {
+	cpConstraint* pConstraint;
+	BLGuid nID;
+	BLVoid(*pPreSolveFunc)(BLGuid);
+	BLVoid(*pPostSolveFunc)(BLGuid);
+	BLF32(*pSpringForceFunc)(BLGuid, BLF32);
+	BLF32(*pSpringTorqueFunc)(BLGuid, BLF32);
+}_BLConstraintGuidNode;
 typedef struct _ChipmunkMember {
 	cpSpace* pSpace;
 }_BLChipmunkMember;
@@ -46,6 +54,42 @@ _PositionUpdateFunc(cpBody* _Body, cpFloat _Dt)
 	_BLBodyGuidNode* _bgn = cpBodyGetUserData(_Body);
 	if (_bgn->pPosition)
 		_bgn->pPosition(_bgn->nID, _Dt);
+}
+static void
+_ConstraintPreSolveFunc(cpConstraint* _Constraint, cpSpace* _Space)
+{
+	_BLConstraintGuidNode* _cgn = cpConstraintGetUserData(_Constraint);
+	if (_cgn->pPreSolveFunc)
+		_cgn->pPreSolveFunc(_cgn->nID);
+}
+static void
+_ConstraintPostSolveFunc(cpConstraint* _Constraint, cpSpace* _Space)
+{
+	_BLConstraintGuidNode* _cgn = cpConstraintGetUserData(_Constraint);
+	if (_cgn->pPostSolveFunc)
+		_cgn->pPostSolveFunc(_cgn->nID);
+}
+static cpFloat
+_ConstraintDampedSpringForceFunc(cpConstraint* _Constraint, cpFloat _Dist)
+{
+	_BLConstraintGuidNode* _cgn = cpConstraintGetUserData(_Constraint);
+	if (_cgn->pSpringForceFunc)
+		return _cgn->pSpringForceFunc(_cgn->nID, _Dist);
+	return 0.f;
+}
+static cpFloat
+_ConstraintDampedRotarySpringTorqueFunc(cpConstraint* _Constraint, cpFloat _Angle)
+{
+	_BLConstraintGuidNode* _cgn = cpConstraintGetUserData(_Constraint);
+	if (_cgn->pSpringTorqueFunc)
+		return _cgn->pSpringTorqueFunc(_cgn->nID, _Angle);
+	return 0.f;
+}
+static void 
+_PostConstraintFree(cpConstraint* _Constraint, cpSpace* _Space)
+{
+	_BLConstraintGuidNode* _node = cpConstraintGetUserData(_Constraint);
+	free(_node);
 }
 static const BLBool
 _BodyCp(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY, BLVoid** _ExtData)
@@ -94,6 +138,7 @@ blChipmunkOpenEXT(IN BLAnsi* _Version, ...)
 BLVoid
 blChipmunkCloseEXT()
 {
+	cpSpaceEachConstraint(_PrCpMem->pSpace, _PostConstraintFree, _PrCpMem->pSpace);
 	cpSpaceFree(_PrCpMem->pSpace);
 	free(_PrCpMem);
 }
@@ -638,7 +683,6 @@ blChipmunkSpriteVelocityUpdateFunc(IN BLGuid _ID, IN BLVoid(*_VelocityFunc)(BLGu
 	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
 	_node->pBody = _body;
 	_node->nID = _ID;
-	_node->pPosition = NULL;
 	_node->pVelocity = _VelocityFunc;
 	cpBodySetUserData(_body, _node);
 	cpBodySetVelocityUpdateFunc(_body, _VelocityUpdateFunc);
@@ -654,7 +698,6 @@ blChipmunkSpritePositionUpdateFunc(IN BLGuid _ID, IN BLVoid(*_PositionFunc)(BLGu
 	_node->pBody = _body;
 	_node->nID = _ID;
 	_node->pPosition = _PositionFunc;
-	_node->pVelocity = NULL;
 	cpBodySetUserData(_body, _node);
 	cpBodySetPositionUpdateFunc(_body, _PositionUpdateFunc);
 }
@@ -801,4 +844,366 @@ blChipmunkQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Density, OUT BLB
 	*_Group = cpShapeGetFilter(_shape).group;
 	*_Category = cpShapeGetFilter(_shape).categories;
 	*_Mask = cpShapeGetFilter(_shape).mask;
+}
+BLGuid 
+blChipmunkConstraintGearEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN BLF32 _Ratio)
+{
+	cpBody* _abody;
+	cpBody* _bbody;
+	if (_A == INVALID_GUID)
+		_abody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else 
+	{
+		cpShape* _ashape = (cpShape*)blSpriteExternalData(_A, NULL);
+		_abody = cpShapeGetBody(_ashape);
+	}
+	if (_B == INVALID_GUID)
+		_bbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _bshape = (cpShape*)blSpriteExternalData(_B, NULL);
+		_bbody = cpShapeGetBody(_bshape);
+	}
+	if (!_abody || !_bbody)
+		return INVALID_GUID;
+	cpConstraint* _con = cpGearJointNew(_abody, _bbody, _Phase, _Ratio);
+	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
+	return blGenGuid(_con, blUniqueUri());
+}
+BLGuid 
+blChipmunkConstraintGrooveEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AGrooveX, IN BLF32 _AGrooveY, IN BLF32 _BGrooveX, IN BLF32 _BGrooveY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
+{
+	cpBody* _abody;
+	cpBody* _bbody;
+	if (_A == INVALID_GUID)
+		_abody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _ashape = (cpShape*)blSpriteExternalData(_A, NULL);
+		_abody = cpShapeGetBody(_ashape);
+	}
+	if (_B == INVALID_GUID)
+		_bbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _bshape = (cpShape*)blSpriteExternalData(_B, NULL);
+		_bbody = cpShapeGetBody(_bshape);
+	}
+	if (!_abody || !_bbody)
+		return INVALID_GUID;
+	cpConstraint* _con = cpGrooveJointNew(_abody, _bbody, cpv(_AGrooveX, _AGrooveY), cpv(_BGrooveX, _BGrooveY), cpv(_BAnchorX, _BAnchorY));
+	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
+	return blGenGuid(_con, blUniqueUri());
+}
+BLGuid 
+blChipmunkConstraintPinEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
+{
+	cpBody* _abody;
+	cpBody* _bbody;
+	if (_A == INVALID_GUID)
+		_abody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _ashape = (cpShape*)blSpriteExternalData(_A, NULL);
+		_abody = cpShapeGetBody(_ashape);
+	}
+	if (_B == INVALID_GUID)
+		_bbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _bshape = (cpShape*)blSpriteExternalData(_B, NULL);
+		_bbody = cpShapeGetBody(_bshape);
+	}
+	if (!_abody || !_bbody)
+		return INVALID_GUID;
+	cpConstraint* _con = cpPinJointNew(_abody, _bbody, cpv(_AAnchorX, _AAnchorY), cpv(_BAnchorX, _BAnchorY));
+	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
+	return blGenGuid(_con, blUniqueUri());
+}
+BLGuid 
+blChipmunkConstraintPivotEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _APivotX, IN BLF32 _APivotY, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLBool _UsePivot)
+{
+	cpBody* _abody;
+	cpBody* _bbody;
+	if (_A == INVALID_GUID)
+		_abody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _ashape = (cpShape*)blSpriteExternalData(_A, NULL);
+		_abody = cpShapeGetBody(_ashape);
+	}
+	if (_B == INVALID_GUID)
+		_bbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _bshape = (cpShape*)blSpriteExternalData(_B, NULL);
+		_bbody = cpShapeGetBody(_bshape);
+	}
+	if (!_abody || !_bbody)
+		return INVALID_GUID;
+	cpConstraint* _con;
+	if (_UsePivot)
+		_con = cpPivotJointNew(_abody, _bbody, cpv(_APivotX, _APivotY));
+	else
+		_con = cpPivotJointNew2(_abody, _bbody, cpv(_AAnchorX, _AAnchorY), cpv(_BAnchorX, _BAnchorY));
+	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
+	return blGenGuid(_con, blUniqueUri());
+}
+BLGuid 
+blChipmunkConstraintRatchetEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN BLF32 _Ratchet)
+{
+	cpBody* _abody;
+	cpBody* _bbody;
+	if (_A == INVALID_GUID)
+		_abody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _ashape = (cpShape*)blSpriteExternalData(_A, NULL);
+		_abody = cpShapeGetBody(_ashape);
+	}
+	if (_B == INVALID_GUID)
+		_bbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _bshape = (cpShape*)blSpriteExternalData(_B, NULL);
+		_bbody = cpShapeGetBody(_bshape);
+	}
+	if (!_abody || !_bbody)
+		return INVALID_GUID;
+	cpConstraint* _con = cpRatchetJointNew(_abody, _bbody, _Phase, _Ratchet);
+	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
+	return blGenGuid(_con, blUniqueUri());
+}
+BLGuid 
+blChipmunkConstraintRotaryEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Min, IN BLF32 _Max)
+{
+	cpBody* _abody;
+	cpBody* _bbody;
+	if (_A == INVALID_GUID)
+		_abody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _ashape = (cpShape*)blSpriteExternalData(_A, NULL);
+		_abody = cpShapeGetBody(_ashape);
+	}
+	if (_B == INVALID_GUID)
+		_bbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _bshape = (cpShape*)blSpriteExternalData(_B, NULL);
+		_bbody = cpShapeGetBody(_bshape);
+	}
+	if (!_abody || !_bbody)
+		return INVALID_GUID;
+	cpConstraint* _con = cpRotaryLimitJointNew(_abody, _bbody, _Min, _Max);
+	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
+	return blGenGuid(_con, blUniqueUri());
+}
+BLGuid 
+blChipmunkConstraintSlideEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _Min, IN BLF32 _Max)
+{
+	cpBody* _abody;
+	cpBody* _bbody;
+	if (_A == INVALID_GUID)
+		_abody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _ashape = (cpShape*)blSpriteExternalData(_A, NULL);
+		_abody = cpShapeGetBody(_ashape);
+	}
+	if (_B == INVALID_GUID)
+		_bbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _bshape = (cpShape*)blSpriteExternalData(_B, NULL);
+		_bbody = cpShapeGetBody(_bshape);
+	}
+	if (!_abody || !_bbody)
+		return INVALID_GUID;
+	cpConstraint* _con = cpSlideJointNew(_abody, _bbody, cpv(_AAnchorX, _AAnchorY), cpv(_BAnchorX, _BAnchorY), _Min, _Max);
+	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
+	return blGenGuid(_con, blUniqueUri());
+}
+BLGuid 
+blChipmunkConstraintSpringEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _RestLength, IN BLF32 _Stiffness, IN BLF32 _Damping)
+{
+	cpBody* _abody;
+	cpBody* _bbody;
+	if (_A == INVALID_GUID)
+		_abody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _ashape = (cpShape*)blSpriteExternalData(_A, NULL);
+		_abody = cpShapeGetBody(_ashape);
+	}
+	if (_B == INVALID_GUID)
+		_bbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _bshape = (cpShape*)blSpriteExternalData(_B, NULL);
+		_bbody = cpShapeGetBody(_bshape);
+	}
+	if (!_abody || !_bbody)
+		return INVALID_GUID;
+	cpConstraint* _con = cpDampedSpringNew(_abody, _bbody, cpv(_AAnchorX, _AAnchorY), cpv(_BAnchorX, _BAnchorY), _RestLength, _Stiffness, _Damping);
+	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
+	return blGenGuid(_con, blUniqueUri());
+}
+BLGuid 
+blChipmunkConstraintRotarySpringEXT(IN BLGuid _A, IN BLGuid _B, IN BLS32 _RestAngle, IN BLF32 _Stiffness, IN BLF32 _Damping)
+{
+	cpBody* _abody;
+	cpBody* _bbody;
+	if (_A == INVALID_GUID)
+		_abody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _ashape = (cpShape*)blSpriteExternalData(_A, NULL);
+		_abody = cpShapeGetBody(_ashape);
+	}
+	if (_B == INVALID_GUID)
+		_bbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _bshape = (cpShape*)blSpriteExternalData(_B, NULL);
+		_bbody = cpShapeGetBody(_bshape);
+	}
+	if (!_abody || !_bbody)
+		return INVALID_GUID;
+	cpConstraint* _con = cpDampedRotarySpringNew(_abody, _bbody, _RestAngle, _Stiffness, _Damping);
+	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
+	return blGenGuid(_con, blUniqueUri());
+}
+BLVoid 
+blChipmunkConstraintMaxForceEXT(IN BLGuid _Constraint, IN BLF32 _MaxForce)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpConstraintSetMaxForce(_con, _MaxForce);
+}
+BLVoid 
+blChipmunkConstraintErrorBiasEXT(IN BLGuid _Constraint, IN BLF32 _ErrorBias)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpConstraintSetErrorBias(_con, _ErrorBias);
+}
+BLVoid 
+blChipmunkConstraintMaxBiasEXT(IN BLGuid _Constraint, IN BLF32 _MaxBias)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpConstraintSetMaxBias(_con, _MaxBias);
+}
+BLVoid 
+blChipmunkConstraintCollideBodiesEXT(IN BLGuid _Constraint, IN BLF32 _CollideBodies)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpConstraintSetCollideBodies(_con, _CollideBodies);
+}
+BLVoid 
+blChipmunkConstraintGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _RestLength, OUT BLF32* _Stiffness, OUT BLF32* _Damping)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_RestLength = cpDampedSpringGetRestLength(_con);
+	*_Stiffness = cpDampedSpringGetStiffness(_con);
+	*_Damping = cpDampedSpringGetDamping(_con);
+}
+BLVoid
+blChipmunkConstraintGearParamEXT(IN BLGuid _Constraint, IN BLF32 _Phase, IN BLF32 _Ratio)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpGearJointSetPhase(_con, _Phase);
+	cpGearJointSetRatio(_con, _Ratio);
+}
+BLVoid
+blChipmunkConstraintGrooveParamEXT(IN BLGuid _Constraint, IN BLF32 _AGrooveX, IN BLF32 _AGrooveY, IN BLF32 _BGrooveX, IN BLF32 _BGrooveY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpGrooveJointSetGrooveA(_con, cpv(_AGrooveX, _AGrooveY));
+	cpGrooveJointSetGrooveB(_con, cpv(_BGrooveX, _BGrooveY));
+	cpGrooveJointSetAnchorB(_con, cpv(_BAnchorX, _BAnchorY));
+}
+BLVoid
+blChipmunkConstraintPinParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _Dist)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint); 
+	cpPinJointSetAnchorA(_con, cpv(_AAnchorX, _AAnchorY));
+	cpPinJointSetAnchorB(_con, cpv(_BAnchorX, _BAnchorY));
+	cpPinJointSetDist(_con, _Dist);
+}
+BLVoid
+blChipmunkConstraintPivotParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpPivotJointSetAnchorA(_con, cpv(_AAnchorX, _AAnchorY));
+	cpPivotJointSetAnchorB(_con, cpv(_BAnchorX, _BAnchorY));
+}
+BLVoid 
+blChipmunkConstraintRatchetParamEXT(IN BLGuid _Constraint, IN BLS32 _Angle, IN BLF32 _Phase, IN BLF32 _Ratchet)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpRatchetJointSetAngle(_con, -_Angle * 0.0174532922222222f);
+	cpRatchetJointSetPhase(_con, _Phase);
+	cpRatchetJointSetRatchet(_con, _Ratchet);
+}
+BLVoid
+blChipmunkConstraintRotaryParamEXT(IN BLGuid _Constraint, IN BLF32 _Min, IN BLF32 _Max)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpRotaryLimitJointSetMin(_con, _Min);
+	cpRotaryLimitJointSetMax(_con, _Max);
+}
+BLGuid 
+blChipmunkConstraintSlideParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _Min, IN BLF32 _Max)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpSlideJointSetAnchorA(_con, cpv(_AAnchorX, _AAnchorY));
+	cpSlideJointSetAnchorB(_con, cpv(_BAnchorX, _BAnchorY));
+	cpSlideJointSetMin(_con, _Min);
+	cpSlideJointSetMax(_con, _Max);
+}
+BLGuid 
+blChipmunkConstraintSpringParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _RestLength, IN BLF32 _Stiffness, IN BLF32 _Damping)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpDampedSpringSetAnchorA(_con, cpv(_AAnchorX, _AAnchorY));
+	cpDampedSpringSetAnchorB(_con, cpv(_BAnchorX, _BAnchorY));
+	cpDampedSpringSetRestLength(_con, _RestLength);
+	cpDampedSpringSetStiffness(_con, _Stiffness);
+	cpDampedSpringSetDamping(_con, _Damping);
+}
+BLGuid 
+blChipmunkConstraintRotarySpringParamEXT(IN BLGuid _Constraint, IN BLS32 _RestAngle, IN BLF32 _Stiffness, IN BLF32 _Damping)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpDampedRotarySpringSetRestAngle(_con, _RestAngle);
+	cpDampedRotarySpringSetStiffness(_con, _Stiffness);
+	cpDampedRotarySpringSetDamping(_con, _Damping);
+}
+BLGuid 
+blChipmunkConstraintSolveFuncEXT(IN BLGuid _Constraint, IN BLVoid(*_PreSolveFunc)(BLGuid), IN BLVoid(*_PostSolveFunc)(BLGuid), IN BLF32(*_SpringForceFunc)(BLGuid, BLF32), IN BLF32(*_SpringTorqueFunc)(BLGuid, BLF32))
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = _Constraint;
+	if (_PreSolveFunc)
+	{
+		_node->pPreSolveFunc = _PreSolveFunc;
+		cpConstraintSetPreSolveFunc(_con, _ConstraintPreSolveFunc);
+	}
+	if (_PostSolveFunc)
+	{
+		_node->pPostSolveFunc = _PostSolveFunc;
+		cpConstraintSetPostSolveFunc(_con, _ConstraintPostSolveFunc);
+	}
+	if (_SpringForceFunc)
+	{
+		_node->pSpringForceFunc = _SpringForceFunc;
+		cpDampedSpringSetSpringForceFunc(_con, _ConstraintDampedSpringForceFunc);
+	}
+	if (_SpringTorqueFunc)
+	{
+		_node->pSpringTorqueFunc = _SpringTorqueFunc;
+		cpDampedRotarySpringSetSpringTorqueFunc(_con, _ConstraintDampedRotarySpringTorqueFunc);
+	}
+	cpConstraintSetUserData(_con, _node);
 }

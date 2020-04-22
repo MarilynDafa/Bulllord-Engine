@@ -400,7 +400,176 @@ extern "C" {
 		OUT BLU32* _Group,
 		OUT BLU32* _Category,
 		OUT BLU32* _Mask);
+
 	//constraint
+	BL_API BLGuid blChipmunkConstraintGearEXT(
+		IN BLGuid _A, 
+		IN BLGuid _B, 
+		IN BLF32 _Phase, 
+		IN BLF32 _Ratio);
+
+	BL_API BLGuid blChipmunkConstraintGrooveEXT(
+		IN BLGuid _A,
+		IN BLGuid _B,
+		IN BLF32 _AGrooveX,
+		IN BLF32 _AGrooveY,
+		IN BLF32 _BGrooveX,
+		IN BLF32 _BGrooveY,
+		IN BLF32 _BAnchorX,
+		IN BLF32 _BAnchorY);
+
+	BL_API BLGuid blChipmunkConstraintPinEXT(
+		IN BLGuid _A,
+		IN BLGuid _B,
+		IN BLF32 _AAnchorX,
+		IN BLF32 _AAnchorY,
+		IN BLF32 _BAnchorX,
+		IN BLF32 _BAnchorY);
+
+	BL_API BLGuid blChipmunkConstraintPivotEXT(
+		IN BLGuid _A,
+		IN BLGuid _B,
+		IN BLF32 _APivotX,
+		IN BLF32 _APivotY,
+		IN BLF32 _AAnchorX,
+		IN BLF32 _AAnchorY,
+		IN BLF32 _BAnchorX,
+		IN BLF32 _BAnchorY,
+		IN BLBool _UsePivot);
+
+	BL_API BLGuid blChipmunkConstraintRatchetEXT(
+		IN BLGuid _A,
+		IN BLGuid _B,
+		IN BLF32 _Phase,
+		IN BLF32 _Ratchet);
+
+	BL_API BLGuid blChipmunkConstraintRotaryEXT(
+		IN BLGuid _A,
+		IN BLGuid _B,
+		IN BLF32 _Min,
+		IN BLF32 _Max);
+
+	BL_API BLGuid blChipmunkConstraintSlideEXT(
+		IN BLGuid _A,
+		IN BLGuid _B,
+		IN BLF32 _AAnchorX,
+		IN BLF32 _AAnchorY,
+		IN BLF32 _BAnchorX,
+		IN BLF32 _BAnchorY,
+		IN BLF32 _Min,
+		IN BLF32 _Max);
+
+	BL_API BLGuid blChipmunkConstraintSpringEXT(
+		IN BLGuid _A,
+		IN BLGuid _B,
+		IN BLF32 _AAnchorX,
+		IN BLF32 _AAnchorY,
+		IN BLF32 _BAnchorX,
+		IN BLF32 _BAnchorY,
+		IN BLF32 _RestLength,
+		IN BLF32 _Stiffness,
+		IN BLF32 _Damping);
+
+	BL_API BLGuid blChipmunkConstraintRotarySpringEXT(
+		IN BLGuid _A,
+		IN BLGuid _B,
+		IN BLS32 _RestAngle,
+		IN BLF32 _Stiffness,
+		IN BLF32 _Damping);
+
+	BL_API BLVoid blChipmunkConstraintMaxForceEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _MaxForce);
+
+	BL_API BLVoid blChipmunkConstraintErrorBiasEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _ErrorBias);
+
+	BL_API BLVoid blChipmunkConstraintMaxBiasEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _MaxBias);
+
+	BL_API BLVoid blChipmunkConstraintCollideBodiesEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _CollideBodies);
+
+	BL_API BLVoid blChipmunkConstraintGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLF32* _RestLength,
+		OUT BLF32* _Stiffness,
+		OUT BLF32* _Damping);
+
+	BL_API BLVoid blChipmunkConstraintGearParamEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _Phase,
+		IN BLF32 _Ratio);
+
+	BL_API BLVoid blChipmunkConstraintGrooveParamEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _AGrooveX,
+		IN BLF32 _AGrooveY,
+		IN BLF32 _BGrooveX,
+		IN BLF32 _BGrooveY,
+		IN BLF32 _BAnchorX,
+		IN BLF32 _BAnchorY);
+
+	BL_API BLVoid blChipmunkConstraintPinParamEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _AAnchorX,
+		IN BLF32 _AAnchorY,
+		IN BLF32 _BAnchorX,
+		IN BLF32 _BAnchorY,
+		IN BLF32 _Dist);
+
+	BL_API BLVoid blChipmunkConstraintPivotParamEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _AAnchorX,
+		IN BLF32 _AAnchorY,
+		IN BLF32 _BAnchorX,
+		IN BLF32 _BAnchorY);
+
+	BL_API BLVoid blChipmunkConstraintRatchetParamEXT(
+		IN BLGuid _Constraint,
+		IN BLS32 _Angle,
+		IN BLF32 _Phase,
+		IN BLF32 _Ratchet);
+
+	BL_API BLVoid blChipmunkConstraintRotaryParamEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _Min,
+		IN BLF32 _Max);
+
+	BL_API BLGuid blChipmunkConstraintSlideParamEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _AAnchorX,
+		IN BLF32 _AAnchorY,
+		IN BLF32 _BAnchorX,
+		IN BLF32 _BAnchorY,
+		IN BLF32 _Min,
+		IN BLF32 _Max);
+
+	BL_API BLGuid blChipmunkConstraintSpringParamEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _AAnchorX,
+		IN BLF32 _AAnchorY,
+		IN BLF32 _BAnchorX,
+		IN BLF32 _BAnchorY,
+		IN BLF32 _RestLength,
+		IN BLF32 _Stiffness,
+		IN BLF32 _Damping);
+
+	BL_API BLGuid blChipmunkConstraintRotarySpringParamEXT(
+		IN BLGuid _Constraint,
+		IN BLS32 _RestAngle,
+		IN BLF32 _Stiffness,
+		IN BLF32 _Damping);
+
+	BL_API BLGuid blChipmunkConstraintSolveFuncEXT(
+		IN BLGuid _Constraint,
+		IN BLVoid(*_PreSolveFunc)(BLGuid),
+		IN BLVoid(*_PostSolveFunc)(BLGuid),
+		IN BLF32(*_SpringForceFunc)(BLGuid, BLF32),
+		IN BLF32(*_SpringTorqueFunc)(BLGuid, BLF32));
 	//arbiter
 #ifdef __cplusplus
 }
