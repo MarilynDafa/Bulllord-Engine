@@ -1074,6 +1074,31 @@ blChipmunkConstraintRotarySpringEXT(IN BLGuid _A, IN BLGuid _B, IN BLS32 _RestAn
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
 	return blGenGuid(_con, blUniqueUri());
 }
+BLGuid 
+blChipmunkConstraintMotorEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Rate)
+{
+	cpBody* _abody;
+	cpBody* _bbody;
+	if (_A == INVALID_GUID)
+		_abody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _ashape = (cpShape*)blSpriteExternalData(_A, NULL);
+		_abody = cpShapeGetBody(_ashape);
+	}
+	if (_B == INVALID_GUID)
+		_bbody = cpSpaceGetStaticBody(_PrCpMem->pSpace);
+	else
+	{
+		cpShape* _bshape = (cpShape*)blSpriteExternalData(_B, NULL);
+		_bbody = cpShapeGetBody(_bshape);
+	}
+	if (!_abody || !_bbody)
+		return INVALID_GUID;
+	cpConstraint* _con = cpSimpleMotorNew(_abody, _bbody, _Rate);
+	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
+	return blGenGuid(_con, blUniqueUri());
+}
 BLVoid 
 blChipmunkConstraintMaxForceEXT(IN BLGuid _Constraint, IN BLF32 _MaxForce)
 {
@@ -1177,6 +1202,12 @@ blChipmunkConstraintRotarySpringParamEXT(IN BLGuid _Constraint, IN BLS32 _RestAn
 	cpDampedRotarySpringSetRestAngle(_con, _RestAngle);
 	cpDampedRotarySpringSetStiffness(_con, _Stiffness);
 	cpDampedRotarySpringSetDamping(_con, _Damping);
+}
+BLGuid 
+blChipmunkConstraintMotorParamEXT(IN BLGuid _Constraint, IN BLF32 _Rate)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	cpSimpleMotorSetRate(_con, _Rate);
 }
 BLGuid 
 blChipmunkConstraintSolveFuncEXT(IN BLGuid _Constraint, IN BLVoid(*_PreSolveFunc)(BLGuid), IN BLVoid(*_PostSolveFunc)(BLGuid), IN BLF32(*_SpringForceFunc)(BLGuid, BLF32), IN BLF32(*_SpringTorqueFunc)(BLGuid, BLF32))

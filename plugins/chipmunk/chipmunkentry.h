@@ -477,6 +477,11 @@ extern "C" {
 		IN BLF32 _Stiffness,
 		IN BLF32 _Damping);
 
+	BL_API BLGuid blChipmunkConstraintMotorEXT(
+		IN BLGuid _A,
+		IN BLGuid _B,
+		IN BLF32 _Rate);
+
 	BL_API BLVoid blChipmunkConstraintMaxForceEXT(
 		IN BLGuid _Constraint,
 		IN BLF32 _MaxForce);
@@ -563,6 +568,10 @@ extern "C" {
 		IN BLS32 _RestAngle,
 		IN BLF32 _Stiffness,
 		IN BLF32 _Damping);
+
+	BL_API BLGuid blChipmunkConstraintMotorParamEXT(
+		IN BLGuid _Constraint,
+		IN BLF32 _Rate);
 
 	BL_API BLGuid blChipmunkConstraintSolveFuncEXT(
 		IN BLGuid _Constraint,
