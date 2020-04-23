@@ -295,7 +295,10 @@ blChipmunkSpacePointQueryNearestEXT(IN BLF32 _PointX, IN BLF32 _PointY, IN BLF32
 	*_GradientX = _out.gradient.x;
 	*_GradientY = _out.gradient.y;
 	BLGuid* _id = cpShapeGetUserData(_sp);
-	return *_id;
+	if (_id)
+		return *_id;
+	else
+		return INVALID_GUID;
 }
 BLVoid 
 blChipmunkSpaceSegmentQueryEXT(IN BLF32 _StartX, IN BLF32 _StartY, IN BLF32 _EndX, IN BLF32 _ExdY, IN BLF32 _Radius, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, IN BLVoid(*_QueryFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*), IN BLVoid* _Data)
@@ -322,7 +325,10 @@ blChipmunkSpaceSegmentQueryFirstEXT(IN BLF32 _StartX, IN BLF32 _StartY, IN BLF32
 	*_NormalY = _out.normal.y;
 	*_Alpha = _out.alpha;
 	BLGuid* _id = cpShapeGetUserData(_sp);
-	return *_id;
+	if (_id)
+		return *_id;
+	else
+		return INVALID_GUID;
 }
 BLVoid 
 blChipmunkSpaceBoxQueryEXT(IN BLF32 _MinX, IN BLF32 _MinY, IN BLF32 _MaxX, IN BLF32 _MaxY, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, IN BLVoid(*_QueryFunc)(BLGuid, BLVoid*), IN BLVoid* _Data)
