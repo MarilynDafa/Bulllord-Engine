@@ -37,8 +37,16 @@ typedef struct _ConstraintGuidNode {
 	BLF32(*pSpringForceFunc)(BLGuid, BLF32);
 	BLF32(*pSpringTorqueFunc)(BLGuid, BLF32);
 }_BLConstraintGuidNode;
+typedef struct _QueryGuidNode {
+	cpShape* pShape;
+	BLGuid nID;
+	BLVoid(*pPointQueryFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*);
+	BLVoid(*pSegmentQueryFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*);
+	BLVoid(*pBoxQueryFunc)(BLGuid, BLVoid*);
+}_BLQueryGuidNode;
 typedef struct _ChipmunkMember {
 	cpSpace* pSpace;
+	_BLQueryGuidNode* pQuery;
 }_BLChipmunkMember;
 static _BLChipmunkMember* _PrCpMem = NULL;
 static void
@@ -89,7 +97,26 @@ static void
 _PostConstraintFree(cpConstraint* _Constraint, cpSpace* _Space)
 {
 	_BLConstraintGuidNode* _node = cpConstraintGetUserData(_Constraint);
+	cpSpaceRemoveConstraint(_Space, _node->pConstraint);
+	cpConstraintFree(_node->pConstraint);
 	free(_node);
+}
+static void 
+_SpacePointQueryFunc(cpShape* _Shape, cpVect _Point, cpFloat _Distance, cpVect _Gradient, void* _Data)
+{
+	BLGuid* _id = cpShapeGetUserData(_Shape);
+	_PrCpMem->pQuery->pPointQueryFunc(*_id, _Point.x, _Point.y, _Distance, _Gradient.x, _Gradient.y, _Data);
+}
+static void
+_SpaceSegmentQueryFunc(cpShape* _Shape, cpVect _Point, cpVect _Normal, cpFloat _Alpha, void* _Data)
+{
+	BLGuid* _id = cpShapeGetUserData(_Shape);
+	_PrCpMem->pQuery->pSegmentQueryFunc(*_id, _Point.x, _Point.y, _Normal.x, _Normal.y, _Alpha, _Data);
+}static void
+_SpaceBoxQueryFunc(cpShape* _Shape, void* _Data)
+{
+	BLGuid* _id = cpShapeGetUserData(_Shape);
+	_PrCpMem->pQuery->pBoxQueryFunc(*_id, _Data);
 }
 static const BLBool
 _BodyCp(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY, BLVoid** _ExtData)
@@ -124,7 +151,11 @@ _UnloadCP(BLGuid _ID, BLVoid** _ExtData)
 	if (_bgn)
 		free(_bgn);
 	if (_body != _sbody)
+	{
+		cpSpaceRemoveBody(_PrCpMem->pSpace, _body);
 		cpBodyFree(_body);
+	}
+	cpSpaceRemoveShape(_PrCpMem->pSpace, _shape);
 	cpShapeFree(_shape);
 	return 2;
 }
@@ -133,6 +164,7 @@ blChipmunkOpenEXT(IN BLAnsi* _Version, ...)
 {
 	_PrCpMem = (_BLChipmunkMember*)malloc(sizeof(_BLChipmunkMember));
 	_PrCpMem->pSpace = cpSpaceNew();
+	_PrCpMem->pQuery = (_BLQueryGuidNode*)malloc(sizeof(_BLQueryGuidNode));
 	blSpriteRegistExternal("bmg", NULL, NULL, _UnloadCP, NULL, _BodyCp, _StepCP);
 }
 BLVoid
@@ -140,10 +172,11 @@ blChipmunkCloseEXT()
 {
 	cpSpaceEachConstraint(_PrCpMem->pSpace, _PostConstraintFree, _PrCpMem->pSpace);
 	cpSpaceFree(_PrCpMem->pSpace);
+	free(_PrCpMem->pQuery);
 	free(_PrCpMem);
 }
 BLVoid 
-blChipmunkSpaceUseSpatialHash(IN BLF32 _Dim, IN BLS32 _Count)
+blChipmunkSpaceUseSpatialHashEXT(IN BLF32 _Dim, IN BLS32 _Count)
 {
 	cpSpaceUseSpatialHash(_PrCpMem->pSpace, _Dim, _Count);
 }
@@ -183,12 +216,12 @@ blChipmunkSpaceGetDampingEXT(OUT BLF32* _Damping)
 	*_Damping = cpSpaceGetDamping(_PrCpMem->pSpace);
 }
 BLVoid 
-blChipmunkSpaceSpeedThreshold(IN BLF32 _Threshold)
+blChipmunkSpaceSpeedThresholdEXT(IN BLF32 _Threshold)
 {
 	cpSpaceSetIdleSpeedThreshold(_PrCpMem->pSpace, _Threshold);
 }
 BLVoid 
-blChipmunkSpaceGetSpeedThreshold(OUT BLF32* _Threshold)
+blChipmunkSpaceGetSpeedThresholdEXT(OUT BLF32* _Threshold)
 {
 	*_Threshold = cpSpaceGetIdleSpeedThreshold(_PrCpMem->pSpace);
 }
@@ -231,6 +264,80 @@ BLVoid
 blChipmunkSpaceGetCollisionPersistenceEXT(OUT BLU32* _Persistence)
 {
 	*_Persistence = cpSpaceGetCollisionPersistence(_PrCpMem->pSpace);
+}
+BLF32
+blChipmunkSpaceCurrentTimeStepEXT()
+{
+	return cpSpaceGetCurrentTimeStep(_PrCpMem->pSpace);
+}
+BLVoid 
+blChipmunkSpacePointQueryEXT(IN BLF32 _PointX, IN BLF32 _PointY, IN BLF32 _MaxDistance, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, IN BLVoid(*_QueryFunc)(BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*), IN BLVoid* _Data)
+{
+	_PrCpMem->pQuery->pPointQueryFunc = _QueryFunc;
+	cpShapeFilter _filter;
+	_filter.group = _Group;
+	_filter.categories = _Category;
+	_filter.mask = _Mask;
+	cpSpacePointQuery(_PrCpMem->pSpace, cpv(_PointX, _PointY), _MaxDistance, _filter, _SpacePointQueryFunc, _Data);
+}
+BLGuid 
+blChipmunkSpacePointQueryNearestEXT(IN BLF32 _PointX, IN BLF32 _PointY, IN BLF32 _MaxDistance, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, OUT BLF32* _OutX, OUT BLF32* _OutY, OUT BLF32* _Distance, OUT BLF32* _GradientX, OUT BLF32* _GradientY)
+{
+	cpShapeFilter _filter;
+	_filter.group = _Group;
+	_filter.categories = _Category;
+	_filter.mask = _Mask;
+	cpPointQueryInfo _out;
+	cpShape* _sp = cpSpacePointQueryNearest(_PrCpMem->pSpace, cpv(_PointX, _PointY), _MaxDistance, _filter, &_out);
+	*_OutX = _out.point.x;
+	*_OutY = _out.point.y;
+	*_Distance = _out.distance;
+	*_GradientX = _out.gradient.x;
+	*_GradientY = _out.gradient.y;
+	BLGuid* _id = cpShapeGetUserData(_sp);
+	return *_id;
+}
+BLVoid 
+blChipmunkSpaceSegmentQueryEXT(IN BLF32 _StartX, IN BLF32 _StartY, IN BLF32 _EndX, IN BLF32 _ExdY, IN BLF32 _Radius, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, IN BLVoid(*_QueryFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*), IN BLVoid* _Data)
+{
+	_PrCpMem->pQuery->pSegmentQueryFunc = _QueryFunc;
+	cpShapeFilter _filter;
+	_filter.group = _Group;
+	_filter.categories = _Category;
+	_filter.mask = _Mask;
+	cpSpaceSegmentQuery(_PrCpMem->pSpace, cpv(_StartX, _StartY), cpv(_EndX, _ExdY), _Radius, _filter, _SpaceSegmentQueryFunc, _Data);
+}
+BLGuid 
+blChipmunkSpaceSegmentQueryFirstEXT(IN BLF32 _StartX, IN BLF32 _StartY, IN BLF32 _EndX, IN BLF32 _ExdY, IN BLF32 _Radius, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, OUT BLF32* _PointX, OUT BLF32* _PointY, OUT BLF32* _NormalX, OUT BLF32* _NormalY, OUT BLF32* _Alpha)
+{
+	cpShapeFilter _filter;
+	_filter.group = _Group;
+	_filter.categories = _Category;
+	_filter.mask = _Mask;
+	cpSegmentQueryInfo _out;
+	cpShape* _sp = cpSpaceSegmentQueryFirst(_PrCpMem->pSpace, cpv(_StartX, _StartY), cpv(_EndX, _ExdY), _Radius, _filter, &_out);
+	*_PointX = _out.point.x;
+	*_PointY = _out.point.y;
+	*_NormalX = _out.normal.x;
+	*_NormalY = _out.normal.y;
+	*_Alpha = _out.alpha;
+	BLGuid* _id = cpShapeGetUserData(_sp);
+	return *_id;
+}
+BLVoid 
+blChipmunkSpaceBoxQueryEXT(IN BLF32 _MinX, IN BLF32 _MinY, IN BLF32 _MaxX, IN BLF32 _MaxY, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, IN BLVoid(*_QueryFunc)(BLGuid, BLVoid*), IN BLVoid* _Data)
+{
+	_PrCpMem->pQuery->pBoxQueryFunc = _QueryFunc;
+	cpBB _box;
+	_box.l = _MinX;
+	_box.t = _MinY;
+	_box.r = _MaxX;
+	_box.b = _MaxY;
+	cpShapeFilter _filter;
+	_filter.group = _Group;
+	_filter.categories = _Category;
+	_filter.mask = _Mask;
+	cpSpaceBBQuery(_PrCpMem->pSpace, _box, _filter, _SpaceBoxQueryFunc, _Data);
 }
 BLF32
 blChipmunkMomentCircleEXT(IN BLF32 _M, IN BLF32 _R1, IN BLF32 _R2, IN BLF32 _CentroidOffsetX, IN BLF32 _CentroidOffsetY)
@@ -308,6 +415,7 @@ blChipmunkSpriteStaticPolyBodyEXT(IN BLGuid _ID, IN BLF32* _ShapeData, IN BLU32 
 		};
 		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_static, 4, _tris, cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f), _Radius));
 	}
+	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -326,6 +434,7 @@ blChipmunkSpriteStaticCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Radius, IN BLF32 _X
 	BLBool _show, _flipx, _flipy;
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpCircleShapeNew(_static, _Radius, cpv(_X, _Y)));
+	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -344,6 +453,7 @@ blChipmunkSpriteStaticBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _Heigh
 	BLBool _show, _flipx, _flipy;
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpBoxShapeNew2(_static, cpBBNew(_X - _Width * 0.5f, _Y - _Height * 0.5f, _X + _Width * 0.5f, _Y + _Height * 0.5f), _Radius));
+	cpShapeSetUserData(_shape, &_ID); 
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -366,6 +476,7 @@ blChipmunkSpriteStaticSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _AX, IN BLF32 _AY, 
 	cpVect _ptb = cpv(_BX, _BY);
 	cpTransform _tm = cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f);
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(_static, cpTransformPoint(_tm, _pta), cpTransformPoint(_tm, _ptb), _Radius));
+	cpShapeSetUserData(_shape, &_ID); 
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -399,6 +510,7 @@ blChipmunkSpriteKinematicPolyBodyEXT(IN BLGuid _ID, IN BLF32* _ShapeData, IN BLU
 		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_kinematic, 4, _tris, cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f), _Radius));
 	}
 	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -418,6 +530,7 @@ blChipmunkSpriteKinematicCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Radius, IN BLF32
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpCircleShapeNew(_kinematic, _Radius, cpv(_X, _Y)));
 	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -437,6 +550,7 @@ blChipmunkSpriteKinematicBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _He
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpBoxShapeNew2(_kinematic, cpBBNew(_X - _Width * 0.5f, _Y - _Height * 0.5f, _X + _Width * 0.5f, _Y + _Height * 0.5f), _Radius));
 	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -460,6 +574,7 @@ blChipmunkSpriteKinematicSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _AX, IN BLF32 _A
 	cpTransform _tm = cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f);
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(_kinematic, cpTransformPoint(_tm, _pta), cpTransformPoint(_tm, _ptb), _Radius));
 	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -491,6 +606,7 @@ blChipmunkSpriteDynamicPolyBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Mome
 		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNewRaw(_body, 4, _tris, _Radius));
 	}
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
+	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -509,6 +625,7 @@ blChipmunkSpriteDynamicCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Mo
 	cpBodySetPosition(_body, cpv(_xpos, _ypos));
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpCircleShapeNew(_body, _Radius, cpvzero));
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
+	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -527,6 +644,7 @@ blChipmunkSpriteDynamicBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Momen
 	cpBodySetPosition(_body, cpv(_xpos, _ypos));
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpBoxShapeNew(_body, _Width, _Height, _Radius));
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
+	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -545,6 +663,7 @@ blChipmunkSpriteDynamicSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _M
 	cpBodySetPosition(_body, cpv(_xpos, _ypos));
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(_body, cpv(_AX, _AY), cpv(_BX, _BY), _Radius));
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
+	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
 }
@@ -674,7 +793,7 @@ blChipmunkSpritePhysicalQuantitiesEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32
 	return TRUE;
 }
 BLVoid 
-blChipmunkSpriteVelocityUpdateFunc(IN BLGuid _ID, IN BLVoid(*_VelocityFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32))
+blChipmunkSpriteVelocityUpdateFuncEXT(IN BLGuid _ID, IN BLVoid(*_VelocityFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32))
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -688,7 +807,7 @@ blChipmunkSpriteVelocityUpdateFunc(IN BLGuid _ID, IN BLVoid(*_VelocityFunc)(BLGu
 	cpBodySetVelocityUpdateFunc(_body, _VelocityUpdateFunc);
 }
 BLVoid 
-blChipmunkSpritePositionUpdateFunc(IN BLGuid _ID, IN BLVoid(*_PositionFunc)(BLGuid, BLF32))
+blChipmunkSpritePositionUpdateFuncEXT(IN BLGuid _ID, IN BLVoid(*_PositionFunc)(BLGuid, BLF32))
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -702,7 +821,7 @@ blChipmunkSpritePositionUpdateFunc(IN BLGuid _ID, IN BLVoid(*_PositionFunc)(BLGu
 	cpBodySetPositionUpdateFunc(_body, _PositionUpdateFunc);
 }
 BLVoid 
-blChipmunkSpriteUpdateVelocity(IN BLGuid _ID, IN BLF32 _GravityX, IN BLF32 _GravityY, IN BLF32 _Damping, IN BLF32 _Dt)
+blChipmunkSpriteUpdateVelocityEXT(IN BLGuid _ID, IN BLF32 _GravityX, IN BLF32 _GravityY, IN BLF32 _Damping, IN BLF32 _Dt)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -711,7 +830,7 @@ blChipmunkSpriteUpdateVelocity(IN BLGuid _ID, IN BLF32 _GravityX, IN BLF32 _Grav
 	cpBodyUpdateVelocity(_body, cpv(_GravityX, _GravityY), _Damping, _Dt);
 }
 BLVoid 
-blChipmunkSpriteUpdatePosition(IN BLGuid _ID, IN BLF32 _Dt)
+blChipmunkSpriteUpdatePositionEXT(IN BLGuid _ID, IN BLF32 _Dt)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -720,7 +839,7 @@ blChipmunkSpriteUpdatePosition(IN BLGuid _ID, IN BLF32 _Dt)
 	cpBodyUpdatePosition(_body, _Dt);
 }
 BLVoid 
-blChipmunkSpriteLocalToWorld(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32* _OX, OUT BLF32* _OY)
+blChipmunkSpriteLocalToWorldEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32* _OX, OUT BLF32* _OY)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -731,7 +850,7 @@ blChipmunkSpriteLocalToWorld(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32*
 	*_OY = _out.y;
 }
 BLVoid 
-blChipmunkSpriteWorldToLocal(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32* _OX, OUT BLF32* _OY)
+blChipmunkSpriteWorldToLocalEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32* _OX, OUT BLF32* _OY)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -742,7 +861,7 @@ blChipmunkSpriteWorldToLocal(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32*
 	*_OY = _out.y;
 }
 BLVoid 
-blChipmunkSpriteApplyForceAtWorld(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ForceX, IN BLF32 _ForceY)
+blChipmunkSpriteApplyForceAtWorldEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ForceX, IN BLF32 _ForceY)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -751,7 +870,7 @@ blChipmunkSpriteApplyForceAtWorld(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BL
 	cpBodyApplyForceAtWorldPoint(_body, cpv(_ForceX, _ForceY), cpv(_X, _Y));
 }
 BLVoid 
-blChipmunkSpriteApplyForceAtLocal(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ForceX, IN BLF32 _ForceY)
+blChipmunkSpriteApplyForceAtLocalEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ForceX, IN BLF32 _ForceY)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -760,7 +879,7 @@ blChipmunkSpriteApplyForceAtLocal(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BL
 	cpBodyApplyForceAtLocalPoint(_body, cpv(_ForceX, _ForceY), cpv(_X, _Y));
 }
 BLVoid 
-blChipmunkSpriteApplyImpulseAtWorld(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ImpulseX, IN BLF32 _ImpulseY)
+blChipmunkSpriteApplyImpulseAtWorldEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ImpulseX, IN BLF32 _ImpulseY)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -769,7 +888,7 @@ blChipmunkSpriteApplyImpulseAtWorld(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN 
 	cpBodyApplyImpulseAtWorldPoint(_body, cpv(_ImpulseX, _ImpulseY), cpv(_X, _Y));
 }
 BLVoid 
-blChipmunkSpriteApplyImpulseAtLocal(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ImpulseX, IN BLF32 _ImpulseY)
+blChipmunkSpriteApplyImpulseAtLocalEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, IN BLF32 _ImpulseX, IN BLF32 _ImpulseY)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -846,7 +965,7 @@ blChipmunkQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Density, OUT BLB
 	*_Mask = cpShapeGetFilter(_shape).mask;
 }
 BLGuid 
-blChipmunkConstraintGearEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN BLF32 _Ratio)
+blChipmunkConstraintGearGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN BLF32 _Ratio)
 {
 	cpBody* _abody;
 	cpBody* _bbody;
@@ -871,7 +990,7 @@ blChipmunkConstraintGearEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN BLF3
 	return blGenGuid(_con, blUniqueUri());
 }
 BLGuid 
-blChipmunkConstraintGrooveEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AGrooveX, IN BLF32 _AGrooveY, IN BLF32 _BGrooveX, IN BLF32 _BGrooveY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
+blChipmunkConstraintGrooveGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AGrooveX, IN BLF32 _AGrooveY, IN BLF32 _BGrooveX, IN BLF32 _BGrooveY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
 {
 	cpBody* _abody;
 	cpBody* _bbody;
@@ -896,7 +1015,7 @@ blChipmunkConstraintGrooveEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AGrooveX, IN
 	return blGenGuid(_con, blUniqueUri());
 }
 BLGuid 
-blChipmunkConstraintPinEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
+blChipmunkConstraintPinGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
 {
 	cpBody* _abody;
 	cpBody* _bbody;
@@ -921,7 +1040,7 @@ blChipmunkConstraintPinEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BL
 	return blGenGuid(_con, blUniqueUri());
 }
 BLGuid 
-blChipmunkConstraintPivotEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _APivotX, IN BLF32 _APivotY, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLBool _UsePivot)
+blChipmunkConstraintPivotGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _APivotX, IN BLF32 _APivotY, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLBool _UsePivot)
 {
 	cpBody* _abody;
 	cpBody* _bbody;
@@ -950,7 +1069,7 @@ blChipmunkConstraintPivotEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _APivotX, IN B
 	return blGenGuid(_con, blUniqueUri());
 }
 BLGuid 
-blChipmunkConstraintRatchetEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN BLF32 _Ratchet)
+blChipmunkConstraintRatchetGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN BLF32 _Ratchet)
 {
 	cpBody* _abody;
 	cpBody* _bbody;
@@ -975,7 +1094,7 @@ blChipmunkConstraintRatchetEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN B
 	return blGenGuid(_con, blUniqueUri());
 }
 BLGuid 
-blChipmunkConstraintRotaryEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Min, IN BLF32 _Max)
+blChipmunkConstraintRotaryGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Min, IN BLF32 _Max)
 {
 	cpBody* _abody;
 	cpBody* _bbody;
@@ -1000,7 +1119,7 @@ blChipmunkConstraintRotaryEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Min, IN BLF3
 	return blGenGuid(_con, blUniqueUri());
 }
 BLGuid 
-blChipmunkConstraintSlideEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _Min, IN BLF32 _Max)
+blChipmunkConstraintSlideGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _Min, IN BLF32 _Max)
 {
 	cpBody* _abody;
 	cpBody* _bbody;
@@ -1025,7 +1144,7 @@ blChipmunkConstraintSlideEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN 
 	return blGenGuid(_con, blUniqueUri());
 }
 BLGuid 
-blChipmunkConstraintSpringEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _RestLength, IN BLF32 _Stiffness, IN BLF32 _Damping)
+blChipmunkConstraintSpringGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _RestLength, IN BLF32 _Stiffness, IN BLF32 _Damping)
 {
 	cpBody* _abody;
 	cpBody* _bbody;
@@ -1050,7 +1169,7 @@ blChipmunkConstraintSpringEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN
 	return blGenGuid(_con, blUniqueUri());
 }
 BLGuid 
-blChipmunkConstraintRotarySpringEXT(IN BLGuid _A, IN BLGuid _B, IN BLS32 _RestAngle, IN BLF32 _Stiffness, IN BLF32 _Damping)
+blChipmunkConstraintRotarySpringGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLS32 _RestAngle, IN BLF32 _Stiffness, IN BLF32 _Damping)
 {
 	cpBody* _abody;
 	cpBody* _bbody;
@@ -1075,7 +1194,7 @@ blChipmunkConstraintRotarySpringEXT(IN BLGuid _A, IN BLGuid _B, IN BLS32 _RestAn
 	return blGenGuid(_con, blUniqueUri());
 }
 BLGuid 
-blChipmunkConstraintMotorEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Rate)
+blChipmunkConstraintMotorGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Rate)
 {
 	cpBody* _abody;
 	cpBody* _bbody;
@@ -1100,6 +1219,14 @@ blChipmunkConstraintMotorEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Rate)
 	return blGenGuid(_con, blUniqueUri());
 }
 BLVoid 
+blChipmunkConstraintDeleteEXT(IN BLGuid _Constraint)
+{
+	_BLConstraintGuidNode* _node = cpConstraintGetUserData(_Constraint);
+	cpSpaceRemoveConstraint(_PrCpMem->pSpace, _node->pConstraint);
+	cpConstraintFree(_node->pConstraint);
+	free(_node);
+}
+BLVoid 
 blChipmunkConstraintMaxForceEXT(IN BLGuid _Constraint, IN BLF32 _MaxForce)
 {
 	cpConstraint* _con = blGuidAsPointer(_Constraint);
@@ -1118,18 +1245,20 @@ blChipmunkConstraintMaxBiasEXT(IN BLGuid _Constraint, IN BLF32 _MaxBias)
 	cpConstraintSetMaxBias(_con, _MaxBias);
 }
 BLVoid 
-blChipmunkConstraintCollideBodiesEXT(IN BLGuid _Constraint, IN BLF32 _CollideBodies)
+blChipmunkConstraintCollideBodiesEXT(IN BLGuid _Constraint, IN BLBool _CollideBodies)
 {
 	cpConstraint* _con = blGuidAsPointer(_Constraint);
 	cpConstraintSetCollideBodies(_con, _CollideBodies);
 }
 BLVoid 
-blChipmunkConstraintGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _RestLength, OUT BLF32* _Stiffness, OUT BLF32* _Damping)
+blChipmunkConstraintGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _MaxForce, OUT BLF32* _ErrorBias, OUT BLF32* _MaxBias, OUT BLBool* _CollideBodies, OUT BLF32* _Impulse)
 {
 	cpConstraint* _con = blGuidAsPointer(_Constraint);
-	*_RestLength = cpDampedSpringGetRestLength(_con);
-	*_Stiffness = cpDampedSpringGetStiffness(_con);
-	*_Damping = cpDampedSpringGetDamping(_con);
+	*_MaxForce = cpConstraintGetMaxForce(_con);
+	*_ErrorBias = cpConstraintGetErrorBias(_con);
+	*_MaxBias = cpConstraintGetMaxBias(_con);
+	*_CollideBodies = cpConstraintGetCollideBodies(_con);
+	*_Impulse = cpConstraintGetImpulse(_con);
 }
 BLVoid
 blChipmunkConstraintGearParamEXT(IN BLGuid _Constraint, IN BLF32 _Phase, IN BLF32 _Ratio)

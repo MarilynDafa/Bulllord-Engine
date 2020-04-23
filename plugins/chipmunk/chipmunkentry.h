@@ -31,7 +31,7 @@ extern "C" {
 	BL_API BLVoid blChipmunkCloseEXT();
 
 	//space
-	BL_API BLVoid blChipmunkSpaceUseSpatialHash(
+	BL_API BLVoid blChipmunkSpaceUseSpatialHashEXT(
 		IN BLF32 _Dim,
 		IN BLS32 _Count);
 
@@ -55,10 +55,10 @@ extern "C" {
 	BL_API BLVoid blChipmunkSpaceGetDampingEXT(
 		OUT BLF32* _Damping);
 
-	BL_API BLVoid blChipmunkSpaceSpeedThreshold(
+	BL_API BLVoid blChipmunkSpaceSpeedThresholdEXT(
 		IN BLF32 _Threshold);
 
-	BL_API BLVoid blChipmunkSpaceGetSpeedThreshold(
+	BL_API BLVoid blChipmunkSpaceGetSpeedThresholdEXT(
 		OUT BLF32* _Threshold);
 
 	BL_API BLVoid blChipmunkSpaceSleepTimeThresholdEXT(
@@ -84,6 +84,69 @@ extern "C" {
 
 	BL_API BLVoid blChipmunkSpaceGetCollisionPersistenceEXT(
 		OUT BLU32* _Persistence);
+
+	BL_API BLF32 blChipmunkSpaceCurrentTimeStepEXT();
+
+	BL_API BLVoid blChipmunkSpacePointQueryEXT(
+		IN BLF32 _PointX,
+		IN BLF32 _PointY, 
+		IN BLF32 _MaxDistance,
+		IN BLU32 _Group,
+		IN BLU32 _Category,
+		IN BLU32 _Mask,
+		IN BLVoid(*_QueryFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*),
+		IN BLVoid* _Data);
+
+	BL_API BLGuid blChipmunkSpacePointQueryNearestEXT(
+		IN BLF32 _PointX,
+		IN BLF32 _PointY,
+		IN BLF32 _MaxDistance,
+		IN BLU32 _Group,
+		IN BLU32 _Category,
+		IN BLU32 _Mask,
+		OUT BLF32* _OutX,
+		OUT BLF32* _OutY,
+		OUT BLF32* _Distance,
+		OUT BLF32* _GradientX,
+		OUT BLF32* _GradientY);
+
+	BL_API BLVoid blChipmunkSpaceSegmentQueryEXT(
+		IN BLF32 _StartX, 
+		IN BLF32 _StartY,
+		IN BLF32 _EndX,
+		IN BLF32 _ExdY,
+		IN BLF32 _Radius,
+		IN BLU32 _Group,
+		IN BLU32 _Category,
+		IN BLU32 _Mask,
+		IN BLVoid(*_QueryFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*),
+		IN BLVoid* _Data);
+
+	BL_API BLGuid blChipmunkSpaceSegmentQueryFirstEXT(
+		IN BLF32 _StartX,
+		IN BLF32 _StartY,
+		IN BLF32 _EndX,
+		IN BLF32 _ExdY,
+		IN BLF32 _Radius,
+		IN BLU32 _Group,
+		IN BLU32 _Category,
+		IN BLU32 _Mask,
+		OUT BLF32* _PointX,
+		OUT BLF32* _PointY,
+		OUT BLF32* _NormalX,
+		OUT BLF32* _NormalY,
+		OUT BLF32* _Alpha);
+
+	BL_API BLVoid blChipmunkSpaceBoxQueryEXT(
+		IN BLF32 _MinX,
+		IN BLF32 _MinY,
+		IN BLF32 _MaxX,
+		IN BLF32 _MaxY,
+		IN BLU32 _Group,
+		IN BLU32 _Category,
+		IN BLU32 _Mask,
+		IN BLVoid(*_QueryFunc)(BLGuid, BLVoid*),
+		IN BLVoid* _Data);
 
 	//Moment & Area
 	BL_API BLF32 blChipmunkMomentCircleEXT(
@@ -290,61 +353,61 @@ extern "C" {
 		OUT BLF32* _ForceY,
 		OUT BLF32* _Torque);
 
-	BL_API BLVoid blChipmunkSpriteVelocityUpdateFunc(
+	BL_API BLVoid blChipmunkSpriteVelocityUpdateFuncEXT(
 		IN BLGuid _ID,
 		IN BLVoid(*_VelocityFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32));
 
-	BL_API BLVoid blChipmunkSpritePositionUpdateFunc(
+	BL_API BLVoid blChipmunkSpritePositionUpdateFuncEXT(
 		IN BLGuid _ID,
 		IN BLVoid(*_PositionFunc)(BLGuid, BLF32));
 
-	BL_API BLVoid blChipmunkSpriteUpdateVelocity(
+	BL_API BLVoid blChipmunkSpriteUpdateVelocityEXT(
 		IN BLGuid _ID,
 		IN BLF32 _GravityX,
 		IN BLF32 _GravityY, 
 		IN BLF32 _Damping, 
 		IN BLF32 _Dt);
 
-	BL_API BLVoid blChipmunkSpriteUpdatePosition(
+	BL_API BLVoid blChipmunkSpriteUpdatePositionEXT(
 		IN BLGuid _ID,
 		IN BLF32 _Dt);
 
-	BL_API BLVoid blChipmunkSpriteLocalToWorld(
+	BL_API BLVoid blChipmunkSpriteLocalToWorldEXT(
 		IN BLGuid _ID,
 		IN BLF32 _X,
 		IN BLF32 _Y,
 		OUT BLF32* _OX,
 		OUT BLF32* _OY);
 
-	BL_API BLVoid blChipmunkSpriteWorldToLocal(
+	BL_API BLVoid blChipmunkSpriteWorldToLocalEXT(
 		IN BLGuid _ID,
 		IN BLF32 _X,
 		IN BLF32 _Y,
 		OUT BLF32* _OX,
 		OUT BLF32* _OY);
 
-	BL_API BLVoid blChipmunkSpriteApplyForceAtWorld(
+	BL_API BLVoid blChipmunkSpriteApplyForceAtWorldEXT(
 		IN BLGuid _ID,
 		IN BLF32 _X,
 		IN BLF32 _Y,
 		IN BLF32 _ForceX,
 		IN BLF32 _ForceY);
 
-	BL_API BLVoid blChipmunkSpriteApplyForceAtLocal(
+	BL_API BLVoid blChipmunkSpriteApplyForceAtLocalEXT(
 		IN BLGuid _ID,
 		IN BLF32 _X,
 		IN BLF32 _Y,
 		IN BLF32 _ForceX,
 		IN BLF32 _ForceY);
 
-	BL_API BLVoid blChipmunkSpriteApplyImpulseAtWorld(
+	BL_API BLVoid blChipmunkSpriteApplyImpulseAtWorldEXT(
 		IN BLGuid _ID,
 		IN BLF32 _X,
 		IN BLF32 _Y,
 		IN BLF32 _ImpulseX,
 		IN BLF32 _ImpulseY);
 
-	BL_API BLVoid blChipmunkSpriteApplyImpulseAtLocal(
+	BL_API BLVoid blChipmunkSpriteApplyImpulseAtLocalEXT(
 		IN BLGuid _ID,
 		IN BLF32 _X,
 		IN BLF32 _Y,
@@ -402,13 +465,13 @@ extern "C" {
 		OUT BLU32* _Mask);
 
 	//constraint
-	BL_API BLGuid blChipmunkConstraintGearEXT(
+	BL_API BLGuid blChipmunkConstraintGearGenEXT(
 		IN BLGuid _A, 
 		IN BLGuid _B, 
 		IN BLF32 _Phase, 
 		IN BLF32 _Ratio);
 
-	BL_API BLGuid blChipmunkConstraintGrooveEXT(
+	BL_API BLGuid blChipmunkConstraintGrooveGenEXT(
 		IN BLGuid _A,
 		IN BLGuid _B,
 		IN BLF32 _AGrooveX,
@@ -418,7 +481,7 @@ extern "C" {
 		IN BLF32 _BAnchorX,
 		IN BLF32 _BAnchorY);
 
-	BL_API BLGuid blChipmunkConstraintPinEXT(
+	BL_API BLGuid blChipmunkConstraintPinGenEXT(
 		IN BLGuid _A,
 		IN BLGuid _B,
 		IN BLF32 _AAnchorX,
@@ -426,7 +489,7 @@ extern "C" {
 		IN BLF32 _BAnchorX,
 		IN BLF32 _BAnchorY);
 
-	BL_API BLGuid blChipmunkConstraintPivotEXT(
+	BL_API BLGuid blChipmunkConstraintPivotGenEXT(
 		IN BLGuid _A,
 		IN BLGuid _B,
 		IN BLF32 _APivotX,
@@ -437,19 +500,19 @@ extern "C" {
 		IN BLF32 _BAnchorY,
 		IN BLBool _UsePivot);
 
-	BL_API BLGuid blChipmunkConstraintRatchetEXT(
+	BL_API BLGuid blChipmunkConstraintRatchetGenEXT(
 		IN BLGuid _A,
 		IN BLGuid _B,
 		IN BLF32 _Phase,
 		IN BLF32 _Ratchet);
 
-	BL_API BLGuid blChipmunkConstraintRotaryEXT(
+	BL_API BLGuid blChipmunkConstraintRotaryGenEXT(
 		IN BLGuid _A,
 		IN BLGuid _B,
 		IN BLF32 _Min,
 		IN BLF32 _Max);
 
-	BL_API BLGuid blChipmunkConstraintSlideEXT(
+	BL_API BLGuid blChipmunkConstraintSlideGenEXT(
 		IN BLGuid _A,
 		IN BLGuid _B,
 		IN BLF32 _AAnchorX,
@@ -459,7 +522,7 @@ extern "C" {
 		IN BLF32 _Min,
 		IN BLF32 _Max);
 
-	BL_API BLGuid blChipmunkConstraintSpringEXT(
+	BL_API BLGuid blChipmunkConstraintSpringGenEXT(
 		IN BLGuid _A,
 		IN BLGuid _B,
 		IN BLF32 _AAnchorX,
@@ -470,17 +533,20 @@ extern "C" {
 		IN BLF32 _Stiffness,
 		IN BLF32 _Damping);
 
-	BL_API BLGuid blChipmunkConstraintRotarySpringEXT(
+	BL_API BLGuid blChipmunkConstraintRotarySpringGenEXT(
 		IN BLGuid _A,
 		IN BLGuid _B,
 		IN BLS32 _RestAngle,
 		IN BLF32 _Stiffness,
 		IN BLF32 _Damping);
 
-	BL_API BLGuid blChipmunkConstraintMotorEXT(
+	BL_API BLGuid blChipmunkConstraintMotorGenEXT(
 		IN BLGuid _A,
 		IN BLGuid _B,
 		IN BLF32 _Rate);
+
+	BL_API BLVoid blChipmunkConstraintDeleteEXT(
+		IN BLGuid _Constraint);
 
 	BL_API BLVoid blChipmunkConstraintMaxForceEXT(
 		IN BLGuid _Constraint,
@@ -496,13 +562,15 @@ extern "C" {
 
 	BL_API BLVoid blChipmunkConstraintCollideBodiesEXT(
 		IN BLGuid _Constraint,
-		IN BLF32 _CollideBodies);
+		IN BLBool _CollideBodies);
 
 	BL_API BLVoid blChipmunkConstraintGetParamEXT(
 		IN BLGuid _Constraint,
-		OUT BLF32* _RestLength,
-		OUT BLF32* _Stiffness,
-		OUT BLF32* _Damping);
+		OUT BLF32* _MaxForce,
+		OUT BLF32* _ErrorBias,
+		OUT BLF32* _MaxBias,
+		OUT BLBool* _CollideBodies,
+		OUT BLF32* _Impulse);
 
 	BL_API BLVoid blChipmunkConstraintGearParamEXT(
 		IN BLGuid _Constraint,
