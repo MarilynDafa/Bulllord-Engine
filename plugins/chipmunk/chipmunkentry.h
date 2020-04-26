@@ -668,12 +668,6 @@ extern "C" {
 		OUT BLF32* _VelX,
 		OUT BLF32* _VelY);
 
-	BL_API BLGuid blChipmunkArbiterGetSpriteA(
-		IN BLGuid _Arbiter);
-
-	BL_API BLGuid blChipmunkArbiterGetSpriteB(
-		IN BLGuid _Arbiter);
-
 	BL_API BLBool blChipmunkArbiterIgnore(
 		IN BLGuid _Arbiter);
 
@@ -682,6 +676,15 @@ extern "C" {
 
 	BL_API BLBool blChipmunkArbiterIsRemoval(
 		IN BLGuid _Arbiter);
+
+	BL_API BLVoid blChipmunkArbiterTotalImpulse(
+		IN BLGuid _Arbiter,
+		OUT BLF32* _X,
+		OUT BLF32* _Y);
+
+	BL_API BLVoid blChipmunkArbiterTotalKE(
+		IN BLGuid _Arbiter,
+		OUT BLF32* _KE);
 
 	BL_API BLVoid blChipmunkArbiterContactPoint(
 		IN BLGuid _Arbiter,
@@ -711,6 +714,12 @@ extern "C" {
 		OUT BLF32* _BY,
 		OUT BLF32* _Depth);
 
+	BL_API BLGuid blChipmunkArbiterGetSpriteA(
+		IN BLGuid _Arbiter);
+
+	BL_API BLGuid blChipmunkArbiterGetSpriteB(
+		IN BLGuid _Arbiter);
+
 	BL_API BLBool blChipmunkArbiterCallWildcardBeginA(
 		IN BLGuid _Arbiter);
 	
@@ -734,15 +743,6 @@ extern "C" {
 	
 	BL_API BLVoid blChipmunkArbiterCallWildcardSeparateB(
 		IN BLGuid _Arbiter);
-
-	BL_API BLVoid blChipmunkArbiterTotalImpulse(
-		IN BLGuid _Arbiter,
-		OUT BLF32* _X,
-		OUT BLF32* _Y);
-	
-	BL_API BLVoid blChipmunkArbiterTotalKE(
-		IN BLGuid _Arbiter,
-		OUT BLF32* _KE);
 #ifdef __cplusplus
 }
 #endif

@@ -1474,22 +1474,6 @@ blChipmunkArbiterGetSurfaceVelocity(IN BLGuid _Arbiter, OUT BLF32* _VelX, OUT BL
 	*_VelX = _vel.x;
 	*_VelY = _vel.y;
 }
-BLGuid 
-blChipmunkArbiterGetSpriteA(IN BLGuid _Arbiter)
-{
-	cpArbiter* _arb = blGuidAsPointer(_Arbiter);
-	CP_ARBITER_GET_SHAPES(_arb, a, b);
-	BLGuid* _id = cpShapeGetUserData(a);
-	return *_id;
-}
-BLGuid 
-blChipmunkArbiterGetSpriteB(IN BLGuid _Arbiter)
-{
-	cpArbiter* _arb = blGuidAsPointer(_Arbiter);
-	CP_ARBITER_GET_SHAPES(_arb, a, b);
-	BLGuid* _id = cpShapeGetUserData(b);
-	return *_id;
-}
 BLBool 
 blChipmunkArbiterIgnore(IN BLGuid _Arbiter)
 {
@@ -1507,6 +1491,20 @@ blChipmunkArbiterIsRemoval(IN BLGuid _Arbiter)
 {
 	cpArbiter* _arb = blGuidAsPointer(_Arbiter);
 	return cpArbiterIsRemoval(_arb);
+}
+BLVoid
+blChipmunkArbiterTotalImpulse(IN BLGuid _Arbiter, OUT BLF32* _X, OUT BLF32* _Y)
+{
+	cpArbiter* _arb = blGuidAsPointer(_Arbiter);
+	cpVect _imp = cpArbiterTotalImpulse(_arb);
+	*_X = _imp.x;
+	*_Y = _imp.y;
+}
+BLVoid
+blChipmunkArbiterTotalKE(IN BLGuid _Arbiter, OUT BLF32* _KE)
+{
+	cpArbiter* _arb = blGuidAsPointer(_Arbiter);
+	*_KE = cpArbiterTotalKE(_arb);
 }
 BLVoid 
 blChipmunkArbiterContactPoint(IN BLGuid _Arbiter, IN BLU32 _Count, IN BLF32 _NormalX, IN BLF32 _NormalY, IN BLF32* _AX, IN BLF32* _AY, IN BLF32* _BX, IN BLF32* _BY, IN BLF32* _Depth)
@@ -1552,6 +1550,22 @@ blChipmunkArbiterGetContactPoint(IN BLGuid _Arbiter, IN BLU32 _Idx, OUT BLF32* _
 	*_BX = _ptb.x;
 	*_BY = _ptb.y;
 	*_Depth = cpArbiterGetDepth(_arb, _Idx);
+}
+BLGuid
+blChipmunkArbiterGetSpriteA(IN BLGuid _Arbiter)
+{
+	cpArbiter* _arb = blGuidAsPointer(_Arbiter);
+	CP_ARBITER_GET_SHAPES(_arb, a, b);
+	BLGuid* _id = cpShapeGetUserData(a);
+	return *_id;
+}
+BLGuid
+blChipmunkArbiterGetSpriteB(IN BLGuid _Arbiter)
+{
+	cpArbiter* _arb = blGuidAsPointer(_Arbiter);
+	CP_ARBITER_GET_SHAPES(_arb, a, b);
+	BLGuid* _id = cpShapeGetUserData(b);
+	return *_id;
 }
 BLBool 
 blChipmunkArbiterCallWildcardBeginA(IN BLGuid _Arbiter)
@@ -1600,18 +1614,4 @@ blChipmunkArbiterCallWildcardSeparateB(IN BLGuid _Arbiter)
 {
 	cpArbiter* _arb = blGuidAsPointer(_Arbiter);
 	cpArbiterCallWildcardSeparateB(_arb, _PrCpMem->pSpace);
-}
-BLVoid 
-blChipmunkArbiterTotalImpulse(IN BLGuid _Arbiter, OUT BLF32* _X, OUT BLF32* _Y)
-{
-	cpArbiter* _arb = blGuidAsPointer(_Arbiter); 
-	cpVect _imp = cpArbiterTotalImpulse(_arb);
-	*_X = _imp.x;
-	*_Y = _imp.y;
-}
-BLVoid 
-blChipmunkArbiterTotalKE(IN BLGuid _Arbiter, OUT BLF32* _KE)
-{
-	cpArbiter* _arb = blGuidAsPointer(_Arbiter);
-	*_KE = cpArbiterTotalKE(_arb);
 }
