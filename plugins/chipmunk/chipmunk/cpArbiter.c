@@ -359,6 +359,16 @@ cpArbiterCallWildcardSeparateB(cpArbiter *arb, cpSpace *space)
 	handler->separateFunc(arb, space, handler->userData);
 	arb->swapped = !arb->swapped;
 }
+cpCollisionHandler* cpArbiterCollisionHandle(cpArbiter* arb)
+{
+	if (arb->handler->userData)
+		return arb->handler;
+	if (arb->handlerA->userData)
+		return arb->handlerA;
+	if (arb->handlerB->userData)
+		return arb->handlerB;
+	return NULL;
+}
 
 cpArbiter*
 cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)

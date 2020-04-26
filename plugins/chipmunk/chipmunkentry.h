@@ -38,54 +38,40 @@ extern "C" {
 	BL_API BLVoid blChipmunkSpaceIterationsEXT(
 		IN BLU32 _Iterations);
 
-	BL_API BLVoid blChipmunkSpaceGetIterationsEXT(
-		OUT BLU32* _Iterations);
-
 	BL_API BLVoid blChipmunkSpaceGravityEXT(
 		IN BLF32 _X,
 		IN BLF32 _Y);
 
-	BL_API BLVoid blChipmunkSpaceGetGravityEXT(
-		OUT BLF32* _X,
-		OUT BLF32* _Y);
-
 	BL_API BLVoid blChipmunkSpaceDampingEXT(
 		IN BLF32 _Damping);
-
-	BL_API BLVoid blChipmunkSpaceGetDampingEXT(
-		OUT BLF32* _Damping);
 
 	BL_API BLVoid blChipmunkSpaceSpeedThresholdEXT(
 		IN BLF32 _Threshold);
 
-	BL_API BLVoid blChipmunkSpaceGetSpeedThresholdEXT(
-		OUT BLF32* _Threshold);
-
 	BL_API BLVoid blChipmunkSpaceSleepTimeThresholdEXT(
 		IN BLF32 _Threshold);
-
-	BL_API BLVoid blChipmunkSpaceGetSleepTimeThresholdEXT(
-		OUT BLF32* _Threshold);
 
 	BL_API BLVoid blChipmunkSpaceCollisionSlopEXT(
 		IN BLF32 _Slop);
 
-	BL_API BLVoid blChipmunkSpaceGetCollisionSlopEXT(
-		OUT BLF32* _Slop);
-
 	BL_API BLVoid blChipmunkSpaceCollisionBiasEXT(
 		IN BLF32 _Bias);
-
-	BL_API BLVoid blChipmunkSpaceGetCollisionBiasEXT(
-		OUT BLF32* _Bias);
 
 	BL_API BLVoid blChipmunkSpaceCollisionPersistenceEXT(
 		IN BLU32 _Persistence);
 
-	BL_API BLVoid blChipmunkSpaceGetCollisionPersistenceEXT(
-		OUT BLU32* _Persistence);
-
-	BL_API BLF32 blChipmunkSpaceCurrentTimeStepEXT();
+	BL_API BLVoid blChipmunkSpaceStateQueryEXT(
+		OUT BLU32* _Iterations,
+		OUT BLF32* _GravityX,
+		OUT BLF32* _GravityY,
+		OUT BLF32* _Damping,
+		OUT BLF32* _SpeedThreshold,
+		OUT BLF32* _SleepThreshold,
+		OUT BLF32* _Slop,
+		OUT BLF32* _Bias,
+		OUT BLU32* _Persistence,
+		OUT BLF32* _TimeStep,
+		OUT BLBool* _Locked);
 
 	BL_API BLVoid blChipmunkSpacePointQueryEXT(
 		IN BLF32 _PointX,
@@ -97,7 +83,7 @@ extern "C" {
 		IN BLVoid(*_QueryFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*),
 		IN BLVoid* _Data);
 
-	BL_API BLGuid blChipmunkSpacePointQueryNearestEXT(
+	BL_API BLGuid blChipmunkSpacePointNearestQueryEXT(
 		IN BLF32 _PointX,
 		IN BLF32 _PointY,
 		IN BLF32 _MaxDistance,
@@ -122,7 +108,7 @@ extern "C" {
 		IN BLVoid(*_QueryFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*),
 		IN BLVoid* _Data);
 
-	BL_API BLGuid blChipmunkSpaceSegmentQueryFirstEXT(
+	BL_API BLGuid blChipmunkSpaceSegmentFirstQueryEXT(
 		IN BLF32 _StartX,
 		IN BLF32 _StartY,
 		IN BLF32 _EndX,
@@ -148,6 +134,13 @@ extern "C" {
 		IN BLVoid(*_QueryFunc)(BLGuid, BLVoid*),
 		IN BLVoid* _Data);
 
+	BL_API BLVoid blChipmunkSpaceCollisionHandler(
+		IN BLU32 _TypeA, 
+		IN BLU32 _TypeB,
+		IN BLVoid(*_BeginFunc)(BLGuid),
+		IN BLVoid(*_PreSolveFunc)(BLGuid),
+		IN BLVoid(*_PostSolveFunc)(BLGuid),
+		IN BLVoid(*_SeparateFunc)(BLGuid));
 	//Moment & Area
 	BL_API BLF32 blChipmunkMomentCircleEXT(
 		IN BLF32 _M,
@@ -340,7 +333,7 @@ extern "C" {
 		IN BLGuid _ID,
 		IN BLF32 _Tor);
 
-	BL_API BLBool blChipmunkSpritePhysicalQuantitiesEXT(
+	BL_API BLBool blChipmunkSpriteQuantitiesQueryEXT(
 		IN BLGuid _ID,
 		OUT BLF32* _Mass, 
 		OUT BLF32* _Moment,
@@ -351,7 +344,8 @@ extern "C" {
 		OUT BLF32* _VelocityA,
 		OUT BLF32* _ForceX,
 		OUT BLF32* _ForceY,
-		OUT BLF32* _Torque);
+		OUT BLF32* _Torque,
+		OUT BLF32* _Energy);
 
 	BL_API BLVoid blChipmunkSpriteVelocityUpdateFuncEXT(
 		IN BLGuid _ID,

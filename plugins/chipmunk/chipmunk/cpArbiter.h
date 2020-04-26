@@ -142,4 +142,6 @@ CP_EXPORT void cpArbiterCallWildcardSeparateA(cpArbiter *arb, cpSpace *space);
 /// If you want a custom callback to invoke the wildcard callback for the second collision type, you must call this function explicitly.
 CP_EXPORT void cpArbiterCallWildcardSeparateB(cpArbiter *arb, cpSpace *space);
 
+CP_EXPORT cpCollisionHandler* cpArbiterCollisionHandle(cpArbiter* arb);
+
 /// @}

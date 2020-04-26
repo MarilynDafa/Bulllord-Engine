@@ -23,6 +23,7 @@ misrepresented as being the original software.
 #include "chipmunk/chipmunk_unsafe.h"
 #include "sprite.h"
 #include "util.h"
+#define ARBITER_PAIR(A, B) ((BLU32)(A)*3344921057ul ^ (BLU32)(B)*3344921057ul)
 typedef struct _BodyGuidNode {
 	cpBody* pBody;
 	BLGuid nID;
@@ -44,9 +45,20 @@ typedef struct _QueryGuidNode {
 	BLVoid(*pSegmentQueryFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*);
 	BLVoid(*pBoxQueryFunc)(BLGuid, BLVoid*);
 }_BLQueryGuidNode;
+typedef struct _ArbiterGuidNode {
+	BLU32 nArbiterID;
+	BLGuid nID;
+	BLVoid(*pBeginFunc)(BLGuid);
+	BLVoid(*pPreSolveFunc)(BLGuid);
+	BLVoid(*pPostSolveFunc)(BLGuid);
+	BLVoid(*pSeparateFunc)(BLGuid);
+}_BLArbiterGuidNode;
 typedef struct _ChipmunkMember {
 	cpSpace* pSpace;
 	_BLQueryGuidNode* pQuery;
+	_BLArbiterGuidNode** pArbiters;
+	BLU32 nArbiterCap;
+	BLU32 nArbiterSize;
 }_BLChipmunkMember;
 static _BLChipmunkMember* _PrCpMem = NULL;
 static void
@@ -112,11 +124,60 @@ _SpaceSegmentQueryFunc(cpShape* _Shape, cpVect _Point, cpVect _Normal, cpFloat _
 {
 	BLGuid* _id = cpShapeGetUserData(_Shape);
 	_PrCpMem->pQuery->pSegmentQueryFunc(*_id, _Point.x, _Point.y, _Normal.x, _Normal.y, _Alpha, _Data);
-}static void
+}
+static void
 _SpaceBoxQueryFunc(cpShape* _Shape, void* _Data)
 {
 	BLGuid* _id = cpShapeGetUserData(_Shape);
 	_PrCpMem->pQuery->pBoxQueryFunc(*_id, _Data);
+}
+static cpBool
+_CollisionBegin(cpArbiter* _Arb, cpSpace* _Space, void* _Data) 
+{
+	cpCollisionHandler* _handler = cpArbiterCollisionHandle(_Arb);
+	if (!_handler)
+		return cpArbiterIgnore(_Arb);
+	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)_handler->userData;
+	if (_node->nID == INVALID_GUID)
+		_node->nID = blGenGuid(_Arb, blUniqueUri());
+	if (_node->pBeginFunc)
+		_node->pBeginFunc(_node->nID);
+}
+static cpBool
+_CollisionPreSolve(cpArbiter* _Arb, cpSpace* _Space, void* _Data) 
+{
+	cpCollisionHandler* _handler = cpArbiterCollisionHandle(_Arb);
+	if (!_handler)
+		return cpArbiterIgnore(_Arb);
+	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)_handler->userData;
+	if (_node->nID == INVALID_GUID)
+		_node->nID = blGenGuid(_Arb, blUniqueUri());
+	if (_node->pPreSolveFunc)
+		_node->pPreSolveFunc(_node->nID);
+}
+static void
+_CollisionPostSolve(cpArbiter* _Arb, cpSpace* _Space, void* _Data)
+{
+	cpCollisionHandler* _handler = cpArbiterCollisionHandle(_Arb);
+	if (!_handler)
+		return cpArbiterIgnore(_Arb);
+	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)_handler->userData;
+	if (_node->nID == INVALID_GUID)
+		_node->nID = blGenGuid(_Arb, blUniqueUri());
+	if (_node->pPostSolveFunc)
+		_node->pPostSolveFunc(_node->nID);
+}
+static void
+_CollisionSeparate(cpArbiter* _Arb, cpSpace* _Space, void* _Data)
+{
+	cpCollisionHandler* _handler = cpArbiterCollisionHandle(_Arb);
+	if (!_handler)
+		return cpArbiterIgnore(_Arb);
+	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)_handler->userData;
+	if (_node->nID == INVALID_GUID)
+		_node->nID = blGenGuid(_Arb, blUniqueUri());
+	if (_node->pSeparateFunc)
+		_node->pSeparateFunc(_node->nID);
 }
 static const BLBool
 _BodyCp(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY, BLVoid** _ExtData)
@@ -165,11 +226,17 @@ blChipmunkOpenEXT(IN BLAnsi* _Version, ...)
 	_PrCpMem = (_BLChipmunkMember*)malloc(sizeof(_BLChipmunkMember));
 	_PrCpMem->pSpace = cpSpaceNew();
 	_PrCpMem->pQuery = (_BLQueryGuidNode*)malloc(sizeof(_BLQueryGuidNode));
+	_PrCpMem->nArbiterCap = 10;
+	_PrCpMem->nArbiterSize = 0;
+	_PrCpMem->pArbiters = (_BLArbiterGuidNode**)malloc(sizeof(BLVoid*) * _PrCpMem->nArbiterCap);
 	blSpriteRegistExternal("bmg", NULL, NULL, _UnloadCP, NULL, _BodyCp, _StepCP);
 }
 BLVoid
 blChipmunkCloseEXT()
 {
+	for (BLU32 _i = 0; _i < _PrCpMem->nArbiterSize; ++_i)
+		free(_PrCpMem->pArbiters[_i]);
+	free(_PrCpMem->pArbiters);
 	cpSpaceEachConstraint(_PrCpMem->pSpace, _PostConstraintFree, _PrCpMem->pSpace);
 	cpSpaceFree(_PrCpMem->pSpace);
 	free(_PrCpMem->pQuery);
@@ -186,11 +253,6 @@ blChipmunkSpaceIterationsEXT(IN BLU32 _Iterations)
 	cpSpaceSetIterations(_PrCpMem->pSpace, _Iterations);
 }
 BLVoid 
-blChipmunkSpaceGetIterationsEXT(OUT BLU32* _Iterations)
-{
-	*_Iterations = cpSpaceGetIterations(_PrCpMem->pSpace);
-}
-BLVoid 
 blChipmunkSpaceGravityEXT(IN BLF32 _X, IN BLF32 _Y)
 {
 	cpVect _vec;
@@ -199,21 +261,9 @@ blChipmunkSpaceGravityEXT(IN BLF32 _X, IN BLF32 _Y)
 	cpSpaceSetGravity(_PrCpMem->pSpace, _vec);
 }
 BLVoid 
-blChipmunkSpaceGetGravityEXT(OUT BLF32* _X, OUT BLF32* _Y)
-{
-	cpVect _ret = cpSpaceGetGravity(_PrCpMem->pSpace);
-	*_X = _ret.x;
-	*_Y = _ret.y;
-}
-BLVoid 
 blChipmunkSpaceDampingEXT(IN BLF32 _Damping)
 {
 	cpSpaceSetDamping(_PrCpMem->pSpace, _Damping);
-}
-BLVoid 
-blChipmunkSpaceGetDampingEXT(OUT BLF32* _Damping)
-{
-	*_Damping = cpSpaceGetDamping(_PrCpMem->pSpace);
 }
 BLVoid 
 blChipmunkSpaceSpeedThresholdEXT(IN BLF32 _Threshold)
@@ -221,19 +271,9 @@ blChipmunkSpaceSpeedThresholdEXT(IN BLF32 _Threshold)
 	cpSpaceSetIdleSpeedThreshold(_PrCpMem->pSpace, _Threshold);
 }
 BLVoid 
-blChipmunkSpaceGetSpeedThresholdEXT(OUT BLF32* _Threshold)
-{
-	*_Threshold = cpSpaceGetIdleSpeedThreshold(_PrCpMem->pSpace);
-}
-BLVoid 
 blChipmunkSpaceSleepTimeThresholdEXT(IN BLF32 _Threshold)
 {
 	cpSpaceSetSleepTimeThreshold(_PrCpMem->pSpace, _Threshold);
-}
-BLVoid 
-blChipmunkSpaceGetSleepTimeThresholdEXT(OUT BLF32* _Threshold)
-{
-	*_Threshold = cpSpaceGetSleepTimeThreshold(_PrCpMem->pSpace);
 }
 BLVoid 
 blChipmunkSpaceCollisionSlopEXT(IN BLF32 _Slop)
@@ -241,19 +281,9 @@ blChipmunkSpaceCollisionSlopEXT(IN BLF32 _Slop)
 	cpSpaceSetCollisionSlop(_PrCpMem->pSpace, _Slop);
 }
 BLVoid 
-blChipmunkSpaceGetCollisionSlopEXT(OUT BLF32* _Slop)
-{
-	*_Slop = cpSpaceGetCollisionSlop(_PrCpMem->pSpace);
-}
-BLVoid 
 blChipmunkSpaceCollisionBiasEXT(IN BLF32 _Bias)
 {
 	cpSpaceSetCollisionBias(_PrCpMem->pSpace, _Bias);
-}
-BLVoid 
-blChipmunkSpaceGetCollisionBiasEXT(OUT BLF32* _Bias)
-{
-	*_Bias = cpSpaceGetCollisionBias(_PrCpMem->pSpace);
 }
 BLVoid 
 blChipmunkSpaceCollisionPersistenceEXT(IN BLU32 _Persistence)
@@ -261,14 +291,20 @@ blChipmunkSpaceCollisionPersistenceEXT(IN BLU32 _Persistence)
 	cpSpaceSetCollisionPersistence(_PrCpMem->pSpace, _Persistence);
 }
 BLVoid 
-blChipmunkSpaceGetCollisionPersistenceEXT(OUT BLU32* _Persistence)
+blChipmunkSpaceStateQueryEXT(OUT BLU32* _Iterations, OUT BLF32* _GravityX, OUT BLF32* _GravityY, OUT BLF32* _Damping, OUT BLF32* _SpeedThreshold, OUT BLF32* _SleepThreshold, OUT BLF32* _Slop, OUT BLF32* _Bias, OUT BLU32* _Persistence, OUT BLF32* _TimeStep, OUT BLBool* _Locked)
 {
+	*_Iterations = cpSpaceGetIterations(_PrCpMem->pSpace);
+	cpVect _ret = cpSpaceGetGravity(_PrCpMem->pSpace);
+	*_GravityX = _ret.x;
+	*_GravityY = _ret.y;
+	*_Damping = cpSpaceGetDamping(_PrCpMem->pSpace);
+	*_SpeedThreshold = cpSpaceGetIdleSpeedThreshold(_PrCpMem->pSpace);
+	*_SleepThreshold = cpSpaceGetSleepTimeThreshold(_PrCpMem->pSpace);
+	*_Slop = cpSpaceGetCollisionSlop(_PrCpMem->pSpace);
+	*_Bias = cpSpaceGetCollisionBias(_PrCpMem->pSpace);
 	*_Persistence = cpSpaceGetCollisionPersistence(_PrCpMem->pSpace);
-}
-BLF32
-blChipmunkSpaceCurrentTimeStepEXT()
-{
-	return cpSpaceGetCurrentTimeStep(_PrCpMem->pSpace);
+	*_TimeStep = cpSpaceGetCurrentTimeStep(_PrCpMem->pSpace);
+	*_Locked = cpSpaceIsLocked(_PrCpMem->pSpace);
 }
 BLVoid 
 blChipmunkSpacePointQueryEXT(IN BLF32 _PointX, IN BLF32 _PointY, IN BLF32 _MaxDistance, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, IN BLVoid(*_QueryFunc)(BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*), IN BLVoid* _Data)
@@ -281,7 +317,7 @@ blChipmunkSpacePointQueryEXT(IN BLF32 _PointX, IN BLF32 _PointY, IN BLF32 _MaxDi
 	cpSpacePointQuery(_PrCpMem->pSpace, cpv(_PointX, _PointY), _MaxDistance, _filter, _SpacePointQueryFunc, _Data);
 }
 BLGuid 
-blChipmunkSpacePointQueryNearestEXT(IN BLF32 _PointX, IN BLF32 _PointY, IN BLF32 _MaxDistance, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, OUT BLF32* _OutX, OUT BLF32* _OutY, OUT BLF32* _Distance, OUT BLF32* _GradientX, OUT BLF32* _GradientY)
+blChipmunkSpacePointNearestQueryEXT(IN BLF32 _PointX, IN BLF32 _PointY, IN BLF32 _MaxDistance, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, OUT BLF32* _OutX, OUT BLF32* _OutY, OUT BLF32* _Distance, OUT BLF32* _GradientX, OUT BLF32* _GradientY)
 {
 	cpShapeFilter _filter;
 	_filter.group = _Group;
@@ -311,7 +347,7 @@ blChipmunkSpaceSegmentQueryEXT(IN BLF32 _StartX, IN BLF32 _StartY, IN BLF32 _End
 	cpSpaceSegmentQuery(_PrCpMem->pSpace, cpv(_StartX, _StartY), cpv(_EndX, _ExdY), _Radius, _filter, _SpaceSegmentQueryFunc, _Data);
 }
 BLGuid 
-blChipmunkSpaceSegmentQueryFirstEXT(IN BLF32 _StartX, IN BLF32 _StartY, IN BLF32 _EndX, IN BLF32 _ExdY, IN BLF32 _Radius, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, OUT BLF32* _PointX, OUT BLF32* _PointY, OUT BLF32* _NormalX, OUT BLF32* _NormalY, OUT BLF32* _Alpha)
+blChipmunkSpaceSegmentFirstQueryEXT(IN BLF32 _StartX, IN BLF32 _StartY, IN BLF32 _EndX, IN BLF32 _ExdY, IN BLF32 _Radius, IN BLU32 _Group, IN BLU32 _Category, IN BLU32 _Mask, OUT BLF32* _PointX, OUT BLF32* _PointY, OUT BLF32* _NormalX, OUT BLF32* _NormalY, OUT BLF32* _Alpha)
 {
 	cpShapeFilter _filter;
 	_filter.group = _Group;
@@ -344,6 +380,32 @@ blChipmunkSpaceBoxQueryEXT(IN BLF32 _MinX, IN BLF32 _MinY, IN BLF32 _MaxX, IN BL
 	_filter.categories = _Category;
 	_filter.mask = _Mask;
 	cpSpaceBBQuery(_PrCpMem->pSpace, _box, _filter, _SpaceBoxQueryFunc, _Data);
+}
+BLVoid 
+blChipmunkSpaceCollisionHandler(IN BLU32 _TypeA, IN BLU32 _TypeB, IN BLVoid(*_BeginFunc)(BLGuid), IN BLVoid(*_PreSolveFunc)(BLGuid), IN BLVoid(*_PostSolveFunc)(BLGuid), IN BLVoid(*_SeparateFunc)(BLGuid))
+{
+	cpCollisionHandler* _handler = cpSpaceAddCollisionHandler(_PrCpMem->pSpace, _TypeA, _TypeB);
+	if (_BeginFunc)
+		_handler->beginFunc = _CollisionBegin;
+	if (_PreSolveFunc)
+		_handler->preSolveFunc = _CollisionPreSolve;
+	if (_PostSolveFunc)
+		_handler->postSolveFunc = _CollisionPostSolve;
+	if (_SeparateFunc)
+		_handler->separateFunc = _CollisionSeparate;
+	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)malloc(sizeof(_BLArbiterGuidNode));
+	_node->nID = INVALID_GUID;
+	_node->pBeginFunc = _BeginFunc;
+	_node->pPreSolveFunc = _PreSolveFunc;
+	_node->pPostSolveFunc = _PostSolveFunc;
+	_node->pSeparateFunc = _SeparateFunc;
+	_handler->userData = _node;
+	if (_PrCpMem->nArbiterSize + 1 > _PrCpMem->nArbiterCap)
+	{
+		_PrCpMem->nArbiterCap += 10;
+		_PrCpMem->pArbiters = (_BLArbiterGuidNode**)realloc(_PrCpMem->pArbiters, sizeof(BLVoid*) * _PrCpMem->nArbiterCap);
+	}
+	_PrCpMem->pArbiters[_PrCpMem->nArbiterSize] = _node;
 }
 BLF32
 blChipmunkMomentCircleEXT(IN BLF32 _M, IN BLF32 _R1, IN BLF32 _R2, IN BLF32 _CentroidOffsetX, IN BLF32 _CentroidOffsetY)
@@ -780,7 +842,7 @@ blChipmunkSpriteTorqueEXT(IN BLGuid _ID, IN BLF32 _Tor)
 	return TRUE;
 }
 BLBool 
-blChipmunkSpritePhysicalQuantitiesEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Moment, OUT BLF32* _CenterX, OUT BLF32* _CenterY, OUT BLF32* _VelocityX, OUT BLF32* _VelocityY, OUT BLF32* _VelocityA, OUT BLF32* _ForceX, OUT BLF32* _ForceY, OUT BLF32* _Torque)
+blChipmunkSpriteQuantitiesQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Moment, OUT BLF32* _CenterX, OUT BLF32* _CenterY, OUT BLF32* _VelocityX, OUT BLF32* _VelocityY, OUT BLF32* _VelocityA, OUT BLF32* _ForceX, OUT BLF32* _ForceY, OUT BLF32* _Torque, OUT BLF32* _Energy)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	if (!_shape)
@@ -796,6 +858,7 @@ blChipmunkSpritePhysicalQuantitiesEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32
 	*_ForceX = cpBodyGetForce(_body).x;
 	*_ForceY = cpBodyGetForce(_body).y;
 	*_Torque = cpBodyGetTorque(_body);
+	*_Energy = cpBodyKineticEnergy(_body);
 	return TRUE;
 }
 BLVoid 
