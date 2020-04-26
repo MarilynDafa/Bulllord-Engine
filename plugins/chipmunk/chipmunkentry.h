@@ -642,6 +642,107 @@ extern "C" {
 		IN BLF32(*_SpringForceFunc)(BLGuid, BLF32),
 		IN BLF32(*_SpringTorqueFunc)(BLGuid, BLF32));
 	//arbiter
+	BL_API BLVoid blChipmunkArbiterRestitution(
+		IN BLGuid _Arbiter,
+		IN BLF32 _Restitution);
+
+	BL_API BLVoid blChipmunkArbiterGetRestitution(
+		IN BLGuid _Arbiter,
+		OUT BLF32* _Restitution);
+
+	BL_API BLVoid blChipmunkArbiterFriction(
+		IN BLGuid _Arbiter,
+		IN BLF32 _Friction);
+
+	BL_API BLVoid blChipmunkArbiterGetFriction(
+		IN BLGuid _Arbiter,
+		OUT BLF32* _Friction);
+
+	BL_API BLVoid blChipmunkArbiterSurfaceVelocity(
+		IN BLGuid _Arbiter,
+		IN BLF32 _VelX,
+		IN BLF32 _VelY);
+
+	BL_API BLVoid blChipmunkArbiterGetSurfaceVelocity(
+		IN BLGuid _Arbiter,
+		OUT BLF32* _VelX,
+		OUT BLF32* _VelY);
+
+	BL_API BLGuid blChipmunkArbiterGetSpriteA(
+		IN BLGuid _Arbiter);
+
+	BL_API BLGuid blChipmunkArbiterGetSpriteB(
+		IN BLGuid _Arbiter);
+
+	BL_API BLBool blChipmunkArbiterIgnore(
+		IN BLGuid _Arbiter);
+
+	BL_API BLBool blChipmunkArbiterIsFirstContact(
+		IN BLGuid _Arbiter);
+
+	BL_API BLBool blChipmunkArbiterIsRemoval(
+		IN BLGuid _Arbiter);
+
+	BL_API BLVoid blChipmunkArbiterContactPoint(
+		IN BLGuid _Arbiter,
+		IN BLU32 _Count,
+		IN BLF32 _NormalX,
+		IN BLF32 _NormalY,
+		IN BLF32* _AX,
+		IN BLF32* _AY,
+		IN BLF32* _BX,
+		IN BLF32* _BY,
+		IN BLF32* _Depth);
+
+	BL_API BLU32 blChipmunkArbiterGetCount(
+		IN BLGuid _Arbiter);
+
+	BL_API BLVoid blChipmunkArbiterGetContactNormal(
+		IN BLGuid _Arbiter,
+		OUT BLF32* _NormalX,
+		OUT BLF32* _NormalY);
+
+	BL_API BLVoid blChipmunkArbiterGetContactPoint(
+		IN BLGuid _Arbiter,
+		IN BLU32 _Idx,
+		OUT BLF32* _AX,
+		OUT BLF32* _AY,
+		OUT BLF32* _BX,
+		OUT BLF32* _BY,
+		OUT BLF32* _Depth);
+
+	BL_API BLBool blChipmunkArbiterCallWildcardBeginA(
+		IN BLGuid _Arbiter);
+	
+	BL_API BLBool blChipmunkArbiterCallWildcardBeginB(
+		IN BLGuid _Arbiter);
+
+	BL_API BLBool blChipmunkArbiterCallWildcardPreSolveA(
+		IN BLGuid _Arbiter);
+	
+	BL_API BLBool blChipmunkArbiterCallWildcardPreSolveB(
+		IN BLGuid _Arbiter);
+
+	BL_API BLVoid blChipmunkArbiterCallWildcardPostSolveA(
+		IN BLGuid _Arbiter);
+	
+	BL_API BLVoid blChipmunkArbiterCallWildcardPostSolveB(
+		IN BLGuid _Arbiter);
+
+	BL_API BLVoid blChipmunkArbiterCallWildcardSeparateA(
+		IN BLGuid _Arbiter);
+	
+	BL_API BLVoid blChipmunkArbiterCallWildcardSeparateB(
+		IN BLGuid _Arbiter);
+
+	BL_API BLVoid blChipmunkArbiterTotalImpulse(
+		IN BLGuid _Arbiter,
+		OUT BLF32* _X,
+		OUT BLF32* _Y);
+	
+	BL_API BLVoid blChipmunkArbiterTotalKE(
+		IN BLGuid _Arbiter,
+		OUT BLF32* _KE);
 #ifdef __cplusplus
 }
 #endif
