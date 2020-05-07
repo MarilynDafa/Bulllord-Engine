@@ -137,8 +137,15 @@ extern "C" {
 	BL_API BLVoid blChipmunkSpaceCollisionHandler(
 		IN BLU32 _TypeA, 
 		IN BLU32 _TypeB,
-		IN BLVoid(*_BeginFunc)(BLGuid),
-		IN BLVoid(*_PreSolveFunc)(BLGuid),
+		IN BLBool(*_BeginFunc)(BLGuid),
+		IN BLBool(*_PreSolveFunc)(BLGuid),
+		IN BLVoid(*_PostSolveFunc)(BLGuid),
+		IN BLVoid(*_SeparateFunc)(BLGuid));
+
+	BL_API BLVoid blChipmunkSpaceWildcardHandler(
+		IN BLU32 _Type,
+		IN BLBool(*_BeginFunc)(BLGuid),
+		IN BLBool(*_PreSolveFunc)(BLGuid),
 		IN BLVoid(*_PostSolveFunc)(BLGuid),
 		IN BLVoid(*_SeparateFunc)(BLGuid));
 	//Moment & Area
@@ -606,7 +613,7 @@ extern "C" {
 		IN BLF32 _Min,
 		IN BLF32 _Max);
 
-	BL_API BLGuid blChipmunkConstraintSlideParamEXT(
+	BL_API BLVoid blChipmunkConstraintSlideParamEXT(
 		IN BLGuid _Constraint,
 		IN BLF32 _AAnchorX,
 		IN BLF32 _AAnchorY,
@@ -615,7 +622,7 @@ extern "C" {
 		IN BLF32 _Min,
 		IN BLF32 _Max);
 
-	BL_API BLGuid blChipmunkConstraintSpringParamEXT(
+	BL_API BLVoid blChipmunkConstraintSpringParamEXT(
 		IN BLGuid _Constraint,
 		IN BLF32 _AAnchorX,
 		IN BLF32 _AAnchorY,
@@ -625,17 +632,17 @@ extern "C" {
 		IN BLF32 _Stiffness,
 		IN BLF32 _Damping);
 
-	BL_API BLGuid blChipmunkConstraintRotarySpringParamEXT(
+	BL_API BLVoid blChipmunkConstraintRotarySpringParamEXT(
 		IN BLGuid _Constraint,
 		IN BLS32 _RestAngle,
 		IN BLF32 _Stiffness,
 		IN BLF32 _Damping);
 
-	BL_API BLGuid blChipmunkConstraintMotorParamEXT(
+	BL_API BLVoid blChipmunkConstraintMotorParamEXT(
 		IN BLGuid _Constraint,
 		IN BLF32 _Rate);
 
-	BL_API BLGuid blChipmunkConstraintSolveFuncEXT(
+	BL_API BLVoid blChipmunkConstraintSolveFuncEXT(
 		IN BLGuid _Constraint,
 		IN BLVoid(*_PreSolveFunc)(BLGuid),
 		IN BLVoid(*_PostSolveFunc)(BLGuid),
