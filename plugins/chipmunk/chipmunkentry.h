@@ -578,6 +578,11 @@ extern "C" {
 		IN BLF32 _Phase,
 		IN BLF32 _Ratio);
 
+	BL_API BLVoid blChipmunkConstraintGearGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLF32* _Phase,
+		OUT BLF32* _Ratio);
+
 	BL_API BLVoid blChipmunkConstraintGrooveParamEXT(
 		IN BLGuid _Constraint,
 		IN BLF32 _AGrooveX,
@@ -587,6 +592,15 @@ extern "C" {
 		IN BLF32 _BAnchorX,
 		IN BLF32 _BAnchorY);
 
+	BL_API BLVoid blChipmunkConstraintGrooveGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLF32* _AGrooveX,
+		OUT BLF32* _AGrooveY,
+		OUT BLF32* _BGrooveX,
+		OUT BLF32* _BGrooveY,
+		OUT BLF32* _BAnchorX,
+		OUT BLF32* _BAnchorY);
+
 	BL_API BLVoid blChipmunkConstraintPinParamEXT(
 		IN BLGuid _Constraint,
 		IN BLF32 _AAnchorX,
@@ -595,6 +609,14 @@ extern "C" {
 		IN BLF32 _BAnchorY,
 		IN BLF32 _Dist);
 
+	BL_API BLVoid blChipmunkConstraintPinGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLF32* _AAnchorX,
+		OUT BLF32* _AAnchorY,
+		OUT BLF32* _BAnchorX,
+		OUT BLF32* _BAnchorY,
+		OUT BLF32* _Dist);
+
 	BL_API BLVoid blChipmunkConstraintPivotParamEXT(
 		IN BLGuid _Constraint,
 		IN BLF32 _AAnchorX,
@@ -602,16 +624,34 @@ extern "C" {
 		IN BLF32 _BAnchorX,
 		IN BLF32 _BAnchorY);
 
+	BL_API BLVoid blChipmunkConstraintPivotGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLF32* _AAnchorX,
+		OUT BLF32* _AAnchorY,
+		OUT BLF32* _BAnchorX,
+		OUT BLF32* _BAnchorY);
+
 	BL_API BLVoid blChipmunkConstraintRatchetParamEXT(
 		IN BLGuid _Constraint,
 		IN BLS32 _Angle,
 		IN BLF32 _Phase,
 		IN BLF32 _Ratchet);
 
+	BL_API BLVoid blChipmunkConstraintRatchetGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLS32* _Angle,
+		OUT BLF32* _Phase,
+		OUT BLF32* _Ratchet);
+
 	BL_API BLVoid blChipmunkConstraintRotaryParamEXT(
 		IN BLGuid _Constraint,
 		IN BLF32 _Min,
 		IN BLF32 _Max);
+
+	BL_API BLVoid blChipmunkConstraintRotaryGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLF32* _Min,
+		OUT BLF32* _Max);
 
 	BL_API BLVoid blChipmunkConstraintSlideParamEXT(
 		IN BLGuid _Constraint,
@@ -621,6 +661,15 @@ extern "C" {
 		IN BLF32 _BAnchorY,
 		IN BLF32 _Min,
 		IN BLF32 _Max);
+
+	BL_API BLVoid blChipmunkConstraintSlideGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLF32* _AAnchorX,
+		OUT BLF32* _AAnchorY,
+		OUT BLF32* _BAnchorX,
+		OUT BLF32* _BAnchorY,
+		OUT BLF32* _Min,
+		OUT BLF32* _Max);
 
 	BL_API BLVoid blChipmunkConstraintSpringParamEXT(
 		IN BLGuid _Constraint,
@@ -632,15 +681,35 @@ extern "C" {
 		IN BLF32 _Stiffness,
 		IN BLF32 _Damping);
 
+	BL_API BLVoid blChipmunkConstraintSpringGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLF32* _AAnchorX,
+		OUT BLF32* _AAnchorY,
+		OUT BLF32* _BAnchorX,
+		OUT BLF32* _BAnchorY,
+		OUT BLF32* _RestLength,
+		OUT BLF32* _Stiffness,
+		OUT BLF32* _Damping);
+
 	BL_API BLVoid blChipmunkConstraintRotarySpringParamEXT(
 		IN BLGuid _Constraint,
 		IN BLS32 _RestAngle,
 		IN BLF32 _Stiffness,
 		IN BLF32 _Damping);
 
+	BL_API BLVoid blChipmunkConstraintRotarySpringGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLS32* _RestAngle,
+		OUT BLF32* _Stiffness,
+		OUT BLF32* _Damping);
+
 	BL_API BLVoid blChipmunkConstraintMotorParamEXT(
 		IN BLGuid _Constraint,
 		IN BLF32 _Rate);
+
+	BL_API BLVoid blChipmunkConstraintMotorGetParamEXT(
+		IN BLGuid _Constraint,
+		OUT BLF32* _Rate);
 
 	BL_API BLVoid blChipmunkConstraintSolveFuncEXT(
 		IN BLGuid _Constraint,

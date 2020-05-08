@@ -237,7 +237,10 @@ BLVoid
 blChipmunkCloseEXT()
 {
 	for (BLU32 _i = 0; _i < _PrCpMem->nArbiterSize; ++_i)
+	{
+		blDeleteGuid(_PrCpMem->pArbiters[_i]->nID);
 		free(_PrCpMem->pArbiters[_i]);
+	}
 	free(_PrCpMem->pArbiters);
 	cpSpaceEachConstraint(_PrCpMem->pSpace, _PostConstraintFree, _PrCpMem->pSpace);
 	cpSpaceFree(_PrCpMem->pSpace);
@@ -1286,7 +1289,7 @@ blChipmunkConstraintRotarySpringGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLS32 _Res
 	}
 	if (!_abody || !_bbody)
 		return INVALID_GUID;
-	cpConstraint* _con = cpDampedRotarySpringNew(_abody, _bbody, _RestAngle, _Stiffness, _Damping);
+	cpConstraint* _con = cpDampedRotarySpringNew(_abody, _bbody, -_RestAngle * 0.0174532922222222f, _Stiffness, _Damping);
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
 	return blGenGuid(_con, blUniqueUri());
 }
@@ -1365,6 +1368,13 @@ blChipmunkConstraintGearParamEXT(IN BLGuid _Constraint, IN BLF32 _Phase, IN BLF3
 	cpGearJointSetPhase(_con, _Phase);
 	cpGearJointSetRatio(_con, _Ratio);
 }
+BLVoid 
+blChipmunkConstraintGearGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _Phase, OUT BLF32* _Ratio)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_Phase = cpGearJointGetPhase(_con);
+	*_Ratio = cpGearJointGetRatio(_con);
+}
 BLVoid
 blChipmunkConstraintGrooveParamEXT(IN BLGuid _Constraint, IN BLF32 _AGrooveX, IN BLF32 _AGrooveY, IN BLF32 _BGrooveX, IN BLF32 _BGrooveY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
 {
@@ -1372,6 +1382,17 @@ blChipmunkConstraintGrooveParamEXT(IN BLGuid _Constraint, IN BLF32 _AGrooveX, IN
 	cpGrooveJointSetGrooveA(_con, cpv(_AGrooveX, _AGrooveY));
 	cpGrooveJointSetGrooveB(_con, cpv(_BGrooveX, _BGrooveY));
 	cpGrooveJointSetAnchorB(_con, cpv(_BAnchorX, _BAnchorY));
+}
+BLVoid 
+blChipmunkConstraintGrooveGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _AGrooveX, OUT BLF32* _AGrooveY, OUT BLF32* _BGrooveX, OUT BLF32* _BGrooveY, OUT BLF32* _BAnchorX, OUT BLF32* _BAnchorY)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_AGrooveX = cpGrooveJointGetGrooveA(_con).x;
+	*_AGrooveY = cpGrooveJointGetGrooveA(_con).y;
+	*_BGrooveX = cpGrooveJointGetGrooveB(_con).x;
+	*_BGrooveY = cpGrooveJointGetGrooveB(_con).y;
+	*_BAnchorX = cpGrooveJointGetAnchorB(_con).x;
+	*_BAnchorY = cpGrooveJointGetAnchorB(_con).y;
 }
 BLVoid
 blChipmunkConstraintPinParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _Dist)
@@ -1381,12 +1402,31 @@ blChipmunkConstraintPinParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN BL
 	cpPinJointSetAnchorB(_con, cpv(_BAnchorX, _BAnchorY));
 	cpPinJointSetDist(_con, _Dist);
 }
+BLVoid 
+blChipmunkConstraintPinGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _AAnchorX, OUT BLF32* _AAnchorY, OUT BLF32* _BAnchorX, OUT BLF32* _BAnchorY, OUT BLF32* _Dist)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_AAnchorX = cpPinJointGetAnchorA(_con).x;
+	*_AAnchorY = cpPinJointGetAnchorA(_con).y;
+	*_BAnchorX = cpPinJointGetAnchorB(_con).x;
+	*_BAnchorY = cpPinJointGetAnchorB(_con).y;
+	*_Dist = cpPinJointGetDist(_con);
+}
 BLVoid
 blChipmunkConstraintPivotParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
 {
 	cpConstraint* _con = blGuidAsPointer(_Constraint);
 	cpPivotJointSetAnchorA(_con, cpv(_AAnchorX, _AAnchorY));
 	cpPivotJointSetAnchorB(_con, cpv(_BAnchorX, _BAnchorY));
+}
+BLVoid 
+blChipmunkConstraintPivotGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _AAnchorX, OUT BLF32* _AAnchorY, OUT BLF32* _BAnchorX, OUT BLF32* _BAnchorY)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_AAnchorX = cpPivotJointGetAnchorA(_con).x;
+	*_AAnchorY = cpPivotJointGetAnchorA(_con).y;
+	*_BAnchorX = cpPivotJointGetAnchorB(_con).x;
+	*_BAnchorY = cpPivotJointGetAnchorB(_con).y;
 }
 BLVoid 
 blChipmunkConstraintRatchetParamEXT(IN BLGuid _Constraint, IN BLS32 _Angle, IN BLF32 _Phase, IN BLF32 _Ratchet)
@@ -1396,12 +1436,27 @@ blChipmunkConstraintRatchetParamEXT(IN BLGuid _Constraint, IN BLS32 _Angle, IN B
 	cpRatchetJointSetPhase(_con, _Phase);
 	cpRatchetJointSetRatchet(_con, _Ratchet);
 }
+BLVoid 
+blChipmunkConstraintRatchetGetParamEXT(IN BLGuid _Constraint, OUT BLS32* _Angle, OUT BLF32* _Phase, OUT BLF32* _Ratchet)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_Angle = (BLS32)(cpRatchetJointGetAngle(_con) / -0.0174532922222222f);
+	*_Phase = cpRatchetJointGetPhase(_con);
+	*_Ratchet = cpRatchetJointGetRatchet(_con);
+}
 BLVoid
 blChipmunkConstraintRotaryParamEXT(IN BLGuid _Constraint, IN BLF32 _Min, IN BLF32 _Max)
 {
 	cpConstraint* _con = blGuidAsPointer(_Constraint);
 	cpRotaryLimitJointSetMin(_con, _Min);
 	cpRotaryLimitJointSetMax(_con, _Max);
+}
+BLVoid 
+blChipmunkConstraintRotaryGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _Min, OUT BLF32* _Max)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_Min = cpRotaryLimitJointGetMin(_con);
+	*_Max = cpRotaryLimitJointGetMax(_con);
 }
 BLVoid 
 blChipmunkConstraintSlideParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _Min, IN BLF32 _Max)
@@ -1411,6 +1466,17 @@ blChipmunkConstraintSlideParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN 
 	cpSlideJointSetAnchorB(_con, cpv(_BAnchorX, _BAnchorY));
 	cpSlideJointSetMin(_con, _Min);
 	cpSlideJointSetMax(_con, _Max);
+}
+BLVoid 
+blChipmunkConstraintSlideGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _AAnchorX, OUT BLF32* _AAnchorY, OUT BLF32* _BAnchorX, OUT BLF32* _BAnchorY, OUT BLF32* _Min, OUT BLF32* _Max)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_AAnchorX = cpSlideJointGetAnchorA(_con).x;
+	*_AAnchorY = cpSlideJointGetAnchorA(_con).y;
+	*_BAnchorX = cpSlideJointGetAnchorB(_con).x;
+	*_BAnchorY = cpSlideJointGetAnchorB(_con).y;
+	*_Min = cpSlideJointGetMin(_con);
+	*_Max = cpSlideJointGetMax(_con);
 }
 BLVoid
 blChipmunkConstraintSpringParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _RestLength, IN BLF32 _Stiffness, IN BLF32 _Damping)
@@ -1422,19 +1488,45 @@ blChipmunkConstraintSpringParamEXT(IN BLGuid _Constraint, IN BLF32 _AAnchorX, IN
 	cpDampedSpringSetStiffness(_con, _Stiffness);
 	cpDampedSpringSetDamping(_con, _Damping);
 }
+BLVoid 
+blChipmunkConstraintSpringGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _AAnchorX, OUT BLF32* _AAnchorY, OUT BLF32* _BAnchorX, OUT BLF32* _BAnchorY, OUT BLF32* _RestLength, OUT BLF32* _Stiffness, OUT BLF32* _Damping)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_AAnchorX = cpDampedSpringGetAnchorA(_con).x;
+	*_AAnchorY = cpDampedSpringGetAnchorA(_con).y;
+	*_BAnchorX = cpDampedSpringGetAnchorB(_con).x;
+	*_BAnchorY = cpDampedSpringGetAnchorB(_con).y;
+	*_RestLength = cpDampedSpringGetRestLength(_con);
+	*_Stiffness = cpDampedSpringGetStiffness(_con);
+	*_Damping = cpDampedSpringGetDamping(_con);
+}
 BLVoid
 blChipmunkConstraintRotarySpringParamEXT(IN BLGuid _Constraint, IN BLS32 _RestAngle, IN BLF32 _Stiffness, IN BLF32 _Damping)
 {
 	cpConstraint* _con = blGuidAsPointer(_Constraint);
-	cpDampedRotarySpringSetRestAngle(_con, _RestAngle);
+	cpDampedRotarySpringSetRestAngle(_con, -_RestAngle * 0.0174532922222222f);
 	cpDampedRotarySpringSetStiffness(_con, _Stiffness);
 	cpDampedRotarySpringSetDamping(_con, _Damping);
+}
+BLVoid 
+blChipmunkConstraintRotarySpringGetParamEXT(IN BLGuid _Constraint, OUT BLS32* _RestAngle, OUT BLF32* _Stiffness, OUT BLF32* _Damping)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_RestAngle = (BLS32)(cpDampedRotarySpringGetRestAngle(_con) / -0.0174532922222222f);
+	*_Stiffness = cpDampedRotarySpringGetStiffness(_con);
+	*_Damping = cpDampedRotarySpringGetDamping(_con);
 }
 BLVoid
 blChipmunkConstraintMotorParamEXT(IN BLGuid _Constraint, IN BLF32 _Rate)
 {
 	cpConstraint* _con = blGuidAsPointer(_Constraint);
 	cpSimpleMotorSetRate(_con, _Rate);
+}
+BLVoid 
+blChipmunkConstraintMotorGetParamEXT(IN BLGuid _Constraint, OUT BLF32* _Rate)
+{
+	cpConstraint* _con = blGuidAsPointer(_Constraint);
+	*_Rate = cpSimpleMotorGetRate(_con);
 }
 BLVoid
 blChipmunkConstraintSolveFuncEXT(IN BLGuid _Constraint, IN BLVoid(*_PreSolveFunc)(BLGuid), IN BLVoid(*_PostSolveFunc)(BLGuid), IN BLF32(*_SpringForceFunc)(BLGuid, BLF32), IN BLF32(*_SpringTorqueFunc)(BLGuid, BLF32))
