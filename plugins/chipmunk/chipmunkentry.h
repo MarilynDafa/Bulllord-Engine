@@ -415,6 +415,16 @@ extern "C" {
 		IN BLF32 _ImpulseX,
 		IN BLF32 _ImpulseY);
 
+	BL_API BLVoid blChipmunkSpriteEachConstraintEXT(
+		IN BLGuid _ID,
+		IN BLVoid(*_IteratorFunc)(BLGuid, BLGuid, BLVoid*),
+		IN BLVoid* _Data);
+
+	BL_API BLVoid blChipmunkSpriteEachArbiterEXT(
+		IN BLGuid _ID,
+		IN BLVoid(*_IteratorFunc)(BLGuid, BLGuid, BLVoid*),
+		IN BLVoid* _Data);
+
 	//shape
 	BL_API BLVoid blChipmunkShapeMassEXT(
 		IN BLGuid _ID,

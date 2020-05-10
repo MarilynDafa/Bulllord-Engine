@@ -185,8 +185,13 @@ cpSpaceNew(void)
 
 static void cpBodyActivateWrap(cpBody *body, void *unused){cpBodyActivate(body);}
 
+static void Free2(void *ptr, void(*Free1)(void*))
+{
+	cpArbiter* arb = (cpArbiter*)ptr;
+	Free1(arb->data);
+}
 void
-cpSpaceDestroy(cpSpace *space)
+cpSpaceDestroy(cpSpace *space, void(*Free)(void*))
 {
 	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)cpBodyActivateWrap, NULL);
 	
@@ -200,8 +205,17 @@ cpSpaceDestroy(cpSpace *space)
 	
 	cpArrayFree(space->constraints);
 	
+	cpHashSetEach(space->cachedArbiters, Free2, Free);
 	cpHashSetFree(space->cachedArbiters);
-	
+
+	for (int i = 0, count = space->arbiters->num; i < count; i++) {
+		cpArbiter *arb = (cpArbiter*)space->arbiters->arr[i];
+		Free(arb->data);
+	}
+	for (int i = 0, count = space->pooledArbiters->num; i < count; i++) {
+		cpArbiter *arb = (cpArbiter*)space->pooledArbiters->arr[i];
+		Free(arb->data);
+	}
 	cpArrayFree(space->arbiters);
 	cpArrayFree(space->pooledArbiters);
 	
@@ -223,7 +237,7 @@ void
 cpSpaceFree(cpSpace *space)
 {
 	if(space){
-		cpSpaceDestroy(space);
+		cpSpaceDestroy(space, NULL);
 		cpfree(space);
 	}
 }

@@ -72,7 +72,7 @@ CP_EXPORT cpSpace* cpSpaceInit(cpSpace *space);
 CP_EXPORT cpSpace* cpSpaceNew(void);
 
 /// Destroy a cpSpace.
-CP_EXPORT void cpSpaceDestroy(cpSpace *space);
+CP_EXPORT void cpSpaceDestroy(cpSpace *space, void(*Free)(void*));
 /// Destroy and free a cpSpace.
 CP_EXPORT void cpSpaceFree(cpSpace *space);
 

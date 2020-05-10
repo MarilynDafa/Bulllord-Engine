@@ -29,6 +29,8 @@ typedef struct _BodyGuidNode {
 	BLGuid nID;
 	BLVoid(*pVelocity)(BLGuid, BLF32, BLF32, BLF32, BLF32);
 	BLVoid(*pPosition)(BLGuid, BLF32);
+	BLVoid(*pConIteratorFunc)(BLGuid, BLGuid, BLVoid*);
+	BLVoid(*pArbIteratorFunc)(BLGuid, BLGuid, BLVoid*);
 }_BLBodyGuidNode;
 typedef struct _ConstraintGuidNode {
 	cpConstraint* pConstraint;
@@ -38,6 +40,10 @@ typedef struct _ConstraintGuidNode {
 	BLF32(*pSpringForceFunc)(BLGuid, BLF32);
 	BLF32(*pSpringTorqueFunc)(BLGuid, BLF32);
 }_BLConstraintGuidNode;
+typedef struct _ArbiterGuidNode {
+	cpArbiter* pArbiter;
+	BLGuid nID;
+}_BLArbiterGuidNode;
 typedef struct _QueryGuidNode {
 	cpShape* pShape;
 	BLGuid nID;
@@ -45,20 +51,19 @@ typedef struct _QueryGuidNode {
 	BLVoid(*pSegmentQueryFunc)(BLGuid, BLF32, BLF32, BLF32, BLF32, BLF32, BLVoid*);
 	BLVoid(*pBoxQueryFunc)(BLGuid, BLVoid*);
 }_BLQueryGuidNode;
-typedef struct _ArbiterGuidNode {
-	BLU32 nArbiterID;
+typedef struct _CollisionGuidNode {
 	BLGuid nID;
 	BLBool(*pBeginFunc)(BLGuid);
 	BLBool(*pPreSolveFunc)(BLGuid);
 	BLVoid(*pPostSolveFunc)(BLGuid);
 	BLVoid(*pSeparateFunc)(BLGuid);
-}_BLArbiterGuidNode;
+}_BLCollisionGuidNode;
 typedef struct _ChipmunkMember {
 	cpSpace* pSpace;
 	_BLQueryGuidNode* pQuery;
-	_BLArbiterGuidNode** pArbiters;
-	BLU32 nArbiterCap;
-	BLU32 nArbiterSize;
+	_BLCollisionGuidNode** pHandlers;
+	BLU32 nHandlerCap;
+	BLU32 nHandlerSize;
 }_BLChipmunkMember;
 static _BLChipmunkMember* _PrCpMem = NULL;
 static void
@@ -74,6 +79,29 @@ _PositionUpdateFunc(cpBody* _Body, cpFloat _Dt)
 	_BLBodyGuidNode* _bgn = cpBodyGetUserData(_Body);
 	if (_bgn->pPosition)
 		_bgn->pPosition(_bgn->nID, _Dt);
+}
+static void
+_ConstraintIteratorFunc(cpBody* _Body, cpConstraint* _Constraint, void* _Data)
+{
+	_BLBodyGuidNode* _bnode = (_BLBodyGuidNode*)cpBodyGetUserData(_Body);
+	_BLConstraintGuidNode* _cnode = (_BLConstraintGuidNode*)cpConstraintGetUserData(_Constraint);
+	if (_bnode->pConIteratorFunc)
+		_bnode->pConIteratorFunc(_bnode->nID, _cnode->nID, _Data);
+}
+static void
+_ArbiterIteratorFunc(cpBody* _Body, cpArbiter* _Arbiter, void* _Data)
+{
+	_BLBodyGuidNode* _bnode = (_BLBodyGuidNode*)cpBodyGetUserData(_Body);
+	_BLArbiterGuidNode* _anode = (_BLArbiterGuidNode*)cpArbiterGetUserData(_Arbiter);
+	if (!_anode)
+	{
+		_anode = (_BLArbiterGuidNode*)malloc(sizeof(_BLArbiterGuidNode));
+		_anode->pArbiter = _Arbiter;
+		_anode->nID = blGenGuid(_Arbiter, blUniqueUri());
+		cpArbiterSetUserData(_Arbiter, _anode);
+	}
+	if (_bnode->pArbIteratorFunc)
+		_bnode->pArbIteratorFunc(_bnode->nID, _anode->nID, _Data);
 }
 static void
 _ConstraintPreSolveFunc(cpConstraint* _Constraint, cpSpace* _Space)
@@ -134,12 +162,20 @@ _SpaceBoxQueryFunc(cpShape* _Shape, void* _Data)
 static cpBool
 _CollisionBegin(cpArbiter* _Arb, cpSpace* _Space, void* _Data) 
 {
+	_BLArbiterGuidNode* _anode = (_BLArbiterGuidNode*)cpArbiterGetUserData(_Arb);
+	if (!_anode)
+	{
+		_anode = (_BLArbiterGuidNode*)malloc(sizeof(_BLArbiterGuidNode));
+		_anode->pArbiter = _Arb;
+		_anode->nID = blGenGuid(_Arb, blUniqueUri());
+		cpArbiterSetUserData(_Arb, _anode);
+	}
 	cpCollisionHandler* _handler = cpArbiterCollisionHandle(_Arb);
 	if (!_handler)
 		return cpArbiterIgnore(_Arb);
-	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)_handler->userData;
+	_BLCollisionGuidNode* _node = (_BLCollisionGuidNode*)_handler->userData;
 	if (_node->nID == INVALID_GUID)
-		_node->nID = blGenGuid(_Arb, blUniqueUri());
+		_node->nID = _anode->nID;
 	if (_node->pBeginFunc)
 		return _node->pBeginFunc(_node->nID);
 	return FALSE;
@@ -147,12 +183,20 @@ _CollisionBegin(cpArbiter* _Arb, cpSpace* _Space, void* _Data)
 static cpBool
 _CollisionPreSolve(cpArbiter* _Arb, cpSpace* _Space, void* _Data) 
 {
+	_BLArbiterGuidNode* _anode = (_BLArbiterGuidNode*)cpArbiterGetUserData(_Arb);
+	if (!_anode)
+	{
+		_anode = (_BLArbiterGuidNode*)malloc(sizeof(_BLArbiterGuidNode));
+		_anode->pArbiter = _Arb;
+		_anode->nID = blGenGuid(_Arb, blUniqueUri());
+		cpArbiterSetUserData(_Arb, _anode);
+	}
 	cpCollisionHandler* _handler = cpArbiterCollisionHandle(_Arb);
 	if (!_handler)
 		return cpArbiterIgnore(_Arb);
-	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)_handler->userData;
+	_BLCollisionGuidNode* _node = (_BLCollisionGuidNode*)_handler->userData;
 	if (_node->nID == INVALID_GUID)
-		_node->nID = blGenGuid(_Arb, blUniqueUri());
+		_node->nID = _anode->nID;
 	if (_node->pPreSolveFunc)
 		return _node->pPreSolveFunc(_node->nID);
 	return FALSE;
@@ -160,26 +204,48 @@ _CollisionPreSolve(cpArbiter* _Arb, cpSpace* _Space, void* _Data)
 static void
 _CollisionPostSolve(cpArbiter* _Arb, cpSpace* _Space, void* _Data)
 {
+	_BLArbiterGuidNode* _anode = (_BLArbiterGuidNode*)cpArbiterGetUserData(_Arb);
+	if (!_anode)
+	{
+		_anode = (_BLArbiterGuidNode*)malloc(sizeof(_BLArbiterGuidNode));
+		_anode->pArbiter = _Arb;
+		_anode->nID = blGenGuid(_Arb, blUniqueUri());
+		cpArbiterSetUserData(_Arb, _anode);
+	}
 	cpCollisionHandler* _handler = cpArbiterCollisionHandle(_Arb);
 	if (!_handler)
 		return;
-	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)_handler->userData;
+	_BLCollisionGuidNode* _node = (_BLCollisionGuidNode*)_handler->userData;
 	if (_node->nID == INVALID_GUID)
-		_node->nID = blGenGuid(_Arb, blUniqueUri());
+		_node->nID = _anode->nID;
 	if (_node->pPostSolveFunc)
 		_node->pPostSolveFunc(_node->nID);
 }
 static void
 _CollisionSeparate(cpArbiter* _Arb, cpSpace* _Space, void* _Data)
 {
+	_BLArbiterGuidNode* _anode = (_BLArbiterGuidNode*)cpArbiterGetUserData(_Arb);
+	if (!_anode)
+	{
+		_anode = (_BLArbiterGuidNode*)malloc(sizeof(_BLArbiterGuidNode));
+		_anode->pArbiter = _Arb;
+		_anode->nID = blGenGuid(_Arb, blUniqueUri());
+		cpArbiterSetUserData(_Arb, _anode);
+	}
 	cpCollisionHandler* _handler = cpArbiterCollisionHandle(_Arb);
 	if (!_handler)
 		return;
-	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)_handler->userData;
+	_BLCollisionGuidNode* _node = (_BLCollisionGuidNode*)_handler->userData;
 	if (_node->nID == INVALID_GUID)
-		_node->nID = blGenGuid(_Arb, blUniqueUri());
+		_node->nID = _anode->nID;
 	if (_node->pSeparateFunc)
 		_node->pSeparateFunc(_node->nID);
+}
+static void
+_FreeArbiter(void* _Data)
+{
+	_BLArbiterGuidNode* _arb = (_BLArbiterGuidNode*)_Data;
+	blDeleteGuid(_arb->nID);
 }
 static const BLBool
 _BodyCp(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY, BLVoid** _ExtData)
@@ -228,22 +294,23 @@ blChipmunkOpenEXT(IN BLAnsi* _Version, ...)
 	_PrCpMem = (_BLChipmunkMember*)malloc(sizeof(_BLChipmunkMember));
 	_PrCpMem->pSpace = cpSpaceNew();
 	_PrCpMem->pQuery = (_BLQueryGuidNode*)malloc(sizeof(_BLQueryGuidNode));
-	_PrCpMem->nArbiterCap = 10;
-	_PrCpMem->nArbiterSize = 0;
-	_PrCpMem->pArbiters = (_BLArbiterGuidNode**)malloc(sizeof(BLVoid*) * _PrCpMem->nArbiterCap);
+	_PrCpMem->nHandlerCap = 10;
+	_PrCpMem->nHandlerSize = 0;
+	_PrCpMem->pHandlers = (_BLCollisionGuidNode**)malloc(sizeof(BLVoid*) * _PrCpMem->nHandlerCap);
 	blSpriteRegistExternal("bmg", NULL, NULL, _UnloadCP, NULL, _BodyCp, _StepCP);
 }
 BLVoid
 blChipmunkCloseEXT()
 {
-	for (BLU32 _i = 0; _i < _PrCpMem->nArbiterSize; ++_i)
+	for (BLU32 _i = 0; _i < _PrCpMem->nHandlerSize; ++_i)
 	{
-		blDeleteGuid(_PrCpMem->pArbiters[_i]->nID);
-		free(_PrCpMem->pArbiters[_i]);
+		blDeleteGuid(_PrCpMem->pHandlers[_i]->nID);
+		free(_PrCpMem->pHandlers[_i]);
 	}
-	free(_PrCpMem->pArbiters);
+	free(_PrCpMem->pHandlers);
 	cpSpaceEachConstraint(_PrCpMem->pSpace, _PostConstraintFree, _PrCpMem->pSpace);
-	cpSpaceFree(_PrCpMem->pSpace);
+	cpSpaceDestroy(_PrCpMem->pSpace, _FreeArbiter);
+	cpfree(_PrCpMem->pSpace);
 	free(_PrCpMem->pQuery);
 	free(_PrCpMem);
 }
@@ -398,19 +465,19 @@ blChipmunkSpaceCollisionHandler(IN BLU32 _TypeA, IN BLU32 _TypeB, IN BLBool(*_Be
 		_handler->postSolveFunc = _CollisionPostSolve;
 	if (_SeparateFunc)
 		_handler->separateFunc = _CollisionSeparate;
-	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)malloc(sizeof(_BLArbiterGuidNode));
+	_BLCollisionGuidNode* _node = (_BLCollisionGuidNode*)malloc(sizeof(_BLCollisionGuidNode));
 	_node->nID = INVALID_GUID;
 	_node->pBeginFunc = _BeginFunc;
 	_node->pPreSolveFunc = _PreSolveFunc;
 	_node->pPostSolveFunc = _PostSolveFunc;
 	_node->pSeparateFunc = _SeparateFunc;
 	_handler->userData = _node;
-	if (_PrCpMem->nArbiterSize + 1 > _PrCpMem->nArbiterCap)
+	if (_PrCpMem->nHandlerSize + 1 > _PrCpMem->nHandlerCap)
 	{
-		_PrCpMem->nArbiterCap += 10;
-		_PrCpMem->pArbiters = (_BLArbiterGuidNode**)realloc(_PrCpMem->pArbiters, sizeof(BLVoid*) * _PrCpMem->nArbiterCap);
+		_PrCpMem->nHandlerCap += 10;
+		_PrCpMem->pHandlers = (_BLCollisionGuidNode**)realloc(_PrCpMem->pHandlers, sizeof(BLVoid*) * _PrCpMem->nHandlerCap);
 	}
-	_PrCpMem->pArbiters[_PrCpMem->nArbiterSize] = _node;
+	_PrCpMem->pHandlers[_PrCpMem->nHandlerSize] = _node;
 }
 BLVoid
 blChipmunkSpaceWildcardHandler(IN BLU32 _Type, IN BLBool(*_BeginFunc)(BLGuid), IN BLBool(*_PreSolveFunc)(BLGuid), IN BLVoid(*_PostSolveFunc)(BLGuid), IN BLVoid(*_SeparateFunc)(BLGuid))
@@ -424,19 +491,19 @@ blChipmunkSpaceWildcardHandler(IN BLU32 _Type, IN BLBool(*_BeginFunc)(BLGuid), I
 		_handler->postSolveFunc = _CollisionPostSolve;
 	if (_SeparateFunc)
 		_handler->separateFunc = _CollisionSeparate;
-	_BLArbiterGuidNode* _node = (_BLArbiterGuidNode*)malloc(sizeof(_BLArbiterGuidNode));
+	_BLCollisionGuidNode* _node = (_BLCollisionGuidNode*)malloc(sizeof(_BLCollisionGuidNode));
 	_node->nID = INVALID_GUID;
 	_node->pBeginFunc = _BeginFunc;
 	_node->pPreSolveFunc = _PreSolveFunc;
 	_node->pPostSolveFunc = _PostSolveFunc;
 	_node->pSeparateFunc = _SeparateFunc;
 	_handler->userData = _node;
-	if (_PrCpMem->nArbiterSize + 1 > _PrCpMem->nArbiterCap)
+	if (_PrCpMem->nHandlerSize + 1 > _PrCpMem->nHandlerCap)
 	{
-		_PrCpMem->nArbiterCap += 10;
-		_PrCpMem->pArbiters = (_BLArbiterGuidNode**)realloc(_PrCpMem->pArbiters, sizeof(BLVoid*) * _PrCpMem->nArbiterCap);
+		_PrCpMem->nHandlerCap += 10;
+		_PrCpMem->pHandlers = (_BLCollisionGuidNode**)realloc(_PrCpMem->pHandlers, sizeof(BLVoid*) * _PrCpMem->nHandlerCap);
 	}
-	_PrCpMem->pArbiters[_PrCpMem->nArbiterSize] = _node;
+	_PrCpMem->pHandlers[_PrCpMem->nHandlerSize] = _node;
 }
 BLF32
 blChipmunkMomentCircleEXT(IN BLF32 _M, IN BLF32 _R1, IN BLF32 _R2, IN BLF32 _CentroidOffsetX, IN BLF32 _CentroidOffsetY)
@@ -609,6 +676,14 @@ blChipmunkSpriteKinematicPolyBodyEXT(IN BLGuid _ID, IN BLF32* _ShapeData, IN BLU
 		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNew(_kinematic, 4, _tris, cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f), _Radius));
 	}
 	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_node->pBody = _kinematic;
+	_node->nID = _ID;
+	_node->pVelocity = NULL;
+	_node->pPosition = NULL;
+	_node->pConIteratorFunc = NULL;
+	_node->pArbIteratorFunc = NULL;
+	cpBodySetUserData(_kinematic, _node);
 	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
@@ -629,6 +704,14 @@ blChipmunkSpriteKinematicCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Radius, IN BLF32
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpCircleShapeNew(_kinematic, _Radius, cpv(_X, _Y)));
 	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_node->pBody = _kinematic;
+	_node->nID = _ID;
+	_node->pVelocity = NULL;
+	_node->pPosition = NULL;
+	_node->pConIteratorFunc = NULL;
+	_node->pArbIteratorFunc = NULL;
+	cpBodySetUserData(_kinematic, _node);
 	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
@@ -649,6 +732,14 @@ blChipmunkSpriteKinematicBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Width, IN BLF32 _He
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpBoxShapeNew2(_kinematic, cpBBNew(_X - _Width * 0.5f, _Y - _Height * 0.5f, _X + _Width * 0.5f, _Y + _Height * 0.5f), _Radius));
 	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_node->pBody = _kinematic;
+	_node->nID = _ID;
+	_node->pVelocity = NULL;
+	_node->pPosition = NULL;
+	_node->pConIteratorFunc = NULL;
+	_node->pArbIteratorFunc = NULL;
+	cpBodySetUserData(_kinematic, _node);
 	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
@@ -673,6 +764,14 @@ blChipmunkSpriteKinematicSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _AX, IN BLF32 _A
 	cpTransform _tm = cpTransformRigid(cpv(_X, _Y), -_Angle * 0.0174532922222222f);
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(_kinematic, cpTransformPoint(_tm, _pta), cpTransformPoint(_tm, _ptb), _Radius));
 	cpSpaceAddBody(_PrCpMem->pSpace, _kinematic);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_node->pBody = _kinematic;
+	_node->nID = _ID;
+	_node->pVelocity = NULL;
+	_node->pPosition = NULL;
+	_node->pConIteratorFunc = NULL;
+	_node->pArbIteratorFunc = NULL;
+	cpBodySetUserData(_kinematic, _node);
 	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
@@ -705,6 +804,14 @@ blChipmunkSpriteDynamicPolyBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Mome
 		_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpPolyShapeNewRaw(_body, 4, _tris, _Radius));
 	}
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_node->pBody = _body;
+	_node->nID = _ID;
+	_node->pVelocity = NULL;
+	_node->pPosition = NULL;
+	_node->pConIteratorFunc = NULL;
+	_node->pArbIteratorFunc = NULL;
+	cpBodySetUserData(_body, _node);
 	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
@@ -724,6 +831,14 @@ blChipmunkSpriteDynamicCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Mo
 	cpBodySetPosition(_body, cpv(_xpos, _ypos));
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpCircleShapeNew(_body, _Radius, cpvzero));
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_node->pBody = _body;
+	_node->nID = _ID;
+	_node->pVelocity = NULL;
+	_node->pPosition = NULL;
+	_node->pConIteratorFunc = NULL;
+	_node->pArbIteratorFunc = NULL;
+	cpBodySetUserData(_body, _node);
 	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
@@ -743,6 +858,14 @@ blChipmunkSpriteDynamicBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Momen
 	cpBodySetPosition(_body, cpv(_xpos, _ypos));
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpBoxShapeNew(_body, _Width, _Height, _Radius));
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_node->pBody = _body;
+	_node->nID = _ID;
+	_node->pVelocity = NULL;
+	_node->pPosition = NULL;
+	_node->pConIteratorFunc = NULL;
+	_node->pArbIteratorFunc = NULL;
+	cpBodySetUserData(_body, _node);
 	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
@@ -762,6 +885,14 @@ blChipmunkSpriteDynamicSegmentBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _M
 	cpBodySetPosition(_body, cpv(_xpos, _ypos));
 	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpSegmentShapeNew(_body, cpv(_AX, _AY), cpv(_BX, _BY), _Radius));
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_node->pBody = _body;
+	_node->nID = _ID;
+	_node->pVelocity = NULL;
+	_node->pPosition = NULL;
+	_node->pConIteratorFunc = NULL;
+	_node->pArbIteratorFunc = NULL;
+	cpBodySetUserData(_body, _node);
 	cpShapeSetUserData(_shape, &_ID);
 	blSpriteExternalData(_ID, _shape);
 	return TRUE;
@@ -899,11 +1030,13 @@ blChipmunkSpriteVelocityUpdateFuncEXT(IN BLGuid _ID, IN BLVoid(*_VelocityFunc)(B
 	if (!_shape)
 		return;
 	cpBody* _body = cpShapeGetBody(_shape);
-	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)cpBodyGetUserData(_body); 
+	if (_node)
+		return;
 	_node->pBody = _body;
 	_node->nID = _ID;
-	_node->pVelocity = _VelocityFunc;
-	cpBodySetUserData(_body, _node);
+	if (_VelocityFunc)
+		_node->pVelocity = _VelocityFunc;
 	cpBodySetVelocityUpdateFunc(_body, _VelocityUpdateFunc);
 }
 BLVoid 
@@ -913,11 +1046,13 @@ blChipmunkSpritePositionUpdateFuncEXT(IN BLGuid _ID, IN BLVoid(*_PositionFunc)(B
 	if (!_shape)
 		return;
 	cpBody* _body = cpShapeGetBody(_shape);
-	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)cpBodyGetUserData(_body);
+	if (_node)
+		return;
 	_node->pBody = _body;
 	_node->nID = _ID;
-	_node->pPosition = _PositionFunc;
-	cpBodySetUserData(_body, _node);
+	if (_PositionFunc)
+		_node->pPosition = _PositionFunc;
 	cpBodySetPositionUpdateFunc(_body, _PositionUpdateFunc);
 }
 BLVoid 
@@ -995,6 +1130,32 @@ blChipmunkSpriteApplyImpulseAtLocalEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, 
 		return;
 	cpBody* _body = cpShapeGetBody(_shape);
 	cpBodyApplyImpulseAtLocalPoint(_body, cpv(_ImpulseX, _ImpulseY), cpv(_X, _Y));
+}
+BLVoid 
+blChipmunkSpriteEachConstraintEXT(IN BLGuid _ID, IN BLVoid(*_IteratorFunc)(BLGuid, BLGuid, BLVoid*), IN BLVoid* _Data)
+{
+	if (!_IteratorFunc)
+		return;
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)cpBodyGetUserData(_body);
+	_node->pConIteratorFunc = _IteratorFunc;
+	cpBodyEachConstraint(_body, _ConstraintIteratorFunc, _Data);
+}
+BLVoid 
+blChipmunkSpriteEachArbiterEXT(IN BLGuid _ID, IN BLVoid(*_IteratorFunc)(BLGuid, BLGuid, BLVoid*), IN BLVoid* _Data)
+{
+	if (!_IteratorFunc)
+		return;
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)cpBodyGetUserData(_body);
+	_node->pArbIteratorFunc = _IteratorFunc;
+	cpBodyEachArbiter(_body, _ArbiterIteratorFunc, _Data);
 }
 BLVoid
 blChipmunkShapeMassEXT(IN BLGuid _ID, IN BLF32 _Mass)
@@ -1087,7 +1248,15 @@ blChipmunkConstraintGearGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN B
 		return INVALID_GUID;
 	cpConstraint* _con = cpGearJointNew(_abody, _bbody, _Phase, _Ratio);
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
-	return blGenGuid(_con, blUniqueUri());
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = blGenGuid(_con, blUniqueUri());
+	_node->pPostSolveFunc = NULL;
+	_node->pPreSolveFunc = NULL;
+	_node->pSpringForceFunc = NULL;
+	_node->pSpringTorqueFunc = NULL;
+	cpConstraintSetUserData(_con, _node);
+	return _node->nID;
 }
 BLGuid 
 blChipmunkConstraintGrooveGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AGrooveX, IN BLF32 _AGrooveY, IN BLF32 _BGrooveX, IN BLF32 _BGrooveY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
@@ -1112,7 +1281,15 @@ blChipmunkConstraintGrooveGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AGrooveX,
 		return INVALID_GUID;
 	cpConstraint* _con = cpGrooveJointNew(_abody, _bbody, cpv(_AGrooveX, _AGrooveY), cpv(_BGrooveX, _BGrooveY), cpv(_BAnchorX, _BAnchorY));
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
-	return blGenGuid(_con, blUniqueUri());
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = blGenGuid(_con, blUniqueUri());
+	_node->pPostSolveFunc = NULL;
+	_node->pPreSolveFunc = NULL;
+	_node->pSpringForceFunc = NULL;
+	_node->pSpringTorqueFunc = NULL;
+	cpConstraintSetUserData(_con, _node);
+	return _node->nID;
 }
 BLGuid 
 blChipmunkConstraintPinGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY)
@@ -1137,7 +1314,15 @@ blChipmunkConstraintPinGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN
 		return INVALID_GUID;
 	cpConstraint* _con = cpPinJointNew(_abody, _bbody, cpv(_AAnchorX, _AAnchorY), cpv(_BAnchorX, _BAnchorY));
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
-	return blGenGuid(_con, blUniqueUri());
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = blGenGuid(_con, blUniqueUri());
+	_node->pPostSolveFunc = NULL;
+	_node->pPreSolveFunc = NULL;
+	_node->pSpringForceFunc = NULL;
+	_node->pSpringTorqueFunc = NULL;
+	cpConstraintSetUserData(_con, _node);
+	return _node->nID;
 }
 BLGuid 
 blChipmunkConstraintPivotGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _APivotX, IN BLF32 _APivotY, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLBool _UsePivot)
@@ -1166,7 +1351,15 @@ blChipmunkConstraintPivotGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _APivotX, I
 	else
 		_con = cpPivotJointNew2(_abody, _bbody, cpv(_AAnchorX, _AAnchorY), cpv(_BAnchorX, _BAnchorY));
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
-	return blGenGuid(_con, blUniqueUri());
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = blGenGuid(_con, blUniqueUri());
+	_node->pPostSolveFunc = NULL;
+	_node->pPreSolveFunc = NULL;
+	_node->pSpringForceFunc = NULL;
+	_node->pSpringTorqueFunc = NULL;
+	cpConstraintSetUserData(_con, _node);
+	return _node->nID;
 }
 BLGuid 
 blChipmunkConstraintRatchetGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN BLF32 _Ratchet)
@@ -1191,7 +1384,15 @@ blChipmunkConstraintRatchetGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, I
 		return INVALID_GUID;
 	cpConstraint* _con = cpRatchetJointNew(_abody, _bbody, _Phase, _Ratchet);
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
-	return blGenGuid(_con, blUniqueUri());
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = blGenGuid(_con, blUniqueUri());
+	_node->pPostSolveFunc = NULL;
+	_node->pPreSolveFunc = NULL;
+	_node->pSpringForceFunc = NULL;
+	_node->pSpringTorqueFunc = NULL;
+	cpConstraintSetUserData(_con, _node);
+	return _node->nID;
 }
 BLGuid 
 blChipmunkConstraintRotaryGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Min, IN BLF32 _Max)
@@ -1216,7 +1417,15 @@ blChipmunkConstraintRotaryGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Min, IN B
 		return INVALID_GUID;
 	cpConstraint* _con = cpRotaryLimitJointNew(_abody, _bbody, _Min, _Max);
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
-	return blGenGuid(_con, blUniqueUri());
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = blGenGuid(_con, blUniqueUri());
+	_node->pPostSolveFunc = NULL;
+	_node->pPreSolveFunc = NULL;
+	_node->pSpringForceFunc = NULL;
+	_node->pSpringTorqueFunc = NULL;
+	cpConstraintSetUserData(_con, _node);
+	return _node->nID;
 }
 BLGuid 
 blChipmunkConstraintSlideGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _Min, IN BLF32 _Max)
@@ -1241,7 +1450,15 @@ blChipmunkConstraintSlideGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, 
 		return INVALID_GUID;
 	cpConstraint* _con = cpSlideJointNew(_abody, _bbody, cpv(_AAnchorX, _AAnchorY), cpv(_BAnchorX, _BAnchorY), _Min, _Max);
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
-	return blGenGuid(_con, blUniqueUri());
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = blGenGuid(_con, blUniqueUri());
+	_node->pPostSolveFunc = NULL;
+	_node->pPreSolveFunc = NULL;
+	_node->pSpringForceFunc = NULL;
+	_node->pSpringTorqueFunc = NULL;
+	cpConstraintSetUserData(_con, _node);
+	return _node->nID;
 }
 BLGuid 
 blChipmunkConstraintSpringGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX, IN BLF32 _AAnchorY, IN BLF32 _BAnchorX, IN BLF32 _BAnchorY, IN BLF32 _RestLength, IN BLF32 _Stiffness, IN BLF32 _Damping)
@@ -1266,7 +1483,15 @@ blChipmunkConstraintSpringGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _AAnchorX,
 		return INVALID_GUID;
 	cpConstraint* _con = cpDampedSpringNew(_abody, _bbody, cpv(_AAnchorX, _AAnchorY), cpv(_BAnchorX, _BAnchorY), _RestLength, _Stiffness, _Damping);
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
-	return blGenGuid(_con, blUniqueUri());
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = blGenGuid(_con, blUniqueUri());
+	_node->pPostSolveFunc = NULL;
+	_node->pPreSolveFunc = NULL;
+	_node->pSpringForceFunc = NULL;
+	_node->pSpringTorqueFunc = NULL;
+	cpConstraintSetUserData(_con, _node);
+	return _node->nID;
 }
 BLGuid 
 blChipmunkConstraintRotarySpringGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLS32 _RestAngle, IN BLF32 _Stiffness, IN BLF32 _Damping)
@@ -1291,7 +1516,15 @@ blChipmunkConstraintRotarySpringGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLS32 _Res
 		return INVALID_GUID;
 	cpConstraint* _con = cpDampedRotarySpringNew(_abody, _bbody, -_RestAngle * 0.0174532922222222f, _Stiffness, _Damping);
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
-	return blGenGuid(_con, blUniqueUri());
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = blGenGuid(_con, blUniqueUri());
+	_node->pPostSolveFunc = NULL;
+	_node->pPreSolveFunc = NULL;
+	_node->pSpringForceFunc = NULL;
+	_node->pSpringTorqueFunc = NULL;
+	cpConstraintSetUserData(_con, _node);
+	return _node->nID;
 }
 BLGuid 
 blChipmunkConstraintMotorGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Rate)
@@ -1316,7 +1549,15 @@ blChipmunkConstraintMotorGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Rate)
 		return INVALID_GUID;
 	cpConstraint* _con = cpSimpleMotorNew(_abody, _bbody, _Rate);
 	cpSpaceAddConstraint(_PrCpMem->pSpace, _con);
-	return blGenGuid(_con, blUniqueUri());
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
+	_node->pConstraint = _con;
+	_node->nID = blGenGuid(_con, blUniqueUri());
+	_node->pPostSolveFunc = NULL;
+	_node->pPreSolveFunc = NULL;
+	_node->pSpringForceFunc = NULL;
+	_node->pSpringTorqueFunc = NULL;
+	cpConstraintSetUserData(_con, _node);
+	return _node->nID;
 }
 BLVoid 
 blChipmunkConstraintDeleteEXT(IN BLGuid _Constraint)
@@ -1325,6 +1566,7 @@ blChipmunkConstraintDeleteEXT(IN BLGuid _Constraint)
 	_BLConstraintGuidNode* _node = cpConstraintGetUserData(_con);
 	cpSpaceRemoveConstraint(_PrCpMem->pSpace, _node->pConstraint);
 	cpConstraintFree(_node->pConstraint);
+	blDeleteGuid(_node->nID);
 	free(_node);
 }
 BLVoid 
@@ -1532,9 +1774,7 @@ BLVoid
 blChipmunkConstraintSolveFuncEXT(IN BLGuid _Constraint, IN BLVoid(*_PreSolveFunc)(BLGuid), IN BLVoid(*_PostSolveFunc)(BLGuid), IN BLF32(*_SpringForceFunc)(BLGuid, BLF32), IN BLF32(*_SpringTorqueFunc)(BLGuid, BLF32))
 {
 	cpConstraint* _con = blGuidAsPointer(_Constraint);
-	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)malloc(sizeof(_BLConstraintGuidNode));
-	_node->pConstraint = _con;
-	_node->nID = _Constraint;
+	_BLConstraintGuidNode* _node = (_BLConstraintGuidNode*)cpConstraintGetUserData(_con);
 	if (_PreSolveFunc)
 	{
 		_node->pPreSolveFunc = _PreSolveFunc;
@@ -1555,7 +1795,6 @@ blChipmunkConstraintSolveFuncEXT(IN BLGuid _Constraint, IN BLVoid(*_PreSolveFunc
 		_node->pSpringTorqueFunc = _SpringTorqueFunc;
 		cpDampedRotarySpringSetSpringTorqueFunc(_con, _ConstraintDampedRotarySpringTorqueFunc);
 	}
-	cpConstraintSetUserData(_con, _node);
 }
 BLVoid 
 blChipmunkArbiterRestitution(IN BLGuid _Arbiter, IN BLF32 _Restitution)
