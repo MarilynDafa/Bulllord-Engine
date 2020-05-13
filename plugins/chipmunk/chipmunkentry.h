@@ -415,6 +415,20 @@ extern "C" {
 		IN BLF32 _ImpulseX,
 		IN BLF32 _ImpulseY);
 
+	BL_API BLVoid blChipmunkSpriteVelocityAtWorldEXT(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		OUT BLF32* _VelX,
+		OUT BLF32* _VelY);
+
+	BL_API BLVoid blChipmunkSpriteVelocityAtLocalEXT(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		OUT BLF32* _VelX,
+		OUT BLF32* _VelY);
+
 	BL_API BLVoid blChipmunkSpriteEachConstraintEXT(
 		IN BLGuid _ID,
 		IN BLVoid(*_IteratorFunc)(BLGuid, BLGuid, BLVoid*),
@@ -461,7 +475,31 @@ extern "C" {
 		IN BLU32 _Category,
 		IN BLU32 _Mask);
 
-	BL_API BLVoid blChipmunkShapeQueryEXT(
+	BL_API BLVoid blChipmunkShapeGetPolyParamEXT(
+		IN BLGuid _ID,
+		IN BLU32 _Index,
+		OUT BLF32* _Radius,
+		OUT BLU32* _Count,
+		OUT BLF32* _X,
+		OUT BLF32* _Y);
+
+	BL_API BLVoid blChipmunkShapeGetCircleParamEXT(
+		IN BLGuid _ID,
+		OUT BLF32* _X,
+		OUT BLF32* _Y,
+		OUT BLF32* _Radius);
+
+	BL_API BLVoid blChipmunkShapeGetSegmentParamEXT(
+		IN BLGuid _ID,
+		OUT BLF32* _AX,
+		OUT BLF32* _AY,
+		OUT BLF32* _BX,
+		OUT BLF32* _BY,
+		OUT BLF32* _NormalX,
+		OUT BLF32* _NormalY,
+		OUT BLF32* _Radius);
+
+	BL_API BLVoid blChipmunkShapeQuantitiesQueryEXT(
 		IN BLGuid _ID,
 		OUT BLF32* _Mass,
 		OUT BLF32* _Density,
@@ -473,7 +511,34 @@ extern "C" {
 		OUT BLU32* _CollisionType,
 		OUT BLU32* _Group,
 		OUT BLU32* _Category,
-		OUT BLU32* _Mask);
+		OUT BLU32* _Mask,
+		OUT BLF32* _BBMinX,
+		OUT BLF32* _BBMaxX,
+		OUT BLF32* _BBMinY,
+		OUT BLF32* _BBMaxY);
+
+	BL_API BLGuid blChipmunkShapePointQueryEXT(
+		IN BLGuid _ID,
+		IN BLF32 _X,
+		IN BLF32 _Y,
+		OUT BLF32* _PtX,
+		OUT BLF32* _PtY,
+		OUT BLF32* _Distance,
+		OUT BLF32* _GradientX,
+		OUT BLF32* _GradientY);
+
+	BL_API BLGuid blChipmunkShapeSegmentQueryEXT(
+		IN BLGuid _ID,
+		IN BLF32 _AX,
+		IN BLF32 _AY,
+		IN BLF32 _BX,
+		IN BLF32 _BY,
+		IN BLF32 _Radius,
+		OUT BLF32* _PtX,
+		OUT BLF32* _PtY,
+		OUT BLF32* _NormalX,
+		OUT BLF32* _NormalY,
+		OUT BLF32* _Alpha);
 
 	//constraint
 	BL_API BLGuid blChipmunkConstraintGearGenEXT(

@@ -1132,6 +1132,28 @@ blChipmunkSpriteApplyImpulseAtLocalEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, 
 	cpBodyApplyImpulseAtLocalPoint(_body, cpv(_ImpulseX, _ImpulseY), cpv(_X, _Y));
 }
 BLVoid 
+blChipmunkSpriteVelocityAtWorldEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32* _VelX, OUT BLF32* _VelY)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpVect _v = cpBodyGetVelocityAtWorldPoint(_body, cpv(_X, _Y));
+	*_VelX = _v.x;
+	*_VelY = _v.y;
+}
+BLVoid 
+blChipmunkSpriteVelocityAtLocalEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32* _VelX, OUT BLF32* _VelY)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	if (!_shape)
+		return;
+	cpBody* _body = cpShapeGetBody(_shape);
+	cpVect _v = cpBodyGetVelocityAtLocalPoint(_body, cpv(_X, _Y));
+	*_VelX = _v.x;
+	*_VelY = _v.y;
+}
+BLVoid 
 blChipmunkSpriteEachConstraintEXT(IN BLGuid _ID, IN BLVoid(*_IteratorFunc)(BLGuid, BLGuid, BLVoid*), IN BLVoid* _Data)
 {
 	if (!_IteratorFunc)
@@ -1210,7 +1232,28 @@ blChipmunkShapeFilterEXT(IN BLGuid _ID, IN BLU32 _Group, IN BLU32 _Category, IN 
 	cpShapeSetFilter(_shape, _filter);
 }
 BLVoid 
-blChipmunkQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Density, OUT BLBool* _Sensor, OUT BLF32* _Elasticity, OUT BLF32* _Friction, OUT BLF32* _XVelocityS, OUT BLF32* _YVelocityS, OUT BLU32* _CollisionType, OUT BLU32* _Group, OUT BLU32* _Category, OUT BLU32* _Mask)
+blChipmunkShapeGetPolyParamEXT(IN BLGuid _ID, IN BLU32 _Index, OUT BLF32* _Radius, OUT BLU32* _Count, OUT BLF32* _X, OUT BLF32* _Y)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	*_Radius = cpPolyShapeGetRadius(_shape);
+	*_Count = cpPolyShapeGetCount(_shape);
+	*_X = cpPolyShapeGetVert(_shape, _Index).x;
+	*_Y = cpPolyShapeGetVert(_shape, _Index).y;
+}
+BLVoid 
+blChipmunkShapeGetSegmentParamEXT(IN BLGuid _ID, OUT BLF32* _AX, OUT BLF32* _AY, OUT BLF32* _BX, OUT BLF32* _BY, OUT BLF32* _NormalX, OUT BLF32* _NormalY, OUT BLF32* _Radius)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	*_AX = cpSegmentShapeGetA(_shape).x;
+	*_AY = cpSegmentShapeGetA(_shape).y;
+	*_BX = cpSegmentShapeGetB(_shape).x;
+	*_BY = cpSegmentShapeGetB(_shape).y;
+	*_NormalX = cpSegmentShapeGetNormal(_shape).x;
+	*_NormalY = cpSegmentShapeGetNormal(_shape).y;
+	*_Radius = cpSegmentShapeGetRadius(_shape);
+}
+BLVoid 
+blChipmunkShapeQuantitiesQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Density, OUT BLBool* _Sensor, OUT BLF32* _Elasticity, OUT BLF32* _Friction, OUT BLF32* _XVelocityS, OUT BLF32* _YVelocityS, OUT BLU32* _CollisionType, OUT BLU32* _Group, OUT BLU32* _Category, OUT BLU32* _Mask, OUT BLF32* _BBMinX, OUT BLF32* _BBMaxX, OUT BLF32* _BBMinY, OUT BLF32* _BBMaxY)
 {
 	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
 	*_Mass = cpShapeGetMass(_shape);
@@ -1224,6 +1267,38 @@ blChipmunkQueryEXT(IN BLGuid _ID, OUT BLF32* _Mass, OUT BLF32* _Density, OUT BLB
 	*_Group = cpShapeGetFilter(_shape).group;
 	*_Category = cpShapeGetFilter(_shape).categories;
 	*_Mask = cpShapeGetFilter(_shape).mask;
+	*_BBMinX = cpShapeGetBB(_shape).l;
+	*_BBMaxX = cpShapeGetBB(_shape).r;
+	*_BBMinY = cpShapeGetBB(_shape).t;
+	*_BBMaxY = cpShapeGetBB(_shape).b;
+}
+BLGuid 
+blChipmunkShapePointQueryEXT(IN BLGuid _ID, IN BLF32 _X, IN BLF32 _Y, OUT BLF32* _PtX, OUT BLF32* _PtY, OUT BLF32* _Distance, OUT BLF32* _GradientX, OUT BLF32* _GradientY)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	cpPointQueryInfo _info;
+	cpShapePointQuery(_shape, cpv(_X, _Y), &_info);
+	*_PtX = _info.point.x;
+	*_PtY = _info.point.y;
+	*_Distance = _info.distance;
+	*_GradientX = _info.gradient.x;
+	*_GradientY = _info.gradient.y;
+	BLGuid* _id = cpShapeGetUserData(_info.shape);
+	return *_id;
+}
+BLGuid 
+blChipmunkShapeSegmentQueryEXT(IN BLGuid _ID, IN BLF32 _AX, IN BLF32 _AY, IN BLF32 _BX, IN BLF32 _BY, IN BLF32 _Radius, OUT BLF32* _PtX, OUT BLF32* _PtY, OUT BLF32* _NormalX, OUT BLF32* _NormalY, OUT BLF32* _Alpha)
+{
+	cpShape* _shape = (cpShape*)blSpriteExternalData(_ID, NULL);
+	cpSegmentQueryInfo _info;
+	cpShapeSegmentQuery(_shape, cpv(_AX, _AY), cpv(_BX, _BY), _Radius, &_info);
+	*_PtX = _info.point.x;
+	*_PtY = _info.point.y;
+	*_NormalX = _info.normal.x;
+	*_NormalY = _info.normal.y;
+	*_Alpha = _info.alpha;
+	BLGuid* _id = cpShapeGetUserData(_info.shape);
+	return *_id;
 }
 BLGuid 
 blChipmunkConstraintGearGenEXT(IN BLGuid _A, IN BLGuid _B, IN BLF32 _Phase, IN BLF32 _Ratio)
