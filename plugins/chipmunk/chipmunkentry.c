@@ -543,14 +543,14 @@ blChipmunkAreaPolyEXT(IN BLF32* _Verts, IN BLU32 _VertNum, IN BLF32 _Radius)
 	return cpAreaForPoly(_hullcount, _verts, _Radius);
 }
 BLF32
-blChipmunkMomentBoxEXT(IN BLF32 _M, IN BLF32 _Width, IN BLF32 _Height)
+blChipmunkMomentBoxEXT(IN BLF32 _M, IN BLF32 _MinX, IN BLF32 _MaxX, IN BLF32 _MinY, IN BLF32 _MaxY)
 {
-	return cpMomentForBox(_M, _Width, _Height);
+	return cpMomentForBox2(_M, cpBBNew(_MinX, _MaxY, _MaxX, _MinY));
 }
 BLF32
-blChipmunkAreaBoxEXT(IN BLF32 _Width, IN BLF32 _Height)
+blChipmunkAreaBoxEXT(IN BLF32 _MinX, IN BLF32 _MaxX, IN BLF32 _MinY, IN BLF32 _MaxY)
 {
-	return _Width * _Height;
+	return (_MaxX - _MinX) * (_MaxY - _MinY);
 }
 BLBool
 blChipmunkSpriteStaticPolyBodyEXT(IN BLGuid _ID, IN BLF32* _ShapeData, IN BLU32 _DataNum, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y, IN BLS32 _Angle)
@@ -844,7 +844,7 @@ blChipmunkSpriteDynamicCircleBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Mo
 	return TRUE;
 }
 BLBool 
-blChipmunkSpriteDynamicBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Moment, IN BLF32 _Width, IN BLF32 _Height, IN BLF32 _Radius)
+blChipmunkSpriteDynamicBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Moment, IN BLF32 _Width, IN BLF32 _Height, IN BLF32 _Radius, IN BLF32 _X, IN BLF32 _Y)
 {
 	if (blSpriteExternalData(_ID, NULL))
 		return FALSE;
@@ -856,7 +856,7 @@ blChipmunkSpriteDynamicBoxBodyEXT(IN BLGuid _ID, IN BLF32 _Mass, IN BLF32 _Momen
 	BLBool _show, _flipx, _flipy;
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
 	cpBodySetPosition(_body, cpv(_xpos, _ypos));
-	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpBoxShapeNew(_body, _Width, _Height, _Radius));
+	_shape = cpSpaceAddShape(_PrCpMem->pSpace, cpBoxShapeNew2(_body, cpBBNew(_X - _Width * 0.5f, _Y - _Height * 0.5f, _X + _Width * 0.5f, _Y + _Height * 0.5f), _Radius));
 	cpSpaceAddBody(_PrCpMem->pSpace, _body);
 	_BLBodyGuidNode* _node = (_BLBodyGuidNode*)malloc(sizeof(_BLBodyGuidNode));
 	_node->pBody = _body;
