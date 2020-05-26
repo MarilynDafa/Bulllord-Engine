@@ -30,7 +30,7 @@ BL_API BLVoid blSpineOpenEXT(
 
 BL_API BLVoid blSpineCloseEXT();
 
-BL_API BLVoid blSpriteAnimationSetEXT(
+BL_API BLVoid blSpriteAnimationEXT(
 	IN BLGuid _ID, 
 	IN BLAnsi* _Animation,
 	IN BLS32 _Track,
@@ -60,7 +60,7 @@ BL_API BLVoid blSpriteAnimationEmptyEXT(
 	IN BLU32 _TrackIndex,
 	IN BLF32 _Duration);
 
-BL_API BLVoid blSpriteTrackEmpty(
+BL_API BLVoid blSpriteTrackEmptyEXT(
 	IN BLGuid _ID,
 	IN BLU32 _TrackIndex);
 

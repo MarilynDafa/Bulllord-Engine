@@ -14,141 +14,91 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Animation.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)AnimationState.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)AnimationStateData.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Atlas.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)AtlasAttachmentLoader.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Attachment.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)AttachmentLoader.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Bone.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)BoneData.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)BoundingBoxAttachment.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Event.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)EventData.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)extension.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IkConstraint.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IkConstraintData.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Json.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)MeshAttachment.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PathAttachment.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PathConstraint.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PathConstraintData.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)RegionAttachment.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Skeleton.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SkeletonBinary.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SkeletonBounds.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SkeletonData.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SkeletonJson.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Skin.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Slot.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SlotData.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)spineentry.c">
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)TransformConstraint.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)TransformConstraintData.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)VertexAttachment.c">
-      <CompileAs>CompileAsC</CompileAs>
-    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Animation.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\AnimationState.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\AnimationStateData.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Array.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Atlas.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\AtlasAttachmentLoader.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Attachment.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\AttachmentLoader.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Bone.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\BoneData.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\BoundingBoxAttachment.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\ClippingAttachment.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Color.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Event.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\EventData.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\extension.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\IkConstraint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\IkConstraintData.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Json.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\MeshAttachment.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\PathAttachment.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\PathConstraint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\PathConstraintData.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\PointAttachment.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\RegionAttachment.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Skeleton.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SkeletonBinary.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SkeletonBounds.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SkeletonClipping.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SkeletonData.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SkeletonJson.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Skin.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Slot.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SlotData.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\TransformConstraint.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\TransformConstraintData.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Triangulator.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\VertexAttachment.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\VertexEffect.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Animation.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)AnimationState.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)AnimationStateData.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Atlas.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)AtlasAttachmentLoader.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Attachment.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)AttachmentLoader.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Bone.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)BoneData.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)BoundingBoxAttachment.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Event.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)EventData.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)extension.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)IkConstraint.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)IkConstraintData.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Json.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)kvec.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)MeshAttachment.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)PathAttachment.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)PathConstraint.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)PathConstraintData.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)RegionAttachment.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Skeleton.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)SkeletonBinary.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)SkeletonBounds.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)SkeletonData.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)SkeletonJson.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Skin.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Slot.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)SlotData.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)spine.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)spineentry.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)TransformConstraint.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)TransformConstraintData.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)VertexAttachment.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Animation.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\AnimationState.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\AnimationStateData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Array.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Atlas.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\AtlasAttachmentLoader.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Attachment.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\AttachmentLoader.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Bone.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\BoneData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\BoundingBoxAttachment.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\ClippingAttachment.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Color.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\dll.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Event.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\EventData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\extension.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\IkConstraint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\IkConstraintData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Json.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\MeshAttachment.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\PathAttachment.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\PathConstraint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\PathConstraintData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\PointAttachment.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\RegionAttachment.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Skeleton.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SkeletonBinary.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SkeletonBounds.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SkeletonClipping.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SkeletonData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SkeletonJson.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Skin.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Slot.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SlotData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\spine.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\TransformConstraint.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\TransformConstraintData.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Triangulator.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\VertexAttachment.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\VertexEffect.h" />
   </ItemGroup>
 </Project>

@@ -12,210 +12,252 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Animation.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)AnimationState.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)AnimationStateData.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Atlas.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)AtlasAttachmentLoader.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Attachment.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)AttachmentLoader.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Bone.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)BoneData.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)BoundingBoxAttachment.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Event.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)EventData.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)extension.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IkConstraint.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)IkConstraintData.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Json.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)MeshAttachment.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PathAttachment.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PathConstraint.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)PathConstraintData.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)RegionAttachment.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Skeleton.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SkeletonBinary.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SkeletonBounds.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SkeletonData.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SkeletonJson.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Skin.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)Slot.c">
-      <Filter>externals</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)SlotData.c">
-      <Filter>externals</Filter>
-    </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)spineentry.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)TransformConstraint.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Animation.c">
       <Filter>externals</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)TransformConstraintData.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\AnimationState.c">
       <Filter>externals</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)VertexAttachment.c">
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\AnimationStateData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Array.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Atlas.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\AtlasAttachmentLoader.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Attachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\AttachmentLoader.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Bone.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\BoneData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\BoundingBoxAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\ClippingAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Color.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Event.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\EventData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\extension.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\IkConstraint.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\IkConstraintData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Json.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\MeshAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\PathAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\PathConstraint.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\PathConstraintData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\PointAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\RegionAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Skeleton.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SkeletonBinary.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SkeletonBounds.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SkeletonClipping.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SkeletonData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SkeletonJson.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Skin.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Slot.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\SlotData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\TransformConstraint.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\TransformConstraintData.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\Triangulator.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\VertexAttachment.c">
+      <Filter>externals</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)spine\VertexEffect.c">
       <Filter>externals</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Animation.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)AnimationState.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)AnimationStateData.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Atlas.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)AtlasAttachmentLoader.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Attachment.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)AttachmentLoader.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Bone.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)BoneData.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)BoundingBoxAttachment.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Event.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)EventData.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)extension.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IkConstraint.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)IkConstraintData.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Json.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)kvec.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)MeshAttachment.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)PathAttachment.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)PathConstraint.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)PathConstraintData.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)RegionAttachment.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Skeleton.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)SkeletonBinary.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)SkeletonBounds.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)SkeletonData.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)SkeletonJson.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Skin.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)Slot.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)SlotData.h">
-      <Filter>externals</Filter>
-    </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)spine.h">
-      <Filter>externals</Filter>
-    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)spineentry.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)TransformConstraint.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Json.h">
       <Filter>externals</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)TransformConstraintData.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Animation.h">
       <Filter>externals</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)VertexAttachment.h">
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\AnimationState.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\AnimationStateData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Array.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Atlas.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\AtlasAttachmentLoader.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Attachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\AttachmentLoader.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Bone.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\BoneData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\BoundingBoxAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\ClippingAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Color.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\dll.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Event.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\EventData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\extension.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\IkConstraint.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\IkConstraintData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\MeshAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\PathAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\PathConstraint.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\PathConstraintData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\PointAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\RegionAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Skeleton.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SkeletonBinary.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SkeletonBounds.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SkeletonClipping.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SkeletonData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SkeletonJson.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Skin.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Slot.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\SlotData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\spine.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\TransformConstraint.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\TransformConstraintData.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\Triangulator.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\VertexAttachment.h">
+      <Filter>externals</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)spine\VertexEffect.h">
       <Filter>externals</Filter>
     </ClInclude>
   </ItemGroup>

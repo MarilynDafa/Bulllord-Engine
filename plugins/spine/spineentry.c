@@ -19,9 +19,8 @@ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
 #include "spineentry.h"
-#include "spine.h"
-#include "extension.h"
-#include "spine.h"
+#include "spine/spine.h"
+#include "spine/extension.h"
 #include "system.h"
 #include "streamio.h"
 #include "util.h"
@@ -29,12 +28,15 @@ misrepresented as being the original software.
 #include "gpu.h"
 #include "webp/src/webp/decode.h"
 #include "astc/astc.h"
+_SP_ARRAY_DECLARE_TYPE(spColorArray, BLU32)
+_SP_ARRAY_IMPLEMENT_TYPE(spColorArray, BLU32)
 typedef struct _TexCacheData {
 	BLU8* pData;
 	BLEnum eFormat;
 	BLU32 nWidth;
 	BLU32 nHeight;
 	BLBool bRepeatWrap;
+	BLBool bSmooth;
 } _BLTexCacheDataExt;
 typedef struct _SpineCacheData {
 	BLU32 nType;
@@ -74,9 +76,17 @@ typedef struct _SpineData {
 	spAnimationState* pState;
 	spSkeleton* pSkeleton;
 	spSkeletonData* pSkeletonData;
+	spSkeletonClipping* pClipping;
+	spFloatArray* pTempUVs;
+	spColorArray* pTempColors;
+	spVertexEffect* pVertexEffect;
 	spAtlas* pAtlas;
 	BLF32* pWorldVertices;
-	BLGuid nTexture;	
+	BLF32* pVertexArray;
+	BLU32 nVertexArrayNum;
+	BLGuid nTexture;
+	BLU32 nTexW;
+	BLU32 nTexH;
 	BLF32 fMinX;
 	BLF32 fMinY;
 	BLF32 fMaxX;
@@ -84,7 +94,7 @@ typedef struct _SpineData {
 } _BLSpineDataExt;
 typedef struct _SpineMember {
 	BLGuid nTech;
-	BLS32 nBlendMode;
+	spBlendMode eBlendMode;
 } _BLSpineMemberExt;
 static _BLSpineMemberExt* _PrSpineMem = NULL;
 void 
@@ -222,6 +232,10 @@ _spAtlasPage_createTexture(spAtlasPage* _Self, const BLAnsi* _Filename)
 		_tcd->bRepeatWrap = TRUE;
 	else
 		_tcd->bRepeatWrap = FALSE;
+	if (_Self->magFilter == SP_ATLAS_LINEAR)
+		_tcd->bSmooth = TRUE;
+	else
+		_tcd->bSmooth = FALSE;
 	_Self->rendererObject = _tcd;
 	_Self->width = _width;
 	_Self->height = _height;
@@ -248,8 +262,29 @@ _AnimationCallback(spAnimationState* _State, spEventType _Type, spTrackEntry* _E
 {
 	if (!_State->rendererObject)
 		return;
-	if (_Type == SP_ANIMATION_COMPLETE && !_Entry->loop)
-		blSysInvokeEvent(BL_ET_SPRITE, 0xFFFFFFFF, 0, NULL, ((_BLSpineDataExt*)_State->rendererObject)->nID);
+	blSysInvokeEvent(BL_ET_SPRITE, 0xFFFFFFFF, _Entry->trackIndex, NULL, ((_BLSpineDataExt*)_State->rendererObject)->nID);
+}
+static BLVoid
+_BlendState(spBlendMode _Mode)
+{
+	switch (_Mode)
+	{
+	case SP_BLEND_MODE_NORMAL:
+		blGpuBlendState(FALSE, TRUE, BL_BF_ONE, BL_BF_INVSRCALPHA, BL_BF_ONE, BL_BF_INVSRCALPHA, BL_BO_ADD, BL_BO_ADD, FALSE);
+		break;
+	case SP_BLEND_MODE_ADDITIVE:
+		blGpuBlendState(FALSE, TRUE, BL_BF_ONE, BL_BF_ONE, BL_BF_ONE, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
+		break;
+	case SP_BLEND_MODE_MULTIPLY:
+		blGpuBlendState(FALSE, TRUE, BL_BF_DESTCOLOR, BL_BF_INVSRCALPHA, BL_BF_DESTCOLOR, BL_BF_INVSRCALPHA, BL_BF_ZERO, BL_BO_ADD, BL_BO_ADD, FALSE);
+		break;
+	case SP_BLEND_MODE_SCREEN:
+		blGpuBlendState(FALSE, TRUE, BL_BF_ONE, BL_BF_INVSRCCOLOR, BL_BF_ONE, BL_BF_INVSRCCOLOR, BL_BO_ADD, BL_BO_ADD, FALSE);
+		break;
+	default:
+		blGpuBlendState(FALSE, TRUE, BL_BF_ONE, BL_BF_INVSRCALPHA, BL_BF_ONE, BL_BF_INVSRCALPHA, BL_BO_ADD, BL_BO_ADD, FALSE);
+		break;
+	}
 }
 static const BLBool
 _LoadSpine(BLGuid _ID, const BLAnsi* _Filename, BLVoid** _ExtData)
@@ -296,9 +331,15 @@ _LoadSpine(BLGuid _ID, const BLAnsi* _Filename, BLVoid** _ExtData)
 		spSkeletonBinary_dispose(_binary);
 	}	
 	_sd->pSkeleton = spSkeleton_create(_sd->pSkeletonData);
+	_sd->pTempUVs = spFloatArray_create(16);
+	_sd->pTempColors = spColorArray_create(16);
 	_sd->pState = spAnimationState_create(spAnimationStateData_create(_sd->pSkeletonData));
+	_sd->pClipping = spSkeletonClipping_create();
+	_sd->pVertexEffect = NULL;
 	_sd->pSkeleton->x = 0.f;
 	_sd->pSkeleton->y = _sd->pSkeletonData->height * 0.5f;
+	_sd->pVertexArray = (BLF32*)malloc(sizeof(BLF32) * _sd->pSkeleton->bonesCount * 4 * 8);
+	_sd->nVertexArrayNum = 0;
 	blSpriteDimension(_ID, _sd->pSkeletonData->width, _sd->pSkeletonData->height, FALSE);
 	spSkeleton_updateWorldTransform(_sd->pSkeleton);
 	if (*_ExtData)
@@ -338,7 +379,9 @@ _SpineSetup(BLGuid _ID, BLVoid** _ExtData)
 	_sd->nID = _ID;
 	_BLTexCacheDataExt* _tcd = (_BLTexCacheDataExt*)_sd->pAtlas->pages->rendererObject;
 	_sd->nTexture = blTextureGen(((BLU32)(((BLU64)(_ID)) & 0xFFFFFFFF)), BL_TT_2D, _tcd->eFormat, FALSE, TRUE, FALSE, 1, 1, _tcd->nWidth, _tcd->nHeight, 1, _tcd->pData);
-	blTextureFilter(_sd->nTexture, BL_TF_LINEAR, BL_TF_LINEAR, _tcd->bRepeatWrap ? BL_TW_REPEAT : BL_TW_CLAMP, _tcd->bRepeatWrap ? BL_TW_REPEAT : BL_TW_CLAMP, FALSE);
+	blTextureFilter(_sd->nTexture, _tcd->bSmooth ? BL_TF_LINEAR : BL_TF_NEAREST, _tcd->bSmooth ? BL_TF_LINEAR : BL_TF_NEAREST, _tcd->bRepeatWrap ? BL_TW_REPEAT : BL_TW_CLAMP, _tcd->bRepeatWrap ? BL_TW_REPEAT : BL_TW_CLAMP, FALSE);
+	_sd->nTexW = _tcd->nWidth;
+	_sd->nTexH = _tcd->nHeight;
 	free(_tcd);
 	_sd->pAtlas->pages->rendererObject = NULL;
 	_sd->pState->listener = _AnimationCallback;
@@ -349,10 +392,14 @@ static const BLBool
 _UnloadSpine(BLGuid _ID, BLVoid** _ExtData)
 {
 	_BLSpineDataExt* _sd = (_BLSpineDataExt*)*_ExtData;
+	free(_sd->pVertexArray);
 	free(_sd->pWorldVertices);
 	spAnimationStateData_dispose(_sd->pState->data);
 	spSkeletonData_dispose(_sd->pSkeletonData);
 	spAnimationState_dispose(_sd->pState);
+	spSkeletonClipping_dispose(_sd->pClipping);
+	spFloatArray_dispose(_sd->pTempUVs);
+	spColorArray_dispose(_sd->pTempColors);
 	spSkeleton_dispose(_sd->pSkeleton);
 	free(_sd);
 	*_ExtData = NULL;
@@ -369,159 +416,183 @@ static const BLBool
 _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY, BLVoid** _ExtData)
 {
 	_BLSpineDataExt* _sd = (_BLSpineDataExt*)*_ExtData;
-	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
-	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	spSkeleton_update(_sd->pSkeleton, (BLF32)_Delta / 1000.f);
 	spAnimationState_update(_sd->pState, (BLF32)_Delta / 1000.f);
 	spAnimationState_apply(_sd->pState, _sd->pSkeleton);
 	spSkeleton_updateWorldTransform(_sd->pSkeleton);
-	BLU32 _gbcap = _sd->pSkeletonData->bonesCount * 32;
-	BLF32* _gbdata = (BLF32*)malloc(_gbcap * sizeof(BLF32));
-	BLU32 _gbi = 0;
 	BLF32 _width, _height, _xpos, _ypos, _zv, _rot, _scalex, _scaley, _alpha;
 	BLU32 _clr;
 	BLBool _show, _flipx, _flipy;
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
-	_sd->pSkeleton->flipX = _flipx;
-	_sd->pSkeleton->flipY = _flipy;
+	if (_sd->pSkeleton->color.a < 1e-6 || !_show || _alpha < 1e-6)
+		return FALSE;
+	if (_sd->pVertexEffect != 0) _sd->pVertexEffect->begin(_sd->pVertexEffect, _sd->pSkeleton);
+	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
+	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
+	BLU16 _quadindices[6] = { 0, 1, 2, 2, 3, 0 };
+	_sd->pSkeleton->scaleX *= _scalex;
+	_sd->pSkeleton->scaleY *= _scaley;
 	_sd->fMinY = _sd->fMinX = 999999.f;
 	_sd->fMaxY = _sd->fMaxX = -999999.f;
-	blTechniqueSampler(_PrSpineMem->nTech, "Texture0", _sd->nTexture, 0);
 	for (BLS32 _idx = 0; _idx < _sd->pSkeleton->slotsCount; ++_idx)
 	{
+		BLF32* _vertices = _sd->pWorldVertices;
+		BLU32 _verticescount = 0;
+		BLF32* _uvs = 0;
+		BLU16* _indices = 0;
+		BLS32 _indicescount = 0;
 		spSlot* _slot = _sd->pSkeleton->drawOrder[_idx];
 		spAttachment* _attachment = _slot->attachment;
 		if (!_attachment)
 			continue;
-		BLS32 _mode;
-		switch (_slot->data->blendMode) 
+		if (_slot->color.a <= 1e-6 || !_slot->bone->active)
 		{
-		case SP_BLEND_MODE_ADDITIVE:
-			_mode = SP_BLEND_MODE_ADDITIVE;
-			blGpuBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_ONE, BL_BF_ONE, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
-			break;
-		case SP_BLEND_MODE_MULTIPLY:
-			_mode = SP_BLEND_MODE_MULTIPLY;
-			blGpuBlendState(FALSE, TRUE, BL_BF_DESTCOLOR, BL_BF_ZERO, BL_BF_DESTCOLOR, BL_BF_ZERO, BL_BO_ADD, BL_BO_ADD, FALSE);
-			break;
-		case SP_BLEND_MODE_SCREEN:
-			_mode = SP_BLEND_MODE_SCREEN;
-			blGpuBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVSRCALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
-			break;
-		default:
-			_mode = 0;
-			blGpuBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_INVDESTALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
-		}
-		if (_PrSpineMem->nBlendMode != _mode)
-		{
-			BLGuid _geo = blGeometryBufferGen(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _gbdata, _gbi * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
-			blTechniqueDraw(_PrSpineMem->nTech, _geo, 1);
-			blGeometryBufferDelete(_geo);
-			_gbcap = _sd->pSkeletonData->bonesCount * 32;
-			_gbi = 0;
-			_PrSpineMem->nBlendMode = _mode;
+			spSkeletonClipping_clipEnd(_sd->pClipping, _slot);
+			continue;
 		}
 		BLF32 _dyeclr[4];
 		blDeColor4F(_clr, _dyeclr);
 		if (_attachment->type == SP_ATTACHMENT_REGION)
 		{
 			spRegionAttachment* _regionattachment = (spRegionAttachment*)_attachment;
-			spRegionAttachment_computeWorldVertices(_regionattachment, _slot->bone, _sd->pWorldVertices);
-			BLF32 _r = _sd->pSkeleton->r * _slot->r * _dyeclr[0];
-			BLF32 _g = _sd->pSkeleton->g * _slot->g * _dyeclr[1];
-			BLF32 _b = _sd->pSkeleton->b * _slot->b * _dyeclr[2];
-			BLF32 _a = _sd->pSkeleton->a * _slot->a * _dyeclr[3] * _alpha;
-			if (_gbi + 50 > _gbcap)
-			{
-				_gbcap *= 2;
-				_gbdata = (BLF32*)realloc(_gbdata, _gbcap * sizeof(BLF32));
+			spColor* _attachmentcolor = &_regionattachment->color;
+			if (_attachmentcolor->a < 1e-6) {
+				spSkeletonClipping_clipEnd(_sd->pClipping, _slot);
+				continue;
 			}
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X1] * _Mat[0]) + (_sd->pWorldVertices[SP_VERTEX_Y1] * _Mat[2]) + _Mat[4] + _OffsetX;
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X1] * _Mat[1]) + (_sd->pWorldVertices[SP_VERTEX_Y1] * _Mat[3]) + _Mat[5] + _OffsetY;
-			_gbdata[_gbi++] = _r;
-			_gbdata[_gbi++] = _g;
-			_gbdata[_gbi++] = _b;
-			_gbdata[_gbi++] = _a;
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_X1];
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_Y1];
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X2] * _Mat[0]) + (_sd->pWorldVertices[SP_VERTEX_Y2] * _Mat[2]) + _Mat[4] + _OffsetX;
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X2] * _Mat[1]) + (_sd->pWorldVertices[SP_VERTEX_Y2] * _Mat[3]) + _Mat[5] + _OffsetY;
-			_gbdata[_gbi++] = _r;
-			_gbdata[_gbi++] = _g;
-			_gbdata[_gbi++] = _b;
-			_gbdata[_gbi++] = _a;
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_X2];
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_Y2];
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X3] * _Mat[0]) + (_sd->pWorldVertices[SP_VERTEX_Y3] * _Mat[2]) + _Mat[4] + _OffsetX;
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X3] * _Mat[1]) + (_sd->pWorldVertices[SP_VERTEX_Y3] * _Mat[3]) + _Mat[5] + _OffsetY;
-			_gbdata[_gbi++] = _r;
-			_gbdata[_gbi++] = _g;
-			_gbdata[_gbi++] = _b;
-			_gbdata[_gbi++] = _a;
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_X3];
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_Y3];
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X1] * _Mat[0]) + (_sd->pWorldVertices[SP_VERTEX_Y1] * _Mat[2]) + _Mat[4] + _OffsetX;
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X1] * _Mat[1]) + (_sd->pWorldVertices[SP_VERTEX_Y1] * _Mat[3]) + _Mat[5] + _OffsetY;
-			_gbdata[_gbi++] = _r;
-			_gbdata[_gbi++] = _g;
-			_gbdata[_gbi++] = _b;
-			_gbdata[_gbi++] = _a;
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_X1];
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_Y1];
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X3] * _Mat[0]) + (_sd->pWorldVertices[SP_VERTEX_Y3] * _Mat[2]) + _Mat[4] + _OffsetX;
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X3] * _Mat[1]) + (_sd->pWorldVertices[SP_VERTEX_Y3] * _Mat[3]) + _Mat[5] + _OffsetY;
-			_gbdata[_gbi++] = _r;
-			_gbdata[_gbi++] = _g;
-			_gbdata[_gbi++] = _b;
-			_gbdata[_gbi++] = _a;
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_X3];
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_Y3];
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X4] * _Mat[0]) + (_sd->pWorldVertices[SP_VERTEX_Y4] * _Mat[2]) + _Mat[4] + _OffsetX;
-			_gbdata[_gbi++] = (_sd->pWorldVertices[SP_VERTEX_X4] * _Mat[1]) + (_sd->pWorldVertices[SP_VERTEX_Y4] * _Mat[3]) + _Mat[5] + _OffsetY;
-			_gbdata[_gbi++] = _r;
-			_gbdata[_gbi++] = _g;
-			_gbdata[_gbi++] = _b;
-			_gbdata[_gbi++] = _a;
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_X4];
-			_gbdata[_gbi++] = _regionattachment->uvs[SP_VERTEX_Y4];
+			spRegionAttachment_computeWorldVertices(_regionattachment, _slot->bone, _vertices, 0, 2);
+			_dyeclr[0] = _sd->pSkeleton->color.r * _slot->color.r * _attachmentcolor->r * _dyeclr[0];
+			_dyeclr[1] = _sd->pSkeleton->color.g * _slot->color.g * _attachmentcolor->g * _dyeclr[1];
+			_dyeclr[2] = _sd->pSkeleton->color.b * _slot->color.b * _attachmentcolor->b * _dyeclr[2];
+			_dyeclr[3] = _sd->pSkeleton->color.a * _slot->color.a * _attachmentcolor->a * _dyeclr[3] * _alpha;
+			_verticescount = 4;
+			_uvs = _regionattachment->uvs;
+			_indices = _quadindices;
+			_indicescount = 6;
 		}
 		else if (_attachment->type == SP_ATTACHMENT_MESH)
 		{
 			spMeshAttachment* _mesh = (spMeshAttachment*)_attachment;
+			spColor* _attachmentcolor = &_mesh->color;
+			if (_attachmentcolor->a < 1e-6) {
+				spSkeletonClipping_clipEnd(_sd->pClipping, _slot);
+				continue;
+			}
 			if (_mesh->super.worldVerticesLength > 1000)
 				continue;
-			spMeshAttachment_computeWorldVertices(_mesh, _slot, _sd->pWorldVertices);
-			BLF32 _r = _sd->pSkeleton->r * _slot->r * _dyeclr[0];
-			BLF32 _g = _sd->pSkeleton->g * _slot->g * _dyeclr[1];
-			BLF32 _b = _sd->pSkeleton->b * _slot->b * _dyeclr[2];
-			BLF32 _a = _sd->pSkeleton->a * _slot->a * _dyeclr[3] * _alpha;
-			if (_gbi + _mesh->trianglesCount * 8 + 4 > _gbcap)
+			spVertexAttachment_computeWorldVertices(SUPER(_mesh), _slot, 0, _mesh->super.worldVerticesLength, _sd->pWorldVertices, 0, 2);
+			_dyeclr[0] = _sd->pSkeleton->color.r * _slot->color.r * _attachmentcolor->r * _dyeclr[0];
+			_dyeclr[1] = _sd->pSkeleton->color.g * _slot->color.g * _attachmentcolor->g * _dyeclr[1];
+			_dyeclr[2] = _sd->pSkeleton->color.b * _slot->color.b * _attachmentcolor->b * _dyeclr[2];
+			_dyeclr[3] = _sd->pSkeleton->color.a * _slot->color.a * _attachmentcolor->a * _dyeclr[3] * _alpha;
+			_verticescount = _mesh->super.worldVerticesLength >> 1;
+			_uvs = _mesh->uvs;
+			_indices = _mesh->triangles;
+			_indicescount = _mesh->trianglesCount;
+		}
+		else if (_attachment->type == SP_ATTACHMENT_CLIPPING) {
+			spClippingAttachment* _clip = (spClippingAttachment*)_slot->attachment;
+			spSkeletonClipping_clipStart(_sd->pClipping, _slot, _clip);
+			continue;
+		}
+		else continue;
+		_BlendState(_slot->data->blendMode);
+		if (_PrSpineMem->eBlendMode != _slot->data->blendMode)
+		{
+			blTechniqueSampler(_PrSpineMem->nTech, "Texture0", _sd->nTexture, 0);
+			BLGuid _geo = blGeometryBufferGen(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _sd->pVertexArray, _sd->nVertexArrayNum * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
+			blTechniqueDraw(_PrSpineMem->nTech, _geo, 1);
+			blGeometryBufferDelete(_geo);
+			_sd->nVertexArrayNum = 0;
+			_PrSpineMem->eBlendMode = _slot->data->blendMode;
+		}
+		if (spSkeletonClipping_isClipping(_sd->pClipping))
+		{
+			spSkeletonClipping_clipTriangles(_sd->pClipping, _vertices, _verticescount << 1, _indices, _indicescount, _uvs, 2);
+			_vertices = _sd->pClipping->clippedVertices->items;
+			_verticescount = _sd->pClipping->clippedVertices->size >> 1;
+			_uvs = _sd->pClipping->clippedUVs->items;
+			_indices = _sd->pClipping->clippedTriangles->items;
+			_indicescount = _sd->pClipping->clippedTriangles->size;
+		}
+		BLU32 _sizex = _sd->nTexW;
+		BLU32 _sizey = _sd->nTexH;
+		if (_sd->pVertexEffect)
+		{
+			spFloatArray_clear(_sd->pTempUVs);
+			spColorArray_clear(_sd->pTempColors);
+			for (BLU32 _j = 0; _j < _verticescount; ++_j)
 			{
-				_gbcap *= 2;
-				_gbdata = (BLF32*)realloc(_gbdata, _gbcap * sizeof(BLF32));
+				spColor _vclr;
+				_vclr.r = _dyeclr[0];
+				_vclr.g = _dyeclr[1];
+				_vclr.b = _dyeclr[2];
+				_vclr.a = _dyeclr[3];
+				spColor _dark;
+				_dark.r = _dark.g = _dark.b = _dark.a = 0.f;
+				BLU32 _index = _j << 1;
+				BLF32 _x = _vertices[_index];
+				BLF32 _y = _vertices[_index + 1];
+				BLF32 _u = _uvs[_index];
+				BLF32 _v = _uvs[_index + 1];
+				_sd->pVertexEffect->transform(_sd->pVertexEffect, &_x, &_y, &_u, &_v, &_vclr, &_dark);
+				_vertices[_index] = _x;
+				_vertices[_index + 1] = _y;
+				spFloatArray_add(_sd->pTempUVs, _u);
+				spFloatArray_add(_sd->pTempUVs, _v);
+				spColorArray_add(_sd->pTempColors, blColor4F(_vclr.r, _vclr.g, _vclr.b, _vclr.a));
 			}
-			for (BLS32 _jdx = 0; _jdx < _mesh->trianglesCount; ++_jdx)
+			for (BLU32 _j = 0; _j < _indicescount; ++_j)
 			{
-				BLS32 _index = _mesh->triangles[_jdx] << 1;
-				_gbdata[_gbi++] = (_sd->pWorldVertices[_index] * _Mat[0]) + (_sd->pWorldVertices[_index + 1] * _Mat[2]) + _Mat[4] + _OffsetX;
-                _sd->fMinX = (_sd->fMinX > _gbdata[_gbi - 1]) ? _gbdata[_gbi - 1] : _sd->fMinX;
-                _sd->fMaxX = (_sd->fMaxX > _gbdata[_gbi - 1]) ? _sd->fMaxX : _gbdata[_gbi - 1];
-				_gbdata[_gbi++] = (_sd->pWorldVertices[_index] * _Mat[1]) + (_sd->pWorldVertices[_index + 1] * _Mat[3]) + _Mat[5] + _OffsetY;
-                _sd->fMinY = (_sd->fMinY > _gbdata[_gbi - 1]) ? _gbdata[_gbi - 1] : _sd->fMinY;
-                _sd->fMaxY = (_sd->fMaxY > _gbdata[_gbi - 1]) ? _sd->fMaxY : _gbdata[_gbi - 1];
-				_gbdata[_gbi++] = _r;
-				_gbdata[_gbi++] = _g;
-				_gbdata[_gbi++] = _b;
-				_gbdata[_gbi++] = _a;
-				_gbdata[_gbi++] = _mesh->uvs[_index];
-				_gbdata[_gbi++] = _mesh->uvs[_index + 1];
+				BLU32 _index = _indices[_j] << 1;
+				BLF32 _dclr[4];
+				blDeColor4F(_sd->pTempColors->items[_index >> 1], _dclr);
+				spColor _vclr;
+				_vclr.r = _dclr[0];
+				_vclr.g = _dclr[1];
+				_vclr.b = _dclr[2];
+				_vclr.a = _dclr[3];
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vertices[_index];
+				_sd->fMinX = (_sd->fMinX > _vertices[_index]) ? _vertices[_index] : _sd->fMinX;
+				_sd->fMaxX = (_sd->fMaxX > _vertices[_index]) ? _sd->fMaxX : _vertices[_index];
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vertices[_index + 1];
+				_sd->fMinY = (_sd->fMinY > _vertices[_index + 1]) ? _vertices[_index + 1] : _sd->fMinY;
+				_sd->fMaxY = (_sd->fMaxY > _vertices[_index + 1]) ? _sd->fMaxY : _vertices[_index + 1];
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vclr.r;
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vclr.g;
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vclr.b;
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vclr.a;
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _uvs[_index] * _sizex;
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _uvs[_index + 1] * _sizey;
 			}
 		}
+		else
+		{
+			for (BLU32 _j = 0; _j < _indicescount; ++_j)
+			{
+				BLU32 _index = _indices[_j] << 1;
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vertices[_index];
+				_sd->fMinX = (_sd->fMinX > _vertices[_index]) ? _vertices[_index] : _sd->fMinX;
+				_sd->fMaxX = (_sd->fMaxX > _vertices[_index]) ? _sd->fMaxX : _vertices[_index];
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vertices[_index + 1];
+				_sd->fMinY = (_sd->fMinY > _vertices[_index + 1]) ? _vertices[_index + 1] : _sd->fMinY;
+				_sd->fMaxY = (_sd->fMaxY > _vertices[_index + 1]) ? _sd->fMaxY : _vertices[_index + 1];
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[0];
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[1];
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[2];
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[3];
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _uvs[_index] * _sizex;
+				_sd->pVertexArray[_sd->nVertexArrayNum++] = _uvs[_index + 1] * _sizey;
+			}
+		}
+		spSkeletonClipping_clipEnd(_sd->pClipping, _slot);
 	}
-	BLGuid _geo = blGeometryBufferGen(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _gbdata, _gbi * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
+	_BlendState(_PrSpineMem->eBlendMode);
+	BLGuid _geo = blGeometryBufferGen(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _sd->pVertexArray, _sd->nVertexArrayNum * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
 	blTechniqueDraw(_PrSpineMem->nTech, _geo, 1);
 	blGeometryBufferDelete(_geo);
-	free(_gbdata);
+	spSkeletonClipping_clipEnd2(_sd->pClipping);
+	if (_sd->pVertexEffect != 0) _sd->pVertexEffect->end(_sd->pVertexEffect);
 	return 1;
 }
 BLVoid 
@@ -529,7 +600,7 @@ blSpineOpenEXT(IN BLAnsi* _Version, ...)
 {
 	_PrSpineMem = (_BLSpineMemberExt*)malloc(sizeof(_BLSpineMemberExt));
 	_PrSpineMem->nTech = blTechniqueGain(blHashString((const BLUtf8*)"shaders/2D.bsl"));
-	_PrSpineMem->nBlendMode = 0;
+	_PrSpineMem->eBlendMode = -1;
 	blSpriteRegistExternal("json", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw, NULL);
 	blSpriteRegistExternal("skel", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw, NULL);
 }
@@ -540,7 +611,7 @@ blSpineCloseEXT()
 	free(_PrSpineMem);
 }
 BLVoid
-blSpriteAnimationSetEXT(IN BLGuid _ID, IN BLAnsi* _Animation, IN BLS32 _Track, IN BLBool _Loop)
+blSpriteAnimationEXT(IN BLGuid _ID, IN BLAnsi* _Animation, IN BLS32 _Track, IN BLBool _Loop)
 {
 	_BLSpineDataExt* _sd = blSpriteExternalData(_ID, NULL);
 	if (!_sd)
@@ -629,7 +700,7 @@ blSpriteAnimationEmptyEXT(IN BLGuid _ID, IN BLU32 _TrackIndex, IN BLF32 _Duratio
 	}
 }
 BLVoid 
-blSpriteTrackEmpty(IN BLGuid _ID, IN BLU32 _TrackIndex)
+blSpriteTrackEmptyEXT(IN BLGuid _ID, IN BLU32 _TrackIndex)
 {
 	_BLSpineDataExt* _sd = blSpriteExternalData(_ID, NULL);
 	if (!_sd)
