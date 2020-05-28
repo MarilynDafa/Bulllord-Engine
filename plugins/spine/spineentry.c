@@ -77,9 +77,6 @@ typedef struct _SpineData {
 	spSkeleton* pSkeleton;
 	spSkeletonData* pSkeletonData;
 	spSkeletonClipping* pClipping;
-	spFloatArray* pTempUVs;
-	spColorArray* pTempColors;
-	spVertexEffect* pVertexEffect;
 	spAtlas* pAtlas;
 	BLF32* pWorldVertices;
 	BLF32* pVertexArray;
@@ -270,13 +267,13 @@ _BlendState(spBlendMode _Mode)
 	switch (_Mode)
 	{
 	case SP_BLEND_MODE_NORMAL:
-		blGpuBlendState(FALSE, TRUE, BL_BF_ONE, BL_BF_INVSRCALPHA, BL_BF_ONE, BL_BF_INVSRCALPHA, BL_BO_ADD, BL_BO_ADD, FALSE);
+		blGpuBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BF_SRCALPHA, BL_BF_INVSRCALPHA, BL_BO_ADD, BL_BO_ADD, FALSE);
 		break;
 	case SP_BLEND_MODE_ADDITIVE:
-		blGpuBlendState(FALSE, TRUE, BL_BF_ONE, BL_BF_ONE, BL_BF_ONE, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
+		blGpuBlendState(FALSE, TRUE, BL_BF_SRCALPHA, BL_BF_ONE, BL_BF_SRCALPHA, BL_BF_ONE, BL_BO_ADD, BL_BO_ADD, FALSE);
 		break;
 	case SP_BLEND_MODE_MULTIPLY:
-		blGpuBlendState(FALSE, TRUE, BL_BF_DESTCOLOR, BL_BF_INVSRCALPHA, BL_BF_DESTCOLOR, BL_BF_INVSRCALPHA, BL_BF_ZERO, BL_BO_ADD, BL_BO_ADD, FALSE);
+		blGpuBlendState(FALSE, TRUE, BL_BF_DESTCOLOR, BL_BF_INVSRCALPHA, BL_BF_DESTCOLOR, BL_BF_INVSRCALPHA, BL_BO_ADD, BL_BO_ADD, FALSE);
 		break;
 	case SP_BLEND_MODE_SCREEN:
 		blGpuBlendState(FALSE, TRUE, BL_BF_ONE, BL_BF_INVSRCCOLOR, BL_BF_ONE, BL_BF_INVSRCCOLOR, BL_BO_ADD, BL_BO_ADD, FALSE);
@@ -331,14 +328,11 @@ _LoadSpine(BLGuid _ID, const BLAnsi* _Filename, BLVoid** _ExtData)
 		spSkeletonBinary_dispose(_binary);
 	}	
 	_sd->pSkeleton = spSkeleton_create(_sd->pSkeletonData);
-	_sd->pTempUVs = spFloatArray_create(16);
-	_sd->pTempColors = spColorArray_create(16);
 	_sd->pState = spAnimationState_create(spAnimationStateData_create(_sd->pSkeletonData));
 	_sd->pClipping = spSkeletonClipping_create();
-	_sd->pVertexEffect = NULL;
 	_sd->pSkeleton->x = 0.f;
-	_sd->pSkeleton->y = _sd->pSkeletonData->height * 0.5f;
-	_sd->pVertexArray = (BLF32*)malloc(sizeof(BLF32) * _sd->pSkeleton->bonesCount * 4 * 8);
+	_sd->pSkeleton->y = 0.f;
+	_sd->pVertexArray = (BLF32*)malloc(sizeof(BLF32) * _sd->pSkeleton->bonesCount * 8 * 24);
 	_sd->nVertexArrayNum = 0;
 	blSpriteDimension(_ID, _sd->pSkeletonData->width, _sd->pSkeletonData->height, FALSE);
 	spSkeleton_updateWorldTransform(_sd->pSkeleton);
@@ -398,8 +392,6 @@ _UnloadSpine(BLGuid _ID, BLVoid** _ExtData)
 	spSkeletonData_dispose(_sd->pSkeletonData);
 	spAnimationState_dispose(_sd->pState);
 	spSkeletonClipping_dispose(_sd->pClipping);
-	spFloatArray_dispose(_sd->pTempUVs);
-	spColorArray_dispose(_sd->pTempColors);
 	spSkeleton_dispose(_sd->pSkeleton);
 	free(_sd);
 	*_ExtData = NULL;
@@ -415,7 +407,12 @@ _SpineRelease(BLGuid _ID, BLVoid** _ExtData)
 static const BLBool
 _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _OffsetY, BLVoid** _ExtData)
 {
+	_PrSpineMem->eBlendMode = SP_BLEND_MODE_NORMAL;
 	_BLSpineDataExt* _sd = (_BLSpineDataExt*)*_ExtData;
+	BLF32 _ltx, _lty, _rbx, _rby;
+	blSpriteViewportQuery(&_ltx, &_lty, &_rbx, &_rby);
+	blTechniqueSampler(_PrSpineMem->nTech, "Texture0", _sd->nTexture, 0);
+	_sd->nVertexArrayNum = 0;
 	spSkeleton_update(_sd->pSkeleton, (BLF32)_Delta / 1000.f);
 	spAnimationState_update(_sd->pState, (BLF32)_Delta / 1000.f);
 	spAnimationState_apply(_sd->pState, _sd->pSkeleton);
@@ -426,12 +423,13 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 	blSpriteQuery(_ID, &_width, &_height, &_xpos, &_ypos, &_zv, &_rot, &_scalex, &_scaley, &_alpha, &_clr, &_flipx, &_flipy, &_show);
 	if (_sd->pSkeleton->color.a < 1e-6 || !_show || _alpha < 1e-6)
 		return FALSE;
-	if (_sd->pVertexEffect != 0) _sd->pVertexEffect->begin(_sd->pVertexEffect, _sd->pSkeleton);
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	BLU16 _quadindices[6] = { 0, 1, 2, 2, 3, 0 };
-	_sd->pSkeleton->scaleX *= _scalex;
-	_sd->pSkeleton->scaleY *= _scaley;
+	_sd->pSkeleton->scaleX = _scalex;
+	_sd->pSkeleton->scaleY = _scaley;
+	_sd->pSkeleton->root->rotation = -_rot;
+	spBone_updateWorldTransform(_sd->pSkeleton->root);
 	_sd->fMinY = _sd->fMinX = 999999.f;
 	_sd->fMaxY = _sd->fMaxX = -999999.f;
 	for (BLS32 _idx = 0; _idx < _sd->pSkeleton->slotsCount; ++_idx)
@@ -496,14 +494,13 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 			continue;
 		}
 		else continue;
-		_BlendState(_slot->data->blendMode);
-		if (_PrSpineMem->eBlendMode != _slot->data->blendMode)
+		if (_PrSpineMem->eBlendMode != _slot->data->blendMode && _sd->nVertexArrayNum)
 		{
-			blTechniqueSampler(_PrSpineMem->nTech, "Texture0", _sd->nTexture, 0);
 			BLGuid _geo = blGeometryBufferGen(0xFFFFFFFF, BL_PT_TRIANGLES, TRUE, _semantic, _decls, 3, _sd->pVertexArray, _sd->nVertexArrayNum * sizeof(BLF32), NULL, 0, BL_IF_INVALID);
 			blTechniqueDraw(_PrSpineMem->nTech, _geo, 1);
 			blGeometryBufferDelete(_geo);
 			_sd->nVertexArrayNum = 0;
+			_BlendState(_slot->data->blendMode);
 			_PrSpineMem->eBlendMode = _slot->data->blendMode;
 		}
 		if (spSkeletonClipping_isClipping(_sd->pClipping))
@@ -515,75 +512,21 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 			_indices = _sd->pClipping->clippedTriangles->items;
 			_indicescount = _sd->pClipping->clippedTriangles->size;
 		}
-		BLU32 _sizex = _sd->nTexW;
-		BLU32 _sizey = _sd->nTexH;
-		if (_sd->pVertexEffect)
+		for (BLU32 _j = 0; _j < (BLU32)_indicescount; ++_j)
 		{
-			spFloatArray_clear(_sd->pTempUVs);
-			spColorArray_clear(_sd->pTempColors);
-			for (BLU32 _j = 0; _j < _verticescount; ++_j)
-			{
-				spColor _vclr;
-				_vclr.r = _dyeclr[0];
-				_vclr.g = _dyeclr[1];
-				_vclr.b = _dyeclr[2];
-				_vclr.a = _dyeclr[3];
-				spColor _dark;
-				_dark.r = _dark.g = _dark.b = _dark.a = 0.f;
-				BLU32 _index = _j << 1;
-				BLF32 _x = _vertices[_index];
-				BLF32 _y = _vertices[_index + 1];
-				BLF32 _u = _uvs[_index];
-				BLF32 _v = _uvs[_index + 1];
-				_sd->pVertexEffect->transform(_sd->pVertexEffect, &_x, &_y, &_u, &_v, &_vclr, &_dark);
-				_vertices[_index] = _x;
-				_vertices[_index + 1] = _y;
-				spFloatArray_add(_sd->pTempUVs, _u);
-				spFloatArray_add(_sd->pTempUVs, _v);
-				spColorArray_add(_sd->pTempColors, blColor4F(_vclr.r, _vclr.g, _vclr.b, _vclr.a));
-			}
-			for (BLU32 _j = 0; _j < _indicescount; ++_j)
-			{
-				BLU32 _index = _indices[_j] << 1;
-				BLF32 _dclr[4];
-				blDeColor4F(_sd->pTempColors->items[_index >> 1], _dclr);
-				spColor _vclr;
-				_vclr.r = _dclr[0];
-				_vclr.g = _dclr[1];
-				_vclr.b = _dclr[2];
-				_vclr.a = _dclr[3];
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vertices[_index];
-				_sd->fMinX = (_sd->fMinX > _vertices[_index]) ? _vertices[_index] : _sd->fMinX;
-				_sd->fMaxX = (_sd->fMaxX > _vertices[_index]) ? _sd->fMaxX : _vertices[_index];
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vertices[_index + 1];
-				_sd->fMinY = (_sd->fMinY > _vertices[_index + 1]) ? _vertices[_index + 1] : _sd->fMinY;
-				_sd->fMaxY = (_sd->fMaxY > _vertices[_index + 1]) ? _sd->fMaxY : _vertices[_index + 1];
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vclr.r;
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vclr.g;
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vclr.b;
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vclr.a;
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _uvs[_index] * _sizex;
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _uvs[_index + 1] * _sizey;
-			}
-		}
-		else
-		{
-			for (BLU32 _j = 0; _j < _indicescount; ++_j)
-			{
-				BLU32 _index = _indices[_j] << 1;
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vertices[_index];
-				_sd->fMinX = (_sd->fMinX > _vertices[_index]) ? _vertices[_index] : _sd->fMinX;
-				_sd->fMaxX = (_sd->fMaxX > _vertices[_index]) ? _sd->fMaxX : _vertices[_index];
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _vertices[_index + 1];
-				_sd->fMinY = (_sd->fMinY > _vertices[_index + 1]) ? _vertices[_index + 1] : _sd->fMinY;
-				_sd->fMaxY = (_sd->fMaxY > _vertices[_index + 1]) ? _sd->fMaxY : _vertices[_index + 1];
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[0];
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[1];
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[2];
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[3];
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _uvs[_index] * _sizex;
-				_sd->pVertexArray[_sd->nVertexArrayNum++] = _uvs[_index + 1] * _sizey;
-			}
+			BLU32 _index = _indices[_j] << 1;
+			_sd->pVertexArray[_sd->nVertexArrayNum++] = _vertices[_index] - _ltx;
+			_sd->fMinX = (_sd->fMinX > _vertices[_index]) ? _vertices[_index] : _sd->fMinX;
+			_sd->fMaxX = (_sd->fMaxX > _vertices[_index]) ? _sd->fMaxX : _vertices[_index];
+			_sd->pVertexArray[_sd->nVertexArrayNum++] = _vertices[_index + 1] - _lty;
+			_sd->fMinY = (_sd->fMinY > _vertices[_index + 1]) ? _vertices[_index + 1] : _sd->fMinY;
+			_sd->fMaxY = (_sd->fMaxY > _vertices[_index + 1]) ? _sd->fMaxY : _vertices[_index + 1];
+			_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[0];
+			_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[1];
+			_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[2];
+			_sd->pVertexArray[_sd->nVertexArrayNum++] = _dyeclr[3];
+			_sd->pVertexArray[_sd->nVertexArrayNum++] = _uvs[_index];
+			_sd->pVertexArray[_sd->nVertexArrayNum++] = _uvs[_index + 1];
 		}
 		spSkeletonClipping_clipEnd(_sd->pClipping, _slot);
 	}
@@ -592,7 +535,6 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 	blTechniqueDraw(_PrSpineMem->nTech, _geo, 1);
 	blGeometryBufferDelete(_geo);
 	spSkeletonClipping_clipEnd2(_sd->pClipping);
-	if (_sd->pVertexEffect != 0) _sd->pVertexEffect->end(_sd->pVertexEffect);
 	return 1;
 }
 BLVoid 
@@ -600,7 +542,7 @@ blSpineOpenEXT(IN BLAnsi* _Version, ...)
 {
 	_PrSpineMem = (_BLSpineMemberExt*)malloc(sizeof(_BLSpineMemberExt));
 	_PrSpineMem->nTech = blTechniqueGain(blHashString((const BLUtf8*)"shaders/2D.bsl"));
-	_PrSpineMem->eBlendMode = -1;
+	_PrSpineMem->eBlendMode = SP_BLEND_MODE_NORMAL;
 	blSpriteRegistExternal("json", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw, NULL);
 	blSpriteRegistExternal("skel", _LoadSpine, _SpineSetup, _UnloadSpine, _SpineRelease, _SpineDraw, NULL);
 }

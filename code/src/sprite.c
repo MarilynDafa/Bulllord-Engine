@@ -2220,7 +2220,7 @@ blSpriteQuery(IN BLGuid _ID, OUT BLF32* _Width, OUT BLF32* _Height,OUT BLF32* _X
     *_Width = _node->sSize.fX;
     *_Height = _node->sSize.fY;
     *_Zv = _node->fZValue;
-    *_Rotate = _node->fRotate;
+    *_Rotate = _node->fRotate * 57.29578049044297f;
     *_XScale = _node->fScaleX;
     *_YScale = _node->fScaleY;
     *_Alpha = _node->fAlpha;
