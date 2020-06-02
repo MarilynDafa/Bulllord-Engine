@@ -87,6 +87,9 @@ BL_API BLBool blSpriteDetach(
 	IN BLGuid _Parent,
 	IN BLGuid _Child);
 
+BL_API BLBool blSpriteValid(
+	IN BLGuid _ID);
+
 BL_API BLBool blSpriteQuery(
 	IN BLGuid _ID,
     OUT BLF32* _Width,

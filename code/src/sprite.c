@@ -2209,6 +2209,16 @@ blSpriteDetach(IN BLGuid _Parent, IN BLGuid _Child)
     _AddToNodeList(_child);
     return TRUE;
 }
+BLBool 
+blSpriteValid(IN BLGuid _ID)
+{
+	if (_ID == INVALID_GUID)
+		return FALSE;
+	_BLSpriteNode* _node = (_BLSpriteNode*)blGuidAsPointer(_ID);
+	if (!_node)
+		return FALSE;
+	return _node->bValid;
+}
 BLBool
 blSpriteQuery(IN BLGuid _ID, OUT BLF32* _Width, OUT BLF32* _Height,OUT BLF32* _XPos, OUT BLF32* _YPos, OUT BLF32* _Zv, OUT BLF32* _Rotate, OUT BLF32* _XScale, OUT BLF32* _YScale, OUT BLF32* _Alpha, OUT BLU32* _DyeClr, OUT BLBool* _FlipX, OUT BLBool* _FlipY, OUT BLBool* _Show)
 {
