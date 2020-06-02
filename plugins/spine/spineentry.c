@@ -426,8 +426,8 @@ _SpineDraw(BLU32 _Delta, BLGuid _ID, BLF32 _Mat[6], BLF32 _OffsetX, BLF32 _Offse
 	BLEnum _semantic[] = { BL_SL_POSITION, BL_SL_COLOR0, BL_SL_TEXCOORD0 };
 	BLEnum _decls[] = { BL_VD_FLOATX2, BL_VD_FLOATX4, BL_VD_FLOATX2 };
 	BLU16 _quadindices[6] = { 0, 1, 2, 2, 3, 0 };
-	_sd->pSkeleton->scaleX = _scalex;
-	_sd->pSkeleton->scaleY = _scaley;
+	_sd->pSkeleton->scaleX = _flipx ? -_scalex : _scalex;
+	_sd->pSkeleton->scaleY = _flipy ? -_scaley : _scaley;
 	_sd->pSkeleton->root->rotation = -_rot;
 	spBone_updateWorldTransform(_sd->pSkeleton->root);
 	_sd->fMinY = _sd->fMinX = 999999.f;
