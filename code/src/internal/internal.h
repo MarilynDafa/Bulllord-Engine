@@ -114,7 +114,7 @@ extern "C" {
 #define UIACTION_DEAD_INTERNAL			6
 
 #if defined(BL_PLATFORM_WIN32) || defined(BL_PLATFORM_UWP)
-#	define INLINE _forceinline
+#	define INLINE inline
 #else
 #	define INLINE __attribute__((always_inline))
 #endif

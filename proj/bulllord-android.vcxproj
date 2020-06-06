@@ -47,14 +47,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
     <AndroidAPILevel>android-19</AndroidAPILevel>
     <UseOfStl>system</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
     <AndroidAPILevel>android-19</AndroidAPILevel>
     <UseOfStl>system</UseOfStl>
   </PropertyGroup>
@@ -63,40 +63,40 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>Clang_5_0</PlatformToolset>
     <UseOfStl>system</UseOfStl>
-    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <AndroidAPILevel>android-19</AndroidAPILevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>Clang_5_0</PlatformToolset>
     <UseOfStl>system</UseOfStl>
-    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <AndroidAPILevel>android-19</AndroidAPILevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
     <AndroidAPILevel>android-19</AndroidAPILevel>
     <UseOfStl>system</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
     <AndroidAPILevel>android-19</AndroidAPILevel>
     <UseOfStl>system</UseOfStl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
     <UseOfStl>system</UseOfStl>
     <AndroidAPILevel>android-19</AndroidAPILevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Clang_3_8</PlatformToolset>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
     <UseOfStl>system</UseOfStl>
     <AndroidAPILevel>android-19</AndroidAPILevel>
   </PropertyGroup>
@@ -152,7 +152,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;CONFIG_BIGNUM;CONFIG_ATOM;CONFIG_VERSION="20200412";__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\cbor;..\code\externals;..\code\externals\webp;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -163,7 +163,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;CONFIG_BIGNUM;CONFIG_ATOM;CONFIG_VERSION="20200412";__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals\cbor;..\code\externals;..\code\externals\webp;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -174,7 +174,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;CONFIG_BIGNUM;CONFIG_ATOM;CONFIG_VERSION="20200412";__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals;..\code\externals\webp;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -185,7 +185,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;CONFIG_BIGNUM;CONFIG_ATOM;CONFIG_VERSION="20200412";__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals;..\code\externals\webp;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -196,7 +196,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;CONFIG_BIGNUM;CONFIG_ATOM;CONFIG_VERSION="20200412";__ARM_NEON;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals;..\code\externals\webp;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -207,7 +207,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;__ARM_NEON;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;CONFIG_BIGNUM;CONFIG_ATOM;CONFIG_VERSION="20200412";__ARM_NEON;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals;..\code\externals\webp;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -218,7 +218,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;WEBP_REDUCE_SIZE;__ARM_NEON;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;CONFIG_BIGNUM;CONFIG_ATOM;CONFIG_VERSION="20200412";WEBP_REDUCE_SIZE;__ARM_NEON;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals;..\code\externals\webp;..\code\externals\freetype2\include;..\code\headers;%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
       <CLanguageStandard>gnu99</CLanguageStandard>
       <EnableNeonCodegen>true</EnableNeonCodegen>
@@ -231,7 +231,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;WEBP_REDUCE_SIZE;__ARM_NEON;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BL_EXPORT;DLL_EXPORT;FT2_BUILD_LIBRARY;ANDROID;CONFIG_BIGNUM;CONFIG_ATOM;CONFIG_VERSION="20200412";WEBP_REDUCE_SIZE;__ARM_NEON;__ARM_NEON__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\code\externals;..\code\externals\webp;..\code\externals\freetype2\include;..\code\headers</AdditionalIncludeDirectories>
       <CLanguageStandard>gnu99</CLanguageStandard>
       <CppLanguageStandard>Default</CppLanguageStandard>

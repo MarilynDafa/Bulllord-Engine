@@ -20,6 +20,7 @@
  */
 #include "../headers/util.h"
 #include "../headers/system.h"
+#include "../externals/quickjs/pthread.h"
 #include "internal/thread.h"
 #include "internal/internal.h"
 typedef struct _Ctx {
@@ -186,6 +187,9 @@ _UtilsInit()
 	_PrUtilMem->sMemCache.nMax = MEMCACHE_CAP_INTERNAL;
 	_PrUtilMem->sMemCache.pDense = (BLU32*)malloc(_PrUtilMem->sMemCache.nMax * sizeof(BLU32));
 	_PrUtilMem->sMemCache.pSparse = (BLU32*)malloc(_PrUtilMem->sMemCache.nMax * sizeof(BLU32));
+#if defined(BL_PLATFORM_WIN32)
+	InitThreadControl();
+#endif
 	for (_idx = 0; _idx < _PrUtilMem->sMemCache.nMax; ++_idx)
 		_PrUtilMem->sMemCache.pDense[_idx] = _idx;
 	_PrUtilMem->pMutex = blGenMutex();
@@ -203,6 +207,9 @@ _UtilsDestroy()
 	free(_PrUtilMem->sMemCache.pDense);
 	free(_PrUtilMem->sMemCache.pSparse);
 	free(_PrUtilMem);
+#if defined(BL_PLATFORM_WIN32)
+	DestroyThreadControl();
+#endif
 }
 BLU32
 blUniqueUri()

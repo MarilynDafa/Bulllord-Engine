@@ -963,6 +963,15 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\src\gpu.xc">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libbf.c">
+      <Filter>externals\quickjs</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\pthread.c">
+      <Filter>externals\quickjs</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\sys\time.c">
+      <Filter>externals\quickjs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\freetype2\include\freetype\config\ftconfig.h">
@@ -1981,6 +1990,18 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\enc\vp8li_enc.h">
       <Filter>externals\webp\enc</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libbf.h">
+      <Filter>externals\quickjs</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\pthread.h">
+      <Filter>externals\quickjs</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\sys\time.h">
+      <Filter>externals\quickjs</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\stdatomic.h">
+      <Filter>externals\quickjs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

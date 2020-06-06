@@ -27,34 +27,15 @@
 
 #include <stdlib.h>
 #include <inttypes.h>
-#if defined(_MSC_VER)
-#include <intrin0.h>
-#include <intrin.h>
-#endif
 
 /* set if CPU is big endian */
 #undef WORDS_BIGENDIAN
 
-
-#ifdef _MSC_VER
-#if defined(_WIN64) || defined(WIN64)
-typedef int64_t ssize_t;
-#else
-typedef int ssize_t;
-#endif
-#define likely(x)      (x)
-#define unlikely(x)     (x)
-#define PATH_MAX 260
-#define force_inline inline
-#define no_inline
-#define __maybe_unused
-#else
 #define likely(x)       __builtin_expect(!!(x), 1)
 #define unlikely(x)     __builtin_expect(!!(x), 0)
 #define force_inline inline __attribute__((always_inline))
 #define no_inline __attribute__((noinline))
 #define __maybe_unused __attribute__((unused))
-#endif
 
 #define xglue(x, y) x ## y
 #define glue(x, y) xglue(x, y)
@@ -77,20 +58,6 @@ enum {
 };
 #endif
 
-#ifdef WIN32
-
-struct timezone
-{
-	int tz_minuteswest;
-	int tz_dsttime;
-};
-struct timeval {
-	long    tv_sec;         /* seconds */
-	long    tv_usec;        /* and microseconds */
-};
-
-int gettimeofday(struct timeval * val, struct timezone * zone);
-#endif
 void pstrcpy(char *buf, int buf_size, const char *str);
 char *pstrcat(char *buf, int buf_size, const char *s);
 int strstart(const char *str, const char *val, const char **ptr);
@@ -147,65 +114,27 @@ static inline int64_t min_int64(int64_t a, int64_t b)
 /* WARNING: undefined if a = 0 */
 static inline int clz32(unsigned int a)
 {
-#if defined(_MSC_VER)
-	unsigned long ret = 0;
-	_BitScanReverse(&ret, a);
-	return (int)ret;
-#else
     return __builtin_clz(a);
-#endif
 }
 
 /* WARNING: undefined if a = 0 */
 static inline int clz64(uint64_t a)
 {
-#if defined(_MSC_VER)
-	return 0;
-	//unsigned long ret = 0;
-	//_BitScanReverse64(&ret, a);
-	//return (int)ret;
-#else
-	return __builtin_clzll(a);
-#endif
+    return __builtin_clzll(a);
 }
 
 /* WARNING: undefined if a = 0 */
 static inline int ctz32(unsigned int a)
 {
-#if defined(_MSC_VER)
-	unsigned long ret = 0;
-	_BitScanForward(&ret, a);
-	return (int)ret;
-#else
-	return __builtin_ctz(a);
-#endif
+    return __builtin_ctz(a);
 }
 
 /* WARNING: undefined if a = 0 */
 static inline int ctz64(uint64_t a)
 {
-#if defined(_MSC_VER)
-	return 0;
-	//unsigned long ret = 0;
-	//_BitScanForward64(&ret, a);
-	//return (int)ret;
-#else
-	return __builtin_ctzll(a);
-#endif
+    return __builtin_ctzll(a);
 }
-#ifdef _MSC_VER
-struct packed_u64 {
-	uint64_t v;
-};
 
-struct packed_u32 {
-	uint32_t v;
-};
-
-struct packed_u16 {
-	uint16_t v;
-};
-#else
 struct __attribute__((packed)) packed_u64 {
     uint64_t v;
 };
@@ -217,7 +146,7 @@ struct __attribute__((packed)) packed_u32 {
 struct __attribute__((packed)) packed_u16 {
     uint16_t v;
 };
-#endif
+
 static inline uint64_t get_u64(const uint8_t *tab)
 {
     return ((const struct packed_u64 *)tab)->v;
@@ -333,13 +262,8 @@ static inline int dbuf_put_u64(DynBuf *s, uint64_t val)
 {
     return dbuf_put(s, (uint8_t *)&val, 8);
 }
-#ifdef _MSC_VER
-int dbuf_printf(DynBuf *s,
-	const char *fmt, ...);
-#else
 int __attribute__((format(printf, 2, 3))) dbuf_printf(DynBuf *s,
                                                       const char *fmt, ...);
-#endif
 void dbuf_free(DynBuf *s);
 static inline BOOL dbuf_error(DynBuf *s) {
     return s->error;

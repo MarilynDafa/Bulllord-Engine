@@ -29,27 +29,7 @@
 #include <string.h>
 
 #include "cutils.h"
-#ifdef _MSC_VER
-#	ifndef WIN32_LEAN_AND_MEAN
-#		define WIN32_LEAN_AND_MEAN
-#	endif
-#include <Windows.h>
-#endif
 
-#ifdef WIN32
-int gettimeofday(struct timeval * val, struct timezone * zone)
-{
-	if (val)
-	{
-		LARGE_INTEGER liTime, liFreq;
-		QueryPerformanceFrequency(&liFreq);
-		QueryPerformanceCounter(&liTime);
-		val->tv_sec = (long)(liTime.QuadPart / liFreq.QuadPart);
-		val->tv_usec = (long)(liTime.QuadPart * 1000000.0 / liFreq.QuadPart - val->tv_sec * 1000000.0);
-	}
-	return 0;
-}
-#endif
 void pstrcpy(char *buf, int buf_size, const char *str)
 {
     int c;
@@ -186,13 +166,9 @@ int dbuf_putstr(DynBuf *s, const char *str)
 {
     return dbuf_put(s, (const uint8_t *)str, strlen(str));
 }
-#ifdef _MSC_VER
-int dbuf_printf(DynBuf *s,
-	const char *fmt, ...)
-#else
+
 int __attribute__((format(printf, 2, 3))) dbuf_printf(DynBuf *s,
                                                       const char *fmt, ...)
-#endif
 {
     va_list ap;
     char buf[128];
@@ -282,18 +258,25 @@ int unicode_from_utf8(const uint8_t *p, int max_len, const uint8_t **pp)
         *pp = p;
         return c;
     }
-	if (c >= 0xc0 && c <= 0xdf)
-		l = 1;
-	else if (c >= 0xe0 && c <= 0xef)
-		l = 2;
-	else if (c >= 0xf0 && c <= 0xf7)
-		l = 3;
-	else if (c >= 0xf8 && c <= 0xfb)
-		l = 4;
-	else if (c >= 0xfc && c <= 0xfd)
-		l = 5;
-	else
-		return -1;
+    switch(c) {
+    case 0xc0 ... 0xdf:
+        l = 1;
+        break;
+    case 0xe0 ... 0xef:
+        l = 2;
+        break;
+    case 0xf0 ... 0xf7:
+        l = 3;
+        break;
+    case 0xf8 ... 0xfb:
+        l = 4;
+        break;
+    case 0xfc ... 0xfd:
+        l = 5;
+        break;
+    default:
+        return -1;
+    }
     /* check that we have enough characters */
     if (l > (max_len - 1))
         return -1;

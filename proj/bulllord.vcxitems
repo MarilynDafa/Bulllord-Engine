@@ -742,9 +742,12 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\bjson.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\cutils.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libbf.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libregexp.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libunicode.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\pthread.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs.c" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\sys\time.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\alpha_dec.c">
       <CompileAs>CompileAsC</CompileAs>
       <CompileAsWinRT>false</CompileAsWinRT>
@@ -1762,15 +1765,19 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpaudectab.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\mpaudec\mpegaudio.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\cutils.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libbf.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libregexp-opcode.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libregexp.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libunicode-table.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\libunicode.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\list.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\pthread.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs-atom.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs-libc.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs-opcode.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\quickjs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\stdatomic.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\quickjs\sys\time.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\alphai_dec.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\common_dec.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)..\code\externals\webp\src\dec\vp8i_dec.h" />
